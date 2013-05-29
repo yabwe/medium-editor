@@ -45,3 +45,16 @@ function selectElementContents(el) {
     sel.removeAllRanges();
     sel.addRange(range);
 }
+
+function getElementDefaultDisplay(tag) {
+    'use strict';
+    var cStyle,
+        t = document.createElement(tag),
+        gcs = window.getComputedStyle !== undefined;
+
+    document.body.appendChild(t);
+    cStyle = (gcs ? window.getComputedStyle(t, "") : t.currentStyle).display;
+    document.body.removeChild(t);
+
+    return cStyle;
+}

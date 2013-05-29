@@ -1,6 +1,8 @@
 /*global saveSelection*/
 /*global restoreSelection*/
 /*global selectElementContents*/
+/*global getElementDefaultDisplay*/
+/*global console*/
 
 var mediumEditor;
 
@@ -100,16 +102,18 @@ var mediumEditor;
             return this;
         },
 
-        // TODO: verificar se elemento acima é block,
-        //       senão pegar próximo
         appendEl: function (el) {
-            if (this.selection.anchorNode.parentNode.tagName.toLowerCase() === el) {
+            var selectionEl = this.selection.anchorNode.parentNode;
+            if (selectionEl.tagName.toLowerCase() === el || selectionEl.tagName.toLowerCase() === 'span') {
                 el = 'p';
             }
+            if (getElementDefaultDisplay(selectionEl.tagName) !== 'block') {
+                selectionEl = selectionEl.parentNode;
+            }
             el = document.createElement(el);
-            el.innerHTML = this.selection.anchorNode.parentNode.innerHTML;
+            el.innerHTML = selectionEl.innerHTML;
             el.setAttribute('contentEditable', true);
-            this.selection.anchorNode.parentNode.parentNode.replaceChild(el, this.selection.anchorNode.parentNode);
+            selectionEl.parentNode.replaceChild(el, selectionEl);
             selectElementContents(el);
             this.setToolbarPosition();
         },
@@ -162,7 +166,6 @@ var mediumEditor;
             };
         },
 
-        // TODO: remover qualquer link filho
         createLink: function (input) {
             restoreSelection(this.savedSelection);
             document.execCommand('CreateLink', false, input.value);
