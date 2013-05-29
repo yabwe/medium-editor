@@ -1,4 +1,6 @@
-/*! medium.editor - v0.1.0 - 2013-05-29 */function saveSelection() {
+/*! medium.editor - v0.1.0 - 2013-05-29 */// http://stackoverflow.com/questions/5605401/insert-link-in-contenteditable-element
+// by Tim Down
+function saveSelection() {
     'use strict';
     var i,
         len,
@@ -37,6 +39,8 @@ function restoreSelection(savedSel) {
     }
 }
 
+// http://stackoverflow.com/questions/6139107/programatically-select-text-in-a-contenteditable-html-element
+// by Tim Down
 function selectElementContents(el) {
     'use strict';
     var range = document.createRange(),
@@ -46,6 +50,8 @@ function selectElementContents(el) {
     sel.addRange(range);
 }
 
+// http://stackoverflow.com/questions/2880957/detect-inline-block-type-of-a-dom-element
+// by Andy E
 function getElementDefaultDisplay(tag) {
     'use strict';
     var cStyle,
