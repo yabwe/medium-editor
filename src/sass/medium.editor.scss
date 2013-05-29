@@ -1,0 +1,55 @@
+@import "compass/css3";
+@import "clearfix";
+
+.toolbar {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 10;
+    display: none;
+    background: #242424;
+    @include border-radius(3px);
+    @include opacity(.8);
+
+    ul {
+        margin: 0;
+        padding: 0;
+    }
+
+    li {
+        float: left;
+        list-style: none;
+        padding: 4px;
+        margin: 4px;
+        a {
+            display: inline-block;
+            color: #fff;
+            font-weight: bold;
+            padding: 10px;
+            text-decoration: none;
+            &:hover {
+                color: yellow;
+            }
+        }
+    }
+}
+
+.toolbar-form-anchor {
+    display: none;
+    padding: 10px;
+    color: #999;
+    font-weight: lighter;
+    input {
+        border: none;
+        padding: 6px;
+    }
+    a {
+        color: #fff;
+        font-weight: bolder;
+        font-size: 22px;
+        display: inline-block;
+        margin: 0 10px 0 20px;
+        text-transform: lowercase;
+        text-decoration: none;
+    }
+}
