@@ -69,6 +69,17 @@ module.exports = function(grunt) {
           debounceDelay: 250,
         },
       }
+    },
+    concat: {
+      options: {
+        stripBanners: true,
+        banner: '/*! <%= pkg.name %> - v<%= pkg.version %> - ' +
+          '<%= grunt.template.today("yyyy-mm-dd") %> */'
+      },
+      dist: {
+        src: ['src/js/util.js', 'src/js/medium.editor.js'],
+        dest: 'dist/js/<%= pkg.name %>.js'
+      }
     }
   });
 
@@ -78,9 +89,10 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-compass');
   grunt.loadNpmTasks('grunt-contrib-csslint');
   grunt.loadNpmTasks('grunt-contrib-watch');
+  grunt.loadNpmTasks('grunt-contrib-concat');
 
   grunt.registerTask('test', ['jslint', 'jasmine', 'csslint']);
-  grunt.registerTask('js', ['jslint', 'jasmine', 'uglify']);
+  grunt.registerTask('js', ['jslint', 'jasmine', 'uglify', 'concat']);
   grunt.registerTask('css', ['compass', 'csslint'])
   grunt.registerTask('default', ['js', 'css']);
 
