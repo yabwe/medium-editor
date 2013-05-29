@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8" />
+    <title>onselect toolbar</title>
+    <link rel="stylesheet" href="css/normalize.css">
+    <style>
+        /* clearfix */
+        .clearfix:after,
+        .clearfix:after {
+            display: block;
+            visibility: hidden;
+            clear: both;
+            height: 0;
+            content: " ";
+            font-size: 0;
+        }
+        * html .clearfix { zoom: 1; } /* IE6 */
+        *:first-child+html .clearfix { zoom: 1; } /* IE7 */
+        #toolbar {
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 10;
+            display: none;
+            background: #242424;
+            border-radius: 3px;
+            opacity: .8;
+        }
+        #toolbar li a {
+            display: inline-block;
+            color: #fff;
+            font-weight: bold;
+            padding: 10px;
+            text-decoration: none;
+        }
+        #toolbar li a:hover {
+            color: yellow;
+        }
+        #toolbar ul {
+            margin: 0;
+            padding: 0;
+        }
+        #toolbar li {
+            float: left;
+            list-style: none;
+            padding: 4px;
+            margin: 4px;
+        }
+        .toolbar-form-anchor {
+            display: none;
+            padding: 10px;
+            color: #999;
+            font-weight: lighter;
+        }
+        .toolbar-form-anchor input {
+            border: none;
+            padding: 6px;
+        }
+        .toolbar-form-anchor a {
+            color: #fff;
+            font-weight: bolder;
+            font-size: 22px;
+            display: inline-block;
+            margin: 0 10px 0 20px;
+            text-transform: lowercase;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <div id="toolbar" style="">
+        <ul class="clearfix" id="toolbar-actions">
+            <li><a href="#" data-action="bold">B</a></li>
+            <li><a href="#" data-action="italic">I</a></li>
+            <li><a href="#" data-action="underline">S</a></li>
+            <li><a href="#" data-action="anchor">#</a></li>
+            <li><a href="#" data-action="append-h3">h1</a></li>
+            <li><a href="#" data-action="append-h4">h2</a></li>
+            <li><a href="#" data-action="append-blockquote">"</a></li>
+        </ul>
+        <div class="toolbar-form-anchor" id="toolbar-form-anchor">
+            <input type="text" value="" placeholder="Digite ou cole um link"><a href="#">x</a>
+        </div>
+    </div>
+    <div id="container">
+        <p contentEditable="true">select me</p>
+        <p contentEditable="true">select me 2</p>
+
+<p contentEditable="true">Now that there is the Tec-9, a crappy spray gun from South Miami. This gun is advertised as the most popular gun in American crime. Do you believe that shit? It actually says that in the little book that comes with it: the most popular gun in American crime. Like they're actually proud of that shit.  </p>
+
+<p contentEditable="true">My money's in that office, right? If she start giving me some bullshit about it ain't there, and we got to go someplace else and get it, I'm gonna shoot you in the head then and there. Then I'm gonna shoot that bitch in the kneecaps, find out where my goddamn money is. She gonna tell me too. Hey, look at me when I'm talking to you, motherfucker. You listen: we go in there, and that nigga Winston or anybody else is in there, you the first motherfucker to get shot. You understand? </p>
+
+<p contentEditable="true">Now that there is the Tec-9, a crappy spray gun from South Miami. This gun is advertised as the most popular gun in American crime. Do you believe that shit? It actually says that in the little book that comes with it: the most popular gun in American crime. Like they're actually proud of that shit.  </p>
+
+<p contentEditable="true">Normally, both your asses would be dead as fucking fried chicken, but you happen to pull this shit while I'm in a transitional period so I don't wanna kill you, I wanna help you. But I can't give you this case, it don't belong to me. Besides, I've already been through too much shit this morning over this case to hand it over to your dumb ass. </p>
+    </div>
+    <script src="../src/js/medium.editor.js"></script>
+    <script>
+        var toolbar = mediumEditor.init(document.getElementById('container'));
+    </script>
+</body>
+</html>
