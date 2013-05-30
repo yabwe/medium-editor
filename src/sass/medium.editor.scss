@@ -1,7 +1,7 @@
 @import "compass/css3";
 @import "clearfix";
 
-.toolbar {
+.medium-editor-toolbar {
     position: absolute;
     top: 0;
     left: 0;
@@ -34,7 +34,7 @@
     }
 }
 
-.toolbar-form-anchor {
+.medium-editor-toolbar-form-anchor {
     display: none;
     padding: 10px;
     color: #999;

@@ -4,25 +4,61 @@
 /*global getElementDefaultDisplay*/
 /*global console*/
 
-var mediumEditor;
+function mediumEditor(selector, options) {
+    'use strict';
+    return this.init(selector, options);
+}
 
 (function (window, document) {
     'use strict';
-    mediumEditor = {
-        init: function (el) {
-            this.root = el;
-            this.initToolbar()
-                .bindSelect()
-                .bindButtons()
-                .bindAnchorForm();
+    mediumEditor.prototype = {
+        init: function (selector, options) {
+            return this.initElements(selector)
+                       .initToolbar()
+                       .bindSelect()
+                       .bindButtons()
+                       .bindAnchorForm();
+        },
+
+        initElements: function (selector) {
+            var elements = document.querySelectorAll(selector),
+                i;
+            for (i = 0; i < elements.length; i += 1) {
+                elements[i].setAttribute('contentEditable', true);
+            }
+            return this;
         },
 
         initToolbar: function () {
-            this.toolbar = document.getElementById('toolbar');
+            this.toolbar = this.getOrCreateToolbar();
             this.keepToolbarAlive = false;
-            this.anchorForm = document.getElementById('toolbar-form-anchor');
-            this.toolbarActions = document.getElementById('toolbar-actions');
+            this.anchorForm = document.getElementById('medium-editor-toolbar-form-anchor');
+            this.toolbarActions = document.getElementById('medium-editor-toolbar-actions');
             return this;
+        },
+
+        // TODO; show toolbar buttons based on options
+        getOrCreateToolbar: function () {
+            var toolbar = document.getElementById('medium-editor-toolbar');
+            if (toolbar === null) {
+                toolbar = document.createElement('div');
+                toolbar.id = 'medium-editor-toolbar';
+                toolbar.classList.add('medium-editor-toolbar');
+                toolbar.innerHTML = '<ul class="clearfix" id="medium-editor-toolbar-actions">' +
+                               '     <li><a href="#" data-action="bold">B</a></li>' +
+                               '     <li><a href="#" data-action="italic">I</a></li>' +
+                               '     <li><a href="#" data-action="underline">S</a></li>' +
+                               '     <li><a href="#" data-action="anchor">#</a></li>' +
+                               '     <li><a href="#" data-action="append-h3">h1</a></li>' +
+                               '     <li><a href="#" data-action="append-h4">h2</a></li>' +
+                               '     <li><a href="#" data-action="append-blockquote">"</a></li>' +
+                               '</ul>' +
+                               '<div class="medium-editor-toolbar-form-anchor" id="medium-editor-toolbar-form-anchor">' +
+                               '     <input type="text" value="" placeholder="Digite ou cole um link"><a href="#">x</a>' +
+                               '</div>';
+                document.getElementsByTagName('body')[0].appendChild(toolbar);
+            }
+            return toolbar;
         },
 
         bindSelect: function () {
@@ -71,6 +107,7 @@ var mediumEditor;
         },
 
         // TODO: break method
+        // TODO: toggle active
         bindButtons: function () {
             var action,
                 buttons = this.toolbar.querySelectorAll('a'),
