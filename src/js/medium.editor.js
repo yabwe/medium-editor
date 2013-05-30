@@ -99,7 +99,6 @@ function mediumEditor(selector, options) {
 
         setToolbarButtonStates: function () {
             var buttons = this.toolbar.querySelectorAll('a'),
-                el,
                 i,
                 parentNode = this.selection.anchorNode.parentNode;
 
@@ -108,11 +107,16 @@ function mediumEditor(selector, options) {
             }
 
             while (getElementDefaultDisplay(parentNode.tagName) !== 'block') {
-                el = this.toolbar.querySelector('a[data-element="' + parentNode.tagName.toLowerCase() + '"]');
-                if (el !== null) {
-                    el.classList.add('medium-editor-button-active');
-                }
+                this.activateButton(parentNode.tagName.toLowerCase());
                 parentNode = parentNode.parentNode;
+            }
+            this.activateButton(parentNode.tagName.toLowerCase());
+        },
+
+        activateButton: function (tag) {
+            var el = this.toolbar.querySelector('a[data-element="' + tag + '"]');
+            if (el !== null) {
+                el.classList.add('medium-editor-button-active');
             }
         },
 
