@@ -64,3 +64,18 @@ function getElementDefaultDisplay(tag) {
 
     return cStyle;
 }
+
+// http://www.quirksmode.org/js/findpos.html
+function findPos(obj) {
+    'use strict';
+    var curleft = 0,
+        curtop = 0;
+    if (obj.offsetParent) {
+        do {
+            curleft += obj.offsetLeft;
+            curtop += obj.offsetTop;
+            obj = obj.offsetParent;
+        } while (obj.offsetParent);
+    }
+    return [curleft, curtop];
+}

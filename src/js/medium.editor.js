@@ -2,6 +2,7 @@
 /*global restoreSelection*/
 /*global selectElementContents*/
 /*global getElementDefaultDisplay*/
+/*global findPos*/
 /*global console*/
 
 function mediumEditor(selector, options) {
@@ -124,12 +125,13 @@ function mediumEditor(selector, options) {
             var box,
                 posEl = document.createElement('span'),
                 range = this.selection.getRangeAt(0);
-            posEl.innerHTML = range.nodeValue;
+            posEl.innerHTML = this.selection.toString();
+            posEl.style.backgroundColor = 'red';
             range.insertNode(posEl);
-            box = posEl.getBoundingClientRect();
+            box = findPos(posEl);
             posEl.parentNode.removeChild(posEl);
             this.selection.addRange(range);
-            return [box.left, box.top];
+            return [box[0], box[1]];
         },
 
         // TODO: break method
