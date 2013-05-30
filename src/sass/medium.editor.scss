@@ -10,6 +10,7 @@
     background: #242424;
     @include border-radius(3px);
     @include opacity(.9);
+    @include box-shadow(0 0 3px #000);
 
     ul {
         margin: 0;
