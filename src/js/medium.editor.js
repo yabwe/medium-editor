@@ -174,7 +174,7 @@ function mediumEditor(selector, options) {
             el.innerHTML = selectionEl.innerHTML;
             el.setAttribute('contentEditable', true);
             selectionEl.parentNode.replaceChild(el, selectionEl);
-            selectElementContents(el);
+            selectElementContents(el.firstChild);
             this.setToolbarPosition();
         },
 
