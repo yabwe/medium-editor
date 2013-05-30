@@ -43,7 +43,7 @@ function mediumEditor(selector, options) {
             if (toolbar === null) {
                 toolbar = document.createElement('div');
                 toolbar.id = 'medium-editor-toolbar';
-                toolbar.classList.add('medium-editor-toolbar');
+                toolbar.className = 'medium-editor-toolbar';
                 toolbar.innerHTML = '<ul class="clearfix" id="medium-editor-toolbar-actions">' +
                                '     <li><a href="#" data-action="bold">B</a></li>' +
                                '     <li><a href="#" data-action="italic">I</a></li>' +
@@ -107,7 +107,6 @@ function mediumEditor(selector, options) {
         },
 
         // TODO: break method
-        // TODO: toggle active
         bindButtons: function () {
             var action,
                 buttons = this.toolbar.querySelectorAll('a'),
@@ -115,7 +114,6 @@ function mediumEditor(selector, options) {
                 self = this,
                 triggerAction = function (e) {
                     e.preventDefault();
-                    //this.classList.toggle('active');
                     action = this.getAttribute('data-action');
                     if (action.indexOf('append-') > -1) {
                         self.appendEl(action.replace('append-', ''));
