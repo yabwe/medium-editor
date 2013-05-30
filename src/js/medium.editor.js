@@ -45,17 +45,17 @@ function mediumEditor(selector, options) {
                 toolbar.id = 'medium-editor-toolbar';
                 toolbar.className = 'medium-editor-toolbar';
                 toolbar.innerHTML = '<ul class="clearfix" id="medium-editor-toolbar-actions">' +
-                               '     <li><a href="#" data-action="bold">B</a></li>' +
-                               '     <li><a href="#" data-action="italic">I</a></li>' +
-                               '     <li><a href="#" data-action="underline">S</a></li>' +
-                               '     <li><a href="#" data-action="anchor">#</a></li>' +
-                               '     <li><a href="#" data-action="append-h3">h1</a></li>' +
-                               '     <li><a href="#" data-action="append-h4">h2</a></li>' +
-                               '     <li><a href="#" data-action="append-blockquote">"</a></li>' +
-                               '</ul>' +
-                               '<div class="medium-editor-toolbar-form-anchor" id="medium-editor-toolbar-form-anchor">' +
-                               '     <input type="text" value="" placeholder="Digite ou cole um link"><a href="#">x</a>' +
-                               '</div>';
+                                    '    <li><a href="#" data-action="bold">B</a></li>' +
+                                    '    <li><a href="#" data-action="italic">I</a></li>' +
+                                    '    <li><a href="#" data-action="underline">S</a></li>' +
+                                    '    <li><a href="#" data-action="anchor">#</a></li>' +
+                                    '    <li><a href="#" data-action="append-h3">h1</a></li>' +
+                                    '    <li><a href="#" data-action="append-h4">h2</a></li>' +
+                                    '    <li><a href="#" data-action="append-blockquote">"</a></li>' +
+                                    '</ul>' +
+                                    '<div class="medium-editor-toolbar-form-anchor" id="medium-editor-toolbar-form-anchor">' +
+                                    '    <input type="text" value="" placeholder="Digite ou cole um link"><a href="#">x</a>' +
+                                    '</div>';
                 document.getElementsByTagName('body')[0].appendChild(toolbar);
             }
             return toolbar;
