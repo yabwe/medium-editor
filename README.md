@@ -10,6 +10,8 @@ It was tested only on Google Chrome and Firefox most recent versions.
 
 ![screenshot](https://raw.github.com/daviferreira/medium-editor/master/demo/img/medium-editor.jpg)
 
+__demo__: [http://daviferreira.github.io/medium-editor/](http://daviferreira.github.io/medium-editor/)
+
 ## development
 
 Medium Editor development tasks are managed by Grunt. To install all the necessary packages, just invoke:

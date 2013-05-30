@@ -112,13 +112,13 @@ function mediumEditor(selector, options) {
                 toolbar.id = 'medium-editor-toolbar';
                 toolbar.className = 'medium-editor-toolbar';
                 toolbar.innerHTML = '<ul class="clearfix" id="medium-editor-toolbar-actions">' +
-                                    '    <li><a href="#" data-action="bold">B</a></li>' +
-                                    '    <li><a href="#" data-action="italic">I</a></li>' +
-                                    '    <li><a href="#" data-action="underline">S</a></li>' +
-                                    '    <li><a href="#" data-action="anchor">#</a></li>' +
-                                    '    <li><a href="#" data-action="append-h3">h1</a></li>' +
-                                    '    <li><a href="#" data-action="append-h4">h2</a></li>' +
-                                    '    <li><a href="#" data-action="append-blockquote">"</a></li>' +
+                                    '    <li><a href="#" data-action="bold" data-element="b">B</a></li>' +
+                                    '    <li><a href="#" data-action="italic" data-element="i">I</a></li>' +
+                                    '    <li><a href="#" data-action="underline" data-element="u">S</a></li>' +
+                                    '    <li><a href="#" data-action="anchor" data-element="a">#</a></li>' +
+                                    '    <li><a href="#" data-action="append-h3" data-element="h3">h1</a></li>' +
+                                    '    <li><a href="#" data-action="append-h4" data-element="h4">h2</a></li>' +
+                                    '    <li><a href="#" data-action="append-blockquote" data-element="blockquote">"</a></li>' +
                                     '</ul>' +
                                     '<div class="medium-editor-toolbar-form-anchor" id="medium-editor-toolbar-form-anchor">' +
                                     '    <input type="text" value="" placeholder="Digite ou cole um link"><a href="#">x</a>' +
@@ -149,6 +149,7 @@ function mediumEditor(selector, options) {
                     this.selection = newSelection;
                     this.selectionRange = this.selection.getRangeAt(0);
                     this.setToolbarPosition();
+                    this.setToolbarButtonStates();
                     this.toolbar.style.display = 'block';
                     this.showToolbarActions();
                 }
@@ -162,10 +163,30 @@ function mediumEditor(selector, options) {
             this.toolbar.style.top = (coords[1] + 20) + 'px';
         },
 
+        setToolbarButtonStates: function () {
+            var buttons = this.toolbar.querySelectorAll('a'),
+                el,
+                i,
+                parentNode = this.selection.anchorNode.parentNode;
+
+            for (i = 0; i < buttons.length; i += 1) {
+                buttons[i].classList.remove('medium-editor-button-active');
+            }
+
+            while (getElementDefaultDisplay(parentNode.tagName) !== 'block') {
+                el = this.toolbar.querySelector('a[data-element="' + parentNode.tagName.toLowerCase() + '"]');
+                if (el !== null) {
+                    el.classList.add('medium-editor-button-active');
+                }
+                parentNode = parentNode.parentNode;
+            }
+        },
+
         getSelectionCoordinates: function () {
             var box,
                 posEl = document.createElement('span'),
                 range = this.selection.getRangeAt(0);
+            posEl.innerHTML = range.nodeValue;
             range.insertNode(posEl);
             box = posEl.getBoundingClientRect();
             posEl.parentNode.removeChild(posEl);
@@ -181,6 +202,7 @@ function mediumEditor(selector, options) {
                 self = this,
                 triggerAction = function (e) {
                     e.preventDefault();
+                    this.classList.toggle('medium-editor-button-active');
                     action = this.getAttribute('data-action');
                     if (action.indexOf('append-') > -1) {
                         self.appendEl(action.replace('append-', ''));
@@ -210,8 +232,9 @@ function mediumEditor(selector, options) {
             if (tagName === el || tagName === 'span') {
                 el = 'p';
             }
-            if (getElementDefaultDisplay(tagName) !== 'block') {
+            while (getElementDefaultDisplay(tagName) !== 'block') {
                 selectionEl = selectionEl.parentNode;
+                tagName = selectionEl.tagName.toLowerCase();
             }
             el = document.createElement(el);
             el.innerHTML = selectionEl.innerHTML;
