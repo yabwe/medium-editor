@@ -6,6 +6,19 @@
 (function (window, document) {
     'use strict';
 
+    function extend(b, a) {
+        var prop;
+        if (b === undefined) {
+            return a;
+        }
+        for (prop in a) {
+            if (a.hasOwnProperty(prop) && b.hasOwnProperty(prop) === false) {
+                b[prop] = a[prop];
+            }
+        }
+        return b;
+    }
+
     // http://stackoverflow.com/questions/5605401/insert-link-in-contenteditable-element
     // by Tim Down
     function saveSelection() {
@@ -85,6 +98,13 @@
 
     mediumEditor.prototype = {
         init: function (selector, options) {
+            var defaults = {
+                    excludedActions: [],
+                    anchorInputPlaceholder: 'Paste or type a link',
+                    diffLeft: 30,
+                    diffTop: 30
+                };
+            this.options = extend(options, defaults);
             return this.initElements(selector)
                        .initToolbar()
                        .bindSelect()
@@ -127,7 +147,7 @@
                                     '    <li><a href="#" data-action="append-blockquote" data-element="blockquote">"</a></li>' +
                                     '</ul>' +
                                     '<div class="medium-editor-toolbar-form-anchor" id="medium-editor-toolbar-form-anchor">' +
-                                    '    <input type="text" value="" placeholder="Digite ou cole um link"><a href="#">x</a>' +
+                                    '    <input type="text" value="" placeholder="' + this.options.anchorInputPlaceholder + '"><a href="#">x</a>' +
                                     '</div>';
                 document.getElementsByTagName('body')[0].appendChild(toolbar);
             }
@@ -165,8 +185,8 @@
 
         setToolbarPosition: function () {
             var coords = this.getSelectionCoordinates();
-            this.toolbar.style.left = (coords[0] + 20) + 'px';
-            this.toolbar.style.top = (coords[1] + 20) + 'px';
+            this.toolbar.style.left = (coords[0] + this.options.diffLeft) + 'px';
+            this.toolbar.style.top = (coords[1] + this.options.diffTop) + 'px';
         },
 
         setToolbarButtonStates: function () {
@@ -176,6 +196,11 @@
 
             for (i = 0; i < buttons.length; i += 1) {
                 buttons[i].classList.remove('medium-editor-button-active');
+                if (this.options.excludedActions.indexOf(buttons[i].getAttribute('data-element')) > -1) {
+                    buttons[i].style.display = 'none';
+                } else {
+                    buttons[i].style.display = 'block';
+                }
             }
 
             while (getElementDefaultDisplay(parentNode.tagName) !== 'block') {

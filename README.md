@@ -27,6 +27,22 @@ The next step is to reference the editor's script and instantiate a new mediumEd
 
 The above code will transform all the elements with the .editable class into HTML5 editable contents and add the medium editor toolbar to them.
 
+## Initialization options
+
+* __excludedActions__: list of actions to be excluded from the toolbar. Default: []
+* __anchorInputPlaceholder__: text to be shown as placeholder of the anchor input. Default: _Paste or type a link_
+* __diffLeft__: value to be added to the X axis positioning of the toolbar. Default: 30
+* __diffTop: value to be added to the Y axis positioning of the toolbar. Default: 30
+
+Example:
+
+	var editor = new mediumEditor('.editable', {
+		excludedActions: ['h3', 'h4'],
+		anchorInputPlaceholder: 'Type a link',
+		diffLeft: 25,
+		diffTop: 10
+	});
+
 ## Development
 
 Medium Editor development tasks are managed by Grunt. To install all the necessary packages, just invoke:
