@@ -103,7 +103,8 @@ function mediumEditor(selector, options) {
             return this;
         },
 
-        // TODO; show toolbar buttons based on options
+        // TODO: show toolbar buttons based on options
+        // TODO: parametrize input placeholder
         getOrCreateToolbar: function () {
             var toolbar = document.getElementById('medium-editor-toolbar');
             if (toolbar === null) {
