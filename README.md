@@ -8,7 +8,7 @@ Medium Editor has been written using vanilla JavaScript, no additional framework
 
 It was tested only on Google Chrome and Firefox most recent versions.
 
-![screenshot](https://raw.github.com/daviferreira/medium-editor/master/demo/img/medium-editor.png)
+![screenshot](https://raw.github.com/daviferreira/medium-editor/master/demo/img/medium-editor.jpg)
 
 ## development
 
