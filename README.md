@@ -20,7 +20,7 @@ First, you need to attach medium editor's stylesheet to your page:
 
 The next step is to reference the editor's script and instantiate a new mediumEditor object:
 
-	<script src="../dist/js/medium.editor.js"></script>
+	<script src="js/medium.editor.js"></script>
 	<script>
 		var editor = new mediumEditor('.editable');
 	</script>
