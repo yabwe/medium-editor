@@ -45,7 +45,7 @@ function selectElementContents(el) {
     'use strict';
     var range = document.createRange(),
         sel = window.getSelection();
-    range.selectNodeContents(el);
+    range.selectNodeContents(el.firstChild);
     sel.removeAllRanges();
     sel.addRange(range);
 }
