@@ -1,10 +1,3 @@
-/*global saveSelection*/
-/*global restoreSelection*/
-/*global selectElementContents*/
-/*global getElementDefaultDisplay*/
-/*global findPos*/
-/*global console*/
-
 function mediumEditor(selector, options) {
     'use strict';
     return this.init(selector, options);
@@ -12,6 +5,84 @@ function mediumEditor(selector, options) {
 
 (function (window, document) {
     'use strict';
+
+    // http://stackoverflow.com/questions/5605401/insert-link-in-contenteditable-element
+    // by Tim Down
+    function saveSelection() {
+        var i,
+            len,
+            ranges,
+            sel;
+        if (window.getSelection) {
+            sel = window.getSelection();
+            if (sel.getRangeAt && sel.rangeCount) {
+                ranges = [];
+                for (i = 0, len = sel.rangeCount; i < len; i += 1) {
+                    ranges.push(sel.getRangeAt(i));
+                }
+                return ranges;
+            }
+        } else if (document.selection && document.selection.createRange) {
+            return document.selection.createRange();
+        }
+        return null;
+    }
+
+    function restoreSelection(savedSel) {
+        var i,
+            len,
+            sel;
+        if (savedSel) {
+            if (window.getSelection) {
+                sel = window.getSelection();
+                sel.removeAllRanges();
+                for (i = 0, len = savedSel.length; i < len; i += 1) {
+                    sel.addRange(savedSel[i]);
+                }
+            } else if (document.selection && savedSel.select) {
+                savedSel.select();
+            }
+        }
+    }
+
+    // http://stackoverflow.com/questions/6139107/programatically-select-text-in-a-contenteditable-html-element
+    // by Tim Down
+    function selectElementContents(el) {
+        var range = document.createRange(),
+            sel = window.getSelection();
+        range.selectNodeContents(el);
+        sel.removeAllRanges();
+        sel.addRange(range);
+    }
+
+    // http://stackoverflow.com/questions/2880957/detect-inline-block-type-of-a-dom-element
+    // by Andy E
+    function getElementDefaultDisplay(tag) {
+        var cStyle,
+            t = document.createElement(tag),
+            gcs = window.getComputedStyle !== undefined;
+
+        document.body.appendChild(t);
+        cStyle = (gcs ? window.getComputedStyle(t, "") : t.currentStyle).display;
+        document.body.removeChild(t);
+
+        return cStyle;
+    }
+
+    // http://www.quirksmode.org/js/findpos.html
+    function findPos(obj) {
+        var curleft = 0,
+            curtop = 0;
+        if (obj.offsetParent) {
+            do {
+                curleft += obj.offsetLeft;
+                curtop += obj.offsetTop;
+                obj = obj.offsetParent;
+            } while (obj.offsetParent);
+        }
+        return [curleft, curtop];
+    }
+
     mediumEditor.prototype = {
         init: function (selector, options) {
             return this.initElements(selector)
