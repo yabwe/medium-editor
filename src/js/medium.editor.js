@@ -139,11 +139,12 @@ function mediumEditor(selector, options) {
         },
 
         appendEl: function (el) {
-            var selectionEl = this.selection.anchorNode.parentNode;
-            if (selectionEl.tagName.toLowerCase() === el || selectionEl.tagName.toLowerCase() === 'span') {
+            var selectionEl = this.selection.anchorNode.parentNode,
+                tagName = selectionEl.tagName.toLowerCase();
+            if (tagName === el || tagName === 'span') {
                 el = 'p';
             }
-            if (getElementDefaultDisplay(selectionEl.tagName) !== 'block') {
+            if (getElementDefaultDisplay(tagName) !== 'block') {
                 selectionEl = selectionEl.parentNode;
             }
             el = document.createElement(el);
