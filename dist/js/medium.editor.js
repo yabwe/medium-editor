@@ -102,7 +102,9 @@
                     excludedActions: [],
                     anchorInputPlaceholder: 'Paste or type a link',
                     diffLeft: 30,
-                    diffTop: 30
+                    diffTop: 30,
+                    firstHeader: 'h3',
+                    secondHeader: 'h4'
                 };
             this.options = extend(options, defaults);
             return this.initElements(selector)
@@ -140,8 +142,8 @@
                                     '    <li><a href="#" data-action="italic" data-element="i">I</a></li>' +
                                     '    <li><a href="#" data-action="underline" data-element="u">S</a></li>' +
                                     '    <li><a href="#" data-action="anchor" data-element="a">#</a></li>' +
-                                    '    <li><a href="#" data-action="append-h3" data-element="h3">h1</a></li>' +
-                                    '    <li><a href="#" data-action="append-h4" data-element="h4">h2</a></li>' +
+                                    '    <li><a href="#" data-action="append-' + this.options.firstHeader + '" data-element="' + this.options.firstHeader + '">h1</a></li>' +
+                                    '    <li><a href="#" data-action="append-' + this.options.secondHeader + '" data-element="' + this.options.secondHeader + '">h2</a></li>' +
                                     '    <li><a href="#" data-action="append-blockquote" data-element="blockquote">"</a></li>' +
                                     '</ul>' +
                                     '<div class="medium-editor-toolbar-form-anchor" id="medium-editor-toolbar-form-anchor">' +
