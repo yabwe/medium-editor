@@ -115,10 +115,10 @@ function mediumEditor(selector, options) {
         },
 
         initElements: function (selector) {
-            var elements = document.querySelectorAll(selector),
-                i;
-            for (i = 0; i < elements.length; i += 1) {
-                elements[i].setAttribute('contentEditable', true);
+            var i;
+            this.elements = document.querySelectorAll(selector);
+            for (i = 0; i < this.elements.length; i += 1) {
+                this.elements[i].setAttribute('contentEditable', true);
             }
             return this;
         },
@@ -131,8 +131,6 @@ function mediumEditor(selector, options) {
             return this;
         },
 
-        // TODO: show toolbar buttons based on options
-        // TODO: parametrize input placeholder
         getOrCreateToolbar: function () {
             var toolbar = document.getElementById('medium-editor-toolbar');
             if (toolbar === null) {
@@ -157,13 +155,15 @@ function mediumEditor(selector, options) {
         },
 
         bindSelect: function () {
-            var self = this;
-            document.onmouseup = function (e) {
-                self.checkSelection(e);
-            };
-            document.onkeyup = function (e) {
-                self.checkSelection(e);
-            };
+            var self = this,
+                checkSelection = function (e) {
+                    self.checkSelection(e);
+                },
+                i;
+            for (i = 0; i < this.elements.length; i += 1) {
+                this.elements[i].onmouseup = checkSelection;
+                this.elements[i].onkeydown = checkSelection;
+            }
             return this;
         },
 
@@ -192,7 +192,7 @@ function mediumEditor(selector, options) {
         },
 
         setToolbarButtonStates: function () {
-            var buttons = this.toolbar.querySelectorAll('a'),
+            var buttons = this.toolbarActions.querySelectorAll('a'),
                 i,
                 parentNode = this.selection.anchorNode.parentNode;
 
