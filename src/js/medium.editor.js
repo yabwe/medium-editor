@@ -281,9 +281,12 @@ function mediumEditor(selector, options) {
 
         appendEl: function (el) {
             var selectionEl = this.selection.anchorNode.parentNode,
-                tagName = selectionEl.tagName.toLowerCase();
+                tagName = selectionEl.tagName.toLowerCase(),
+                bindEvents = false,
+                self = this;
             if (tagName === el || tagName === 'span') {
                 el = 'p';
+                bindEvents = true;
             }
             while (getElementDefaultDisplay(tagName) !== 'block') {
                 selectionEl = selectionEl.parentNode;
@@ -294,6 +297,14 @@ function mediumEditor(selector, options) {
             el.setAttribute('contentEditable', true);
             selectionEl.parentNode.replaceChild(el, selectionEl);
             selectElementContents(el.firstChild);
+            if (bindEvents === true) {
+                el.onmouseup = function (e) {
+                    self.checkSelection(e);
+                };
+                el.onkeydown = function (e) {
+                    self.checkSelection(e);
+                };
+            }
             this.setToolbarPosition();
         },
 
