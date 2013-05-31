@@ -1,15 +1,18 @@
 @import "compass/css3";
 @import "clearfix";
 
+$bgcolor: #242424;
+
 .medium-editor-toolbar {
     position: absolute;
     top: 0;
     left: 0;
     z-index: 10;
     display: none;
-    background: #242424;
+    background: $bgcolor;
+    font-family: Georgia, Times, TimesNewRoman, serif;
+    font-size: 20px;
     @include border-radius(3px);
-    @include opacity(.9);
     @include box-shadow(0 0 3px #000);
 
     ul {
@@ -22,13 +25,17 @@
         list-style: none;
         a {
             display: inline-block;
+            padding: 15px;
             color: #fff;
             font-weight: bold;
-            padding: 15px;
             text-decoration: none;
+            text-transform: lowercase;
             &:hover {
                 color: yellow;
             }
+        }
+        .medium-editor-action-underline {
+            text-decoration: underline;
         }
     }
 }
@@ -38,22 +45,32 @@
     color: #ccc;
 }
 
+.medium-editor-action-bold {
+    font-weight: bolder;
+}
+
+.medium-editor-action-italic {
+    font-style: italic;
+}
+
 .medium-editor-toolbar-form-anchor {
     display: none;
-    padding: 10px;
     color: #999;
-    font-weight: lighter;
+    input, a {
+        font-family: HelveticaNeue, Helvetica, Arial, sans-serif;
+    }
     input {
-        border: none;
         padding: 6px;
+        background: $bgcolor;
+        border: none;
+        color: #ccc;
     }
     a {
         color: #fff;
         font-weight: bolder;
-        font-size: 22px;
+        font-size: 24px;
         display: inline-block;
-        margin: 0 10px 0 20px;
-        text-transform: lowercase;
+        margin: 0 10px;
         text-decoration: none;
     }
 }

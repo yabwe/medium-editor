@@ -137,17 +137,17 @@
                 toolbar = document.createElement('div');
                 toolbar.id = 'medium-editor-toolbar';
                 toolbar.className = 'medium-editor-toolbar';
-                toolbar.innerHTML = '<ul class="clearfix" id="medium-editor-toolbar-actions">' +
-                                    '    <li><a href="#" data-action="bold" data-element="b">B</a></li>' +
-                                    '    <li><a href="#" data-action="italic" data-element="i">I</a></li>' +
-                                    '    <li><a href="#" data-action="underline" data-element="u">S</a></li>' +
-                                    '    <li><a href="#" data-action="anchor" data-element="a">#</a></li>' +
-                                    '    <li><a href="#" data-action="append-' + this.options.firstHeader + '" data-element="' + this.options.firstHeader + '">h1</a></li>' +
-                                    '    <li><a href="#" data-action="append-' + this.options.secondHeader + '" data-element="' + this.options.secondHeader + '">h2</a></li>' +
-                                    '    <li><a href="#" data-action="append-blockquote" data-element="blockquote">"</a></li>' +
+                toolbar.innerHTML = '<ul class="clearfix" id="medium-editor-toolbar-actions" class="medium-editor-toolbar-actions">' +
+                                    '    <li><a href="#" class="medium-editor-action medium-editor-action-bold" data-action="bold" data-element="b">B</a></li>' +
+                                    '    <li><a href="#" class="medium-editor-action medium-editor-action-italic" data-action="italic" data-element="i">I</a></li>' +
+                                    '    <li><a href="#" class="medium-editor-action medium-editor-action-underline" data-action="underline" data-element="u">S</a></li>' +
+                                    '    <li><a href="#" class="medium-editor-action medium-editor-action-anchor" data-action="anchor" data-element="a">#</a></li>' +
+                                    '    <li><a href="#" class="medium-editor-action medium-editor-action-header1" data-action="append-' + this.options.firstHeader + '" data-element="' + this.options.firstHeader + '">h1</a></li>' +
+                                    '    <li><a href="#" class="medium-editor-action medium-editor-action-header2" data-action="append-' + this.options.secondHeader + '" data-element="' + this.options.secondHeader + '">h2</a></li>' +
+                                    '    <li><a href="#" class="medium-editor-action medium-editor-action-quote" data-action="append-blockquote" data-element="blockquote">&ldquo;</a></li>' +
                                     '</ul>' +
                                     '<div class="medium-editor-toolbar-form-anchor" id="medium-editor-toolbar-form-anchor">' +
-                                    '    <input type="text" value="" placeholder="' + this.options.anchorInputPlaceholder + '"><a href="#">x</a>' +
+                                    '    <input type="text" value="" placeholder="' + this.options.anchorInputPlaceholder + '"><a href="#">&times;</a>' +
                                     '</div>';
                 document.getElementsByTagName('body')[0].appendChild(toolbar);
             }
