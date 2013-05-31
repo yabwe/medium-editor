@@ -108,7 +108,7 @@ function mediumEditor(selector, options) {
                     firstHeader: 'h3',
                     secondHeader: 'h4'
                 };
-            this.id = +new Date();
+            this.id = document.querySelectorAll('.medium-editor-toolbar').length + 1;
             this.options = extend(options, defaults);
             return this.initElements(selector)
                        .initToolbar()
