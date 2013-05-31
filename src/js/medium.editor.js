@@ -108,6 +108,7 @@ function mediumEditor(selector, options) {
                     firstHeader: 'h3',
                     secondHeader: 'h4'
                 };
+            this.id = +new Date();
             this.options = extend(options, defaults);
             return this.initElements(selector)
                        .initToolbar()
@@ -127,7 +128,7 @@ function mediumEditor(selector, options) {
 
         //TODO: actionTemplate
         toolbarTemplate: function () {
-            return '<ul class="clearfix" id="medium-editor-toolbar-actions" class="medium-editor-toolbar-actions">' +
+            return '<ul id="medium-editor-toolbar-actions" class="medium-editor-toolbar-actions clearfix">' +
                    '    <li><a href="#" class="medium-editor-action medium-editor-action-bold" data-action="bold" data-element="b">B</a></li>' +
                    '    <li><a href="#" class="medium-editor-action medium-editor-action-italic" data-action="italic" data-element="i">I</a></li>' +
                    '    <li><a href="#" class="medium-editor-action medium-editor-action-underline" data-action="underline" data-element="u">S</a></li>' +
@@ -144,16 +145,16 @@ function mediumEditor(selector, options) {
         initToolbar: function () {
             this.toolbar = this.getOrCreateToolbar();
             this.keepToolbarAlive = false;
-            this.anchorForm = document.getElementById('medium-editor-toolbar-form-anchor');
-            this.toolbarActions = document.getElementById('medium-editor-toolbar-actions');
+            this.anchorForm = this.toolbar.querySelector('.medium-editor-toolbar-form-anchor');
+            this.toolbarActions = this.toolbar.querySelector('.medium-editor-toolbar-actions');
             return this;
         },
 
         getOrCreateToolbar: function () {
-            var toolbar = document.getElementById('medium-editor-toolbar');
+            var toolbar = document.getElementById('medium-editor-toolbar-' + this.id);
             if (toolbar === null) {
                 toolbar = document.createElement('div');
-                toolbar.id = 'medium-editor-toolbar';
+                toolbar.id = 'medium-editor-toolbar-' + this.id;
                 toolbar.className = 'medium-editor-toolbar';
                 toolbar.innerHTML = this.toolbarTemplate();
                 document.getElementsByTagName('body')[0].appendChild(toolbar);
@@ -183,10 +184,10 @@ function mediumEditor(selector, options) {
                 } else {
                     this.selection = newSelection;
                     this.selectionRange = this.selection.getRangeAt(0);
-                    this.setToolbarPosition();
-                    this.setToolbarButtonStates();
+                    this.setToolbarPosition()
+                        .setToolbarButtonStates()
+                        .showToolbarActions();
                     this.toolbar.style.display = 'block';
-                    this.showToolbarActions();
                 }
             }
             return this;
@@ -196,6 +197,7 @@ function mediumEditor(selector, options) {
             var coords = this.getSelectionCoordinates();
             this.toolbar.style.left = (coords[0] + this.options.diffLeft) + 'px';
             this.toolbar.style.top = (coords[1] + this.options.diffTop) + 'px';
+            return this;
         },
 
         setToolbarButtonStates: function () {
@@ -217,6 +219,7 @@ function mediumEditor(selector, options) {
                 parentNode = parentNode.parentNode;
             }
             this.activateButton(parentNode.tagName.toLowerCase());
+            return this;
         },
 
         activateButton: function (tag) {
@@ -247,6 +250,9 @@ function mediumEditor(selector, options) {
                 triggerAction = function (e) {
                     e.preventDefault();
                     e.stopPropagation();
+                    if (this.selection === undefined) {
+                        self.checkSelection(e);
+                    }
                     this.classList.toggle('medium-editor-button-active');
                     action = this.getAttribute('data-action');
                     if (action.indexOf('append-') > -1) {
@@ -264,9 +270,6 @@ function mediumEditor(selector, options) {
         },
 
         triggerAnchorAction: function (e) {
-            if (this.selection === undefined) {
-                this.checkSelection(e);
-            }
             if (this.selection.anchorNode.parentNode.tagName.toLowerCase() === 'a') {
                 document.execCommand('unlink', null, false);
             } else {
