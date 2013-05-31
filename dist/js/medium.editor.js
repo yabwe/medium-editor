@@ -141,22 +141,19 @@
         },
 
         initToolbar: function () {
-            this.toolbar = this.getOrCreateToolbar();
+            this.toolbar = this.createToolbar();
             this.keepToolbarAlive = false;
             this.anchorForm = this.toolbar.querySelector('.medium-editor-toolbar-form-anchor');
             this.toolbarActions = this.toolbar.querySelector('.medium-editor-toolbar-actions');
             return this;
         },
 
-        getOrCreateToolbar: function () {
-            var toolbar = document.getElementById('medium-editor-toolbar-' + this.id);
-            if (toolbar === null) {
-                toolbar = document.createElement('div');
-                toolbar.id = 'medium-editor-toolbar-' + this.id;
-                toolbar.className = 'medium-editor-toolbar';
-                toolbar.innerHTML = this.toolbarTemplate();
-                document.getElementsByTagName('body')[0].appendChild(toolbar);
-            }
+        createToolbar: function () {
+            var toolbar = document.createElement('div');
+            toolbar.id = 'medium-editor-toolbar-' + this.id;
+            toolbar.className = 'medium-editor-toolbar';
+            toolbar.innerHTML = this.toolbarTemplate();
+            document.getElementsByTagName('body')[0].appendChild(toolbar);
             return toolbar;
         },
 
@@ -285,6 +282,7 @@
                 tagName = selectionEl.tagName.toLowerCase(),
                 bindEvents = false,
                 self = this;
+            // TODO: save element attributes
             if (tagName === el || tagName === 'span') {
                 el = 'p';
                 bindEvents = true;
