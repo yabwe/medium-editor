@@ -240,11 +240,15 @@
                 self = this,
                 triggerAction = function (e) {
                     e.preventDefault();
+                    e.stopPropagation();
                     this.classList.toggle('medium-editor-button-active');
                     action = this.getAttribute('data-action');
                     if (action.indexOf('append-') > -1) {
                         self.appendEl(action.replace('append-', ''));
                     } else if (action === 'anchor') {
+                        if (self.selection === undefined) {
+                            self.checkSelection(e);
+                        }
                         if (self.selection.anchorNode.parentNode.tagName.toLowerCase() === 'a') {
                             document.execCommand('unlink', null, false);
                         } else {
@@ -283,21 +287,10 @@
         },
 
         showToolbarActions: function () {
+            var self = this;
             this.anchorForm.style.display = 'none';
             this.toolbarActions.style.display = 'block';
             this.keepToolbarAlive = false;
-            document.onclick = '';
-        },
-
-        showAnchorForm: function () {
-            var input = this.anchorForm.querySelector('input'),
-                self = this;
-            this.toolbarActions.style.display = 'none';
-            this.savedSelection = saveSelection();
-            this.anchorForm.style.display = 'block';
-            this.keepToolbarAlive = true;
-            input.focus();
-            input.value = '';
             clearTimeout(this.timer);
             this.timer = setTimeout(function () {
                 document.onclick = function (e) {
@@ -306,6 +299,16 @@
                     this.onclick = '';
                 };
             }, 300);
+        },
+
+        showAnchorForm: function () {
+            var input = this.anchorForm.querySelector('input');
+            this.toolbarActions.style.display = 'none';
+            this.savedSelection = saveSelection();
+            this.anchorForm.style.display = 'block';
+            this.keepToolbarAlive = true;
+            input.focus();
+            input.value = '';
         },
 
         bindAnchorForm: function () {
