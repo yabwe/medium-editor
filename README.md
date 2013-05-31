@@ -16,14 +16,16 @@ __demo__: [http://daviferreira.github.io/medium-editor/](http://daviferreira.git
 
 First, you need to attach medium editor's stylesheet to your page:
 
-	<link rel="stylesheet" href="css/medium.editor.css">
+```html
+<link rel="stylesheet" href="css/medium.editor.css">
+```
 
 The next step is to reference the editor's script and instantiate a new mediumEditor object:
 
-	<script src="js/medium.editor.js"></script>
-	<script>
-		var editor = new mediumEditor('.editable');
-	</script>
+```html
+<script src="js/medium.editor.js"></script>
+<script>var editor = new mediumEditor('.editable');</script>
+```
 
 The above code will transform all the elements with the .editable class into HTML5 editable contents and add the medium editor toolbar to them.
 
@@ -36,18 +38,22 @@ The above code will transform all the elements with the .editable class into HTM
 
 Example:
 
-	var editor = new mediumEditor('.editable', {
-		excludedActions: ['h3', 'h4'],
-		anchorInputPlaceholder: 'Type a link',
-		diffLeft: 25,
-		diffTop: 10
-	});
+```javascript
+var editor = new mediumEditor('.editable', {
+    excludedActions: ['h3', 'h4'],
+    anchorInputPlaceholder: 'Type a link',
+    diffLeft: 25,
+    diffTop: 10
+});
+```
 
 ## Development
 
 Medium Editor development tasks are managed by Grunt. To install all the necessary packages, just invoke:
 
-	npm install
+```bash
+npm install
+```
 
 These are the available grunt tasks:
 
