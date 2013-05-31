@@ -270,7 +270,7 @@ function mediumEditor(selector, options) {
             if (this.selection.anchorNode.parentNode.tagName.toLowerCase() === 'a') {
                 document.execCommand('unlink', null, false);
             } else {
-                if (this.anchorForm.style === 'block') {
+                if (this.anchorForm.style.display === 'block') {
                     this.showToolbarActions();
                 } else {
                     this.showAnchorForm();
