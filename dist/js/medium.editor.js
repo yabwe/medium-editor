@@ -61,7 +61,7 @@
     // http://stackoverflow.com/questions/6846230/javascript-text-selection-page-coordinates
     // by Tim Down
     function getSelectionCoords() {
-        var sel = document.selection,
+        var sel = window.selection,
             range,
             rect,
             x = 0,
@@ -117,8 +117,8 @@
             var defaults = {
                     excludedActions: [],
                     anchorInputPlaceholder: 'Paste or type a link',
-                    diffLeft: 30,
-                    diffTop: 30,
+                    diffLeft: 0,
+                    diffTop: 0,
                     firstHeader: 'h3',
                     secondHeader: 'h4',
                     delay: 300
@@ -201,10 +201,10 @@
                     this.selection = newSelection;
                     this.selectionRange = this.selection.getRangeAt(0);
                     if (this.toolbar.style.display !== 'block') {
+                        this.toolbar.style.display = 'block';
                         this.setToolbarPosition()
                             .setToolbarButtonStates()
                             .showToolbarActions();
-                        this.toolbar.style.display = 'block';
                     }
                 }
             }
@@ -214,7 +214,7 @@
         setToolbarPosition: function () {
             var coords = getSelectionCoords();
             this.toolbar.style.left = (coords[0] + this.options.diffLeft) + 'px';
-            this.toolbar.style.top = (coords[1] + this.options.diffTop) + 'px';
+            this.toolbar.style.top = (coords[1] + window.scrollY - this.toolbar.offsetHeight + this.options.diffTop) + 'px';
             return this;
         },
 
