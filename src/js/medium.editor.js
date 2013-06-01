@@ -128,20 +128,6 @@ function mediumEditor(selector, options) {
         sel.addRange(range);
     }
 
-    // http://stackoverflow.com/questions/2880957/detect-inline-block-type-of-a-dom-element
-    // by Andy E
-    function getElementDefaultDisplay(tag) {
-        var cStyle,
-            t = document.createElement(tag),
-            gcs = window.getComputedStyle !== undefined;
-
-        document.body.appendChild(t);
-        cStyle = (gcs ? window.getComputedStyle(t, "") : t.currentStyle).display;
-        document.body.removeChild(t);
-
-        return cStyle;
-    }
-
     mediumEditor.prototype = {
         init: function (selector, options) {
             var defaults = {
@@ -153,6 +139,7 @@ function mediumEditor(selector, options) {
                     secondHeader: 'h4',
                     delay: 300
                 };
+            this.parentElements = ['p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'blockquote'];
             this.id = document.querySelectorAll('.medium-editor-toolbar').length + 1;
             this.options = extend(options, defaults);
             return this.initElements(selector)
@@ -247,6 +234,7 @@ function mediumEditor(selector, options) {
             return this;
         },
 
+        // TODO: break method
         setToolbarButtonStates: function () {
             var buttons = this.toolbarActions.querySelectorAll('a'),
                 i,
@@ -261,11 +249,11 @@ function mediumEditor(selector, options) {
                 }
             }
 
-            while (getElementDefaultDisplay(parentNode.tagName) !== 'block') {
+            while (parentNode.tagName !== undefined && this.parentElements.indexOf(parentNode.tagName) === -1) {
                 this.activateButton(parentNode.tagName.toLowerCase());
                 parentNode = parentNode.parentNode;
             }
-            this.activateButton(parentNode.tagName.toLowerCase());
+
             return this;
         },
 
@@ -276,6 +264,7 @@ function mediumEditor(selector, options) {
             }
         },
 
+        // TODO: break method
         bindButtons: function () {
             var action,
                 buttons = this.toolbar.querySelectorAll('a'),
@@ -291,6 +280,7 @@ function mediumEditor(selector, options) {
                     action = this.getAttribute('data-action');
                     if (action.indexOf('append-') > -1) {
                         self.appendEl(action.replace('append-', ''));
+                        self.setToolbarButtonStates();
                     } else if (action === 'anchor') {
                         self.triggerAnchorAction(e);
                     } else {
@@ -316,21 +306,27 @@ function mediumEditor(selector, options) {
             return this;
         },
 
+        // TODO: break method
         appendEl: function (el) {
-            var selectionEl = this.selection.anchorNode.parentNode,
+            var attributes = [],
+                selectionEl = this.selection.anchorNode.parentNode,
                 tagName = selectionEl.tagName.toLowerCase(),
                 self = this;
-            // TODO: save element attributes
-            if (tagName === el || tagName === 'span') {
+            if (tagName === el) {
                 el = 'p';
             }
-            while (getElementDefaultDisplay(tagName) !== 'block') {
+            while (this.parentElements.indexOf(tagName) === '-1') {
                 selectionEl = selectionEl.parentNode;
                 tagName = selectionEl.tagName.toLowerCase();
             }
+            Array.prototype.slice.call(selectionEl.attributes).forEach(function(item) {
+                attributes.push(item);
+            });
             el = document.createElement(el);
             el.innerHTML = selectionEl.innerHTML;
-            el.setAttribute('contentEditable', true);
+            attributes.forEach(function(item) {
+                el.setAttribute(item.name, item.value);
+            });
             selectionEl.parentNode.replaceChild(el, selectionEl);
             selectElementContents(el.firstChild);
             el.onmouseup = function (e) {
