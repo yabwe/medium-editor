@@ -186,10 +186,12 @@ function mediumEditor(selector, options) {
                 } else {
                     this.selection = newSelection;
                     this.selectionRange = this.selection.getRangeAt(0);
-                    this.setToolbarPosition()
-                        .setToolbarButtonStates()
-                        .showToolbarActions();
-                    this.toolbar.style.display = 'block';
+                    if (this.toolbar.style.display !== 'block') {
+                        this.setToolbarPosition()
+                            .setToolbarButtonStates()
+                            .showToolbarActions();
+                        this.toolbar.style.display = 'block';
+                    }
                 }
             }
             return this;
@@ -240,7 +242,7 @@ function mediumEditor(selector, options) {
             range.insertNode(posEl);
             box = findPos(posEl);
             posEl.parentNode.removeChild(posEl);
-            this.selection.addRange(range);
+            this.selection.anchorNode.parentNode.normalize();
             return [box[0], box[1]];
         },
 
