@@ -60,6 +60,36 @@ function mediumEditor(selector, options) {
         }
     }
 
+    // http://stackoverflow.com/questions/6846230/javascript-text-selection-page-coordinates
+    // by Tim Down
+    function getSelectionCoords() {
+        var sel = document.selection,
+            range,
+            rect,
+            x = 0,
+            y = 0;
+        if (sel) {
+            if (sel.type !== "Control") {
+                range = sel.createRange();
+                range.collapse(true);
+                x = range.boundingLeft;
+                y = range.boundingTop;
+            }
+        } else if (window.getSelection) {
+            sel = window.getSelection();
+            if (sel.rangeCount) {
+                range = sel.getRangeAt(0).cloneRange();
+                if (range.getClientRects) {
+                    range.collapse(true);
+                    rect = range.getClientRects()[0];
+                    x = rect.left;
+                    y = rect.top;
+                }
+            }
+        }
+        return [x, y];
+    }
+
     // http://stackoverflow.com/questions/6139107/programatically-select-text-in-a-contenteditable-html-element
     // by Tim Down
     function selectElementContents(el) {
@@ -82,20 +112,6 @@ function mediumEditor(selector, options) {
         document.body.removeChild(t);
 
         return cStyle;
-    }
-
-    // http://www.quirksmode.org/js/findpos.html
-    function findPos(obj) {
-        var curleft = 0,
-            curtop = 0;
-        if (obj.offsetParent) {
-            do {
-                curleft += obj.offsetLeft;
-                curtop += obj.offsetTop;
-                obj = obj.offsetParent;
-            } while (obj.offsetParent);
-        }
-        return [curleft, curtop];
     }
 
     mediumEditor.prototype = {
@@ -198,7 +214,7 @@ function mediumEditor(selector, options) {
         },
 
         setToolbarPosition: function () {
-            var coords = this.getSelectionCoordinates();
+            var coords = getSelectionCoords();
             this.toolbar.style.left = (coords[0] + this.options.diffLeft) + 'px';
             this.toolbar.style.top = (coords[1] + this.options.diffTop) + 'px';
             return this;
@@ -231,19 +247,6 @@ function mediumEditor(selector, options) {
             if (el !== null) {
                 el.classList.add('medium-editor-button-active');
             }
-        },
-
-        getSelectionCoordinates: function () {
-            var box,
-                posEl = document.createElement('span'),
-                range = this.selection.getRangeAt(0);
-            posEl.innerHTML = this.selection.toString();
-            posEl.style.backgroundColor = 'red';
-            range.insertNode(posEl);
-            box = findPos(posEl);
-            posEl.parentNode.removeChild(posEl);
-            this.selection.anchorNode.parentNode.normalize();
-            return [box[0], box[1]];
         },
 
         bindButtons: function () {
