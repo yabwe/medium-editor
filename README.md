@@ -37,6 +37,7 @@ The above code will transform all the elements with the .editable class into HTM
 * __diffTop__: value to be added to the Y axis positioning of the toolbar. Default: 30
 * __firstHeader__: HTML tag to be used as first header. Default: h3
 * __secondHeader__: HTML tag to be used as second header. Default: h4
+* __delay__: time in milliseconds to show the toolbar. Default: 300
 
 Example:
 
@@ -48,6 +49,7 @@ var editor = new mediumEditor('.editable', {
     firstHeader: 'h1',
     secondHeader: 'h2',
     excludedActions: ['blockquote', 's'],
+    delay: 1000
 });
 ```
 

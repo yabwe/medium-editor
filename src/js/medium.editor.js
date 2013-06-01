@@ -106,7 +106,8 @@ function mediumEditor(selector, options) {
                     diffLeft: 30,
                     diffTop: 30,
                     firstHeader: 'h3',
-                    secondHeader: 'h4'
+                    secondHeader: 'h4',
+                    delay: 300
                 };
             this.id = document.querySelectorAll('.medium-editor-toolbar').length + 1;
             this.options = extend(options, defaults);
@@ -166,7 +167,7 @@ function mediumEditor(selector, options) {
                     clearTimeout(timer);
                     setTimeout(function () {
                         self.checkSelection(e);
-                    }, 1000);
+                    }, self.options.delay);
                 },
                 i;
             for (i = 0; i < this.elements.length; i += 1) {
