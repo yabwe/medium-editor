@@ -67,7 +67,7 @@
             x = 0,
             y = 0;
         if (sel) {
-            if (sel.type !== "Control") {
+            if (sel.type !== 'Control') {
                 range = sel.createRange();
                 range.collapse(true);
                 x = range.boundingLeft;
@@ -86,6 +86,34 @@
             }
         }
         return [x, y];
+    }
+
+    // http://stackoverflow.com/questions/12603397/calculate-width-height-of-the-selected-text-javascript
+    // by Tim Down
+    function getSelectionDimensions() {
+        var sel = document.selection,
+            range,
+            rect,
+            width = 0,
+            height = 0;
+        if (sel) {
+            if (sel.type !== 'Control') {
+                range = sel.createRange();
+                width = range.boundingWidth;
+                height = range.boundingHeight;
+            }
+        } else if (window.getSelection) {
+            sel = window.getSelection();
+            if (sel.rangeCount) {
+                range = sel.getRangeAt(0).cloneRange();
+                if (range.getBoundingClientRect) {
+                    rect = range.getBoundingClientRect();
+                    width = rect.right - rect.left;
+                    height = rect.bottom - rect.top;
+                }
+            }
+        }
+        return [width, height];
     }
 
     // http://stackoverflow.com/questions/6139107/programatically-select-text-in-a-contenteditable-html-element
@@ -118,7 +146,7 @@
                     excludedActions: [],
                     anchorInputPlaceholder: 'Paste or type a link',
                     diffLeft: 0,
-                    diffTop: 0,
+                    diffTop: -5,
                     firstHeader: 'h3',
                     secondHeader: 'h4',
                     delay: 300
@@ -200,20 +228,19 @@
                 } else {
                     this.selection = newSelection;
                     this.selectionRange = this.selection.getRangeAt(0);
-                    if (this.toolbar.style.display !== 'block') {
-                        this.toolbar.style.display = 'block';
-                        this.setToolbarPosition()
-                            .setToolbarButtonStates()
-                            .showToolbarActions();
-                    }
+                    this.toolbar.style.display = 'block';
+                    this.setToolbarPosition()
+                        .setToolbarButtonStates()
+                        .showToolbarActions();
                 }
             }
             return this;
         },
 
         setToolbarPosition: function () {
-            var coords = getSelectionCoords();
-            this.toolbar.style.left = (coords[0] + this.options.diffLeft) + 'px';
+            var coords = getSelectionCoords(),
+                selDimensions = getSelectionDimensions();
+            this.toolbar.style.left = (coords[0] - (this.toolbar.offsetWidth / 2) + (selDimensions[0] / 2) + this.options.diffLeft) + 'px';
             this.toolbar.style.top = (coords[1] + window.scrollY - this.toolbar.offsetHeight + this.options.diffTop) + 'px';
             return this;
         },
