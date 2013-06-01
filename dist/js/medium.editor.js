@@ -313,7 +313,7 @@
             if (tagName === el) {
                 el = 'p';
             }
-            while (this.parentElements.indexOf(tagName) === '-1') {
+            while (this.parentElements.indexOf(tagName) === -1) {
                 selectionEl = selectionEl.parentNode;
                 tagName = selectionEl.tagName.toLowerCase();
             }
