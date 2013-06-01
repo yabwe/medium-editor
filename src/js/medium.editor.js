@@ -161,8 +161,12 @@ function mediumEditor(selector, options) {
 
         bindSelect: function () {
             var self = this,
+                timer = '',
                 checkSelection = function (e) {
-                    self.checkSelection(e);
+                    clearTimeout(timer);
+                    setTimeout(function () {
+                        self.checkSelection(e);
+                    }, 1000);
                 },
                 i;
             for (i = 0; i < this.elements.length; i += 1) {
@@ -310,12 +314,13 @@ function mediumEditor(selector, options) {
         },
 
         showToolbarActions: function () {
-            var self = this;
+            var self = this,
+                timer;
             this.anchorForm.style.display = 'none';
             this.toolbarActions.style.display = 'block';
             this.keepToolbarAlive = false;
-            clearTimeout(this.timer);
-            this.timer = setTimeout(function () {
+            clearTimeout(timer);
+            timer = setTimeout(function () {
                 document.onclick = function (e) {
                     self.keepToolbarAlive = false;
                     self.toolbar.style.display = 'none';
