@@ -1,4 +1,4 @@
-/*! medium.editor - v0.1.0 - 2013-05-31 */function mediumEditor(selector, options) {
+/*! medium.editor - v0.1.0 - 2013-06-01 */function mediumEditor(selector, options) {
     'use strict';
     return this.init(selector, options);
 }
@@ -317,12 +317,10 @@
         appendEl: function (el) {
             var selectionEl = this.selection.anchorNode.parentNode,
                 tagName = selectionEl.tagName.toLowerCase(),
-                bindEvents = false,
                 self = this;
             // TODO: save element attributes
             if (tagName === el || tagName === 'span') {
                 el = 'p';
-                bindEvents = true;
             }
             while (getElementDefaultDisplay(tagName) !== 'block') {
                 selectionEl = selectionEl.parentNode;
@@ -333,14 +331,12 @@
             el.setAttribute('contentEditable', true);
             selectionEl.parentNode.replaceChild(el, selectionEl);
             selectElementContents(el.firstChild);
-            if (bindEvents === true) {
-                el.onmouseup = function (e) {
-                    self.checkSelection(e);
-                };
-                el.onkeydown = function (e) {
-                    self.checkSelection(e);
-                };
-            }
+            el.onmouseup = function (e) {
+                self.checkSelection(e);
+            };
+            el.onkeydown = function (e) {
+                self.checkSelection(e);
+            };
             this.setToolbarPosition();
         },
 
