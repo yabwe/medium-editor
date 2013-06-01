@@ -216,7 +216,7 @@ function mediumEditor(selector, options) {
                 i;
             for (i = 0; i < this.elements.length; i += 1) {
                 this.elements[i].onmouseup = checkSelection;
-                this.elements[i].onkeydown = checkSelection;
+                this.elements[i].onkeyup = checkSelection;
             }
             return this;
         },
@@ -336,7 +336,7 @@ function mediumEditor(selector, options) {
             el.onmouseup = function (e) {
                 self.checkSelection(e);
             };
-            el.onkeydown = function (e) {
+            el.onkeyup = function (e) {
                 self.checkSelection(e);
             };
             this.setToolbarPosition();
@@ -377,7 +377,7 @@ function mediumEditor(selector, options) {
                 e.stopPropagation();
             };
 
-            input.onkeydown = function (e) {
+            input.onkeyup = function (e) {
                 if (e.keyCode === 13) {
                     e.preventDefault();
                     self.createLink(this);
