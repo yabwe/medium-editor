@@ -232,27 +232,34 @@
             return this;
         },
 
-        // TODO: break method
         setToolbarButtonStates: function () {
             var buttons = this.toolbarActions.querySelectorAll('a'),
-                i,
-                parentNode = this.selection.anchorNode.parentNode;
+                i;
 
             for (i = 0; i < buttons.length; i += 1) {
                 buttons[i].classList.remove('medium-editor-button-active');
-                if (this.options.excludedActions.indexOf(buttons[i].getAttribute('data-element')) > -1) {
-                    buttons[i].style.display = 'none';
-                } else {
-                    buttons[i].style.display = 'block';
-                }
+                this.showHideButton(buttons[i]);
             }
 
+            this.checkActiveButtons();
+
+            return this;
+        },
+
+        showHideButton: function (button) {
+            if (this.options.excludedActions.indexOf(button.getAttribute('data-element')) > -1) {
+                button.style.display = 'none';
+            } else {
+                button.style.display = 'block';
+            }
+        },
+
+        checkActiveButtons: function () {
+            var parentNode = this.selection.anchorNode.parentNode;
             while (parentNode.tagName !== undefined && this.parentElements.indexOf(parentNode.tagName) === -1) {
                 this.activateButton(parentNode.tagName.toLowerCase());
                 parentNode = parentNode.parentNode;
             }
-
-            return this;
         },
 
         activateButton: function (tag) {
@@ -262,10 +269,8 @@
             }
         },
 
-        // TODO: break method
         bindButtons: function () {
-            var action,
-                buttons = this.toolbar.querySelectorAll('a'),
+            var buttons = this.toolbar.querySelectorAll('a'),
                 i,
                 self = this,
                 triggerAction = function (e) {
@@ -275,20 +280,23 @@
                         self.checkSelection(e);
                     }
                     this.classList.toggle('medium-editor-button-active');
-                    action = this.getAttribute('data-action');
-                    if (action.indexOf('append-') > -1) {
-                        self.appendEl(action.replace('append-', ''));
-                        self.setToolbarButtonStates();
-                    } else if (action === 'anchor') {
-                        self.triggerAnchorAction(e);
-                    } else {
-                        document.execCommand(action, null, false);
-                    }
+                    self.execAction(this.getAttribute('data-action'), e);
                 };
             for (i = 0; i < buttons.length; i += 1) {
                 buttons[i].onclick = triggerAction;
             }
             return this;
+        },
+
+        execAction: function(action, e) {
+            if (action.indexOf('append-') > -1) {
+                this.appendEl(action.replace('append-', ''));
+                this.setToolbarButtonStates();
+            } else if (action === 'anchor') {
+                this.triggerAnchorAction(e);
+            } else {
+                document.execCommand(action, null, false);
+            }
         },
 
         triggerAnchorAction: function (e) {
@@ -304,13 +312,9 @@
             return this;
         },
 
-        // TODO: break method
         appendEl: function (el) {
-            var attributes = [],
-                firstChild,
-                selectionEl = this.selection.anchorNode.parentNode,
-                tagName = selectionEl.tagName.toLowerCase(),
-                self = this;
+            var selectionEl = this.selection.anchorNode.parentNode,
+                tagName = selectionEl.tagName.toLowerCase();
             while (this.parentElements.indexOf(tagName) === -1) {
                 selectionEl = selectionEl.parentNode;
                 tagName = selectionEl.tagName.toLowerCase();
@@ -318,27 +322,37 @@
             if (tagName === el) {
                 el = 'p';
             }
-            Array.prototype.slice.call(selectionEl.attributes).forEach(function(item) {
-                attributes.push(item);
-            });
             el = document.createElement(el);
+            this.transferAttributes(selectionEl, el);
             el.innerHTML = selectionEl.innerHTML;
-            attributes.forEach(function(item) {
-                el.setAttribute(item.name, item.value);
-            });
             selectionEl.parentNode.replaceChild(el, selectionEl);
-            firstChild = el.firstChild;
-            while (firstChild.nodeType !== 1) {
+            selectElementContents(this.getFirstChild(el) || el);
+            this.bindElementToolbarEvents(el);
+            this.setToolbarPosition();
+        },
+
+        transferAttributes: function (elFrom, elTo) {
+            Array.prototype.slice.call(elFrom.attributes).forEach(function(item) {
+                elTo.setAttribute(item.name, item.value);
+            });
+        },
+
+        getFirstChild: function (el) {
+            var firstChild = el.firstChild;
+            while (firstChild !== null && firstChild.nodeType !== 1) {
                 firstChild = firstChild.nextSibling;
             }
-            selectElementContents(firstChild);
+            return firstChild;
+        },
+
+        bindElementToolbarEvents: function (el) {
+            var self = this;
             el.onmouseup = function (e) {
                 self.checkSelection(e);
             };
             el.onkeyup = function (e) {
                 self.checkSelection(e);
             };
-            this.setToolbarPosition();
         },
 
         showToolbarActions: function () {
