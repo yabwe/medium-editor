@@ -61,7 +61,7 @@
     // http://stackoverflow.com/questions/6846230/javascript-text-selection-page-coordinates
     // by Tim Down
     function getSelectionCoords() {
-        var sel = window.selection,
+        var sel = document.selection,
             range,
             rect,
             x = 0,
