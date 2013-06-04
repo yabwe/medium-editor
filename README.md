@@ -1,5 +1,7 @@
 # MediumEditor
 
+[![Build Status](https://travis-ci.org/daviferreira/medium-editor.png?branch=master)](https://travis-ci.org/daviferreira/medium-editor)
+
 This is a clone of [medium.com](medium.com) inline editor toolbar. 
 
 Since I always had problems with bloated editors and I loved the simplicity of medium.com solution I've tried to implement their WYSIWYG approach with this script.
