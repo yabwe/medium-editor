@@ -1,6 +1,6 @@
 /*global console*/
 
-function mediumEditor(selector, options) {
+function MediumEditor(selector, options) {
     'use strict';
     return this.init(selector, options);
 }
@@ -128,7 +128,7 @@ function mediumEditor(selector, options) {
         sel.addRange(range);
     }
 
-    mediumEditor.prototype = {
+    MediumEditor.prototype = {
         init: function (selector, options) {
             var defaults = {
                     excludedActions: [],

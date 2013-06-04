@@ -3,7 +3,7 @@ module.exports = function(grunt) {
   grunt.initConfig({
     pkg: grunt.file.readJSON('package.json'),
     jslint: {
-      files: 'src/js/**/*.js',
+      files: ['src/js/**/*.js', 'spec/*.js'],
       directives: {
         browser: true,
         unparam: true,
@@ -11,7 +11,7 @@ module.exports = function(grunt) {
       }
     },
     jasmine: {
-      feed: {
+      suite: {
         src: 'src/js/**/*.js',
         options: {
           specs: 'spec/*.spec.js',
@@ -49,7 +49,7 @@ module.exports = function(grunt) {
     },
     watch: {
       scripts: {
-        files: 'src/js/**/*.js',
+        files: ['src/js/**/*.js', 'spec/*.js'],
         tasks: ['js'],
         options: {
           debounceDelay: 250,
@@ -58,13 +58,6 @@ module.exports = function(grunt) {
       styles: {
         files: 'src/sass/**/*.scss',
         tasks: ['css'],
-        options: {
-          debounceDelay: 250,
-        },
-      },
-      specs: {
-        files: 'spec/**/*.js',
-        tasks: ['jasmine'],
         options: {
           debounceDelay: 250,
         },

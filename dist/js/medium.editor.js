@@ -1,4 +1,4 @@
-/*! medium.editor - v0.1.0 - 2013-06-03 */function mediumEditor(selector, options) {
+/*! medium.editor - v0.1.0 - 2013-06-03 */function MediumEditor(selector, options) {
     'use strict';
     return this.init(selector, options);
 }
@@ -126,7 +126,7 @@
         sel.addRange(range);
     }
 
-    mediumEditor.prototype = {
+    MediumEditor.prototype = {
         init: function (selector, options) {
             var defaults = {
                     excludedActions: [],
