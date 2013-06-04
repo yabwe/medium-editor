@@ -239,7 +239,8 @@ function mediumEditor(selector, options) {
                 i;
 
             for (i = 0; i < buttons.length; i += 1) {
-                buttons[i].classList.remove('medium-editor-button-active');
+                buttons[i].className = buttons[i].className.replace(/medium-editor-button-active/g, '')
+                                                           .replace(/\s{2}/g, ' ');
                 this.showHideButton(buttons[i]);
             }
 
@@ -258,7 +259,8 @@ function mediumEditor(selector, options) {
 
         checkActiveButtons: function () {
             var parentNode = this.selection.anchorNode.parentNode;
-            while (parentNode.tagName !== undefined && this.parentElements.indexOf(parentNode.tagName) === -1) {
+            while (parentNode.tagName !== undefined
+                    && this.parentElements.indexOf(parentNode.tagName) === -1) {
                 this.activateButton(parentNode.tagName.toLowerCase());
                 parentNode = parentNode.parentNode;
             }
@@ -266,8 +268,8 @@ function mediumEditor(selector, options) {
 
         activateButton: function (tag) {
             var el = this.toolbar.querySelector('a[data-element="' + tag + '"]');
-            if (el !== null) {
-                el.classList.add('medium-editor-button-active');
+            if (el !== null && el.className.indexOf('medium-editor-button-active') > -1) {
+                el.className += ' medium-editor-button-active';
             }
         },
 
@@ -278,10 +280,15 @@ function mediumEditor(selector, options) {
                 triggerAction = function (e) {
                     e.preventDefault();
                     e.stopPropagation();
-                    if (this.selection === undefined) {
+                    if (self.selection === undefined) {
                         self.checkSelection(e);
                     }
-                    this.classList.toggle('medium-editor-button-active');
+                    if (this.className.indexOf('medium-editor-button-active') > -1) {
+                        this.className = this.className.replace(/medium-editor-button-active/g, '')
+                                             .replace(/\s{2}/g, ' ');
+                    } else {
+                        this.className += ' medium-editor-button-active';
+                    }
                     self.execAction(this.getAttribute('data-action'), e);
                 };
             for (i = 0; i < buttons.length; i += 1) {
