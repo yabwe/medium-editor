@@ -1,4 +1,4 @@
-/*! medium.editor - v0.1.0 - 2013-06-03 */function mediumEditor(selector, options) {
+function MediumEditor(selector, options) {
     'use strict';
     return this.init(selector, options);
 }
@@ -126,8 +126,12 @@
         sel.addRange(range);
     }
 
-    mediumEditor.prototype = {
+    MediumEditor.prototype = {
         init: function (selector, options) {
+            this.elements = document.querySelectorAll(selector);
+            if (this.elements.length === 0) {
+                return;
+            }
             var defaults = {
                     excludedActions: [],
                     anchorInputPlaceholder: 'Paste or type a link',
@@ -149,7 +153,6 @@
 
         initElements: function (selector) {
             var i;
-            this.elements = document.querySelectorAll(selector);
             for (i = 0; i < this.elements.length; i += 1) {
                 this.elements[i].setAttribute('contentEditable', true);
             }
