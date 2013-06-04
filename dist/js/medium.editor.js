@@ -1,4 +1,4 @@
-/*! medium.editor - v0.1.0 - 2013-06-01 */function mediumEditor(selector, options) {
+/*! medium.editor - v0.1.0 - 2013-06-03 */function mediumEditor(selector, options) {
     'use strict';
     return this.init(selector, options);
 }
@@ -307,15 +307,16 @@
         // TODO: break method
         appendEl: function (el) {
             var attributes = [],
+                firstChild,
                 selectionEl = this.selection.anchorNode.parentNode,
                 tagName = selectionEl.tagName.toLowerCase(),
                 self = this;
-            if (tagName === el) {
-                el = 'p';
-            }
             while (this.parentElements.indexOf(tagName) === -1) {
                 selectionEl = selectionEl.parentNode;
                 tagName = selectionEl.tagName.toLowerCase();
+            }
+            if (tagName === el) {
+                el = 'p';
             }
             Array.prototype.slice.call(selectionEl.attributes).forEach(function(item) {
                 attributes.push(item);
@@ -326,7 +327,11 @@
                 el.setAttribute(item.name, item.value);
             });
             selectionEl.parentNode.replaceChild(el, selectionEl);
-            selectElementContents(el.firstChild);
+            firstChild = el.firstChild;
+            while (firstChild.nodeType !== 1) {
+                firstChild = firstChild.nextSibling;
+            }
+            selectElementContents(firstChild);
             el.onmouseup = function (e) {
                 self.checkSelection(e);
             };
