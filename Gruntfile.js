@@ -20,9 +20,6 @@ module.exports = function(grunt) {
       }
     },
     uglify: {
-      options: {
-        banner: '/*! <%= pkg.name %> <%= grunt.template.today("yyyy-mm-dd") %> */\n'
-      },
       build: {
         src: 'src/js/medium.editor.js',
         dest: 'dist/js/<%= pkg.name %>.min.js'
@@ -65,9 +62,7 @@ module.exports = function(grunt) {
     },
     concat: {
       options: {
-        stripBanners: true,
-        banner: '/*! <%= pkg.name %> - v<%= pkg.version %> - ' +
-          '<%= grunt.template.today("yyyy-mm-dd") %> */'
+        stripBanners: true
       },
       dist: {
         src: 'src/js/medium.editor.js',

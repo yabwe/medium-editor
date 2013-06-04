@@ -1,4 +1,4 @@
-/*! medium.editor - v0.1.0 - 2013-06-04 */function MediumEditor(selector, options) {
+function MediumEditor(selector, options) {
     'use strict';
     return this.init(selector, options);
 }
