@@ -37,7 +37,7 @@ The above code will transform all the elements with the .editable class into HTM
 * __diffTop__: value in pixels to be added to the Y axis positioning of the toolbar. Default: -5
 * __firstHeader__: HTML tag to be used as first header. Default: h3
 * __secondHeader__: HTML tag to be used as second header. Default: h4
-* __delay__: time in milliseconds to show the toolbar. Default: 300
+* __delay__: time in milliseconds to show the toolbar. Default: 0
 
 Example:
 
