@@ -130,6 +130,10 @@ function MediumEditor(selector, options) {
 
     MediumEditor.prototype = {
         init: function (selector, options) {
+            this.elements = document.querySelectorAll(selector);
+            if (this.elements.length === 0) {
+                return;
+            }
             var defaults = {
                     excludedActions: [],
                     anchorInputPlaceholder: 'Paste or type a link',
@@ -151,7 +155,6 @@ function MediumEditor(selector, options) {
 
         initElements: function (selector) {
             var i;
-            this.elements = document.querySelectorAll(selector);
             for (i = 0; i < this.elements.length; i += 1) {
                 this.elements[i].setAttribute('contentEditable', true);
             }
