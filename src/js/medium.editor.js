@@ -268,7 +268,7 @@ function mediumEditor(selector, options) {
 
         activateButton: function (tag) {
             var el = this.toolbar.querySelector('a[data-element="' + tag + '"]');
-            if (el !== null && el.className.indexOf('medium-editor-button-active') > -1) {
+            if (el !== null && el.className.indexOf('medium-editor-button-active') === -1) {
                 el.className += ' medium-editor-button-active';
             }
         },
