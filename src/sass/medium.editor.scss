@@ -41,6 +41,8 @@ $bgcolor: #242424;
         button {
             display: block;
             padding: 15px;
+            box-sizing: border-box;
+            width: 50px;
             background: #333332;
             color: #fff;
             color: rgba(#fff, .8);
@@ -49,7 +51,7 @@ $bgcolor: #242424;
             border-left: 1px solid #333;
             border-left: 1px solid rgba(#fff, .1);
             @include box-shadow(0 2px 2px rgba(0,0,0,0.3));
-            font-weight: bold;
+            font-weight: normal;
             text-decoration: none;
             text-transform: lowercase;
             &:hover {
@@ -96,7 +98,7 @@ $bgcolor: #242424;
         box-sizing: border-box;
         padding: 6px;
         height: 52px;
-        width: 295px;
+        width: 316px;
         background: $bgcolor;
         border: none;
         color: #ccc;
