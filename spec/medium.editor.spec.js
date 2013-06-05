@@ -67,6 +67,20 @@ describe('Medium Editor TestCase', function () {
                 expect(editor.options).toEqual(defaultOptions);
             });
 
+            it('should accept custom options values', function () {
+                var options = {
+                        excludedActions: ['h1'],
+                        anchorInputPlaceholder: 'test',
+                        diffLeft: 10,
+                        diffTop: 5,
+                        firstHeader: 'h2',
+                        secondHeader: 'h3',
+                        delay: 300
+                    },
+                    editor = new MediumEditor('.editor', options);
+                expect(editor.options).toEqual(options);
+            });
+
             it('should call the default initialization methods', function () {
                 spyOn(MediumEditor.prototype, 'initElements').andCallThrough();
                 spyOn(MediumEditor.prototype, 'initToolbar').andCallThrough();
@@ -91,6 +105,30 @@ describe('Medium Editor TestCase', function () {
                 expect(editor2.id).toBe(2);
                 expect(editor3.id).toBe(3);
             });
+        });
+    });
+
+    describe('Elements initialization', function () {
+        beforeEach(function () {
+            this.body = document.getElementsByTagName('body')[0];
+            this.el = document.createElement('div');
+            this.el.className = 'editor';
+            this.body.appendChild(this.el);
+        });
+
+        afterEach(function () {
+            var elements = document.querySelectorAll('.medium-editor-toolbar'),
+                i;
+            for (i = 0; i < elements.length; i += 1) {
+                this.body.removeChild(elements[i]);
+            }
+            this.body.removeChild(this.el);
+        });
+
+        it('should set element contenteditable attribute to true', function () {
+            var editor = new MediumEditor('.editor');
+            expect(editor.elements.length).toBe(1);
+            expect(this.el.getAttribute('contenteditable')).toEqual('true');
         });
     });
 });
