@@ -15,7 +15,17 @@ module.exports = function(grunt) {
         src: 'src/js/**/*.js',
         options: {
           specs: 'spec/*.spec.js',
-          helpers: 'spec/helpers/*.js'
+          helpers: 'spec/helpers/*.js',
+          junit: {
+              path: "reports/jasmine/",
+              consolidate: true
+          },
+          keepRunner: true,
+          template: require('grunt-template-jasmine-istanbul'),
+          templateOptions: {
+              coverage: 'reports/jasmine/coverage.json',
+              report: 'coverage/client'
+          }
         }
       }
     },
@@ -68,6 +78,13 @@ module.exports = function(grunt) {
         src: 'src/js/medium.editor.js',
         dest: 'dist/js/<%= pkg.name %>.js'
       }
+    },
+    plato: {
+      feed: {
+        files: {
+          'reports/plato': ['src/js/medium.editor.js'],
+        }
+      },
     }
   });
 
@@ -78,6 +95,7 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-csslint');
   grunt.loadNpmTasks('grunt-contrib-watch');
   grunt.loadNpmTasks('grunt-contrib-concat');
+  grunt.loadNpmTasks('grunt-plato');
 
   grunt.registerTask('test', ['jslint', 'jasmine', 'csslint']);
   grunt.registerTask('js', ['jslint', 'jasmine', 'uglify', 'concat']);

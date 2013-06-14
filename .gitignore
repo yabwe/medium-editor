@@ -6,3 +6,5 @@ node_modules/
 npm-debug.log
 .grunt/
 _SpecRunner.html
+reports/
+coverage/
