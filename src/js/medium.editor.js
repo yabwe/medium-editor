@@ -199,7 +199,7 @@ function MediumEditor(selector, options) {
         bindSelect: function () {
             var self = this,
                 timer = '',
-                checkSelection = function (e) {
+                checkSelectionWrapper = function (e) {
                     clearTimeout(timer);
                     setTimeout(function () {
                         self.checkSelection(e);
@@ -207,8 +207,8 @@ function MediumEditor(selector, options) {
                 },
                 i;
             for (i = 0; i < this.elements.length; i += 1) {
-                this.elements[i].onmouseup = checkSelection;
-                this.elements[i].onkeyup = checkSelection;
+                this.elements[i].onmouseup = checkSelectionWrapper;
+                this.elements[i].onkeyup = checkSelectionWrapper;
             }
             return this;
         },
