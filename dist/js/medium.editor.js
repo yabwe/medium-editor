@@ -260,8 +260,7 @@ function MediumEditor(selector, options) {
 
         checkActiveButtons: function () {
             var parentNode = this.selection.anchorNode.parentNode;
-            while (parentNode.tagName !== undefined
-                    && this.parentElements.indexOf(parentNode.tagName) === -1) {
+            while (parentNode.tagName !== undefined && this.parentElements.indexOf(parentNode.tagName) === -1) {
                 this.activateButton(parentNode.tagName.toLowerCase());
                 parentNode = parentNode.parentNode;
             }
