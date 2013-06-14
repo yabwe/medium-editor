@@ -127,23 +127,25 @@ function MediumEditor(selector, options) {
     }
 
     MediumEditor.prototype = {
+
+        defaults: {
+            excludedActions: [],
+            anchorInputPlaceholder: 'Paste or type a link',
+            diffLeft: 0,
+            diffTop: -5,
+            firstHeader: 'h3',
+            secondHeader: 'h4',
+            delay: 0
+        },
+
         init: function (selector, options) {
             this.elements = document.querySelectorAll(selector);
             if (this.elements.length === 0) {
                 return;
             }
-            var defaults = {
-                    excludedActions: [],
-                    anchorInputPlaceholder: 'Paste or type a link',
-                    diffLeft: 0,
-                    diffTop: -5,
-                    firstHeader: 'h3',
-                    secondHeader: 'h4',
-                    delay: 0
-                };
             this.parentElements = ['p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'blockquote'];
             this.id = document.querySelectorAll('.medium-editor-toolbar').length + 1;
-            this.options = extend(options, defaults);
+            this.options = extend(options, this.defaults);
             return this.initElements(selector)
                        .initToolbar()
                        .bindSelect()
