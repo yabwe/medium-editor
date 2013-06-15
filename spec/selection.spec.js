@@ -15,18 +15,18 @@ describe('Selection TestCase', function () {
 
     afterEach(function () {
         var elements = document.querySelectorAll('.medium-editor-toolbar'),
-            i;
+            i,
+            sel = window.getSelection();
         for (i = 0; i < elements.length; i += 1) {
             this.body.removeChild(elements[i]);
         }
         this.body.removeChild(this.el);
+        sel.removeAllRanges();
     });
 
     describe('CheckSelection', function () {
-        beforeEach(function () {
-            jasmine.Clock.useMock();
-        });
         it('should check for selection on mouseup event', function () {
+            jasmine.Clock.useMock();
             spyOn(MediumEditor.prototype, 'checkSelection');
             var editor = new MediumEditor('.editor');
             fireEvent(editor.elements[0], 'mouseup');
@@ -35,6 +35,7 @@ describe('Selection TestCase', function () {
         });
 
         it('should check for selection on keyup', function () {
+            jasmine.Clock.useMock();
             spyOn(MediumEditor.prototype, 'checkSelection');
             var editor = new MediumEditor('.editor');
             fireEvent(editor.elements[0], 'keyup');
@@ -51,13 +52,6 @@ describe('Selection TestCase', function () {
         });
 
         describe('When keepToolbarAlive is false', function () {
-            it('should get window selection', function () {
-                spyOn(window, 'getSelection').andCallThrough();
-                var editor = new MediumEditor('.editor');
-                editor.checkSelection();
-                expect(window.getSelection).toHaveBeenCalled();
-            });
-
             it('should hide the toolbar if selection is empty', function () {
                 spyOn(MediumEditor.prototype, 'setToolbarPosition').andCallThrough();
                 spyOn(MediumEditor.prototype, 'setToolbarButtonStates').andCallThrough();
