@@ -1,10 +1,25 @@
+*:focus {
+    outline: none;
+}
+
 body {
-    font-family: HelveticaNeue, Helvetica, Arial, sans-serif;
-    font-size: 14px;
-    line-height: 18px;
+    font-family: Georgia, Times, TimesNewRoman, serif;
+    font-size: 22px;
+    line-height: 30px;
 }
 
 #container {
     width: 960px;
     margin: 30px auto;
+}
+
+h1 {
+    text-align: center;
+    margin-bottom: 40px;
+    padding-bottom: 40px;
+    border-bottom: 1px solid #dbdbdb;
+}
+
+p {
+    margin-bottom: 40px;
 }
