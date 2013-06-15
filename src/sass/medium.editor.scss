@@ -27,7 +27,7 @@ $button_size: 50px;
         width: 0;
         height: 0;
         border-width: 8px 8px 0 8px;
-        border-color: #333 transparent transparent transparent;
+        border-color: $bgcolor transparent transparent transparent;
         border-style: solid;
     }
 
@@ -45,7 +45,7 @@ $button_size: 50px;
             box-sizing: border-box;
             height: $button_size;
             width: $button_size;
-            background: #333;
+            background: $bgcolor;
             color: #fff;
             border: 0;
             border-right: 1px solid #000;
