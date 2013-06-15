@@ -5,3 +5,7 @@
 * fix toolbar positioning on IE
 * toolbar CSS3 transitions
 * toolbar tip?
+* modularize
+* image action
+* focus mode
+* fullscreen
