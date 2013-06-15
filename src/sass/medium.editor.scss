@@ -2,6 +2,7 @@
 @import "clearfix";
 
 $bgcolor: #242424;
+$button_size: 50px;
 
 .medium-editor-toolbar {
     position: absolute;
@@ -10,24 +11,24 @@ $bgcolor: #242424;
     z-index: 10;
     display: none;
     background: $bgcolor;
-    font-family: Georgia, Times, TimesNewRoman, serif;
-    font-size: 20px;
+    font-family: HelveticaNeue, Helvetica, Arial, sans-serif;
+    font-size: 16px;
     @include border-radius(5px);
     @include box-shadow(0 0 3px #000);
+    @include transition(all .2s ease-in-out);
 
     &:before {
         content: "";
         display: block;
         position: absolute;
-        top: 51.5px;
+        top: $button_size;
         left: 50%;
         margin-left: -8px;
         width: 0;
         height: 0;
         border-width: 8px 8px 0 8px;
-        border-color: #333332 transparent transparent transparent;
+        border-color: #333 transparent transparent transparent;
         border-style: solid;
-        z-index: 10;
     }
 
     ul {
@@ -42,20 +43,22 @@ $bgcolor: #242424;
             display: block;
             padding: 15px;
             box-sizing: border-box;
-            width: 55px;
-            background: #333332;
+            height: $button_size;
+            width: $button_size;
+            background: #333;
             color: #fff;
-            color: rgba(#fff, .8);
             border: 0;
             border-right: 1px solid #000;
             border-left: 1px solid #333;
             border-left: 1px solid rgba(#fff, .1);
-            @include box-shadow(0 2px 2px rgba(0,0,0,0.3));
-            font-weight: normal;
+            font-weight: bold;
             text-decoration: none;
             text-transform: lowercase;
+            @include box-shadow(0 2px 2px rgba(0,0,0,0.3));
+            @include transition(background-color .2s ease-in);
             &:hover {
                 color: yellow;
+                background-color: #000;
             }
         }
         .medium-editor-button-active {
@@ -97,7 +100,7 @@ $bgcolor: #242424;
     input {
         box-sizing: border-box;
         padding: 6px;
-        height: 52px;
+        height: $button_size;
         width: 316px;
         background: $bgcolor;
         border: none;
