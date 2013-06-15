@@ -53,7 +53,7 @@ $button_size: 50px;
             border-left: 1px solid rgba(#fff, .1);
             font-weight: bold;
             text-decoration: none;
-            text-transform: lowercase;
+            text-transform: uppercase;
             @include box-shadow(0 2px 2px rgba(0,0,0,0.3));
             @include transition(background-color .2s ease-in);
             &:hover {
