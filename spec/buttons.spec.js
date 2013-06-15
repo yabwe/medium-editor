@@ -40,7 +40,7 @@ describe('Buttons TestCase', function () {
             expect(editor.toolbar.querySelector('[data-element="u"]').style.display).toBe('block');
             expect(editor.toolbar.querySelector('[data-element="h3"]').style.display).toBe('block');
             expect(editor.toolbar.querySelector('[data-element="h4"]').style.display).toBe('block');
-            expect(editor.toolbar.querySelector('[data-element="blockquote"]').style.display).toBe('block');
+            expect(editor.toolbar.querySelector('[data-element="q"]').style.display).toBe('block');
         });
 
         it('should activate button if selection already has the element', function () {
