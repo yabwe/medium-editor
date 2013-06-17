@@ -134,6 +134,24 @@ describe('Buttons TestCase', function () {
             expect(editor.execAction).toHaveBeenCalled();
         });
 
+        it('should call the triggerAnchorAction method when button element is "a"', function () {
+            spyOn(MediumEditor.prototype, 'triggerAnchorAction');
+            var button,
+                editor = new MediumEditor('.editor');
+            selectElementContents(editor.elements[0]);
+            fireEvent(editor.elements[0], 'mouseup');
+            jasmine.Clock.tick(1);
+            button = editor.toolbar.querySelector('[data-element="a"]');
+            fireEvent(button, 'click');
+            expect(editor.triggerAnchorAction).toHaveBeenCalled();
+        });
+    });
+
+    describe('AppendEl', function () {
+        beforeEach(function () {
+            jasmine.Clock.useMock();
+        });
+
         it('should call the appendEl method when button action is append', function () {
             spyOn(MediumEditor.prototype, 'appendEl');
             var button,
@@ -146,18 +164,41 @@ describe('Buttons TestCase', function () {
             expect(editor.appendEl).toHaveBeenCalled();
         });
 
-        it('should call the triggerAnchorAction method when button element is "a"', function () {
-            spyOn(MediumEditor.prototype, 'triggerAnchorAction');
+        it('should create an h3 element when header1 is clicked', function () {
+            this.el.innerHTML = '<p><b>lorem ipsum</b></p>';
             var button,
                 editor = new MediumEditor('.editor');
             selectElementContents(editor.elements[0]);
             fireEvent(editor.elements[0], 'mouseup');
             jasmine.Clock.tick(1);
-            button = editor.toolbar.querySelector('[data-element="a"]');
+            button = editor.toolbar.querySelector('[data-element="h3"]');
             fireEvent(button, 'click');
-            expect(editor.triggerAnchorAction).toHaveBeenCalled();
+            expect(this.el.innerHTML).toBe('<h3><b>lorem ipsum</b></h3>');
         });
 
+        it('should get back to a p element if parent element is the same as the action', function () {
+            this.el.innerHTML = '<h3><b>lorem ipsum</b></h3>';
+            var button,
+                editor = new MediumEditor('.editor');
+            selectElementContents(editor.elements[0]);
+            fireEvent(editor.elements[0], 'mouseup');
+            jasmine.Clock.tick(1);
+            button = editor.toolbar.querySelector('[data-element="h3"]');
+            fireEvent(button, 'click');
+            expect(this.el.innerHTML).toBe('<p><b>lorem ipsum</b></p>');
+        });
+
+        it('should transfer parent element attributes', function () {
+            this.el.innerHTML = '<p class="test" data-transfer="test"><b>lorem ipsum</b></p>';
+            var button,
+                editor = new MediumEditor('.editor');
+            selectElementContents(editor.elements[0]);
+            fireEvent(editor.elements[0], 'mouseup');
+            jasmine.Clock.tick(1);
+            button = editor.toolbar.querySelector('[data-element="h3"]');
+            fireEvent(button, 'click');
+            expect(this.el.innerHTML).toBe('<h3 class="test" data-transfer="test"><b>lorem ipsum</b></h3>');
+        });
 
     });
 });
