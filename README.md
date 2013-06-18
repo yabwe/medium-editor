@@ -50,7 +50,7 @@ var editor = new MediumEditor('.editable', {
     diffTop: 10,
     firstHeader: 'h1',
     secondHeader: 'h2',
-    excludedActions: ['blockquote', 's'],
+    excludedActions: ['q', 's'],
     delay: 1000
 });
 ```
