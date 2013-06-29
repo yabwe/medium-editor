@@ -19,6 +19,11 @@ function MediumEditor(selector, options) {
         return b;
     }
 
+    // https://developer.mozilla.org/en-US/docs/Web/API/window.scrollY?redirectlocale=en-US&redirectslug=DOM/window.scrollY
+    function getDocumentScrollY() {
+        return (window.pageYOffset !== undefined) ? window.pageYOffset : (document.documentElement || document.body.parentNode || document.body).scrollTop;
+    }
+
     // http://stackoverflow.com/questions/5605401/insert-link-in-contenteditable-element
     // by Tim Down
     function saveSelection() {
@@ -233,7 +238,7 @@ function MediumEditor(selector, options) {
             var coords = getSelectionCoords(),
                 selDimensions = getSelectionDimensions();
             this.toolbar.style.left = (coords[0] - (this.toolbar.offsetWidth / 2) + (selDimensions[0] / 2) + this.options.diffLeft) + 'px';
-            this.toolbar.style.top = (coords[1] + window.scrollY - this.toolbar.offsetHeight + this.options.diffTop) + 'px';
+            this.toolbar.style.top = (coords[1] + getDocumentScrollY() - this.toolbar.offsetHeight + this.options.diffTop) + 'px';
             return this;
         },
 
