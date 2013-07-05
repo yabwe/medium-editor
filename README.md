@@ -71,3 +71,9 @@ These are the available grunt tasks:
 * __watch__: watch for modifications on script/scss files
 
 The source files are located inside the __src__ directory. MediumEditor stylesheet was created using sass/compass, make sure you have the compass gem installed on your system.
+
+## License
+
+"THE BEER-WARE LICENSE" (Revision 42):
+
+As long as you retain this notice you can do whatever you want with this stuff. If we meet some day, and you think this stuff is worth it, you can buy me a beer in return.
