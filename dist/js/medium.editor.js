@@ -236,7 +236,10 @@ function MediumEditor(selector, options) {
         },
 
         checkActiveButtons: function () {
-            var parentNode = this.selection.anchorNode.parentNode;
+            var parentNode = this.selection.anchorNode;
+            if (!parentNode.tagName) {
+                parentNode = this.selection.anchorNode.parentNode;
+            }
             while (parentNode.tagName !== undefined && this.parentElements.indexOf(parentNode.tagName) === -1) {
                 this.activateButton(parentNode.tagName.toLowerCase());
                 parentNode = parentNode.parentNode;
@@ -315,7 +318,7 @@ function MediumEditor(selector, options) {
             this.transferAttributes(selectionEl, el);
             el.innerHTML = selectionEl.innerHTML;
             selectionEl.parentNode.replaceChild(el, selectionEl);
-            selectElementContents(this.getFirstChild(el) || el);
+            selectElementContents(el);
             this.bindElementToolbarEvents(el);
             this.setToolbarPosition();
         },
