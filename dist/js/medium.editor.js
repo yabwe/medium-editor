@@ -30,18 +30,13 @@ function MediumEditor(selector, options) {
         var i,
             len,
             ranges,
-            sel;
-        if (window.getSelection) {
             sel = window.getSelection();
-            if (sel.getRangeAt && sel.rangeCount) {
-                ranges = [];
-                for (i = 0, len = sel.rangeCount; i < len; i += 1) {
-                    ranges.push(sel.getRangeAt(i));
-                }
-                return ranges;
+        if (sel.getRangeAt && sel.rangeCount) {
+            ranges = [];
+            for (i = 0, len = sel.rangeCount; i < len; i += 1) {
+                ranges.push(sel.getRangeAt(i));
             }
-        } else if (document.selection && document.selection.createRange) {
-            return document.selection.createRange();
+            return ranges;
         }
         return null;
     }
@@ -49,16 +44,11 @@ function MediumEditor(selector, options) {
     function restoreSelection(savedSel) {
         var i,
             len,
-            sel;
+            sel = window.getSelection();
         if (savedSel) {
-            if (window.getSelection) {
-                sel = window.getSelection();
-                sel.removeAllRanges();
-                for (i = 0, len = savedSel.length; i < len; i += 1) {
-                    sel.addRange(savedSel[i]);
-                }
-            } else if (document.selection && savedSel.select) {
-                savedSel.select();
+            sel.removeAllRanges();
+            for (i = 0, len = savedSel.length; i < len; i += 1) {
+                sel.addRange(savedSel[i]);
             }
         }
     }
@@ -66,28 +56,17 @@ function MediumEditor(selector, options) {
     // http://stackoverflow.com/questions/6846230/javascript-text-selection-page-coordinates
     // by Tim Down
     function getSelectionCoords() {
-        var sel = document.selection,
+        var sel = window.getSelection(),
             range,
             rect,
             x = 0,
             y = 0;
-        if (sel) {
-            if (sel.type !== 'Control') {
-                range = sel.createRange();
-                range.collapse(true);
-                x = range.boundingLeft;
-                y = range.boundingTop;
-            }
-        } else if (window.getSelection) {
-            sel = window.getSelection();
-            if (sel.rangeCount) {
-                range = sel.getRangeAt(0).cloneRange();
-                if (range.getClientRects) {
-                    range.collapse(true);
-                    rect = range.getClientRects()[0];
-                    x = rect.left;
-                    y = rect.top;
-                }
+        if (sel.rangeCount) {
+            range = sel.getRangeAt(0).cloneRange();
+            if (range.getClientRects) {
+                rect = range.getClientRects()[0];
+                x = rect.left;
+                y = rect.top;
             }
         }
         return [x, y];
@@ -96,26 +75,17 @@ function MediumEditor(selector, options) {
     // http://stackoverflow.com/questions/12603397/calculate-width-height-of-the-selected-text-javascript
     // by Tim Down
     function getSelectionDimensions() {
-        var sel = document.selection,
+        var sel = window.getSelection(),
             range,
             rect,
             width = 0,
             height = 0;
-        if (sel) {
-            if (sel.type !== 'Control') {
-                range = sel.createRange();
-                width = range.boundingWidth;
-                height = range.boundingHeight;
-            }
-        } else if (window.getSelection) {
-            sel = window.getSelection();
-            if (sel.rangeCount) {
-                range = sel.getRangeAt(0).cloneRange();
-                if (range.getBoundingClientRect) {
-                    rect = range.getBoundingClientRect();
-                    width = rect.right - rect.left;
-                    height = rect.bottom - rect.top;
-                }
+        if (sel.rangeCount) {
+            range = sel.getRangeAt(0).cloneRange();
+            if (range.getBoundingClientRect) {
+                rect = range.getBoundingClientRect();
+                width = rect.right - rect.left;
+                height = rect.bottom - rect.top;
             }
         }
         return [width, height];
@@ -124,18 +94,11 @@ function MediumEditor(selector, options) {
     // http://stackoverflow.com/questions/6139107/programatically-select-text-in-a-contenteditable-html-element
     // by Tim Down & yckart
     function selectElementContents(el) {
-        var range, selection;
-        if (document.body.createTextRange) {
-            range = document.body.createTextRange();
-            range.moveToElementText(el);
-            range.select();
-        } else if (window.getSelection) {
-            selection = window.getSelection();
+        var selection = window.getSelection(),
             range = document.createRange();
-            range.selectNodeContents(el);
-            selection.removeAllRanges();
-            selection.addRange(range);
-        }
+        range.selectNodeContents(el);
+        selection.removeAllRanges();
+        selection.addRange(range);
     }
 
     MediumEditor.prototype = {
@@ -336,8 +299,11 @@ function MediumEditor(selector, options) {
         },
 
         appendEl: function (el) {
-            var selectionEl = this.selection.anchorNode.parentNode,
+            var selectionEl = this.selection.anchorNode,
+                tagName;
+            if (selectionEl && selectionEl.tagName) {
                 tagName = selectionEl.tagName.toLowerCase();
+            }
             while (this.parentElements.indexOf(tagName) === -1) {
                 selectionEl = selectionEl.parentNode;
                 tagName = selectionEl.tagName.toLowerCase();
