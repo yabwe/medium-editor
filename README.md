@@ -8,7 +8,7 @@ Since I always had problems with bloated editors and I loved the simplicity of m
 
 MediumEditor has been written using vanilla JavaScript, no additional frameworks required.
 
-It was tested only on Google Chrome and Firefox most recent versions.
+Tested on Googe Chrome, Firefox and IE9+.
 
 # Basic usage
 
