@@ -124,13 +124,20 @@ function MediumEditor(selector, options) {
     }
 
     // http://stackoverflow.com/questions/6139107/programatically-select-text-in-a-contenteditable-html-element
-    // by Tim Down
+    // by Tim Down & yckart
     function selectElementContents(el) {
-        var range = document.createRange(),
-            sel = window.getSelection();
-        range.selectNodeContents(el);
-        sel.removeAllRanges();
-        sel.addRange(range);
+        var range, selection;
+        if (document.body.createTextRange) {
+            range = document.body.createTextRange();
+            range.moveToElementText(el);
+            range.select();
+        } else if (window.getSelection) {
+            selection = window.getSelection();
+            range = document.createRange();
+            range.selectNodeContents(el);
+            selection.removeAllRanges();
+            selection.addRange(range);
+        }
     }
 
     MediumEditor.prototype = {
