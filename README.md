@@ -1,4 +1,3 @@
-[![Stories in Ready](http://badge.waffle.io/daviferreira/medium-editor.png)](http://waffle.io/daviferreira/medium-editor)  
 # MediumEditor
 
 [![Build Status](https://travis-ci.org/daviferreira/medium-editor.png?branch=master)](https://travis-ci.org/daviferreira/medium-editor)
