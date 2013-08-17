@@ -66,6 +66,7 @@ function MediumEditor(selector, options) {
         if (sel.rangeCount) {
             range = sel.getRangeAt(0).cloneRange();
             if (range.getClientRects) {
+                range.collapse(false);
                 rect = range.getClientRects()[0];
                 x = rect.left;
                 y = rect.top;
@@ -109,7 +110,7 @@ function MediumEditor(selector, options) {
             excludedActions: [],
             anchorInputPlaceholder: 'Paste or type a link',
             diffLeft: 0,
-            diffTop: -5,
+            diffTop: -10,
             firstHeader: 'h3',
             secondHeader: 'h4',
             delay: 0
@@ -209,7 +210,7 @@ function MediumEditor(selector, options) {
         setToolbarPosition: function () {
             var coords = getSelectionCoords(),
                 selDimensions = getSelectionDimensions();
-            this.toolbar.style.left = (coords[0] - (this.toolbar.offsetWidth / 2) + (selDimensions[0] / 2) + this.options.diffLeft) + 'px';
+            this.toolbar.style.left = (coords[0] - (this.toolbar.offsetWidth / 2) - (selDimensions[0] / 2) + this.options.diffLeft) + 'px';
             this.toolbar.style.top = (coords[1] + getDocumentScrollY() - this.toolbar.offsetHeight + this.options.diffTop) + 'px';
             return this;
         },

@@ -7,7 +7,8 @@ module.exports = function(grunt) {
       directives: {
         browser: true,
         unparam: true,
-        todo: true
+        todo: true,
+        debug: true
       }
     },
     jasmine: {

@@ -59,7 +59,7 @@ describe('Initialization TestCase', function () {
                     excludedActions: [],
                     anchorInputPlaceholder: 'Paste or type a link',
                     diffLeft: 0,
-                    diffTop: -5,
+                    diffTop: -10,
                     firstHeader: 'h3',
                     secondHeader: 'h4',
                     delay: 0
