@@ -53,3 +53,9 @@ p {
 b {
     font-family: ProximaNovaBlack, Helvetica, Arial, sans-serif;
 }
+
+q {
+    display: block;
+    padding-left: 20px;
+    border-left: 6px solid #df0d32;
+}
