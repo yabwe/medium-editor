@@ -282,10 +282,12 @@ function MediumEditor(selector, options) {
             if (action.indexOf('append-') > -1) {
                 this.appendEl(action.replace('append-', ''));
                 this.setToolbarButtonStates();
+                this.setToolbarPosition();
             } else if (action === 'anchor') {
                 this.triggerAnchorAction(e);
             } else {
                 document.execCommand(action, null, false);
+                this.setToolbarPosition();
             }
         },
 
@@ -401,6 +403,7 @@ function MediumEditor(selector, options) {
             document.execCommand('CreateLink', false, input.value);
             this.showToolbarActions();
             input.value = '';
+            this.setToolbarPosition();
         }
     };
 }(window, document));
