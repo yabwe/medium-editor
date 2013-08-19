@@ -284,7 +284,6 @@ function MediumEditor(selector, options) {
             if (action.indexOf('append-') > -1) {
                 this.appendEl(action.replace('append-', ''));
                 this.setToolbarButtonStates();
-                this.setToolbarPosition();
             } else if (action === 'anchor') {
                 this.triggerAnchorAction(e);
             } else {
@@ -325,7 +324,6 @@ function MediumEditor(selector, options) {
             selectionEl.parentNode.replaceChild(el, selectionEl);
             selectElementContents(el);
             this.bindElementToolbarEvents(el);
-            this.setToolbarPosition();
         },
 
         transferAttributes: function (elFrom, elTo) {
@@ -405,7 +403,6 @@ function MediumEditor(selector, options) {
             document.execCommand('CreateLink', false, input.value);
             this.showToolbarActions();
             input.value = '';
-            this.setToolbarPosition();
         }
     };
 }(window, document));
