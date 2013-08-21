@@ -15,7 +15,6 @@ $button_size: 50px;
     font-size: 16px;
     @include border-radius(5px);
     @include box-shadow(0 0 3px #000);
-    @include transition(all .2s ease-in-out);
 
     &:before {
         content: "";
