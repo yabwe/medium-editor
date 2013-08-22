@@ -1,8 +1,14 @@
-function fireEvent(element,event) {
+function fireEvent (element, event, keyCode, ctrlKey) {
    if (document.createEvent) {
        // dispatch for firefox + others
        var evt = document.createEvent("HTMLEvents");
-       evt.initEvent(event, true, true); // event type,bubbling,cancelable
+       evt.initEvent(event, true, true ); // event type,bubbling,cancelable
+       if (keyCode) {
+        evt.keyCode = keyCode;
+       }
+       if (ctrlKey) {
+        evt.ctrlKey = true;
+       }
        return !element.dispatchEvent(evt);
    } else {
        // dispatch for IE

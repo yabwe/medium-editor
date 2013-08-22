@@ -71,4 +71,39 @@ describe('Anchor Button TestCase', function () {
 
     });
 
+    describe('Link Creation', function () {
+        it('should create a link when user presses enter', function () {
+            spyOn(MediumEditor.prototype, 'createLink').andCallThrough();
+            var editor = new MediumEditor('.editor'),
+                button,
+                input;
+
+            selectElementContents(editor.elements[0]);
+            button = editor.toolbar.querySelector('[data-element="a"]');
+            fireEvent(button, 'click');
+            input = editor.anchorForm.querySelector('input');
+            input.value = 'test';
+            fireEvent(input, 'keyup', 13);
+            expect(editor.createLink).toHaveBeenCalled();
+        });
+    });
+
+    describe('Cancel', function () {
+        it('should close the link form when user clicks on cancel', function () {
+            spyOn(MediumEditor.prototype, 'showToolbarActions').andCallThrough();
+            var editor = new MediumEditor('.editor'),
+                button,
+                cancel;
+
+            selectElementContents(editor.elements[0]);
+            button = editor.toolbar.querySelector('[data-element="a"]');
+            cancel = editor.anchorForm.querySelector('a');
+            fireEvent(button, 'click');
+            expect(editor.anchorForm.style.display).toBe('block');
+            fireEvent(cancel, 'click');
+            expect(editor.showToolbarActions).toHaveBeenCalled();
+            expect(editor.anchorForm.style.display).toBe('none');
+        });
+    });
+
 });
