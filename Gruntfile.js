@@ -25,7 +25,7 @@ module.exports = function(grunt) {
           template: require('grunt-template-jasmine-istanbul'),
           templateOptions: {
               coverage: 'reports/jasmine/coverage.json',
-              report: 'coverage/client'
+              report: 'coverage'
           }
         }
       }
