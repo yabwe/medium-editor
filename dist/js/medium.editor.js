@@ -19,11 +19,6 @@ function MediumEditor(selector, options) {
         return b;
     }
 
-    // https://developer.mozilla.org/en-US/docs/Web/API/window.scrollY?redirectlocale=en-US&redirectslug=DOM/window.scrollY
-    function getDocumentScrollY() {
-        return (window.pageYOffset !== undefined) ? window.pageYOffset : (document.documentElement || document.body.parentNode || document.body).scrollTop;
-    }
-
     // http://stackoverflow.com/questions/5605401/insert-link-in-contenteditable-element
     // by Tim Down
     function saveSelection() {
@@ -51,45 +46,6 @@ function MediumEditor(selector, options) {
                 sel.addRange(savedSel[i]);
             }
         }
-    }
-
-    // http://stackoverflow.com/questions/6846230/javascript-text-selection-page-coordinates
-    // by Tim Down
-    function getSelectionCoords() {
-        var sel = window.getSelection(),
-            range,
-            rect,
-            x = 0,
-            y = 0;
-        if (sel.rangeCount) {
-            range = sel.getRangeAt(0).cloneRange();
-            if (range.getClientRects) {
-                range.collapse(false);
-                rect = range.getClientRects()[0];
-                x = rect.left;
-                y = rect.top;
-            }
-        }
-        return [x, y];
-    }
-
-    // http://stackoverflow.com/questions/12603397/calculate-width-height-of-the-selected-text-javascript
-    // by Tim Down
-    function getSelectionDimensions() {
-        var sel = window.getSelection(),
-            range,
-            rect,
-            width = 0,
-            height = 0;
-        if (sel.rangeCount) {
-            range = sel.getRangeAt(0).cloneRange();
-            if (range.getBoundingClientRect) {
-                rect = range.getBoundingClientRect();
-                width = rect.right - rect.left;
-                height = rect.bottom - rect.top;
-            }
-        }
-        return [width, height];
     }
 
     // http://stackoverflow.com/questions/6139107/programatically-select-text-in-a-contenteditable-html-element
@@ -126,7 +82,8 @@ function MediumEditor(selector, options) {
                        .initToolbar()
                        .bindSelect()
                        .bindButtons()
-                       .bindAnchorForm();
+                       .bindAnchorForm()
+                       .bindWindowActions();
         },
 
         initElements: function (selector) {
@@ -206,10 +163,11 @@ function MediumEditor(selector, options) {
         },
 
         setToolbarPosition: function () {
-            var coords = getSelectionCoords(),
-                selDimensions = getSelectionDimensions();
-            this.toolbar.style.left = (coords[0] - (this.toolbar.offsetWidth / 2) - (selDimensions[0] / 2) + this.options.diffLeft) + 'px';
-            this.toolbar.style.top = (coords[1] + getDocumentScrollY() - this.toolbar.offsetHeight + this.options.diffTop) + 'px';
+            var selection = window.getSelection(),
+                range = selection.getRangeAt(0),
+                boundary = range.getBoundingClientRect();
+            this.toolbar.style.top = boundary.top - 5 + window.pageYOffset - this.toolbar.offsetHeight + 'px';
+            this.toolbar.style.left = ((boundary.left + boundary.right) / 2) - (this.toolbar.offsetWidth / 2) + 'px';
             return this;
         },
 
@@ -394,6 +352,8 @@ function MediumEditor(selector, options) {
                 self.showToolbarActions();
                 restoreSelection(self.savedSelection);
             };
+
+            return this;
         },
 
         createLink: function (input) {
@@ -401,6 +361,20 @@ function MediumEditor(selector, options) {
             document.execCommand('CreateLink', false, input.value);
             this.showToolbarActions();
             input.value = '';
+        },
+
+        bindWindowActions: function () {
+            var timerResize,
+                self = this;
+
+            window.addEventListener('resize', function(e) {
+                clearTimeout(timerResize);
+                timerResize = setTimeout(function () {
+                    self.setToolbarPosition();
+                }, 100);
+            });
+
+            return this;
         }
     };
 }(window, document));
