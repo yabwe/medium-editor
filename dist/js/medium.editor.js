@@ -166,8 +166,8 @@ function MediumEditor(selector, options) {
             var selection = window.getSelection(),
                 range = selection.getRangeAt(0),
                 boundary = range.getBoundingClientRect();
-            this.toolbar.style.top = boundary.top - 5 + window.pageYOffset - this.toolbar.offsetHeight + 'px';
-            this.toolbar.style.left = ((boundary.left + boundary.right) / 2) - (this.toolbar.offsetWidth / 2) + 'px';
+            this.toolbar.style.top = boundary.top + this.options.diffTop + window.pageYOffset - this.toolbar.offsetHeight + 'px';
+            this.toolbar.style.left = ((boundary.left + boundary.right) / 2) - (this.toolbar.offsetWidth / 2) + (this.options.diffLeft) + 'px';
             return this;
         },
 
