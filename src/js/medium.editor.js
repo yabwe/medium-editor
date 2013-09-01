@@ -282,6 +282,7 @@ function MediumEditor(selector, options) {
             selectionEl.parentNode.replaceChild(el, selectionEl);
             selectElementContents(el);
             this.bindElementToolbarEvents(el);
+            this.setToolbarPosition();
         },
 
         transferAttributes: function (elFrom, elTo) {
