@@ -90,8 +90,17 @@ function MediumEditor(selector, options) {
             var i;
             for (i = 0; i < this.elements.length; i += 1) {
                 this.elements[i].setAttribute('contentEditable', true);
+                this.bindParagraphCreation(this.elements[i]);
             }
             return this;
+        },
+
+        bindParagraphCreation: function (el) {
+            el.addEventListener('keypress', function (e) {
+                if (e.which === 13) {
+                    document.execCommand('formatBlock', false, 'p');
+                }
+            });
         },
 
         //TODO: actionTemplate
