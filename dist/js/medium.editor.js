@@ -96,7 +96,7 @@ function MediumEditor(selector, options) {
         },
 
         bindParagraphCreation: function (el) {
-            el.addEventListener('keypress', function (e) {
+            el.addEventListener('keyup', function (e) {
                 if (e.which === 13) {
                     document.execCommand('formatBlock', false, 'p');
                 }
