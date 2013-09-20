@@ -99,7 +99,7 @@ function MediumEditor(selector, options) {
 
         bindParagraphCreation: function (el) {
             el.addEventListener('keyup', function (e) {
-                if (e.which === 13) {
+                if (e.which === 13 && !e.shiftKey) {
                     document.execCommand('formatBlock', false, 'p');
                 }
             });
@@ -354,7 +354,7 @@ function MediumEditor(selector, options) {
             };
 
             input.onkeyup = function (e) {
-                if (e.keyCode === 13 && !e.shiftKey) {
+                if (e.keyCode === 13) {
                     e.preventDefault();
                     self.createLink(this);
                 }
