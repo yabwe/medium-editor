@@ -354,7 +354,7 @@ function MediumEditor(selector, options) {
             };
 
             input.onkeyup = function (e) {
-                if (e.keyCode === 13) {
+                if (e.keyCode === 13 && !e.shiftKey) {
                     e.preventDefault();
                     self.createLink(this);
                 }
