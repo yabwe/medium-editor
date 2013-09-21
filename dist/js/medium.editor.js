@@ -404,7 +404,7 @@ function MediumEditor(selector, options) {
 
         activate: function () {
             var i;
-            if (!this.deactivated) {
+            if (this.isActive) {
                 return;
             }
             this.isActive = true;
