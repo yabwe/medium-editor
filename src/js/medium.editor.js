@@ -60,6 +60,14 @@ function MediumEditor(selector, options) {
         selection.addRange(range);
     }
 
+    // http://stackoverflow.com/questions/1197401/how-can-i-get-the-element-the-caret-is-in-with-javascript-when-using-contentedi
+    // by You
+    function getSelectionStart() {
+        var node = document.getSelection().anchorNode,
+            startNode = (node && node.nodeType === 3 ? node.parentNode : node);
+        return startNode;
+    }
+
     MediumEditor.prototype = {
 
         defaults: {
@@ -99,8 +107,14 @@ function MediumEditor(selector, options) {
 
         bindParagraphCreation: function (el) {
             el.addEventListener('keyup', function (e) {
+                var node = getSelectionStart();
+                if (node) {
+                    node = node.tagName.toLowerCase();
+                }
                 if (e.which === 13 && !e.shiftKey) {
-                    document.execCommand('formatBlock', false, 'p');
+                    if (node !== 'q') {
+                        document.execCommand('formatBlock', false, 'p');
+                    }
                 }
             });
         },
