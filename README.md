@@ -55,6 +55,11 @@ var editor = new MediumEditor('.editable', {
 });
 ```
 
+## API
+
+* __.deactivate()__: disables the editor
+* __.activate()__: re-activates the editor
+
 ## Development
 
 MediumEditor development tasks are managed by Grunt. To install all the necessary packages, just invoke:

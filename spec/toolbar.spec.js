@@ -39,4 +39,15 @@ describe('Toolbar TestCase', function () {
             expect(document.querySelectorAll('.medium-editor-toolbar').length).toBe(1);
         });
     });
+
+    describe('Deactive', function () {
+        it('should remove select event from elements', function () {
+            spyOn(this.el, 'addEventListener');
+            var editor = new MediumEditor('.editor');
+            expect(this.el.addEventListener).toHaveBeenCalled();
+            spyOn(this.el, 'removeEventListener');
+            editor.deactivate();
+            expect(this.el.removeEventListener).toHaveBeenCalled();
+        });
+    });
 });

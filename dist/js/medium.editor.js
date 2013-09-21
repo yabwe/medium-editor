@@ -83,6 +83,7 @@ function MediumEditor(selector, options) {
             if (this.elements.length === 0) {
                 return;
             }
+            this.isActive = true;
             this.parentElements = ['p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'q'];
             this.id = document.querySelectorAll('.medium-editor-toolbar').length + 1;
             this.options = extend(options, this.defaults);
@@ -153,16 +154,16 @@ function MediumEditor(selector, options) {
         bindSelect: function () {
             var self = this,
                 timer = '',
-                checkSelectionWrapper = function (e) {
-                    clearTimeout(timer);
-                    setTimeout(function () {
-                        self.checkSelection(e);
-                    }, self.options.delay);
-                },
                 i;
+            this.checkSelectionWrapper = function (e) {
+                clearTimeout(timer);
+                setTimeout(function () {
+                    self.checkSelection(e);
+                }, self.options.delay);
+            };
             for (i = 0; i < this.elements.length; i += 1) {
-                this.elements[i].addEventListener('mouseup', checkSelectionWrapper);
-                this.elements[i].addEventListener('keyup', checkSelectionWrapper);
+                this.elements[i].addEventListener('mouseup', this.checkSelectionWrapper);
+                this.elements[i].addEventListener('keyup', this.checkSelectionWrapper);
             }
             return this;
         },
@@ -399,6 +400,32 @@ function MediumEditor(selector, options) {
             });
 
             return this;
+        },
+
+        activate: function () {
+            var i;
+            if (!this.deactivated) {
+                return;
+            }
+            this.isActive = true;
+            for (i = 0; i < this.elements.length; i += 1) {
+                this.elements[i].setAttribute('contentEditable', true);
+            }
+            this.bindSelect();
+        },
+
+        deactivate: function () {
+            var i;
+            if (!this.isActive) {
+                return;
+            }
+            this.isActive = false;
+            this.toolbar.style.display = 'none';
+            for (i = 0; i < this.elements.length; i += 1) {
+                this.elements[i].removeEventListener('mouseup', this.checkSelectionWrapper);
+                this.elements[i].removeEventListener('keyup', this.checkSelectionWrapper);
+                this.elements[i].removeAttribute('contentEditable');
+            }
         }
     };
 }(window, document));
