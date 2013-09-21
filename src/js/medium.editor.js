@@ -163,8 +163,8 @@ function MediumEditor(selector, options) {
                 },
                 i;
             for (i = 0; i < this.elements.length; i += 1) {
-                this.elements[i].onmouseup = checkSelectionWrapper;
-                this.elements[i].onkeyup = checkSelectionWrapper;
+                this.elements[i].addEventListener('mouseup', checkSelectionWrapper);
+                this.elements[i].addEventListener('keyup', checkSelectionWrapper);
             }
             return this;
         },
@@ -256,7 +256,7 @@ function MediumEditor(selector, options) {
                     self.execAction(this.getAttribute('data-action'), e);
                 };
             for (i = 0; i < buttons.length; i += 1) {
-                buttons[i].onclick = triggerAction;
+                buttons[i].addEventListener('click', triggerAction);
             }
             return this;
         },
@@ -324,12 +324,12 @@ function MediumEditor(selector, options) {
 
         bindElementToolbarEvents: function (el) {
             var self = this;
-            el.onmouseup = function (e) {
+            el.addEventListener('mouseup', function (e) {
                 self.checkSelection(e);
-            };
-            el.onkeyup = function (e) {
+            });
+            el.addEventListener('keyup', function (e) {
                 self.checkSelection(e);
-            };
+            });
         },
 
         showToolbarActions: function () {
@@ -340,11 +340,11 @@ function MediumEditor(selector, options) {
             this.keepToolbarAlive = false;
             clearTimeout(timer);
             timer = setTimeout(function () {
-                document.onclick = function (e) {
+                document.addEventListener('click', function (e) {
                     self.keepToolbarAlive = false;
                     self.toolbar.style.display = 'none';
-                    this.onclick = '';
-                };
+                    document.removeEventListener('click', this);
+                });
             }, 300);
         },
 
@@ -363,21 +363,21 @@ function MediumEditor(selector, options) {
                 linkCancel = this.anchorForm.querySelector('a'),
                 self = this;
 
-            this.anchorForm.onclick = function (e) {
+            this.anchorForm.addEventListener('click', function (e) {
                 e.stopPropagation();
-            };
+            });
 
-            input.onkeyup = function (e) {
+            input.addEventListener('keyup', function (e) {
                 if (e.keyCode === 13) {
                     e.preventDefault();
                     self.createLink(this);
                 }
-            };
+            });
 
-            linkCancel.onclick = function (e) {
+            linkCancel.addEventListener('click', function (e) {
                 self.showToolbarActions();
                 restoreSelection(self.savedSelection);
-            };
+            });
 
             return this;
         },
