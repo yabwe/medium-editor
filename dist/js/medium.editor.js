@@ -1,6 +1,6 @@
-function MediumEditor(selector, options) {
+function MediumEditor(elements, options) {
     'use strict';
-    return this.init(selector, options);
+    return this.init(elements, options);
 }
 
 (function (window, document) {
