@@ -31,6 +31,13 @@ The next step is to reference the editor's script and instantiate a new MediumEd
 
 The above code will transform all the elements with the .editable class into HTML5 editable contents and add the medium editor toolbar to them.
 
+You can also pass a list of HTML elements:
+
+```javascript
+var elements = document.querySelectorAll('.editable'),
+    editor = new MediumEditor(elements);
+```
+
 ## Initialization options
 
 * __excludedActions__: list of actions to be excluded from the toolbar. Default: []

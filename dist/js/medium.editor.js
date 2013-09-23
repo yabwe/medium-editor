@@ -78,8 +78,8 @@ function MediumEditor(selector, options) {
             delay: 0
         },
 
-        init: function (selector, options) {
-            this.elements = document.querySelectorAll(selector);
+        init: function (elements, options) {
+            this.elements = typeof elements === 'string' ? document.querySelectorAll(elements) : elements;
             if (this.elements.length === 0) {
                 return;
             }
@@ -87,7 +87,7 @@ function MediumEditor(selector, options) {
             this.parentElements = ['p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'q'];
             this.id = document.querySelectorAll('.medium-editor-toolbar').length + 1;
             this.options = extend(options, this.defaults);
-            return this.initElements(selector)
+            return this.initElements()
                        .initToolbar()
                        .bindSelect()
                        .bindButtons()
@@ -95,7 +95,7 @@ function MediumEditor(selector, options) {
                        .bindWindowActions();
         },
 
-        initElements: function (selector) {
+        initElements: function () {
             var i;
             for (i = 0; i < this.elements.length; i += 1) {
                 this.elements[i].setAttribute('contentEditable', true);

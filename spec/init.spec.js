@@ -37,6 +37,22 @@ describe('Initialization TestCase', function () {
         });
     });
 
+    describe('Elements', function () {
+        it('should allow a string as parameter', function () {
+            spyOn(document, 'querySelectorAll').andCallThrough();
+            (function () {
+                return new MediumEditor('.test');
+            }());
+            expect(document.querySelectorAll).toHaveBeenCalled();
+        });
+
+        it('should allow a list of html elements as parameters', function () {
+            var elements = document.querySelectorAll('span'),
+                editor = new MediumEditor(elements);
+            expect(editor.elements).toBe(elements);
+        });
+    });
+
     describe('With a valid element', function () {
         beforeEach(function () {
             this.body = document.getElementsByTagName('body')[0];

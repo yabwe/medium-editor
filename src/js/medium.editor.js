@@ -80,8 +80,8 @@ function MediumEditor(selector, options) {
             delay: 0
         },
 
-        init: function (selector, options) {
-            this.elements = typeof(selector) == "string" ? document.querySelectorAll(selector) : selector;
+        init: function (elements, options) {
+            this.elements = typeof elements === 'string' ? document.querySelectorAll(elements) : elements;
             if (this.elements.length === 0) {
                 return;
             }
