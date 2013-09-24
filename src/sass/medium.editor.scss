@@ -60,21 +60,17 @@ $button_size: 50px;
                 background-color: #000;
             }
         }
+        .medium-editor-button-first {
+            @include border-top-left-radius(5px);
+            @include border-bottom-left-radius(5px);
+        }
+        .medium-editor-button-last {
+            @include border-top-right-radius(5px);
+            @include border-bottom-right-radius(5px);
+        }
         .medium-editor-button-active {
             background-color: #000;
             color: #fff;
-        }
-        &:first-child {
-            button {
-                @include border-top-left-radius(5px);
-                @include border-bottom-left-radius(5px);
-            }
-        }
-        &:last-child {
-            button {
-                @include border-top-right-radius(5px);
-                @include border-bottom-right-radius(5px);
-            }
         }
         .medium-editor-action-underline {
             text-decoration: underline;
