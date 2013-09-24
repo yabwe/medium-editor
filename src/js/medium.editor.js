@@ -199,13 +199,28 @@ function MediumEditor(elements, options) {
 
         setToolbarButtonStates: function () {
             var buttons = this.toolbarActions.querySelectorAll('button'),
-                i;
+                i,
+                f = null,
+                l = null,
+                b = null;
 
             for (i = 0; i < buttons.length; i += 1) {
                 buttons[i].className = buttons[i].className.replace(/medium-editor-button-active/g, '')
+                                                           .replace(/\b(medium-editor-button-first|medium-editor-button-last)\b/g, '')
                                                            .replace(/\s{2}/g, ' ');
                 this.showHideButton(buttons[i]);
             }
+            for (i = 0; i < buttons.length; i += 1) {
+                b = buttons[i];
+                if (b.style.display === "block") {
+                    if (f === null) {
+                        f = b;
+                    }
+                    l = b;
+                }
+            }
+            f.className += " medium-editor-button-first";
+            l.className += " medium-editor-button-last";
 
             this.checkActiveButtons();
 
