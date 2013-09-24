@@ -207,6 +207,8 @@ describe('Buttons TestCase', function () {
             var editor = new MediumEditor('.editor'),
                 buttons = editor.toolbar.querySelectorAll('button');
             expect(buttons[0].className).toContain('medium-editor-button-first');
+            expect(buttons[1].className).not.toContain('medium-editor-button-first');
+            expect(buttons[1].className).not.toContain('medium-editor-button-last');
             expect(buttons[buttons.length - 1].className).toContain('medium-editor-button-last');
         });
     });
