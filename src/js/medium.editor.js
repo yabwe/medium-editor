@@ -180,8 +180,8 @@ function MediumEditor(elements, options) {
                     this.selection = newSelection;
                     this.selectionRange = this.selection.getRangeAt(0);
                     this.toolbar.style.display = 'block';
-                    this.setToolbarPosition()
-                        .setToolbarButtonStates()
+                    this.setToolbarButtonStates()
+                        .setToolbarPosition()
                         .showToolbarActions();
                 }
             }
