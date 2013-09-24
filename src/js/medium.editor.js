@@ -199,28 +199,13 @@ function MediumEditor(elements, options) {
 
         setToolbarButtonStates: function () {
             var buttons = this.toolbarActions.querySelectorAll('button'),
-                i,
-                f = null,
-                l = null,
-                b = null;
+                i;
 
             for (i = 0; i < buttons.length; i += 1) {
                 buttons[i].className = buttons[i].className.replace(/medium-editor-button-active/g, '')
-                                                           .replace(/\b(medium-editor-button-first|medium-editor-button-last)\b/g, '')
                                                            .replace(/\s{2}/g, ' ');
                 this.showHideButton(buttons[i]);
             }
-            for (i = 0; i < buttons.length; i += 1) {
-                b = buttons[i];
-                if (b.style.display === "block") {
-                    if (f === null) {
-                        f = b;
-                    }
-                    l = b;
-                }
-            }
-            f.className += " medium-editor-button-first";
-            l.className += " medium-editor-button-last";
 
             this.checkActiveButtons();
 
@@ -274,6 +259,13 @@ function MediumEditor(elements, options) {
             for (i = 0; i < buttons.length; i += 1) {
                 buttons[i].addEventListener('click', triggerAction);
             }
+            this.setFirstAndLastItens(buttons);
+            return this;
+        },
+
+        setFirstAndLastItens: function (buttons) {
+            buttons[0].className += ' medium-editor-button-first';
+            buttons[buttons.length - 1].className += ' medium-editor-button-last';
             return this;
         },
 

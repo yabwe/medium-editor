@@ -178,8 +178,8 @@ function MediumEditor(elements, options) {
                     this.selection = newSelection;
                     this.selectionRange = this.selection.getRangeAt(0);
                     this.toolbar.style.display = 'block';
-                    this.setToolbarPosition()
-                        .setToolbarButtonStates()
+                    this.setToolbarButtonStates()
+                        .setToolbarPosition()
                         .showToolbarActions();
                 }
             }
@@ -257,6 +257,13 @@ function MediumEditor(elements, options) {
             for (i = 0; i < buttons.length; i += 1) {
                 buttons[i].addEventListener('click', triggerAction);
             }
+            this.setFirstAndLastItens(buttons);
+            return this;
+        },
+
+        setFirstAndLastItens: function (buttons) {
+            buttons[0].className += ' medium-editor-button-first';
+            buttons[buttons.length - 1].className += ' medium-editor-button-last';
             return this;
         },
 

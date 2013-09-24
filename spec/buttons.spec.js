@@ -201,4 +201,13 @@ describe('Buttons TestCase', function () {
         });
 
     });
+
+    describe('First and Last', function () {
+        it('should add a special class to the first and last buttons', function () {
+            var editor = new MediumEditor('.editor'),
+                buttons = editor.toolbar.querySelectorAll('button');
+            expect(buttons[0].className).toContain('medium-editor-button-first');
+            expect(buttons[buttons.length - 1].className).toContain('medium-editor-button-last');
+        });
+    });
 });
