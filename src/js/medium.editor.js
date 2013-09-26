@@ -1,11 +1,11 @@
-/*global console*/
+/*global console, MediumEditor: true*/
 
 function MediumEditorClass(elements, options) {
     'use strict';
     return this.init(elements, options);
 }
 
-var MediumEditor = MediumEditorClass;
+MediumEditor = MediumEditorClass;
 
 (function (window, document) {
     'use strict';

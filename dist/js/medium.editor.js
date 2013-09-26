@@ -3,7 +3,7 @@ function MediumEditorClass(elements, options) {
     return this.init(elements, options);
 }
 
-var MediumEditor = MediumEditorClass;
+MediumEditor = MediumEditorClass;
 
 (function (window, document) {
     'use strict';
