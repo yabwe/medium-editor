@@ -1,9 +1,11 @@
 /*global console*/
 
-function MediumEditor(elements, options) {
+function MediumEditorClass(elements, options) {
     'use strict';
     return this.init(elements, options);
 }
+
+var MediumEditor = MediumEditorClass;
 
 (function (window, document) {
     'use strict';
@@ -68,7 +70,7 @@ function MediumEditor(elements, options) {
         return startNode;
     }
 
-    MediumEditor.prototype = {
+    MediumEditorClass.prototype = {
 
         defaults: {
             excludedActions: [],
