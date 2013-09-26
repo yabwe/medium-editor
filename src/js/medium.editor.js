@@ -259,11 +259,11 @@ function MediumEditor(elements, options) {
             for (i = 0; i < buttons.length; i += 1) {
                 buttons[i].addEventListener('click', triggerAction);
             }
-            this.setFirstAndLastItens(buttons);
+            this.setFirstAndLastItems(buttons);
             return this;
         },
 
-        setFirstAndLastItens: function (buttons) {
+        setFirstAndLastItems: function (buttons) {
             buttons[0].className += ' medium-editor-button-first';
             buttons[buttons.length - 1].className += ' medium-editor-button-last';
             return this;
