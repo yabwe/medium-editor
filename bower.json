@@ -1,0 +1,26 @@
+{
+  "name": "medium-editor",
+  "version": "1.0.2",
+  "homepage": "http://daviferreira.github.io/medium-editor/",
+  "authors": [
+    "Davi Ferreira <hi@daviferreira.com>"
+  ],
+  "description": "Medium.com WYSIWYG editor clone written in pure JavaScript.",
+  "main": "dist/js/medium.editor.min.js",
+  "keywords": [
+    "wysiwyg",
+    "medium",
+    "rich-text",
+    "editor"
+  ],
+  "license": "THE BEER-WARE LICENSE",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "spec",
+    "coverage",
+    "reports",
+    "_SpecRunner.html"
+  ]
+}
