@@ -72,13 +72,14 @@ describe('Initialization TestCase', function () {
 
         it('should have a default set of options', function () {
             var defaultOptions = {
-                    excludedActions: [],
                     anchorInputPlaceholder: 'Paste or type a link',
                     diffLeft: 0,
                     diffTop: -10,
+                    delay: 0,
+                    excludedActions: [],
                     firstHeader: 'h3',
-                    secondHeader: 'h4',
-                    delay: 0
+                    forcePlainText: true,
+                    secondHeader: 'h4'
                 },
                 editor = new MediumEditor('.editor');
             expect(editor.options).toEqual(defaultOptions);

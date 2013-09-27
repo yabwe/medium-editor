@@ -69,13 +69,14 @@ function MediumEditor(elements, options) {
     MediumEditor.prototype = {
 
         defaults: {
-            excludedActions: [],
             anchorInputPlaceholder: 'Paste or type a link',
+            delay: 0,
             diffLeft: 0,
             diffTop: -10,
+            excludedActions: [],
             firstHeader: 'h3',
-            secondHeader: 'h4',
-            delay: 0
+            forcePlainText: true,
+            secondHeader: 'h4'
         },
 
         init: function (elements, options) {
@@ -437,6 +438,9 @@ function MediumEditor(elements, options) {
         },
 
         bindPaste: function () {
+            if (!this.options.forcePlainText) {
+                return;
+            }
             var i,
                 pasteWrapper = function (e) {
                     if (e.clipboardData && e.clipboardData.getData) {
