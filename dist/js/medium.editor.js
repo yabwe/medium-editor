@@ -92,6 +92,7 @@ function MediumEditor(elements, options) {
                        .bindSelect()
                        .bindButtons()
                        .bindAnchorForm()
+                       .bindPaste()
                        .bindWindowActions();
         },
 
@@ -257,11 +258,11 @@ function MediumEditor(elements, options) {
             for (i = 0; i < buttons.length; i += 1) {
                 buttons[i].addEventListener('click', triggerAction);
             }
-            this.setFirstAndLastItens(buttons);
+            this.setFirstAndLastItems(buttons);
             return this;
         },
 
-        setFirstAndLastItens: function (buttons) {
+        setFirstAndLastItems: function (buttons) {
             buttons[0].className += ' medium-editor-button-first';
             buttons[buttons.length - 1].className += ' medium-editor-button-last';
             return this;
@@ -433,6 +434,20 @@ function MediumEditor(elements, options) {
                 this.elements[i].removeEventListener('keyup', this.checkSelectionWrapper);
                 this.elements[i].removeAttribute('contentEditable');
             }
+        },
+
+        bindPaste: function () {
+            var i,
+                pasteWrapper = function (e) {
+                    if (e.clipboardData && e.clipboardData.getData) {
+                        e.preventDefault();
+                        document.execCommand('insertHTML', false, e.clipboardData.getData('text/plain').replace(/[\r\n]/g, '<br>'));
+                    }
+                };
+            for (i = 0; i < this.elements.length; i += 1) {
+                this.elements[i].addEventListener('paste', pasteWrapper);
+            }
+            return this;
         }
     };
 }(window, document));
