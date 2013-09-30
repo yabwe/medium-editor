@@ -191,10 +191,20 @@ function MediumEditor(elements, options) {
         },
 
         setToolbarPosition: function () {
+			var button_size = 50;
             var selection = window.getSelection(),
                 range = selection.getRangeAt(0),
                 boundary = range.getBoundingClientRect();
-            this.toolbar.style.top = boundary.top + this.options.diffTop + window.pageYOffset - this.toolbar.offsetHeight + 'px';
+			if (boundary.top < button_size) {
+				this.toolbar.classList.add('medium-toolbar-arrow-over');
+				this.toolbar.classList.remove('medium-toolbar-arrow-under');
+            	this.toolbar.style.top = button_size + boundary.bottom - this.options.diffTop + window.pageYOffset - this.toolbar.offsetHeight + 'px';
+			}
+			else {
+				this.toolbar.classList.add('medium-toolbar-arrow-under');
+				this.toolbar.classList.remove('medium-toolbar-arrow-over');
+            	this.toolbar.style.top = boundary.top + this.options.diffTop + window.pageYOffset - this.toolbar.offsetHeight + 'px';
+			}
             this.toolbar.style.left = ((boundary.left + boundary.right) / 2) - (this.toolbar.offsetWidth / 2) + (this.options.diffLeft) + 'px';
             return this;
         },
