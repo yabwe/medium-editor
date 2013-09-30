@@ -18,14 +18,14 @@ $button_size: 50px;
 .medium-toolbar-arrow-under:after {
     @extend .medium-toolbar-arrow;
     top: $button_size;
-    border-width: 8px 8px 0px 8px;
+    border-width: 8px 8px 0 8px;
     border-color: $bgcolor transparent transparent transparent;
 }
 
 .medium-toolbar-arrow-over:before {
     @extend .medium-toolbar-arrow;
     top: -8px;
-    border-width: 0px 8px 8px 8px;
+    border-width: 0 8px 8px 8px;
     border-color: transparent transparent $bgcolor transparent;
 }
 

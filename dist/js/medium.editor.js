@@ -189,10 +189,19 @@ function MediumEditor(elements, options) {
         },
 
         setToolbarPosition: function () {
-            var selection = window.getSelection(),
+            var buttonHeight = 50,
+                selection = window.getSelection(),
                 range = selection.getRangeAt(0),
                 boundary = range.getBoundingClientRect();
-            this.toolbar.style.top = boundary.top + this.options.diffTop + window.pageYOffset - this.toolbar.offsetHeight + 'px';
+            if (boundary.top < buttonHeight) {
+                this.toolbar.classList.add('medium-toolbar-arrow-over');
+                this.toolbar.classList.remove('medium-toolbar-arrow-under');
+                this.toolbar.style.top = buttonHeight + boundary.bottom - this.options.diffTop + window.pageYOffset - this.toolbar.offsetHeight + 'px';
+            } else {
+                this.toolbar.classList.add('medium-toolbar-arrow-under');
+                this.toolbar.classList.remove('medium-toolbar-arrow-over');
+                this.toolbar.style.top = boundary.top + this.options.diffTop + window.pageYOffset - this.toolbar.offsetHeight + 'px';
+            }
             this.toolbar.style.left = ((boundary.left + boundary.right) / 2) - (this.toolbar.offsetWidth / 2) + (this.options.diffLeft) + 'px';
             return this;
         },
