@@ -191,6 +191,7 @@ function MediumEditor(elements, options) {
         },
 
         setToolbarPosition: function () {
+<<<<<<< HEAD
 			var button_size = 50;
             var selection = window.getSelection(),
                 range = selection.getRangeAt(0),
@@ -205,6 +206,22 @@ function MediumEditor(elements, options) {
 				this.toolbar.classList.remove('medium-toolbar-arrow-over');
             	this.toolbar.style.top = boundary.top + this.options.diffTop + window.pageYOffset - this.toolbar.offsetHeight + 'px';
 			}
+=======
+            var button_size = 50;
+            var selection = window.getSelection(),
+                range = selection.getRangeAt(0),
+                boundary = range.getBoundingClientRect();
+            if (boundary.top < button_size) {
+                this.toolbar.classList.add('medium-toolbar-arrow-over');
+                this.toolbar.classList.remove('medium-toolbar-arrow-under');
+                this.toolbar.style.top = button_size + boundary.bottom - this.options.diffTop + window.pageYOffset - this.toolbar.offsetHeight + 'px';
+            }
+            else {
+                this.toolbar.classList.add('medium-toolbar-arrow-under');
+                this.toolbar.classList.remove('medium-toolbar-arrow-over');
+                this.toolbar.style.top = boundary.top + this.options.diffTop + window.pageYOffset - this.toolbar.offsetHeight + 'px';
+            }
+>>>>>>> 76d32b1... Fixes problem with toolbar position when selection is at the top of the
             this.toolbar.style.left = ((boundary.left + boundary.right) / 2) - (this.toolbar.offsetWidth / 2) + (this.options.diffLeft) + 'px';
             return this;
         },
