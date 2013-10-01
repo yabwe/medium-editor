@@ -458,6 +458,7 @@ function MediumEditor(elements, options) {
             }
             var i,
                 pasteWrapper = function (e) {
+                    e.target.classList.remove('medium-editor-placeholder');
                     if (e.clipboardData && e.clipboardData.getData) {
                         e.preventDefault();
                         document.execCommand('insertHTML', false, e.clipboardData.getData('text/plain').replace(/[\r\n]/g, '<br>'));
