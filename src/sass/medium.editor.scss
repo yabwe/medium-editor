@@ -126,3 +126,11 @@ $button_size: 50px;
         text-decoration: none;
     }
 }
+
+.medium-editor-placeholder {
+    &:after {
+        content: attr(data-placeholder);
+        color: #b3b3b1;
+        font-style: italic;
+    }
+}

@@ -23,6 +23,7 @@ module.exports = function(grunt) {
             options: {
                 specs: 'spec/*.spec.js',
                 helpers: 'spec/helpers/*.js',
+                styles: 'dist/css/*.css',
                 junit: {
                     path: "reports/jasmine/",
                     consolidate: true

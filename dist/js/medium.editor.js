@@ -76,6 +76,7 @@ function MediumEditor(elements, options) {
             excludedActions: [],
             firstHeader: 'h3',
             forcePlainText: true,
+            placeholder: 'Type your text',
             secondHeader: 'h4'
         },
 
@@ -94,6 +95,7 @@ function MediumEditor(elements, options) {
                        .bindButtons()
                        .bindAnchorForm()
                        .bindPaste()
+                       .setPlaceholders()
                        .bindWindowActions();
         },
 
@@ -101,6 +103,9 @@ function MediumEditor(elements, options) {
             var i;
             for (i = 0; i < this.elements.length; i += 1) {
                 this.elements[i].setAttribute('contentEditable', true);
+                if (!this.elements[i].getAttribute('data-placeholder')) {
+                    this.elements[i].setAttribute('data-placeholder', this.options.placeholder);
+                }
                 this.bindParagraphCreation(this.elements[i]);
             }
             return this;
@@ -459,6 +464,28 @@ function MediumEditor(elements, options) {
                 };
             for (i = 0; i < this.elements.length; i += 1) {
                 this.elements[i].addEventListener('paste', pasteWrapper);
+            }
+            return this;
+        },
+
+        setPlaceholders: function () {
+            var i,
+                activatePlaceholder = function (el) {
+                    if (el.textContent.replace(/^\s+|\s+$/g, '') === '') {
+                        el.innerHTML = '';
+                        el.classList.add('medium-editor-placeholder');
+                    }
+                },
+                placeholderWrapper = function (e) {
+                    this.classList.remove('medium-editor-placeholder');
+                    if (e.type !== 'keypress') {
+                        activatePlaceholder(this);
+                    }
+                };
+            for (i = 0; i < this.elements.length; i += 1) {
+                activatePlaceholder(this.elements[i]);
+                this.elements[i].addEventListener('focusout', placeholderWrapper);
+                this.elements[i].addEventListener('keypress', placeholderWrapper);
             }
             return this;
         }
