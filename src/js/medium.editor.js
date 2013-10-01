@@ -218,8 +218,7 @@ function MediumEditor(elements, options) {
                 i;
 
             for (i = 0; i < buttons.length; i += 1) {
-                buttons[i].className = buttons[i].className.replace(/medium-editor-button-active/g, '')
-                                                           .replace(/\s{2}/g, ' ');
+                buttons[i].classList.remove('medium-editor-button-active');
                 this.showHideButton(buttons[i]);
             }
 
@@ -265,8 +264,7 @@ function MediumEditor(elements, options) {
                         self.checkSelection(e);
                     }
                     if (this.className.indexOf('medium-editor-button-active') > -1) {
-                        this.className = this.className.replace(/medium-editor-button-active/g, '')
-                                             .replace(/\s{2}/g, ' ');
+                        this.classList.remove('medium-editor-button-active');
                     } else {
                         this.className += ' medium-editor-button-active';
                     }
@@ -399,6 +397,7 @@ function MediumEditor(elements, options) {
             });
 
             linkCancel.addEventListener('click', function (e) {
+                e.preventDefault();
                 self.showToolbarActions();
                 restoreSelection(self.savedSelection);
             });
