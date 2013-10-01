@@ -8,3 +8,7 @@ body {
     width: 960px;
     margin: 30px auto;
 }
+
+.editable {
+    outline: none;
+}

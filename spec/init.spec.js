@@ -79,6 +79,7 @@ describe('Initialization TestCase', function () {
                     excludedActions: [],
                     firstHeader: 'h3',
                     forcePlainText: true,
+                    placeholder: 'Type your text',
                     secondHeader: 'h4'
                 },
                 editor = new MediumEditor('.editor');
