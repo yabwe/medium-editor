@@ -471,18 +471,21 @@ function MediumEditor(elements, options) {
         setPlaceholders: function () {
             var i,
                 activatePlaceholder = function (el) {
-                    if (el.textContent.replace(/^\s+|\s+$/g, '') === '' && el.children.length === 0) {
+                    if (el.textContent.replace(/^\s+|\s+$/g, '') === '') {
+                        el.innerHTML = '';
                         el.classList.add('medium-editor-placeholder');
                     }
                 },
                 placeholderWrapper = function (e) {
                     this.classList.remove('medium-editor-placeholder');
-                    activatePlaceholder(this);
+                    if (e.type !== 'keypress') {
+                        activatePlaceholder(this);
+                    }
                 };
             for (i = 0; i < this.elements.length; i += 1) {
                 activatePlaceholder(this.elements[i]);
                 this.elements[i].addEventListener('focusout', placeholderWrapper);
-                this.elements[i].addEventListener('keydown', placeholderWrapper);
+                this.elements[i].addEventListener('keypress', placeholderWrapper);
             }
             return this;
         }
