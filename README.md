@@ -47,7 +47,7 @@ var elements = document.querySelectorAll('.editable'),
 * __excludedActions__: list of actions to be excluded from the toolbar. Default: []
 * __firstHeader__: HTML tag to be used as first header. Default: h3
 * __forcePlainText__: Forces pasting as plain text. Default: true
-* __placeholder__: Defines the placeholder for empty contenteditables. Default: 'Type your text'
+* __placeholder__: Defines the default placeholder for empty contenteditables. You can overwrite it by setting a data-placeholder attribute to your elements. Default: 'Type your text'
 * __secondHeader__: HTML tag to be used as second header. Default: h4
 
 Example:
