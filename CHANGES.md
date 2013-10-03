@@ -1,3 +1,11 @@
+1.1.0 / 2013-10-03
+==================
+
+* Adds an option to disable the toolbar and maintain only the contenteditable behavior
+* Adds an option to disable returns
+* Adds an placeholder option for the contenteditable areas
+
+
 1.0.3 / 2013-10-01
 ==================
 
