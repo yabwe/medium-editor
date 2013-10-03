@@ -64,6 +64,7 @@ function MediumEditor(elements, options) {
             startNode = (node && node.nodeType === 3 ? node.parentNode : node);
         return startNode;
     }
+
     MediumEditor.prototype = {
         defaults: {
             anchorInputPlaceholder: 'Paste or type a link',
@@ -78,6 +79,7 @@ function MediumEditor(elements, options) {
             placeholder: 'Type your text',
             secondHeader: 'h4'
         },
+
         init: function (elements, options) {
             this.elements = typeof elements === 'string' ? document.querySelectorAll(elements) : elements;
             if (this.elements.length === 0) {
@@ -88,10 +90,11 @@ function MediumEditor(elements, options) {
             this.id = document.querySelectorAll('.medium-editor-toolbar').length + 1;
             this.options = extend(options, this.defaults);
             return this.initElements()
-                .bindPaste()
-                .setPlaceholders()
-                .bindWindowActions();
+                       .bindPaste()
+                       .setPlaceholders()
+                       .bindWindowActions();
         },
+
         initElements: function () {
             var i;
             for (i = 0; i < this.elements.length; i += 1) {
@@ -110,6 +113,7 @@ function MediumEditor(elements, options) {
             }
             return this;
         },
+
         bindParagraphCreation: function (el) {
             var self = this;
             el.addEventListener('keypress', function (e) {
@@ -126,6 +130,7 @@ function MediumEditor(elements, options) {
                 }
             });
         },
+
         //TODO: actionTemplate
         toolbarTemplate: function () {
             return '<ul id="medium-editor-toolbar-actions" class="medium-editor-toolbar-actions clearfix">' +
@@ -141,6 +146,7 @@ function MediumEditor(elements, options) {
                 '    <input type="text" value="" placeholder="' + this.options.anchorInputPlaceholder + '"><a href="#">&times;</a>' +
                 '</div>';
         },
+
         initToolbar: function () {
             this.toolbar = this.createToolbar();
             this.keepToolbarAlive = false;
@@ -148,6 +154,7 @@ function MediumEditor(elements, options) {
             this.toolbarActions = this.toolbar.querySelector('.medium-editor-toolbar-actions');
             return this;
         },
+
         createToolbar: function () {
             var toolbar = document.createElement('div');
             toolbar.id = 'medium-editor-toolbar-' + this.id;
@@ -156,6 +163,7 @@ function MediumEditor(elements, options) {
             document.getElementsByTagName('body')[0].appendChild(toolbar);
             return toolbar;
         },
+
         bindSelect: function () {
             var self = this,
                 timer = '',
@@ -172,6 +180,7 @@ function MediumEditor(elements, options) {
             }
             return this;
         },
+
         checkSelection: function () {
             var newSelection;
             if (this.keepToolbarAlive !== true) {
@@ -191,6 +200,7 @@ function MediumEditor(elements, options) {
             }
             return this;
         },
+
         getSelectionElement: function () {
             var selection = window.getSelection(),
                 range = selection.getRangeAt(0),
@@ -204,6 +214,7 @@ function MediumEditor(elements, options) {
             }
             return parent;
         },
+
         setToolbarPosition: function () {
             var buttonHeight = 50,
                 selection = window.getSelection(),
@@ -221,6 +232,7 @@ function MediumEditor(elements, options) {
             this.toolbar.style.left = ((boundary.left + boundary.right) / 2) - (this.toolbar.offsetWidth / 2) + (this.options.diffLeft) + 'px';
             return this;
         },
+
         setToolbarButtonStates: function () {
             var buttons = this.toolbarActions.querySelectorAll('button'),
                 i;
@@ -231,6 +243,7 @@ function MediumEditor(elements, options) {
             this.checkActiveButtons();
             return this;
         },
+
         showHideButton: function (button) {
             if (this.options.excludedActions.indexOf(button.getAttribute('data-element')) > -1) {
                 button.style.display = 'none';
@@ -238,6 +251,7 @@ function MediumEditor(elements, options) {
                 button.style.display = 'block';
             }
         },
+
         checkActiveButtons: function () {
             var parentNode = this.selection.anchorNode;
             if (!parentNode.tagName) {
@@ -248,12 +262,14 @@ function MediumEditor(elements, options) {
                 parentNode = parentNode.parentNode;
             }
         },
+
         activateButton: function (tag) {
             var el = this.toolbar.querySelector('[data-element="' + tag + '"]');
             if (el !== null && el.className.indexOf('medium-editor-button-active') === -1) {
                 el.className += ' medium-editor-button-active';
             }
         },
+
         bindButtons: function () {
             var buttons = this.toolbar.querySelectorAll('button'),
                 i,
@@ -277,11 +293,13 @@ function MediumEditor(elements, options) {
             this.setFirstAndLastItems(buttons);
             return this;
         },
+
         setFirstAndLastItems: function (buttons) {
             buttons[0].className += ' medium-editor-button-first';
             buttons[buttons.length - 1].className += ' medium-editor-button-last';
             return this;
         },
+
         execAction: function (action, e) {
             if (action.indexOf('append-') > -1) {
                 this.appendEl(action.replace('append-', ''));
@@ -293,6 +311,7 @@ function MediumEditor(elements, options) {
                 this.setToolbarPosition();
             }
         },
+
         triggerAnchorAction: function () {
             if (this.selection.anchorNode.parentNode.tagName.toLowerCase() === 'a') {
                 document.execCommand('unlink', null, false);
@@ -305,6 +324,7 @@ function MediumEditor(elements, options) {
             }
             return this;
         },
+
         appendEl: function (el) {
             var selectionEl = this.selection.anchorNode,
                 tagName;
@@ -326,11 +346,13 @@ function MediumEditor(elements, options) {
             this.bindElementToolbarEvents(el);
             this.setToolbarPosition();
         },
+
         transferAttributes: function (elFrom, elTo) {
             Array.prototype.slice.call(elFrom.attributes).forEach(function (item) {
                 elTo.setAttribute(item.name, item.value);
             });
         },
+
         getFirstChild: function (el) {
             var firstChild = el.firstChild;
             while (firstChild !== null && firstChild.nodeType !== 1) {
@@ -338,6 +360,7 @@ function MediumEditor(elements, options) {
             }
             return firstChild;
         },
+
         bindElementToolbarEvents: function (el) {
             var self = this;
             el.addEventListener('mouseup', function (e) {
@@ -347,6 +370,7 @@ function MediumEditor(elements, options) {
                 self.checkSelection(e);
             });
         },
+
         showToolbarActions: function () {
             var self = this,
                 timer;
@@ -362,6 +386,7 @@ function MediumEditor(elements, options) {
                 });
             }, 300);
         },
+
         showAnchorForm: function () {
             var input = this.anchorForm.querySelector('input');
             this.toolbarActions.style.display = 'none';
@@ -371,6 +396,7 @@ function MediumEditor(elements, options) {
             input.focus();
             input.value = '';
         },
+
         bindAnchorForm: function () {
             var input = this.anchorForm.querySelector('input'),
                 linkCancel = this.anchorForm.querySelector('a'),
@@ -391,12 +417,14 @@ function MediumEditor(elements, options) {
             });
             return this;
         },
+
         createLink: function (input) {
             restoreSelection(this.savedSelection);
             document.execCommand('CreateLink', false, input.value);
             this.showToolbarActions();
             input.value = '';
         },
+
         bindWindowActions: function () {
             var timerResize,
                 self = this;
@@ -408,6 +436,7 @@ function MediumEditor(elements, options) {
             });
             return this;
         },
+
         activate: function () {
             var i;
             if (this.isActive) {
@@ -419,6 +448,7 @@ function MediumEditor(elements, options) {
             }
             this.bindSelect();
         },
+
         deactivate: function () {
             var i;
             if (!this.isActive) {
@@ -432,6 +462,7 @@ function MediumEditor(elements, options) {
                 this.elements[i].removeAttribute('contentEditable');
             }
         },
+
         bindPaste: function () {
             if (!this.options.forcePlainText) {
                 return;
@@ -449,6 +480,7 @@ function MediumEditor(elements, options) {
             }
             return this;
         },
+
         setPlaceholders: function () {
             var i,
                 activatePlaceholder = function (el) {
