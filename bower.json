@@ -24,9 +24,10 @@
     "reports",
     "_SpecRunner.html",
     "Gruntfile.js",
-    "bower.json",
     "demo",
     "package.json",
-    "src"
+    "src",
+    "README.md",
+    "CHANGES.md"
   ]
 }
