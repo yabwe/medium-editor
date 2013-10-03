@@ -22,6 +22,12 @@
     "spec",
     "coverage",
     "reports",
-    "_SpecRunner.html"
+    "_SpecRunner.html",
+    "Gruntfile.js",
+    "demo",
+    "package.json",
+    "src",
+    "README.md",
+    "CHANGES.md"
   ]
 }
