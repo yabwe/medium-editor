@@ -39,6 +39,9 @@ module.exports = function(grunt) {
     };
 
     gruntConfig.uglify = {
+        options: {
+            report: 'gzip'
+        },
         build: {
             src: 'src/js/medium.editor.js',
             dest: 'dist/js/<%= pkg.name %>.min.js'
