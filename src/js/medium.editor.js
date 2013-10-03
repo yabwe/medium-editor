@@ -221,7 +221,9 @@ function MediumEditor(elements, options) {
             var buttonHeight = 50,
                 selection = window.getSelection(),
                 range = selection.getRangeAt(0),
-                boundary = range.getBoundingClientRect();
+                boundary = range.getBoundingClientRect(),
+                defaultLeft = (this.options.diffLeft) - (this.toolbar.offsetWidth / 2),
+                middleBoundary = (boundary.left + boundary.right) / 2;
             if (boundary.top < buttonHeight) {
                 this.toolbar.classList.add('medium-toolbar-arrow-over');
                 this.toolbar.classList.remove('medium-toolbar-arrow-under');
@@ -231,7 +233,13 @@ function MediumEditor(elements, options) {
                 this.toolbar.classList.remove('medium-toolbar-arrow-over');
                 this.toolbar.style.top = boundary.top + this.options.diffTop + window.pageYOffset - this.toolbar.offsetHeight + 'px';
             }
-            this.toolbar.style.left = ((boundary.left + boundary.right) / 2) - (this.toolbar.offsetWidth / 2) + (this.options.diffLeft) + 'px';
+            if (middleBoundary < (this.toolbar.offsetWidth / 2)) {
+                this.toolbar.style.left = defaultLeft + (this.toolbar.offsetWidth / 2) + 'px';
+            } else if ((window.innerWidth - middleBoundary) < (this.toolbar.offsetWidth / 2)) {
+                this.toolbar.style.left = windown.innerWidth + defaultLeft + 'px';
+            } else {
+                this.toolbar.style.left = defaultLeft + middleBoundary + 'px';
+            }
             return this;
         },
 
