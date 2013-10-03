@@ -44,6 +44,8 @@ var elements = document.querySelectorAll('.editable'),
 * __delay__: time in milliseconds to show the toolbar. Default: 0
 * __diffLeft__: value in pixels to be added to the X axis positioning of the toolbar. Default: 0
 * __diffTop__: value in pixels to be added to the Y axis positioning of the toolbar. Default: -5
+* __disableReturn__:  enables/disables the use of the return-key. You can also set specific element behavior by using setting a data-disable-return attribute. Default: false
+* __disableToolbar: enables/disables the toolbar, adding only thecontenteditable behavior. You can also set specific element behavior by using setting a data-disable-toolbar attribute. Default: false
 * __excludedActions__: list of actions to be excluded from the toolbar. Default: []
 * __firstHeader__: HTML tag to be used as first header. Default: h3
 * __forcePlainText__: Forces pasting as plain text. Default: true

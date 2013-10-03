@@ -72,13 +72,13 @@ function MediumEditor(elements, options) {
             delay: 0,
             diffLeft: 0,
             diffTop: -10,
+            disableReturn: false,
+            disableToolbar: false,
             excludedActions: [],
             firstHeader: 'h3',
             forcePlainText: true,
             placeholder: 'Type your text',
-            secondHeader: 'h4',
-            disableToolbar: false,
-            enableReturn: true
+            secondHeader: 'h4'
         },
         init: function (elements, options) {
             this.elements = typeof elements === 'string' ? document.querySelectorAll(elements) : elements;
@@ -120,7 +120,7 @@ function MediumEditor(elements, options) {
                     node = node.tagName.toLowerCase();
                 }
                 if (e.which === 13 && !e.shiftKey) {
-                    if (node !== 'q' && self.options.enableReturn && !el.getAttribute('data-disable-returns')) {
+                    if (node !== 'q' && !self.options.disableReturn && !el.getAttribute('data-disable-return')) {
                         document.execCommand('formatBlock', false, 'p');
                     } else {
                         e.preventDefault();
