@@ -80,7 +80,9 @@ describe('Initialization TestCase', function () {
                     firstHeader: 'h3',
                     forcePlainText: true,
                     placeholder: 'Type your text',
-                    secondHeader: 'h4'
+                    secondHeader: 'h4',
+                    disableToolbar: false,
+                    enableReturn: true
                 },
                 editor = new MediumEditor('.editor');
             expect(editor.options).toEqual(defaultOptions);
