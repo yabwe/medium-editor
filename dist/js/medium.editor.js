@@ -17,9 +17,9 @@ function MediumEditor(elements, options) {
         }
         return b;
     }
+
     // http://stackoverflow.com/questions/5605401/insert-link-in-contenteditable-element
     // by Tim Down
-
     function saveSelection() {
         var i,
             len,
@@ -46,9 +46,9 @@ function MediumEditor(elements, options) {
             }
         }
     }
+
     // http://stackoverflow.com/questions/6139107/programatically-select-text-in-a-contenteditable-html-element
     // by Tim Down & yckart
-
     function selectElementContents(el) {
         var selection = window.getSelection(),
             range = document.createRange();
@@ -56,9 +56,9 @@ function MediumEditor(elements, options) {
         selection.removeAllRanges();
         selection.addRange(range);
     }
+
     // http://stackoverflow.com/questions/1197401/how-can-i-get-the-element-the-caret-is-in-with-javascript-when-using-contentedi
     // by You
-
     function getSelectionStart() {
         var node = document.getSelection().anchorNode,
             startNode = (node && node.nodeType === 3 ? node.parentNode : node);
@@ -326,25 +326,42 @@ function MediumEditor(elements, options) {
         },
 
         appendEl: function (el) {
-            var selectionEl = this.selection.anchorNode,
-                tagName;
-            if (selectionEl && selectionEl.tagName) {
-                tagName = selectionEl.tagName.toLowerCase();
-            }
-            while (this.parentElements.indexOf(tagName) === -1) {
-                selectionEl = selectionEl.parentNode;
-                tagName = selectionEl.tagName.toLowerCase();
-            }
-            if (tagName === el) {
+            var selectionData = this.getSelectionData(this.selection.anchorNode);
+            if (selectionData.tagName === el) {
                 el = 'p';
             }
             el = document.createElement(el);
-            this.transferAttributes(selectionEl, el);
-            el.innerHTML = selectionEl.innerHTML;
-            selectionEl.parentNode.replaceChild(el, selectionEl);
+            if (selectionData.el) {
+                this.transferAttributes(selectionData.el, el);
+                el.innerHTML = selectionData.el.innerHTML;
+                selectionData.el.parentNode.replaceChild(el, selectionData.el);
+            } else {
+                el.innerHTML = this.selection.anchorNode.textContent;
+                this.selection.anchorNode.parentNode.replaceChild(el, this.selection.anchorNode);
+            }
             selectElementContents(el);
             this.bindElementToolbarEvents(el);
             this.setToolbarPosition();
+        },
+
+        getSelectionData: function (el) {
+            var tagName;
+
+            if (el && el.tagName) {
+                tagName = el.tagName.toLowerCase();
+            }
+
+            while (el && this.parentElements.indexOf(tagName) === -1) {
+                el = el.parentNode;
+                if (el && el.tagName) {
+                    tagName = el.tagName.toLowerCase();
+                }
+            }
+
+            return {
+                el: el,
+                tagName: tagName
+            };
         },
 
         transferAttributes: function (elFrom, elTo) {
