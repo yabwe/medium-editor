@@ -1,7 +1,5 @@
 # MediumEditor
 
-[![Build Status](https://travis-ci.org/daviferreira/medium-editor.png?branch=master)](https://travis-ci.org/daviferreira/medium-editor)
-
 This is a clone of [medium.com](https://medium.com) inline editor toolbar.
 
 Since I always had problems with bloated editors and I loved the simplicity of medium.com solution I've tried to implement their WYSIWYG approach with this script.
@@ -9,6 +7,8 @@ Since I always had problems with bloated editors and I loved the simplicity of m
 MediumEditor has been written using vanilla JavaScript, no additional frameworks required.
 
 Tested on Googe Chrome, Firefox and IE9+.
+
+[![Build Status](https://travis-ci.org/daviferreira/medium-editor.png?branch=master)](https://travis-ci.org/daviferreira/medium-editor)
 
 # Basic usage
 
