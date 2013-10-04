@@ -102,8 +102,8 @@ function MediumEditor(elements, options) {
                 if (!this.elements[i].getAttribute('data-placeholder')) {
                     this.elements[i].setAttribute('data-placeholder', this.options.placeholder);
                 }
-                this.elements[i].setAttribute('data-medium-element', 'true');
-                this.bindParagraphCreation(this.elements[i]);
+                this.elements[i].setAttribute('data-medium-element', true);
+                this.bindParagraphCreation(i).bindReturn(i);
                 if (!this.options.disableToolbar && !this.elements[i].getAttribute('data-disable-toolbar')) {
                     this.initToolbar()
                         .bindSelect()
@@ -114,17 +114,29 @@ function MediumEditor(elements, options) {
             return this;
         },
 
-        bindParagraphCreation: function (el) {
+        bindParagraphCreation: function (index) {
             var self = this;
-            el.addEventListener('keypress', function (e) {
+            this.elements[index].addEventListener('keyup', function (e) {
                 var node = getSelectionStart();
                 if (node) {
                     node = node.tagName.toLowerCase();
                 }
                 if (e.which === 13 && !e.shiftKey) {
-                    if (node !== 'q' && !self.options.disableReturn && !el.getAttribute('data-disable-return')) {
+                    if (node !== 'q' && !(self.options.disableReturn || this.getAttribute('data-disable-return'))) {
                         document.execCommand('formatBlock', false, 'p');
                     } else {
+                        e.preventDefault();
+                    }
+                }
+            });
+            return this;
+        },
+
+        bindReturn: function (index) {
+            var self = this;
+            this.elements[index].addEventListener('keypress', function (e) {
+                if (e.which === 13 && !e.shiftKey) {
+                    if (self.options.disableReturn || this.getAttribute('data-disable-return')) {
                         e.preventDefault();
                     }
                 }
