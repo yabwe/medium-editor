@@ -19,13 +19,13 @@ __demo__: [http://daviferreira.github.io/medium-editor/](http://daviferreira.git
 First, you need to attach medium editor's stylesheet to your page:
 
 ```html
-<link rel="stylesheet" href="css/medium.editor.css">
+<link rel="stylesheet" href="css/medium-editor.css">
 ```
 
 The next step is to reference the editor's script and instantiate a new MediumEditor object:
 
 ```html
-<script src="js/medium.editor.js"></script>
+<script src="js/medium-editor.js"></script>
 <script>var editor = new MediumEditor('.editable');</script>
 ```
 
