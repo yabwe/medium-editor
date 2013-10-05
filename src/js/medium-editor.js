@@ -313,7 +313,8 @@ function MediumEditor(elements, options) {
 
         execAction: function (action, e) {
             if (action.indexOf('append-') > -1) {
-                this.appendEl(action.replace('append-', ''));
+                this.execFormatBlock(action.replace('append-', ''));
+                this.setToolbarPosition();
                 this.setToolbarButtonStates();
             } else if (action === 'anchor') {
                 this.triggerAnchorAction(e);
@@ -336,13 +337,18 @@ function MediumEditor(elements, options) {
             return this;
         },
 
-        appendEl: function (el) {
+        execFormatBlock: function (el) {
             var selectionData = this.getSelectionData(this.selection.anchorNode);
+            // FF handles blockquote differently on formatBlock
+            // allowing nesting, we need to use outdent
+            // https://developer.mozilla.org/en-US/docs/Rich-Text_Editing_in_Mozilla
+            if (el === 'blockquote' && selectionData.el.parentNode.tagName.toLowerCase() === 'blockquote') {
+                return document.execCommand('outdent', false, null);
+            }
             if (selectionData.tagName === el) {
                 el = 'p';
             }
-            document.execCommand('formatBlock', false, el);
-            this.setToolbarPosition();
+            return document.execCommand('formatBlock', false, el);
         },
 
         getSelectionData: function (el) {

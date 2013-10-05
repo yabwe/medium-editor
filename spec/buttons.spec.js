@@ -152,8 +152,8 @@ describe('Buttons TestCase', function () {
             jasmine.Clock.useMock();
         });
 
-        it('should call the appendEl method when button action is append', function () {
-            spyOn(MediumEditor.prototype, 'appendEl');
+        it('should call the execFormatBlock method when button action is append', function () {
+            spyOn(MediumEditor.prototype, 'execFormatBlock');
             var button,
                 editor = new MediumEditor('.editor');
             selectElementContents(editor.elements[0]);
@@ -161,7 +161,7 @@ describe('Buttons TestCase', function () {
             jasmine.Clock.tick(1);
             button = editor.toolbar.querySelector('[data-element="h3"]');
             fireEvent(button, 'click');
-            expect(editor.appendEl).toHaveBeenCalled();
+            expect(editor.execFormatBlock).toHaveBeenCalled();
         });
 
         it('should create an h3 element when header1 is clicked', function () {
