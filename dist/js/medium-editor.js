@@ -108,7 +108,7 @@ function MediumEditor(elements, options) {
             var self = this;
             this.elements[index].addEventListener('keyup', function (e) {
                 var node = getSelectionStart();
-                if (node && node.getAttribute('data-medium-element')) {
+                if (node && node.getAttribute('data-medium-element') && node.children.length === 0) {
                     document.execCommand('formatBlock', false, 'p');
                 }
                 if (e.which === 13 && !e.shiftKey) {
@@ -339,7 +339,7 @@ function MediumEditor(elements, options) {
             if (selectionData.tagName === el) {
                 el = 'p';
             }
-            document.execCommand('formatblock', false, el);
+            document.execCommand('formatBlock', false, el);
             this.setToolbarPosition();
         },
 
