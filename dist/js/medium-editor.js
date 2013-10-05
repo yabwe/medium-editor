@@ -108,8 +108,8 @@ function MediumEditor(elements, options) {
             var self = this;
             this.elements[index].addEventListener('keyup', function (e) {
                 var node = getSelectionStart();
-                if (node) {
-                    node = node.tagName.toLowerCase();
+                if (node && node.getAttribute('data-medium-element')) {
+                    document.execCommand('formatBlock', false, 'p');
                 }
                 if (e.which === 13 && !e.shiftKey) {
                     if (!(self.options.disableReturn || this.getAttribute('data-disable-return'))) {
