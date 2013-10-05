@@ -47,16 +47,6 @@ function MediumEditor(elements, options) {
         }
     }
 
-    // http://stackoverflow.com/questions/6139107/programatically-select-text-in-a-contenteditable-html-element
-    // by Tim Down & yckart
-    function selectElementContents(el) {
-        var selection = window.getSelection(),
-            range = document.createRange();
-        range.selectNodeContents(el);
-        selection.removeAllRanges();
-        selection.addRange(range);
-    }
-
     // http://stackoverflow.com/questions/1197401/how-can-i-get-the-element-the-caret-is-in-with-javascript-when-using-contentedi
     // by You
     function getSelectionStart() {
@@ -86,7 +76,7 @@ function MediumEditor(elements, options) {
                 return;
             }
             this.isActive = true;
-            this.parentElements = ['p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'q'];
+            this.parentElements = ['p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'blockquote'];
             this.id = document.querySelectorAll('.medium-editor-toolbar').length + 1;
             this.options = extend(options, this.defaults);
             return this.initElements()
@@ -122,10 +112,8 @@ function MediumEditor(elements, options) {
                     node = node.tagName.toLowerCase();
                 }
                 if (e.which === 13 && !e.shiftKey) {
-                    if (node !== 'q' && !(self.options.disableReturn || this.getAttribute('data-disable-return'))) {
+                    if (!(self.options.disableReturn || this.getAttribute('data-disable-return'))) {
                         document.execCommand('formatBlock', false, 'p');
-                    } else {
-                        e.preventDefault();
                     }
                 }
             });
@@ -152,7 +140,7 @@ function MediumEditor(elements, options) {
                 '    <li><button class="medium-editor-action medium-editor-action-anchor" data-action="anchor" data-element="a">#</button></li>' +
                 '    <li><button class="medium-editor-action medium-editor-action-header1" data-action="append-' + this.options.firstHeader + '" data-element="' + this.options.firstHeader + '">h1</button></li>' +
                 '    <li><button class="medium-editor-action medium-editor-action-header2" data-action="append-' + this.options.secondHeader + '" data-element="' + this.options.secondHeader + '">h2</button></li>' +
-                '    <li><button class="medium-editor-action medium-editor-action-quote" data-action="append-q" data-element="q">&ldquo;</button></li>' +
+                '    <li><button class="medium-editor-action medium-editor-action-quote" data-action="append-blockquote" data-element="blockquote">&ldquo;</button></li>' +
                 '</ul>' +
                 '<div class="medium-editor-toolbar-form-anchor" id="medium-editor-toolbar-form-anchor">' +
                 '    <input type="text" value="" placeholder="' + this.options.anchorInputPlaceholder + '"><a href="#">&times;</a>' +
@@ -351,17 +339,7 @@ function MediumEditor(elements, options) {
             if (selectionData.tagName === el) {
                 el = 'p';
             }
-            el = document.createElement(el);
-            if (selectionData.el) {
-                this.transferAttributes(selectionData.el, el);
-                el.innerHTML = selectionData.el.innerHTML;
-                selectionData.el.parentNode.replaceChild(el, selectionData.el);
-            } else {
-                el.innerHTML = this.selection.anchorNode.textContent;
-                this.selection.anchorNode.parentNode.replaceChild(el, this.selection.anchorNode);
-            }
-            selectElementContents(el);
-            this.bindElementToolbarEvents(el);
+            document.execCommand('formatblock', false, el);
             this.setToolbarPosition();
         },
 
@@ -383,12 +361,6 @@ function MediumEditor(elements, options) {
                 el: el,
                 tagName: tagName
             };
-        },
-
-        transferAttributes: function (elFrom, elTo) {
-            Array.prototype.slice.call(elFrom.attributes).forEach(function (item) {
-                elTo.setAttribute(item.name, item.value);
-            });
         },
 
         getFirstChild: function (el) {
@@ -523,7 +495,6 @@ function MediumEditor(elements, options) {
             var i,
                 activatePlaceholder = function (el) {
                     if (el.textContent.replace(/^\s+|\s+$/g, '') === '') {
-                        el.innerHTML = '';
                         el.classList.add('medium-editor-placeholder');
                     }
                 },

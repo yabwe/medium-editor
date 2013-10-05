@@ -39,7 +39,6 @@ describe('Placeholder TestCase', function () {
         this.el.innerHTML = '<p><br></p><div class="empty"></div>';
         var editor = new MediumEditor('.editor');
         expect(editor.elements[0].className).toContain('medium-editor-placeholder');
-        expect(editor.elements[0].innerHTML).toBe('');
     });
 
     it('should remove the placeholder on keypress', function () {
