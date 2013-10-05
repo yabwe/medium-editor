@@ -4,6 +4,7 @@ function MediumEditor(elements, options) {
     'use strict';
     return this.init(elements, options);
 }
+
 (function (window, document) {
     'use strict';
 
@@ -116,6 +117,10 @@ function MediumEditor(elements, options) {
                 if (e.which === 13 && !e.shiftKey) {
                     if (!(self.options.disableReturn || this.getAttribute('data-disable-return'))) {
                         document.execCommand('formatBlock', false, 'p');
+                        node = getSelectionStart();
+                        if (node.tagName.toLowerCase() === 'a') {
+                            document.execCommand('unlink', null, false);
+                        }
                     }
                 }
             });
@@ -391,17 +396,18 @@ function MediumEditor(elements, options) {
 
         showToolbarActions: function () {
             var self = this,
+                timeoutWrapper = function () {
+                    self.keepToolbarAlive = false;
+                    self.toolbar.style.display = 'none';
+                    document.removeEventListener('click', timeoutWrapper);
+                },
                 timer;
             this.anchorForm.style.display = 'none';
             this.toolbarActions.style.display = 'block';
             this.keepToolbarAlive = false;
             clearTimeout(timer);
             timer = setTimeout(function () {
-                document.addEventListener('click', function () {
-                    self.keepToolbarAlive = false;
-                    self.toolbar.style.display = 'none';
-                    document.removeEventListener('click', this);
-                });
+                document.addEventListener('click', timeoutWrapper);
             }, 300);
         },
 
@@ -438,7 +444,7 @@ function MediumEditor(elements, options) {
 
         createLink: function (input) {
             restoreSelection(this.savedSelection);
-            document.execCommand('CreateLink', false, input.value);
+            document.execCommand('createLink', false, input.value);
             this.showToolbarActions();
             input.value = '';
         },
@@ -519,5 +525,7 @@ function MediumEditor(elements, options) {
             }
             return this;
         }
+
     };
+
 }(window, document));
