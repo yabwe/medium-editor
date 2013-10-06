@@ -1,3 +1,17 @@
+1.1.2 / 2013-10-06
+==================
+
+* Changes the editor to use the formatBlock command to handle block elements
+* Fixes placeholder for empty elements
+
+
+1.1.1 / 2013-10-04
+==================
+
+* Normalizes styles and scripts
+* Improves bower manifest
+
+
 1.1.0 / 2013-10-03
 ==================
 
