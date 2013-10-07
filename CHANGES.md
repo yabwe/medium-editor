@@ -1,3 +1,30 @@
+1.1.2 / 2013-10-06
+==================
+
+* Changes the editor to use the formatBlock command to handle block elements
+* Fixes placeholder for empty elements
+
+
+1.1.1 / 2013-10-04
+==================
+
+* Normalizes styles and scripts
+* Improves bower manifest
+
+
+1.1.0 / 2013-10-03
+==================
+
+* Adds an option to disable the toolbar and maintain only the contenteditable behavior
+* Adds an option to disable returns
+* Adds an placeholder option for the contenteditable areas
+
+
+1.0.3 / 2013-10-01
+==================
+
+* Fixes toolbar positioning on screen top
+
 1.0.2 / 2013-09-24
 ==================
 

@@ -1,26 +1,19 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <meta charset="UTF-8" />
+    <meta charset="UTF-8">
     <title>medium editor | demo</title>
     <link rel="stylesheet" href="css/normalize.css">
     <link rel="stylesheet" href="css/demo.css">
-    <link rel="stylesheet" href="../dist/css/medium.editor.css">
+    <link rel="stylesheet" href="../dist/css/medium-editor.css">
     <style>
     </style>
 </head>
 <body>
-    <div id="container" class="editable">
-        <p>select me</p>
-        <p>select me 2</p>
-
-        <p>So strange an accident has happened to us that I cannot forbear recording it, although it is very probable that you will see me before these papers can come into your possession.</p>
-
-        <p>Last Monday (July 31st) we were nearly surrounded by ice, which closed in the ship on all sides, scarcely leaving her the sea-room in which she floated. Our situation was somewhat dangerous, especially as we were compassed round by a very thick fog. We accordingly lay to, hoping that some change would take place in the atmosphere and weather.</p>
-
-        <p>About two o'clock the mist cleared away, and we beheld, stretched out in every direction, vast and irregular plains of ice, which seemed to have no end. Some of my comrades groaned, and my own mind began to grow watchful with anxious thoughts, when a strange sight suddenly attracted our attention and diverted our solicitude from our own situation. We perceived a low carriage, fixed on a sledge and drawn by dogs, pass on towards the north, at the distance of half a mile; a being which had the shape of a man, but apparently of gigantic stature, sat in the sledge and guided the dogs. We watched the rapid progress of the traveller with our telescopes until he was lost among the distant inequalities of the ice. This appearance excited our unqualified wonder. We were, as we believed, many hundred miles from any land; but this apparition seemed to denote that it was not, in reality, so distant as we had supposed. Shut in, however, by ice, it was impossible to follow his track, which we had observed with the greatest attention. About two hours after this occurrence we heard the ground sea, and before night the ice broke and freed our ship. We, however, lay to until the morning, fearing to encounter in the dark those large loose masses which float about after the breaking up of the ice. I profited of this time to rest for a few hours.</p>
+    <div id="container">
+        <div class="editable" data-placeholder="Type some text"></div>
     </div>
-    <script src="../dist/js/medium.editor.js"></script>
+    <script src="../dist/js/medium-editor.js"></script>
     <script>
         var editor = new MediumEditor('.editable');
     </script>

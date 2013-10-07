@@ -1,10 +1,27 @@
 body {
-    font-family: HelveticaNeue, Helvetica, Arial, sans-serif;
-    font-size: 14px;
-    line-height: 18px;
+    font-family: Georgia, Times, 'Times New Roman', serif;
+    font-size: 16px;
+    line-height: 20px;
 }
 
 #container {
     width: 960px;
     margin: 30px auto;
+}
+
+.editable {
+    outline: none;
+    margin: 0 0 20px 0;
+    padding: 0 0 20px 0;
+    border-bottom: 1px solid #dbdbdb;
+}
+
+h3 {
+    font-size: 32px;
+    line-height: 42px;
+}
+
+h4 {
+    font-size: 26px;
+    line-height: 32px;
 }

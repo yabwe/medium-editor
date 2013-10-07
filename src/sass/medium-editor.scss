@@ -4,6 +4,31 @@
 $bgcolor: #242424;
 $button_size: 50px;
 
+.medium-toolbar-arrow {
+    content: "";
+    display: block;
+    position: absolute;
+    left: 50%;
+    margin-left: -8px;
+    width: 0;
+    height: 0;
+    border-style: solid;
+}
+
+.medium-toolbar-arrow-under:after {
+    @extend .medium-toolbar-arrow;
+    top: $button_size;
+    border-width: 8px 8px 0 8px;
+    border-color: $bgcolor transparent transparent transparent;
+}
+
+.medium-toolbar-arrow-over:before {
+    @extend .medium-toolbar-arrow;
+    top: -8px;
+    border-width: 0 8px 8px 8px;
+    border-color: transparent transparent $bgcolor transparent;
+}
+
 .medium-editor-toolbar {
     position: absolute;
     top: 0;
@@ -15,20 +40,6 @@ $button_size: 50px;
     font-size: 16px;
     @include border-radius(5px);
     @include box-shadow(0 0 3px #000);
-
-    &:before {
-        content: "";
-        display: block;
-        position: absolute;
-        top: $button_size;
-        left: 50%;
-        margin-left: -8px;
-        width: 0;
-        height: 0;
-        border-width: 8px 8px 0 8px;
-        border-color: $bgcolor transparent transparent transparent;
-        border-style: solid;
-    }
 
     ul {
         margin: 0;
@@ -113,5 +124,17 @@ $button_size: 50px;
         display: inline-block;
         margin: 0 10px;
         text-decoration: none;
+    }
+}
+
+.medium-editor-placeholder {
+    position: relative;
+    &:after {
+        position: absolute;
+        top: 0;
+        left: 0;
+        content: attr(data-placeholder);
+        color: #b3b3b1;
+        font-style: italic;
     }
 }
