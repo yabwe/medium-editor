@@ -520,7 +520,7 @@ function MediumEditor(elements, options) {
                 };
             for (i = 0; i < this.elements.length; i += 1) {
                 activatePlaceholder(this.elements[i]);
-                this.elements[i].addEventListener('focusout', placeholderWrapper);
+                this.elements[i].addEventListener('blur', placeholderWrapper);
                 this.elements[i].addEventListener('keypress', placeholderWrapper);
             }
             return this;

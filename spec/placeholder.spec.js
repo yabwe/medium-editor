@@ -48,20 +48,20 @@ describe('Placeholder TestCase', function () {
         expect(editor.elements[0].className).not.toContain('medium-editor-placeholder');
     });
 
-    it('should add a placeholder to empty elements on focusout', function () {
+    it('should add a placeholder to empty elements on blur', function () {
         this.el.innerHTML = 'some text';
         var editor = new MediumEditor('.editor');
         expect(editor.elements[0].className).not.toContain('medium-editor-placeholder');
         editor.elements[0].innerHTML = '';
-        fireEvent(editor.elements[0], 'focusout');
+        fireEvent(editor.elements[0], 'blur');
         expect(editor.elements[0].className).toContain('medium-editor-placeholder');
     });
 
-    it('should not add a placeholder to elements with text on focusout', function () {
+    it('should not add a placeholder to elements with text on blur', function () {
         var editor = new MediumEditor('.editor');
         expect(editor.elements[0].className).toContain('medium-editor-placeholder');
         editor.elements[0].innerHTML = 'some text';
-        fireEvent(editor.elements[0], 'focusout');
+        fireEvent(editor.elements[0], 'blur');
         expect(editor.elements[0].className).not.toContain('medium-editor-placeholder');
     });
 
