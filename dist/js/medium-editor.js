@@ -491,14 +491,14 @@ function MediumEditor(elements, options) {
             }
             var i,
                 pasteWrapper = function (e) {
+                    var paragraphs, formattedText, p;
                     e.target.classList.remove('medium-editor-placeholder');
                     if (e.clipboardData && e.clipboardData.getData) {
                         e.preventDefault();
-                        var text = e.clipboardData.getData('text/plain');
-                        var paragraphs = text.split(/[\r\n]/g);
-                        var formattedText = "";
-                        for (var i in paragraphs){
-                            formattedText += "<p>" + paragraphs[i] + "</p>";
+                        paragraphs = e.clipboardData.getData('text/plain').split(/[\r\n]/g);
+                        formattedText = "";
+                        for (p = 0; p < paragraphs.length; p += 1) {
+                            formattedText += "<p>" + paragraphs[p] + "</p>";
                         }
                         document.execCommand('insertHTML', false, formattedText);
                     }
