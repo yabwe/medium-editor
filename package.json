@@ -1,7 +1,13 @@
 {
   "name": "medium-editor",
   "version": "1.1.3",
-  "repository": "https://github.com/daviferreira/medium-editor",
+  "description": "Medium.com WYSIWYG editor clone.",
+  "main": "src/js/medium-editor.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/daviferreira/medium-editor"
+  },
+  "license": "THE BEER-WARE LICENSE",
   "devDependencies": {
     "grunt": "~0.4.1",
     "grunt-contrib-uglify": "~0.2.0",
@@ -12,7 +18,8 @@
     "grunt-contrib-watch": "~0.4.2",
     "grunt-contrib-concat": "~0.3.0",
     "grunt-template-jasmine-istanbul": "~0.2.4",
-    "grunt-plato": "~0.2.0"
+    "grunt-plato": "~0.2.0",
+    "brfs": "0.0.8"
   },
   "scripts": {
     "test": "grunt test --verbose"
