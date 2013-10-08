@@ -1,10 +1,12 @@
-/*global console*/
-
-if (typeof module !== 'undefined') module.exports = MediumEditor;
+/*global console, module*/
 
 function MediumEditor(elements, options) {
     'use strict';
     return this.init(elements, options);
+}
+
+if (window.module !== undefined) {
+    module.exports = MediumEditor;
 }
 
 (function (window, document) {

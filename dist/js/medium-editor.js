@@ -3,6 +3,10 @@ function MediumEditor(elements, options) {
     return this.init(elements, options);
 }
 
+if (window.module !== undefined) {
+    module.exports = MediumEditor;
+}
+
 (function (window, document) {
     'use strict';
 
