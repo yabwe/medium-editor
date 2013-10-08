@@ -71,6 +71,11 @@ var editor = new MediumEditor('.editable', {
 * __.deactivate()__: disables the editor
 * __.activate()__: re-activates the editor
 
+
+## Image Upload
+
+[Pavel Linkesch](https://github.com/orthes) has developed a jQuery plugin to upload images following Medium.com functionality. Check it out at [http://orthes.github.io/medium-editor-images-plugin/](http://orthes.github.io/medium-editor-images-plugin/)
+
 ## Development
 
 MediumEditor development tasks are managed by Grunt. To install all the necessary packages, just invoke:
