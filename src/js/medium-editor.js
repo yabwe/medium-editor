@@ -493,10 +493,16 @@ function MediumEditor(elements, options) {
             }
             var i,
                 pasteWrapper = function (e) {
+                    var paragraphs, formattedText, p;
                     e.target.classList.remove('medium-editor-placeholder');
                     if (e.clipboardData && e.clipboardData.getData) {
                         e.preventDefault();
-                        document.execCommand('insertHTML', false, e.clipboardData.getData('text/plain').replace(/[\r\n]/g, '<br>'));
+                        paragraphs = e.clipboardData.getData('text/plain').split(/[\r\n]/g);
+                        formattedText = "";
+                        for (p = 0; p < paragraphs.length; p += 1) {
+                            formattedText += "<p>" + paragraphs[p] + "</p>";
+                        }
+                        document.execCommand('insertHTML', false, formattedText);
                     }
                 };
             for (i = 0; i < this.elements.length; i += 1) {
