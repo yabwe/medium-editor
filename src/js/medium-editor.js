@@ -147,7 +147,7 @@ if (window.module !== undefined) {
             return '<ul id="medium-editor-toolbar-actions" class="medium-editor-toolbar-actions clearfix">' +
                 '    <li><button class="medium-editor-action medium-editor-action-bold" data-action="bold" data-element="b">B</button></li>' +
                 '    <li><button class="medium-editor-action medium-editor-action-italic" data-action="italic" data-element="i">I</button></li>' +
-                '    <li><button class="medium-editor-action medium-editor-action-underline" data-action="underline" data-element="u">S</button></li>' +
+                '    <li><button class="medium-editor-action medium-editor-action-underline" data-action="underline" data-element="u">U</button></li>' +
                 '    <li><button class="medium-editor-action medium-editor-action-anchor" data-action="anchor" data-element="a">#</button></li>' +
                 '    <li><button class="medium-editor-action medium-editor-action-header1" data-action="append-' + this.options.firstHeader + '" data-element="' + this.options.firstHeader + '">h1</button></li>' +
                 '    <li><button class="medium-editor-action medium-editor-action-header2" data-action="append-' + this.options.secondHeader + '" data-element="' + this.options.secondHeader + '">h2</button></li>' +
