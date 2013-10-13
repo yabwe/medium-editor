@@ -1,3 +1,9 @@
+1.1.4 / 2013-10-13
+==================
+
+* Exports MediumEditor as module
+* Changes "Underline" button to display "U" instead of "S"
+
 1.1.3 / 2013-10-08
 ==================
 
