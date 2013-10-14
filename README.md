@@ -61,7 +61,7 @@ var editor = new MediumEditor('.editable', {
     diffTop: 10,
     firstHeader: 'h1',
     secondHeader: 'h2',
-    excludedActions: ['q', 's'],
+    excludedActions: ['q', 'u'],
     delay: 1000
 });
 ```
