@@ -74,7 +74,8 @@ if (window.module !== undefined) {
             firstHeader: 'h3',
             forcePlainText: true,
             placeholder: 'Type your text',
-            secondHeader: 'h4'
+            secondHeader: 'h4',
+            buttons: [ 'bold','italic','underline','anchor', 'header1', 'header2','quote' ]
         },
 
         init: function (elements, options) {
@@ -142,20 +143,35 @@ if (window.module !== undefined) {
             });
         },
 
+        buttonTemplate: function(btnType) {
+            var buttonTemplates = {
+                'bold': '<li><button class="medium-editor-action medium-editor-action-bold" data-action="bold" data-element="b">B</button></li>' ,
+                'italic': '<li><button class="medium-editor-action medium-editor-action-italic" data-action="italic" data-element="i">I</button></li>' ,
+                'underline': '<li><button class="medium-editor-action medium-editor-action-underline" data-action="underline" data-element="u">U</button></li>' ,
+                'anchor': '<li><button class="medium-editor-action medium-editor-action-anchor" data-action="anchor" data-element="a">#</button></li>' , 
+                'header1': '<li><button class="medium-editor-action medium-editor-action-header1" data-action="append-' + this.options.firstHeader + '" data-element="' + this.options.firstHeader + '">h1</button></li>' , 
+                'header2': '<li><button class="medium-editor-action medium-editor-action-header2" data-action="append-' + this.options.secondHeader + '" data-element="' + this.options.secondHeader + '">h2</button></li>' ,
+                'quote': '<li><button class="medium-editor-action medium-editor-action-quote" data-action="append-blockquote" data-element="blockquote">&ldquo;</button></li>'
+            };
+            return buttonTemplates[btnType];
+        },
+
         //TODO: actionTemplate
         toolbarTemplate: function () {
-            return '<ul id="medium-editor-toolbar-actions" class="medium-editor-toolbar-actions clearfix">' +
-                '    <li><button class="medium-editor-action medium-editor-action-bold" data-action="bold" data-element="b">B</button></li>' +
-                '    <li><button class="medium-editor-action medium-editor-action-italic" data-action="italic" data-element="i">I</button></li>' +
-                '    <li><button class="medium-editor-action medium-editor-action-underline" data-action="underline" data-element="u">U</button></li>' +
-                '    <li><button class="medium-editor-action medium-editor-action-anchor" data-action="anchor" data-element="a">#</button></li>' +
-                '    <li><button class="medium-editor-action medium-editor-action-header1" data-action="append-' + this.options.firstHeader + '" data-element="' + this.options.firstHeader + '">h1</button></li>' +
-                '    <li><button class="medium-editor-action medium-editor-action-header2" data-action="append-' + this.options.secondHeader + '" data-element="' + this.options.secondHeader + '">h2</button></li>' +
-                '    <li><button class="medium-editor-action medium-editor-action-quote" data-action="append-blockquote" data-element="blockquote">&ldquo;</button></li>' +
-                '</ul>' +
+            var btns = this.options.buttons;
+            var html = '<ul id="medium-editor-toolbar-actions" class="medium-editor-toolbar-actions clearfix">';
+            for (var i = 0; i < btns.length; i++){
+                var iBtn = btns[i];
+
+                if( this.defaults.buttons.indexOf(iBtn) > -1 ){
+                    html += this.buttonTemplate(iBtn);
+                }
+            }
+            html += '</ul>' +
                 '<div class="medium-editor-toolbar-form-anchor" id="medium-editor-toolbar-form-anchor">' +
                 '    <input type="text" value="" placeholder="' + this.options.anchorInputPlaceholder + '"><a href="#">&times;</a>' +
                 '</div>';
+            return html;
         },
 
         initToolbar: function () {
