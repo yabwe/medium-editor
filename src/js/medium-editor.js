@@ -178,7 +178,7 @@ if (window.module !== undefined) {
 
             for (i = 0; i < btns.length; i += 1) {
                 iBtn = btns[i];
-                if( this.builtInButtons.indexOf(iBtn) > -1 ){
+                if (this.builtInButtons.indexOf(iBtn) > -1) {
                     html += this.buttonTemplate(iBtn);
                 }
             }
