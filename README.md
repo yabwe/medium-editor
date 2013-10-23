@@ -41,12 +41,12 @@ var elements = document.querySelectorAll('.editable'),
 ## Initialization options
 
 * __anchorInputPlaceholder__: text to be shown as placeholder of the anchor input. Default: _Paste or type a link_
+* __buttons__: the set of buttons to display on the toolbar. Default: [ 'bold', 'italic', 'underline', 'anchor', 'header1', 'header2', 'quote' ]
 * __delay__: time in milliseconds to show the toolbar. Default: 0
 * __diffLeft__: value in pixels to be added to the X axis positioning of the toolbar. Default: 0
 * __diffTop__: value in pixels to be added to the Y axis positioning of the toolbar. Default: -5
 * __disableReturn__:  enables/disables the use of the return-key. You can also set specific element behavior by using setting a data-disable-return attribute. Default: false
 * __disableToolbar__: enables/disables the toolbar, adding only thecontenteditable behavior. You can also set specific element behavior by using setting a data-disable-toolbar attribute. Default: false
-* __excludedActions__: list of actions to be excluded from the toolbar. Default: []
 * __firstHeader__: HTML tag to be used as first header. Default: h3
 * __forcePlainText__: Forces pasting as plain text. Default: true
 * __placeholder__: Defines the default placeholder for empty contenteditables. You can overwrite it by setting a data-placeholder attribute on your elements. Default: 'Type your text'
@@ -57,11 +57,11 @@ Example:
 ```javascript
 var editor = new MediumEditor('.editable', {
     anchorInputPlaceholder: 'Type a link',
+    buttons: [ 'bold', 'italic', 'quote' ]
     diffLeft: 25,
     diffTop: 10,
     firstHeader: 'h1',
     secondHeader: 'h2',
-    excludedActions: ['q', 'u'],
     delay: 1000
 });
 ```
