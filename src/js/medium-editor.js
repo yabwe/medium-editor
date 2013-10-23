@@ -111,6 +111,18 @@ if (window.module !== undefined) {
             return this;
         },
 
+        builtInButtons : [
+            'bold',
+            'italic',
+            'underline',
+            'superscript',
+            'subscript',
+            'anchor',
+            'header1',
+            'header2',
+            'quote'
+        ],
+
         bindParagraphCreation: function (index) {
             var self = this;
             this.elements[index].addEventListener('keyup', function (e) {
@@ -123,7 +135,7 @@ if (window.module !== undefined) {
                         document.execCommand('formatBlock', false, 'p');
                         node = getSelectionStart();
                         if (node.tagName.toLowerCase() === 'a') {
-                            document.execCommand('unlink', null, false);
+                            document.execCommand('unlink', false, null);
                         }
                     }
                 }
@@ -147,6 +159,8 @@ if (window.module !== undefined) {
                 'bold': '<li><button class="medium-editor-action medium-editor-action-bold" data-action="bold" data-element="b">B</button></li>',
                 'italic': '<li><button class="medium-editor-action medium-editor-action-italic" data-action="italic" data-element="i">I</button></li>',
                 'underline': '<li><button class="medium-editor-action medium-editor-action-underline" data-action="underline" data-element="u">U</button></li>',
+                'superscript': '<li><button class="medium-editor-action medium-editor-action-superscript" data-action="superscript" data-element="sup">Sup</button></li>',
+                'subscript': '<li><button class="medium-editor-action medium-editor-action-subscript" data-action="subscript" data-element="sub">Sub</button></li>',
                 'anchor': '<li><button class="medium-editor-action medium-editor-action-anchor" data-action="anchor" data-element="a">#</button></li>',
                 'header1': '<li><button class="medium-editor-action medium-editor-action-header1" data-action="append-' + this.options.firstHeader + '" data-element="' + this.options.firstHeader + '">h1</button></li>',
                 'header2': '<li><button class="medium-editor-action medium-editor-action-header2" data-action="append-' + this.options.secondHeader + '" data-element="' + this.options.secondHeader + '">h2</button></li>',
@@ -164,8 +178,7 @@ if (window.module !== undefined) {
 
             for (i = 0; i < btns.length; i += 1) {
                 iBtn = btns[i];
-
-                if (this.defaults.buttons.indexOf(iBtn) > -1) {
+                if( this.builtInButtons.indexOf(iBtn) > -1 ){
                     html += this.buttonTemplate(iBtn);
                 }
             }
@@ -337,14 +350,14 @@ if (window.module !== undefined) {
             } else if (action === 'anchor') {
                 this.triggerAnchorAction(e);
             } else {
-                document.execCommand(action, null, false);
+                document.execCommand(action, false, null);
                 this.setToolbarPosition();
             }
         },
 
         triggerAnchorAction: function () {
             if (this.selection.anchorNode.parentNode.tagName.toLowerCase() === 'a') {
-                document.execCommand('unlink', null, false);
+                document.execCommand('unlink', false, null);
             } else {
                 if (this.anchorForm.style.display === 'block') {
                     this.showToolbarActions();
