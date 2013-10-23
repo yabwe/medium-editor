@@ -70,7 +70,6 @@ if (window.module !== undefined) {
             diffTop: -10,
             disableReturn: false,
             disableToolbar: false,
-            excludedActions: [],
             firstHeader: 'h3',
             forcePlainText: true,
             placeholder: 'Type your text',
@@ -277,18 +276,9 @@ if (window.module !== undefined) {
                 i;
             for (i = 0; i < buttons.length; i += 1) {
                 buttons[i].classList.remove('medium-editor-button-active');
-                this.showHideButton(buttons[i]);
             }
             this.checkActiveButtons();
             return this;
-        },
-
-        showHideButton: function (button) {
-            if (this.options.excludedActions.indexOf(button.getAttribute('data-element')) > -1) {
-                button.style.display = 'none';
-            } else {
-                button.style.display = 'block';
-            }
         },
 
         checkActiveButtons: function () {
