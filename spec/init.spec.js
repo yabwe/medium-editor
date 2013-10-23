@@ -78,11 +78,11 @@ describe('Initialization TestCase', function () {
                     diffTop: -10,
                     disableReturn: false,
                     disableToolbar: false,
-                    excludedActions: [],
                     firstHeader: 'h3',
                     forcePlainText: true,
                     placeholder: 'Type your text',
-                    secondHeader: 'h4'
+                    secondHeader: 'h4',
+                    buttons: [ 'bold', 'italic', 'underline', 'anchor', 'header1', 'header2', 'quote' ]
                 },
                 editor = new MediumEditor('.editor');
             expect(editor.options).toEqual(defaultOptions);
@@ -90,7 +90,6 @@ describe('Initialization TestCase', function () {
 
         it('should accept custom options values', function () {
             var options = {
-                    excludedActions: ['h1'],
                     anchorInputPlaceholder: 'test',
                     diffLeft: 10,
                     diffTop: 5,
