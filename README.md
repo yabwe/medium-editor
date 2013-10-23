@@ -41,7 +41,7 @@ var elements = document.querySelectorAll('.editable'),
 ## Initialization options
 
 * __anchorInputPlaceholder__: text to be shown as placeholder of the anchor input. Default: _Paste or type a link_
-* __buttons__: the set of buttons to display on the toolbar. Default: [ 'bold', 'italic', 'underline', 'anchor', 'header1', 'header2', 'quote' ]
+* __buttons__: the set of buttons to display on the toolbar. Default: ['bold', 'italic', 'underline', 'anchor', 'header1', 'header2', 'quote']
 * __delay__: time in milliseconds to show the toolbar. Default: 0
 * __diffLeft__: value in pixels to be added to the X axis positioning of the toolbar. Default: 0
 * __diffTop__: value in pixels to be added to the Y axis positioning of the toolbar. Default: -5
@@ -57,7 +57,7 @@ Example:
 ```javascript
 var editor = new MediumEditor('.editable', {
     anchorInputPlaceholder: 'Type a link',
-    buttons: [ 'bold', 'italic', 'quote' ]
+    buttons: ['bold', 'italic', 'quote']
     diffLeft: 25,
     diffTop: 10,
     firstHeader: 'h1',

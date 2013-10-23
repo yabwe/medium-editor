@@ -74,7 +74,7 @@ if (window.module !== undefined) {
             forcePlainText: true,
             placeholder: 'Type your text',
             secondHeader: 'h4',
-            buttons: [ 'bold', 'italic', 'underline', 'anchor', 'header1', 'header2', 'quote' ]
+            buttons: ['bold', 'italic', 'underline', 'anchor', 'header1', 'header2', 'quote']
         },
 
         init: function (elements, options) {
