@@ -68,13 +68,13 @@ var editor = new MediumEditor('.editable', {
 
 ## Extra buttons
 
-Medium Editor, by default, will show only the buttons listed above to avoid a
-:x
+Medium Editor, by default, will show only the buttons listed above to avoid a huge toolbar. There are a couple of extra buttons you can use:
 
-* __superscript__ *
-* __subscript__ *
-* __unorderedlist__ *
-* __orderedlist__ *
+* __superscript__
+* __subscript__
+* __unorderedlist__
+* __orderedlist__
+
 
 ## API
 
