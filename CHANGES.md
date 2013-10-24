@@ -1,4 +1,10 @@
-1.1.5 / 2013-10-13
+1.1.6 / 2013-10-24
+==================
+
+* Adds extra buttons: superscript, subscript, ordered list and unordered list
+
+
+1.1.5 / 2013-10-23
 ==================
 
 * Changes buttons blacklist to whitelist
