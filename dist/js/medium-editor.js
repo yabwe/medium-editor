@@ -68,11 +68,11 @@ if (window.module !== undefined) {
             diffTop: -10,
             disableReturn: false,
             disableToolbar: false,
-            excludedActions: [],
             firstHeader: 'h3',
             forcePlainText: true,
             placeholder: 'Type your text',
-            secondHeader: 'h4'
+            secondHeader: 'h4',
+            buttons: ['bold', 'italic', 'underline', 'anchor', 'header1', 'header2', 'quote']
         },
 
         init: function (elements, options) {
@@ -112,16 +112,18 @@ if (window.module !== undefined) {
         bindParagraphCreation: function (index) {
             var self = this;
             this.elements[index].addEventListener('keyup', function (e) {
-                var node = getSelectionStart();
+                var node = getSelectionStart(),
+                    tagName;
                 if (node && node.getAttribute('data-medium-element') && node.children.length === 0) {
                     document.execCommand('formatBlock', false, 'p');
                 }
                 if (e.which === 13 && !e.shiftKey) {
-                    if (!(self.options.disableReturn || this.getAttribute('data-disable-return'))) {
+                    node = getSelectionStart();
+                    tagName = node.tagName.toLowerCase();
+                    if (!(self.options.disableReturn || this.getAttribute('data-disable-return')) && tagName !== 'li') {
                         document.execCommand('formatBlock', false, 'p');
-                        node = getSelectionStart();
-                        if (node.tagName.toLowerCase() === 'a') {
-                            document.execCommand('unlink', null, false);
+                        if (tagName === 'a') {
+                            document.execCommand('unlink', false, null);
                         }
                     }
                 }
@@ -140,20 +142,41 @@ if (window.module !== undefined) {
             });
         },
 
+        buttonTemplate: function(btnType) {
+            var buttonTemplates = {
+                'bold': '<li><button class="medium-editor-action medium-editor-action-bold" data-action="bold" data-element="b">B</button></li>',
+                'italic': '<li><button class="medium-editor-action medium-editor-action-italic" data-action="italic" data-element="i">I</button></li>',
+                'underline': '<li><button class="medium-editor-action medium-editor-action-underline" data-action="underline" data-element="u">U</button></li>',
+                'superscript': '<li><button class="medium-editor-action medium-editor-action-superscript" data-action="superscript" data-element="sup">x<sup>1</sup></button></li>',
+                'subscript': '<li><button class="medium-editor-action medium-editor-action-subscript" data-action="subscript" data-element="sub">x<sub>1</sup></button></li>',
+                'anchor': '<li><button class="medium-editor-action medium-editor-action-anchor" data-action="anchor" data-element="a">#</button></li>',
+                'header1': '<li><button class="medium-editor-action medium-editor-action-header1" data-action="append-' + this.options.firstHeader + '" data-element="' + this.options.firstHeader + '">h1</button></li>',
+                'header2': '<li><button class="medium-editor-action medium-editor-action-header2" data-action="append-' + this.options.secondHeader + '" data-element="' + this.options.secondHeader + '">h2</button></li>',
+                'quote': '<li><button class="medium-editor-action medium-editor-action-quote" data-action="append-blockquote" data-element="blockquote">&ldquo;</button></li>',
+                'orderedlist': '<li><button class="medium-editor-action medium-editor-action-orderedlist" data-action="insertorderedlist" data-element="ol">1.</button></li>',
+                'unorderedlist': '<li><button class="medium-editor-action medium-editor-action-unorderedlist" data-action="insertunorderedlist" data-element="ul">&bull;</button></li>'
+            };
+            return buttonTemplates[btnType] || false;
+        },
+
         //TODO: actionTemplate
         toolbarTemplate: function () {
-            return '<ul id="medium-editor-toolbar-actions" class="medium-editor-toolbar-actions clearfix">' +
-                '    <li><button class="medium-editor-action medium-editor-action-bold" data-action="bold" data-element="b">B</button></li>' +
-                '    <li><button class="medium-editor-action medium-editor-action-italic" data-action="italic" data-element="i">I</button></li>' +
-                '    <li><button class="medium-editor-action medium-editor-action-underline" data-action="underline" data-element="u">U</button></li>' +
-                '    <li><button class="medium-editor-action medium-editor-action-anchor" data-action="anchor" data-element="a">#</button></li>' +
-                '    <li><button class="medium-editor-action medium-editor-action-header1" data-action="append-' + this.options.firstHeader + '" data-element="' + this.options.firstHeader + '">h1</button></li>' +
-                '    <li><button class="medium-editor-action medium-editor-action-header2" data-action="append-' + this.options.secondHeader + '" data-element="' + this.options.secondHeader + '">h2</button></li>' +
-                '    <li><button class="medium-editor-action medium-editor-action-quote" data-action="append-blockquote" data-element="blockquote">&ldquo;</button></li>' +
-                '</ul>' +
+            var btns = this.options.buttons,
+                html = '<ul id="medium-editor-toolbar-actions" class="medium-editor-toolbar-actions clearfix">',
+                i,
+                tpl;
+
+            for (i = 0; i < btns.length; i += 1) {
+                tpl = this.buttonTemplate(btns[i]);
+                if (tpl) {
+                    html += tpl;
+                }
+            }
+            html += '</ul>' +
                 '<div class="medium-editor-toolbar-form-anchor" id="medium-editor-toolbar-form-anchor">' +
                 '    <input type="text" value="" placeholder="' + this.options.anchorInputPlaceholder + '"><a href="#">&times;</a>' +
                 '</div>';
+            return html;
         },
 
         initToolbar: function () {
@@ -256,18 +279,9 @@ if (window.module !== undefined) {
                 i;
             for (i = 0; i < buttons.length; i += 1) {
                 buttons[i].classList.remove('medium-editor-button-active');
-                this.showHideButton(buttons[i]);
             }
             this.checkActiveButtons();
             return this;
-        },
-
-        showHideButton: function (button) {
-            if (this.options.excludedActions.indexOf(button.getAttribute('data-element')) > -1) {
-                button.style.display = 'none';
-            } else {
-                button.style.display = 'block';
-            }
         },
 
         checkActiveButtons: function () {
@@ -326,14 +340,14 @@ if (window.module !== undefined) {
             } else if (action === 'anchor') {
                 this.triggerAnchorAction(e);
             } else {
-                document.execCommand(action, null, false);
+                document.execCommand(action, false, null);
                 this.setToolbarPosition();
             }
         },
 
         triggerAnchorAction: function () {
             if (this.selection.anchorNode.parentNode.tagName.toLowerCase() === 'a') {
-                document.execCommand('unlink', null, false);
+                document.execCommand('unlink', false, null);
             } else {
                 if (this.anchorForm.style.display === 'block') {
                     this.showToolbarActions();

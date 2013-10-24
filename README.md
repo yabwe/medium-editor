@@ -41,7 +41,7 @@ var elements = document.querySelectorAll('.editable'),
 ## Initialization options
 
 * __anchorInputPlaceholder__: text to be shown as placeholder of the anchor input. Default: _Paste or type a link_
-* __buttons__: the set of buttons to display on the toolbar. Default: [ 'bold', 'italic', 'underline', 'anchor', 'header1', 'header2', 'quote' ]
+* __buttons__: the set of buttons to display on the toolbar. Default: ['bold', 'italic', 'underline', 'anchor', 'header1', 'header2', 'quote']
 * __delay__: time in milliseconds to show the toolbar. Default: 0
 * __diffLeft__: value in pixels to be added to the X axis positioning of the toolbar. Default: 0
 * __diffTop__: value in pixels to be added to the Y axis positioning of the toolbar. Default: -5
@@ -57,7 +57,7 @@ Example:
 ```javascript
 var editor = new MediumEditor('.editable', {
     anchorInputPlaceholder: 'Type a link',
-    buttons: [ 'bold', 'italic', 'quote' ]
+    buttons: ['bold', 'italic', 'quote']
     diffLeft: 25,
     diffTop: 10,
     firstHeader: 'h1',
@@ -65,6 +65,16 @@ var editor = new MediumEditor('.editable', {
     delay: 1000
 });
 ```
+
+## Extra buttons
+
+Medium Editor, by default, will show only the buttons listed above to avoid a huge toolbar. There are a couple of extra buttons you can use:
+
+* __superscript__
+* __subscript__
+* __unorderedlist__
+* __orderedlist__
+
 
 ## API
 
@@ -98,3 +108,7 @@ The source files are located inside the __src__ directory. MediumEditor styleshe
 "THE BEER-WARE LICENSE" (Revision 42):
 
 As long as you retain this notice you can do whatever you want with this stuff. If we meet some day, and you think this stuff is worth it, you can buy me a beer in return.
+
+
+[![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/daviferreira/medium-editor/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
+
