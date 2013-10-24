@@ -66,6 +66,16 @@ var editor = new MediumEditor('.editable', {
 });
 ```
 
+## Extra buttons
+
+Medium Editor, by default, will show only the buttons listed above to avoid a
+:x
+
+* __superscript__ *
+* __subscript__ *
+* __unorderedlist__ *
+* __orderedlist__ *
+
 ## API
 
 * __.deactivate()__: disables the editor
