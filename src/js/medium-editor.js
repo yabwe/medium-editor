@@ -111,30 +111,20 @@ if (window.module !== undefined) {
             return this;
         },
 
-        builtInButtons : [
-            'bold',
-            'italic',
-            'underline',
-            'superscript',
-            'subscript',
-            'anchor',
-            'header1',
-            'header2',
-            'quote'
-        ],
-
         bindParagraphCreation: function (index) {
             var self = this;
             this.elements[index].addEventListener('keyup', function (e) {
-                var node = getSelectionStart();
+                var node = getSelectionStart(),
+                    tagName;
                 if (node && node.getAttribute('data-medium-element') && node.children.length === 0) {
                     document.execCommand('formatBlock', false, 'p');
                 }
                 if (e.which === 13 && !e.shiftKey) {
-                    if (!(self.options.disableReturn || this.getAttribute('data-disable-return'))) {
+                    node = getSelectionStart();
+                    tagName = node.tagName.toLowerCase();
+                    if (!(self.options.disableReturn || this.getAttribute('data-disable-return')) && tagName !== 'li') {
                         document.execCommand('formatBlock', false, 'p');
-                        node = getSelectionStart();
-                        if (node.tagName.toLowerCase() === 'a') {
+                        if (tagName === 'a') {
                             document.execCommand('unlink', false, null);
                         }
                     }
@@ -168,7 +158,7 @@ if (window.module !== undefined) {
                 'orderedlist': '<li><button class="medium-editor-action medium-editor-action-orderedlist" data-action="insertorderedlist" data-element="ol">1.</button></li>',
                 'unorderedlist': '<li><button class="medium-editor-action medium-editor-action-unorderedlist" data-action="insertunorderedlist" data-element="ul">&bull;</button></li>'
             };
-            return buttonTemplates[btnType];
+            return buttonTemplates[btnType] || false;
         },
 
         //TODO: actionTemplate
@@ -176,12 +166,12 @@ if (window.module !== undefined) {
             var btns = this.options.buttons,
                 html = '<ul id="medium-editor-toolbar-actions" class="medium-editor-toolbar-actions clearfix">',
                 i,
-                iBtn;
+                tpl;
 
             for (i = 0; i < btns.length; i += 1) {
-                iBtn = btns[i];
-                if (this.builtInButtons.indexOf(iBtn) > -1) {
-                    html += this.buttonTemplate(iBtn);
+                tpl = this.buttonTemplate(btns[i]);
+                if (tpl) {
+                    html += tpl;
                 }
             }
             html += '</ul>' +
