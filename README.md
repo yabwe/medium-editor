@@ -57,7 +57,7 @@ Example:
 ```javascript
 var editor = new MediumEditor('.editable', {
     anchorInputPlaceholder: 'Type a link',
-    buttons: ['bold', 'italic', 'quote']
+    buttons: ['bold', 'italic', 'quote'],
     diffLeft: 25,
     diffTop: 10,
     firstHeader: 'h1',
