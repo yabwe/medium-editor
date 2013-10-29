@@ -186,10 +186,10 @@ if (window.module !== undefined) {
                 tpl;
 
             for (i = 0; i < btns.length; i += 1) {
-                var iBtn = btns[i];
+                iBtn = btns[i];
                 if (typeof iBtn === 'object') {
                     this.customButtonActions[iBtn.name] = iBtn.action;
-                    html += '<li class="medium-editor-custom-button" data-button-name="'+ iBtn.name +'">'+ iBtn.button + '</li>';
+                    html += '<li class="medium-editor-custom-button" data-button-name="' + iBtn.name + '">' + iBtn.button + '</li>';
                 } else {
                     tpl = this.buttonTemplate(iBtn);
                     if (tpl) {
@@ -329,10 +329,9 @@ if (window.module !== undefined) {
         },
 
         bindButtons: function () {
-            var i,
-                self = this;
+            var self = this;
 
-            this.toolbar.addEventListener("click",function(e) {
+            this.toolbar.addEventListener("click", function(e) {
                 var btn,
                     btnContainer,
                     btnName;
@@ -340,16 +339,18 @@ if (window.module !== undefined) {
                 e.preventDefault();
                 e.stopPropagation();
 
+                if (!e.target) {
+                    return;
+                }
+
                 if (self.selection === undefined) {
                     self.checkSelection(e);
                 }
 
                 //allow DOM to go one level deep within the button
-                if (!e.target) {
-                    return;
-                } else if (e.target.nodeName == "BUTTON") {
+                if (e.target.nodeName === "BUTTON") {
                     btn = e.target;
-                } else if (e.target.parentNode.nodeName == "BUTTON"){
+                } else if (e.target.parentNode.nodeName === "BUTTON") {
                     btn = e.target.parentNode;
                 } else {
                     return;
@@ -363,9 +364,9 @@ if (window.module !== undefined) {
                     btn.className += ' medium-editor-button-active';
                 }
 
-                if (btnContainer.className.indexOf('medium-editor-custom-button') > -1){
+                if (btnContainer.className.indexOf('medium-editor-custom-button') > -1) {
                     btnName = btnContainer.getAttribute('data-button-name');
-                    if ((self.customButtonActions[btnName]) && (typeof self.customButtonActions[btnName] == 'function')) {
+                    if ((self.customButtonActions[btnName]) && (typeof self.customButtonActions[btnName] === 'function')) {
                         self.customButtonActions[btnName].apply(self);
                     }
                 } else {
@@ -471,6 +472,7 @@ if (window.module !== undefined) {
                 },
                 timer;
             this.toolbarActions.style.display = 'block';
+            this.anchorForm.style.display = 'none';
             this.keepToolbarAlive = false;
             clearTimeout(timer);
             timer = setTimeout(function () {
@@ -479,19 +481,17 @@ if (window.module !== undefined) {
         },
 
         showSubForm: function(subFormName) {
-            var subForm = this.toolbar.querySelectorAll('.medium-editor-toolbar-form-'+subFormName);
+            var subForm = this.toolbar.querySelectorAll('.medium-editor-toolbar-form-' + subFormName);
             if (subForm.length < 1) {
-                console.error("MediumEditor() ... sub form not found: '"+ (subFormName||'[NOT SPECIFIED]') +"'" );
+                console.error("MediumEditor() ... sub form not found: '" + (subFormName || '[NOT SPECIFIED]') + "'");
                 return;
             }
             this.activeSubForm = subForm[0];
 
-        showAnchorForm: function () {
-            var input = this.anchorForm.querySelector('input');
             this.toolbarActions.style.display = 'none';
             this.savedSelection = saveSelection();
             this.activeSubForm.style.display = 'block';
-            this.setToolbarPosition()
+            this.setToolbarPosition();
             this.keepToolbarAlive = true;
         },
 
