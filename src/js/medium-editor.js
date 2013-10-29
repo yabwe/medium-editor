@@ -491,6 +491,7 @@ if (window.module !== undefined) {
             this.toolbarActions.style.display = 'none';
             this.savedSelection = saveSelection();
             this.activeSubForm.style.display = 'block';
+            this.setToolbarPosition()
             this.keepToolbarAlive = true;
         },
 
