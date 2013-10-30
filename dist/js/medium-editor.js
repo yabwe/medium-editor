@@ -495,7 +495,11 @@ if (window.module !== undefined) {
                 return;
             }
             this.isActive = false;
-            this.toolbar.style.display = 'none';
+
+            if (this.toolbar !== undefined) {
+                this.toolbar.style.display = 'none';
+            }
+
             for (i = 0; i < this.elements.length; i += 1) {
                 this.elements[i].removeEventListener('mouseup', this.checkSelectionWrapper);
                 this.elements[i].removeEventListener('keyup', this.checkSelectionWrapper);
