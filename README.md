@@ -48,6 +48,7 @@ var elements = document.querySelectorAll('.editable'),
 * __disableReturn__:  enables/disables the use of the return-key. You can also set specific element behavior by using setting a data-disable-return attribute. Default: false
 * __disableToolbar__: enables/disables the toolbar, adding only thecontenteditable behavior. You can also set specific element behavior by using setting a data-disable-toolbar attribute. Default: false
 * __firstHeader__: HTML tag to be used as first header. Default: h3
+* __textOnly__: Prevent any HTML tag on the content. Default: false
 * __forcePlainText__: Forces pasting as plain text. Default: true
 * __placeholder__: Defines the default placeholder for empty contenteditables. You can overwrite it by setting a data-placeholder attribute on your elements. Default: 'Type your text'
 * __secondHeader__: HTML tag to be used as second header. Default: h4

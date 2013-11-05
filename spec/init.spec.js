@@ -79,6 +79,7 @@ describe('Initialization TestCase', function () {
                     disableReturn: false,
                     disableToolbar: false,
                     firstHeader: 'h3',
+                    textOnly: false,
                     forcePlainText: true,
                     placeholder: 'Type your text',
                     secondHeader: 'h4',
