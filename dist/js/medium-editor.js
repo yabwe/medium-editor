@@ -215,7 +215,7 @@ if (window.module !== undefined) {
 
         checkSelection: function () {
             var newSelection;
-            if (this.keepToolbarAlive !== true) {
+            if (this.keepToolbarAlive !== true && this.toolbar !== undefined) {
                 newSelection = window.getSelection();
                 if (newSelection.toString().trim() === '') {
                     this.toolbar.style.display = 'none';
