@@ -71,6 +71,7 @@ if (window.module !== undefined) {
             disableReturn: false,
             disableToolbar: false,
             firstHeader: 'h3',
+            textOnly: false,
             forcePlainText: true,
             placeholder: 'Type your text',
             secondHeader: 'h4',
@@ -116,13 +117,13 @@ if (window.module !== undefined) {
             this.elements[index].addEventListener('keyup', function (e) {
                 var node = getSelectionStart(),
                     tagName;
-                if (node && node.getAttribute('data-medium-element') && node.children.length === 0) {
+                if (node && node.getAttribute('data-medium-element') && node.children.length === 0 && !self.options.textOnly) {
                     document.execCommand('formatBlock', false, 'p');
                 }
                 if (e.which === 13 && !e.shiftKey) {
                     node = getSelectionStart();
                     tagName = node.tagName.toLowerCase();
-                    if (!(self.options.disableReturn || this.getAttribute('data-disable-return')) && tagName !== 'li') {
+                    if (!(self.options.disableReturn || this.getAttribute('data-disable-return') || self.options.textOnly) && tagName !== 'li') {
                         document.execCommand('formatBlock', false, 'p');
                         if (tagName === 'a') {
                             document.execCommand('unlink', false, null);
@@ -335,6 +336,9 @@ if (window.module !== undefined) {
         },
 
         execAction: function (action, e) {
+            if (this.options.textOnly === true) {
+                return false;
+            }
             if (action.indexOf('append-') > -1) {
                 this.execFormatBlock(action.replace('append-', ''));
                 this.setToolbarPosition();
