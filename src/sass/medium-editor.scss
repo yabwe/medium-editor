@@ -33,8 +33,8 @@ $button_size: 50px;
     position: absolute;
     top: 0;
     left: 0;
-    z-index: 10;
-    display: none;
+    z-index: 600;
+    visibility: hidden;
     background: $bgcolor;
     font-family: HelveticaNeue, Helvetica, Arial, sans-serif;
     font-size: 16px;
@@ -89,6 +89,16 @@ $button_size: 50px;
     }
 }
 
+.medium-editor-toolbar-active {
+    visibility: visible;
+    -webkit-animation: pop-upwards 180ms forwards linear;
+    -moz-animation: pop-upwards 180ms forwards linear;
+    -ms-animation: pop-upwards 180ms forwards linear;
+    -o-animation: pop-upwards 180ms forwards linear;
+    animation: pop-upwards 180ms forwards linear;
+}
+
+
 .medium-editor-action-bold {
     font-weight: bolder;
 }
@@ -137,4 +147,122 @@ $button_size: 50px;
         color: #b3b3b1;
         font-style: italic;
     }
+
 }
+
+@-webkit-keyframes pop-upwards {
+    0% {
+        @include transform(matrix(0.97,0,0,1,0,12));
+        @include opacity(0);
+    }
+
+    20% {
+        @include transform(matrix(0.99,0,0,1,0,2));
+        @include opacity(.7);
+
+    }
+
+    40% {
+        @include transform(matrix(1,0,0,1,0,-1));
+        @include opacity(1);
+    }
+
+    70% {
+        @include transform(matrix(1,0,0,1,0,0));
+        @include opacity(1);
+    }
+
+    100% {
+        @include transform(matrix(1,0,0,1,0,0));
+        @include opacity(1);
+
+    }
+}
+
+@-moz-keyframes pop-upwards {
+    0% {
+        @include transform(matrix(0.97,0,0,1,0,12));
+        @include opacity(0);
+    }
+
+    20% {
+        @include transform(matrix(0.99,0,0,1,0,2));
+        @include opacity(.7);
+
+    }
+
+    40% {
+        @include transform(matrix(1,0,0,1,0,-1));
+        @include opacity(1);
+    }
+
+    70% {
+        @include transform(matrix(1,0,0,1,0,0));
+        @include opacity(1);
+    }
+
+    100% {
+        @include transform(matrix(1,0,0,1,0,0));
+        @include opacity(1);
+
+    }
+}
+
+@-o-keyframes pop-upwards {
+    0% {
+        @include transform(matrix(0.97,0,0,1,0,12));
+        @include opacity(0);
+    }
+
+    20% {
+        @include transform(matrix(0.99,0,0,1,0,2));
+        @include opacity(.7);
+
+    }
+
+    40% {
+        @include transform(matrix(1,0,0,1,0,-1));
+        @include opacity(1);
+    }
+
+    70% {
+        @include transform(matrix(1,0,0,1,0,0));
+        @include opacity(1);
+    }
+
+    100% {
+        @include transform(matrix(1,0,0,1,0,0));
+        @include opacity(1);
+
+    }
+}
+
+@keyframes pop-upwards {
+    0% {
+        @include transform(matrix(0.97,0,0,1,0,12));
+        @include opacity(0);
+    }
+
+    20% {
+        @include transform(matrix(0.99,0,0,1,0,2));
+        @include opacity(.7);
+
+    }
+
+    40% {
+        @include transform(matrix(1,0,0,1,0,-1));
+        @include opacity(1);
+    }
+
+    70% {
+        @include transform(matrix(1,0,0,1,0,0));
+        @include opacity(1);
+    }
+
+    100% {
+        @include transform(matrix(1,0,0,1,0,0));
+        @include opacity(1);
+
+    }
+}
+
