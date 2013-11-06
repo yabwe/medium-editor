@@ -80,6 +80,7 @@ describe('Initialization TestCase', function () {
                     disableToolbar: false,
                     firstHeader: 'h3',
                     forcePlainText: true,
+                    allowMultiParagraphSelection: true,
                     placeholder: 'Type your text',
                     secondHeader: 'h4',
                     buttons: [ 'bold', 'italic', 'underline', 'anchor', 'header1', 'header2', 'quote' ]

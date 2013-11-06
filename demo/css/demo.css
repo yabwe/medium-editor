@@ -25,3 +25,11 @@ h4 {
     font-size: 26px;
     line-height: 32px;
 }
+
+blockquote {
+    border-left: 5px solid #555;
+    margin-left: -15px;
+    padding-left: 15px;
+    font-style: italic;
+    color: #555;
+}
