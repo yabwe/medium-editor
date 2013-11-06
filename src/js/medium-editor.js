@@ -520,14 +520,21 @@ if (window.module !== undefined) {
             var i,
                 pasteWrapper = function (e) {
                     var paragraphs,
+                        plainText,
                         html = '',
                         p;
                     e.target.classList.remove('medium-editor-placeholder');
                     if (e.clipboardData && e.clipboardData.getData) {
                         e.preventDefault();
-                        paragraphs = e.clipboardData.getData('text/plain').split(/[\r\n]/g);
-                        for (p = 0; p < paragraphs.length; p += 1) {
-                            html += '<p>' + paragraphs[p] + '</p>';
+
+                        plainText = e.clipboardData.getData('text/plain');
+                        if (this.options.textOnly === true) {
+                            html = plainText;
+                        } else {
+                            paragraphs = plainText.split(/[\r\n]/g);
+                            for (p = 0; p < paragraphs.length; p += 1) {
+                                html += '<p>' + paragraphs[p] + '</p>';
+                            }
                         }
                         document.execCommand('insertHTML', false, html);
                     }
