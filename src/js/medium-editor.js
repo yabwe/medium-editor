@@ -336,7 +336,7 @@ if (window.module !== undefined) {
         },
 
         execAction: function (action, e) {
-            if (this.options.textOnly === true) {
+            if (this.options.textOnly) {
                 return false;
             }
             if (action.indexOf('append-') > -1) {
