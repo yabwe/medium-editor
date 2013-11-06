@@ -1,3 +1,12 @@
+1.2.0 / 2013-11-06
+==================
+
+* Fixes issue on deactivation without enabled toolbar
+* Fixes checkSelection error when disableToolbar option is enabled
+* Adds new option to disable multiple paragraph selection
+* Prevents paragraph creation on paste when disableReturn is set to true
+
+
 1.1.6 / 2013-10-24
 ==================
 
