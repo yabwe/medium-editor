@@ -58,8 +58,11 @@ describe('Selection TestCase', function () {
                 spyOn(MediumEditor.prototype, 'showToolbarActions').andCallThrough();
                 var editor = new MediumEditor('.editor');
                 editor.toolbar.style.display = 'block';
+                editor.toolbar.classList.add('medium-editor-toolbar-active');
+                expect(editor.toolbar.classList.contains('medium-editor-toolbar-active')).toBe(true);
                 editor.checkSelection();
                 expect(editor.toolbar.style.display).toBe('none');
+                expect(editor.toolbar.classList.contains('medium-editor-toolbar-active')).toBe(false);
                 expect(editor.setToolbarPosition).not.toHaveBeenCalled();
                 expect(editor.setToolbarButtonStates).not.toHaveBeenCalled();
                 expect(editor.showToolbarActions).not.toHaveBeenCalled();
@@ -68,9 +71,11 @@ describe('Selection TestCase', function () {
             it('should show the toolbar when something is selected', function () {
                 var editor = new MediumEditor('.editor');
                 expect(editor.toolbar.style.display).toBe('');
+                expect(editor.toolbar.classList.contains('medium-editor-toolbar-active')).toBe(false);
                 selectElementContents(this.el);
                 editor.checkSelection();
                 expect(editor.toolbar.style.display).toBe('block');
+                expect(editor.toolbar.classList.contains('medium-editor-toolbar-active')).toBe(true);
             });
 
             it('should update toolbar position and button states when something is selected', function () {

@@ -101,6 +101,7 @@ describe('Toolbar TestCase', function () {
             selectElementContents(this.el);
             editor.checkSelection();
             expect(editor.toolbar.style.display).toBe('block');
+            expect(editor.toolbar.classList.contains('medium-editor-toolbar-active')).toBe(true);
 
             // Remove the new element from the DOM
             this.body.removeChild(element);
