@@ -401,7 +401,7 @@ if (window.module !== undefined) {
             // FF handles blockquote differently on formatBlock
             // allowing nesting, we need to use outdent
             // https://developer.mozilla.org/en-US/docs/Rich-Text_Editing_in_Mozilla
-            if (el === 'blockquote' && selectionData.el.parentNode.tagName.toLowerCase() === 'blockquote') {
+            if (el === 'blockquote' && selectionData.el && selectionData.el.parentNode.tagName.toLowerCase() === 'blockquote') {
                 return document.execCommand('outdent', false, null);
             }
             if (selectionData.tagName === el) {
