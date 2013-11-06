@@ -137,6 +137,22 @@ if (window.module !== undefined) {
             return this;
         },
 
+        builtInButtons : [
+            'bold',
+            'italic',
+            'underline',
+            'superscript',
+            'subscript',
+            'anchor',
+            'header1',
+            'header2',
+            'quote',
+            'orderedlist',
+            'unorderedlist'
+        ],
+
+        customButtonActions: {},
+
         bindParagraphCreation: function (index) {
             var self = this;
             this.elements[index].addEventListener('keyup', function (e) {
@@ -191,17 +207,24 @@ if (window.module !== undefined) {
         toolbarTemplate: function () {
             var btns = this.options.buttons,
                 html = '<ul id="medium-editor-toolbar-actions" class="medium-editor-toolbar-actions clearfix">',
+                iBtn,
                 i,
                 tpl;
 
             for (i = 0; i < btns.length; i += 1) {
-                tpl = this.buttonTemplate(btns[i]);
-                if (tpl) {
-                    html += tpl;
+                iBtn = btns[i];
+                if (typeof iBtn === 'object') {
+                    this.customButtonActions[iBtn.name] = iBtn.action;
+                    html += '<li class="medium-editor-custom-button" data-button-name="' + iBtn.name + '">' + iBtn.button + '</li>';
+                } else {
+                    tpl = this.buttonTemplate(iBtn);
+                    if (tpl) {
+                        html += tpl;
+                    }
                 }
             }
             html += '</ul>' +
-                '<div class="medium-editor-toolbar-form-anchor" id="medium-editor-toolbar-form-anchor">' +
+                '<div class="medium-editor-sub-form medium-editor-toolbar-form-anchor" id="medium-editor-toolbar-form-anchor">' +
                 '    <input type="text" value="" placeholder="' + this.options.anchorInputPlaceholder + '"><a href="#">&times;</a>' +
                 '</div>';
             return html;
@@ -258,6 +281,7 @@ if (window.module !== undefined) {
                 } else {
                     this.selection = newSelection;
                     this.selectionRange = this.selection.getRangeAt(0);
+                    this.hideVisibleSubForm();
                     if (!this.getSelectionElement().getAttribute('data-disable-toolbar')) {
                         this.toolbar.style.display = 'block';
                         this.setToolbarButtonStates()
@@ -339,26 +363,53 @@ if (window.module !== undefined) {
         },
 
         bindButtons: function () {
-            var buttons = this.toolbar.querySelectorAll('button'),
-                i,
-                self = this,
-                triggerAction = function (e) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    if (self.selection === undefined) {
-                        self.checkSelection(e);
+            var self = this;
+
+            this.toolbar.addEventListener("click", function(e) {
+                var btn,
+                    btnContainer,
+                    btnName;
+
+                e.preventDefault();
+                e.stopPropagation();
+
+                if (!e.target) {
+                    return;
+                }
+
+                if (self.selection === undefined) {
+                    self.checkSelection(e);
+                }
+
+                //allow DOM to go one level deep within the button
+                if (e.target.nodeName === "BUTTON") {
+                    btn = e.target;
+                } else if (e.target.parentNode.nodeName === "BUTTON") {
+                    btn = e.target.parentNode;
+                } else {
+                    return;
+                }
+
+                btnContainer = btn.parentNode;
+
+                if (btn.className.indexOf('medium-editor-button-active') > -1) {
+                    btn.classList.remove('medium-editor-button-active');
+                } else {
+                    btn.className += ' medium-editor-button-active';
+                }
+
+                if (btnContainer.className.indexOf('medium-editor-custom-button') > -1) {
+                    btnName = btnContainer.getAttribute('data-button-name');
+                    if ((self.customButtonActions[btnName]) && (typeof self.customButtonActions[btnName] === 'function')) {
+                        self.customButtonActions[btnName].apply(self);
                     }
-                    if (this.className.indexOf('medium-editor-button-active') > -1) {
-                        this.classList.remove('medium-editor-button-active');
-                    } else {
-                        this.className += ' medium-editor-button-active';
-                    }
-                    self.execAction(this.getAttribute('data-action'), e);
-                };
-            for (i = 0; i < buttons.length; i += 1) {
-                buttons[i].addEventListener('click', triggerAction);
-            }
-            this.setFirstAndLastItems(buttons);
+                } else {
+                    self.execAction(btn.getAttribute('data-action'), e);
+                }
+
+            });
+
+            this.setFirstAndLastItems(this.toolbar.querySelectorAll('button'));
             return this;
         },
 
@@ -454,8 +505,8 @@ if (window.module !== undefined) {
                     document.removeEventListener('click', timeoutWrapper);
                 },
                 timer;
-            this.anchorForm.style.display = 'none';
             this.toolbarActions.style.display = 'block';
+            this.anchorForm.style.display = 'none';
             this.keepToolbarAlive = false;
             clearTimeout(timer);
             timer = setTimeout(function () {
@@ -463,12 +514,36 @@ if (window.module !== undefined) {
             }, 300);
         },
 
-        showAnchorForm: function () {
-            var input = this.anchorForm.querySelector('input');
+        showSubForm: function(subFormName) {
+            var subForm = this.toolbar.querySelectorAll('.medium-editor-toolbar-form-' + subFormName);
+            if (subForm.length < 1) {
+                console.error("MediumEditor() ... sub form not found: '" + (subFormName || '[NOT SPECIFIED]') + "'");
+                return;
+            }
+            this.activeSubForm = subForm[0];
+
             this.toolbarActions.style.display = 'none';
             this.savedSelection = saveSelection();
-            this.anchorForm.style.display = 'block';
+            this.activeSubForm.style.display = 'block';
+            this.setToolbarPosition();
             this.keepToolbarAlive = true;
+        },
+
+        hideVisibleSubForm: function() {
+            if (!this.activeSubForm) {
+                return;
+            }
+
+            restoreSelection(this.savedSelection);
+            this.activeSubForm.style.display = 'none';
+            this.showToolbarActions();
+            this.setToolbarPosition();
+            this.activeSubForm = null;
+        },
+
+        showAnchorForm: function () {
+            var input = this.anchorForm.querySelector('input');
+            this.showSubForm('anchor');
             input.focus();
             input.value = '';
         },
@@ -488,6 +563,7 @@ if (window.module !== undefined) {
             });
             linkCancel.addEventListener('click', function (e) {
                 e.preventDefault();
+                self.hideVisibleSubForm();
                 self.showToolbarActions();
                 restoreSelection(self.savedSelection);
             });
@@ -495,9 +571,8 @@ if (window.module !== undefined) {
         },
 
         createLink: function (input) {
-            restoreSelection(this.savedSelection);
+            this.hideVisibleSubForm();
             document.execCommand('createLink', false, input.value);
-            this.showToolbarActions();
             input.value = '';
         },
 
