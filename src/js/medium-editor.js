@@ -142,7 +142,7 @@ if (window.module !== undefined) {
             this.elements[index].addEventListener('keyup', function (e) {
                 var node = getSelectionStart(),
                     tagName;
-                if (node && node.getAttribute('data-medium-element') && node.children.length === 0) {
+                if (node && node.getAttribute('data-medium-element') && node.children.length === 0 && !(self.options.disableReturn || node.getAttribute('disable-return'))) {
                     document.execCommand('formatBlock', false, 'p');
                 }
                 if (e.which === 13 && !e.shiftKey) {
@@ -548,6 +548,7 @@ if (window.module !== undefined) {
                 return;
             }
             var i,
+                self = this,
                 pasteWrapper = function (e) {
                     var paragraphs,
                         html = '',
@@ -555,11 +556,15 @@ if (window.module !== undefined) {
                     e.target.classList.remove('medium-editor-placeholder');
                     if (e.clipboardData && e.clipboardData.getData) {
                         e.preventDefault();
-                        paragraphs = e.clipboardData.getData('text/plain').split(/[\r\n]/g);
-                        for (p = 0; p < paragraphs.length; p += 1) {
-                            html += '<p>' + paragraphs[p] + '</p>';
+                        if (!self.options.disableReturn) {
+                            paragraphs = e.clipboardData.getData('text/plain').split(/[\r\n]/g);
+                            for (p = 0; p < paragraphs.length; p += 1) {
+                                html += '<p>' + paragraphs[p] + '</p>';
+                            }
+                            document.execCommand('insertHTML', false, html);
+                        } else {
+                            document.execCommand('insertHTML', false, e.clipboardData.getData('text/plain'));
                         }
-                        document.execCommand('insertHTML', false, html);
                     }
                 };
             for (i = 0; i < this.elements.length; i += 1) {
