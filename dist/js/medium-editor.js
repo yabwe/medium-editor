@@ -60,6 +60,31 @@ if (window.module !== undefined) {
         return startNode;
     }
 
+    // http://stackoverflow.com/questions/4176923/html-of-selected-text
+    // by Tim Down
+    function getSelectionHtml() {
+        var i,
+            html = "",
+            sel,
+            len,
+            container;
+        if (window.getSelection !== undefined) {
+            sel = window.getSelection();
+            if (sel.rangeCount) {
+                container = document.createElement("div");
+                for (i = 0, len = sel.rangeCount; i < len; i += 1) {
+                    container.appendChild(sel.getRangeAt(i).cloneContents());
+                }
+                html = container.innerHTML;
+            }
+        } else if (document.selection !== undefined) {
+            if (document.selection.type === "Text") {
+                html = document.selection.createRange().htmlText;
+            }
+        }
+        return html;
+    }
+
     MediumEditor.prototype = {
         defaults: {
             anchorInputPlaceholder: 'Paste or type a link',
@@ -70,6 +95,7 @@ if (window.module !== undefined) {
             disableToolbar: false,
             firstHeader: 'h3',
             forcePlainText: true,
+            allowMultiParagraphSelection: true,
             placeholder: 'Type your text',
             secondHeader: 'h4',
             buttons: ['bold', 'italic', 'underline', 'anchor', 'header1', 'header2', 'quote']
@@ -214,10 +240,18 @@ if (window.module !== undefined) {
         },
 
         checkSelection: function () {
-            var newSelection;
+            var newSelection,
+                pCount,
+                selectionHtml;
             if (this.keepToolbarAlive !== true && this.toolbar !== undefined) {
                 newSelection = window.getSelection();
-                if (newSelection.toString().trim() === '') {
+
+                selectionHtml = getSelectionHtml();
+                // Check if selection is between multi paragraph <p>. 
+                pCount = selectionHtml.match(/<(p|blockquote)>([\s\S]*?)<\/(p|blockquote)>/g);
+                pCount = pCount ? pCount.length : 0;
+
+                if (newSelection.toString().trim() === '' || (this.options.allowMultiParagraphSelection === false && pCount > 1)) {
                     this.toolbar.style.display = 'none';
                 } else {
                     this.selection = newSelection;
