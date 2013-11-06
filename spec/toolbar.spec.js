@@ -105,5 +105,24 @@ describe('Toolbar TestCase', function () {
             // Remove the new element from the DOM
             this.body.removeChild(element);
         });
+
+        it('should not try to toggle toolbar when option disabletoolbar is set to true', function () {
+            var element = document.createElement('div'),
+                editor = null;
+
+            element.className = 'editor';
+            this.el.innerHTML = 'lorem ipsum';
+            this.body.appendChild(element);
+
+            editor = new MediumEditor(document.querySelectorAll('.editor'), { disableToolbar: true });
+
+            expect(editor.toolbar).toBe(undefined);
+
+            selectElementContents(this.el);
+            editor.checkSelection();
+
+            // Remove the new element from the DOM
+            this.body.removeChild(element);
+        });
     });
 });
