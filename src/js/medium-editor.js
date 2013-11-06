@@ -249,7 +249,7 @@ if (window.module !== undefined) {
                 newSelection = window.getSelection();
 
                 selectionHtml = getSelectionHtml();
-                // Check if selection is between multi paragraph <p>. 
+                // Check if selection is between multi paragraph <p>.
                 pCount = selectionHtml.match(/<(p|blockquote)>([\s\S]*?)<\/(p|blockquote)>/g);
                 pCount = pCount ? pCount.length : 0;
 

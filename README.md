@@ -40,6 +40,7 @@ var elements = document.querySelectorAll('.editable'),
 
 ## Initialization options
 
+* __allowMultiParagraphSelection__: enables the toolbar when selection multiple paragraphs/block elements. Default: true
 * __anchorInputPlaceholder__: text to be shown as placeholder of the anchor input. Default: _Paste or type a link_
 * __buttons__: the set of buttons to display on the toolbar. Default: ['bold', 'italic', 'underline', 'anchor', 'header1', 'header2', 'quote']
 * __delay__: time in milliseconds to show the toolbar. Default: 0
