@@ -114,31 +114,32 @@ The source files are located inside the __src__ directory. MediumEditor styleshe
 
 ## Contributors
 ```
+ 
  project  : medium-editor
  repo age : 5 months
- active   : 53 days
- commits  : 236
+ active   : 54 days
+ commits  : 249
  files    : 27
- authors  :
-   197	Davi Ferreira           83.5%
-     8	Derek Odegard           3.4%
-     8	Jarl Gunnar T. Flaten   3.4%
-     4	Maxime de Visscher      1.7%
-     3	Troels Knak-Nielsen     1.3%
-     3	Dmitri Cherniak         1.3%
-     1	Pedro Nasser            0.4%
-     1	Tom MacWright           0.4%
-     1	happyaccidents          0.4%
-     1	muescha                 0.4%
-     1	t_kjaergaard            0.4%
-     1	typify                  0.4%
+ authors  : 
+   202	Davi Ferreira           81.1%
+     9	Maxime de Visscher      3.6%
+     8	Derek Odegard           3.2%
+     8	Jarl Gunnar T. Flaten   3.2%
+     4	Pedro Nasser            1.6%
+     3	Dmitri Cherniak         1.2%
+     3	Troels Knak-Nielsen     1.2%
      1	Bitdeli Chef            0.4%
-     1	waffleio                0.4%
      1	David Collien           0.4%
      1	Denis Gorbachev         0.4%
      1	Maxime Dantec           0.4%
      1	Nikita Korotaev         0.4%
      1	Noah Paessel            0.4%
+     1	Tom MacWright           0.4%
+     1	happyaccidents          0.4%
+     1	muescha                 0.4%
+     1	t_kjaergaard            0.4%
+     1	typify                  0.4%
+     1	waffleio                0.4%
 ```
 
 ## License
