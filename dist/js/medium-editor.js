@@ -245,21 +245,16 @@ if (window.module !== undefined) {
                 selectionHtml;
             if (this.keepToolbarAlive !== true && this.toolbar !== undefined) {
                 newSelection = window.getSelection();
-
                 selectionHtml = getSelectionHtml();
                 // Check if selection is between multi paragraph <p>.
                 pCount = selectionHtml.match(/<(p|blockquote)>([\s\S]*?)<\/(p|blockquote)>/g);
                 pCount = pCount ? pCount.length : 0;
-
                 if (newSelection.toString().trim() === '' || (this.options.allowMultiParagraphSelection === false && pCount > 1)) {
-                    this.toolbar.style.display = 'none';
-                    this.toolbar.classList.remove('medium-editor-toolbar-active');
+                    this.hideToolbarActions();
                 } else {
                     this.selection = newSelection;
                     this.selectionRange = this.selection.getRangeAt(0);
                     if (!this.getSelectionElement().getAttribute('data-disable-toolbar')) {
-                        this.toolbar.style.display = 'block';
-                        this.toolbar.classList.add('medium-editor-toolbar-active');
                         this.setToolbarButtonStates()
                             .setToolbarPosition()
                             .showToolbarActions();
@@ -446,24 +441,22 @@ if (window.module !== undefined) {
             });
         },
 
+        hideToolbarActions: function () {
+            this.toolbar.classList.remove('medium-editor-toolbar-active');
+        },
+
         showToolbarActions: function () {
             var self = this,
-                timeoutWrapper = function () {
-                    self.keepToolbarAlive = false;
-                    self.toolbar.style.display = 'none';
-                    if (this.toolbar !== undefined) {
-                        this.toolbar.classList.remove('medium-editor-toolbar-active');
-                    }
-                    document.removeEventListener('click', timeoutWrapper);
-                },
                 timer;
             this.anchorForm.style.display = 'none';
             this.toolbarActions.style.display = 'block';
             this.keepToolbarAlive = false;
             clearTimeout(timer);
-            timer = setTimeout(function () {
-                document.addEventListener('click', timeoutWrapper);
-            }, 300);
+            timer = setTimeout(function() {
+                if (!self.toolbar.classList.contains('medium-editor-toolbar-active')) {
+                    self.toolbar.classList.add('medium-editor-toolbar-active');
+                }
+            }, 100);
         },
 
         showAnchorForm: function () {
