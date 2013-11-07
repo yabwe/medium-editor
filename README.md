@@ -110,19 +110,21 @@ The source files are located inside the __src__ directory. MediumEditor styleshe
 
 1. Fork it
 2. Create your feature branch (`git checkout -b my-new-feature`)
-3. Commit your changes (`git commit -am "Added some feature"`)
-4. Push (`git push origin my-new-feature`)
-5. Submit a new Pull Request
+3. Test your changes to the best of your ability.
+4. Update the documentation to reflect your changes if they add or changes current functionality.
+5. Commit your changes (`git commit -am 'Added some feature'`)
+6. Push to the branch (`git push origin my-new-feature`)
+7. Create new Pull Request
 
 ## Contributors
 ```
- 
+
  project  : medium-editor
  repo age : 5 months
  active   : 54 days
  commits  : 249
  files    : 27
- authors  : 
+ authors  :
    202	Davi Ferreira           81.1%
      9	Maxime de Visscher      3.6%
      8	Derek Odegard           3.2%
