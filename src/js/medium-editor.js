@@ -244,7 +244,6 @@ if (window.module !== undefined) {
         checkSelection: function () {
             var newSelection,
                 pCount,
-                selectionHtml;
                 selectionHtml,
                 selectionElement;
 
@@ -261,8 +260,6 @@ if (window.module !== undefined) {
                     this.selection = newSelection;
                     this.selectionRange = this.selection.getRangeAt(0);
                     if (selectionElement && this.elements[0] === selectionElement && !selectionElement.getAttribute('data-disable-toolbar')) {
-                        this.toolbar.style.display = 'block';
-                        this.toolbar.classList.add('medium-editor-toolbar-active');
                         this.setToolbarButtonStates()
                             .setToolbarPosition()
                             .showToolbarActions();
@@ -450,6 +447,7 @@ if (window.module !== undefined) {
         },
 
         hideToolbarActions: function () {
+            this.keepToolbarAlive = false;
             this.toolbar.classList.remove('medium-editor-toolbar-active');
         },
 
