@@ -106,6 +106,8 @@ The source files are located inside the __src__ directory. MediumEditor styleshe
 
 ## Contributing
 
+[![Stories in Ready](https://badge.waffle.io/daviferreira/medium-editor.png?label=ready)](https://waffle.io/daviferreira/medium-editor)  
+
 1. Fork it
 2. Create your feature branch (`git checkout -b my-new-feature`)
 3. Commit your changes (`git commit -am "Added some feature"`)
