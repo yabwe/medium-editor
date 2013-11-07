@@ -1,6 +1,6 @@
 /*global MediumEditor, describe, it, expect, spyOn,
          afterEach, beforeEach, fireEvent, waits,
-         jasmine, selectElementContents*/
+         jasmine, selectElementContents, runs , waitsFor */
 
 describe('Selection TestCase', function () {
     'use strict';
@@ -61,7 +61,6 @@ describe('Selection TestCase', function () {
                 editor.toolbar.classList.add('medium-editor-toolbar-active');
                 expect(editor.toolbar.classList.contains('medium-editor-toolbar-active')).toBe(true);
                 editor.checkSelection();
-                expect(editor.toolbar.style.display).toBe('none');
                 expect(editor.toolbar.classList.contains('medium-editor-toolbar-active')).toBe(false);
                 expect(editor.setToolbarPosition).not.toHaveBeenCalled();
                 expect(editor.setToolbarButtonStates).not.toHaveBeenCalled();
@@ -69,13 +68,27 @@ describe('Selection TestCase', function () {
             });
 
             it('should show the toolbar when something is selected', function () {
-                var editor = new MediumEditor('.editor');
-                expect(editor.toolbar.style.display).toBe('');
-                expect(editor.toolbar.classList.contains('medium-editor-toolbar-active')).toBe(false);
-                selectElementContents(this.el);
-                editor.checkSelection();
-                expect(editor.toolbar.style.display).toBe('block');
-                expect(editor.toolbar.classList.contains('medium-editor-toolbar-active')).toBe(true);
+                var value,
+                    flag,
+                    editor = new MediumEditor('.editor');
+                runs(function() {
+                    flag = false;
+                    value = 0;
+                    expect(editor.toolbar.classList.contains('medium-editor-toolbar-active')).toBe(false);
+                    selectElementContents(this.el);
+                    editor.checkSelection();
+                    setTimeout(function() {
+                        flag = true;
+                    }, 500);
+                });
+                // Because the toolbar appear after 100ms, waits 150ms... 
+                waitsFor(function() {
+                    value = value + 1; // value += 1 is not accepted by jslint (unused)
+                    return flag;
+                }, "The Value should be incremented", 500);
+                runs(function() {
+                    expect(editor.toolbar.classList.contains('medium-editor-toolbar-active')).toBe(true);
+                });
             });
 
             it('should update toolbar position and button states when something is selected', function () {

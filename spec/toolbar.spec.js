@@ -1,5 +1,5 @@
 /*global MediumEditor, describe, it, expect, spyOn,
-         afterEach, beforeEach, selectElementContents, fireEvent*/
+         afterEach, beforeEach, selectElementContents, runs, waitsFor, i */
 
 describe('Toolbar TestCase', function () {
     'use strict';
@@ -86,25 +86,39 @@ describe('Toolbar TestCase', function () {
         });
 
         it('should show the toolbar it it\'s text are selected even though one or more elements that has a data attr of disable-toolbar', function () {
-            var element = document.createElement('div'),
+            var value,
+                flag,
+                element = document.createElement('div'),
                 editor = null;
 
-            element.className = 'editor';
-            element.setAttribute('data-disable-toolbar', 'true');
-            this.el.innerHTML = 'lorem ipsum';
-            this.body.appendChild(element);
+            runs(function() {
+                flag = false;
+                element.className = 'editor';
+                element.setAttribute('data-disable-toolbar', 'true');
+                this.el.innerHTML = 'lorem ipsum';
+                this.body.appendChild(element);
+                editor = new MediumEditor(document.querySelectorAll('.editor'));
+                expect(editor.elements.length).toEqual(2);
+                expect(editor.toolbar.style.display).toBe('');
+                selectElementContents(this.el);
+                editor.checkSelection();
+                setTimeout(function() {
+                    flag = true;
+                }, 500);
+            });
 
-            editor = new MediumEditor(document.querySelectorAll('.editor'));
+            // Because the toolbar appear after 100ms, waits 150ms... 
+            waitsFor(function() {
+                value = value + 1; // value += 1 is not accepted by jslint (unused)
+                return flag;
+            }, 'The i value should be incremented', 500);
 
-            expect(editor.elements.length).toEqual(2);
-            expect(editor.toolbar.style.display).toBe('');
-            selectElementContents(this.el);
-            editor.checkSelection();
-            expect(editor.toolbar.style.display).toBe('block');
-            expect(editor.toolbar.classList.contains('medium-editor-toolbar-active')).toBe(true);
+            runs(function() {
+                expect(editor.toolbar.classList.contains('medium-editor-toolbar-active')).toBe(true);
+                // Remove the new element from the DOM
+                this.body.removeChild(element);
+            });
 
-            // Remove the new element from the DOM
-            this.body.removeChild(element);
         });
 
         it('should not try to toggle toolbar when option disabletoolbar is set to true', function () {

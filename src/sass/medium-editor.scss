@@ -40,7 +40,7 @@ $button_size: 50px;
     font-size: 16px;
     @include border-radius(5px);
     @include box-shadow(0 0 3px #000);
-
+    @include transition(top .075s ease-out,left .075s ease-out);
     ul {
         margin: 0;
         padding: 0;
@@ -90,12 +90,13 @@ $button_size: 50px;
 }
 
 .medium-editor-toolbar-active {
+    @include transition(top .075s ease-out,left .075s ease-out);
     visibility: visible;
-    -webkit-animation: pop-upwards 180ms forwards linear;
-    -moz-animation: pop-upwards 180ms forwards linear;
-    -ms-animation: pop-upwards 180ms forwards linear;
-    -o-animation: pop-upwards 180ms forwards linear;
-    animation: pop-upwards 180ms forwards linear;
+    -webkit-animation: pop-upwards 160ms forwards linear;
+    -moz-animation: pop-upwards 160ms forwards linear;
+    -ms-animation: pop-upwards 160ms forwards linear;
+    -o-animation: pop-upwards 160ms forwards linear;
+    animation: pop-upwards 160ms forwards linear;
 }
 
 
