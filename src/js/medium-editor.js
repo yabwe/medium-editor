@@ -245,6 +245,9 @@ if (window.module !== undefined) {
             var newSelection,
                 pCount,
                 selectionHtml;
+                selectionHtml,
+                selectionElement;
+
             if (this.keepToolbarAlive !== true && this.toolbar !== undefined) {
                 newSelection = window.getSelection();
                 selectionHtml = getSelectionHtml();
@@ -254,9 +257,12 @@ if (window.module !== undefined) {
                 if (newSelection.toString().trim() === '' || (this.options.allowMultiParagraphSelection === false && pCount > 1)) {
                     this.hideToolbarActions();
                 } else {
+                    selectionElement = this.getSelectionElement();
                     this.selection = newSelection;
                     this.selectionRange = this.selection.getRangeAt(0);
-                    if (!this.getSelectionElement().getAttribute('data-disable-toolbar')) {
+                    if (selectionElement && this.elements[0] === selectionElement && !selectionElement.getAttribute('data-disable-toolbar')) {
+                        this.toolbar.style.display = 'block';
+                        this.toolbar.classList.add('medium-editor-toolbar-active');
                         this.setToolbarButtonStates()
                             .setToolbarPosition()
                             .showToolbarActions();
@@ -275,7 +281,7 @@ if (window.module !== undefined) {
                     parent = parent.parentNode;
                 }
             } catch (err) {
-                return this.elements[0];
+                return false;
             }
             return parent;
         },
