@@ -237,6 +237,7 @@ if (window.module !== undefined) {
             for (i = 0; i < this.elements.length; i += 1) {
                 this.elements[i].addEventListener('mouseup', this.checkSelectionWrapper);
                 this.elements[i].addEventListener('keyup', this.checkSelectionWrapper);
+                this.elements[i].addEventListener('blur', this.checkSelectionWrapper);
             }
             return this;
         },
