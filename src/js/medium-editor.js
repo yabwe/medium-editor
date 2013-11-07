@@ -542,6 +542,7 @@ if (window.module !== undefined) {
             for (i = 0; i < this.elements.length; i += 1) {
                 this.elements[i].removeEventListener('mouseup', this.checkSelectionWrapper);
                 this.elements[i].removeEventListener('keyup', this.checkSelectionWrapper);
+                this.elements[i].removeEventListener('blur', this.checkSelectionWrapper);
                 this.elements[i].removeAttribute('contentEditable');
             }
         },

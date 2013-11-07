@@ -1,3 +1,12 @@
+1.2.1 / 2013-11-07
+==================
+
+* Fixes empty selectionNode.el bug
+* Prevents toolbar opening when changing to selection elements
+  with the toolbar disabled
+* Adds a transition to the toolbar when moving across elements
+
+
 1.2.0 / 2013-11-06
 ==================
 
