@@ -1,3 +1,4 @@
+[![Stories in Ready](https://badge.waffle.io/daviferreira/medium-editor.png?label=ready)](https://waffle.io/daviferreira/medium-editor)  
 [![Stories in Ready](http://badge.waffle.io/daviferreira/medium-editor.png)](http://waffle.io/daviferreira/medium-editor)  
 # MediumEditor
 
