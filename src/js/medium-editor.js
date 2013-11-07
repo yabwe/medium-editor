@@ -244,7 +244,9 @@ if (window.module !== undefined) {
         checkSelection: function () {
             var newSelection,
                 pCount,
-                selectionHtml;
+                selectionHtml,
+                selectionElement;
+
             if (this.keepToolbarAlive !== true && this.toolbar !== undefined) {
                 newSelection = window.getSelection();
 
@@ -257,9 +259,10 @@ if (window.module !== undefined) {
                     this.toolbar.style.display = 'none';
                     this.toolbar.classList.remove('medium-editor-toolbar-active');
                 } else {
+                    selectionElement = this.getSelectionElement();
                     this.selection = newSelection;
                     this.selectionRange = this.selection.getRangeAt(0);
-                    if (!this.getSelectionElement().getAttribute('data-disable-toolbar')) {
+                    if (selectionElement && this.elements[0] === selectionElement && !selectionElement.getAttribute('data-disable-toolbar')) {
                         this.toolbar.style.display = 'block';
                         this.toolbar.classList.add('medium-editor-toolbar-active');
                         this.setToolbarButtonStates()
@@ -280,7 +283,7 @@ if (window.module !== undefined) {
                     parent = parent.parentNode;
                 }
             } catch (err) {
-                return this.elements[0];
+                return false;
             }
             return parent;
         },
