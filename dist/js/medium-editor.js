@@ -209,6 +209,7 @@ if (window.module !== undefined) {
             this.toolbar = this.createToolbar();
             this.keepToolbarAlive = false;
             this.anchorForm = this.toolbar.querySelector('.medium-editor-toolbar-form-anchor');
+            this.anchorInput = this.anchorForm.querySelector('input');
             this.toolbarActions = this.toolbar.querySelector('.medium-editor-toolbar-actions');
             return this;
         },
@@ -465,27 +466,29 @@ if (window.module !== undefined) {
         },
 
         showAnchorForm: function () {
-            var input = this.anchorForm.querySelector('input');
             this.toolbarActions.style.display = 'none';
             this.savedSelection = saveSelection();
             this.anchorForm.style.display = 'block';
             this.keepToolbarAlive = true;
-            input.focus();
-            input.value = '';
+            this.anchorInput.focus();
+            this.anchorInput.value = '';
         },
 
         bindAnchorForm: function () {
-            var input = this.anchorForm.querySelector('input'),
-                linkCancel = this.anchorForm.querySelector('a'),
+            var linkCancel = this.anchorForm.querySelector('a'),
                 self = this;
             this.anchorForm.addEventListener('click', function (e) {
                 e.stopPropagation();
             });
-            input.addEventListener('keyup', function (e) {
+            this.anchorInput.addEventListener('keyup', function (e) {
                 if (e.keyCode === 13) {
                     e.preventDefault();
                     self.createLink(this);
                 }
+            });
+            this.anchorInput.addEventListener('blur', function (e) {
+                self.keepToolbarAlive = false;
+                self.checkSelection();
             });
             linkCancel.addEventListener('click', function (e) {
                 e.preventDefault();
