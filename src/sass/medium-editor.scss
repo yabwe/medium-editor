@@ -35,7 +35,8 @@ $button_size: 50px;
     left: 0;
     z-index: 600;
     visibility: hidden;
-    background: $bgcolor;
+    background-color: $bgcolor;
+    @include background(linear-gradient(bottom, $bgcolor, rgba($bgcolor, 0.75)));
     font-family: HelveticaNeue, Helvetica, Arial, sans-serif;
     font-size: 16px;
     @include border-radius(5px);
@@ -56,6 +57,7 @@ $button_size: 50px;
             height: $button_size;
             width: $button_size;
             background: $bgcolor;
+            @include background(linear-gradient(bottom, $bgcolor, rgba($bgcolor, 0.89)));
             color: #fff;
             border: 0;
             border-right: 1px solid #000;
@@ -110,6 +112,8 @@ $button_size: 50px;
 
 .medium-editor-toolbar-form-anchor {
     display: none;
+    background: $bgcolor;
+    @include border-radius(5px);
     color: #999;
     input, a {
         font-family: HelveticaNeue, Helvetica, Arial, sans-serif;

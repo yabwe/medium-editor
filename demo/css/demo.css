@@ -55,6 +55,14 @@ b {
     font-weight: bolder
 }
 
+a {
+    color:black;
+}    
+
+a:hover {
+    color:green;
+}
+
 blockquote {
     display: block;
     padding-left: 20px;
@@ -73,6 +81,7 @@ blockquote {
     width: 960px;
     margin: 30px auto;
 }
+
 
 h3 {
     font-size: 32px;
