@@ -513,7 +513,9 @@ if (window.module !== undefined) {
             window.addEventListener('resize', function () {
                 clearTimeout(timerResize);
                 timerResize = setTimeout(function () {
-                    self.setToolbarPosition();
+                    if (self.toolbar.classList.contains('medium-editor-toolbar-active')) {
+                        self.setToolbarPosition();
+                    }
                 }, 100);
             });
             return this;
