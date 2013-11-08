@@ -83,6 +83,7 @@ $button_size: 50px;
         }
         .medium-editor-button-active {
             background-color: #000;
+            @include background(linear-gradient(bottom, $bgcolor, rgba(#000, 0.89)));
             color: #fff;
         }
         .medium-editor-action-underline {
