@@ -87,6 +87,13 @@ Medium Editor, by default, will show only the buttons listed above to avoid a hu
 
 [Pavel Linkesch](https://github.com/orthes) has developed a jQuery plugin to upload images following Medium.com functionality. Check it out at [http://orthes.github.io/medium-editor-images-plugin/](http://orthes.github.io/medium-editor-images-plugin/)
 
+
+## Angular directive
+
+[Thijs Wijnmaalen](https://github.com/thijsw) hacked together an AngularJS
+directive. Check it out at
+[https://github.com/thijsw/angular-medium-editor](https://github.com/thijsw/angular-medium-editor)
+
 ## Development
 
 MediumEditor development tasks are managed by Grunt. To install all the necessary packages, just invoke:
