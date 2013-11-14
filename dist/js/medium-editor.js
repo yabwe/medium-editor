@@ -206,6 +206,9 @@ if (window.module !== undefined) {
         },
 
         initToolbar: function () {
+            if (this.toolbar) {
+                return this;
+            }
             this.toolbar = this.createToolbar();
             this.keepToolbarAlive = false;
             this.anchorForm = this.toolbar.querySelector('.medium-editor-toolbar-form-anchor');
@@ -234,6 +237,7 @@ if (window.module !== undefined) {
                 }, self.options.delay);
             };
             for (i = 0; i < this.elements.length; i += 1) {
+                this.elements[i].addEventListener('mousedown', this.checkSelectionWrapper);
                 this.elements[i].addEventListener('mouseup', this.checkSelectionWrapper);
                 this.elements[i].addEventListener('keyup', this.checkSelectionWrapper);
                 this.elements[i].addEventListener('blur', this.checkSelectionWrapper);
@@ -241,13 +245,14 @@ if (window.module !== undefined) {
             return this;
         },
 
-        checkSelection: function () {
+        checkSelection: function (e) {
             var newSelection,
                 pCount,
                 selectionHtml,
-                selectionElement;
+                selectionElement,
+                eventType = e ? e.type : 'click';
 
-            if (this.keepToolbarAlive !== true && this.toolbar !== undefined) {
+            if (this.keepToolbarAlive !== true && !this.options.disableToolbar) {
                 newSelection = window.getSelection();
                 selectionHtml = getSelectionHtml();
                 // Check if selection is between multi paragraph <p>.
@@ -257,12 +262,27 @@ if (window.module !== undefined) {
                     this.hideToolbarActions();
                 } else {
                     selectionElement = this.getSelectionElement();
-                    this.selection = newSelection;
-                    this.selectionRange = this.selection.getRangeAt(0);
-                    if (selectionElement && this.elements[0] === selectionElement && !selectionElement.getAttribute('data-disable-toolbar')) {
-                        this.setToolbarButtonStates()
-                            .setToolbarPosition()
-                            .showToolbarActions();
+
+                    if (selectionElement.getAttribute('data-disable-toolbar')) {
+                        this.hideToolbarActions();
+                        return;
+                    }
+
+                    if (eventType === "mousedown") {
+                        this.selectedElement = selectionElement;
+                    } else if (eventType === "mouseup" || eventType === "click") {
+                        this.selection = newSelection;
+                        this.selectionRange = this.selection.getRangeAt(0);
+
+                        if (!this.selectedElement) {
+                            this.selectedElement = selectionElement;
+                        }
+
+                        if (selectionElement && selectionElement === this.selectedElement) {
+                            this.setToolbarButtonStates()
+                                .setToolbarPosition()
+                                .showToolbarActions();
+                        }
                     }
                 }
             }
@@ -441,6 +461,9 @@ if (window.module !== undefined) {
             el.addEventListener('mouseup', function (e) {
                 self.checkSelection(e);
             });
+            el.addEventListener('mousedown', function (e) {
+                self.checkSelection(e);
+            });
             el.addEventListener('keyup', function (e) {
                 self.checkSelection(e);
             });
@@ -524,6 +547,11 @@ if (window.module !== undefined) {
             if (this.isActive) {
                 return;
             }
+
+            if (this.toolbar !== undefined) {
+                this.toolbar.style.display = 'block';
+            }
+
             this.isActive = true;
             for (i = 0; i < this.elements.length; i += 1) {
                 this.elements[i].setAttribute('contentEditable', true);
@@ -544,6 +572,7 @@ if (window.module !== undefined) {
 
             for (i = 0; i < this.elements.length; i += 1) {
                 this.elements[i].removeEventListener('mouseup', this.checkSelectionWrapper);
+                this.elements[i].removeEventListener('mousedown', this.checkSelectionWrapper);
                 this.elements[i].removeEventListener('keyup', this.checkSelectionWrapper);
                 this.elements[i].removeEventListener('blur', this.checkSelectionWrapper);
                 this.elements[i].removeAttribute('contentEditable');
