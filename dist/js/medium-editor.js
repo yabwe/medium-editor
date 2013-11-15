@@ -247,6 +247,7 @@ if (window.module !== undefined) {
 
         checkSelection: function (e) {
             var newSelection,
+                i,
                 pCount,
                 selectionHtml,
                 selectionElement,
@@ -263,14 +264,10 @@ if (window.module !== undefined) {
                 } else {
                     selectionElement = this.getSelectionElement();
 
-                    if (selectionElement.getAttribute('data-disable-toolbar')) {
-                        this.hideToolbarActions();
-                        return;
-                    }
-
                     if (eventType === "mousedown") {
                         this.selectedElement = selectionElement;
                     } else if (eventType === "mouseup" || eventType === "click") {
+
                         this.selection = newSelection;
                         this.selectionRange = this.selection.getRangeAt(0);
 
@@ -278,10 +275,18 @@ if (window.module !== undefined) {
                             this.selectedElement = selectionElement;
                         }
 
-                        if (selectionElement && selectionElement === this.selectedElement) {
-                            this.setToolbarButtonStates()
-                                .setToolbarPosition()
-                                .showToolbarActions();
+                        if (!this.selectedElement || this.selectedElement.getAttribute('data-disable-toolbar')) {
+                            this.hideToolbarActions();
+                        } else {
+                            for (i = 0; i < this.elements.length; i += 1) {
+                                if (this.elements[i] === this.selectedElement) {
+                                    this.setToolbarButtonStates()
+                                        .setToolbarPosition()
+                                        .showToolbarActions();
+                                    return;
+                                }
+                            }
+                            this.hideToolbarActions();
                         }
                     }
                 }
@@ -595,7 +600,9 @@ if (window.module !== undefined) {
                         if (!self.options.disableReturn) {
                             paragraphs = e.clipboardData.getData('text/plain').split(/[\r\n]/g);
                             for (p = 0; p < paragraphs.length; p += 1) {
-                                html += '<p>' + paragraphs[p] + '</p>';
+                                if (paragraphs[p] !== "") {
+                                    html += '<p>' + paragraphs[p] + '</p>';
+                                }
                             }
                             document.execCommand('insertHTML', false, html);
                         } else {
