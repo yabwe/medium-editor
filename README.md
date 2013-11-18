@@ -124,33 +124,33 @@ The source files are located inside the __src__ directory. MediumEditor styleshe
 7. Create new Pull Request
 
 ## Contributors
-```
 
+```
  project  : medium-editor
- repo age : 5 months
- active   : 54 days
- commits  : 249
- files    : 27
+ repo age : 6 months
+ active   : 62 days
+ commits  : 276
+ files    : 29
  authors  :
-   202	Davi Ferreira           81.1%
-     9	Maxime de Visscher      3.6%
-     8	Derek Odegard           3.2%
-     8	Jarl Gunnar T. Flaten   3.2%
-     4	Pedro Nasser            1.6%
-     3	Dmitri Cherniak         1.2%
-     3	Troels Knak-Nielsen     1.2%
+   220	Davi Ferreira           79.7%
+    14	Maxime de Visscher      5.1%
+     8	Jarl Gunnar T. Flaten   2.9%
+     8	Derek Odegard           2.9%
+     8	Pedro Nasser            2.9%
+     3	Troels Knak-Nielsen     1.1%
+     3	Dmitri Cherniak         1.1%
+     1	happyaccidents          0.4%
+     1	muescha                 0.4%
+     1	t_kjaergaard            0.4%
+     1	typify                  0.4%
      1	Bitdeli Chef            0.4%
+     1	waffleio                0.4%
      1	David Collien           0.4%
      1	Denis Gorbachev         0.4%
      1	Maxime Dantec           0.4%
      1	Nikita Korotaev         0.4%
      1	Noah Paessel            0.4%
      1	Tom MacWright           0.4%
-     1	happyaccidents          0.4%
-     1	muescha                 0.4%
-     1	t_kjaergaard            0.4%
-     1	typify                  0.4%
-     1	waffleio                0.4%
 ```
 
 ## License

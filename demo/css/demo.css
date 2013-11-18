@@ -69,7 +69,9 @@ blockquote {
     border-left: 6px solid #df0d32;
 }
 
-.editable {
+.editable,
+.secondEditable
+ {
     outline: none;
     margin: 0 0 20px 0;
     padding: 0 0 20px 0;

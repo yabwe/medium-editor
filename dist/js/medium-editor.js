@@ -111,6 +111,7 @@ if (window.module !== undefined) {
             this.id = document.querySelectorAll('.medium-editor-toolbar').length + 1;
             this.options = extend(options, this.defaults);
             return this.initElements()
+                        .bindSelect()
                        .bindPaste()
                        .setPlaceholders()
                        .bindWindowActions();
@@ -127,7 +128,6 @@ if (window.module !== undefined) {
                 this.bindParagraphCreation(i).bindReturn(i);
                 if (!this.options.disableToolbar && !this.elements[i].getAttribute('data-disable-toolbar')) {
                     this.initToolbar()
-                        .bindSelect()
                         .bindButtons()
                         .bindAnchorForm();
                 }
@@ -206,6 +206,9 @@ if (window.module !== undefined) {
         },
 
         initToolbar: function () {
+            if (this.toolbar) {
+                return this;
+            }
             this.toolbar = this.createToolbar();
             this.keepToolbarAlive = false;
             this.anchorForm = this.toolbar.querySelector('.medium-editor-toolbar-form-anchor');
@@ -233,8 +236,10 @@ if (window.module !== undefined) {
                     self.checkSelection(e);
                 }, self.options.delay);
             };
+
+            document.documentElement.addEventListener('mouseup', this.checkSelectionWrapper);
+
             for (i = 0; i < this.elements.length; i += 1) {
-                document.documentElement.addEventListener('mouseup', this.checkSelectionWrapper);
                 this.elements[i].addEventListener('keyup', this.checkSelectionWrapper);
                 this.elements[i].addEventListener('blur', this.checkSelectionWrapper);
             }
@@ -242,27 +247,36 @@ if (window.module !== undefined) {
         },
 
         checkSelection: function () {
-            var newSelection,
+            var i,
+                newSelection,
                 pCount,
                 selectionHtml,
                 selectionElement;
-
-            if (this.keepToolbarAlive !== true && this.toolbar !== undefined) {
+            if (this.keepToolbarAlive !== true && !this.options.disableToolbar) {
                 newSelection = window.getSelection();
                 selectionHtml = getSelectionHtml();
+                selectionHtml = selectionHtml.replace(/<[\S]+><\/[\S]+>/gim, '');
                 // Check if selection is between multi paragraph <p>.
-                pCount = selectionHtml.match(/<(p|blockquote)>([\s\S]*?)<\/(p|blockquote)>/g);
+                pCount = selectionHtml.match(/<(p|h[0-6]|blockquote)>([\s\S]*?)<\/(p|h[0-6]|blockquote)>/g);
                 pCount = pCount ? pCount.length : 0;
-                if (newSelection.toString().trim() === '' || (this.options.allowMultiParagraphSelection === false && pCount > 1)) {
+                if (newSelection.toString().trim() === '' || (this.options.allowMultiParagraphSelection === false && pCount)) {
                     this.hideToolbarActions();
                 } else {
                     selectionElement = this.getSelectionElement();
-                    this.selection = newSelection;
-                    this.selectionRange = this.selection.getRangeAt(0);
-                    if (selectionElement && this.elements[0] === selectionElement && !selectionElement.getAttribute('data-disable-toolbar')) {
-                        this.setToolbarButtonStates()
-                            .setToolbarPosition()
-                            .showToolbarActions();
+                    if (!selectionElement || selectionElement.getAttribute('data-disable-toolbar')) {
+                        this.hideToolbarActions();
+                    } else {
+                        this.selection = newSelection;
+                        this.selectionRange = this.selection.getRangeAt(0);
+                        for (i = 0; i < this.elements.length; i += 1) {
+                            if (this.elements[i] === selectionElement) {
+                                this.setToolbarButtonStates()
+                                    .setToolbarPosition()
+                                    .showToolbarActions();
+                                return;
+                            }
+                        }
+                        this.hideToolbarActions();
                     }
                 }
             }
@@ -272,15 +286,32 @@ if (window.module !== undefined) {
         getSelectionElement: function () {
             var selection = window.getSelection(),
                 range = selection.getRangeAt(0),
-                parent = range.commonAncestorContainer.parentNode;
+                current = range.commonAncestorContainer,
+                parent = current.parentNode,
+                result,
+                getMediumElement = function(e) {
+                    var parent = e;
+                    try {
+                        while (!parent.getAttribute('data-medium-element')) {
+                            parent = parent.parentNode;
+                        }
+                    } catch (errb) {
+                        return false;
+                    }
+                    return parent;
+                };
+            // First try on current node
             try {
-                while (!parent.getAttribute('data-medium-element')) {
-                    parent = parent.parentNode;
+                if (current.getAttribute('data-medium-element')) {
+                    result = current;
+                } else {
+                    result = getMediumElement(parent);
                 }
-            } catch (err) {
-                return false;
+            // If not search in the parent nodes.
+            } catch (erra) {
+                result = getMediumElement(parent);
             }
-            return parent;
+            return result;
         },
 
         setToolbarPosition: function () {
@@ -524,6 +555,11 @@ if (window.module !== undefined) {
             if (this.isActive) {
                 return;
             }
+
+            if (this.toolbar !== undefined) {
+                this.toolbar.style.display = 'block';
+            }
+
             this.isActive = true;
             for (i = 0; i < this.elements.length; i += 1) {
                 this.elements[i].setAttribute('contentEditable', true);
@@ -542,8 +578,9 @@ if (window.module !== undefined) {
                 this.toolbar.style.display = 'none';
             }
 
+            document.documentElement.removeEventListener('mouseup', this.checkSelectionWrapper);
+
             for (i = 0; i < this.elements.length; i += 1) {
-                this.elements[i].removeEventListener('mouseup', this.checkSelectionWrapper);
                 this.elements[i].removeEventListener('keyup', this.checkSelectionWrapper);
                 this.elements[i].removeEventListener('blur', this.checkSelectionWrapper);
                 this.elements[i].removeAttribute('contentEditable');
@@ -566,7 +603,9 @@ if (window.module !== undefined) {
                         if (!self.options.disableReturn) {
                             paragraphs = e.clipboardData.getData('text/plain').split(/[\r\n]/g);
                             for (p = 0; p < paragraphs.length; p += 1) {
-                                html += '<p>' + paragraphs[p] + '</p>';
+                                if (paragraphs[p] !== "") {
+                                    html += '<p>' + paragraphs[p] + '</p>';
+                                }
                             }
                             document.execCommand('insertHTML', false, html);
                         } else {
