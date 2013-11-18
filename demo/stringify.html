@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>medium editor | demo</title>
+    <link rel="stylesheet" href="css/normalize.css">
+    <link rel="stylesheet" href="css/demo.css">
+    <link rel="stylesheet" href="../dist/css/medium-editor.css">
+    <style>
+    textarea {
+        width: 100%;
+        height: 300px;
+        font-size:  12px;
+    }
+    </style>
+</head>
+<body>
+    <a href="https://github.com/daviferreira/medium-editor"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_gray_6d6d6d.png" alt="Fork me on GitHub"></a>
+    <div id="container">
+        <h1>Medium Editor </h1>
+        <h2>Breaking Bad Quote</h2>
+        
+        <b>(Spoiler Alert: Do not try to resolve this if you don't have seen the season Season 4)</b>
+        <div class="editable" id="skyler">
+        <p><b>SKYLER WHITE</b> Walt, please, let's both of us stop trying to justify this whole thing and admit you're in _____ !</p>
+        </div>
+        <div class="editable" id="walter">
+        <p><b>WALTER WHITE</b>
+[Walter turns to face Skyler; fire is in his eyes. He isn't Walt anymore. It's _________] Who are you talking to right now? Who is it you think you see? Do you know how much I make a year? I mean, even if I told you, you wouldn't believe it. Do you know what would happen if I suddenly decided to stop going into work? A business big enough that it could be listed on the ______ goes belly up. Disappears! It ceases to exist without me. No, you clearly don't know who you're talking to, so let me clue you in. I am not in _____ , Skyler. I AM the _____ ! A guy opens his door and gets shot and you think that of me? No. I am the one who ______!</p>
+        </div>
+
+        <div style="text-align: center;">
+            <input type="button" value="Stringify" id="button">
+            <p><textarea id="result"></textarea></p>
+            
+            <small><a style="color: #333;" target="_blank" href="http://en.wikiquote.org/wiki/Breaking_Bad#Cornered_.5B4.06.5D">Source</a></small> - 
+            <small><a style="color: #333;" target="_blank" href="http://en.wikipedia.org/wiki/Cornered_(Breaking_Bad)">Cornered (Breaking Bad)</a></small>
+        </div>
+    </div>
+    <script src="../dist/js/medium-editor.js"></script>
+
+
+    <script>
+
+        var editor = new MediumEditor('.editable'),
+            result = document.getElementById('result'),
+            onclick="show();"
+
+        document.getElementById("button").addEventListener('click', function () {
+                result.value = editor.stringify(4);
+            }
+        );
+    </script>
+</body>
+</html>
