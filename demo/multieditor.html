@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>medium editor | demo</title>
+    <link rel="stylesheet" href="css/normalize.css">
+    <link rel="stylesheet" href="css/demo.css">
+    <link rel="stylesheet" href="../dist/css/medium-editor.css">
+    <style>
+    </style>
+</head>
+<body>
+    <a href="https://github.com/daviferreira/medium-editor"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_gray_6d6d6d.png" alt="Fork me on GitHub"></a>
+    <div id="container">
+        <h1>Medium Multi Editor</h1>
+        <div class="editable" id="a">
+            <h2>First Editor </h2>
+            <p>This text is a <b>paragraph</b> with some <i><a href="http://www.w3schools.com/jsref/dom_obj_all.asp">tags elements</i></a></p>
+        </div>
+        <div class="editable" id="b">
+            <h2>Second Editor </h2>
+            <p>This text is another paragraph in the same instance.</p>
+        </div>
+        <div class="secondEditable" id="c">
+            <h2>Third Editor in another instance </h2>
+            <p>This text is another paragraph in another editor instance.<br>
+                It's working but not recommended.
+            </p>
+        </div>
+        <div class="editable" id="d" data-disable-toolbar="true">
+            <h2>Disabled Toolbar Editor</h2>
+            <p>This text is a paragraph in a<br> <i> data-disable-toolbar="true"</i></p>
+        </div>
+        <div id="d">
+            <h2>Non editable Div</h2>
+            <p>This text is another paragraph is a normal div.</p>
+        </div>
+
+    </div>
+    <p style="text-align: center;"><small><a style="color: #333;" target="_blank" href="http://www.goodreads.com/reader/475-great-expectations">Source</a></small></p>
+
+    <script src="../dist/js/medium-editor.js"></script>
+    <script>
+        var editor = new MediumEditor('.editable');
+        var editor2 = new MediumEditor('.secondEditable');
+
+    </script>
+
+</body>
+</html>
