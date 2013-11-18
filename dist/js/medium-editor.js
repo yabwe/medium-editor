@@ -64,21 +64,21 @@ if (window.module !== undefined) {
     // by Tim Down
     function getSelectionHtml() {
         var i,
-            html = "",
+            html = '',
             sel,
             len,
             container;
         if (window.getSelection !== undefined) {
             sel = window.getSelection();
             if (sel.rangeCount) {
-                container = document.createElement("div");
+                container = document.createElement('div');
                 for (i = 0, len = sel.rangeCount; i < len; i += 1) {
                     container.appendChild(sel.getRangeAt(i).cloneContents());
                 }
                 html = container.innerHTML;
             }
         } else if (document.selection !== undefined) {
-            if (document.selection.type === "Text") {
+            if (document.selection.type === 'Text') {
                 html = document.selection.createRange().htmlText;
             }
         }
@@ -618,7 +618,7 @@ if (window.module !== undefined) {
                         if (!self.options.disableReturn) {
                             paragraphs = e.clipboardData.getData('text/plain').split(/[\r\n]/g);
                             for (p = 0; p < paragraphs.length; p += 1) {
-                                if (paragraphs[p] !== "") {
+                                if (paragraphs[p] !== '') {
                                     html += '<p>' + paragraphs[p] + '</p>';
                                 }
                             }
