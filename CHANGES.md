@@ -1,3 +1,14 @@
+1.3.0 / 2013-11-18
+==================
+
+* Fixes data-disable-return not preventing paragraph creation
+* Improves getSelectionElement() to work in any case
+* Fixes multi element selection bug
+* Fixes Issues #88 & #89
+* Improves binding for multiple editor instance, checkSelection() is called only once per instance
+* Improves allowMultiParagraphSelection filter by removing empty tags elements before counting
+* Considers header tags has a paragraph too (same as medium)
+
 1.2.2 / 2013-11-07
 ==================
 
