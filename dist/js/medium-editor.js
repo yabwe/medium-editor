@@ -234,7 +234,7 @@ if (window.module !== undefined) {
                 }, self.options.delay);
             };
             for (i = 0; i < this.elements.length; i += 1) {
-                this.elements[i].addEventListener('mouseup', this.checkSelectionWrapper);
+                document.documentElement.addEventListener('mouseup', this.checkSelectionWrapper);
                 this.elements[i].addEventListener('keyup', this.checkSelectionWrapper);
                 this.elements[i].addEventListener('blur', this.checkSelectionWrapper);
             }
