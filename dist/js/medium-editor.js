@@ -135,6 +135,21 @@ if (window.module !== undefined) {
             return this;
         },
 
+        stringify: function(space) {
+            var i,
+                elementid,
+                content = {};
+            space = space || '0';
+            for (i = 0; i < this.elements.length; i += 1) {
+
+                elementid = (this.elements[i].id !== '') ? this.elements[i].id : 'element-' + i.toString();
+                content[elementid] = {
+                    value : this.elements[i].innerHTML.trim()
+                };
+            }
+            return JSON.stringify(content, null, space);
+        },
+
         bindParagraphCreation: function (index) {
             var self = this;
             this.elements[index].addEventListener('keyup', function (e) {
