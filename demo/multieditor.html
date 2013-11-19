@@ -39,9 +39,10 @@
 
     <script src="../dist/js/medium-editor.js"></script>
     <script>
-        var editor = new MediumEditor('.editable');
-        var editor2 = new MediumEditor('.secondEditable');
-
+        var editor = new MediumEditor('.editable'),
+            editor2 = new MediumEditor('.secondEditable', {
+                buttons: ['bold', 'italic', 'quote']
+            });
     </script>
 
 </body>
