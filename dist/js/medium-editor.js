@@ -111,14 +111,15 @@ if (window.module !== undefined) {
             this.id = document.querySelectorAll('.medium-editor-toolbar').length + 1;
             this.options = extend(options, this.defaults);
             return this.initElements()
-                        .bindSelect()
+                       .bindSelect()
                        .bindPaste()
                        .setPlaceholders()
                        .bindWindowActions();
         },
 
         initElements: function () {
-            var i;
+            var i,
+                addToolbar = false;
             for (i = 0; i < this.elements.length; i += 1) {
                 this.elements[i].setAttribute('contentEditable', true);
                 if (!this.elements[i].getAttribute('data-placeholder')) {
@@ -127,14 +128,17 @@ if (window.module !== undefined) {
                 this.elements[i].setAttribute('data-medium-element', true);
                 this.bindParagraphCreation(i).bindReturn(i);
                 if (!this.options.disableToolbar && !this.elements[i].getAttribute('data-disable-toolbar')) {
-                    this.initToolbar()
-                        .bindButtons()
-                        .bindAnchorForm();
+                    addToolbar = true;
                 }
+            }
+            // Init toolbar
+            if (addToolbar) {
+                this.initToolbar()
+                    .bindButtons()
+                    .bindAnchorForm();
             }
             return this;
         },
-
         bindParagraphCreation: function (index) {
             var self = this;
             this.elements[index].addEventListener('keyup', function (e) {
