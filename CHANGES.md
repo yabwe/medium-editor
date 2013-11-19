@@ -1,3 +1,9 @@
+1.3.1 / 2013-11-19
+==================
+
+* Fixes toolbar binding button issue with multi-editor mode
+
+
 1.3.0 / 2013-11-18
 ==================
 
@@ -9,12 +15,14 @@
 * Improves allowMultiParagraphSelection filter by removing empty tags elements before counting
 * Considers header tags has a paragraph too (same as medium)
 
+
 1.2.2 / 2013-11-07
 ==================
 
 * Removes blur event listener when disabling the toolbar
 * Adds a light gradient opacity to the toolbar
 * Fixes bug that would keep toolbar alive when moving out of the anchor input
+
 
 1.2.1 / 2013-11-07
 ==================
