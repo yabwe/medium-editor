@@ -545,10 +545,10 @@ if (window.module !== undefined) {
         createLink: function (input) {
             restoreSelection(this.savedSelection);
             document.execCommand('createLink', false, input.value);
-            if(this.options.targetBlank) {
-              Array.prototype.slice.call(document.getElementsByTagName("a")).forEach(function(e){
-                e.target = "_blank";
-              });
+            if (this.options.targetBlank) {
+                Array.prototype.slice.call(document.getElementsByTagName("a")).forEach(function(e) {
+                    e.target = "_blank";
+                });
             }
             this.showToolbarActions();
             input.value = '';
