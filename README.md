@@ -52,6 +52,8 @@ var elements = document.querySelectorAll('.editable'),
 * __forcePlainText__: Forces pasting as plain text. Default: true
 * __placeholder__: Defines the default placeholder for empty contenteditables. You can overwrite it by setting a data-placeholder attribute on your elements. Default: 'Type your text'
 * __secondHeader__: HTML tag to be used as second header. Default: h4
+* __targetBlank__: enables/disables target="\_blank" for anchor tags. Default:
+  false
 
 Example:
 
@@ -63,7 +65,8 @@ var editor = new MediumEditor('.editable', {
     diffTop: 10,
     firstHeader: 'h1',
     secondHeader: 'h2',
-    delay: 1000
+    delay: 1000,
+    targetBlank: true
 });
 ```
 
