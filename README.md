@@ -78,6 +78,7 @@ Medium Editor, by default, will show only the buttons listed above to avoid a hu
 * __subscript__
 * __unorderedlist__
 * __orderedlist__
+* __pre__
 
 
 ## API
