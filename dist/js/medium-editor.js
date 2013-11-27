@@ -140,19 +140,17 @@ if (typeof module === 'object') {
             return this;
         },
 
-        stringify: function(space) {
+        serialize: function () {
             var i,
                 elementid,
                 content = {};
-            space = space || '0';
             for (i = 0; i < this.elements.length; i += 1) {
-
-                elementid = (this.elements[i].id !== '') ? this.elements[i].id : 'element-' + i.toString();
+                elementid = (this.elements[i].id !== '') ? this.elements[i].id : 'element-' + i;
                 content[elementid] = {
-                    value : this.elements[i].innerHTML.trim()
+                    value: this.elements[i].innerHTML.trim()
                 };
             }
-            return JSON.stringify(content, null, space);
+            return content;
         },
 
         bindParagraphCreation: function (index) {
