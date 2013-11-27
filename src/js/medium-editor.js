@@ -614,7 +614,7 @@ if (typeof module === 'object') {
 
         bindPaste: function () {
             if (!this.options.forcePlainText) {
-                return;
+                return this;
             }
             var i,
                 self = this,
