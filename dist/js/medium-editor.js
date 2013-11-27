@@ -127,7 +127,7 @@ if (typeof module === 'object') {
                     this.elements[i].setAttribute('data-placeholder', this.options.placeholder);
                 }
                 this.elements[i].setAttribute('data-medium-element', true);
-                this.bindParagraphCreation(i).bindReturn(i);
+                this.bindParagraphCreation(i).bindReturn(i).bindTab(i);
                 if (!this.options.disableToolbar && !this.elements[i].getAttribute('data-disable-toolbar')) {
                     addToolbar = true;
                 }
@@ -188,6 +188,19 @@ if (typeof module === 'object') {
                 }
             });
             return this;
+        },
+
+        bindTab: function (index) {
+            this.elements[index].addEventListener('keydown', function (e) {
+                if (e.which === 9) {
+                    // Override tab only for pre nodes
+                    var tag = getSelectionStart().tagName.toLowerCase();
+                    if (tag === "pre") {
+                        e.preventDefault();
+                        document.execCommand('insertHtml', null, '    ');
+                    }
+                }
+            });
         },
 
         buttonTemplate: function(btnType) {
