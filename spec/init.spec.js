@@ -83,7 +83,8 @@ describe('Initialization TestCase', function () {
                     allowMultiParagraphSelection: true,
                     placeholder: 'Type your text',
                     secondHeader: 'h4',
-                    buttons: [ 'bold', 'italic', 'underline', 'anchor', 'header1', 'header2', 'quote' ]
+                    buttons: [ 'bold', 'italic', 'underline', 'anchor', 'header1', 'header2', 'quote' ],
+                    targetBlank: false
                 },
                 editor = new MediumEditor('.editor');
             expect(editor.options).toEqual(defaultOptions);

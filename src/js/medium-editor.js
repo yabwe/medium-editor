@@ -100,7 +100,8 @@ if (typeof module === 'object') {
             allowMultiParagraphSelection: true,
             placeholder: 'Type your text',
             secondHeader: 'h4',
-            buttons: ['bold', 'italic', 'underline', 'anchor', 'header1', 'header2', 'quote']
+            buttons: ['bold', 'italic', 'underline', 'anchor', 'header1', 'header2', 'quote'],
+            targetBlank: false
         },
 
         init: function (elements, options) {
@@ -557,6 +558,11 @@ if (typeof module === 'object') {
         createLink: function (input) {
             restoreSelection(this.savedSelection);
             document.execCommand('createLink', false, input.value);
+            if (this.options.targetBlank) {
+                Array.prototype.slice.call(document.getElementsByTagName("a")).forEach(function(e) {
+                    e.target = "_blank";
+                });
+            }
             this.showToolbarActions();
             input.value = '';
         },
