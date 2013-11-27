@@ -5,7 +5,7 @@ function MediumEditor(elements, options) {
     return this.init(elements, options);
 }
 
-if (window.module !== undefined) {
+if (typeof module === 'object') {
     module.exports = MediumEditor;
 }
 
