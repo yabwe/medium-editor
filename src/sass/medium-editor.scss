@@ -54,7 +54,6 @@ $button_size: 50px;
         button {
             display: block;
             padding: 15px;
-            box-sizing: border-box;
             height: $button_size;
             width: $button_size;
             background-color: $bgcolor;
@@ -68,6 +67,7 @@ $button_size: 50px;
             text-transform: uppercase;
             @include background(linear-gradient(bottom, $bgcolor, rgba($bgcolor, 0.89)));
             @include box-shadow(0 2px 2px rgba(0,0,0,0.3));
+            @include box-sizing(border-box);
             @include transition(background-color .2s ease-in);
             &:hover {
                 color: yellow;
@@ -122,13 +122,13 @@ $button_size: 50px;
         font-family: HelveticaNeue, Helvetica, Arial, sans-serif;
     }
     input {
-        box-sizing: border-box;
         padding: 6px;
         height: $button_size;
         width: 316px;
         background: $bgcolor;
         border: none;
         color: #ccc;
+        @include box-sizing(border-box);
         &:focus {
             outline: 0;
             -moz-appearance: none;
