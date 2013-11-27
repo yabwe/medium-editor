@@ -1,6 +1,6 @@
 /*global MediumEditor, describe, it, expect, spyOn,
          afterEach, beforeEach, selectElementContents,
-         jasmine, fireEvent*/
+         jasmine, fireEvent, console*/
 
 describe('Anchor Button TestCase', function () {
     'use strict';
@@ -85,6 +85,15 @@ describe('Anchor Button TestCase', function () {
             input.value = 'test';
             fireEvent(input, 'keyup', 13);
             expect(editor.createLink).toHaveBeenCalled();
+        });
+
+        it('should add target="_blank" when respective option is set to true', function () {
+            var editor = new MediumEditor('.editor', {targetBlank: true}),
+                input = editor.anchorForm.querySelector('input');
+            selectElementContents(editor.elements[0]);
+            input.value = 'http://test.com';
+            editor.createLink(input);
+            expect(editor.elements[0].querySelector('a').target).toBe('_blank');
         });
     });
 

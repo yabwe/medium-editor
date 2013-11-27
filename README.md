@@ -135,7 +135,7 @@ The source files are located inside the __src__ directory. MediumEditor styleshe
  active   : 64 days
  commits  : 292
  files    : 30
- authors  : 
+ authors  :
    229	Davi Ferreira           78.4%
     20	Maxime de Visscher      6.8%
      8	Derek Odegard           2.7%

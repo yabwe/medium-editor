@@ -87,7 +87,9 @@ if (typeof module === 'object') {
 
     MediumEditor.prototype = {
         defaults: {
+            allowMultiParagraphSelection: true,
             anchorInputPlaceholder: 'Paste or type a link',
+            buttons: ['bold', 'italic', 'underline', 'anchor', 'header1', 'header2', 'quote'],
             delay: 0,
             diffLeft: 0,
             diffTop: -10,
@@ -95,10 +97,8 @@ if (typeof module === 'object') {
             disableToolbar: false,
             firstHeader: 'h3',
             forcePlainText: true,
-            allowMultiParagraphSelection: true,
             placeholder: 'Type your text',
             secondHeader: 'h4',
-            buttons: ['bold', 'italic', 'underline', 'anchor', 'header1', 'header2', 'quote'],
             targetBlank: false
         },
 
@@ -553,13 +553,24 @@ if (typeof module === 'object') {
             return this;
         },
 
+        setTargetBlank: function () {
+            var el = getSelectionStart(),
+                i;
+            if (el.tagName.toLowerCase() === 'a') {
+                el.target = '_blank';
+            } else {
+                el = el.getElementsByTagName('a');
+                for (i = 0; i < el.length; i += 1) {
+                    el[i].target = '_blank';
+                }
+            }
+        },
+
         createLink: function (input) {
             restoreSelection(this.savedSelection);
             document.execCommand('createLink', false, input.value);
             if (this.options.targetBlank) {
-                Array.prototype.slice.call(document.getElementsByTagName("a")).forEach(function(e) {
-                    e.target = "_blank";
-                });
+                this.setTargetBlank();
             }
             this.showToolbarActions();
             input.value = '';
