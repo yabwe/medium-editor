@@ -81,6 +81,7 @@ Medium Editor, by default, will show only the buttons listed above to avoid a hu
 
 * __.deactivate()__: disables the editor
 * __.activate()__: re-activates the editor
+* __.serialize()__: returns a JSON object with elements contents
 
 
 ## Image Upload
@@ -128,29 +129,30 @@ The source files are located inside the __src__ directory. MediumEditor styleshe
 ```
  project  : medium-editor
  repo age : 6 months
- active   : 62 days
- commits  : 276
- files    : 29
- authors  :
-   220	Davi Ferreira           79.7%
-    14	Maxime de Visscher      5.1%
-     8	Jarl Gunnar T. Flaten   2.9%
-     8	Derek Odegard           2.9%
-     8	Pedro Nasser            2.9%
-     3	Troels Knak-Nielsen     1.1%
-     3	Dmitri Cherniak         1.1%
-     1	happyaccidents          0.4%
-     1	muescha                 0.4%
-     1	t_kjaergaard            0.4%
-     1	typify                  0.4%
-     1	Bitdeli Chef            0.4%
-     1	waffleio                0.4%
-     1	David Collien           0.4%
-     1	Denis Gorbachev         0.4%
-     1	Maxime Dantec           0.4%
-     1	Nikita Korotaev         0.4%
-     1	Noah Paessel            0.4%
-     1	Tom MacWright           0.4%
+ active   : 64 days
+ commits  : 292
+ files    : 30
+ authors  : 
+   229	Davi Ferreira           78.4%
+    20	Maxime de Visscher      6.8%
+     8	Derek Odegard           2.7%
+     8	Jarl Gunnar T. Flaten   2.7%
+     8	Pedro Nasser            2.7%
+     3	Dmitri Cherniak         1.0%
+     3	Troels Knak-Nielsen     1.0%
+     1	Bitdeli Chef            0.3%
+     1	David Collien           0.3%
+     1	David Hellsing          0.3%
+     1	Denis Gorbachev         0.3%
+     1	Maxime Dantec           0.3%
+     1	Nikita Korotaev         0.3%
+     1	Noah Paessel            0.3%
+     1	Tom MacWright           0.3%
+     1	happyaccidents          0.3%
+     1	muescha                 0.3%
+     1	t_kjaergaard            0.3%
+     1	typify                  0.3%
+     1	waffleio                0.3%
 ```
 
 ## License
