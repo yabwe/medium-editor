@@ -1,3 +1,12 @@
+1.3.5 / 2013-11-27
+==================
+
+* Fixes problem with text selection ending outside the container div
+* Implements serialize method
+* Adds a targetBlank option
+* Fixes Firefox box-sizing declarations
+
+
 1.3.1 / 2013-11-19
 ==================
 
