@@ -33,7 +33,7 @@ $button_size: 50px;
     position: absolute;
     top: 0;
     left: 0;
-    z-index: 600;
+    z-index: 2000;
     visibility: hidden;
     background-color: $bgcolor;
     border: 1px solid #000;
@@ -51,6 +51,8 @@ $button_size: 50px;
     li {
         float: left;
         list-style: none;
+        margin: 0;
+        padding: 0;
         button {
             display: block;
             padding: 15px;
@@ -129,6 +131,7 @@ $button_size: 50px;
         font-family: HelveticaNeue, Helvetica, Arial, sans-serif;
     }
     input {
+        margin: 0;
         padding: 6px;
         height: $button_size;
         width: 316px;
@@ -140,6 +143,9 @@ $button_size: 50px;
             outline: 0;
             -moz-appearance: none;
             -webkit-appearance: none;
+            // Prevent CSS conflicts.
+            border: none; 
+            box-shadow: none;
         }
     }
     a {
