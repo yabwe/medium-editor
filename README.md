@@ -61,6 +61,8 @@ Example:
 var editor = new MediumEditor('.editable', {
     anchorInputPlaceholder: 'Type a link',
     buttons: ['bold', 'italic', 'quote'],
+	highlightForeground: '#333333',
+	highlightBackground: '#BADA55',
     diffLeft: 25,
     diffTop: 10,
     firstHeader: 'h1',
@@ -79,6 +81,7 @@ Medium Editor, by default, will show only the buttons listed above to avoid a hu
 * __unorderedlist__
 * __orderedlist__
 * __pre__
+* __highlight__
 
 
 ## API
