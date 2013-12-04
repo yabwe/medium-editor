@@ -653,7 +653,7 @@ if (typeof module === 'object') {
                     var paragraphs,
                         html = '',
                         p;
-                    e.target.classList.remove('medium-editor-placeholder');
+                    this.classList.remove('medium-editor-placeholder');
                     if (e.clipboardData && e.clipboardData.getData) {
                         e.preventDefault();
                         if (!self.options.disableReturn) {
