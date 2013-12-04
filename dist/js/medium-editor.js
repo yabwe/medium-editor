@@ -90,6 +90,8 @@ if (typeof module === 'object') {
             allowMultiParagraphSelection: true,
             anchorInputPlaceholder: 'Paste or type a link',
             buttons: ['bold', 'italic', 'underline', 'anchor', 'header1', 'header2', 'quote'],
+			highlightForeground: '#333333',
+			highlightBackground: '#BADA55',
             delay: 0,
             diffLeft: 0,
             diffTop: -10,
@@ -216,7 +218,8 @@ if (typeof module === 'object') {
                 'quote': '<li><button class="medium-editor-action medium-editor-action-quote" data-action="append-blockquote" data-element="blockquote">&ldquo;</button></li>',
                 'orderedlist': '<li><button class="medium-editor-action medium-editor-action-orderedlist" data-action="insertorderedlist" data-element="ol">1.</button></li>',
                 'unorderedlist': '<li><button class="medium-editor-action medium-editor-action-unorderedlist" data-action="insertunorderedlist" data-element="ul">&bull;</button></li>',
-                'pre': '<li><button class="medium-editor-action medium-editor-action-pre" data-action="append-pre" data-element="pre">0101</button></li>'
+                'pre': '<li><button class="medium-editor-action medium-editor-action-pre" data-action="append-pre" data-element="pre">0101</button></li>',
+				'highlight': '<li><button class="medium-editor-action medium-editor-action-highlight" data-action="highlight" data-element="font"><span style="padding:0 3px;background-color:' + this.options.highlightBackground + ';"><font color="'+ this.options.highlightForeground +'">H</font></span></button></li>'
             };
             return buttonTemplates[btnType] || false;
         },
@@ -445,10 +448,31 @@ if (typeof module === 'object') {
                 this.setToolbarButtonStates();
             } else if (action === 'anchor') {
                 this.triggerAnchorAction(e);
+            } else if (action === 'highlight') {
+				this.triggerHighlightAction(e);
             } else {
                 document.execCommand(action, false, null);
                 this.setToolbarPosition();
             }
+        },
+
+	 	triggerHighlightAction: function () {
+            if (this.selection.anchorNode.parentNode.tagName.toLowerCase() === 'font') {
+				restoreSelection(this.savedHighlightSelection);
+				var sel = getSelectionStart(),
+					selText = sel.innerText;
+				sel.parentNode.removeChild(sel);
+				document.execCommand('insertText', false, selText);
+            } else {
+				this.savedHighlightSelection = saveSelection();
+				document.execCommand('foreColor', false, this.options.highlightForeground);
+	            document.execCommand('backColor', false, this.options.highlightBackground);
+            }
+			
+			this.setToolbarButtonStates();
+			this.showToolbarActions();
+
+            return this;
         },
 
         triggerAnchorAction: function () {
@@ -473,9 +497,11 @@ if (typeof module === 'object') {
                     && selectionData.el.parentNode.tagName.toLowerCase() === 'blockquote') {
                 return document.execCommand('outdent', false, null);
             }
+
             if (selectionData.tagName === el) {
                 el = 'p';
             }
+			
             return document.execCommand('formatBlock', false, el);
         },
 
