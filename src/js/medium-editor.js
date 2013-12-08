@@ -271,7 +271,7 @@ if (typeof module === 'object') {
                 i;
             this.checkSelectionWrapper = function (e) {
                 clearTimeout(timer);
-                setTimeout(function () {
+                timer = setTimeout(function () {
                     self.checkSelection(e);
                 }, self.options.delay);
             };
