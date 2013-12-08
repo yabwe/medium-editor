@@ -272,7 +272,7 @@ if (typeof module === 'object') {
             this.checkSelectionWrapper = function (e) {
                 clearTimeout(timer);
                 timer = setTimeout(function () {
-                    self.checkSelection(e);
+                    self.checkSelection();
                 }, self.options.delay);
             };
 
@@ -417,7 +417,7 @@ if (typeof module === 'object') {
                     e.preventDefault();
                     e.stopPropagation();
                     if (self.selection === undefined) {
-                        self.checkSelection(e);
+                        self.checkSelection();
                     }
                     if (this.className.indexOf('medium-editor-button-active') > -1) {
                         this.classList.remove('medium-editor-button-active');
@@ -512,10 +512,10 @@ if (typeof module === 'object') {
         bindElementToolbarEvents: function (el) {
             var self = this;
             el.addEventListener('mouseup', function (e) {
-                self.checkSelection(e);
+                self.checkSelection();
             });
             el.addEventListener('keyup', function (e) {
-                self.checkSelection(e);
+                self.checkSelection();
             });
         },
 
