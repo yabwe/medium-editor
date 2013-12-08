@@ -45,7 +45,7 @@ var elements = document.querySelectorAll('.editable'),
 * __buttons__: the set of buttons to display on the toolbar. Default: ['bold', 'italic', 'underline', 'anchor', 'header1', 'header2', 'quote']
 * __delay__: time in milliseconds to show the toolbar. Default: 0
 * __diffLeft__: value in pixels to be added to the X axis positioning of the toolbar. Default: 0
-* __diffTop__: value in pixels to be added to the Y axis positioning of the toolbar. Default: -5
+* __diffTop__: value in pixels to be added to the Y axis positioning of the toolbar. Default: -10
 * __disableReturn__:  enables/disables the use of the return-key. You can also set specific element behavior by using setting a data-disable-return attribute. Default: false
 * __disableToolbar__: enables/disables the toolbar, adding only the contenteditable behavior. You can also set specific element behavior by using setting a data-disable-toolbar attribute. Default: false
 * __firstHeader__: HTML tag to be used as first header. Default: h3
