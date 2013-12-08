@@ -90,7 +90,7 @@ Medium Editor, by default, will show only the buttons listed above to avoid a hu
 
 ## Image Upload
 
-[Pavel Linkesch](https://github.com/orthes) has developed a jQuery plugin to upload images following Medium.com functionality. Check it out at [http://orthes.github.io/medium-editor-images-plugin/](http://orthes.github.io/medium-editor-images-plugin/)
+[Pavel Linkesch](https://github.com/orthes) has developed a jQuery plugin to upload images following Medium.com functionality. Check it out at [http://orthes.github.io/medium-editor-insert-plugin/](http://orthes.github.io/medium-editor-insert-plugin/)
 
 
 ## Angular directive
