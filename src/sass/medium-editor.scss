@@ -57,16 +57,14 @@ $button_size: 50px;
             display: block;
             padding: 15px;
             height: $button_size;
-            width: $button_size;
+            min-width: $button_size;
             background-color: $bgcolor;
             color: #fff;
             border: 0;
             border-right: 1px solid #000;
             border-left: 1px solid #333;
             border-left: 1px solid rgba(#fff, .1);
-            font-weight: bold;
             text-decoration: none;
-            text-transform: uppercase;
             @include background(linear-gradient(bottom, $bgcolor, rgba($bgcolor, 0.89)));
             @include box-shadow(0 2px 2px rgba(0,0,0,0.3));
             @include box-sizing(border-box);
@@ -144,7 +142,7 @@ $button_size: 50px;
             -moz-appearance: none;
             -webkit-appearance: none;
             // Prevent CSS conflicts.
-            border: none; 
+            border: none;
             box-shadow: none;
         }
     }
