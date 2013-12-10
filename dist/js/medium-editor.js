@@ -181,7 +181,7 @@ if (typeof module === 'object') {
         bindReturn: function (index) {
             var self = this;
             this.elements[index].addEventListener('keypress', function (e) {
-                if (e.which === 13 && !e.shiftKey) {
+                if (e.which === 13) {
                     if (self.options.disableReturn || this.getAttribute('data-disable-return')) {
                         e.preventDefault();
                     }
