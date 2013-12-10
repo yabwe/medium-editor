@@ -43,6 +43,7 @@ var elements = document.querySelectorAll('.editable'),
 * __allowMultiParagraphSelection__: enables the toolbar when selecting multiple paragraphs/block elements. Default: true
 * __anchorInputPlaceholder__: text to be shown as placeholder of the anchor input. Default: _Paste or type a link_
 * __buttons__: the set of buttons to display on the toolbar. Default: ['bold', 'italic', 'underline', 'anchor', 'header1', 'header2', 'quote']
+* __buttonLabels__: type of labels on the buttons. Values: 'fontawesome', `{'bold': '<b>b</b>', 'italic': '<i>i</i>'}`. Default: false
 * __delay__: time in milliseconds to show the toolbar. Default: 0
 * __diffLeft__: value in pixels to be added to the X axis positioning of the toolbar. Default: 0
 * __diffTop__: value in pixels to be added to the Y axis positioning of the toolbar. Default: -10

@@ -84,6 +84,7 @@ describe('Initialization TestCase', function () {
                     placeholder: 'Type your text',
                     secondHeader: 'h4',
                     buttons: [ 'bold', 'italic', 'underline', 'anchor', 'header1', 'header2', 'quote' ],
+                    buttonLabels: false,
                     targetBlank: false
                 },
                 editor = new MediumEditor('.editor');
