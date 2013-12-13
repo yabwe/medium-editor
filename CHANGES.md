@@ -1,3 +1,13 @@
+1.4.0 / 2013-12-13
+==================
+
+* Adds new extra buttons: pre and strikethrough
+* Fixes placeholder bug on paste
+* Various code improvements
+* Prevents returns using shift when disableReturn is set to true
+* Improves CSS to avoid conflicts
+
+
 1.3.5 / 2013-11-27
 ==================
 
