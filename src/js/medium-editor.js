@@ -92,6 +92,7 @@ if (typeof module === 'object') {
             allowMultiParagraphSelection: true,
             anchorInputPlaceholder: 'Paste or type a link',
             buttons: ['bold', 'italic', 'underline', 'anchor', 'header1', 'header2', 'quote'],
+            buttonLabels: false,
             delay: 0,
             diffLeft: 0,
             diffTop: -10,
@@ -205,23 +206,64 @@ if (typeof module === 'object') {
             });
         },
 
-        buttonTemplate: function(btnType) {
-            var buttonTemplates = {
-                'bold': '<li><button class="medium-editor-action medium-editor-action-bold" data-action="bold" data-element="b">B</button></li>',
-                'italic': '<li><button class="medium-editor-action medium-editor-action-italic" data-action="italic" data-element="i">I</button></li>',
-                'underline': '<li><button class="medium-editor-action medium-editor-action-underline" data-action="underline" data-element="u">U</button></li>',
+        buttonTemplate: function (btnType) {
+            var buttonLabels = this.getButtonLabels(this.options.buttonLabels), buttonTemplates = {
+                'bold': '<li><button class="medium-editor-action medium-editor-action-bold" data-action="bold" data-element="b">' + buttonLabels.bold + '</button></li>',
+                'italic': '<li><button class="medium-editor-action medium-editor-action-italic" data-action="italic" data-element="i">' + buttonLabels.italic + '</button></li>',
+                'underline': '<li><button class="medium-editor-action medium-editor-action-underline" data-action="underline" data-element="u">' + buttonLabels.underline + '</button></li>',
                 'strikethrough': '<li><button class="medium-editor-action medium-editor-action-strikethrough" data-action="strikethrough" data-element="strike"><strike>A</strike></button></li>',
-                'superscript': '<li><button class="medium-editor-action medium-editor-action-superscript" data-action="superscript" data-element="sup">x<sup>1</sup></button></li>',
-                'subscript': '<li><button class="medium-editor-action medium-editor-action-subscript" data-action="subscript" data-element="sub">x<sub>1</sub></button></li>',
-                'anchor': '<li><button class="medium-editor-action medium-editor-action-anchor" data-action="anchor" data-element="a">#</button></li>',
-                'header1': '<li><button class="medium-editor-action medium-editor-action-header1" data-action="append-' + this.options.firstHeader + '" data-element="' + this.options.firstHeader + '">h1</button></li>',
-                'header2': '<li><button class="medium-editor-action medium-editor-action-header2" data-action="append-' + this.options.secondHeader + '" data-element="' + this.options.secondHeader + '">h2</button></li>',
-                'quote': '<li><button class="medium-editor-action medium-editor-action-quote" data-action="append-blockquote" data-element="blockquote">&ldquo;</button></li>',
-                'orderedlist': '<li><button class="medium-editor-action medium-editor-action-orderedlist" data-action="insertorderedlist" data-element="ol">1.</button></li>',
-                'unorderedlist': '<li><button class="medium-editor-action medium-editor-action-unorderedlist" data-action="insertunorderedlist" data-element="ul">&bull;</button></li>',
-                'pre': '<li><button class="medium-editor-action medium-editor-action-pre" data-action="append-pre" data-element="pre">0101</button></li>'
+                'superscript': '<li><button class="medium-editor-action medium-editor-action-superscript" data-action="superscript" data-element="sup">' + buttonLabels.superscript + '</button></li>',
+                'subscript': '<li><button class="medium-editor-action medium-editor-action-subscript" data-action="subscript" data-element="sub">' + buttonLabels.subscript + '</button></li>',
+                'anchor': '<li><button class="medium-editor-action medium-editor-action-anchor" data-action="anchor" data-element="a">' + buttonLabels.anchor + '</button></li>',
+                'header1': '<li><button class="medium-editor-action medium-editor-action-header1" data-action="append-' + this.options.firstHeader + '" data-element="' + this.options.firstHeader + '">' + buttonLabels.header1 + '</button></li>',
+                'header2': '<li><button class="medium-editor-action medium-editor-action-header2" data-action="append-' + this.options.secondHeader + '" data-element="' + this.options.secondHeader + '">' + buttonLabels.header2 + '</button></li>',
+                'quote': '<li><button class="medium-editor-action medium-editor-action-quote" data-action="append-blockquote" data-element="blockquote">' + buttonLabels.quote + '</button></li>',
+                'orderedlist': '<li><button class="medium-editor-action medium-editor-action-orderedlist" data-action="insertorderedlist" data-element="ol">' + buttonLabels.orderedlist + '</button></li>',
+                'unorderedlist': '<li><button class="medium-editor-action medium-editor-action-unorderedlist" data-action="insertunorderedlist" data-element="ul">' + buttonLabels.unorderedlist + '</button></li>',
+                'pre': '<li><button class="medium-editor-action medium-editor-action-pre" data-action="append-pre" data-element="pre">' + buttonLabels.pre + '</button></li>'
             };
             return buttonTemplates[btnType] || false;
+        },
+
+        getButtonLabels: function (buttonLabelType) {
+            var customButtonLabels, attrname, buttonLabels = {
+                'bold': '<b>B</b>',
+                'italic' : '<b><i>I<i></b>',
+                'underline': '<b><u>U</u></b>',
+                'superscript': '<b>x<sup>1</sup></b>',
+                'subscript': '<b>x<sub>1</sup></b>',
+                'anchor': '<b>#</b>',
+                'header1': '<b>H1</b>',
+                'header2': '<b>H2</b>',
+                'quote': '<b>&ldquo;</b>',
+                'orderedlist': '<b>1.</b>',
+                'unorderedlist': '<b>&bull;</b>',
+                'pre': '<b>0101</b>'
+            };
+            if (buttonLabelType === 'fontawesome') {
+                customButtonLabels = {
+                    'bold': '<i class="fa fa-bold"></i>',
+                    'italic' : '<i class="fa fa-italic"></i>',
+                    'underline': '<i class="fa fa-underline"></i>',
+                    'superscript': '<i class="fa fa-superscript"></i>',
+                    'subscript': '<i class="fa fa-subscript"></i>',
+                    'anchor': '<i class="fa fa-link"></i>',
+                    'quote': '<i class="fa fa-quote-right"></i>',
+                    'orderedlist': '<i class="fa fa-list-ol"></i>',
+                    'unorderedlist': '<i class="fa fa-list-ul"></i>',
+                    'pre': '<i class="fa fa-code fa-lg"></i>'
+                };
+            } else if (typeof buttonLabelType === 'object') {
+                customButtonLabels = buttonLabelType;
+            }
+            if (typeof customButtonLabels === 'object') {
+                for (attrname in customButtonLabels) {
+                    if (customButtonLabels.hasOwnProperty(attrname)) {
+                        buttonLabels[attrname] = customButtonLabels[attrname];
+                    }
+                }
+            }
+            return buttonLabels;
         },
 
         //TODO: actionTemplate
