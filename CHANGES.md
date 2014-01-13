@@ -1,3 +1,12 @@
+1.4.5 / 2014-01-13
+==================
+
+* Adds ability to set custom labels on buttons
+* Updates uglify
+* Fixes bug where pressing enter on formatted list item would generate 
+  a new list instead of a new list item
+
+
 1.4.0 / 2013-12-13
 ==================
 
