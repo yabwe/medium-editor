@@ -471,7 +471,6 @@ if (typeof module === 'object') {
                     } else {
                         this.className += ' medium-editor-button-active';
                     }
-                    console.log(this.getAttribute('data-action'));
                     self.execAction(this.getAttribute('data-action'), e);
                 };
             for (i = 0; i < buttons.length; i += 1) {
