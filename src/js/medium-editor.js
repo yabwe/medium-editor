@@ -170,7 +170,7 @@ if (typeof module === 'object') {
                     node = getSelectionStart();
                     tagName = node.tagName.toLowerCase();
                     if (!(self.options.disableReturn || this.getAttribute('data-disable-return'))
-                            && tagName !== 'li') {
+                            && tagName !== 'li' && !self.isListItemChild(node)) {
                         document.execCommand('formatBlock', false, 'p');
                         if (tagName === 'a') {
                             document.execCommand('unlink', false, null);
@@ -179,6 +179,23 @@ if (typeof module === 'object') {
                 }
             });
             return this;
+        },
+
+        isListItemChild: function (node) {
+            var parentNode = node.parentNode,
+                tagName = parentNode.tagName.toLowerCase();
+            while (this.parentElements.indexOf(tagName) === -1 && tagName !== 'div') {
+                if (tagName === 'li') {
+                    return true;
+                }
+                parentNode = parentNode.parentNode;
+                if (parentNode && parentNode.tagName) {
+                    tagName = parentNode.tagName.toLowerCase();
+                } else {
+                    return false;
+                }
+            }
+            return false;
         },
 
         bindReturn: function (index) {
