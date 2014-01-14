@@ -249,7 +249,7 @@ if (typeof module === 'object') {
                 attrname,
                 buttonLabels = {
                     'bold': '<b>B</b>',
-                    'italic' : '<b><i>I<i></b>',
+                    'italic' : '<b><i>I</i></b>',
                     'underline': '<b><u>U</u></b>',
                     'superscript': '<b>x<sup>1</sup></b>',
                     'subscript': '<b>x<sub>1</sup></b>',
