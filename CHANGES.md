@@ -1,6 +1,12 @@
 1.4.5 / 2014-01-13
 ==================
 
+* Adds 3 new themes: Roman, Mani e Flat
+
+
+1.4.5 / 2014-01-13
+==================
+
 * Adds ability to set custom labels on buttons
 * Updates uglify
 * Fixes bug where pressing enter on formatted list item would generate 

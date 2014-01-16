@@ -139,22 +139,23 @@ The source files are located inside the __src__ directory. MediumEditor styleshe
 ```
  project  : medium-editor
  repo age : 8 months
- active   : 80 days
- commits  : 341
- files    : 31
+ active   : 82 days
+ commits  : 354
+ files    : 41
  authors  :
-   256	Davi Ferreira           75.1%
-    20	Maxime de Visscher      5.9%
+   268	Davi Ferreira           75.7%
+    20	Maxime de Visscher      5.6%
+     8	Jarl Gunnar T. Flaten   2.3%
      8	Derek Odegard           2.3%
      8	Pedro Nasser            2.3%
-     8	Jarl Gunnar T. Flaten   2.3%
-     4	minikomi                1.2%
-     4	Sebastian Zuchmanski    1.2%
-     3	arol                    0.9%
-     3	Andrew Hubbs            0.9%
-     3	Dmitri Cherniak         0.9%
-     3	Troels Knak-Nielsen     0.9%
+     4	Sebastian Zuchmanski    1.1%
+     4	minikomi                1.1%
+     3	Dmitri Cherniak         0.8%
+     3	arol                    0.8%
+     3	Andrew Hubbs            0.8%
+     3	Troels Knak-Nielsen     0.8%
      2	Nikita Korotaev         0.6%
+     1	Noah Paessel            0.3%
      1	Pavel Linkesch          0.3%
      1	Tom MacWright           0.3%
      1	happyaccidents          0.3%
@@ -168,12 +169,12 @@ The source files are located inside the __src__ directory. MediumEditor styleshe
      1	David Hellsing          0.3%
      1	Denis Gorbachev         0.3%
      1	Jeff Welch              0.3%
+     1	Mark Kraemer            0.3%
      1	Max                     0.3%
      1	Maxime Dantec           0.3%
      1	Maxime De Visscher      0.3%
      1	Michael Kay             0.3%
      1	Moore Adam              0.3%
-     1	Noah Paessel            0.3%
 ```
 
 ## License
