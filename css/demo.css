@@ -30,9 +30,27 @@ body {
     line-height: 30px;
 }
 
+.top-bar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: auto;
+    z-index: 10;
+    padding: 10px;
+    background-color: #000;
+    background-color: rgba(0, 0, 0, .8);
+    box-shadow: 0 0 4px #000;
+    box-sizing: border-box;
+    color: #ccc;
+    font-size: 12px;
+    font-weight: bold;
+    text-align: center;
+    text-transform: uppercase;
+}
+
 #container {
     width: 960px;
-    margin: 30px auto;
+    margin: 90px auto;
 }
 
 h1 {
