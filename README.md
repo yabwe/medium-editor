@@ -85,7 +85,7 @@ Medium Editor, by default, will show only the buttons listed above to avoid a hu
 
 ## Themes
 
-Checkout the Wiki page for a list of avaliable themes: [https://github.com/daviferreira/medium-editor/wiki/Themes](https://github.com/daviferreira/medium-editor/wiki/Themes)
+Check out the Wiki page for a list of available themes: [https://github.com/daviferreira/medium-editor/wiki/Themes](https://github.com/daviferreira/medium-editor/wiki/Themes)
 
 ## API
 
