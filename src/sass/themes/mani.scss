@@ -68,7 +68,7 @@ $link_color: #40648a;
         .medium-editor-button-active {
             background-color: #5c90c7;
             background-color: rgba(#5c90c7, .45);
-            color: #fff;
+            color: #000;
             @include background(linear-gradient(bottom, $bgcolor, rgba(#000, .1)));
         }
         .medium-editor-action-underline {
