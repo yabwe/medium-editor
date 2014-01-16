@@ -1,13 +1,13 @@
-// inspired by http://dribbble.com/shots/848100-Toolbar-Psd
+// inspired by http://dribbble.com/shots/857472-Toolbar
 
 @import "compass/css3";
 @import "clearfix";
 @import "pop-upwards";
 
-$bgcolor: #fff;
-$border_color: #a8a8a8;
+$bgcolor: #dee7f0;
+$border_color: #cdd6e0;
 $button_size: 50px;
-$link_color: #889aac;
+$link_color: #40648a;
 
 .medium-toolbar-arrow-under:after,
 .medium-toolbar-arrow-over:before {
@@ -22,8 +22,10 @@ $link_color: #889aac;
     visibility: hidden;
     background-color: $bgcolor;
     background-color: rgba($bgcolor, .95);
+    border: 1px solid $border_color;
     font-family: HelveticaNeue, Helvetica, Arial, sans-serif;
     font-size: 16px;
+    @include background(linear-gradient(bottom, $bgcolor, rgba(#fff, 1)));
     @include border-radius(5px);
     @include box-shadow(0 2px 6px rgba(#000, .45));
     @include transition(top .075s ease-out,left .075s ease-out);
@@ -47,15 +49,12 @@ $link_color: #889aac;
             border: none;
             border-right: 1px solid $border_color;
             text-decoration: none;
-            @include box-shadow(inset 0 0 3px #f8f8e6);
             @include box-sizing(border-box);
-            @include background(linear-gradient(top, $bgcolor, rgba(#000, .1)));
-            @include text-shadow(1px 4px 6px #def, 0 0 0 #000, 1px 4px 6px #def);
-            @include transition(background-color .2s ease-in);
+            @include transition(background-color .2s ease-in, color .2s ease-in);
             &:hover {
-                background-color: #fff;
-                color: #000;
-                color: rgba(#000, .8);
+                background-color: #5c90c7;
+                background-color: rgba(#5c90c7, .45);
+                color: #fff;
             }
         }
         .medium-editor-button-first {
@@ -67,10 +66,10 @@ $link_color: #889aac;
             @include border-bottom-right-radius(5px);
         }
         .medium-editor-button-active {
-            background-color: #ccc;
-            color: #000;
-            color: rgba(#000, .8);
-            @include background(linear-gradient(bottom, $bgcolor, rgba(#000, .2)));
+            background-color: #5c90c7;
+            background-color: rgba(#5c90c7, .45);
+            color: #fff;
+            @include background(linear-gradient(bottom, $bgcolor, rgba(#000, .1)));
         }
         .medium-editor-action-underline {
             text-decoration: underline;
