@@ -83,6 +83,10 @@ Medium Editor, by default, will show only the buttons listed above to avoid a hu
 * __pre__
 
 
+## Themes
+
+Checkout the Wiki page for a list of avaliable themes: [https://github.com/daviferreira/medium-editor/wiki/Themes](https://github.com/daviferreira/medium-editor/wiki/Themes)
+
 ## API
 
 * __.deactivate()__: disables the editor
