@@ -1,0 +1,116 @@
+@-webkit-keyframes pop-upwards {
+    0% {
+        @include transform(matrix(0.97,0,0,1,0,12));
+        @include opacity(0);
+    }
+
+    20% {
+        @include transform(matrix(0.99,0,0,1,0,2));
+        @include opacity(.7);
+
+    }
+
+    40% {
+        @include transform(matrix(1,0,0,1,0,-1));
+        @include opacity(1);
+    }
+
+    70% {
+        @include transform(matrix(1,0,0,1,0,0));
+        @include opacity(1);
+    }
+
+    100% {
+        @include transform(matrix(1,0,0,1,0,0));
+        @include opacity(1);
+
+    }
+}
+
+@-moz-keyframes pop-upwards {
+    0% {
+        @include transform(matrix(0.97,0,0,1,0,12));
+        @include opacity(0);
+    }
+
+    20% {
+        @include transform(matrix(0.99,0,0,1,0,2));
+        @include opacity(.7);
+
+    }
+
+    40% {
+        @include transform(matrix(1,0,0,1,0,-1));
+        @include opacity(1);
+    }
+
+    70% {
+        @include transform(matrix(1,0,0,1,0,0));
+        @include opacity(1);
+    }
+
+    100% {
+        @include transform(matrix(1,0,0,1,0,0));
+        @include opacity(1);
+
+    }
+}
+
+@-o-keyframes pop-upwards {
+    0% {
+        @include transform(matrix(0.97,0,0,1,0,12));
+        @include opacity(0);
+    }
+
+    20% {
+        @include transform(matrix(0.99,0,0,1,0,2));
+        @include opacity(.7);
+
+    }
+
+    40% {
+        @include transform(matrix(1,0,0,1,0,-1));
+        @include opacity(1);
+    }
+
+    70% {
+        @include transform(matrix(1,0,0,1,0,0));
+        @include opacity(1);
+    }
+
+    100% {
+        @include transform(matrix(1,0,0,1,0,0));
+        @include opacity(1);
+
+    }
+}
+
+@keyframes pop-upwards {
+    0% {
+        @include transform(matrix(0.97,0,0,1,0,12));
+        @include opacity(0);
+    }
+
+    20% {
+        @include transform(matrix(0.99,0,0,1,0,2));
+        @include opacity(.7);
+
+    }
+
+    40% {
+        @include transform(matrix(1,0,0,1,0,-1));
+        @include opacity(1);
+    }
+
+    70% {
+        @include transform(matrix(1,0,0,1,0,0));
+        @include opacity(1);
+    }
+
+    100% {
+        @include transform(matrix(1,0,0,1,0,0));
+        @include opacity(1);
+
+    }
+}
+

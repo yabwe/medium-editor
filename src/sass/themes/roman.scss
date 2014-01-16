@@ -1,33 +1,15 @@
+// inspired by http://dribbble.com/shots/848100-Toolbar-Psd
+
 @import "compass/css3";
 @import "clearfix";
 @import "pop-upwards";
 
-$bgcolor: #242424;
+$bgcolor: #fff;
 $button_size: 50px;
 
-%medium-toolbar-arrow {
-    content: "";
-    display: block;
-    position: absolute;
-    left: 50%;
-    margin-left: -8px;
-    width: 0;
-    height: 0;
-    border-style: solid;
-}
-
-.medium-toolbar-arrow-under:after {
-    @extend %medium-toolbar-arrow;
-    top: $button_size;
-    border-width: 8px 8px 0 8px;
-    border-color: $bgcolor transparent transparent transparent;
-}
-
+.medium-toolbar-arrow-under:after,
 .medium-toolbar-arrow-over:before {
-    @extend %medium-toolbar-arrow;
-    top: -8px;
-    border-width: 0 8px 8px 8px;
-    border-color: transparent transparent $bgcolor transparent;
+    display: none;
 }
 
 .medium-editor-toolbar {
@@ -37,12 +19,11 @@ $button_size: 50px;
     z-index: 2000;
     visibility: hidden;
     background-color: $bgcolor;
-    border: 1px solid #000;
+    background-color: rgba($bgcolor, .95);
     font-family: HelveticaNeue, Helvetica, Arial, sans-serif;
     font-size: 16px;
-    @include background(linear-gradient(bottom, $bgcolor, rgba($bgcolor, 0.75)));
     @include border-radius(5px);
-    @include box-shadow(0 0 3px #000);
+    @include box-shadow(0 2px 6px rgba(#000, .45));
     @include transition(top .075s ease-out,left .075s ease-out);
     ul {
         margin: 0;
@@ -59,20 +40,20 @@ $button_size: 50px;
             padding: 15px;
             height: $button_size;
             min-width: $button_size;
-            background-color: $bgcolor;
-            color: #fff;
-            border: 0;
-            border-right: 1px solid #000;
-            border-left: 1px solid #333;
-            border-left: 1px solid rgba(#fff, .1);
+            background-color: transparent;
+            color: #889aac;
+            border: none;
+            border-right: 1px solid #a8a8a8;
             text-decoration: none;
-            @include background(linear-gradient(bottom, $bgcolor, rgba($bgcolor, 0.89)));
-            @include box-shadow(0 2px 2px rgba(0,0,0,0.3));
+            @include box-shadow(inset 0 0 3px #f8f8e6);
             @include box-sizing(border-box);
+            @include background(linear-gradient(top, $bgcolor, rgba(#000, .1)));
+            @include text-shadow(1px 4px 6px #def, 0 0 0 #000, 1px 4px 6px #def);
             @include transition(background-color .2s ease-in);
             &:hover {
-                color: yellow;
-                background-color: #000;
+                background-color: #fff;
+                color: #000;
+                color: rgba(#000, .8);
             }
         }
         .medium-editor-button-first {
@@ -84,9 +65,10 @@ $button_size: 50px;
             @include border-bottom-right-radius(5px);
         }
         .medium-editor-button-active {
-            background-color: #000;
-            @include background(linear-gradient(bottom, $bgcolor, rgba(#000, 0.89)));
-            color: #fff;
+            background-color: #ccc;
+            color: #000;
+            color: rgba(#000, .8);
+            @include background(linear-gradient(bottom, $bgcolor, rgba(#000, .2)));
         }
         .medium-editor-action-underline {
             text-decoration: underline;
@@ -134,7 +116,7 @@ $button_size: 50px;
         width: 316px;
         background: $bgcolor;
         border: none;
-        color: #ccc;
+        color: #a8a8a8;
         @include box-sizing(border-box);
         &:focus {
             outline: 0;
@@ -146,7 +128,7 @@ $button_size: 50px;
         }
     }
     a {
-        color: #fff;
+        color: #889aac;
         font-weight: bolder;
         font-size: 24px;
         display: inline-block;

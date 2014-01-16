@@ -5,7 +5,8 @@
     <title>medium editor | demo</title>
     <link rel="stylesheet" href="css/normalize.css">
     <link rel="stylesheet" href="css/demo.css">
-    <link rel="stylesheet" href="../dist/css/medium-editor.css">
+    <link rel="stylesheet" href="http://netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css">
+    <link rel="stylesheet" href="../dist/css/themes/roman.css">
     <style>
     </style>
 </head>
@@ -22,7 +23,9 @@
     <p style="text-align: center;"><small><a style="color: #333;" target="_blank" href="http://www.goodreads.com/reader/475-great-expectations">Source</a></small></p>
     <script src="../dist/js/medium-editor.js"></script>
     <script>
-        var editor = new MediumEditor('.editable');
+        var editor = new MediumEditor('.editable', {
+            buttonLabels: 'fontawesome'
+        });
     </script>
 </body>
 </html>
