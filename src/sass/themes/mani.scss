@@ -26,7 +26,7 @@ $link_color: #40648a;
     font-family: HelveticaNeue, Helvetica, Arial, sans-serif;
     font-size: 16px;
     @include background(linear-gradient(bottom, $bgcolor, rgba(#fff, 1)));
-    @include border-radius(5px);
+    @include border-radius(2px);
     @include box-shadow(0 2px 6px rgba(#000, .45));
     @include transition(top .075s ease-out,left .075s ease-out);
     ul {
@@ -58,12 +58,12 @@ $link_color: #40648a;
             }
         }
         .medium-editor-button-first {
-            @include border-top-left-radius(5px);
-            @include border-bottom-left-radius(5px);
+            @include border-top-left-radius(2px);
+            @include border-bottom-left-radius(2px);
         }
         .medium-editor-button-last {
-            @include border-top-right-radius(5px);
-            @include border-bottom-right-radius(5px);
+            @include border-top-right-radius(2px);
+            @include border-bottom-right-radius(2px);
         }
         .medium-editor-button-active {
             background-color: #5c90c7;
@@ -106,7 +106,7 @@ $link_color: #40648a;
     display: none;
     background: $bgcolor;
     color: #999;
-    @include border-radius(5px);
+    @include border-radius(2px);
     input, a {
         font-family: HelveticaNeue, Helvetica, Arial, sans-serif;
     }
