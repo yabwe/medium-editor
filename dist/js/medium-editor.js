@@ -269,7 +269,7 @@ if (typeof module === 'object') {
                     'superscript': '<i class="fa fa-superscript"></i>',
                     'subscript': '<i class="fa fa-subscript"></i>',
                     'anchor': '<i class="fa fa-link"></i>',
-                    'image': '<i class="fa fa-image"></i>',
+                    'image': '<i class="fa fa-picture-o"></i>',
                     'quote': '<i class="fa fa-quote-right"></i>',
                     'orderedlist': '<i class="fa fa-list-ol"></i>',
                     'unorderedlist': '<i class="fa fa-list-ul"></i>',

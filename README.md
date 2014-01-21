@@ -81,6 +81,7 @@ Medium Editor, by default, will show only the buttons listed above to avoid a hu
 * __unorderedlist__
 * __orderedlist__
 * __pre__
+* __image__ (this simply converts selected text to an image tag)
 
 
 ## Themes
