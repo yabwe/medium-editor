@@ -57,6 +57,7 @@ $button_size: 50px;
         button {
             display: block;
             padding: 15px;
+            margin: 0;
             height: $button_size;
             min-width: $button_size;
             background-color: $bgcolor;
