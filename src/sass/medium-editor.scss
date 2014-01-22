@@ -137,6 +137,7 @@ $button_size: 50px;
         width: 316px;
         background: $bgcolor;
         border: none;
+        font-size: 14px;
         color: #ccc;
         @include box-sizing(border-box);
         &:focus {

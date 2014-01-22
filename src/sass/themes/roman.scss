@@ -122,6 +122,7 @@ $link_color: #889aac;
         background: $bgcolor;
         border: none;
         color: $border_color;
+        font-size: 14px;
         @include box-sizing(border-box);
         &:focus {
             outline: 0;

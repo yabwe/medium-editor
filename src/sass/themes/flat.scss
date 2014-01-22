@@ -123,6 +123,7 @@ $link_color: #fff;
         background: $bgcolor;
         border: none;
         color: $link_color;
+        font-size: 14px;
         @include box-sizing(border-box);
         &:focus {
             outline: 0;
