@@ -42,12 +42,15 @@ $link_color: #40648a;
         button {
             display: block;
             padding: 15px;
+            margin: 0;
             height: $button_size;
             min-width: $button_size;
             background-color: transparent;
-            color: $link_color;
             border: none;
             border-right: 1px solid $border_color;
+            color: $link_color;
+            cursor: pointer;
+            font-size: 14px;
             text-decoration: none;
             @include box-sizing(border-box);
             @include transition(background-color .2s ease-in, color .2s ease-in);
