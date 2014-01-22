@@ -1,4 +1,12 @@
-1.4.5 / 2014-01-13
+1.5.3 / 2014-01-22
+==================
+
+* Adds bootstrap theme
+* Adds image button that converts selected text into an image tag
+* Removes normalize.css dependency
+
+
+1.5.0 / 2014-01-16
 ==================
 
 * Adds 3 new themes: Roman, Mani e Flat

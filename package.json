@@ -1,6 +1,6 @@
 {
   "name": "medium-editor",
-  "version": "1.5.0",
+  "version": "1.5.3",
   "description": "Medium.com WYSIWYG editor clone.",
   "main": "src/js/medium-editor.js",
   "repository": {
