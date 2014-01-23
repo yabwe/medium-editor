@@ -162,15 +162,15 @@ if (typeof module === 'object') {
             this.elements[index].addEventListener('keyup', function (e) {
                 var node = getSelectionStart(),
                     tagName;
-                if (node && node.getAttribute('data-medium-element') && node.children.length === 0
-                        && !(self.options.disableReturn || node.getAttribute('data-disable-return'))) {
+                if (node && node.getAttribute('data-medium-element') && node.children.length === 0 &&
+                        !(self.options.disableReturn || node.getAttribute('data-disable-return'))) {
                     document.execCommand('formatBlock', false, 'p');
                 }
                 if (e.which === 13 && !e.shiftKey) {
                     node = getSelectionStart();
                     tagName = node.tagName.toLowerCase();
-                    if (!(self.options.disableReturn || this.getAttribute('data-disable-return'))
-                            && tagName !== 'li' && !self.isListItemChild(node)) {
+                    if (!(self.options.disableReturn || this.getAttribute('data-disable-return')) &&
+                            tagName !== 'li' && !self.isListItemChild(node)) {
                         document.execCommand('formatBlock', false, 'p');
                         if (tagName === 'a') {
                             document.execCommand('unlink', false, null);
@@ -365,8 +365,8 @@ if (typeof module === 'object') {
                 // Check if selection is between multi paragraph <p>.
                 hasMultiParagraphs = selectionHtml.match(/<(p|h[0-6]|blockquote)>([\s\S]*?)<\/(p|h[0-6]|blockquote)>/g);
                 hasMultiParagraphs = hasMultiParagraphs ? hasMultiParagraphs.length : 0;
-                if (newSelection.toString().trim() === ''
-                        || (this.options.allowMultiParagraphSelection === false && hasMultiParagraphs)) {
+                if (newSelection.toString().trim() === '' ||
+                        (this.options.allowMultiParagraphSelection === false && hasMultiParagraphs)) {
                     this.hideToolbarActions();
                 } else {
                     selectionElement = this.getSelectionElement();
@@ -539,8 +539,8 @@ if (typeof module === 'object') {
             // FF handles blockquote differently on formatBlock
             // allowing nesting, we need to use outdent
             // https://developer.mozilla.org/en-US/docs/Rich-Text_Editing_in_Mozilla
-            if (el === 'blockquote' && selectionData.el
-                    && selectionData.el.parentNode.tagName.toLowerCase() === 'blockquote') {
+            if (el === 'blockquote' && selectionData.el &&
+                    selectionData.el.parentNode.tagName.toLowerCase() === 'blockquote') {
                 return document.execCommand('outdent', false, null);
             }
             if (selectionData.tagName === el) {
