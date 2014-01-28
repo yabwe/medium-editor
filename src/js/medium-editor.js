@@ -353,41 +353,45 @@ if (typeof module === 'object') {
         },
 
         checkSelection: function () {
-            var i,
-                newSelection,
-                hasMultiParagraphs,
-                selectionHtml,
+            var newSelection,
                 selectionElement;
             if (this.keepToolbarAlive !== true && !this.options.disableToolbar) {
                 newSelection = window.getSelection();
-                selectionHtml = getSelectionHtml();
-                selectionHtml = selectionHtml.replace(/<[\S]+><\/[\S]+>/gim, '');
-                // Check if selection is between multi paragraph <p>.
-                hasMultiParagraphs = selectionHtml.match(/<(p|h[0-6]|blockquote)>([\s\S]*?)<\/(p|h[0-6]|blockquote)>/g);
-                hasMultiParagraphs = hasMultiParagraphs ? hasMultiParagraphs.length : 0;
                 if (newSelection.toString().trim() === '' ||
-                        (this.options.allowMultiParagraphSelection === false && hasMultiParagraphs)) {
+                        (this.options.allowMultiParagraphSelection === false && this.hasMultiParagraphs())) {
                     this.hideToolbarActions();
                 } else {
                     selectionElement = this.getSelectionElement();
                     if (!selectionElement || selectionElement.getAttribute('data-disable-toolbar')) {
                         this.hideToolbarActions();
                     } else {
-                        this.selection = newSelection;
-                        this.selectionRange = this.selection.getRangeAt(0);
-                        for (i = 0; i < this.elements.length; i += 1) {
-                            if (this.elements[i] === selectionElement) {
-                                this.setToolbarButtonStates()
-                                    .setToolbarPosition()
-                                    .showToolbarActions();
-                                return;
-                            }
-                        }
-                        this.hideToolbarActions();
+                        this.checkSelectionElement(newSelection, selectionElement);
                     }
                 }
             }
             return this;
+        },
+
+        hasMultiParagraphs: function () {
+            var selectionHtml = getSelectionHtml().replace(/<[\S]+><\/[\S]+>/gim, ''),
+                hasMultiParagraphs = selectionHtml.match(/<(p|h[0-6]|blockquote)>([\s\S]*?)<\/(p|h[0-6]|blockquote)>/g);
+
+            return (hasMultiParagraphs ? hasMultiParagraphs.length : 0);
+        },
+
+        checkSelectionElement: function (newSelection, selectionElement) {
+            var i;
+            this.selection = newSelection;
+            this.selectionRange = this.selection.getRangeAt(0);
+            for (i = 0; i < this.elements.length; i += 1) {
+                if (this.elements[i] === selectionElement) {
+                    this.setToolbarButtonStates()
+                        .setToolbarPosition()
+                        .showToolbarActions();
+                    return;
+                }
+            }
+            this.hideToolbarActions();
         },
 
         getSelectionElement: function () {
