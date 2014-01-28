@@ -334,7 +334,7 @@ if (typeof module === 'object') {
             var self = this,
                 timer = '',
                 i;
-            this.checkSelectionWrapper = function (e) {
+            this.checkSelectionWrapper = function () {
                 clearTimeout(timer);
                 timer = setTimeout(function () {
                     self.checkSelection();
@@ -577,10 +577,10 @@ if (typeof module === 'object') {
 
         bindElementToolbarEvents: function (el) {
             var self = this;
-            el.addEventListener('mouseup', function (e) {
+            el.addEventListener('mouseup', function () {
                 self.checkSelection();
             });
-            el.addEventListener('keyup', function (e) {
+            el.addEventListener('keyup', function () {
                 self.checkSelection();
             });
         },
@@ -625,7 +625,7 @@ if (typeof module === 'object') {
                     self.createLink(this);
                 }
             });
-            this.anchorInput.addEventListener('blur', function (e) {
+            this.anchorInput.addEventListener('blur', function () {
                 self.keepToolbarAlive = false;
                 self.checkSelection();
             });
