@@ -667,14 +667,15 @@ if (typeof module === 'object') {
         bindWindowActions: function () {
             var timerResize,
                 self = this;
-            window.addEventListener('resize', function () {
+            this.windowResizeHandler = function () {
                 clearTimeout(timerResize);
                 timerResize = setTimeout(function () {
                     if (self.toolbar.classList.contains('medium-editor-toolbar-active')) {
                         self.setToolbarPosition();
                     }
                 }, 100);
-            });
+            };
+            window.addEventListener('resize', this.windowResizeHandler);
             return this;
         },
 
@@ -692,7 +693,9 @@ if (typeof module === 'object') {
             for (i = 0; i < this.elements.length; i += 1) {
                 this.elements[i].setAttribute('contentEditable', true);
             }
-            this.bindSelect();
+
+            this.bindWindowActions()
+                .bindSelect();
         },
 
         deactivate: function () {
@@ -707,6 +710,7 @@ if (typeof module === 'object') {
             }
 
             document.documentElement.removeEventListener('mouseup', this.checkSelectionWrapper);
+            window.removeEventListener('resize', this.windowResizeHandler);
 
             for (i = 0; i < this.elements.length; i += 1) {
                 this.elements[i].removeEventListener('keyup', this.checkSelectionWrapper);
