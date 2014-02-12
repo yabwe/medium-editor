@@ -1,3 +1,10 @@
+1.5.4 / 2014-02-12
+==================
+
+* Fixes filenames for main in bower.json
+* Removes window resize event listener on deactivate
+
+
 1.5.3 / 2014-01-22
 ==================
 

@@ -152,27 +152,29 @@ The source files are located inside the __src__ directory. MediumEditor styleshe
 ## Contributors
 
 ```
- project  : medium-editor
- repo age : 8 months
- active   : 85 days
- commits  : 366
+project  : medium-editor
+ repo age : 9 months
+ active   : 91 days
+ commits  : 376
  files    : 43
  authors  :
-   278	Davi Ferreira           76.0%
-    20	Maxime de Visscher      5.5%
-     8	Pedro Nasser            2.2%
-     8	Derek Odegard           2.2%
-     8	Jarl Gunnar T. Flaten   2.2%
+   286	Davi Ferreira           76.1%
+    20	Maxime de Visscher      5.3%
+     8	Pedro Nasser            2.1%
+     8	Derek Odegard           2.1%
+     8	Jarl Gunnar T. Flaten   2.1%
      4	minikomi                1.1%
      4	Sebastian Zuchmanski    1.1%
-     3	Dmitri Cherniak         0.8%
-     3	Andrew Hubbs            0.8%
      3	arol                    0.8%
+     3	Andrew Hubbs            0.8%
+     3	Dmitri Cherniak         0.8%
      3	Troels Knak-Nielsen     0.8%
      2	Nikita Korotaev         0.5%
+     1	Moore Adam              0.3%
      1	Nic Malan               0.3%
      1	Noah Paessel            0.3%
      1	Pavel Linkesch          0.3%
+     1	Seif                    0.3%
      1	Tom MacWright           0.3%
      1	happyaccidents          0.3%
      1	mbrookes                0.3%
@@ -185,13 +187,13 @@ The source files are located inside the __src__ directory. MediumEditor styleshe
      1	David Collien           0.3%
      1	David Hellsing          0.3%
      1	Denis Gorbachev         0.3%
+     1	Diana Liao              0.3%
      1	Jeff Welch              0.3%
      1	Mark Kraemer            0.3%
      1	Max                     0.3%
      1	Maxime Dantec           0.3%
      1	Maxime De Visscher      0.3%
      1	Michael Kay             0.3%
-     1	Moore Adam              0.3%
 ```
 
 ## License
@@ -199,7 +201,3 @@ The source files are located inside the __src__ directory. MediumEditor styleshe
 "THE BEER-WARE LICENSE" (Revision 42):
 
 As long as you retain this notice you can do whatever you want with this stuff. If we meet some day, and you think this stuff is worth it, you can buy me a beer in return.
-
-
-[![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/daviferreira/medium-editor/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
-
