@@ -95,6 +95,20 @@ Check out the Wiki page for a list of available themes: [https://github.com/davi
 * __.serialize()__: returns a JSON object with elements contents
 
 
+## Capturing DOM changes
+
+For observing any changes on contentEditable
+
+```js
+$('.editable').on('input', function() {
+  // Do some work
+});
+```
+
+This is handy when you need to capture modifications other thats outside of `key up`'s scope like clicking on toolbar buttons.
+
+`input` is supported by Chrome, Firefox, IE9 and other modern browsers. If you want to read more or support older browsers, check [Listening to events of a contenteditable HTML element](http://stackoverflow.com/questions/7802784/listening-to-events-of-a-contenteditable-html-element/7804973#7804973) and [Detect changes in the DOM](http://stackoverflow.com/questions/3219758/detect-changes-in-the-dom)
+
 ## Image Upload
 
 [Pavel Linkesch](https://github.com/orthes) has developed a jQuery plugin to upload images following Medium.com functionality. Check it out at [http://orthes.github.io/medium-editor-insert-plugin/](http://orthes.github.io/medium-editor-insert-plugin/)
