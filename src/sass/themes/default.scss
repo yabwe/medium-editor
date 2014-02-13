@@ -2,8 +2,9 @@
 @import "clearfix";
 @import "pop-upwards";
 
-$medium_editor_bgcolor: #242424;
-$medium_editor_button_size: 50px;
+$medium_editor_bgcolor:       #242424;
+$medium_editor_button_size:   50px;
+$medium_editor_border_radius: 5px;
 
 .medium-toolbar-arrow-under:after {
     top: $medium_editor_button_size;
@@ -19,8 +20,10 @@ $medium_editor_button_size: 50px;
     border: 1px solid #000;
     background-color: $medium_editor_bgcolor;
     @include background(linear-gradient(bottom, $medium_editor_bgcolor, rgba($medium_editor_bgcolor, 0.75)));
-    @include border-radius(5px);
+    @include border-radius($medium_editor_border_radius);
     @include box-shadow(0 0 3px #000);
+    @include transition(top .075s ease-out,left .075s ease-out);
+
     li {
         button {
             min-width: $medium_editor_button_size;
@@ -39,14 +42,17 @@ $medium_editor_button_size: 50px;
                 color: yellow;
             }
         }
+
         .medium-editor-button-first {
-            @include border-top-left-radius(5px);
-            @include border-bottom-left-radius(5px);
+            @include border-top-left-radius($medium_editor_border_radius);
+            @include border-bottom-left-radius($medium_editor_border_radius);
         }
+
         .medium-editor-button-last {
-            @include border-top-right-radius(5px);
-            @include border-bottom-right-radius(5px);
+            @include border-top-right-radius($medium_editor_border_radius);
+            @include border-bottom-right-radius($medium_editor_border_radius);
         }
+
         .medium-editor-button-active {
             background-color: #000;
             color: #fff;
@@ -58,13 +64,15 @@ $medium_editor_button_size: 50px;
 .medium-editor-toolbar-form-anchor {
     background: $medium_editor_bgcolor;
     color: #999;
-    @include border-radius(5px);
+    @include border-radius($medium_editor_border_radius);
+
     input {
         height: $medium_editor_button_size;
         background: $medium_editor_bgcolor;
         color: #ccc;
         @include box-sizing(border-box);
     }
+
     a {
         color: #fff;
     }

@@ -40,7 +40,6 @@
     // @include background(linear-gradient(bottom, $bgcolor, rgba($bgcolor, 0.75)));
     // // @include border-radius(5px);
     // // @include box-shadow(0 0 3px #000);
-    @include transition(top .075s ease-out,left .075s ease-out);
 
     ul {
         margin: 0;

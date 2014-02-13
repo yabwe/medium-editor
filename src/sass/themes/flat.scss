@@ -2,42 +2,46 @@
 @import "clearfix";
 @import "pop-upwards";
 
-$bgcolor: #57ad68;
-$border_color: #fff;
-$button_size: 60px;
-$link_color: #fff;
+$medium_editor_bgcolor:       #57ad68;
+$medium_editor_border_color:  #fff;
+$medium_editor_button_size:   60px;
+$medium_editor_link_color:    #fff;
 
 .medium-toolbar-arrow-under:after {
-    top: $button_size;
-    border-color: $bgcolor transparent transparent transparent;
+    top: $medium_editor_button_size;
+    border-color: $medium_editor_bgcolor transparent transparent transparent;
 }
 
 .medium-toolbar-arrow-over:before {
     top: -8px;
-    border-color: transparent transparent $bgcolor transparent;
+    border-color: transparent transparent $medium_editor_bgcolor transparent;
 }
 
 .medium-editor-toolbar {
-    background-color: $bgcolor;
+    background-color: $medium_editor_bgcolor;
+
     li {
         padding: 0;
+
         button {
-            min-width: $button_size;
-            height: $button_size;
+            min-width: $medium_editor_button_size;
+            height: $medium_editor_button_size;
             border: none;
-            border-right: 1px solid lighten($bgcolor, 20);
+            border-right: 1px solid lighten($medium_editor_bgcolor, 20);
             background-color: transparent;
-            color: $link_color;
+            color: $medium_editor_link_color;
             @include transition(background-color .2s ease-in, color .2s ease-in);
             &:hover {
-                background-color: darken($bgcolor, 20);
+                background-color: darken($medium_editor_bgcolor, 20);
                 color: #fff;
             }
         }
+
         .medium-editor-button-active {
-            background-color: darken($bgcolor, 30);
+            background-color: darken($medium_editor_bgcolor, 30);
             color: #fff;
         }
+
         .medium-editor-button-last {
             border-right: none;
         }
@@ -46,31 +50,36 @@ $link_color: #fff;
 
 .medium-editor-toolbar-form-anchor {
     input {
-        height: $button_size;
-        background: $bgcolor;
-        color: $link_color;
+        height: $medium_editor_button_size;
+        background: $medium_editor_bgcolor;
+        color: $medium_editor_link_color;
+
         &::-webkit-input-placeholder {
            color: #fff;
            color: rgba(#fff, .8);
         }
+
         &:-moz-placeholder { /* Firefox 18- */
            color: #fff;
            color: rgba(#fff, .8);
         }
+
         &::-moz-placeholder {  /* Firefox 19+ */
            color: #fff;
            color: rgba(#fff, .8);
         }
+
         &:-ms-input-placeholder {
            color: #fff;
            color: rgba(#fff, .8);
         }
     }
+
     a {
-        color: $link_color;
+        color: $medium_editor_link_color;
     }
 }
 
 .medium-editor-placeholder:after {
-    color: $border_color;
+    color: $medium_editor_border_color;
 }

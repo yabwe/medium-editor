@@ -4,10 +4,11 @@
 @import "clearfix";
 @import "pop-upwards";
 
-$bgcolor: #dee7f0;
-$border_color: #cdd6e0;
-$button_size: 50px;
-$link_color: #40648a;
+$medium_editor_bgcolor:       #dee7f0;
+$medium_editor_border_color:  #cdd6e0;
+$medium_editor_button_size:   50px;
+$medium_editor_link_color:    #40648a;
+$medium_editor_border_radius: 2px;
 
 .medium-toolbar-arrow-under:after,
 .medium-toolbar-arrow-over:before {
@@ -15,21 +16,21 @@ $link_color: #40648a;
 }
 
 .medium-editor-toolbar {
-    border: 1px solid $border_color;
-    background-color: $bgcolor;
-    background-color: rgba($bgcolor, .95);
-    @include background(linear-gradient(bottom, $bgcolor, rgba(#fff, 1)));
-    @include border-radius(2px);
+    border: 1px solid $medium_editor_border_color;
+    background-color: $medium_editor_bgcolor;
+    background-color: rgba($medium_editor_bgcolor, .95);
+    @include background(linear-gradient(bottom, $medium_editor_bgcolor, rgba(#fff, 1)));
+    @include border-radius($medium_editor_border_radius);
     @include box-shadow(0 2px 6px rgba(#000, .45));
 
     li {
         button {
-            min-width: $button_size;
-            height: $button_size;
+            min-width: $medium_editor_button_size;
+            height: $medium_editor_button_size;
             border: none;
-            border-right: 1px solid $border_color;
+            border-right: 1px solid $medium_editor_border_color;
             background-color: transparent;
-            color: $link_color;
+            color: $medium_editor_link_color;
             @include transition(background-color .2s ease-in, color .2s ease-in);
             &:hover {
                 background-color: #5c90c7;
@@ -37,38 +38,43 @@ $link_color: #40648a;
                 color: #fff;
             }
         }
+
         .medium-editor-button-first {
-            @include border-top-left-radius(2px);
-            @include border-bottom-left-radius(2px);
+            @include border-top-left-radius($medium_editor_border_radius);
+            @include border-bottom-left-radius($medium_editor_border_radius);
         }
+
         .medium-editor-button-last {
-            @include border-top-right-radius(2px);
-            @include border-bottom-right-radius(2px);
+            @include border-top-right-radius($medium_editor_border_radius);
+            @include border-bottom-right-radius($medium_editor_border_radius);
         }
+
         .medium-editor-button-active {
             background-color: #5c90c7;
             background-color: rgba(#5c90c7, .45);
             color: #000;
-            @include background(linear-gradient(bottom, $bgcolor, rgba(#000, .1)));
+            @include background(linear-gradient(bottom, $medium_editor_bgcolor, rgba(#000, .1)));
         }
     }
 }
 
 .medium-editor-toolbar-form-anchor {
-    background: $bgcolor;
+    background: $medium_editor_bgcolor;
     color: #999;
-    @include border-radius(2px);
+    @include border-radius($medium_editor_border_radius);
+
     input {
-        height: $button_size;
-        background: $bgcolor;
-        color: $link_color;
+        height: $medium_editor_button_size;
+        background: $medium_editor_bgcolor;
+        color: $medium_editor_link_color;
         @include box-sizing(border-box);
     }
+
     a {
-        color: $link_color;
+        color: $medium_editor_link_color;
     }
 }
 
 .medium-editor-placeholder:after {
-    color: $border_color;
+    color: $medium_editor_border_color;
 }
