@@ -18,18 +18,18 @@ $link_color: #fff;
 }
 
 .medium-editor-toolbar {
-    background-color: $bgcolor;
     border: 1px solid $border_color;
+    background-color: $bgcolor;
     @include border-radius(4px);
     @include transition(top .075s ease-out,left .075s ease-out);
 
     li {
         button {
-            height: $button_size;
             min-width: $button_size;
-            background-color: transparent;
+            height: $button_size;
             border: none;
             border-right: 1px solid $border_color;
+            background-color: transparent;
             color: $link_color;
             @include box-sizing(border-box);
             @include transition(background-color .2s ease-in, color .2s ease-in);
@@ -63,14 +63,6 @@ $link_color: #fff;
         height: $button_size;
         background: $bgcolor;
         color: $link_color;
-        &:focus {
-            outline: 0;
-            -moz-appearance: none;
-            -webkit-appearance: none;
-            // Prevent CSS conflicts.
-            border: none;
-            box-shadow: none;
-        }
         &::-webkit-input-placeholder {
            color: #fff;
            color: rgba(#fff, .8);

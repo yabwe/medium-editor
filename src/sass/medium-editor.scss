@@ -2,18 +2,15 @@
 @import "clearfix";
 @import "pop-upwards";
 
-// $bgcolor: #242424;
-// $button_size: 50px;
-
 %medium-toolbar-arrow {
-    content: "";
-    display: block;
     position: absolute;
     left: 50%;
+    display: block;
     margin-left: -8px;
     width: 0;
     height: 0;
     border-style: solid;
+    content: "";
 }
 
 .medium-toolbar-arrow-under:after {
@@ -36,10 +33,10 @@
     left: 0;
     z-index: 2000;
     visibility: hidden;
+    font-size: 16px;
     // background-color: $bgcolor;
     // // border: 1px solid #000;
     font-family: HelveticaNeue, Helvetica, Arial, sans-serif;
-    font-size: 16px;
     // @include background(linear-gradient(bottom, $bgcolor, rgba($bgcolor, 0.75)));
     // // @include border-radius(5px);
     // // @include box-shadow(0 0 3px #000);
@@ -52,13 +49,15 @@
 
     li {
         float: left;
-        list-style: none;
         margin: 0;
         padding: 0;
+        list-style: none;
         button {
             display: block;
-            padding: 15px;
             margin: 0;
+            padding: 15px;
+            text-decoration: none;
+            font-size: 14px;
             // height: $button_size;
             // min-width: $button_size;
             // background-color: $bgcolor;
@@ -68,8 +67,6 @@
             // // border-left: 1px solid rgba(#fff, .1);
             // // color: #fff;
             cursor: pointer;
-            font-size: 14px;
-            text-decoration: none;
             // @include background(linear-gradient(bottom, $bgcolor, rgba($bgcolor, 0.89)));
             // // @include box-shadow(0 2px 2px rgba(0,0,0,0.3));
             @include box-sizing(border-box);
@@ -101,10 +98,10 @@
         }
 
         .medium-editor-action-pre {
-            font-family: 'Menlo', monospace;
-            font-size: 12px;
-            font-weight: 100;
             padding: 15px 0;
+            font-weight: 100;
+            font-size: 12px;
+            font-family: 'Menlo', monospace;
         }
     }
 }
@@ -112,10 +109,10 @@
 .medium-editor-toolbar-active {
     visibility: visible;
     -webkit-animation: pop-upwards 160ms forwards linear;
-    -moz-animation: pop-upwards 160ms forwards linear;
-    -ms-animation: pop-upwards 160ms forwards linear;
-    -o-animation: pop-upwards 160ms forwards linear;
-    animation: pop-upwards 160ms forwards linear;
+       -moz-animation: pop-upwards 160ms forwards linear;
+        -ms-animation: pop-upwards 160ms forwards linear;
+         -o-animation: pop-upwards 160ms forwards linear;
+            animation: pop-upwards 160ms forwards linear;
     @include transition(top .075s ease-out,left .075s ease-out);
 }
 
@@ -149,21 +146,20 @@
         @include box-sizing(border-box);
         &:focus {
             outline: 0;
-            -moz-appearance: none;
-            -webkit-appearance: none;
-            // Prevent CSS conflicts.
             border: none;
             box-shadow: none;
+            -webkit-appearance: none;
+               -moz-appearance: none;
         }
     }
 
     a {
         // color: #fff;
-        font-weight: bolder;
-        font-size: 24px;
         display: inline-block;
         margin: 0 10px;
         text-decoration: none;
+        font-weight: bolder;
+        font-size: 24px;
     }
 }
 

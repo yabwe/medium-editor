@@ -15,20 +15,20 @@ $link_color: #40648a;
 }
 
 .medium-editor-toolbar {
+    border: 1px solid $border_color;
     background-color: $bgcolor;
     background-color: rgba($bgcolor, .95);
-    border: 1px solid $border_color;
     @include background(linear-gradient(bottom, $bgcolor, rgba(#fff, 1)));
     @include border-radius(2px);
     @include box-shadow(0 2px 6px rgba(#000, .45));
 
     li {
         button {
-            height: $button_size;
             min-width: $button_size;
-            background-color: transparent;
+            height: $button_size;
             border: none;
             border-right: 1px solid $border_color;
+            background-color: transparent;
             color: $link_color;
             @include transition(background-color .2s ease-in, color .2s ease-in);
             &:hover {
@@ -70,10 +70,5 @@ $link_color: #40648a;
 }
 
 .medium-editor-placeholder:after {
-    position: absolute;
-    top: 0;
-    left: 0;
-    content: attr(data-placeholder);
     color: $border_color;
-    font-style: italic;
 }
