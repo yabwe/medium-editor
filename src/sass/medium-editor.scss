@@ -15,16 +15,13 @@
 
 .medium-toolbar-arrow-under:after {
     @extend %medium-toolbar-arrow;
-    // top: $button_size;
     border-width: 8px 8px 0 8px;
-    // border-color: $bgcolor transparent transparent transparent;
 }
 
 .medium-toolbar-arrow-over:before {
     @extend %medium-toolbar-arrow;
     top: -8px;
     border-width: 0 8px 8px 8px;
-    // border-color: transparent transparent $bgcolor transparent;
 }
 
 .medium-editor-toolbar {
@@ -34,12 +31,7 @@
     z-index: 2000;
     visibility: hidden;
     font-size: 16px;
-    // background-color: $bgcolor;
-    // // border: 1px solid #000;
     font-family: HelveticaNeue, Helvetica, Arial, sans-serif;
-    // @include background(linear-gradient(bottom, $bgcolor, rgba($bgcolor, 0.75)));
-    // // @include border-radius(5px);
-    // // @include box-shadow(0 0 3px #000);
 
     ul {
         margin: 0;
@@ -57,39 +49,8 @@
             padding: 15px;
             text-decoration: none;
             font-size: 14px;
-            // height: $button_size;
-            // min-width: $button_size;
-            // background-color: $bgcolor;
-            // // border: 0;
-            // // border-right: 1px solid #000;
-            // // border-left: 1px solid #333;
-            // // border-left: 1px solid rgba(#fff, .1);
-            // // color: #fff;
             cursor: pointer;
-            // @include background(linear-gradient(bottom, $bgcolor, rgba($bgcolor, 0.89)));
-            // // @include box-shadow(0 2px 2px rgba(0,0,0,0.3));
             @include box-sizing(border-box);
-            // // @include transition(background-color .2s ease-in);
-            // &:hover {
-                // // color: yellow;
-                // // background-color: #000;
-            // }
-        }
-
-        .medium-editor-button-first {
-            // // @include border-top-left-radius(5px);
-            // // @include border-bottom-left-radius(5px);
-        }
-
-        .medium-editor-button-last {
-            // // @include border-top-right-radius(5px);
-            // // @include border-bottom-right-radius(5px);
-        }
-
-        .medium-editor-button-active {
-            // background-color: #000;
-            // @include background(linear-gradient(bottom, $bgcolor, rgba(#000, 0.89)));
-            // color: #fff;
         }
 
         .medium-editor-action-underline {
@@ -125,9 +86,6 @@
 
 .medium-editor-toolbar-form-anchor {
     display: none;
-    // background: $bgcolor;
-    // color: #999;
-    // @include border-radius(5px);
     input,
     a {
         font-family: HelveticaNeue, Helvetica, Arial, sans-serif;
@@ -136,12 +94,9 @@
     input {
         margin: 0;
         padding: 6px;
-        // height: $button_size;
         width: 316px;
-        // background: $bgcolor;
         border: none;
         font-size: 14px;
-        // color: #ccc;
         @include box-sizing(border-box);
         &:focus {
             outline: 0;
@@ -153,7 +108,6 @@
     }
 
     a {
-        // color: #fff;
         display: inline-block;
         margin: 0 10px;
         text-decoration: none;
@@ -170,7 +124,6 @@
         top: 0;
         left: 0;
         content: attr(data-placeholder);
-        // color: #b3b3b1;
         font-style: italic;
     }
 }
