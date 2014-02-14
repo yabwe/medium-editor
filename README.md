@@ -19,7 +19,8 @@ __demo__: [http://daviferreira.github.io/medium-editor/](http://daviferreira.git
 First, you need to attach medium editor's stylesheet to your page:
 
 ```html
-<link rel="stylesheet" href="css/medium-editor.css">
+<link rel="stylesheet" href="css/medium-editor.css"> <!-- Core -->
+<link rel="stylesheet" href="css/themes/default.css"> <!-- or any other theme -->
 ```
 
 The next step is to reference the editor's script and instantiate a new MediumEditor object:

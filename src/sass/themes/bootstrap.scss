@@ -2,147 +2,71 @@
 @import "clearfix";
 @import "pop-upwards";
 
-$bgcolor: #428bca;
-$border_color: #357ebd;
-$button_size: 60px;
-$hover_color: #3276b1;
-$link_color: #fff;
-
-%medium-toolbar-arrow {
-    content: "";
-    display: block;
-    position: absolute;
-    left: 50%;
-    margin-left: -8px;
-    width: 0;
-    height: 0;
-    border-style: solid;
-}
+$medium_editor_bgcolor:       #428bca;
+$medium_editor_border_color:  #357ebd;
+$medium_editor_button_size:   60px;
+$medium_editor_hover_color:   #3276b1;
+$medium_editor_link_color:    #fff;
+$medium_editor_border_radius: 4px;
 
 .medium-toolbar-arrow-under:after {
-    @extend %medium-toolbar-arrow;
-    top: $button_size;
-    border-width: 8px 8px 0 8px;
-    border-color: $bgcolor transparent transparent transparent;
+    top: $medium_editor_button_size;
+    border-color: $medium_editor_bgcolor transparent transparent transparent;
 }
 
 .medium-toolbar-arrow-over:before {
-    @extend %medium-toolbar-arrow;
-    top: -8px;
-    border-width: 0 8px 8px 8px;
-    border-color: transparent transparent $bgcolor transparent;
+    border-color: transparent transparent $medium_editor_bgcolor transparent;
 }
 
 .medium-editor-toolbar {
-    position: absolute;
-    top: 0;
-    left: 0;
-    z-index: 2000;
-    visibility: hidden;
-    background-color: $bgcolor;
-    border: 1px solid $border_color;
-    font-family: HelveticaNeue, Helvetica, Arial, sans-serif;
-    font-size: 16px;
-    @include border-radius(4px);
+    border: 1px solid $medium_editor_border_color;
+    background-color: $medium_editor_bgcolor;
+    @include border-radius($medium_editor_border_radius);
     @include transition(top .075s ease-out,left .075s ease-out);
-    ul {
-        margin: 0;
-        padding: 0;
-    }
+
     li {
-        float: left;
-        list-style: none;
-        margin: 0;
-        padding: 0;
         button {
-            display: block;
-            padding: 15px;
-            margin: 0;
-            height: $button_size;
-            min-width: $button_size;
-            background-color: transparent;
+            min-width: $medium_editor_button_size;
+            height: $medium_editor_button_size;
             border: none;
-            border-right: 1px solid $border_color;
-            color: $link_color;
-            cursor: pointer;
-            font-size: 14px;
-            text-decoration: none;
+            border-right: 1px solid $medium_editor_border_color;
+            background-color: transparent;
+            color: $medium_editor_link_color;
             @include box-sizing(border-box);
             @include transition(background-color .2s ease-in, color .2s ease-in);
             &:hover {
-                background-color: $hover_color;
+                background-color: $medium_editor_hover_color;
                 color: #fff;
             }
         }
-        .medium-editor-button-active {
-            background-color: $hover_color;
-            color: #fff;
-        }
-        .medium-editor-action-underline {
-            text-decoration: underline;
-        }
+
         .medium-editor-button-first {
-            @include border-top-left-radius(4px);
-            @include border-bottom-left-radius(4px);
+            @include border-top-left-radius($medium_editor_border_radius);
+            @include border-bottom-left-radius($medium_editor_border_radius);
         }
+
         .medium-editor-button-last {
             border-right: none;
-            @include border-top-right-radius(4px);
-            @include border-bottom-right-radius(4px);
+            @include border-top-right-radius($medium_editor_border_radius);
+            @include border-bottom-right-radius($medium_editor_border_radius);
         }
-        .medium-editor-action-pre {
-            font-family: 'Menlo', monospace;
-            font-size: 12px;
-            font-weight: 100;
-            padding: 15px 0;
+
+        .medium-editor-button-active {
+            background-color: $medium_editor_hover_color;
+            color: #fff;
         }
     }
-}
-
-.medium-editor-toolbar-active {
-    visibility: visible;
-    -webkit-animation: pop-upwards 160ms forwards linear;
-    -moz-animation: pop-upwards 160ms forwards linear;
-    -ms-animation: pop-upwards 160ms forwards linear;
-    -o-animation: pop-upwards 160ms forwards linear;
-    animation: pop-upwards 160ms forwards linear;
-    @include transition(top .075s ease-out,left .075s ease-out);
-}
-
-.medium-editor-action-bold {
-    font-weight: bolder;
-}
-
-.medium-editor-action-italic {
-    font-style: italic;
 }
 
 .medium-editor-toolbar-form-anchor {
-    display: none;
-    background: $bgcolor;
+    background: $medium_editor_bgcolor;
     color: #fff;
-    @include border-radius(4px);
-    input, a {
-        font-family: HelveticaNeue, Helvetica, Arial, sans-serif;
-    }
+    @include border-radius($medium_editor_border_radius);
+
     input {
-        margin: 0;
-        padding: 6px;
-        height: $button_size;
-        width: 316px;
-        background: $bgcolor;
-        border: none;
-        color: $link_color;
-        font-size: 14px;
-        @include box-sizing(border-box);
-        &:focus {
-            outline: 0;
-            -moz-appearance: none;
-            -webkit-appearance: none;
-            // Prevent CSS conflicts.
-            border: none;
-            box-shadow: none;
-        }
+        height: $medium_editor_button_size;
+        background: $medium_editor_bgcolor;
+        color: $medium_editor_link_color;
         &::-webkit-input-placeholder {
            color: #fff;
            color: rgba(#fff, .8);
@@ -160,24 +84,12 @@ $link_color: #fff;
            color: rgba(#fff, .8);
         }
     }
+
     a {
-        color: $link_color;
-        font-weight: bolder;
-        font-size: 24px;
-        display: inline-block;
-        margin: 0 10px;
-        text-decoration: none;
+        color: $medium_editor_link_color;
     }
 }
 
-.medium-editor-placeholder {
-    position: relative;
-    &:after {
-        position: absolute;
-        top: 0;
-        left: 0;
-        content: attr(data-placeholder);
-        color: $border_color;
-        font-style: italic;
-    }
+.medium-editor-placeholder:after {
+    color: $medium_editor_border_color;
 }
