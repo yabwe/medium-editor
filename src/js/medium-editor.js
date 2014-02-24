@@ -588,16 +588,6 @@ if (typeof module === 'object') {
             return firstChild;
         },
 
-        bindElementToolbarEvents: function (el) {
-            var self = this;
-            el.addEventListener('mouseup', function () {
-                self.checkSelection();
-            });
-            el.addEventListener('keyup', function () {
-                self.checkSelection();
-            });
-        },
-
         hideToolbarActions: function () {
             this.keepToolbarAlive = false;
             this.toolbar.classList.remove('medium-editor-toolbar-active');
