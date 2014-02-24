@@ -356,6 +356,7 @@ if (typeof module === 'object') {
         checkSelection: function () {
             var newSelection,
                 selectionElement;
+
             if (this.keepToolbarAlive !== true && !this.options.disableToolbar) {
                 newSelection = window.getSelection();
                 if (newSelection.toString().trim() === '' ||
@@ -635,6 +636,11 @@ if (typeof module === 'object') {
                     self.createLink(this);
                 }
             });
+            this.anchorInput.addEventListener('click', function (e) {
+                // make sure not to hide form when cliking into the input
+                e.stopPropagation();
+                self.keepToolbarAlive = true;
+            });
             this.anchorInput.addEventListener('blur', function () {
                 self.keepToolbarAlive = false;
                 self.checkSelection();
@@ -768,6 +774,7 @@ if (typeof module === 'object') {
                 sel.addRange(range);
                 setTimeout(function() {
                     self.showAnchorForm(self.activeAnchor.href);
+                    self.keepToolbarAlive = false;
                 }, 100);
 
             }

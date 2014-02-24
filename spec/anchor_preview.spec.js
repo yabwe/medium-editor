@@ -10,7 +10,7 @@ describe('Anchor Preview TestCase', function () {
         this.body = document.getElementsByTagName('body')[0];
         this.el = document.createElement('div');
         this.el.className = 'editor';
-        this.el.innerHTML = 'lorem <a id="test-link" href="http://test.com">ipsum</a> preview';
+        this.el.innerHTML = 'lorem <a id="test-link" href="http://test.com">ipsum</a> preview <span id="another-element">&nbsp;</span>';
         this.body.appendChild(this.el);
     });
 
@@ -27,7 +27,8 @@ describe('Anchor Preview TestCase', function () {
 
     describe('Link Creation', function () {
         it('Hover anchor should show preview', function () {
-            var editor = new MediumEditor('.editor');
+            var editor = new MediumEditor('.editor'),
+                sel = window.getSelection();
 
             // show preview
             spyOn(MediumEditor.prototype, 'showAnchorPreview').andCallThrough();
@@ -43,6 +44,15 @@ describe('Anchor Preview TestCase', function () {
             fireEvent(editor.anchorPreview, 'click');
             jasmine.Clock.tick(200);
             expect(editor.showAnchorForm).toHaveBeenCalled();
+
+            // selecting other text should close the toolbar
+            spyOn(MediumEditor.prototype, 'hideToolbarActions').andCallThrough();
+            sel.removeAllRanges();
+            sel.addRange(document.createRange().selectNodeContents(document.getElementById('another-element')));
+            fireEvent(document.documentElement, 'mouseup');
+            jasmine.Clock.tick(1);
+            expect(editor.hideToolbarActions).toHaveBeenCalled();
+
 
         });
 
