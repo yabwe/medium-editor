@@ -24,7 +24,7 @@
     border-width: 0 8px 8px 8px;
 }
 
-.medium-editor-toolbar {
+.medium-editor-toolbar, .medium-editor-anchor-preview {
     position: absolute;
     top: 0;
     left: 0;
@@ -66,7 +66,18 @@
     }
 }
 
-.medium-editor-toolbar-active {
+.medium-editor-anchor-preview {
+    i {
+        display: inline-block;
+        margin: 5px 5px 5px 10px;
+        text-decoration: underline;
+        font-style: normal;
+        cursor: pointer;
+    }
+}
+
+
+.medium-editor-toolbar-active, .medium-editor-anchor-preview-active {
     visibility: visible;
     -webkit-animation: pop-upwards 160ms forwards linear;
        -moz-animation: pop-upwards 160ms forwards linear;

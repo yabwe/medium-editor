@@ -128,7 +128,7 @@ if (typeof module === 'object') {
                     this.elements[i].setAttribute('data-placeholder', this.options.placeholder);
                 }
                 this.elements[i].setAttribute('data-medium-element', true);
-                this.bindParagraphCreation(i).bindReturn(i).bindTab(i);
+                this.bindParagraphCreation(i).bindReturn(i).bindTab(i).bindAnchorPreview(i);
                 if (!this.options.disableToolbar && !this.elements[i].getAttribute('data-disable-toolbar')) {
                     addToolbar = true;
                 }
@@ -219,6 +219,7 @@ if (typeof module === 'object') {
                     }
                 }
             });
+            return this;
         },
 
         buttonTemplate: function (btnType) {
@@ -318,6 +319,8 @@ if (typeof module === 'object') {
             this.anchorForm = this.toolbar.querySelector('.medium-editor-toolbar-form-anchor');
             this.anchorInput = this.anchorForm.querySelector('input');
             this.toolbarActions = this.toolbar.querySelector('.medium-editor-toolbar-actions');
+            this.anchorPreview = this.createAnchorPreview();
+
             return this;
         },
 
@@ -447,6 +450,9 @@ if (typeof module === 'object') {
             } else {
                 this.toolbar.style.left = defaultLeft + middleBoundary + 'px';
             }
+
+            this.hideAnchorPreview();
+
             return this;
         },
 
@@ -608,13 +614,13 @@ if (typeof module === 'object') {
             }, 100);
         },
 
-        showAnchorForm: function () {
+        showAnchorForm: function (link_value) {
             this.toolbarActions.style.display = 'none';
             this.savedSelection = saveSelection();
             this.anchorForm.style.display = 'block';
             this.keepToolbarAlive = true;
             this.anchorInput.focus();
-            this.anchorInput.value = '';
+            this.anchorInput.value = link_value || '';
         },
 
         bindAnchorForm: function () {
@@ -638,6 +644,156 @@ if (typeof module === 'object') {
                 self.showToolbarActions();
                 restoreSelection(self.savedSelection);
             });
+            return this;
+        },
+
+
+        hideAnchorPreview: function() {
+            this.anchorPreview.classList.remove('medium-editor-anchor-preview-active');
+        },
+
+        showAnchorPreview: function (anchor_el) {
+
+
+            if (this.anchorPreview.classList.contains('medium-editor-anchor-preview-active')) {
+                return true;
+            }
+
+            var self = this,
+                buttonHeight = 40,
+                boundary = anchor_el.getBoundingClientRect(),
+                defaultLeft = (self.options.diffLeft) - (self.anchorPreview.offsetWidth / 2),
+                middleBoundary = (boundary.left + boundary.right) / 2,
+                halfOffsetWidth = self.anchorPreview.offsetWidth / 2,
+                timer;
+
+            clearTimeout(timer);
+            timer = setTimeout(function() {
+                if (!self.anchorPreview.classList.contains('medium-editor-anchor-preview-active')) {
+                    self.anchorPreview.classList.add('medium-editor-anchor-preview-active');
+                }
+            }, 100);
+
+            self.anchorPreview.querySelector('i').innerHTML = anchor_el.href;
+            self.observeAnchorPreview(anchor_el);
+
+            self.anchorPreview.classList.add('medium-toolbar-arrow-over');
+            self.anchorPreview.classList.remove('medium-toolbar-arrow-under');
+            self.anchorPreview.style.top = Math.round(buttonHeight + boundary.bottom - self.options.diffTop + window.pageYOffset - self.anchorPreview.offsetHeight) + 'px';
+            if (middleBoundary < halfOffsetWidth) {
+                self.anchorPreview.style.left = defaultLeft + halfOffsetWidth + 'px';
+            } else if ((window.innerWidth - middleBoundary) < halfOffsetWidth) {
+                self.anchorPreview.style.left = window.innerWidth + defaultLeft - halfOffsetWidth + 'px';
+            } else {
+                self.anchorPreview.style.left = defaultLeft + middleBoundary + 'px';
+            }
+
+            return this;
+
+        },
+
+        observeAnchorPreview: function(anchor_el) {
+
+            var self = this,
+                last_over = (new Date()).getTime(),
+                over = true,
+                stamp = function() {
+                    last_over = (new Date()).getTime();
+                    over = true;
+                },
+                unstamp = function(e) {
+                    if (!e.relatedTarget || !/anchor-preview/.test(e.relatedTarget.className)) {
+                        over = false;
+                    }
+                },
+                interval_timer = setInterval(function() {
+                    if (over) {
+                        return true;
+                    }
+
+                    var durr = (new Date()).getTime() - last_over;
+                    if (durr > 500) {
+                        // hide the preview 1/2 second after mouse leaves the link
+                        self.hideAnchorPreview();
+
+                        // cleanup
+                        clearInterval(interval_timer);
+                        self.anchorPreview.removeEventListener('mouseover', stamp);
+                        self.anchorPreview.removeEventListener('mouseout', unstamp);
+                        anchor_el.removeEventListener('mouseover', stamp);
+                        anchor_el.removeEventListener('mouseout', unstamp);
+
+                    }
+
+                }, 200);
+
+            self.anchorPreview.addEventListener('mouseover', stamp);
+            self.anchorPreview.addEventListener('mouseout', unstamp);
+            anchor_el.addEventListener('mouseover', stamp);
+            anchor_el.addEventListener('mouseout', unstamp);
+
+        },
+
+        createAnchorPreview: function () {
+            var self = this,
+                anchorPreview = document.createElement('div');
+            anchorPreview.id = 'medium-editor-anchor-preview-' + this.id;
+            anchorPreview.className = 'medium-editor-anchor-preview';
+            anchorPreview.innerHTML = this.anchorPreviewTemplate();
+            document.getElementsByTagName('body')[0].appendChild(anchorPreview);
+
+            anchorPreview.addEventListener('click', function() { self.anchorPreviewClickHandler(); });
+
+            return anchorPreview;
+        },
+
+        anchorPreviewTemplate: function () {
+
+            return '<div class="medium-editor-toolbar-anchor-preview" id="medium-editor-toolbar-anchor-preview">' +
+                '    <i class="medium-editor-toolbar-anchor-preview-inner">http://google.com/</i>' +
+                '</div>';
+
+        },
+
+        anchorPreviewClickHandler: function(e) {
+
+            if (this.activeAnchor) {
+
+                var self = this,
+                    range = document.createRange(),
+                    sel = window.getSelection();
+
+                range.selectNodeContents(self.activeAnchor);
+                sel.removeAllRanges();
+                sel.addRange(range);
+                setTimeout(function() {
+                    self.showAnchorForm(self.activeAnchor.href);
+                }, 100);
+
+            }
+
+            this.hideAnchorPreview();
+
+        },
+
+        editorAnchorObserver: function(e) {
+
+            if (e.target && e.target.tagName.toLowerCase() === 'a') {
+                // only show when hovering on anchors
+                if (this.toolbar.classList.contains('medium-editor-toolbar-active')) {
+                    // only show when toolbar is not present
+                    return true;
+                }
+                this.activeAnchor = e.target;
+                this.showAnchorPreview(e.target);
+            }
+        },
+
+        bindAnchorPreview: function (index) {
+
+            var self = this;
+            this.elements[index].addEventListener('mouseover', function(e) { self.editorAnchorObserver(e); });
+
             return this;
         },
 
