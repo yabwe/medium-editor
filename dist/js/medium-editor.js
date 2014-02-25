@@ -648,9 +648,8 @@ if (typeof module === 'object') {
             this.anchorPreview.classList.remove('medium-editor-anchor-preview-active');
         },
 
+        // TODO: break method
         showAnchorPreview: function (anchor_el) {
-
-
             if (this.anchorPreview.classList.contains('medium-editor-anchor-preview-active')) {
                 return true;
             }
@@ -685,16 +684,15 @@ if (typeof module === 'object') {
             }
 
             return this;
-
         },
 
-        observeAnchorPreview: function(anchor_el) {
-
+        // TODO: break method
+        observeAnchorPreview: function(anchorEl) {
             var self = this,
-                last_over = (new Date()).getTime(),
+                lastOver = (new Date()).getTime(),
                 over = true,
                 stamp = function() {
-                    last_over = (new Date()).getTime();
+                    lastOver = (new Date()).getTime();
                     over = true;
                 },
                 unstamp = function(e) {
@@ -706,8 +704,7 @@ if (typeof module === 'object') {
                     if (over) {
                         return true;
                     }
-
-                    var durr = (new Date()).getTime() - last_over;
+                    var durr = (new Date()).getTime() - lastOver;
                     if (durr > 500) {
                         // hide the preview 1/2 second after mouse leaves the link
                         self.hideAnchorPreview();
@@ -716,18 +713,16 @@ if (typeof module === 'object') {
                         clearInterval(interval_timer);
                         self.anchorPreview.removeEventListener('mouseover', stamp);
                         self.anchorPreview.removeEventListener('mouseout', unstamp);
-                        anchor_el.removeEventListener('mouseover', stamp);
-                        anchor_el.removeEventListener('mouseout', unstamp);
+                        anchorEl.removeEventListener('mouseover', stamp);
+                        anchorEl.removeEventListener('mouseout', unstamp);
 
                     }
-
                 }, 200);
 
             self.anchorPreview.addEventListener('mouseover', stamp);
             self.anchorPreview.addEventListener('mouseout', unstamp);
-            anchor_el.addEventListener('mouseover', stamp);
-            anchor_el.addEventListener('mouseout', unstamp);
-
+            anchorEl.addEventListener('mouseover', stamp);
+            anchorEl.addEventListener('mouseout', unstamp);
         },
 
         createAnchorPreview: function () {
@@ -744,15 +739,12 @@ if (typeof module === 'object') {
         },
 
         anchorPreviewTemplate: function () {
-
             return '<div class="medium-editor-toolbar-anchor-preview" id="medium-editor-toolbar-anchor-preview">' +
                 '    <i class="medium-editor-toolbar-anchor-preview-inner">http://google.com/</i>' +
                 '</div>';
-
         },
 
         anchorPreviewClickHandler: function(e) {
-
             if (this.activeAnchor) {
 
                 var self = this,
@@ -770,11 +762,9 @@ if (typeof module === 'object') {
             }
 
             this.hideAnchorPreview();
-
         },
 
         editorAnchorObserver: function(e) {
-
             if (e.target && e.target.tagName.toLowerCase() === 'a') {
                 // only show when hovering on anchors
                 if (this.toolbar.classList.contains('medium-editor-toolbar-active')) {
@@ -787,10 +777,10 @@ if (typeof module === 'object') {
         },
 
         bindAnchorPreview: function (index) {
-
             var self = this;
-            this.elements[index].addEventListener('mouseover', function(e) { self.editorAnchorObserver(e); });
-
+            this.elements[index].addEventListener('mouseover', function(e) {
+                self.editorAnchorObserver(e);
+            });
             return this;
         },
 
