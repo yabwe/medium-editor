@@ -76,6 +76,12 @@ $medium_editor_border_radius: 2px;
     }
 }
 
+.medium-editor-toolbar-anchor-preview {
+    background: $medium_editor_bgcolor;
+    color: $medium_editor_link_color;
+    @include border-radius($medium_editor_border_radius);
+}
+
 .medium-editor-placeholder:after {
     color: $medium_editor_border_color;
 }

@@ -80,6 +80,11 @@ $medium_editor_link_color:    #fff;
     }
 }
 
+.medium-editor-toolbar-anchor-preview {
+    background: $medium_editor_bgcolor;
+    color: $medium_editor_link_color;
+}
+
 .medium-editor-placeholder:after {
     color: $medium_editor_border_color;
 }

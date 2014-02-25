@@ -1,4 +1,4 @@
-function fireEvent (element, event, keyCode, ctrlKey) {
+function fireEvent (element, event, keyCode, ctrlKey, target) {
    if (document.createEvent) {
        // dispatch for firefox + others
        var evt = document.createEvent("HTMLEvents");
@@ -8,6 +8,9 @@ function fireEvent (element, event, keyCode, ctrlKey) {
        }
        if (ctrlKey) {
         evt.ctrlKey = true;
+       }
+       if (target) {
+        evt.target = target;
        }
        return !element.dispatchEvent(evt);
    } else {
