@@ -860,6 +860,7 @@ if (typeof module === 'object') {
             for (i = 0; i < this.elements.length; i += 1) {
                 this.elements[i].removeEventListener('keyup', this.checkSelectionWrapper);
                 this.elements[i].removeEventListener('blur', this.checkSelectionWrapper);
+                this.elements[i].removeEventListener('paste', this.pasteWrapper);
                 this.elements[i].removeAttribute('contentEditable');
             }
         },
@@ -868,30 +869,29 @@ if (typeof module === 'object') {
             if (!this.options.forcePlainText) {
                 return this;
             }
-            var i,
-                self = this,
-                pasteWrapper = function (e) {
-                    var paragraphs,
-                        html = '',
-                        p;
-                    this.classList.remove('medium-editor-placeholder');
-                    if (e.clipboardData && e.clipboardData.getData) {
-                        e.preventDefault();
-                        if (!self.options.disableReturn) {
-                            paragraphs = e.clipboardData.getData('text/plain').split(/[\r\n]/g);
-                            for (p = 0; p < paragraphs.length; p += 1) {
-                                if (paragraphs[p] !== '') {
-                                    html += '<p>' + paragraphs[p] + '</p>';
-                                }
+            var i, self = this;
+            this.pasteWrapper = function (e) {
+                var paragraphs,
+                    html = '',
+                    p;
+                this.classList.remove('medium-editor-placeholder');
+                if (e.clipboardData && e.clipboardData.getData) {
+                    e.preventDefault();
+                    if (!self.options.disableReturn) {
+                        paragraphs = e.clipboardData.getData('text/plain').split(/[\r\n]/g);
+                        for (p = 0; p < paragraphs.length; p += 1) {
+                            if (paragraphs[p] !== '') {
+                                html += '<p>' + paragraphs[p] + '</p>';
                             }
-                            document.execCommand('insertHTML', false, html);
-                        } else {
-                            document.execCommand('insertHTML', false, e.clipboardData.getData('text/plain'));
                         }
+                        document.execCommand('insertHTML', false, html);
+                    } else {
+                        document.execCommand('insertHTML', false, e.clipboardData.getData('text/plain'));
                     }
-                };
+                }
+            };
             for (i = 0; i < this.elements.length; i += 1) {
-                this.elements[i].addEventListener('paste', pasteWrapper);
+                this.elements[i].addEventListener('paste', this.pasteWrapper);
             }
             return this;
         },
