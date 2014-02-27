@@ -6,6 +6,7 @@
 * Adds a preview toolbar for anchors
 * Removes paste event binding on deactivate
 
+
 1.5.4 / 2014-02-12
 ==================
 
