@@ -153,37 +153,27 @@ The source files are located inside the __src__ directory. MediumEditor styleshe
 ## Contributors
 
 ```
-project  : medium-editor
+ project  : medium-editor
  repo age : 9 months
- active   : 91 days
- commits  : 376
- files    : 43
- authors  :
-   286	Davi Ferreira           76.1%
-    20	Maxime de Visscher      5.3%
-     8	Pedro Nasser            2.1%
-     8	Derek Odegard           2.1%
-     8	Jarl Gunnar T. Flaten   2.1%
-     4	minikomi                1.1%
-     4	Sebastian Zuchmanski    1.1%
-     3	arol                    0.8%
+ active   : 99 days
+ commits  : 399
+ files    : 46
+ authors  : 
+   297	Davi Ferreira           74.4%
+    20	Maxime de Visscher      5.0%
+     8	Derek Odegard           2.0%
+     8	Jarl Gunnar T. Flaten   2.0%
+     8	Pedro Nasser            2.0%
+     8	Seif                    2.0%
+     4	Sebastian Zuchmanski    1.0%
+     4	minikomi                1.0%
      3	Andrew Hubbs            0.8%
      3	Dmitri Cherniak         0.8%
      3	Troels Knak-Nielsen     0.8%
+     3	arol                    0.8%
+     3	ʞuıɯ-oɔɐʎ ʎpuɐ          0.8%
      2	Nikita Korotaev         0.5%
-     1	Moore Adam              0.3%
-     1	Nic Malan               0.3%
-     1	Noah Paessel            0.3%
-     1	Pavel Linkesch          0.3%
-     1	Seif                    0.3%
-     1	Tom MacWright           0.3%
-     1	happyaccidents          0.3%
-     1	mbrookes                0.3%
-     1	muescha                 0.3%
-     1	t_kjaergaard            0.3%
-     1	typify                  0.3%
      1	Adam Mulligan           0.3%
-     1	waffleio                0.3%
      1	Bitdeli Chef            0.3%
      1	David Collien           0.3%
      1	David Hellsing          0.3%
@@ -195,6 +185,19 @@ project  : medium-editor
      1	Maxime Dantec           0.3%
      1	Maxime De Visscher      0.3%
      1	Michael Kay             0.3%
+     1	Moore Adam              0.3%
+     1	Nic Malan               0.3%
+     1	Noah Paessel            0.3%
+     1	Pavel Linkesch          0.3%
+     1	Søren Torp Petersen     0.3%
+     1	Tom MacWright           0.3%
+     1	happyaccidents          0.3%
+     1	mbrookes                0.3%
+     1	muescha                 0.3%
+     1	shaohua                 0.3%
+     1	t_kjaergaard            0.3%
+     1	typify                  0.3%
+     1	waffleio                0.3%
 ```
 
 ## License

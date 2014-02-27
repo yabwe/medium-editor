@@ -1,3 +1,11 @@
+1.6.0 / 2014-02-27
+==================
+
+* Reorganizes CSS files
+* Removes unused method bindElementToolbarEvents
+* Adds a preview toolbar for anchors
+* Removes paste event binding on deactivate
+
 1.5.4 / 2014-02-12
 ==================
 
