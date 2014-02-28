@@ -53,6 +53,25 @@ describe('Anchor Preview TestCase', function () {
             jasmine.Clock.tick(1);
             expect(editor.hideToolbarActions).toHaveBeenCalled();
 
+        });
+
+        it('Anchor form stays visible on click', function () {
+            var editor = new MediumEditor('.editor');
+
+            // show preview
+            editor.editorAnchorObserver({ target: document.getElementById('test-link') });
+            fireEvent(editor.elements[0], 'mouseover', undefined, undefined, document.getElementById('test-link'));
+
+            // load into editor
+            fireEvent(editor.anchorPreview, 'click');
+            jasmine.Clock.tick(200);
+
+            // blur the editable area and focus onto the input for the anchor form
+            spyOn(MediumEditor.prototype, 'hideToolbarActions').andCallThrough();
+            fireEvent(editor.elements[0], 'blur', undefined, undefined, editor.elements[0], document.querySelector('#medium-editor-toolbar-form-anchor input'));
+            jasmine.Clock.tick(1);
+            expect(editor.hideToolbarActions).not.toHaveBeenCalled();
+
 
         });
 
