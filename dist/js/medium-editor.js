@@ -337,7 +337,14 @@ if (typeof module === 'object') {
             var self = this,
                 timer = '',
                 i;
-            this.checkSelectionWrapper = function () {
+
+            this.checkSelectionWrapper = function (e) {
+
+                // Do not close the toolbar when bluring the editable area and clicking into the anchor form
+                if (e && self.clickingIntoArchorForm(e)) {
+                    return false;
+                }
+
                 clearTimeout(timer);
                 timer = setTimeout(function () {
                     self.checkSelection();
@@ -372,6 +379,14 @@ if (typeof module === 'object') {
                 }
             }
             return this;
+        },
+
+        clickingIntoArchorForm: function(e) {
+            var self = this;
+            if (e.type && e.type.toLowerCase() === 'blur' && e.relatedTarget && e.relatedTarget === self.anchorInput) {
+                return true;
+            }
+            return false;
         },
 
         hasMultiParagraphs: function () {
