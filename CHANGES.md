@@ -1,3 +1,11 @@
+1.6.1 / 2014-03-04
+==================
+
+* fixes case where clicking anchor preview and then clicking into the anchorInput
+  causes hideToolbarActions to be called
+* fixes window resize when toolbar element is not created
+
+
 1.6.0 / 2014-02-27
 ==================
 
