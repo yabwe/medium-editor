@@ -828,7 +828,7 @@ if (typeof module === 'object') {
             this.windowResizeHandler = function () {
                 clearTimeout(timerResize);
                 timerResize = setTimeout(function () {
-                    if (self.toolbar.classList.contains('medium-editor-toolbar-active')) {
+                    if (self.toolbar && self.toolbar.classList.contains('medium-editor-toolbar-active')) {
                         self.setToolbarPosition();
                     }
                 }, 100);
