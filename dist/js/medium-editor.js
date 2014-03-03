@@ -888,7 +888,7 @@ if (typeof module === 'object') {
                     html = '',
                     p;
                 this.classList.remove('medium-editor-placeholder');
-                if (e.clipboardData && e.clipboardData.getData) {
+                if (e.clipboardData && e.clipboardData.getData && !e.defaultPrevented) {
                     e.preventDefault();
                     if (!self.options.disableReturn) {
                         paragraphs = e.clipboardData.getData('text/plain').split(/[\r\n]/g);
