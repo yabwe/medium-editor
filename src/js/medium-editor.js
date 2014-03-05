@@ -881,15 +881,17 @@ if (typeof module === 'object') {
         },
 
         bindPaste: function () {
-            if (!this.options.forcePlainText) {
-                return this;
-            }
             var i, self = this;
             this.pasteWrapper = function (e) {
                 var paragraphs,
                     html = '',
                     p;
+
                 this.classList.remove('medium-editor-placeholder');
+                if (!self.options.forcePlainText) {
+                    return this;
+                }
+
                 if (e.clipboardData && e.clipboardData.getData && !e.defaultPrevented) {
                     e.preventDefault();
                     if (!self.options.disableReturn) {
