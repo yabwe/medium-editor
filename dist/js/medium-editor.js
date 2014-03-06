@@ -773,7 +773,7 @@ if (typeof module === 'object') {
                 setTimeout(function() {
                     self.showAnchorForm(self.activeAnchor.href);
                     self.keepToolbarAlive = false;
-                }, 100);
+                }, 100 + self.options.delay);
 
             }
 

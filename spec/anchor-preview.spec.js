@@ -46,7 +46,7 @@ describe('Anchor Preview TestCase', function () {
             // load into editor
             spyOn(MediumEditor.prototype, 'showAnchorForm').andCallThrough();
             fireEvent(editor.anchorPreview, 'click');
-            jasmine.Clock.tick(200);
+            jasmine.Clock.tick(300);
             expect(editor.showAnchorForm).toHaveBeenCalled();
 
             // selecting other text should close the toolbar
