@@ -27,13 +27,17 @@ describe('Anchor Preview TestCase', function () {
 
     describe('Link Creation', function () {
         it('Hover anchor should show preview', function () {
-            var editor = new MediumEditor('.editor'),
+            var editor = new MediumEditor('.editor', { delay: 200 }),
                 sel = window.getSelection();
 
             // show preview
             spyOn(MediumEditor.prototype, 'showAnchorPreview').andCallThrough();
             editor.editorAnchorObserver({ target: document.getElementById('test-link') });
             fireEvent(editor.elements[0], 'mouseover', undefined, undefined, document.getElementById('test-link'));
+
+            // preview shows only after delay
+            expect(editor.showAnchorPreview).not.toHaveBeenCalled();
+            jasmine.Clock.tick(250);
             expect(editor.showAnchorPreview).toHaveBeenCalled();
 
             // link is set in preview
@@ -42,7 +46,7 @@ describe('Anchor Preview TestCase', function () {
             // load into editor
             spyOn(MediumEditor.prototype, 'showAnchorForm').andCallThrough();
             fireEvent(editor.anchorPreview, 'click');
-            jasmine.Clock.tick(200);
+            jasmine.Clock.tick(300);
             expect(editor.showAnchorForm).toHaveBeenCalled();
 
             // selecting other text should close the toolbar
@@ -50,7 +54,7 @@ describe('Anchor Preview TestCase', function () {
             sel.removeAllRanges();
             sel.addRange(document.createRange().selectNodeContents(document.getElementById('another-element')));
             fireEvent(document.documentElement, 'mouseup');
-            jasmine.Clock.tick(1);
+            jasmine.Clock.tick(200);
             expect(editor.hideToolbarActions).toHaveBeenCalled();
 
         });
