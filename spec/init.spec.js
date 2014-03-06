@@ -85,7 +85,8 @@ describe('Initialization TestCase', function () {
                     secondHeader: 'h4',
                     buttons: [ 'bold', 'italic', 'underline', 'anchor', 'header1', 'header2', 'quote' ],
                     buttonLabels: false,
-                    targetBlank: false
+                    targetBlank: false,
+                    anchorPreviewHideDelay: 500
                 },
                 editor = new MediumEditor('.editor');
             expect(editor.options).toEqual(defaultOptions);

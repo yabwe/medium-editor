@@ -100,7 +100,8 @@ if (typeof module === 'object') {
             forcePlainText: true,
             placeholder: 'Type your text',
             secondHeader: 'h4',
-            targetBlank: false
+            targetBlank: false,
+            anchorPreviewHideDelay: 500
         },
 
         init: function (elements, options) {
@@ -720,7 +721,7 @@ if (typeof module === 'object') {
                         return true;
                     }
                     var durr = (new Date()).getTime() - lastOver;
-                    if (durr > 500) {
+                    if (durr > self.options.anchorPreviewHideDelay) {
                         // hide the preview 1/2 second after mouse leaves the link
                         self.hideAnchorPreview();
 
@@ -780,6 +781,14 @@ if (typeof module === 'object') {
         },
 
         editorAnchorObserver: function(e) {
+            var self = this,
+                overAnchor = true,
+                leaveAnchor = function() {
+                    // mark the anchor as no longer hovered, and stop listening
+                    overAnchor = false;
+                    self.activeAnchor.removeEventListener('mouseout', leaveAnchor);
+                };
+
             if (e.target && e.target.tagName.toLowerCase() === 'a') {
                 // only show when hovering on anchors
                 if (this.toolbar.classList.contains('medium-editor-toolbar-active')) {
@@ -787,7 +796,16 @@ if (typeof module === 'object') {
                     return true;
                 }
                 this.activeAnchor = e.target;
-                this.showAnchorPreview(e.target);
+                this.activeAnchor.addEventListener('mouseout', leaveAnchor);
+                // show the anchor preview according to the configured delay
+                // if the mouse has not left the anchor tag in that time
+                setTimeout(function() {
+                    if (overAnchor) {
+                        self.showAnchorPreview(e.target);
+                    }
+                }, self.options.delay);
+
+
             }
         },
 
