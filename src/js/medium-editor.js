@@ -87,6 +87,12 @@ if (typeof module === 'object') {
         return html;
     }
 
+    // http://stackoverflow.com/questions/17907445/how-to-detect-ie11#comment30165888_17907562
+    // by rg89
+    function isIE() {
+        return ((navigator.appName === 'Microsoft Internet Explorer') || ((navigator.appName === 'Netscape') && (new RegExp("Trident/.*rv:([0-9]{1,}[.0-9]{0,})").exec(navigator.userAgent) !== null)));
+    }
+
     MediumEditor.prototype = {
         defaults: {
             allowMultiParagraphSelection: true,
@@ -572,6 +578,16 @@ if (typeof module === 'object') {
             }
             if (selectionData.tagName === el) {
                 el = 'p';
+            }
+            // When IE we need to add <> to heading elements and
+            //  blockquote needs to be called as indent
+            // http://stackoverflow.com/questions/10741831/execcommand-formatblock-headings-in-ie
+            // http://stackoverflow.com/questions/1816223/rich-text-editor-with-blockquote-function/1821777#1821777
+            if (isIE()) {
+                if (el === 'blockquote') {
+                    return document.execCommand('indent', false, el);
+                }
+                el = '<' + el + '>';
             }
             return document.execCommand('formatBlock', false, el);
         },
