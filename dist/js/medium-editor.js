@@ -687,10 +687,14 @@ if (typeof module === 'object') {
             var self = this,
                 buttonHeight = 40,
                 boundary = anchor_el.getBoundingClientRect(),
-                defaultLeft = (self.options.diffLeft) - (self.anchorPreview.offsetWidth / 2),
                 middleBoundary = (boundary.left + boundary.right) / 2,
-                halfOffsetWidth = self.anchorPreview.offsetWidth / 2,
+                halfOffsetWidth,
+                defaultLeft,
                 timer;
+
+            self.anchorPreview.querySelector('i').innerHTML = anchor_el.href;
+            halfOffsetWidth = self.anchorPreview.offsetWidth / 2;
+            defaultLeft = self.options.diffLeft - halfOffsetWidth;
 
             clearTimeout(timer);
             timer = setTimeout(function() {
@@ -699,7 +703,6 @@ if (typeof module === 'object') {
                 }
             }, 100);
 
-            self.anchorPreview.querySelector('i').innerHTML = anchor_el.href;
             self.observeAnchorPreview(anchor_el);
 
             self.anchorPreview.classList.add('medium-toolbar-arrow-over');
