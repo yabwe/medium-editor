@@ -47,9 +47,10 @@
             display: block;
             margin: 0;
             padding: 15px;
-            text-decoration: none;
-            font-size: 14px;
             cursor: pointer;
+            font-size: 14px;
+            line-height: 1.33;
+            text-decoration: none;
             @include box-sizing(border-box);
         }
 
