@@ -156,49 +156,50 @@ The source files are located inside the __src__ directory. MediumEditor styleshe
 ```
  project  : medium-editor
  repo age : 9 months
- active   : 99 days
- commits  : 399
+ active   : 107 days
+ commits  : 421
  files    : 46
- authors  :
-   297	Davi Ferreira           74.4%
-    20	Maxime de Visscher      5.0%
-     8	Derek Odegard           2.0%
-     8	Jarl Gunnar T. Flaten   2.0%
-     8	Pedro Nasser            2.0%
-     8	Seif                    2.0%
+ authors  : 
+   312	Davi Ferreira           74.1%
+    20	Maxime de Visscher      4.8%
+     8	Derek Odegard           1.9%
+     8	Jarl Gunnar T. Flaten   1.9%
+     8	Pedro Nasser            1.9%
+     8	Seif                    1.9%
+     6	Andy Yaco-Mink          1.4%
      4	Sebastian Zuchmanski    1.0%
      4	minikomi                1.0%
-     3	Andrew Hubbs            0.8%
-     3	Dmitri Cherniak         0.8%
-     3	Troels Knak-Nielsen     0.8%
-     3	arol                    0.8%
-     3	ʞuıɯ-oɔɐʎ ʎpuɐ          0.8%
-     2	Nikita Korotaev         0.5%
-     1	Adam Mulligan           0.3%
-     1	Bitdeli Chef            0.3%
-     1	David Collien           0.3%
-     1	David Hellsing          0.3%
-     1	Denis Gorbachev         0.3%
-     1	Diana Liao              0.3%
-     1	Jeff Welch              0.3%
-     1	Mark Kraemer            0.3%
-     1	Max                     0.3%
-     1	Maxime Dantec           0.3%
-     1	Maxime De Visscher      0.3%
-     1	Michael Kay             0.3%
-     1	Moore Adam              0.3%
-     1	Nic Malan               0.3%
-     1	Noah Paessel            0.3%
-     1	Pavel Linkesch          0.3%
-     1	Søren Torp Petersen     0.3%
-     1	Tom MacWright           0.3%
-     1	happyaccidents          0.3%
-     1	mbrookes                0.3%
-     1	muescha                 0.3%
-     1	shaohua                 0.3%
-     1	t_kjaergaard            0.3%
-     1	typify                  0.3%
-     1	waffleio                0.3%
+     3	Andrew Hubbs            0.7%
+     3	Dmitri Cherniak         0.7%
+     3	Nikita Korotaev         0.7%
+     3	Troels Knak-Nielsen     0.7%
+     3	arol                    0.7%
+     3	ʞuıɯ-oɔɐʎ ʎpuɐ          0.7%
+     1	Adam Mulligan           0.2%
+     1	Bitdeli Chef            0.2%
+     1	David Collien           0.2%
+     1	David Hellsing          0.2%
+     1	Denis Gorbachev         0.2%
+     1	Diana Liao              0.2%
+     1	Jeff Welch              0.2%
+     1	Mark Kraemer            0.2%
+     1	Max                     0.2%
+     1	Maxime Dantec           0.2%
+     1	Maxime De Visscher      0.2%
+     1	Michael Kay             0.2%
+     1	Moore Adam              0.2%
+     1	Nic Malan               0.2%
+     1	Noah Paessel            0.2%
+     1	Pavel Linkesch          0.2%
+     1	Søren Torp Petersen     0.2%
+     1	Tom MacWright           0.2%
+     1	happyaccidents          0.2%
+     1	mbrookes                0.2%
+     1	muescha                 0.2%
+     1	shaohua                 0.2%
+     1	t_kjaergaard            0.2%
+     1	typify                  0.2%
+     1	waffleio                0.2%
 ```
 
 ## License

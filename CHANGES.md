@@ -1,3 +1,12 @@
+1.6.5 / 2014-03-08
+==================
+
+* fixes some minor paste bugs
+* adds a delay option for anchor toolbar
+* fixes anchor toolbar initial positioning
+* fixes heading and blockquote on IE
+
+
 1.6.1 / 2014-03-04
 ==================
 
