@@ -112,6 +112,9 @@ if (typeof module === 'object') {
 
         init: function (elements, options) {
             this.elements = typeof elements === 'string' ? document.querySelectorAll(elements) : elements;
+            if (this.elements.nodeType === 1) {
+                this.elements = [this.elements];
+            }
             if (this.elements.length === 0) {
                 return;
             }
