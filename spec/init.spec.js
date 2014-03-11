@@ -51,6 +51,12 @@ describe('Initialization TestCase', function () {
                 editor = new MediumEditor(elements);
             expect(editor.elements).toBe(elements);
         });
+
+        it('should allow a single element as parameter', function () {
+            var element = document.querySelector('span'),
+                editor = new MediumEditor(element);
+            expect(editor.elements).toEqual([element]);
+        });
     });
 
     describe('With a valid element', function () {
