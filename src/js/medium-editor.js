@@ -108,7 +108,7 @@ if (typeof module === 'object') {
 
         // http://stackoverflow.com/questions/17907445/how-to-detect-ie11#comment30165888_17907562
         // by rg89
-        isIE: ((navigator.appName === 'Microsoft Internet Explorer') || ((navigator.appName === 'Netscape') && (new RegExp("Trident/.*rv:([0-9]{1,}[.0-9]{0,})").exec(navigator.userAgent) !== null))),
+        isIE: ((navigator.appName === 'Microsoft Internet Explorer') || ((navigator.appName === 'Netscape') && (new RegExp('Trident/.*rv:([0-9]{1,}[.0-9]{0,})').exec(navigator.userAgent) !== null))),
 
         init: function (elements, options) {
             this.elements = typeof elements === 'string' ? document.querySelectorAll(elements) : elements;
@@ -223,7 +223,7 @@ if (typeof module === 'object') {
                 if (e.which === 9) {
                     // Override tab only for pre nodes
                     var tag = getSelectionStart().tagName.toLowerCase();
-                    if (tag === "pre") {
+                    if (tag === 'pre') {
                         e.preventDefault();
                         document.execCommand('insertHtml', null, '    ');
                     }
@@ -289,8 +289,8 @@ if (typeof module === 'object') {
                     'orderedlist': '<i class="fa fa-list-ol"></i>',
                     'unorderedlist': '<i class="fa fa-list-ul"></i>',
                     'pre': '<i class="fa fa-code fa-lg"></i>',
-                    'indent': '<i class="fa fa-toggle-right"></i>',
-                    'outdent': '<i class="fa fa-code fa-toggle-left"></i>'
+                    'indent': '<i class="fa fa-indent"></i>',
+                    'outdent': '<i class="fa fa-outdent"></i>'
                 };
             } else if (typeof buttonLabelType === 'object') {
                 customButtonLabels = buttonLabelType;
