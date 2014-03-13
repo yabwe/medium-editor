@@ -1,3 +1,10 @@
+1.6.7 / 2014-03-13
+==================
+
+* Allows initialization with a single DOM node
+* Adds indent and outdent buttons
+
+
 1.6.5 / 2014-03-08
 ==================
 
