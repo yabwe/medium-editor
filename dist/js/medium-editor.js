@@ -224,6 +224,9 @@ if (typeof module === 'object') {
                     if (tag === "pre") {
                         e.preventDefault();
                         document.execCommand('insertHtml', null, '    ');
+                    } else if (tag === "li") {
+                        e.preventDefault();
+                        document.execCommand('insertUnorderedList', null, null);
                     }
                 }
             });
