@@ -84,6 +84,8 @@ Medium Editor, by default, will show only the buttons listed above to avoid a hu
 * __orderedlist__
 * __pre__
 * __image__ (this simply converts selected text to an image tag)
+* __indent__ (moves the selected text up one level)
+* __outdent__ (moves the selected text down one level)
 
 
 ## Themes
@@ -159,7 +161,7 @@ The source files are located inside the __src__ directory. MediumEditor styleshe
  active   : 107 days
  commits  : 421
  files    : 46
- authors  : 
+ authors  :
    312	Davi Ferreira           74.1%
     20	Maxime de Visscher      4.8%
      8	Derek Odegard           1.9%

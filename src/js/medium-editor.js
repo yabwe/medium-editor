@@ -226,9 +226,6 @@ if (typeof module === 'object') {
                     if (tag === "pre") {
                         e.preventDefault();
                         document.execCommand('insertHtml', null, '    ');
-                    } else if (tag === "li") {
-                        e.preventDefault();
-                        document.execCommand('insertUnorderedList', null, null);
                     }
                 }
             });
@@ -251,7 +248,9 @@ if (typeof module === 'object') {
                     'quote': '<li><button class="medium-editor-action medium-editor-action-quote" data-action="append-blockquote" data-element="blockquote">' + buttonLabels.quote + '</button></li>',
                     'orderedlist': '<li><button class="medium-editor-action medium-editor-action-orderedlist" data-action="insertorderedlist" data-element="ol">' + buttonLabels.orderedlist + '</button></li>',
                     'unorderedlist': '<li><button class="medium-editor-action medium-editor-action-unorderedlist" data-action="insertunorderedlist" data-element="ul">' + buttonLabels.unorderedlist + '</button></li>',
-                    'pre': '<li><button class="medium-editor-action medium-editor-action-pre" data-action="append-pre" data-element="pre">' + buttonLabels.pre + '</button></li>'
+                    'pre': '<li><button class="medium-editor-action medium-editor-action-pre" data-action="append-pre" data-element="pre">' + buttonLabels.pre + '</button></li>',
+                    'indent': '<li><button class="medium-editor-action medium-editor-action-indent" data-action="indent" data-element="ul">' + buttonLabels.indent + '</button></li>',
+                    'outdent': '<li><button class="medium-editor-action medium-editor-action-outdent" data-action="outdent" data-element="ul">' + buttonLabels.outdent + '</button></li>'
                 };
             return buttonTemplates[btnType] || false;
         },
@@ -273,7 +272,9 @@ if (typeof module === 'object') {
                     'quote': '<b>&ldquo;</b>',
                     'orderedlist': '<b>1.</b>',
                     'unorderedlist': '<b>&bull;</b>',
-                    'pre': '<b>0101</b>'
+                    'pre': '<b>0101</b>',
+                    'indent': '<b>&rarr;</b>',
+                    'outdent': '<b>&larr;</b>'
                 };
             if (buttonLabelType === 'fontawesome') {
                 customButtonLabels = {
@@ -287,7 +288,9 @@ if (typeof module === 'object') {
                     'quote': '<i class="fa fa-quote-right"></i>',
                     'orderedlist': '<i class="fa fa-list-ol"></i>',
                     'unorderedlist': '<i class="fa fa-list-ul"></i>',
-                    'pre': '<i class="fa fa-code fa-lg"></i>'
+                    'pre': '<i class="fa fa-code fa-lg"></i>',
+                    'indent': '<i class="fa fa-toggle-right"></i>',
+                    'outdent': '<i class="fa fa-code fa-toggle-left"></i>'
                 };
             } else if (typeof buttonLabelType === 'object') {
                 customButtonLabels = buttonLabelType;
