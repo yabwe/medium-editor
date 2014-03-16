@@ -1,6 +1,5 @@
-@import "compass/css3";
-@import "clearfix";
-@import "pop-upwards";
+@import "../clearfix";
+@import "../pop-upwards";
 
 $medium_editor_bgcolor:       #428bca;
 $medium_editor_border_color:  #357ebd;
@@ -21,8 +20,8 @@ $medium_editor_border_radius: 4px;
 .medium-editor-toolbar {
     border: 1px solid $medium_editor_border_color;
     background-color: $medium_editor_bgcolor;
-    @include border-radius($medium_editor_border_radius);
-    @include transition(top .075s ease-out,left .075s ease-out);
+    border-radius: $medium_editor_border_radius;
+    transition: top .075s ease-out,left .075s ease-out;
 
     li {
         button {
@@ -32,8 +31,8 @@ $medium_editor_border_radius: 4px;
             border-right: 1px solid $medium_editor_border_color;
             background-color: transparent;
             color: $medium_editor_link_color;
-            @include box-sizing(border-box);
-            @include transition(background-color .2s ease-in, color .2s ease-in);
+            box-sizing: border-box;
+            transition: background-color .2s ease-in, color .2s ease-in;
             &:hover {
                 background-color: $medium_editor_hover_color;
                 color: #fff;
@@ -41,14 +40,14 @@ $medium_editor_border_radius: 4px;
         }
 
         .medium-editor-button-first {
-            @include border-top-left-radius($medium_editor_border_radius);
-            @include border-bottom-left-radius($medium_editor_border_radius);
+            border-top-left-radius: $medium_editor_border_radius;
+            border-bottom-left-radius: $medium_editor_border_radius;
         }
 
         .medium-editor-button-last {
             border-right: none;
-            @include border-top-right-radius($medium_editor_border_radius);
-            @include border-bottom-right-radius($medium_editor_border_radius);
+            border-top-right-radius: $medium_editor_border_radius;
+            border-bottom-right-radius: $medium_editor_border_radius;
         }
 
         .medium-editor-button-active {
@@ -61,7 +60,7 @@ $medium_editor_border_radius: 4px;
 .medium-editor-toolbar-form-anchor {
     background: $medium_editor_bgcolor;
     color: #fff;
-    @include border-radius($medium_editor_border_radius);
+    border-radius: $medium_editor_border_radius;
 
     input {
         height: $medium_editor_button_size;
@@ -93,7 +92,7 @@ $medium_editor_border_radius: 4px;
 .medium-editor-toolbar-anchor-preview {
     background: $medium_editor_bgcolor;
     color: $medium_editor_link_color;
-    @include border-radius($medium_editor_border_radius);
+    border-radius: $medium_editor_border_radius;
 }
 
 .medium-editor-placeholder:after {

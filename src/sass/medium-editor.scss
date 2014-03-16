@@ -1,4 +1,3 @@
-@import "compass/css3";
 @import "clearfix";
 @import "pop-upwards";
 
@@ -51,7 +50,7 @@
             font-size: 14px;
             line-height: 1.33;
             text-decoration: none;
-            @include box-sizing(border-box);
+            box-sizing: border-box;
         }
 
         .medium-editor-action-underline {
@@ -85,7 +84,7 @@
         -ms-animation: pop-upwards 160ms forwards linear;
          -o-animation: pop-upwards 160ms forwards linear;
             animation: pop-upwards 160ms forwards linear;
-    @include transition(top .075s ease-out,left .075s ease-out);
+    transition: top .075s ease-out, left .075s ease-out;
 }
 
 .medium-editor-action-bold {
@@ -109,7 +108,7 @@
         width: 316px;
         border: none;
         font-size: 14px;
-        @include box-sizing(border-box);
+        box-sizing: border-box;
         &:focus {
             outline: 0;
             border: none;

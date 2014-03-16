@@ -1,6 +1,5 @@
-@import "compass/css3";
-@import "clearfix";
-@import "pop-upwards";
+@import "../clearfix";
+@import "../pop-upwards";
 
 $medium_editor_bgcolor:       #57ad68;
 $medium_editor_border_color:  #fff;
@@ -30,7 +29,7 @@ $medium_editor_link_color:    #fff;
             border-right: 1px solid lighten($medium_editor_bgcolor, 20);
             background-color: transparent;
             color: $medium_editor_link_color;
-            @include transition(background-color .2s ease-in, color .2s ease-in);
+            transition: background-color .2s ease-in, color .2s ease-in;
             &:hover {
                 background-color: darken($medium_editor_bgcolor, 20);
                 color: #fff;

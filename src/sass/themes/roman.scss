@@ -1,8 +1,7 @@
 // inspired by http://dribbble.com/shots/848100-Toolbar-Psd
 
-@import "compass/css3";
-@import "clearfix";
-@import "pop-upwards";
+@import "../clearfix";
+@import "../pop-upwards";
 
 $medium_editor_bgcolor:       #fff;
 $medium_editor_border_color:  #a8a8a8;
@@ -18,8 +17,8 @@ $medium_editor_border_radius: 5px;
 .medium-editor-toolbar {
     background-color: $medium_editor_bgcolor;
     background-color: rgba($medium_editor_bgcolor, .95);
-    @include border-radius($medium_editor_border_radius);
-    @include box-shadow(0 2px 6px rgba(#000, .45));
+    border-radius: $medium_editor_border_radius;
+    box-shadow: 0 2px 6px rgba(#000, .45);
 
     li {
         button {
@@ -29,10 +28,10 @@ $medium_editor_border_radius: 5px;
             border-right: 1px solid $medium_editor_border_color;
             background-color: transparent;
             color: $medium_editor_link_color;
-            @include box-shadow(inset 0 0 3px #f8f8e6);
-            @include background(linear-gradient(top, $medium_editor_bgcolor, rgba(#000, .1)));
-            @include text-shadow(1px 4px 6px #def, 0 0 0 #000, 1px 4px 6px #def);
-            @include transition(background-color .2s ease-in);
+            box-shadow: inset 0 0 3px #f8f8e6;
+            background: linear-gradient(top, $medium_editor_bgcolor, rgba(#000, .1));
+            text-shadow: 1px 4px 6px #def, 0 0 0 #000, 1px 4px 6px #def;
+            transition: background-color .2s ease-in;
             &:hover {
                 background-color: #fff;
                 color: #000;
@@ -41,20 +40,20 @@ $medium_editor_border_radius: 5px;
         }
 
         .medium-editor-button-first {
-            @include border-top-left-radius($medium_editor_border_radius);
-            @include border-bottom-left-radius($medium_editor_border_radius);
+            border-top-left-radius: $medium_editor_border_radius;
+            border-bottom-left-radius: $medium_editor_border_radius;
         }
 
         .medium-editor-button-last {
-            @include border-top-right-radius($medium_editor_border_radius);
-            @include border-bottom-right-radius($medium_editor_border_radius);
+            border-top-right-radius: $medium_editor_border_radius;
+            border-bottom-right-radius: $medium_editor_border_radius;
         }
 
         .medium-editor-button-active {
             background-color: #ccc;
             color: #000;
             color: rgba(#000, .8);
-            @include background(linear-gradient(bottom, $medium_editor_bgcolor, rgba(#000, .2)));
+            background: linear-gradient(bottom, $medium_editor_bgcolor, rgba(#000, .2));
         }
     }
 }
@@ -62,7 +61,7 @@ $medium_editor_border_radius: 5px;
 .medium-editor-toolbar-form-anchor {
     background: $medium_editor_bgcolor;
     color: #999;
-    @include border-radius($medium_editor_border_radius);
+    border-radius: $medium_editor_border_radius;
 
     input {
         margin: 0;
@@ -79,7 +78,7 @@ $medium_editor_border_radius: 5px;
 .medium-editor-toolbar-anchor-preview {
     background: $medium_editor_bgcolor;
     color: $medium_editor_link_color;
-    @include border-radius($medium_editor_border_radius);
+    border-radius: $medium_editor_border_radius;
 }
 
 .medium-editor-placeholder:after {

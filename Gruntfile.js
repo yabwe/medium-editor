@@ -1,5 +1,7 @@
 /*global module, require*/
 
+var AUTOPREFIXER_BROWSERS = ['last 3 versions', 'ie >= 9'];
+
 module.exports = function(grunt) {
     'use strict';
 
@@ -52,20 +54,42 @@ module.exports = function(grunt) {
         strict: {
             options: {
                 'box-sizing': false,
-                'import': 2
+                'import': 2,
+                'compatible-vendor-prefixes': false,
+                'gradients': false
             },
             src: 'dist/css/**/*.css'
         }
     };
 
-    gruntConfig.compass = {
+    gruntConfig.sass = {
         dist: {
             options: {
-                sassDir: 'src/sass',
-                cssDir: 'dist/css',
                 outputStyle: 'compressed',
-                noLineComments: true
+                includePaths: ['src/sass/']
+            },
+            files: {
+                'dist/css/medium-editor.css': 'src/sass/medium-editor.scss',
+                'dist/css/themes/bootstrap.css': 'src/sass/themes/bootstrap.scss',
+                'dist/css/themes/default.css': 'src/sass/themes/default.scss',
+                'dist/css/themes/flat.css': 'src/sass/themes/flat.scss',
+                'dist/css/themes/mani.css': 'src/sass/themes/mani.scss',
+                'dist/css/themes/roman.css': 'src/sass/themes/roman.scss'
             }
+        }
+    };
+
+    gruntConfig.autoprefixer = {
+        single_file: {
+            src: 'dist/css/medium-editor.css',
+            browsers: AUTOPREFIXER_BROWSERS
+        },
+        multiple_files: {
+            expand: true,
+            flatten: true,
+            src: 'dist/css/themes/*.css',
+            dest: 'dist/css/themes/',
+            browsers: AUTOPREFIXER_BROWSERS
         }
     };
 
@@ -109,15 +133,16 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-contrib-uglify');
     grunt.loadNpmTasks('grunt-jslint');
     grunt.loadNpmTasks('grunt-contrib-jasmine');
-    grunt.loadNpmTasks('grunt-contrib-compass');
+    grunt.loadNpmTasks('grunt-autoprefixer');
     grunt.loadNpmTasks('grunt-contrib-csslint');
+    grunt.loadNpmTasks('grunt-sass');
     grunt.loadNpmTasks('grunt-contrib-watch');
     grunt.loadNpmTasks('grunt-contrib-concat');
     grunt.loadNpmTasks('grunt-plato');
 
     grunt.registerTask('test', ['jslint', 'jasmine', 'csslint']);
     grunt.registerTask('js', ['jslint', 'jasmine', 'uglify', 'concat']);
-    grunt.registerTask('css', ['compass', 'csslint']);
+    grunt.registerTask('css', ['sass', 'autoprefixer', 'csslint']);
     grunt.registerTask('default', ['js', 'css']);
 
 };

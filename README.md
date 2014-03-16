@@ -135,11 +135,11 @@ npm install
 These are the available grunt tasks:
 
 * __js__: runs jslint and jasmine tests and creates minified and concatenated versions of the script;
-* __css__: runs compass and csslint
+* __css__: runs autoprefixer and csslint
 * __test__: runs jasmine tests, jslint and csslint
 * __watch__: watch for modifications on script/scss files
 
-The source files are located inside the __src__ directory. MediumEditor stylesheet was created using sass/compass, make sure you have the compass gem installed on your system.
+The source files are located inside the __src__ directory.
 
 ## Contributing
 
@@ -162,48 +162,48 @@ The source files are located inside the __src__ directory. MediumEditor styleshe
  commits  : 429
  files    : 46
  authors  :
-   317	Davi Ferreira           73.9%
-    20	Maxime de Visscher      4.7%
-     8	Derek Odegard           1.9%
-     8	Jarl Gunnar T. Flaten   1.9%
-     8	Pedro Nasser            1.9%
-     8	Seif                    1.9%
-     6	Andy Yaco-Mink          1.4%
-     4	Sebastian Zuchmanski    0.9%
-     4	minikomi                0.9%
-     3	Andrew Hubbs            0.7%
-     3	Dmitri Cherniak         0.7%
-     3	Nikita Korotaev         0.7%
-     3	Troels Knak-Nielsen     0.7%
-     3	arol                    0.7%
-     3	ʞuıɯ-oɔɐʎ ʎpuɐ          0.7%
-     2	Ethan Turkeltaub        0.5%
-     1	Adam Mulligan           0.2%
-     1	Alberto Gasparin        0.2%
-     1	Bitdeli Chef            0.2%
-     1	David Collien           0.2%
-     1	David Hellsing          0.2%
-     1	Denis Gorbachev         0.2%
-     1	Diana Liao              0.2%
-     1	Jeff Welch              0.2%
-     1	Mark Kraemer            0.2%
-     1	Max                     0.2%
-     1	Maxime Dantec           0.2%
-     1	Maxime De Visscher      0.2%
-     1	Michael Kay             0.2%
-     1	Moore Adam              0.2%
-     1	Nic Malan               0.2%
-     1	Noah Paessel            0.2%
-     1	Pavel Linkesch          0.2%
-     1	Søren Torp Petersen     0.2%
-     1	Tom MacWright           0.2%
-     1	happyaccidents          0.2%
-     1	mbrookes                0.2%
-     1	muescha                 0.2%
-     1	shaohua                 0.2%
-     1	t_kjaergaard            0.2%
-     1	typify                  0.2%
-     1	waffleio                0.2%
+   317  Davi Ferreira           73.9%
+    20  Maxime de Visscher      4.7%
+     8  Derek Odegard           1.9%
+     8  Jarl Gunnar T. Flaten   1.9%
+     8  Pedro Nasser            1.9%
+     8  Seif                    1.9%
+     6  Andy Yaco-Mink          1.4%
+     4  Sebastian Zuchmanski    0.9%
+     4  minikomi                0.9%
+     3  Andrew Hubbs            0.7%
+     3  Dmitri Cherniak         0.7%
+     3  Nikita Korotaev         0.7%
+     3  Troels Knak-Nielsen     0.7%
+     3  arol                    0.7%
+     3  ʞuıɯ-oɔɐʎ ʎpuɐ          0.7%
+     2  Ethan Turkeltaub        0.5%
+     1  Adam Mulligan           0.2%
+     1  Alberto Gasparin        0.2%
+     1  Bitdeli Chef            0.2%
+     1  David Collien           0.2%
+     1  David Hellsing          0.2%
+     1  Denis Gorbachev         0.2%
+     1  Diana Liao              0.2%
+     1  Jeff Welch              0.2%
+     1  Mark Kraemer            0.2%
+     1  Max                     0.2%
+     1  Maxime Dantec           0.2%
+     1  Maxime De Visscher      0.2%
+     1  Michael Kay             0.2%
+     1  Moore Adam              0.2%
+     1  Nic Malan               0.2%
+     1  Noah Paessel            0.2%
+     1  Pavel Linkesch          0.2%
+     1  Søren Torp Petersen     0.2%
+     1  Tom MacWright           0.2%
+     1  happyaccidents          0.2%
+     1  mbrookes                0.2%
+     1  muescha                 0.2%
+     1  shaohua                 0.2%
+     1  t_kjaergaard            0.2%
+     1  typify                  0.2%
+     1  waffleio                0.2%
 ```
 
 ## License
