@@ -9,17 +9,18 @@
   },
   "license": "THE BEER-WARE LICENSE",
   "devDependencies": {
-    "grunt": "~0.4.1",
+    "grunt": "~0.4.4",
+    "grunt-autoprefixer": "~0.7.2",
     "grunt-contrib-uglify": "~0.2.7",
     "grunt-contrib-jasmine": "~0.4.2",
-    "grunt-contrib-compass": "~0.6.0",
     "grunt-contrib-csslint": "~0.1.2",
     "grunt-jslint": "~0.2.5a",
     "grunt-contrib-watch": "~0.4.2",
     "grunt-contrib-concat": "~0.3.0",
     "grunt-template-jasmine-istanbul": "~0.2.4",
     "grunt-plato": "~0.2.0",
-    "brfs": "0.0.8"
+    "brfs": "0.0.8",
+    "grunt-sass": "~0.11.0"
   },
   "scripts": {
     "test": "grunt test --verbose"
