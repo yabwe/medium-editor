@@ -97,6 +97,7 @@ if (typeof module === 'object') {
             diffLeft: 0,
             diffTop: -10,
             disableReturn: false,
+            disableDoubleReturn: false;
             disableToolbar: false,
             firstHeader: 'h3',
             forcePlainText: true,
@@ -208,10 +209,23 @@ if (typeof module === 'object') {
 
         bindReturn: function (index) {
             var self = this;
+            var double_return = 0;
             this.elements[index].addEventListener('keypress', function (e) {
-                if (e.which === 13) {
-                    if (self.options.disableReturn || this.getAttribute('data-disable-return')) {
-                        e.preventDefault();
+                if (self.options.disableDoubleReturn){
+                    if (e.which === 13) {
+                        if (double_return === 1){
+                            e.preventDefault();
+                        }else{
+                            double_return = 1;
+                        }
+                    }else{
+                        double_return = 0;
+                    }
+                }else{
+                    if (e.which === 13) {
+                        if (self.options.disableReturn || this.getAttribute('data-disable-return')) {
+                            e.preventDefault();
+                        }
                     }
                 }
             });
