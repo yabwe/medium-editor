@@ -1,13 +1,12 @@
 /*global module, require*/
 
-var AUTOPREFIXER_BROWSERS = ['last 3 versions', 'ie >= 9'];
-
 module.exports = function(grunt) {
     'use strict';
 
     var gruntConfig = {
-        pkg: grunt.file.readJSON('package.json')
-    };
+            pkg: grunt.file.readJSON('package.json')
+        },
+        autoprefixerBrowsers = ['last 3 versions', 'ie >= 9'];
 
     gruntConfig.jslint = {
         files: ['src/js/**/*.js', 'spec/*.js', 'Gruntfile.js'],
@@ -80,16 +79,16 @@ module.exports = function(grunt) {
     };
 
     gruntConfig.autoprefixer = {
-        single_file: {
+        singleFile: {
             src: 'dist/css/medium-editor.css',
-            browsers: AUTOPREFIXER_BROWSERS
+            browsers: autoprefixerBrowsers
         },
-        multiple_files: {
+        multipleFiles: {
             expand: true,
             flatten: true,
             src: 'dist/css/themes/*.css',
             dest: 'dist/css/themes/',
-            browsers: AUTOPREFIXER_BROWSERS
+            browsers: autoprefixerBrowsers
         }
     };
 
