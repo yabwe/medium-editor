@@ -262,7 +262,7 @@ if (typeof module === 'object') {
                     'italic' : '<b><i>I</i></b>',
                     'underline': '<b><u>U</u></b>',
                     'superscript': '<b>x<sup>1</sup></b>',
-                    'subscript': '<b>x<sub>1</sup></b>',
+                    'subscript': '<b>x<sub>1</sub></b>',
                     'anchor': '<b>#</b>',
                     'image': '<b>image</b>',
                     'header1': '<b>H1</b>',
