@@ -10,7 +10,7 @@ describe('Anchor Preview TestCase', function () {
         this.body = document.getElementsByTagName('body')[0];
         this.el = document.createElement('div');
         this.el.className = 'editor';
-        this.el.innerHTML = 'lorem <a id="test-link" href="http://test.com">ipsum</a> preview <span id="another-element">&nbsp;</span>';
+        this.el.innerHTML = 'lorem <a id="test-link" href="http://test.com">ipsum</a> preview <span id="another-element">&nbsp;</span> <a id="test-empty-link" href="">ipsum</a>';
         this.body.appendChild(this.el);
     });
 
@@ -76,6 +76,20 @@ describe('Anchor Preview TestCase', function () {
             jasmine.Clock.tick(1);
             expect(editor.hideToolbarActions).not.toHaveBeenCalled();
 
+
+        });
+
+        it('Hover empty anchor should NOT show preview', function () {
+            var editor = new MediumEditor('.editor', { delay: 200 });
+
+            // show preview
+            spyOn(MediumEditor.prototype, 'showAnchorPreview').andCallThrough();
+            editor.editorAnchorObserver({ target: document.getElementById('test-empty-link') });
+            fireEvent(editor.elements[0], 'mouseover', undefined, undefined, document.getElementById('test-empty-link'));
+
+            // preview shows only after delay
+            jasmine.Clock.tick(250);
+            expect(editor.showAnchorPreview).not.toHaveBeenCalled();
 
         });
 
