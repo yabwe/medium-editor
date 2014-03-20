@@ -822,7 +822,7 @@ if (typeof module === 'object') {
                 // Detect empty href attributes
                 // The browser will make href="" or href="#top" 
                 // into absolute urls when accessed as e.targed.href, so check the html
-                if (!/href="\S+"/.test(e.target.outerHTML) || /href="#\S+"/.test(e.target.outerHTML)) {
+                if (!/href=["']\S+["']/.test(e.target.outerHTML) || /href=["']#\S+["']/.test(e.target.outerHTML)) {
                     return true;
                 }
 

@@ -88,7 +88,7 @@ describe('Anchor Preview TestCase', function () {
             fireEvent(editor.elements[0], 'mouseover', undefined, undefined, document.getElementById('test-empty-link'));
 
             // preview shows only after delay
-            // jasmine.Clock.tick(250);
+            jasmine.Clock.tick(250);
             expect(editor.showAnchorPreview).not.toHaveBeenCalled();
 
         });
