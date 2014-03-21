@@ -858,6 +858,9 @@ if (typeof module === 'object') {
 
         createLink: function (input) {
             restoreSelection(this.savedSelection);
+            if (!(/^(http|https):\/\//i).test(input.value)) {
+                input.value = "http://" + input.value;
+            }
             document.execCommand('createLink', false, input.value);
             if (this.options.targetBlank) {
                 this.setTargetBlank();
