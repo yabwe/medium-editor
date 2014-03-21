@@ -87,6 +87,39 @@ if (typeof module === 'object') {
         return html;
     }
 
+    // extends selection of partially selected lines to full lines
+    // this is used in execAction to mitigate issue:
+    // https://github.com/daviferreira/medium-editor/issues/172
+    // by Robert Koritnik
+    function extendSelectionToFullLines() {
+        var s = window.getSelection(),
+            a = s.anchorNode,
+            f = s.focusNode;
+        // no selection? do nothing
+        if (s.isCollapsed) {
+            return;
+        }
+        switch(a.compareDocumentPosition(f)) {
+            case 0: // both selection boundaries are in the same node
+                // is it a forward selection?
+                if (s.anchorOffset < s.focusOffset) {
+                    break;
+                }
+            case 2: // DOCUMENT_POSITION_PRECEDING
+                // backward selection; switch boundaries (swap values trick without using third variable)
+                a = [f, f = a][0];
+                break;
+            default: // DOCUMENT_POSITION_FOLLOWING
+                break;
+        }
+        // create an extended range and use it
+        var r = document.createRange();
+        r.setStart(a, 0);
+        r.setEnd(f, f.length);
+        s.removeAllRanges();
+        s.addRange(r);
+    }
+
     MediumEditor.prototype = {
         defaults: {
             allowMultiParagraphSelection: true,
@@ -546,18 +579,32 @@ if (typeof module === 'object') {
             return this;
         },
 
-        execAction: function (action, e) {
-            if (action.indexOf('append-') > -1) {
-                this.execFormatBlock(action.replace('append-', ''));
-                this.setToolbarPosition();
-                this.setToolbarButtonStates();
-            } else if (action === 'anchor') {
-                this.triggerAnchorAction(e);
-            } else if (action === 'image') {
-                document.execCommand('insertImage', false, window.getSelection());
-            } else {
-                document.execCommand(action, false, null);
-                this.setToolbarPosition();
+        execAction: function(action, e) {
+            switch(action) {
+                case "append-" + this.options.firstHeader:
+                case "append-" + this.options.secondHeader:
+                case "append-blockquote":
+                case "append-pre":
+                    extendSelectionToFullLines();
+                    this.execFormatBlock(action.replace('append-', ''));
+                    this.setToolbarPosition();
+                    this.setToolbarButtonStates();
+                    break;
+                case "anchor":
+                    this.triggerAnchorAction(e);
+                    break;
+                case "image":
+                    document.execCommand('insertImage', false, window.getSelection());
+                    break;
+                case "insertorderedlist":
+                case "insertunorderedlist":
+                    extendSelectionToFullLines();
+                    // fall through to default
+                default:
+                    document.execCommand(action, false, null);
+                    document.execCommand("removeFormat", false, null);
+                    this.setToolbarPosition();
+                    break;
             }
         },
 
