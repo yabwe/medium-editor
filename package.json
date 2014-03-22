@@ -8,6 +8,17 @@
     "type": "git",
     "url": "https://github.com/daviferreira/medium-editor"
   },
+  "bugs": {
+    "url": "https://github.com/daviferreira/medium-editor/issues",
+    "email": "hi@daviferreira.com"
+  },
+  "homepage": "http://daviferreira.github.io/medium-editor/",
+  "keywords": [
+    "editor",
+    "medium",
+    "wysiwyg",
+    "rich-text"
+  ],
   "license": "THE BEER-WARE LICENSE",
   "devDependencies": {
     "grunt": "~0.4.4",
