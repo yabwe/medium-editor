@@ -778,12 +778,15 @@ if (typeof module === 'object') {
         createAnchorPreview: function () {
             var self = this,
                 anchorPreview = document.createElement('div');
+
             anchorPreview.id = 'medium-editor-anchor-preview-' + this.id;
             anchorPreview.className = 'medium-editor-anchor-preview';
             anchorPreview.innerHTML = this.anchorPreviewTemplate();
             document.body.appendChild(anchorPreview);
 
-            anchorPreview.addEventListener('click', function() { self.anchorPreviewClickHandler(); });
+            anchorPreview.addEventListener('click', function() {
+                self.anchorPreviewClickHandler();
+            });
 
             return anchorPreview;
         },
