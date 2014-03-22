@@ -1,3 +1,8 @@
+1.7.1 / 2014-03-22
+
+* Prevents new lines with shift+enter when disableReturn is set to true
+
+
 1.7.0 / 2014-03-22
 ==================
 
