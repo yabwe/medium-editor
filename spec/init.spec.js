@@ -1,5 +1,5 @@
 /*global MediumEditor, describe, it, expect, spyOn,
-         afterEach, beforeEach*/
+         afterEach, beforeEach, tearDown*/
 
 describe('Initialization TestCase', function () {
     'use strict';
@@ -61,19 +61,13 @@ describe('Initialization TestCase', function () {
 
     describe('With a valid element', function () {
         beforeEach(function () {
-            this.body = document.getElementsByTagName('body')[0];
             this.el = document.createElement('div');
             this.el.className = 'editor';
-            this.body.appendChild(this.el);
+            document.body.appendChild(this.el);
         });
 
         afterEach(function () {
-            var elements = document.querySelectorAll('.medium-editor-toolbar'),
-                i;
-            for (i = 0; i < elements.length; i += 1) {
-                this.body.removeChild(elements[i]);
-            }
-            this.body.removeChild(this.el);
+            tearDown(this.el);
         });
 
         it('should have a default set of options', function () {

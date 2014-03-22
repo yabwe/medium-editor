@@ -1,28 +1,20 @@
 /*global MediumEditor, describe, it, expect, spyOn,
          afterEach, beforeEach, selectElementContents,
-         jasmine, fireEvent, console*/
+         jasmine, fireEvent, console, tearDown*/
 
 describe('Anchor Preview TestCase', function () {
     'use strict';
 
     beforeEach(function () {
         jasmine.Clock.useMock();
-        this.body = document.getElementsByTagName('body')[0];
         this.el = document.createElement('div');
         this.el.className = 'editor';
         this.el.innerHTML = 'lorem <a id="test-link" href="http://test.com">ipsum</a> preview <span id="another-element">&nbsp;</span> <a id="test-empty-link" href="">ipsum</a>';
-        this.body.appendChild(this.el);
+        document.body.appendChild(this.el);
     });
 
     afterEach(function () {
-        var elements = document.querySelectorAll('.medium-editor-toolbar'),
-            i,
-            sel = window.getSelection();
-        for (i = 0; i < elements.length; i += 1) {
-            this.body.removeChild(elements[i]);
-        }
-        this.body.removeChild(this.el);
-        sel.removeAllRanges();
+        tearDown(this.el);
     });
 
     describe('Link Creation', function () {

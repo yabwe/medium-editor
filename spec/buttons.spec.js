@@ -1,27 +1,19 @@
 /*global MediumEditor, describe, it, expect, spyOn,
          afterEach, beforeEach, selectElementContents,
-         jasmine, fireEvent*/
+         jasmine, fireEvent, tearDown*/
 
 describe('Buttons TestCase', function () {
     'use strict';
 
     beforeEach(function () {
-        this.body = document.getElementsByTagName('body')[0];
         this.el = document.createElement('div');
         this.el.className = 'editor';
         this.el.innerHTML = 'lorem ipsum';
-        this.body.appendChild(this.el);
+        document.body.appendChild(this.el);
     });
 
     afterEach(function () {
-        var elements = document.querySelectorAll('.medium-editor-toolbar'),
-            i,
-            sel = window.getSelection();
-        for (i = 0; i < elements.length; i += 1) {
-            this.body.removeChild(elements[i]);
-        }
-        this.body.removeChild(this.el);
-        sel.removeAllRanges();
+        tearDown(this.el);
     });
 
     describe('Button Initial State', function () {

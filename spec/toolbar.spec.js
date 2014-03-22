@@ -1,23 +1,18 @@
 /*global MediumEditor, describe, it, expect, spyOn,
-         afterEach, beforeEach, selectElementContents, runs, waitsFor, i */
+         afterEach, beforeEach, selectElementContents, runs,
+         waitsFor, tearDown */
 
 describe('Toolbar TestCase', function () {
     'use strict';
 
     beforeEach(function () {
-        this.body = document.getElementsByTagName('body')[0];
         this.el = document.createElement('div');
         this.el.className = 'editor';
-        this.body.appendChild(this.el);
+        document.body.appendChild(this.el);
     });
 
     afterEach(function () {
-        var elements = document.querySelectorAll('.medium-editor-toolbar'),
-            i;
-        for (i = 0; i < elements.length; i += 1) {
-            this.body.removeChild(elements[i]);
-        }
-        this.body.removeChild(this.el);
+        tearDown(this.el);
     });
 
     describe('Initialization', function () {
@@ -72,7 +67,7 @@ describe('Toolbar TestCase', function () {
             element.className = 'editor';
             element.setAttribute('data-disable-toolbar', 'true');
             element.innerHTML = 'lorem ipsum';
-            this.body.appendChild(element);
+            document.body.appendChild(element);
 
             editor = new MediumEditor(document.querySelectorAll('.editor'));
 
@@ -82,7 +77,7 @@ describe('Toolbar TestCase', function () {
             editor.checkSelection();
             expect(editor.toolbar.style.display).toBe('');
             // Remove the new element from the DOM
-            this.body.removeChild(element);
+            document.body.removeChild(element);
         });
 
         it('should show the toolbar it it\'s text are selected even though one or more elements that has a data attr of disable-toolbar', function () {
@@ -96,7 +91,7 @@ describe('Toolbar TestCase', function () {
                 element.className = 'editor';
                 element.setAttribute('data-disable-toolbar', 'true');
                 this.el.innerHTML = 'lorem ipsum';
-                this.body.appendChild(element);
+                document.body.appendChild(element);
                 editor = new MediumEditor(document.querySelectorAll('.editor'));
                 expect(editor.elements.length).toEqual(2);
                 expect(editor.toolbar.style.display).toBe('');
@@ -116,7 +111,7 @@ describe('Toolbar TestCase', function () {
             runs(function() {
                 expect(editor.toolbar.classList.contains('medium-editor-toolbar-active')).toBe(true);
                 // Remove the new element from the DOM
-                this.body.removeChild(element);
+                document.body.removeChild(element);
             });
 
         });
@@ -127,7 +122,7 @@ describe('Toolbar TestCase', function () {
 
             element.className = 'editor';
             this.el.innerHTML = 'lorem ipsum';
-            this.body.appendChild(element);
+            document.body.appendChild(element);
 
             editor = new MediumEditor(document.querySelectorAll('.editor'), { disableToolbar: true });
 
@@ -137,7 +132,7 @@ describe('Toolbar TestCase', function () {
             editor.checkSelection();
 
             // Remove the new element from the DOM
-            this.body.removeChild(element);
+            document.body.removeChild(element);
         });
     });
 });
