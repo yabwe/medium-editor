@@ -175,12 +175,14 @@ if (typeof module === 'object') {
                         !(self.options.disableReturn || node.getAttribute('data-disable-return'))) {
                     document.execCommand('formatBlock', false, 'p');
                 }
-                if (e.which === 13 && !e.shiftKey) {
+                if (e.which === 13) {
                     node = getSelectionStart();
                     tagName = node.tagName.toLowerCase();
                     if (!(self.options.disableReturn || this.getAttribute('data-disable-return')) &&
                             tagName !== 'li' && !self.isListItemChild(node)) {
-                        document.execCommand('formatBlock', false, 'p');
+                        if (!e.shiftKey) {
+                            document.execCommand('formatBlock', false, 'p');
+                        }
                         if (tagName === 'a') {
                             document.execCommand('unlink', false, null);
                         }
