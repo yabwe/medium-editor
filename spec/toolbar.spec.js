@@ -48,7 +48,9 @@ describe('Toolbar TestCase', function () {
 
     describe('Disable', function () {
         it('should not show the toolbar on elements when option disableToolbar is set to true', function () {
-            var editor = new MediumEditor('.editor', { disableToolbar: true });
+            var editor = new MediumEditor('.editor', {
+                disableToolbar: true
+            });
             expect(editor.options.disableToolbar).toEqual(true);
             expect(document.getElementsByClassName('medium-editor-toolbar-actions').length).toEqual(0);
         });
@@ -86,7 +88,7 @@ describe('Toolbar TestCase', function () {
                 element = document.createElement('div'),
                 editor = null;
 
-            runs(function() {
+            runs(function () {
                 flag = false;
                 element.className = 'editor';
                 element.setAttribute('data-disable-toolbar', 'true');
@@ -97,18 +99,18 @@ describe('Toolbar TestCase', function () {
                 expect(editor.toolbar.style.display).toBe('');
                 selectElementContents(this.el);
                 editor.checkSelection();
-                setTimeout(function() {
+                setTimeout(function () {
                     flag = true;
                 }, 500);
             });
 
             // Because the toolbar appear after 100ms, waits 150ms... 
-            waitsFor(function() {
+            waitsFor(function () {
                 value = value + 1; // value += 1 is not accepted by jslint (unused)
                 return flag;
             }, 'The i value should be incremented', 500);
 
-            runs(function() {
+            runs(function () {
                 expect(editor.toolbar.classList.contains('medium-editor-toolbar-active')).toBe(true);
                 // Remove the new element from the DOM
                 document.body.removeChild(element);
@@ -124,7 +126,9 @@ describe('Toolbar TestCase', function () {
             this.el.innerHTML = 'lorem ipsum';
             document.body.appendChild(element);
 
-            editor = new MediumEditor(document.querySelectorAll('.editor'), { disableToolbar: true });
+            editor = new MediumEditor(document.querySelectorAll('.editor'), {
+                disableToolbar: true
+            });
 
             expect(editor.toolbar).toBe(undefined);
 

@@ -173,15 +173,14 @@ if (typeof module === 'object') {
             this.elements[index].addEventListener('keyup', function (e) {
                 var node = getSelectionStart(),
                     tagName;
-                if (node && node.getAttribute('data-medium-element') && node.children.length === 0 &&
-                        !(self.options.disableReturn || node.getAttribute('data-disable-return'))) {
+                if (node && node.getAttribute('data-medium-element') && node.children.length === 0 && !(self.options.disableReturn || node.getAttribute('data-disable-return'))) {
                     document.execCommand('formatBlock', false, 'p');
                 }
                 if (e.which === 13) {
                     node = getSelectionStart();
                     tagName = node.tagName.toLowerCase();
                     if (!(self.options.disableReturn || this.getAttribute('data-disable-return')) &&
-                            tagName !== 'li' && !self.isListItemChild(node)) {
+                        tagName !== 'li' && !self.isListItemChild(node)) {
                         if (!e.shiftKey) {
                             document.execCommand('formatBlock', false, 'p');
                         }
@@ -271,7 +270,7 @@ if (typeof module === 'object') {
                 attrname,
                 buttonLabels = {
                     'bold': '<b>B</b>',
-                    'italic' : '<b><i>I</i></b>',
+                    'italic': '<b><i>I</i></b>',
                     'underline': '<b><u>U</u></b>',
                     'superscript': '<b>x<sup>1</sup></b>',
                     'subscript': '<b>x<sub>1</sub></b>',
@@ -289,7 +288,7 @@ if (typeof module === 'object') {
             if (buttonLabelType === 'fontawesome') {
                 customButtonLabels = {
                     'bold': '<i class="fa fa-bold"></i>',
-                    'italic' : '<i class="fa fa-italic"></i>',
+                    'italic': '<i class="fa fa-italic"></i>',
                     'underline': '<i class="fa fa-underline"></i>',
                     'superscript': '<i class="fa fa-superscript"></i>',
                     'subscript': '<i class="fa fa-subscript"></i>',
@@ -393,7 +392,7 @@ if (typeof module === 'object') {
             if (this.keepToolbarAlive !== true && !this.options.disableToolbar) {
                 newSelection = window.getSelection();
                 if (newSelection.toString().trim() === '' ||
-                        (this.options.allowMultiParagraphSelection === false && this.hasMultiParagraphs())) {
+                    (this.options.allowMultiParagraphSelection === false && this.hasMultiParagraphs())) {
                     this.hideToolbarActions();
                 } else {
                     selectionElement = this.getSelectionElement();
@@ -407,7 +406,7 @@ if (typeof module === 'object') {
             return this;
         },
 
-        clickingIntoArchorForm: function(e) {
+        clickingIntoArchorForm: function (e) {
             var self = this;
             if (e.type && e.type.toLowerCase() === 'blur' && e.relatedTarget && e.relatedTarget === self.anchorInput) {
                 return true;
@@ -443,16 +442,16 @@ if (typeof module === 'object') {
                 current = range.commonAncestorContainer,
                 parent = current.parentNode,
                 result,
-                getMediumElement = function(e) {
-                    var parent = e;
+                getMediumElement = function (e) {
+                    var localParent = e;
                     try {
-                        while (!parent.getAttribute('data-medium-element')) {
-                            parent = parent.parentNode;
+                        while (!localParent.getAttribute('data-medium-element')) {
+                            localParent = localParent.parentNode;
                         }
                     } catch (errb) {
                         return false;
                     }
-                    return parent;
+                    return localParent;
                 };
             // First try on current node
             try {
@@ -461,7 +460,7 @@ if (typeof module === 'object') {
                 } else {
                     result = getMediumElement(parent);
                 }
-            // If not search in the parent nodes.
+                // If not search in the parent nodes.
             } catch (err) {
                 result = getMediumElement(parent);
             }
@@ -590,7 +589,7 @@ if (typeof module === 'object') {
             // allowing nesting, we need to use outdent
             // https://developer.mozilla.org/en-US/docs/Rich-Text_Editing_in_Mozilla
             if (el === 'blockquote' && selectionData.el &&
-                    selectionData.el.parentNode.tagName.toLowerCase() === 'blockquote') {
+                selectionData.el.parentNode.tagName.toLowerCase() === 'blockquote') {
                 return document.execCommand('outdent', false, null);
             }
             if (selectionData.tagName === el) {
@@ -649,7 +648,7 @@ if (typeof module === 'object') {
             this.toolbarActions.style.display = 'block';
             this.keepToolbarAlive = false;
             clearTimeout(timer);
-            timer = setTimeout(function() {
+            timer = setTimeout(function () {
                 if (!self.toolbar.classList.contains('medium-editor-toolbar-active')) {
                     self.toolbar.classList.add('medium-editor-toolbar-active');
                 }
@@ -695,7 +694,7 @@ if (typeof module === 'object') {
         },
 
 
-        hideAnchorPreview: function() {
+        hideAnchorPreview: function () {
             this.anchorPreview.classList.remove('medium-editor-anchor-preview-active');
         },
 
@@ -718,7 +717,7 @@ if (typeof module === 'object') {
             defaultLeft = self.options.diffLeft - halfOffsetWidth;
 
             clearTimeout(timer);
-            timer = setTimeout(function() {
+            timer = setTimeout(function () {
                 if (!self.anchorPreview.classList.contains('medium-editor-anchor-preview-active')) {
                     self.anchorPreview.classList.add('medium-editor-anchor-preview-active');
                 }
@@ -741,20 +740,20 @@ if (typeof module === 'object') {
         },
 
         // TODO: break method
-        observeAnchorPreview: function(anchorEl) {
+        observeAnchorPreview: function (anchorEl) {
             var self = this,
                 lastOver = (new Date()).getTime(),
                 over = true,
-                stamp = function() {
+                stamp = function () {
                     lastOver = (new Date()).getTime();
                     over = true;
                 },
-                unstamp = function(e) {
+                unstamp = function (e) {
                     if (!e.relatedTarget || !/anchor-preview/.test(e.relatedTarget.className)) {
                         over = false;
                     }
                 },
-                interval_timer = setInterval(function() {
+                interval_timer = setInterval(function () {
                     if (over) {
                         return true;
                     }
@@ -788,7 +787,7 @@ if (typeof module === 'object') {
             anchorPreview.innerHTML = this.anchorPreviewTemplate();
             document.body.appendChild(anchorPreview);
 
-            anchorPreview.addEventListener('click', function() {
+            anchorPreview.addEventListener('click', function () {
                 self.anchorPreviewClickHandler();
             });
 
@@ -801,7 +800,7 @@ if (typeof module === 'object') {
                 '</div>';
         },
 
-        anchorPreviewClickHandler: function(e) {
+        anchorPreviewClickHandler: function (e) {
             if (this.activeAnchor) {
 
                 var self = this,
@@ -811,7 +810,7 @@ if (typeof module === 'object') {
                 range.selectNodeContents(self.activeAnchor);
                 sel.removeAllRanges();
                 sel.addRange(range);
-                setTimeout(function() {
+                setTimeout(function () {
                     self.showAnchorForm(self.activeAnchor.href);
                     self.keepToolbarAlive = false;
                 }, 100 + self.options.delay);
@@ -821,10 +820,10 @@ if (typeof module === 'object') {
             this.hideAnchorPreview();
         },
 
-        editorAnchorObserver: function(e) {
+        editorAnchorObserver: function (e) {
             var self = this,
                 overAnchor = true,
-                leaveAnchor = function() {
+                leaveAnchor = function () {
                     // mark the anchor as no longer hovered, and stop listening
                     overAnchor = false;
                     self.activeAnchor.removeEventListener('mouseout', leaveAnchor);
@@ -848,7 +847,7 @@ if (typeof module === 'object') {
                 this.activeAnchor.addEventListener('mouseout', leaveAnchor);
                 // show the anchor preview according to the configured delay
                 // if the mouse has not left the anchor tag in that time
-                setTimeout(function() {
+                setTimeout(function () {
                     if (overAnchor) {
                         self.showAnchorPreview(e.target);
                     }
@@ -860,7 +859,7 @@ if (typeof module === 'object') {
 
         bindAnchorPreview: function (index) {
             var self = this;
-            this.elements[index].addEventListener('mouseover', function(e) {
+            this.elements[index].addEventListener('mouseover', function (e) {
                 self.editorAnchorObserver(e);
             });
             return this;

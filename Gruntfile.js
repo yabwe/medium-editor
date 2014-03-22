@@ -1,20 +1,48 @@
 /*global module, require*/
 
-module.exports = function(grunt) {
+module.exports = function (grunt) {
     'use strict';
 
     var gruntConfig = {
-            pkg: grunt.file.readJSON('package.json')
-        },
+        pkg: grunt.file.readJSON('package.json')
+    },
         autoprefixerBrowsers = ['last 3 versions', 'ie >= 9'];
 
-    gruntConfig.jslint = {
+    gruntConfig.jsbeautifier = {
         files: ['src/js/**/*.js', 'spec/*.js', 'Gruntfile.js'],
-        directives: {
-            browser: true,
-            unparam: true,
-            todo: true,
-            debug: true
+        options: {
+            js: {
+                braceStyle: "collapse",
+                breakChainedMethods: false,
+                e4x: false,
+                evalCode: false,
+                indentChar: " ",
+                indentLevel: 0,
+                indentSize: 4,
+                indentWithTabs: false,
+                jslintHappy: true,
+                keepArrayIndentation: true,
+                keepFunctionIndentation: true,
+                maxPreserveNewlines: 5,
+                preserveNewlines: true,
+                spaceBeforeConditional: true,
+                spaceInParen: false,
+                unescapeStrings: false,
+                wrapLineLength: 0
+            }
+        }
+    };
+
+    gruntConfig.jslint = {
+        client: {
+            src: ['src/js/**/*.js', 'spec/*.js', 'Gruntfile.js'],
+            directives: {
+                browser: true,
+                unparam: true,
+                todo: true,
+                debug: true,
+                white: true
+            }
         }
     };
 
@@ -130,6 +158,7 @@ module.exports = function(grunt) {
     grunt.initConfig(gruntConfig);
 
     grunt.loadNpmTasks('grunt-contrib-uglify');
+    grunt.loadNpmTasks('grunt-jsbeautifier');
     grunt.loadNpmTasks('grunt-jslint');
     grunt.loadNpmTasks('grunt-contrib-jasmine');
     grunt.loadNpmTasks('grunt-autoprefixer');
@@ -139,8 +168,8 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-contrib-concat');
     grunt.loadNpmTasks('grunt-plato');
 
-    grunt.registerTask('test', ['jslint', 'jasmine', 'csslint']);
-    grunt.registerTask('js', ['jslint', 'jasmine', 'uglify', 'concat']);
+    grunt.registerTask('test', ['jsbeautifier', 'jslint', 'jasmine', 'csslint']);
+    grunt.registerTask('js', ['jsbeautifier', 'jslint', 'jasmine', 'uglify', 'concat']);
     grunt.registerTask('css', ['sass', 'autoprefixer', 'csslint']);
     grunt.registerTask('default', ['js', 'css']);
 

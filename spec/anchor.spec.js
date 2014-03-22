@@ -80,7 +80,9 @@ describe('Anchor Button TestCase', function () {
         });
 
         it('should add target="_blank" when respective option is set to true', function () {
-            var editor = new MediumEditor('.editor', {targetBlank: true}),
+            var editor = new MediumEditor('.editor', {
+                targetBlank: true
+            }),
                 input = editor.anchorForm.querySelector('input');
             selectElementContents(editor.elements[0]);
             input.value = 'http://test.com';
