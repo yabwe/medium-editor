@@ -351,7 +351,7 @@ if (typeof module === 'object') {
             toolbar.id = 'medium-editor-toolbar-' + this.id;
             toolbar.className = 'medium-editor-toolbar';
             toolbar.innerHTML = this.toolbarTemplate();
-            document.getElementsByTagName('body')[0].appendChild(toolbar);
+            document.body.appendChild(toolbar);
             return toolbar;
         },
 
@@ -781,7 +781,7 @@ if (typeof module === 'object') {
             anchorPreview.id = 'medium-editor-anchor-preview-' + this.id;
             anchorPreview.className = 'medium-editor-anchor-preview';
             anchorPreview.innerHTML = this.anchorPreviewTemplate();
-            document.getElementsByTagName('body')[0].appendChild(anchorPreview);
+            document.body.appendChild(anchorPreview);
 
             anchorPreview.addEventListener('click', function() { self.anchorPreviewClickHandler(); });
 
@@ -916,6 +916,7 @@ if (typeof module === 'object') {
                 .bindSelect();
         },
 
+        // TODO: break method
         deactivate: function () {
             var i;
             if (!this.isActive) {
@@ -924,7 +925,8 @@ if (typeof module === 'object') {
             this.isActive = false;
 
             if (this.toolbar !== undefined) {
-                this.toolbar.style.display = 'none';
+                document.body.removeChild(this.anchorPreview);
+                document.body.removeChild(this.toolbar);
             }
 
             document.documentElement.removeEventListener('mouseup', this.checkSelectionWrapper);
@@ -936,6 +938,7 @@ if (typeof module === 'object') {
                 this.elements[i].removeEventListener('paste', this.pasteWrapper);
                 this.elements[i].removeAttribute('contentEditable');
             }
+
         },
 
         bindPaste: function () {
