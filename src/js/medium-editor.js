@@ -925,7 +925,8 @@ if (typeof module === 'object') {
             if (this.toolbar !== undefined) {
                 document.body.removeChild(this.anchorPreview);
                 document.body.removeChild(this.toolbar);
-                this.toolbar = this.anchorPreview = undefined;
+                delete this.toolbar;
+                delete this.anchorPreview;
             }
 
             document.documentElement.removeEventListener('mouseup', this.checkSelectionWrapper);
