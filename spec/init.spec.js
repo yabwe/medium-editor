@@ -83,6 +83,7 @@ describe('Initialization TestCase', function () {
                     diffLeft: 0,
                     diffTop: -10,
                     disableReturn: false,
+                    disableDoubleReturn: false,
                     disableToolbar: false,
                     firstHeader: 'h3',
                     forcePlainText: true,

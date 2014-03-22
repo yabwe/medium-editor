@@ -211,14 +211,13 @@ if (typeof module === 'object') {
             var self = this;
             this.elements[index].addEventListener('keypress', function (e) {
                 if (e.which === 13) {
-                    if (self.options.disableDoubleReturn || this.getAttribute('data-disable-double-return')) {
+                    if (self.options.disableReturn || this.getAttribute('data-disable-return')) {
+                        e.preventDefault();
+                    } else if (self.options.disableDoubleReturn || this.getAttribute('data-disable-double-return')) {
                         var node = getSelectionStart();
                         if (node && node.innerText === '\n') {
                             e.preventDefault();
                         }
-                    }
-                    if (self.options.disableReturn || this.getAttribute('data-disable-return')) {
-                        e.preventDefault();
                     }
                 }
             });
