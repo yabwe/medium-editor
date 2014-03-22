@@ -72,36 +72,36 @@ describe('Initialization TestCase', function () {
 
         it('should have a default set of options', function () {
             var defaultOptions = {
-                    anchorInputPlaceholder: 'Paste or type a link',
-                    delay: 0,
-                    diffLeft: 0,
-                    diffTop: -10,
-                    disableReturn: false,
-                    disableDoubleReturn: false,
-                    disableToolbar: false,
-                    firstHeader: 'h3',
-                    forcePlainText: true,
-                    allowMultiParagraphSelection: true,
-                    placeholder: 'Type your text',
-                    secondHeader: 'h4',
-                    buttons: [ 'bold', 'italic', 'underline', 'anchor', 'header1', 'header2', 'quote' ],
-                    buttonLabels: false,
-                    targetBlank: false,
-                    anchorPreviewHideDelay: 500
-                },
+                anchorInputPlaceholder: 'Paste or type a link',
+                delay: 0,
+                diffLeft: 0,
+                diffTop: -10,
+                disableReturn: false,
+                disableDoubleReturn: false,
+                disableToolbar: false,
+                firstHeader: 'h3',
+                forcePlainText: true,
+                allowMultiParagraphSelection: true,
+                placeholder: 'Type your text',
+                secondHeader: 'h4',
+                buttons: ['bold', 'italic', 'underline', 'anchor', 'header1', 'header2', 'quote'],
+                buttonLabels: false,
+                targetBlank: false,
+                anchorPreviewHideDelay: 500
+            },
                 editor = new MediumEditor('.editor');
             expect(editor.options).toEqual(defaultOptions);
         });
 
         it('should accept custom options values', function () {
             var options = {
-                    anchorInputPlaceholder: 'test',
-                    diffLeft: 10,
-                    diffTop: 5,
-                    firstHeader: 'h2',
-                    secondHeader: 'h3',
-                    delay: 300
-                },
+                anchorInputPlaceholder: 'test',
+                diffLeft: 10,
+                diffTop: 5,
+                firstHeader: 'h2',
+                secondHeader: 'h3',
+                delay: 300
+            },
                 editor = new MediumEditor('.editor', options);
             expect(editor.options).toEqual(options);
         });

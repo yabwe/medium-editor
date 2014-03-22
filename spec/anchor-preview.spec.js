@@ -19,12 +19,16 @@ describe('Anchor Preview TestCase', function () {
 
     describe('Link Creation', function () {
         it('Hover anchor should show preview', function () {
-            var editor = new MediumEditor('.editor', { delay: 200 }),
+            var editor = new MediumEditor('.editor', {
+                delay: 200
+            }),
                 sel = window.getSelection();
 
             // show preview
             spyOn(MediumEditor.prototype, 'showAnchorPreview').andCallThrough();
-            editor.editorAnchorObserver({ target: document.getElementById('test-link') });
+            editor.editorAnchorObserver({
+                target: document.getElementById('test-link')
+            });
             fireEvent(editor.elements[0], 'mouseover', undefined, undefined, document.getElementById('test-link'));
 
             // preview shows only after delay
@@ -55,7 +59,9 @@ describe('Anchor Preview TestCase', function () {
             var editor = new MediumEditor('.editor');
 
             // show preview
-            editor.editorAnchorObserver({ target: document.getElementById('test-link') });
+            editor.editorAnchorObserver({
+                target: document.getElementById('test-link')
+            });
             fireEvent(editor.elements[0], 'mouseover', undefined, undefined, document.getElementById('test-link'));
 
             // load into editor
@@ -72,11 +78,15 @@ describe('Anchor Preview TestCase', function () {
         });
 
         it('Hover empty anchor should NOT show preview', function () {
-            var editor = new MediumEditor('.editor', { delay: 200 });
+            var editor = new MediumEditor('.editor', {
+                delay: 200
+            });
 
             // show preview
             spyOn(MediumEditor.prototype, 'showAnchorPreview').andCallThrough();
-            editor.editorAnchorObserver({ target: document.getElementById('test-empty-link') });
+            editor.editorAnchorObserver({
+                target: document.getElementById('test-empty-link')
+            });
             fireEvent(editor.elements[0], 'mouseover', undefined, undefined, document.getElementById('test-empty-link'));
 
             // preview shows only after delay
