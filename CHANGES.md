@@ -1,4 +1,11 @@
+1.7.2 / 2014-03-22
+==================
+
+* Removes DOM elements created by MediumEditor on deactivate
+
+
 1.7.1 / 2014-03-22
+==================
 
 * Prevents new lines with shift+enter when disableReturn is set to true
 

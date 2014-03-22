@@ -160,11 +160,11 @@ The source files are located inside the __src__ directory.
  project  : medium-editor
  repo age : 10 months
  active   : 116 days
- commits  : 446
- files    : 46
+ commits  : 455
+ files    : 47
  authors  :
-   328	Davi Ferreira           73.5%
-    20	Maxime de Visscher      4.5%
+   337	Davi Ferreira           74.1%
+    20	Maxime de Visscher      4.4%
      8	Andy Yaco-Mink          1.8%
      8	Derek Odegard           1.8%
      8	Jarl Gunnar T. Flaten   1.8%
