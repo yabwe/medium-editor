@@ -908,9 +908,7 @@ if (typeof module === 'object') {
                 return;
             }
 
-            if (this.toolbar !== undefined) {
-                this.toolbar.style.display = 'block';
-            }
+            this.initToolbar();
 
             this.isActive = true;
             for (i = 0; i < this.elements.length; i += 1) {

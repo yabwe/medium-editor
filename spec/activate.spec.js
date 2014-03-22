@@ -15,12 +15,24 @@ describe('Activate/Deactivate TestCase', function () {
         tearDown(this.el);
     });
 
-    it('should remove mediumEditor elements from DOM', function () {
-        var editor = new MediumEditor('.editor');
-        expect(document.querySelector('.medium-editor-toolbar')).toBeTruthy();
-        expect(document.querySelector('.medium-editor-anchor-preview')).toBeTruthy();
-        editor.deactivate();
-        expect(document.querySelector('.medium-editor-toolbar')).toBeFalsy();
-        expect(document.querySelector('.medium-editor-anchor-preview')).toBeFalsy();
+    describe('Activate', function () {
+        it('should init the toolbar', function () {
+            var editor = new MediumEditor('.editor');
+            editor.deactivate();
+            spyOn(MediumEditor.prototype, 'initToolbar');
+            editor.activate();
+            expect(editor.initToolbar).toHaveBeenCalled();
+        });
+    });
+
+    describe('Deactivate', function () {
+        it('should remove mediumEditor elements from DOM', function () {
+            var editor = new MediumEditor('.editor');
+            expect(document.querySelector('.medium-editor-toolbar')).toBeTruthy();
+            expect(document.querySelector('.medium-editor-anchor-preview')).toBeTruthy();
+            editor.deactivate();
+            expect(document.querySelector('.medium-editor-toolbar')).toBeFalsy();
+            expect(document.querySelector('.medium-editor-anchor-preview')).toBeFalsy();
+        });
     });
 });
