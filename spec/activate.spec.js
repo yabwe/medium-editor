@@ -16,12 +16,12 @@ describe('Activate/Deactivate TestCase', function () {
     });
 
     describe('Activate', function () {
-        it('should init the toolbar', function () {
+        it('should init the toolbar and editor elements', function () {
             var editor = new MediumEditor('.editor');
             editor.deactivate();
-            spyOn(MediumEditor.prototype, 'initToolbar');
+            spyOn(MediumEditor.prototype, 'setup').andCallThrough();
             editor.activate();
-            expect(editor.initToolbar).toHaveBeenCalled();
+            expect(editor.setup).toHaveBeenCalled();
         });
     });
 

@@ -121,11 +121,15 @@ if (typeof module === 'object') {
             this.parentElements = ['p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'blockquote', 'pre'];
             this.id = document.querySelectorAll('.medium-editor-toolbar').length + 1;
             this.options = extend(options, this.defaults);
-            return this.initElements()
-                       .bindSelect()
-                       .bindPaste()
-                       .setPlaceholders()
-                       .bindWindowActions();
+            return this.setup();
+        },
+
+        setup: function () {
+            this.initElements()
+                .bindSelect()
+                .bindPaste()
+                .setPlaceholders()
+                .bindWindowActions();
         },
 
         initElements: function () {
@@ -901,20 +905,11 @@ if (typeof module === 'object') {
         },
 
         activate: function () {
-            var i;
             if (this.isActive) {
                 return;
             }
 
-            this.initToolbar();
-
-            this.isActive = true;
-            for (i = 0; i < this.elements.length; i += 1) {
-                this.elements[i].setAttribute('contentEditable', true);
-            }
-
-            this.bindWindowActions()
-                .bindSelect();
+            this.setup();
         },
 
         // TODO: break method
@@ -928,6 +923,7 @@ if (typeof module === 'object') {
             if (this.toolbar !== undefined) {
                 document.body.removeChild(this.anchorPreview);
                 document.body.removeChild(this.toolbar);
+                this.toolbar = this.anchorPreview = undefined;
             }
 
             document.documentElement.removeEventListener('mouseup', this.checkSelectionWrapper);
@@ -938,6 +934,7 @@ if (typeof module === 'object') {
                 this.elements[i].removeEventListener('blur', this.checkSelectionWrapper);
                 this.elements[i].removeEventListener('paste', this.pasteWrapper);
                 this.elements[i].removeAttribute('contentEditable');
+                this.elements[i].removeAttribute('data-medium-element');
             }
 
         },
