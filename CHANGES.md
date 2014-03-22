@@ -1,3 +1,12 @@
+1.7.0 / 2014-03-22
+==================
+
+* Removes compass dependency by using grunt with libsass
+* Fixes subscript button markup
+* Fixes anchor preview behavior for empty links and anchors
+* Adds a new option to disable double returns
+
+
 1.6.7 / 2014-03-13
 ==================
 
