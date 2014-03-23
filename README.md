@@ -12,7 +12,7 @@ Tested on Google Chrome, Firefox and IE9+.
 
 [![Travis build status](https://travis-ci.org/daviferreira/medium-editor.png?branch=master)](https://travis-ci.org/daviferreira/medium-editor)
 [![dependencies](https://david-dm.org/daviferreira/medium-editor.png)](https://david-dm.org/daviferreira/medium-editor)
-[![devDependency Status](https://david-dm.org/daviferreira/medium-editor/dev-status.svg?theme=shields.io)](https://david-dm.org/daviferreira/medium-editor#info=devDependencies)
+[![devDependency Status](https://david-dm.org/daviferreira/medium-editor/dev-status.png)](https://david-dm.org/daviferreira/medium-editor#info=devDependencies)
 
 # Basic usage
 

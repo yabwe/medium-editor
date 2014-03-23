@@ -6,7 +6,7 @@ describe('Anchor Button TestCase', function () {
     'use strict';
 
     beforeEach(function () {
-        jasmine.Clock.useMock();
+        jasmine.clock().install();
         this.el = document.createElement('div');
         this.el.className = 'editor';
         this.el.innerHTML = 'lorem ipsum';
@@ -15,16 +15,17 @@ describe('Anchor Button TestCase', function () {
 
     afterEach(function () {
         tearDown(this.el);
+        jasmine.clock().uninstall();
     });
 
     describe('Click', function () {
         it('should display the anchor form when toolbar is visible', function () {
-            spyOn(MediumEditor.prototype, 'showAnchorForm').andCallThrough();
+            spyOn(MediumEditor.prototype, 'showAnchorForm').and.callThrough();
             var button,
                 editor = new MediumEditor('.editor');
             selectElementContents(editor.elements[0]);
             fireEvent(editor.elements[0], 'mouseup');
-            jasmine.Clock.tick(1);
+            jasmine.clock().tick(1);
             button = editor.toolbar.querySelector('[data-element="a"]');
             fireEvent(button, 'click');
             expect(editor.toolbarActions.style.display).toBe('none');
@@ -33,12 +34,12 @@ describe('Anchor Button TestCase', function () {
         });
 
         it('should display the toolbar actions when anchor form is visible', function () {
-            spyOn(MediumEditor.prototype, 'showToolbarActions').andCallThrough();
+            spyOn(MediumEditor.prototype, 'showToolbarActions').and.callThrough();
             var button,
                 editor = new MediumEditor('.editor');
             selectElementContents(editor.elements[0]);
             fireEvent(editor.elements[0], 'mouseup');
-            jasmine.Clock.tick(1);
+            jasmine.clock().tick(1);
             button = editor.toolbar.querySelector('[data-element="a"]');
             editor.anchorForm.style.display = 'block';
             fireEvent(button, 'click');
@@ -48,13 +49,13 @@ describe('Anchor Button TestCase', function () {
         });
 
         it('should unlink when selection is a link', function () {
-            spyOn(document, 'execCommand').andCallThrough();
+            spyOn(document, 'execCommand').and.callThrough();
             this.el.innerHTML = '<a href="#">link</a>';
             var button,
                 editor = new MediumEditor('.editor');
             selectElementContents(editor.elements[0]);
             fireEvent(editor.elements[0], 'mouseup');
-            jasmine.Clock.tick(1);
+            jasmine.clock().tick(1);
             button = editor.toolbar.querySelector('[data-element="a"]');
             fireEvent(button, 'click');
             expect(this.el.innerHTML, 'link');
@@ -65,7 +66,7 @@ describe('Anchor Button TestCase', function () {
 
     describe('Link Creation', function () {
         it('should create a link when user presses enter', function () {
-            spyOn(MediumEditor.prototype, 'createLink').andCallThrough();
+            spyOn(MediumEditor.prototype, 'createLink').and.callThrough();
             var editor = new MediumEditor('.editor'),
                 button,
                 input;
@@ -93,7 +94,7 @@ describe('Anchor Button TestCase', function () {
 
     describe('Cancel', function () {
         it('should close the link form when user clicks on cancel', function () {
-            spyOn(MediumEditor.prototype, 'showToolbarActions').andCallThrough();
+            spyOn(MediumEditor.prototype, 'showToolbarActions').and.callThrough();
             var editor = new MediumEditor('.editor'),
                 button,
                 cancel;

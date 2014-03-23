@@ -70,5 +70,4 @@ describe('Placeholder TestCase', function () {
         expect(placeholder).toEqual("'Custom placeholder'");
     });
 
-
 });

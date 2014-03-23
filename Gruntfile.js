@@ -62,7 +62,8 @@ module.exports = function (grunt) {
                 templateOptions: {
                     coverage: 'reports/jasmine/coverage.json',
                     report: 'coverage'
-                }
+                },
+                summary: true
             }
         }
     };

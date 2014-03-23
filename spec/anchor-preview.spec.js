@@ -6,7 +6,7 @@ describe('Anchor Preview TestCase', function () {
     'use strict';
 
     beforeEach(function () {
-        jasmine.Clock.useMock();
+        jasmine.clock().install();
         this.el = document.createElement('div');
         this.el.className = 'editor';
         this.el.innerHTML = 'lorem <a id="test-link" href="http://test.com">ipsum</a> preview <span id="another-element">&nbsp;</span> <a id="test-empty-link" href="">ipsum</a>';
@@ -15,6 +15,7 @@ describe('Anchor Preview TestCase', function () {
 
     afterEach(function () {
         tearDown(this.el);
+        jasmine.clock().uninstall();
     });
 
     describe('Link Creation', function () {
@@ -25,7 +26,7 @@ describe('Anchor Preview TestCase', function () {
                 sel = window.getSelection();
 
             // show preview
-            spyOn(MediumEditor.prototype, 'showAnchorPreview').andCallThrough();
+            spyOn(MediumEditor.prototype, 'showAnchorPreview').and.callThrough();
             editor.editorAnchorObserver({
                 target: document.getElementById('test-link')
             });
@@ -33,24 +34,24 @@ describe('Anchor Preview TestCase', function () {
 
             // preview shows only after delay
             expect(editor.showAnchorPreview).not.toHaveBeenCalled();
-            jasmine.Clock.tick(250);
+            jasmine.clock().tick(250);
             expect(editor.showAnchorPreview).toHaveBeenCalled();
 
             // link is set in preview
             expect(editor.anchorPreview.querySelector('i').innerHTML).toBe(document.getElementById('test-link').href);
 
             // load into editor
-            spyOn(MediumEditor.prototype, 'showAnchorForm').andCallThrough();
+            spyOn(MediumEditor.prototype, 'showAnchorForm').and.callThrough();
             fireEvent(editor.anchorPreview, 'click');
-            jasmine.Clock.tick(300);
+            jasmine.clock().tick(300);
             expect(editor.showAnchorForm).toHaveBeenCalled();
 
             // selecting other text should close the toolbar
-            spyOn(MediumEditor.prototype, 'hideToolbarActions').andCallThrough();
+            spyOn(MediumEditor.prototype, 'hideToolbarActions').and.callThrough();
             sel.removeAllRanges();
             sel.addRange(document.createRange().selectNodeContents(document.getElementById('another-element')));
             fireEvent(document.documentElement, 'mouseup');
-            jasmine.Clock.tick(200);
+            jasmine.clock().tick(200);
             expect(editor.hideToolbarActions).toHaveBeenCalled();
 
         });
@@ -66,12 +67,12 @@ describe('Anchor Preview TestCase', function () {
 
             // load into editor
             fireEvent(editor.anchorPreview, 'click');
-            jasmine.Clock.tick(200);
+            jasmine.clock().tick(200);
 
             // blur the editable area and focus onto the input for the anchor form
-            spyOn(MediumEditor.prototype, 'hideToolbarActions').andCallThrough();
+            spyOn(MediumEditor.prototype, 'hideToolbarActions').and.callThrough();
             fireEvent(editor.elements[0], 'blur', undefined, undefined, editor.elements[0], document.querySelector('#medium-editor-toolbar-form-anchor input'));
-            jasmine.Clock.tick(1);
+            jasmine.clock().tick(1);
             expect(editor.hideToolbarActions).not.toHaveBeenCalled();
 
 
@@ -83,14 +84,14 @@ describe('Anchor Preview TestCase', function () {
             });
 
             // show preview
-            spyOn(MediumEditor.prototype, 'showAnchorPreview').andCallThrough();
+            spyOn(MediumEditor.prototype, 'showAnchorPreview').and.callThrough();
             editor.editorAnchorObserver({
                 target: document.getElementById('test-empty-link')
             });
             fireEvent(editor.elements[0], 'mouseover', undefined, undefined, document.getElementById('test-empty-link'));
 
             // preview shows only after delay
-            jasmine.Clock.tick(250);
+            jasmine.clock().tick(250);
             expect(editor.showAnchorPreview).not.toHaveBeenCalled();
 
         });

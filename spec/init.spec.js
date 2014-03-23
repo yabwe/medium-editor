@@ -17,7 +17,7 @@ describe('Initialization TestCase', function () {
                 editor2 = new MediumEditor('.test');
             expect(editor1 === editor2).toBe(false);
             expect(MediumEditor.prototype.init).toHaveBeenCalled();
-            expect(MediumEditor.prototype.init.calls.length).toBe(2);
+            expect(MediumEditor.prototype.init.calls.count()).toBe(2);
         });
 
         it('should do nothing when selector does not return any elements', function () {
@@ -39,7 +39,7 @@ describe('Initialization TestCase', function () {
 
     describe('Elements', function () {
         it('should allow a string as parameter', function () {
-            spyOn(document, 'querySelectorAll').andCallThrough();
+            spyOn(document, 'querySelectorAll').and.callThrough();
             (function () {
                 return new MediumEditor('.test');
             }());
@@ -107,11 +107,11 @@ describe('Initialization TestCase', function () {
         });
 
         it('should call the default initialization methods', function () {
-            spyOn(MediumEditor.prototype, 'initElements').andCallThrough();
-            spyOn(MediumEditor.prototype, 'initToolbar').andCallThrough();
-            spyOn(MediumEditor.prototype, 'bindSelect').andCallThrough();
-            spyOn(MediumEditor.prototype, 'bindButtons').andCallThrough();
-            spyOn(MediumEditor.prototype, 'bindAnchorForm').andCallThrough();
+            spyOn(MediumEditor.prototype, 'initElements').and.callThrough();
+            spyOn(MediumEditor.prototype, 'initToolbar').and.callThrough();
+            spyOn(MediumEditor.prototype, 'bindSelect').and.callThrough();
+            spyOn(MediumEditor.prototype, 'bindButtons').and.callThrough();
+            spyOn(MediumEditor.prototype, 'bindAnchorForm').and.callThrough();
             var editor = new MediumEditor('.editor');
             expect(editor.id).toBe(1);
             expect(editor.initElements).toHaveBeenCalled();

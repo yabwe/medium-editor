@@ -19,7 +19,7 @@ describe('Activate/Deactivate TestCase', function () {
         it('should init the toolbar and editor elements', function () {
             var editor = new MediumEditor('.editor');
             editor.deactivate();
-            spyOn(MediumEditor.prototype, 'setup').andCallThrough();
+            spyOn(MediumEditor.prototype, 'setup').and.callThrough();
             editor.activate();
             expect(editor.setup).toHaveBeenCalled();
         });
