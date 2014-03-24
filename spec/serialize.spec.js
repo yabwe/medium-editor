@@ -1,28 +1,20 @@
 /*global MediumEditor, describe, it, expect, spyOn,
          afterEach, beforeEach, selectElementContents,
-         fireEvent*/
+         fireEvent, tearDown*/
 
 describe('Anchor Button TestCase', function () {
     'use strict';
 
     beforeEach(function () {
-        this.body = document.getElementsByTagName('body')[0];
         this.el = document.createElement('div');
         this.el.className = 'editor';
         this.el.id = 'medium-editor-test';
         this.el.innerHTML = '<p>lorem <strong>ipsum</strong></p>';
-        this.body.appendChild(this.el);
+        document.body.appendChild(this.el);
     });
 
     afterEach(function () {
-        var elements = document.querySelectorAll('.medium-editor-toolbar'),
-            i,
-            sel = window.getSelection();
-        for (i = 0; i < elements.length; i += 1) {
-            this.body.removeChild(elements[i]);
-        }
-        this.body.removeChild(this.el);
-        sel.removeAllRanges();
+        tearDown(this.el);
     });
 
     it('should return the editor content as a JSON object', function () {

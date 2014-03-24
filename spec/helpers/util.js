@@ -30,3 +30,18 @@ function selectElementContents(el) {
     sel.removeAllRanges();
     sel.addRange(range);
 }
+
+function tearDown(el) {
+    var elements = document.querySelectorAll('.medium-editor-toolbar'),
+        i,
+        sel = window.getSelection();
+    for (i = 0; i < elements.length; i += 1) {
+        document.body.removeChild(elements[i]);
+    }
+    elements = document.querySelectorAll('.medium-editor-anchor-preview');
+    for (i = 0; i < elements.length; i += 1) {
+        document.body.removeChild(elements[i]);
+    }
+    document.body.removeChild(el);
+    sel.removeAllRanges();
+}
