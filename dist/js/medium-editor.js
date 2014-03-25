@@ -942,8 +942,16 @@ if (typeof module === 'object') {
 
         },
 
+        htmlEntities: function (str) {
+            // converts special characters (like <) into their escaped/encoded values (like &lt;).
+            // This allows you to show to display the string without the browser reading it as HTML.
+            return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+        },
+
         bindPaste: function () {
             var i, self = this;
+            var _this = this
+
             this.pasteWrapper = function (e) {
                 var paragraphs,
                     html = '',
@@ -960,7 +968,7 @@ if (typeof module === 'object') {
                         paragraphs = e.clipboardData.getData('text/plain').split(/[\r\n]/g);
                         for (p = 0; p < paragraphs.length; p += 1) {
                             if (paragraphs[p] !== '') {
-                                html += '<p>' + paragraphs[p] + '</p>';
+                                html += '<p>' + _this.htmlEntities(paragraphs[p]) + '</p>';
                             }
                         }
                         document.execCommand('insertHTML', false, html);
