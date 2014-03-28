@@ -1,3 +1,30 @@
+1.7.3 / 2014-03-22
+==================
+
+* Fixes activate/deactivate behavior
+
+
+1.7.2 / 2014-03-22
+==================
+
+* Removes DOM elements created by MediumEditor on deactivate
+
+
+1.7.1 / 2014-03-22
+==================
+
+* Prevents new lines with shift+enter when disableReturn is set to true
+
+
+1.7.0 / 2014-03-22
+==================
+
+* Removes compass dependency by using grunt with libsass
+* Fixes subscript button markup
+* Fixes anchor preview behavior for empty links and anchors
+* Adds a new option to disable double returns
+
+
 1.6.7 / 2014-03-13
 ==================
 

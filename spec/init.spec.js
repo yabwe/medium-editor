@@ -1,5 +1,5 @@
 /*global MediumEditor, describe, it, expect, spyOn,
-         afterEach, beforeEach*/
+         afterEach, beforeEach, tearDown*/
 
 describe('Initialization TestCase', function () {
     'use strict';
@@ -17,7 +17,7 @@ describe('Initialization TestCase', function () {
                 editor2 = new MediumEditor('.test');
             expect(editor1 === editor2).toBe(false);
             expect(MediumEditor.prototype.init).toHaveBeenCalled();
-            expect(MediumEditor.prototype.init.calls.length).toBe(2);
+            expect(MediumEditor.prototype.init.calls.count()).toBe(2);
         });
 
         it('should do nothing when selector does not return any elements', function () {
@@ -39,7 +39,7 @@ describe('Initialization TestCase', function () {
 
     describe('Elements', function () {
         it('should allow a string as parameter', function () {
-            spyOn(document, 'querySelectorAll').andCallThrough();
+            spyOn(document, 'querySelectorAll').and.callThrough();
             (function () {
                 return new MediumEditor('.test');
             }());
@@ -61,62 +61,57 @@ describe('Initialization TestCase', function () {
 
     describe('With a valid element', function () {
         beforeEach(function () {
-            this.body = document.getElementsByTagName('body')[0];
             this.el = document.createElement('div');
             this.el.className = 'editor';
-            this.body.appendChild(this.el);
+            document.body.appendChild(this.el);
         });
 
         afterEach(function () {
-            var elements = document.querySelectorAll('.medium-editor-toolbar'),
-                i;
-            for (i = 0; i < elements.length; i += 1) {
-                this.body.removeChild(elements[i]);
-            }
-            this.body.removeChild(this.el);
+            tearDown(this.el);
         });
 
         it('should have a default set of options', function () {
             var defaultOptions = {
-                    anchorInputPlaceholder: 'Paste or type a link',
-                    delay: 0,
-                    diffLeft: 0,
-                    diffTop: -10,
-                    disableReturn: false,
-                    disableToolbar: false,
-                    firstHeader: 'h3',
-                    forcePlainText: true,
-                    allowMultiParagraphSelection: true,
-                    placeholder: 'Type your text',
-                    secondHeader: 'h4',
-                    buttons: [ 'bold', 'italic', 'underline', 'anchor', 'header1', 'header2', 'quote' ],
-                    buttonLabels: false,
-                    targetBlank: false,
-                    anchorPreviewHideDelay: 500
-                },
+                anchorInputPlaceholder: 'Paste or type a link',
+                delay: 0,
+                diffLeft: 0,
+                diffTop: -10,
+                disableReturn: false,
+                disableDoubleReturn: false,
+                disableToolbar: false,
+                firstHeader: 'h3',
+                forcePlainText: true,
+                allowMultiParagraphSelection: true,
+                placeholder: 'Type your text',
+                secondHeader: 'h4',
+                buttons: ['bold', 'italic', 'underline', 'anchor', 'header1', 'header2', 'quote'],
+                buttonLabels: false,
+                targetBlank: false,
+                anchorPreviewHideDelay: 500
+            },
                 editor = new MediumEditor('.editor');
             expect(editor.options).toEqual(defaultOptions);
         });
 
         it('should accept custom options values', function () {
             var options = {
-                    anchorInputPlaceholder: 'test',
-                    diffLeft: 10,
-                    diffTop: 5,
-                    firstHeader: 'h2',
-                    secondHeader: 'h3',
-                    delay: 300
-                },
+                anchorInputPlaceholder: 'test',
+                diffLeft: 10,
+                diffTop: 5,
+                firstHeader: 'h2',
+                secondHeader: 'h3',
+                delay: 300
+            },
                 editor = new MediumEditor('.editor', options);
             expect(editor.options).toEqual(options);
         });
 
         it('should call the default initialization methods', function () {
-            spyOn(MediumEditor.prototype, 'initElements').andCallThrough();
-            spyOn(MediumEditor.prototype, 'initToolbar').andCallThrough();
-            spyOn(MediumEditor.prototype, 'bindSelect').andCallThrough();
-            spyOn(MediumEditor.prototype, 'bindButtons').andCallThrough();
-            spyOn(MediumEditor.prototype, 'bindAnchorForm').andCallThrough();
+            spyOn(MediumEditor.prototype, 'initElements').and.callThrough();
+            spyOn(MediumEditor.prototype, 'initToolbar').and.callThrough();
+            spyOn(MediumEditor.prototype, 'bindSelect').and.callThrough();
+            spyOn(MediumEditor.prototype, 'bindButtons').and.callThrough();
+            spyOn(MediumEditor.prototype, 'bindAnchorForm').and.callThrough();
             var editor = new MediumEditor('.editor');
             expect(editor.id).toBe(1);
             expect(editor.initElements).toHaveBeenCalled();

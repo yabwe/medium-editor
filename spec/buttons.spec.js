@@ -1,32 +1,28 @@
 /*global MediumEditor, describe, it, expect, spyOn,
          afterEach, beforeEach, selectElementContents,
-         jasmine, fireEvent*/
+         jasmine, fireEvent, tearDown*/
 
 describe('Buttons TestCase', function () {
     'use strict';
 
     beforeEach(function () {
-        this.body = document.getElementsByTagName('body')[0];
         this.el = document.createElement('div');
         this.el.className = 'editor';
         this.el.innerHTML = 'lorem ipsum';
-        this.body.appendChild(this.el);
+        document.body.appendChild(this.el);
     });
 
     afterEach(function () {
-        var elements = document.querySelectorAll('.medium-editor-toolbar'),
-            i,
-            sel = window.getSelection();
-        for (i = 0; i < elements.length; i += 1) {
-            this.body.removeChild(elements[i]);
-        }
-        this.body.removeChild(this.el);
-        sel.removeAllRanges();
+        tearDown(this.el);
     });
 
     describe('Button Initial State', function () {
         beforeEach(function () {
-            jasmine.Clock.useMock();
+            jasmine.clock().install();
+        });
+
+        afterEach(function () {
+            jasmine.clock().uninstall();
         });
 
         it('should activate button if selection already has the element', function () {
@@ -35,7 +31,7 @@ describe('Buttons TestCase', function () {
             this.el.innerHTML = '<b>lorem ipsum</b>';
             selectElementContents(editor.elements[0]);
             fireEvent(editor.elements[0], 'mouseup');
-            jasmine.Clock.tick(1);
+            jasmine.clock().tick(1);
             button = editor.toolbar.querySelector('[data-element="b"]');
             expect(button.className).toContain('medium-editor-button-active');
         });
@@ -43,7 +39,7 @@ describe('Buttons TestCase', function () {
 
     describe('Button click', function () {
         beforeEach(function () {
-            jasmine.Clock.useMock();
+            jasmine.clock().install();
         });
 
         it('should set active class on click', function () {
@@ -51,7 +47,7 @@ describe('Buttons TestCase', function () {
                 editor = new MediumEditor('.editor');
             selectElementContents(editor.elements[0]);
             fireEvent(editor.elements[0], 'mouseup');
-            jasmine.Clock.tick(1);
+            jasmine.clock().tick(1);
             button = editor.toolbar.querySelector('[data-element="b"]');
             fireEvent(button, 'click');
             expect(button.className).toContain('medium-editor-button-active');
@@ -63,7 +59,7 @@ describe('Buttons TestCase', function () {
                 editor = new MediumEditor('.editor');
             selectElementContents(editor.elements[0]);
             fireEvent(editor.elements[0], 'mouseup');
-            jasmine.Clock.tick(1);
+            jasmine.clock().tick(1);
             button = editor.toolbar.querySelector('[data-element="b"]');
             editor.selection = undefined;
             fireEvent(button, 'click');
@@ -76,7 +72,7 @@ describe('Buttons TestCase', function () {
                 editor = new MediumEditor('.editor');
             selectElementContents(editor.elements[0]);
             fireEvent(editor.elements[0], 'mouseup');
-            jasmine.Clock.tick(1);
+            jasmine.clock().tick(1);
             button = editor.toolbar.querySelector('[data-element="b"]');
             expect(button.className).toContain('medium-editor-button-active');
             fireEvent(button, 'click');
@@ -89,19 +85,19 @@ describe('Buttons TestCase', function () {
                 editor = new MediumEditor('.editor');
             selectElementContents(editor.elements[0]);
             fireEvent(editor.elements[0], 'mouseup');
-            jasmine.Clock.tick(1);
+            jasmine.clock().tick(1);
             button = editor.toolbar.querySelector('[data-element="b"]');
             fireEvent(button, 'click');
             expect(editor.execAction).toHaveBeenCalled();
         });
 
         it('should call the execCommand for native actions', function () {
-            spyOn(document, 'execCommand').andCallThrough();
+            spyOn(document, 'execCommand').and.callThrough();
             var button,
                 editor = new MediumEditor('.editor');
             selectElementContents(editor.elements[0]);
             fireEvent(editor.elements[0], 'mouseup');
-            jasmine.Clock.tick(1);
+            jasmine.clock().tick(1);
             button = editor.toolbar.querySelector('[data-element="i"]');
             fireEvent(button, 'click');
             expect(document.execCommand).toHaveBeenCalled();
@@ -114,7 +110,7 @@ describe('Buttons TestCase', function () {
                 editor = new MediumEditor('.editor');
             selectElementContents(editor.elements[0]);
             fireEvent(editor.elements[0], 'mouseup');
-            jasmine.Clock.tick(1);
+            jasmine.clock().tick(1);
             button = editor.toolbar.querySelector('[data-element="b"]');
             fireEvent(button, 'click');
             expect(editor.execAction).toHaveBeenCalled();
@@ -126,7 +122,7 @@ describe('Buttons TestCase', function () {
                 editor = new MediumEditor('.editor');
             selectElementContents(editor.elements[0]);
             fireEvent(editor.elements[0], 'mouseup');
-            jasmine.Clock.tick(1);
+            jasmine.clock().tick(1);
             button = editor.toolbar.querySelector('[data-element="a"]');
             fireEvent(button, 'click');
             expect(editor.triggerAnchorAction).toHaveBeenCalled();
@@ -135,7 +131,7 @@ describe('Buttons TestCase', function () {
 
     describe('AppendEl', function () {
         beforeEach(function () {
-            jasmine.Clock.useMock();
+            jasmine.clock().install();
         });
 
         it('should call the execFormatBlock method when button action is append', function () {
@@ -144,7 +140,7 @@ describe('Buttons TestCase', function () {
                 editor = new MediumEditor('.editor');
             selectElementContents(editor.elements[0]);
             fireEvent(editor.elements[0], 'mouseup');
-            jasmine.Clock.tick(1);
+            jasmine.clock().tick(1);
             button = editor.toolbar.querySelector('[data-element="h3"]');
             fireEvent(button, 'click');
             expect(editor.execFormatBlock).toHaveBeenCalled();
@@ -156,7 +152,7 @@ describe('Buttons TestCase', function () {
                 editor = new MediumEditor('.editor');
             selectElementContents(editor.elements[0]);
             fireEvent(editor.elements[0], 'mouseup');
-            jasmine.Clock.tick(1);
+            jasmine.clock().tick(1);
             button = editor.toolbar.querySelector('[data-element="h3"]');
             fireEvent(button, 'click');
             expect(this.el.innerHTML).toBe('<h3><b>lorem ipsum</b></h3>');
@@ -168,7 +164,7 @@ describe('Buttons TestCase', function () {
                 editor = new MediumEditor('.editor');
             selectElementContents(editor.elements[0]);
             fireEvent(editor.elements[0], 'mouseup');
-            jasmine.Clock.tick(1);
+            jasmine.clock().tick(1);
             button = editor.toolbar.querySelector('[data-element="h3"]');
             fireEvent(button, 'click');
             expect(this.el.innerHTML).toBe('<p><b>lorem ipsum</b></p>');

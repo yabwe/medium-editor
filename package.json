@@ -1,26 +1,39 @@
 {
   "name": "medium-editor",
-  "version": "1.6.7",
+  "version": "1.7.3",
+  "author": "Davi Ferreira <hi@daviferreira.com>",
   "description": "Medium.com WYSIWYG editor clone.",
   "main": "src/js/medium-editor.js",
   "repository": {
     "type": "git",
     "url": "https://github.com/daviferreira/medium-editor"
   },
+  "bugs": {
+    "url": "https://github.com/daviferreira/medium-editor/issues",
+    "email": "hi@daviferreira.com"
+  },
+  "homepage": "http://daviferreira.github.io/medium-editor/",
+  "keywords": [
+    "editor",
+    "medium",
+    "wysiwyg",
+    "rich-text"
+  ],
   "license": "THE BEER-WARE LICENSE",
   "devDependencies": {
     "grunt": "~0.4.4",
     "grunt-autoprefixer": "~0.7.2",
-    "grunt-contrib-uglify": "~0.2.7",
-    "grunt-contrib-jasmine": "~0.4.2",
-    "grunt-contrib-csslint": "~0.1.2",
-    "grunt-jslint": "~0.2.5a",
-    "grunt-contrib-watch": "~0.4.2",
+    "grunt-contrib-uglify": "~0.4.0",
+    "grunt-contrib-jasmine": "~0.6.1",
+    "grunt-contrib-csslint": "~0.2.0",
+    "grunt-jslint": "~1.1.8",
+    "grunt-contrib-watch": "~0.5.3",
     "grunt-contrib-concat": "~0.3.0",
-    "grunt-template-jasmine-istanbul": "~0.2.4",
-    "grunt-plato": "~0.2.0",
-    "brfs": "0.0.8",
-    "grunt-sass": "~0.11.0"
+    "grunt-template-jasmine-istanbul": "~0.3.1",
+    "grunt-plato": "~1.0.0",
+    "brfs": "1.0.0",
+    "grunt-sass": "~0.11.0",
+    "grunt-jsbeautifier": "~0.2.6"
   },
   "scripts": {
     "test": "grunt test --verbose"
