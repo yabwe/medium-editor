@@ -87,6 +87,30 @@ if (typeof module === 'object') {
         return html;
     }
 
+    // ie9 compatability
+    function addClass(obj, className) {
+        if (obj.classList) {
+            obj.classList.add(className);
+        } else {
+            obj.className += " " + className;
+        }
+    }
+
+    function removeClass(obj, className) {
+        if (obj.classList) {
+            obj.classList.remove(className);
+        } else {
+            obj.className = obj.className.replace(new RegExp('(?:^|\\s)' + className + '(?!\\S)'), '');
+        }
+    }
+
+    function containsClass(obj, className) {
+        if (obj.classList) {
+            return obj.classList.contains(className);
+        }
+        return new RegExp('(?:^|\\s)' + className + '(?!\\S)').text(obj.className);
+    }
+
     MediumEditor.prototype = {
         defaults: {
             allowMultiParagraphSelection: true,
@@ -478,12 +502,12 @@ if (typeof module === 'object') {
                 middleBoundary = (boundary.left + boundary.right) / 2,
                 halfOffsetWidth = this.toolbar.offsetWidth / 2;
             if (boundary.top < buttonHeight) {
-                this.toolbar.classList.add('medium-toolbar-arrow-over');
-                this.toolbar.classList.remove('medium-toolbar-arrow-under');
+                addClass(this.toolbar, 'medium-toolbar-arrow-over');
+                removeClass(this.toolbar, 'medium-toolbar-arrow-under');
                 this.toolbar.style.top = buttonHeight + boundary.bottom - this.options.diffTop + window.pageYOffset - this.toolbar.offsetHeight + 'px';
             } else {
-                this.toolbar.classList.add('medium-toolbar-arrow-under');
-                this.toolbar.classList.remove('medium-toolbar-arrow-over');
+                addClass(this.toolbar, 'medium-toolbar-arrow-under');
+                removeClass(this.toolbar, 'medium-toolbar-arrow-over');
                 this.toolbar.style.top = boundary.top + this.options.diffTop + window.pageYOffset - this.toolbar.offsetHeight + 'px';
             }
             if (middleBoundary < halfOffsetWidth) {
@@ -503,7 +527,7 @@ if (typeof module === 'object') {
             var buttons = this.toolbarActions.querySelectorAll('button'),
                 i;
             for (i = 0; i < buttons.length; i += 1) {
-                buttons[i].classList.remove('medium-editor-button-active');
+                removeClass(buttons[i], 'medium-editor-button-active');
             }
             this.checkActiveButtons();
             return this;
@@ -538,9 +562,9 @@ if (typeof module === 'object') {
                         self.checkSelection();
                     }
                     if (this.className.indexOf('medium-editor-button-active') > -1) {
-                        this.classList.remove('medium-editor-button-active');
+                        removeClass(this, 'medium-editor-button-active');
                     } else {
-                        this.className += ' medium-editor-button-active';
+                        addClass(this, 'medium-editor-button-active');
                     }
                     self.execAction(this.getAttribute('data-action'), e);
                 };
@@ -640,7 +664,7 @@ if (typeof module === 'object') {
 
         hideToolbarActions: function () {
             this.keepToolbarAlive = false;
-            this.toolbar.classList.remove('medium-editor-toolbar-active');
+            removeClass(this.toolbar, 'medium-editor-toolbar-active');
         },
 
         showToolbarActions: function () {
@@ -651,8 +675,8 @@ if (typeof module === 'object') {
             this.keepToolbarAlive = false;
             clearTimeout(timer);
             timer = setTimeout(function () {
-                if (!self.toolbar.classList.contains('medium-editor-toolbar-active')) {
-                    self.toolbar.classList.add('medium-editor-toolbar-active');
+                if (!containsClass(self.toolbar, 'medium-editor-toolbar-active')) {
+                    addClass(self.toolbar, 'medium-editor-toolbar-active');
                 }
             }, 100);
         },
@@ -697,12 +721,12 @@ if (typeof module === 'object') {
 
 
         hideAnchorPreview: function () {
-            this.anchorPreview.classList.remove('medium-editor-anchor-preview-active');
+            removeClass(this.anchorPreview, 'medium-editor-anchor-preview-active');
         },
 
         // TODO: break method
         showAnchorPreview: function (anchor_el) {
-            if (this.anchorPreview.classList.contains('medium-editor-anchor-preview-active')) {
+            if (containsClass(this.anchorPreview, 'medium-editor-anchor-preview-active')) {
                 return true;
             }
 
@@ -720,15 +744,15 @@ if (typeof module === 'object') {
 
             clearTimeout(timer);
             timer = setTimeout(function () {
-                if (!self.anchorPreview.classList.contains('medium-editor-anchor-preview-active')) {
-                    self.anchorPreview.classList.add('medium-editor-anchor-preview-active');
+                if (!containsClass(self.anchorPreview, 'medium-editor-anchor-preview-active')) {
+                    addClass(self.anchorPreview, 'medium-editor-anchor-preview-active');
                 }
             }, 100);
 
             self.observeAnchorPreview(anchor_el);
 
-            self.anchorPreview.classList.add('medium-toolbar-arrow-over');
-            self.anchorPreview.classList.remove('medium-toolbar-arrow-under');
+            addClass(self.anchorPreview, 'medium-toolbar-arrow-over');
+            removeClass(self.anchorPreview, 'medium-toolbar-arrow-under');
             self.anchorPreview.style.top = Math.round(buttonHeight + boundary.bottom - self.options.diffTop + window.pageYOffset - self.anchorPreview.offsetHeight) + 'px';
             if (middleBoundary < halfOffsetWidth) {
                 self.anchorPreview.style.left = defaultLeft + halfOffsetWidth + 'px';
@@ -841,7 +865,7 @@ if (typeof module === 'object') {
                 }
 
                 // only show when hovering on anchors
-                if (this.toolbar.classList.contains('medium-editor-toolbar-active')) {
+                if (containsClass(this.toolbar, 'medium-editor-toolbar-active')) {
                     // only show when toolbar is not present
                     return true;
                 }
@@ -896,7 +920,7 @@ if (typeof module === 'object') {
             this.windowResizeHandler = function () {
                 clearTimeout(timerResize);
                 timerResize = setTimeout(function () {
-                    if (self.toolbar && self.toolbar.classList.contains('medium-editor-toolbar-active')) {
+                    if (self.toolbar && containsClass(self.toolbar, 'medium-editor-toolbar-active')) {
                         self.setToolbarPosition();
                     }
                 }, 100);
@@ -948,7 +972,7 @@ if (typeof module === 'object') {
                     html = '',
                     p;
 
-                this.classList.remove('medium-editor-placeholder');
+                removeClass(this, 'medium-editor-placeholder');
                 if (!self.options.forcePlainText) {
                     return this;
                 }
@@ -978,11 +1002,11 @@ if (typeof module === 'object') {
             var i,
                 activatePlaceholder = function (el) {
                     if (el.textContent.replace(/^\s+|\s+$/g, '') === '') {
-                        el.classList.add('medium-editor-placeholder');
+                        addClass(el, 'medium-editor-placeholder');
                     }
                 },
                 placeholderWrapper = function (e) {
-                    this.classList.remove('medium-editor-placeholder');
+                    removeClass(this, 'medium-editor-placeholder');
                     if (e.type !== 'keypress') {
                         activatePlaceholder(this);
                     }
