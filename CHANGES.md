@@ -1,3 +1,10 @@
+1.7.5 / 2014-03-30
+==================
+
+* Fixes isActive toggling
+* Removes anchor preview default value
+
+
 1.7.3 / 2014-03-22
 ==================
 
