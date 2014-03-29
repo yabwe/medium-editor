@@ -43,6 +43,10 @@ var elements = document.querySelectorAll('.editable'),
     editor = new MediumEditor(elements);
 ```
 
+## IE9
+
+If you want to support IE9, you will need to use a classList pollyfill, like Eli Gray's, available at [https://github.com/eligrey/classList.js](https://github.com/eligrey/classList.js).
+
 ## Initialization options
 
 * __allowMultiParagraphSelection__: enables the toolbar when selecting multiple paragraphs/block elements. Default: true
