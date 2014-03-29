@@ -15,6 +15,16 @@ describe('Activate/Deactivate TestCase', function () {
         tearDown(this.el);
     });
 
+    it('should toggle the isActive property', function () {
+        var editor = new MediumEditor('.editor');
+        editor.deactivate();
+        expect(editor.isActive).toBe(false);
+        editor.activate();
+        expect(editor.isActive).toBe(true);
+        editor.deactivate();
+        expect(editor.isActive).toBe(false);
+    });
+
     describe('Activate', function () {
         it('should init the toolbar and editor elements', function () {
             var editor = new MediumEditor('.editor');

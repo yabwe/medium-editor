@@ -117,7 +117,6 @@ if (typeof module === 'object') {
             if (this.elements.length === 0) {
                 return;
             }
-            this.isActive = true;
             this.parentElements = ['p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'blockquote', 'pre'];
             this.id = document.querySelectorAll('.medium-editor-toolbar').length + 1;
             this.options = extend(options, this.defaults);
@@ -125,6 +124,7 @@ if (typeof module === 'object') {
         },
 
         setup: function () {
+            this.isActive = true;
             this.initElements()
                 .bindSelect()
                 .bindPaste()
