@@ -796,7 +796,7 @@ if (typeof module === 'object') {
 
         anchorPreviewTemplate: function () {
             return '<div class="medium-editor-toolbar-anchor-preview" id="medium-editor-toolbar-anchor-preview">' +
-                '    <i class="medium-editor-toolbar-anchor-preview-inner">http://google.com/</i>' +
+                '    <i class="medium-editor-toolbar-anchor-preview-inner"></i>' +
                 '</div>';
         },
 
