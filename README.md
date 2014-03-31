@@ -66,6 +66,8 @@ If you want to support IE9, you will need to use a classList pollyfill, like Eli
 * __secondHeader__: HTML tag to be used as second header. Default: h4
 * __targetBlank__: enables/disables target="\_blank" for anchor tags. Default:
   false
+* __checkLinkFormat__: enables/disables check for http on anchor links. Default:
+   false
 
 Example:
 

@@ -102,7 +102,8 @@ if (typeof module === 'object') {
             placeholder: 'Type your text',
             secondHeader: 'h4',
             targetBlank: false,
-            anchorPreviewHideDelay: 500
+            anchorPreviewHideDelay: 500,
+            checkLinkFormat: false
         },
 
         // http://stackoverflow.com/questions/17907445/how-to-detect-ie11#comment30165888_17907562
@@ -832,7 +833,7 @@ if (typeof module === 'object') {
             if (e.target && e.target.tagName.toLowerCase() === 'a') {
 
                 // Detect empty href attributes
-                // The browser will make href="" or href="#top" 
+                // The browser will make href="" or href="#top"
                 // into absolute urls when accessed as e.targed.href, so check the html
                 if (!/href=["']\S+["']/.test(e.target.outerHTML) || /href=["']#\S+["']/.test(e.target.outerHTML)) {
                     return true;
@@ -865,6 +866,15 @@ if (typeof module === 'object') {
             return this;
         },
 
+        checkLinkFormat: function (value) {
+            var re = /^https?:\/\//;
+            if (value.match(re)) {
+                console.log('match');
+                return value;
+            }
+            return "http://" + value;
+        },
+
         setTargetBlank: function () {
             var el = getSelectionStart(),
                 i;
@@ -880,6 +890,9 @@ if (typeof module === 'object') {
 
         createLink: function (input) {
             restoreSelection(this.savedSelection);
+            if (this.options.checkLinkFormat) {
+                input.value = this.checkLinkFormat(input.value);
+            }
             document.execCommand('createLink', false, input.value);
             if (this.options.targetBlank) {
                 this.setTargetBlank();
