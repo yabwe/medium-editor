@@ -3,10 +3,15 @@
 module.exports = function (grunt) {
     'use strict';
 
-    var gruntConfig = {
-        pkg: grunt.file.readJSON('package.json')
-    },
-        autoprefixerBrowsers = ['last 3 versions', 'ie >= 9'];
+    var autoprefixerBrowsers = ['last 3 versions', 'ie >= 9'],
+        globalConfig = {
+            src: 'src',
+            dest: 'dev'
+        },
+        gruntConfig = {
+            pkg: grunt.file.readJSON('package.json'),
+            globalConfig: globalConfig
+        };
 
     gruntConfig.jsbeautifier = {
         files: ['src/js/**/*.js', 'spec/*.js', 'Gruntfile.js'],
@@ -64,6 +69,13 @@ module.exports = function (grunt) {
                     report: 'coverage'
                 },
                 summary: true
+            }
+        },
+        spec: {
+            src: 'src/js/**/*.js',
+            options: {
+                specs: ['spec/<%= globalConfig.file %>.spec.js'],
+                helpers: 'spec/helpers/*.js'
             }
         }
     };
@@ -169,9 +181,14 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-contrib-concat');
     grunt.loadNpmTasks('grunt-plato');
 
-    grunt.registerTask('test', ['jsbeautifier', 'jslint', 'jasmine', 'csslint']);
-    grunt.registerTask('js', ['jsbeautifier', 'jslint', 'jasmine', 'uglify', 'concat']);
+    grunt.registerTask('test', ['jsbeautifier', 'jslint', 'jasmine:suite', 'csslint']);
+    grunt.registerTask('js', ['jsbeautifier', 'jslint', 'jasmine:suite', 'uglify', 'concat']);
     grunt.registerTask('css', ['sass', 'autoprefixer', 'csslint']);
     grunt.registerTask('default', ['js', 'css']);
+
+    grunt.registerTask('spec', 'Runs a task on a specified file', function (taskName, fileName) {
+        globalConfig.file = fileName;
+        grunt.task.run(taskName + ':spec');
+    });
 
 };
