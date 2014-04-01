@@ -71,27 +71,27 @@ describe('Initialization TestCase', function () {
         });
 
         it('should have a default set of options', function () {
-            var editor = new MediumEditor('.editor'),
-                defaultOptions = {
-                    anchorInputPlaceholder: 'Paste or type a link',
-                    delay: 0,
-                    diffLeft: 0,
-                    diffTop: -10,
-                    disableReturn: false,
-                    disableDoubleReturn: false,
-                    disableToolbar: false,
-                    firstHeader: 'h3',
-                    forcePlainText: true,
-                    cleanPastedHTML: false,
-                    allowMultiParagraphSelection: true,
-                    placeholder: 'Type your text',
-                    secondHeader: 'h4',
-                    buttons: ['bold', 'italic', 'underline', 'anchor', 'header1', 'header2', 'quote'],
-                    buttonLabels: false,
-                    targetBlank: false,
-                    anchorPreviewHideDelay: 500
-                };
-
+            var defaultOptions = {
+                anchorInputPlaceholder: 'Paste or type a link',
+                delay: 0,
+                diffLeft: 0,
+                diffTop: -10,
+                disableReturn: false,
+                disableDoubleReturn: false,
+                disableToolbar: false,
+                firstHeader: 'h3',
+                forcePlainText: true,
+                cleanPastedHTML: false,
+                allowMultiParagraphSelection: true,
+                placeholder: 'Type your text',
+                secondHeader: 'h4',
+                buttons: ['bold', 'italic', 'underline', 'anchor', 'header1', 'header2', 'quote'],
+                buttonLabels: false,
+                targetBlank: false,
+                anchorPreviewHideDelay: 500,
+                checkLinkFormat: false
+            },
+                editor = new MediumEditor('.editor');
             expect(editor.options).toEqual(defaultOptions);
         });
 

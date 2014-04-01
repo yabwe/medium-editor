@@ -80,6 +80,17 @@ describe('Anchor Button TestCase', function () {
             expect(editor.createLink).toHaveBeenCalled();
         });
 
+        it('should add http:// if need be and checkLinkFormat option is set to true', function () {
+            var editor = new MediumEditor('.editor', {
+                checkLinkFormat: true
+            }),
+                input = editor.anchorForm.querySelector('input');
+            selectElementContents(editor.elements[0]);
+            input.value = 'test.com';
+            editor.createLink(input);
+            expect(editor.elements[0].querySelector('a').href).toBe('http://test.com/');
+        });
+
         it('should add target="_blank" when respective option is set to true', function () {
             var editor = new MediumEditor('.editor', {
                 targetBlank: true
