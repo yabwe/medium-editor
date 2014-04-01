@@ -56,7 +56,7 @@ If you want to support IE9, you will need to use a classList pollyfill, like Eli
 * __buttonLabels__: type of labels on the buttons. Values: 'fontawesome', `{'bold': '<b>b</b>', 'italic': '<i>i</i>'}`. Default: false
 * __checkLinkFormat__: enables/disables check for http on anchor links. Default:
    false
-* cleanPastedHTML: cleans pasted content from different sources, like google docs etc. Default: false
+* __cleanPastedHTML__: cleans pasted content from different sources, like google docs etc. Default: false
 * __delay__: time in milliseconds to show the toolbar or anchor tag preview. Default: 0
 * __diffLeft__: value in pixels to be added to the X axis positioning of the toolbar. Default: 0
 * __diffTop__: value in pixels to be added to the Y axis positioning of the toolbar. Default: -10
