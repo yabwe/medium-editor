@@ -89,7 +89,8 @@ describe('Initialization TestCase', function () {
                 buttonLabels: false,
                 targetBlank: false,
                 anchorPreviewHideDelay: 500,
-                checkLinkFormat: false
+                checkLinkFormat: false,
+                extensions: {}
             },
                 editor = new MediumEditor('.editor');
             expect(editor.options).toEqual(defaultOptions);
