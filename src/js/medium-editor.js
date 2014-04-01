@@ -91,8 +91,11 @@ if (typeof module === 'object') {
         defaults: {
             allowMultiParagraphSelection: true,
             anchorInputPlaceholder: 'Paste or type a link',
+            anchorPreviewHideDelay: 500,
             buttons: ['bold', 'italic', 'underline', 'anchor', 'header1', 'header2', 'quote'],
             buttonLabels: false,
+            checkLinkFormat: false,
+            cleanPastedHTML: false,
             delay: 0,
             diffLeft: 0,
             diffTop: -10,
@@ -101,12 +104,9 @@ if (typeof module === 'object') {
             disableToolbar: false,
             firstHeader: 'h3',
             forcePlainText: true,
-            cleanPastedHTML: false,
             placeholder: 'Type your text',
             secondHeader: 'h4',
-            targetBlank: false,
-            anchorPreviewHideDelay: 500,
-            checkLinkFormat: false
+            targetBlank: false
         },
 
         // http://stackoverflow.com/questions/17907445/how-to-detect-ie11#comment30165888_17907562
