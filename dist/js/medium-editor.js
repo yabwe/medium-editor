@@ -141,7 +141,7 @@ if (typeof module === 'object') {
                     this.elements[i].setAttribute('data-placeholder', this.options.placeholder);
                 }
                 this.elements[i].setAttribute('data-medium-element', true);
-                this.bindParagraphCreation(i).bindReturn(i).bindTab(i).bindAnchorPreview(i);
+                this.bindParagraphCreation(i).bindReturn(i).bindTab(i);
                 if (!this.options.disableToolbar && !this.elements[i].getAttribute('data-disable-toolbar')) {
                     addToolbar = true;
                 }
@@ -150,7 +150,8 @@ if (typeof module === 'object') {
             if (addToolbar) {
                 this.initToolbar()
                     .bindButtons()
-                    .bindAnchorForm();
+                    .bindAnchorForm()
+                    .bindAnchorPreview();
             }
             return this;
         },
@@ -858,10 +859,13 @@ if (typeof module === 'object') {
         },
 
         bindAnchorPreview: function (index) {
-            var self = this;
-            this.elements[index].addEventListener('mouseover', function (e) {
+            var i, self = this;
+            this.editorAnchorObserverWrapper = function (e) {
                 self.editorAnchorObserver(e);
-            });
+            };
+            for (i = 0; i < this.elements.length; i += 1) {
+                this.elements[i].addEventListener('mouseover', this.editorAnchorObserverWrapper);
+            }
             return this;
         },
 
@@ -930,6 +934,7 @@ if (typeof module === 'object') {
             window.removeEventListener('resize', this.windowResizeHandler);
 
             for (i = 0; i < this.elements.length; i += 1) {
+                this.elements[i].removeEventListener('mouseover', this.editorAnchorObserverWrapper);
                 this.elements[i].removeEventListener('keyup', this.checkSelectionWrapper);
                 this.elements[i].removeEventListener('blur', this.checkSelectionWrapper);
                 this.elements[i].removeEventListener('paste', this.pasteWrapper);
