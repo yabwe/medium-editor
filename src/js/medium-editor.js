@@ -645,7 +645,9 @@ if (typeof module === 'object') {
 
         hideToolbarActions: function () {
             this.keepToolbarAlive = false;
-            this.toolbar.classList.remove('medium-editor-toolbar-active');
+            if (this.toolbar !== undefined) {
+                this.toolbar.classList.remove('medium-editor-toolbar-active');
+            }
         },
 
         showToolbarActions: function () {
