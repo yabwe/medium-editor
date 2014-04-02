@@ -1,4 +1,4 @@
-/*global MediumEditor, describe, it, expect, spyOn,
+/*global MediumEditor, describe, it, expect, spyOn, jasmine, fireEvent,
          afterEach, beforeEach, selectElementContents, runs, waitsFor,
          tearDown */
 
