@@ -658,7 +658,7 @@ if (typeof module === 'object') {
             this.keepToolbarAlive = false;
             clearTimeout(timer);
             timer = setTimeout(function () {
-                if (!self.toolbar.classList.contains('medium-editor-toolbar-active')) {
+                if (self.toolbar && !self.toolbar.classList.contains('medium-editor-toolbar-active')) {
                     self.toolbar.classList.add('medium-editor-toolbar-active');
                 }
             }, 100);
@@ -727,7 +727,7 @@ if (typeof module === 'object') {
 
             clearTimeout(timer);
             timer = setTimeout(function () {
-                if (!self.anchorPreview.classList.contains('medium-editor-anchor-preview-active')) {
+                if (self.anchorPreview && !self.anchorPreview.classList.contains('medium-editor-anchor-preview-active')) {
                     self.anchorPreview.classList.add('medium-editor-anchor-preview-active');
                 }
             }, 100);
@@ -820,7 +820,9 @@ if (typeof module === 'object') {
                 sel.removeAllRanges();
                 sel.addRange(range);
                 setTimeout(function () {
-                    self.showAnchorForm(self.activeAnchor.href);
+                    if (self.activeAnchor) {
+                        self.showAnchorForm(self.activeAnchor.href);
+                    }
                     self.keepToolbarAlive = false;
                 }, 100 + self.options.delay);
 
