@@ -85,6 +85,11 @@ if (typeof module === 'object') {
         return html;
     }
 
+    // https://github.com/jashkenas/underscore
+    function isElement(obj) {
+        return !!(obj && obj.nodeType === 1);
+    }
+
     MediumEditor.prototype = {
         defaults: {
             allowMultiParagraphSelection: true,
@@ -104,7 +109,8 @@ if (typeof module === 'object') {
             forcePlainText: true,
             placeholder: 'Type your text',
             secondHeader: 'h4',
-            targetBlank: false
+            targetBlank: false,
+            extensions: {}
         },
 
         // http://stackoverflow.com/questions/17907445/how-to-detect-ie11#comment30165888_17907562
@@ -163,12 +169,39 @@ if (typeof module === 'object') {
                 elementid,
                 content = {};
             for (i = 0; i < this.elements.length; i += 1) {
+                console.log("serialize", this.elements, this.elements[i].id);
                 elementid = (this.elements[i].id !== '') ? this.elements[i].id : 'element-' + i;
                 content[elementid] = {
                     value: this.elements[i].innerHTML.trim()
                 };
             }
             return content;
+        },
+
+        /**
+         * Helper function to call a method with a number of parameters on all registered extensions.
+         * The function assures that the function exists before calling.
+         *
+         * @param {string} funcName name of the function to call
+         * @param [args] arguments passed into funcName
+         */
+        callExtensions: function (funcName) {
+            if (arguments.length < 1) {
+                return;
+            }
+
+            var args = Array.prototype.slice.call(arguments, 1),
+                ext,
+                name;
+
+            for (name in this.options.extensions) {
+                if (this.options.extensions.hasOwnProperty(name)) {
+                    ext = this.options.extensions[name];
+                    if (ext[funcName] !== undefined) {
+                        ext[funcName].apply(ext, args);
+                    }
+                }
+            }
         },
 
         bindParagraphCreation: function (index) {
@@ -247,22 +280,22 @@ if (typeof module === 'object') {
         buttonTemplate: function (btnType) {
             var buttonLabels = this.getButtonLabels(this.options.buttonLabels),
                 buttonTemplates = {
-                    'bold': '<li><button class="medium-editor-action medium-editor-action-bold" data-action="bold" data-element="b">' + buttonLabels.bold + '</button></li>',
-                    'italic': '<li><button class="medium-editor-action medium-editor-action-italic" data-action="italic" data-element="i">' + buttonLabels.italic + '</button></li>',
-                    'underline': '<li><button class="medium-editor-action medium-editor-action-underline" data-action="underline" data-element="u">' + buttonLabels.underline + '</button></li>',
-                    'strikethrough': '<li><button class="medium-editor-action medium-editor-action-strikethrough" data-action="strikethrough" data-element="strike"><strike>A</strike></button></li>',
-                    'superscript': '<li><button class="medium-editor-action medium-editor-action-superscript" data-action="superscript" data-element="sup">' + buttonLabels.superscript + '</button></li>',
-                    'subscript': '<li><button class="medium-editor-action medium-editor-action-subscript" data-action="subscript" data-element="sub">' + buttonLabels.subscript + '</button></li>',
-                    'anchor': '<li><button class="medium-editor-action medium-editor-action-anchor" data-action="anchor" data-element="a">' + buttonLabels.anchor + '</button></li>',
-                    'image': '<li><button class="medium-editor-action medium-editor-action-image" data-action="image" data-element="img">' + buttonLabels.image + '</button></li>',
-                    'header1': '<li><button class="medium-editor-action medium-editor-action-header1" data-action="append-' + this.options.firstHeader + '" data-element="' + this.options.firstHeader + '">' + buttonLabels.header1 + '</button></li>',
-                    'header2': '<li><button class="medium-editor-action medium-editor-action-header2" data-action="append-' + this.options.secondHeader + '" data-element="' + this.options.secondHeader + '">' + buttonLabels.header2 + '</button></li>',
-                    'quote': '<li><button class="medium-editor-action medium-editor-action-quote" data-action="append-blockquote" data-element="blockquote">' + buttonLabels.quote + '</button></li>',
-                    'orderedlist': '<li><button class="medium-editor-action medium-editor-action-orderedlist" data-action="insertorderedlist" data-element="ol">' + buttonLabels.orderedlist + '</button></li>',
-                    'unorderedlist': '<li><button class="medium-editor-action medium-editor-action-unorderedlist" data-action="insertunorderedlist" data-element="ul">' + buttonLabels.unorderedlist + '</button></li>',
-                    'pre': '<li><button class="medium-editor-action medium-editor-action-pre" data-action="append-pre" data-element="pre">' + buttonLabels.pre + '</button></li>',
-                    'indent': '<li><button class="medium-editor-action medium-editor-action-indent" data-action="indent" data-element="ul">' + buttonLabels.indent + '</button></li>',
-                    'outdent': '<li><button class="medium-editor-action medium-editor-action-outdent" data-action="outdent" data-element="ul">' + buttonLabels.outdent + '</button></li>'
+                    'bold': '<button class="medium-editor-action medium-editor-action-bold" data-action="bold" data-element="b">' + buttonLabels.bold + '</button>',
+                    'italic': '<button class="medium-editor-action medium-editor-action-italic" data-action="italic" data-element="i">' + buttonLabels.italic + '</button>',
+                    'underline': '<button class="medium-editor-action medium-editor-action-underline" data-action="underline" data-element="u">' + buttonLabels.underline + '</button>',
+                    'strikethrough': '<button class="medium-editor-action medium-editor-action-strikethrough" data-action="strikethrough" data-element="strike"><strike>A</strike></button>',
+                    'superscript': '<button class="medium-editor-action medium-editor-action-superscript" data-action="superscript" data-element="sup">' + buttonLabels.superscript + '</button>',
+                    'subscript': '<button class="medium-editor-action medium-editor-action-subscript" data-action="subscript" data-element="sub">' + buttonLabels.subscript + '</button>',
+                    'anchor': '<button class="medium-editor-action medium-editor-action-anchor" data-action="anchor" data-element="a">' + buttonLabels.anchor + '</button>',
+                    'image': '<button class="medium-editor-action medium-editor-action-image" data-action="image" data-element="img">' + buttonLabels.image + '</button>',
+                    'header1': '<button class="medium-editor-action medium-editor-action-header1" data-action="append-' + this.options.firstHeader + '" data-element="' + this.options.firstHeader + '">' + buttonLabels.header1 + '</button>',
+                    'header2': '<button class="medium-editor-action medium-editor-action-header2" data-action="append-' + this.options.secondHeader + '" data-element="' + this.options.secondHeader + '">' + buttonLabels.header2 + '</button>',
+                    'quote': '<button class="medium-editor-action medium-editor-action-quote" data-action="append-blockquote" data-element="blockquote">' + buttonLabels.quote + '</button>',
+                    'orderedlist': '<button class="medium-editor-action medium-editor-action-orderedlist" data-action="insertorderedlist" data-element="ol">' + buttonLabels.orderedlist + '</button>',
+                    'unorderedlist': '<button class="medium-editor-action medium-editor-action-unorderedlist" data-action="insertunorderedlist" data-element="ul">' + buttonLabels.unorderedlist + '</button>',
+                    'pre': '<button class="medium-editor-action medium-editor-action-pre" data-action="append-pre" data-element="pre">' + buttonLabels.pre + '</button>',
+                    'indent': '<button class="medium-editor-action medium-editor-action-indent" data-action="indent" data-element="ul">' + buttonLabels.indent + '</button>',
+                    'outdent': '<button class="medium-editor-action medium-editor-action-outdent" data-action="outdent" data-element="ul">' + buttonLabels.outdent + '</button>'
                 };
             return buttonTemplates[btnType] || false;
         },
@@ -317,27 +350,6 @@ if (typeof module === 'object') {
             return buttonLabels;
         },
 
-        //TODO: actionTemplate
-        toolbarTemplate: function () {
-            var btns = this.options.buttons,
-                html = '<ul id="medium-editor-toolbar-actions" class="medium-editor-toolbar-actions clearfix">',
-                i,
-                tpl;
-
-            for (i = 0; i < btns.length; i += 1) {
-                tpl = this.buttonTemplate(btns[i]);
-                if (tpl) {
-                    html += tpl;
-                }
-            }
-            html += '</ul>' +
-                '<div class="medium-editor-toolbar-form-anchor" id="medium-editor-toolbar-form-anchor">' +
-                '    <input type="text" value="" placeholder="' + this.options.anchorInputPlaceholder + '">' +
-                '    <a href="#">&times;</a>' +
-                '</div>';
-            return html;
-        },
-
         initToolbar: function () {
             if (this.toolbar) {
                 return this;
@@ -356,9 +368,63 @@ if (typeof module === 'object') {
             var toolbar = document.createElement('div');
             toolbar.id = 'medium-editor-toolbar-' + this.id;
             toolbar.className = 'medium-editor-toolbar';
-            toolbar.innerHTML = this.toolbarTemplate();
+            toolbar.appendChild(this.toolbarButtons());
+            toolbar.appendChild(this.toolbarFormAnchor());
             document.body.appendChild(toolbar);
             return toolbar;
+        },
+
+        //TODO: actionTemplate
+        toolbarButtons: function () {
+            var btns = this.options.buttons,
+                ul = document.createElement('ul'),
+                li,
+                i,
+                btn,
+                ext;
+
+            ul.id = 'medium-editor-toolbar-actions';
+            ul.className = 'medium-editor-toolbar-actions clearfix';
+
+            for (i = 0; i < btns.length; i += 1) {
+                if (this.options.extensions.hasOwnProperty(btns[i])) {
+                    ext = this.options.extensions[btns[i]];
+                    btn = ext.getButton !== undefined ? ext.getButton() : null;
+                } else {
+                    btn = this.buttonTemplate(btns[i]);
+                }
+
+                if (btn) {
+                    li = document.createElement('li');
+                    if (isElement(btn)) {
+                        li.appendChild(btn);
+                    } else {
+                        li.innerHTML = btn;
+                    }
+                    ul.appendChild(li);
+                }
+            }
+
+            return ul;
+        },
+
+        toolbarFormAnchor: function () {
+            var anchor = document.createElement('div'),
+                input = document.createElement('input'),
+                a = document.createElement('a');
+
+            a.setAttribute('href', '#');
+            a.innerText = '&times;';
+
+            input.setAttribute('type', 'text');
+            input.setAttribute('placeholder', this.options.anchorInputPlaceholder);
+
+            anchor.className = 'medium-editor-toolbar-form-anchor';
+            anchor.id = 'medium-editor-toolbar-form-anchor';
+            anchor.appendChild(input);
+            anchor.appendChild(a);
+
+            return anchor;
         },
 
         bindSelect: function () {
@@ -513,12 +579,19 @@ if (typeof module === 'object') {
         },
 
         checkActiveButtons: function () {
-            var parentNode = this.selection.anchorNode;
+            var elements = Array.prototype.slice.call(this.elements),
+                parentNode = this.selection.anchorNode;
             if (!parentNode.tagName) {
                 parentNode = this.selection.anchorNode.parentNode;
             }
             while (parentNode.tagName !== undefined && this.parentElements.indexOf(parentNode.tagName.toLowerCase) === -1) {
                 this.activateButton(parentNode.tagName.toLowerCase());
+                this.callExtensions('checkState', parentNode);
+
+                // we can abort the search upwards if we leave the contentEditable element
+                if (elements.indexOf(parentNode) !== -1) {
+                    break;
+                }
                 parentNode = parentNode.parentNode;
             }
         },
@@ -545,7 +618,9 @@ if (typeof module === 'object') {
                     } else {
                         this.className += ' medium-editor-button-active';
                     }
-                    self.execAction(this.getAttribute('data-action'), e);
+                    if (this.hasAttribute('data-action')) {
+                        self.execAction(this.getAttribute('data-action'), e);
+                    }
                 };
             for (i = 0; i < buttons.length; i += 1) {
                 buttons[i].addEventListener('click', triggerAction);

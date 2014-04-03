@@ -67,8 +67,8 @@ If you want to support IE9, you will need to use a classList pollyfill, like Eli
 * __forcePlainText__: Forces pasting as plain text. Default: true
 * __placeholder__: Defines the default placeholder for empty contenteditables. You can overwrite it by setting a data-placeholder attribute on your elements. Default: 'Type your text'
 * __secondHeader__: HTML tag to be used as second header. Default: h4
-* __targetBlank__: enables/disables target="\_blank" for anchor tags. Default:
-  false
+* __targetBlank__: enables/disables target="\_blank" for anchor tags. Default: false
+* __extensions__: extension to use (see _Extensions_) for more. Default: {}
 
 Example:
 
@@ -124,6 +124,58 @@ $('.editable').on('input', function() {
 This is handy when you need to capture modifications other thats outside of `key up`'s scope like clicking on toolbar buttons.
 
 `input` is supported by Chrome, Firefox, IE9 and other modern browsers. If you want to read more or support older browsers, check [Listening to events of a contenteditable HTML element](http://stackoverflow.com/questions/7802784/listening-to-events-of-a-contenteditable-html-element/7804973#7804973) and [Detect changes in the DOM](http://stackoverflow.com/questions/3219758/detect-changes-in-the-dom)
+
+## Extensions
+
+To add additional additional functions that are not supported by the native [browser API](https://developer.mozilla.org/de/docs/Rich-Text_Editing_in_Mozilla) you can
+write extensions that are then integrated into the toolbar. The Extension API is currently unstable and very minimal.
+
+An extension is an object that has essentially two functions `getButton` and `checkState`.
+
+* `getButton` is called when the editor is initialized and should return a element that is integrated into the toolbar.
+  Usually this will be a `<button>` element like the onces Medium Editor uses. All event handling on this button is
+  _entirely up to you_ so you should either keep a reference or bind your eventhandlers before returning it. You can
+  also return a HTML-String that is then integrated into the toolbar also this is not really useful.
+
+* `checkState` is called whenever a user selects some text in the area where the Medium Editor instance is running. It's
+  responsability is to toggle the current _state_ of the button. I.e. marking is a _on_ or _off_. Again the method on how
+  determine the state is entirely up to you. `checkState` will be called multiple times and will receive a [DOM `Element`](https://developer.mozilla.org/en-US/docs/Web/API/element)
+  as parameter.
+
+### Example
+
+A simple example the uses [rangy](https://code.google.com/p/rangy/) and the [CSS Class Applier Module](https://code.google.com/p/rangy/wiki/CSSClassApplierModule) to support highlighting of text:
+
+    rangy.init();
+
+    function Highlighter() {
+        this.button = document.createElement('button');
+        this.button.className = 'medium-editor-action';
+        this.button.innerText = 'H';
+        this.button.onclick = this.onClick.bind(this);
+        this.classApplier = rangy.createCssClassApplier("highlight", {
+            elementTagName: 'mark',
+            normalize: true
+        });
+    }
+    Highlighter.prototype.onClick = function() {
+        this.classApplier.toggleSelection();
+    }
+    Highlighter.prototype.getButton = function() {
+        return this.button;
+    }
+    Highlighter.prototype.checkState = function (node) {
+        if(node.tagName == 'MARK') {
+            this.button.classList.add('medium-editor-button-active');
+        }
+    }
+
+    var e = new MediumEditor('.editor', {
+        buttons: ['highlight', 'bold', 'italic', 'underline'],
+        extensions: {
+            'highlight': new Highlighter()
+        }
+    });
 
 ## Image Upload
 
