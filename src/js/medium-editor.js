@@ -415,7 +415,7 @@ if (typeof module === 'object') {
                 a = document.createElement('a');
 
             a.setAttribute('href', '#');
-            a.innerText = '&times;';
+            a.innerHTML = '&times;';
 
             input.setAttribute('type', 'text');
             input.setAttribute('placeholder', this.options.anchorInputPlaceholder);
