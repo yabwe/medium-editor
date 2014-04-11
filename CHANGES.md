@@ -1,3 +1,13 @@
+1.8.0 / 2014-04-12
+==================
+
+* Removes anchor preview listeners on deactivate
+* Implements clean paste
+* Adds an option to validate links
+* Adds a basic extensions support
+* Misc minor fixes
+
+
 1.7.5 / 2014-03-30
 ==================
 

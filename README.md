@@ -223,29 +223,31 @@ The source files are located inside the __src__ directory.
 ## Contributors
 
 ```
- project  : medium-editor
- repo age : 10 months
- active   : 116 days
- commits  : 455
- files    : 47
+project  : medium-editor
+ repo age : 11 months
+ active   : 129 days
+ commits  : 493
+ files    : 50
  authors  :
-   337	Davi Ferreira           74.1%
-    20	Maxime de Visscher      4.4%
-     8	Andy Yaco-Mink          1.8%
-     8	Derek Odegard           1.8%
-     8	Jarl Gunnar T. Flaten   1.8%
-     8	Pedro Nasser            1.8%
-     8	Seif                    1.8%
-     4	Sebastian Zuchmanski    0.9%
-     4	minikomi                0.9%
-     3	Andrew Hubbs            0.7%
-     3	Dmitri Cherniak         0.7%
-     3	Nikita Korotaev         0.7%
-     3	Troels Knak-Nielsen     0.7%
-     3	arol                    0.7%
-     3	ʞuıɯ-oɔɐʎ ʎpuɐ          0.7%
+   363	Davi Ferreira           73.6%
+    20	Maxime de Visscher      4.1%
+    12	Andy Yaco-Mink          2.4%
+     8	Derek Odegard           1.6%
+     8	Jarl Gunnar T. Flaten   1.6%
+     8	Pedro Nasser            1.6%
+     8	Seif                    1.6%
+     5	Martin Thurau           1.0%
+     4	Sebastian Zuchmanski    0.8%
+     4	minikomi                0.8%
+     3	Andrew Hubbs            0.6%
+     3	Dmitri Cherniak         0.6%
+     3	Nikita Korotaev         0.6%
+     3	Troels Knak-Nielsen     0.6%
+     3	arol                    0.6%
+     3	ʞuıɯ-oɔɐʎ ʎpuɐ          0.6%
      2	Ethan Turkeltaub        0.4%
      2	Jacob Magnusson         0.4%
+     2	OmniaGM                 0.4%
      1	Adam Mulligan           0.2%
      1	Alberto Gasparin        0.2%
      1	Bitdeli Chef            0.2%
@@ -264,6 +266,7 @@ The source files are located inside the __src__ directory.
      1	Noah Paessel            0.2%
      1	Pavel Linkesch          0.2%
      1	Robert Koritnik         0.2%
+     1	Scott Carleton          0.2%
      1	Søren Torp Petersen     0.2%
      1	Tom MacWright           0.2%
      1	happyaccidents          0.2%
@@ -273,8 +276,7 @@ The source files are located inside the __src__ directory.
      1	t_kjaergaard            0.2%
      1	typify                  0.2%
      1	waffleio                0.2%
-     1	zzjin                   0.2%
-```
+     1	zzjin                   0.2%```
 
 ## License
 
