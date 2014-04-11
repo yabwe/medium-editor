@@ -1061,7 +1061,11 @@ if (typeof module === 'object') {
                         paragraphs = e.clipboardData.getData('text/plain').split(/[\r\n]/g);
                         for (p = 0; p < paragraphs.length; p += 1) {
                             if (paragraphs[p] !== '') {
-                                html += '<p>' + paragraphs[p] + '</p>';
+                                if (navigator.userAgent.match(/firefox/i) && p === 0) {
+                                    html += paragraphs[p];
+                                } else {
+                                    html += '<p>' + paragraphs[p] + '</p>';
+                                }
                             }
                         }
                         document.execCommand('insertHTML', false, html);
