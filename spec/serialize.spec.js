@@ -28,7 +28,7 @@ describe('Anchor Button TestCase', function () {
     });
 
     it('should set a custom id when elements have no ids', function () {
-        this.el.id = null;
+        this.el.removeAttribute('id');
         var editor = new MediumEditor('.editor'),
             json = editor.serialize();
         expect(json).toEqual({

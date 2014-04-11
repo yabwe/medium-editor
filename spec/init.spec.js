@@ -81,13 +81,16 @@ describe('Initialization TestCase', function () {
                 disableToolbar: false,
                 firstHeader: 'h3',
                 forcePlainText: true,
+                cleanPastedHTML: false,
                 allowMultiParagraphSelection: true,
                 placeholder: 'Type your text',
                 secondHeader: 'h4',
                 buttons: ['bold', 'italic', 'underline', 'anchor', 'header1', 'header2', 'quote'],
                 buttonLabels: false,
                 targetBlank: false,
-                anchorPreviewHideDelay: 500
+                anchorPreviewHideDelay: 500,
+                checkLinkFormat: false,
+                extensions: {}
             },
                 editor = new MediumEditor('.editor');
             expect(editor.options).toEqual(defaultOptions);
