@@ -87,20 +87,12 @@ if (typeof module === 'object') {
         return html;
     }
 
-    // https://github.com/jashkenas/underscore
-    function isElement(obj) {
-        return !!(obj && obj.nodeType === 1);
-    }
-
     MediumEditor.prototype = {
         defaults: {
             allowMultiParagraphSelection: true,
             anchorInputPlaceholder: 'Paste or type a link',
-            anchorPreviewHideDelay: 500,
             buttons: ['bold', 'italic', 'underline', 'anchor', 'header1', 'header2', 'quote'],
             buttonLabels: false,
-            checkLinkFormat: false,
-            cleanPastedHTML: false,
             delay: 0,
             diffLeft: 0,
             diffTop: -10,
@@ -113,7 +105,7 @@ if (typeof module === 'object') {
             placeholder: 'Type your text',
             secondHeader: 'h4',
             targetBlank: false,
-            extensions: {}
+            anchorPreviewHideDelay: 500
         },
 
         // http://stackoverflow.com/questions/17907445/how-to-detect-ie11#comment30165888_17907562
@@ -161,7 +153,7 @@ if (typeof module === 'object') {
                     this.elements[i].setAttribute('data-placeholder', this.options.placeholder);
                 }
                 this.elements[i].setAttribute('data-medium-element', true);
-                this.bindParagraphCreation(i).bindReturn(i).bindTab(i);
+                this.bindParagraphCreation(i).bindReturn(i).bindTab(i).bindAnchorPreview(i);
                 if (!this.options.disableToolbar && !this.elements[i].getAttribute('data-disable-toolbar')) {
                     addToolbar = true;
                 }
@@ -170,8 +162,7 @@ if (typeof module === 'object') {
             if (addToolbar) {
                 this.initToolbar()
                     .bindButtons()
-                    .bindAnchorForm()
-                    .bindAnchorPreview();
+                    .bindAnchorForm();
             }
             return this;
         },
@@ -187,32 +178,6 @@ if (typeof module === 'object') {
                 };
             }
             return content;
-        },
-
-        /**
-         * Helper function to call a method with a number of parameters on all registered extensions.
-         * The function assures that the function exists before calling.
-         *
-         * @param {string} funcName name of the function to call
-         * @param [args] arguments passed into funcName
-         */
-        callExtensions: function (funcName) {
-            if (arguments.length < 1) {
-                return;
-            }
-
-            var args = Array.prototype.slice.call(arguments, 1),
-                ext,
-                name;
-
-            for (name in this.options.extensions) {
-                if (this.options.extensions.hasOwnProperty(name)) {
-                    ext = this.options.extensions[name];
-                    if (ext[funcName] !== undefined) {
-                        ext[funcName].apply(ext, args);
-                    }
-                }
-            }
         },
 
         bindParagraphCreation: function (index) {
@@ -291,22 +256,22 @@ if (typeof module === 'object') {
         buttonTemplate: function (btnType) {
             var buttonLabels = this.getButtonLabels(this.options.buttonLabels),
                 buttonTemplates = {
-                    'bold': '<button class="medium-editor-action medium-editor-action-bold" data-action="bold" data-element="b">' + buttonLabels.bold + '</button>',
-                    'italic': '<button class="medium-editor-action medium-editor-action-italic" data-action="italic" data-element="i">' + buttonLabels.italic + '</button>',
-                    'underline': '<button class="medium-editor-action medium-editor-action-underline" data-action="underline" data-element="u">' + buttonLabels.underline + '</button>',
-                    'strikethrough': '<button class="medium-editor-action medium-editor-action-strikethrough" data-action="strikethrough" data-element="strike"><strike>A</strike></button>',
-                    'superscript': '<button class="medium-editor-action medium-editor-action-superscript" data-action="superscript" data-element="sup">' + buttonLabels.superscript + '</button>',
-                    'subscript': '<button class="medium-editor-action medium-editor-action-subscript" data-action="subscript" data-element="sub">' + buttonLabels.subscript + '</button>',
-                    'anchor': '<button class="medium-editor-action medium-editor-action-anchor" data-action="anchor" data-element="a">' + buttonLabels.anchor + '</button>',
-                    'image': '<button class="medium-editor-action medium-editor-action-image" data-action="image" data-element="img">' + buttonLabels.image + '</button>',
-                    'header1': '<button class="medium-editor-action medium-editor-action-header1" data-action="append-' + this.options.firstHeader + '" data-element="' + this.options.firstHeader + '">' + buttonLabels.header1 + '</button>',
-                    'header2': '<button class="medium-editor-action medium-editor-action-header2" data-action="append-' + this.options.secondHeader + '" data-element="' + this.options.secondHeader + '">' + buttonLabels.header2 + '</button>',
-                    'quote': '<button class="medium-editor-action medium-editor-action-quote" data-action="append-blockquote" data-element="blockquote">' + buttonLabels.quote + '</button>',
-                    'orderedlist': '<button class="medium-editor-action medium-editor-action-orderedlist" data-action="insertorderedlist" data-element="ol">' + buttonLabels.orderedlist + '</button>',
-                    'unorderedlist': '<button class="medium-editor-action medium-editor-action-unorderedlist" data-action="insertunorderedlist" data-element="ul">' + buttonLabels.unorderedlist + '</button>',
-                    'pre': '<button class="medium-editor-action medium-editor-action-pre" data-action="append-pre" data-element="pre">' + buttonLabels.pre + '</button>',
-                    'indent': '<button class="medium-editor-action medium-editor-action-indent" data-action="indent" data-element="ul">' + buttonLabels.indent + '</button>',
-                    'outdent': '<button class="medium-editor-action medium-editor-action-outdent" data-action="outdent" data-element="ul">' + buttonLabels.outdent + '</button>'
+                    'bold': '<li><button class="medium-editor-action medium-editor-action-bold" data-action="bold" data-element="b">' + buttonLabels.bold + '</button></li>',
+                    'italic': '<li><button class="medium-editor-action medium-editor-action-italic" data-action="italic" data-element="i">' + buttonLabels.italic + '</button></li>',
+                    'underline': '<li><button class="medium-editor-action medium-editor-action-underline" data-action="underline" data-element="u">' + buttonLabels.underline + '</button></li>',
+                    'strikethrough': '<li><button class="medium-editor-action medium-editor-action-strikethrough" data-action="strikethrough" data-element="strike"><strike>A</strike></button></li>',
+                    'superscript': '<li><button class="medium-editor-action medium-editor-action-superscript" data-action="superscript" data-element="sup">' + buttonLabels.superscript + '</button></li>',
+                    'subscript': '<li><button class="medium-editor-action medium-editor-action-subscript" data-action="subscript" data-element="sub">' + buttonLabels.subscript + '</button></li>',
+                    'anchor': '<li><button class="medium-editor-action medium-editor-action-anchor" data-action="anchor" data-element="a">' + buttonLabels.anchor + '</button></li>',
+                    'image': '<li><button class="medium-editor-action medium-editor-action-image" data-action="image" data-element="img">' + buttonLabels.image + '</button></li>',
+                    'header1': '<li><button class="medium-editor-action medium-editor-action-header1" data-action="append-' + this.options.firstHeader + '" data-element="' + this.options.firstHeader + '">' + buttonLabels.header1 + '</button></li>',
+                    'header2': '<li><button class="medium-editor-action medium-editor-action-header2" data-action="append-' + this.options.secondHeader + '" data-element="' + this.options.secondHeader + '">' + buttonLabels.header2 + '</button></li>',
+                    'quote': '<li><button class="medium-editor-action medium-editor-action-quote" data-action="append-blockquote" data-element="blockquote">' + buttonLabels.quote + '</button></li>',
+                    'orderedlist': '<li><button class="medium-editor-action medium-editor-action-orderedlist" data-action="insertorderedlist" data-element="ol">' + buttonLabels.orderedlist + '</button></li>',
+                    'unorderedlist': '<li><button class="medium-editor-action medium-editor-action-unorderedlist" data-action="insertunorderedlist" data-element="ul">' + buttonLabels.unorderedlist + '</button></li>',
+                    'pre': '<li><button class="medium-editor-action medium-editor-action-pre" data-action="append-pre" data-element="pre">' + buttonLabels.pre + '</button></li>',
+                    'indent': '<li><button class="medium-editor-action medium-editor-action-indent" data-action="indent" data-element="ul">' + buttonLabels.indent + '</button></li>',
+                    'outdent': '<li><button class="medium-editor-action medium-editor-action-outdent" data-action="outdent" data-element="ul">' + buttonLabels.outdent + '</button></li>'
                 };
             return buttonTemplates[btnType] || false;
         },
@@ -361,6 +326,27 @@ if (typeof module === 'object') {
             return buttonLabels;
         },
 
+        //TODO: actionTemplate
+        toolbarTemplate: function () {
+            var btns = this.options.buttons,
+                html = '<ul id="medium-editor-toolbar-actions" class="medium-editor-toolbar-actions clearfix">',
+                i,
+                tpl;
+
+            for (i = 0; i < btns.length; i += 1) {
+                tpl = this.buttonTemplate(btns[i]);
+                if (tpl) {
+                    html += tpl;
+                }
+            }
+            html += '</ul>' +
+                '<div class="medium-editor-toolbar-form-anchor" id="medium-editor-toolbar-form-anchor">' +
+                '    <input type="text" value="" placeholder="' + this.options.anchorInputPlaceholder + '">' +
+                '    <a href="#">&times;</a>' +
+                '</div>';
+            return html;
+        },
+
         initToolbar: function () {
             if (this.toolbar) {
                 return this;
@@ -379,63 +365,9 @@ if (typeof module === 'object') {
             var toolbar = document.createElement('div');
             toolbar.id = 'medium-editor-toolbar-' + this.id;
             toolbar.className = 'medium-editor-toolbar';
-            toolbar.appendChild(this.toolbarButtons());
-            toolbar.appendChild(this.toolbarFormAnchor());
+            toolbar.innerHTML = this.toolbarTemplate();
             document.body.appendChild(toolbar);
             return toolbar;
-        },
-
-        //TODO: actionTemplate
-        toolbarButtons: function () {
-            var btns = this.options.buttons,
-                ul = document.createElement('ul'),
-                li,
-                i,
-                btn,
-                ext;
-
-            ul.id = 'medium-editor-toolbar-actions';
-            ul.className = 'medium-editor-toolbar-actions clearfix';
-
-            for (i = 0; i < btns.length; i += 1) {
-                if (this.options.extensions.hasOwnProperty(btns[i])) {
-                    ext = this.options.extensions[btns[i]];
-                    btn = ext.getButton !== undefined ? ext.getButton() : null;
-                } else {
-                    btn = this.buttonTemplate(btns[i]);
-                }
-
-                if (btn) {
-                    li = document.createElement('li');
-                    if (isElement(btn)) {
-                        li.appendChild(btn);
-                    } else {
-                        li.innerHTML = btn;
-                    }
-                    ul.appendChild(li);
-                }
-            }
-
-            return ul;
-        },
-
-        toolbarFormAnchor: function () {
-            var anchor = document.createElement('div'),
-                input = document.createElement('input'),
-                a = document.createElement('a');
-
-            a.setAttribute('href', '#');
-            a.innerHTML = '&times;';
-
-            input.setAttribute('type', 'text');
-            input.setAttribute('placeholder', this.options.anchorInputPlaceholder);
-
-            anchor.className = 'medium-editor-toolbar-form-anchor';
-            anchor.id = 'medium-editor-toolbar-form-anchor';
-            anchor.appendChild(input);
-            anchor.appendChild(a);
-
-            return anchor;
         },
 
         bindSelect: function () {
@@ -518,7 +450,9 @@ if (typeof module === 'object') {
 
         getSelectionElement: function () {
             var selection = window.getSelection(),
-                range, current, parent,
+                range = selection.getRangeAt(0),
+                current = range.commonAncestorContainer,
+                parent = current.parentNode,
                 result,
                 getMediumElement = function (e) {
                     var localParent = e;
@@ -533,10 +467,6 @@ if (typeof module === 'object') {
                 };
             // First try on current node
             try {
-                range = selection.getRangeAt(0);
-                current = range.commonAncestorContainer;
-                parent = current.parentNode;
-
                 if (current.getAttribute('data-medium-element')) {
                     result = current;
                 } else {
@@ -590,19 +520,12 @@ if (typeof module === 'object') {
         },
 
         checkActiveButtons: function () {
-            var elements = Array.prototype.slice.call(this.elements),
-                parentNode = this.selection.anchorNode;
+            var parentNode = this.selection.anchorNode;
             if (!parentNode.tagName) {
                 parentNode = this.selection.anchorNode.parentNode;
             }
             while (parentNode.tagName !== undefined && this.parentElements.indexOf(parentNode.tagName.toLowerCase) === -1) {
                 this.activateButton(parentNode.tagName.toLowerCase());
-                this.callExtensions('checkState', parentNode);
-
-                // we can abort the search upwards if we leave the contentEditable element
-                if (elements.indexOf(parentNode) !== -1) {
-                    break;
-                }
                 parentNode = parentNode.parentNode;
             }
         },
@@ -629,9 +552,7 @@ if (typeof module === 'object') {
                     } else {
                         this.className += ' medium-editor-button-active';
                     }
-                    if (this.hasAttribute('data-action')) {
-                        self.execAction(this.getAttribute('data-action'), e);
-                    }
+                    self.execAction(this.getAttribute('data-action'), e);
                 };
             for (i = 0; i < buttons.length; i += 1) {
                 buttons[i].addEventListener('click', triggerAction);
@@ -641,10 +562,8 @@ if (typeof module === 'object') {
         },
 
         setFirstAndLastItems: function (buttons) {
-            if (buttons.length > 0) {
-                buttons[0].className += ' medium-editor-button-first';
-                buttons[buttons.length - 1].className += ' medium-editor-button-last';
-            }
+            buttons[0].className += ' medium-editor-button-first';
+            buttons[buttons.length - 1].className += ' medium-editor-button-last';
             return this;
         },
 
@@ -731,9 +650,7 @@ if (typeof module === 'object') {
 
         hideToolbarActions: function () {
             this.keepToolbarAlive = false;
-            if (this.toolbar !== undefined) {
-                this.toolbar.classList.remove('medium-editor-toolbar-active');
-            }
+            this.toolbar.classList.remove('medium-editor-toolbar-active');
         },
 
         showToolbarActions: function () {
@@ -744,7 +661,7 @@ if (typeof module === 'object') {
             this.keepToolbarAlive = false;
             clearTimeout(timer);
             timer = setTimeout(function () {
-                if (self.toolbar && !self.toolbar.classList.contains('medium-editor-toolbar-active')) {
+                if (!self.toolbar.classList.contains('medium-editor-toolbar-active')) {
                     self.toolbar.classList.add('medium-editor-toolbar-active');
                 }
             }, 100);
@@ -813,7 +730,7 @@ if (typeof module === 'object') {
 
             clearTimeout(timer);
             timer = setTimeout(function () {
-                if (self.anchorPreview && !self.anchorPreview.classList.contains('medium-editor-anchor-preview-active')) {
+                if (!self.anchorPreview.classList.contains('medium-editor-anchor-preview-active')) {
                     self.anchorPreview.classList.add('medium-editor-anchor-preview-active');
                 }
             }, 100);
@@ -906,9 +823,7 @@ if (typeof module === 'object') {
                 sel.removeAllRanges();
                 sel.addRange(range);
                 setTimeout(function () {
-                    if (self.activeAnchor) {
-                        self.showAnchorForm(self.activeAnchor.href);
-                    }
+                    self.showAnchorForm(self.activeAnchor.href);
                     self.keepToolbarAlive = false;
                 }, 100 + self.options.delay);
 
@@ -929,7 +844,7 @@ if (typeof module === 'object') {
             if (e.target && e.target.tagName.toLowerCase() === 'a') {
 
                 // Detect empty href attributes
-                // The browser will make href="" or href="#top"
+                // The browser will make href="" or href="#top" 
                 // into absolute urls when accessed as e.targed.href, so check the html
                 if (!/href=["']\S+["']/.test(e.target.outerHTML) || /href=["']#\S+["']/.test(e.target.outerHTML)) {
                     return true;
@@ -955,22 +870,11 @@ if (typeof module === 'object') {
         },
 
         bindAnchorPreview: function (index) {
-            var i, self = this;
-            this.editorAnchorObserverWrapper = function (e) {
+            var self = this;
+            this.elements[index].addEventListener('mouseover', function (e) {
                 self.editorAnchorObserver(e);
-            };
-            for (i = 0; i < this.elements.length; i += 1) {
-                this.elements[i].addEventListener('mouseover', this.editorAnchorObserverWrapper);
-            }
+            });
             return this;
-        },
-
-        checkLinkFormat: function (value) {
-            var re = /^https?:\/\//;
-            if (value.match(re)) {
-                return value;
-            }
-            return "http://" + value;
         },
 
         setTargetBlank: function () {
@@ -988,9 +892,6 @@ if (typeof module === 'object') {
 
         createLink: function (input) {
             restoreSelection(this.savedSelection);
-            if (this.options.checkLinkFormat) {
-                input.value = this.checkLinkFormat(input.value);
-            }
             document.execCommand('createLink', false, input.value);
             if (this.options.targetBlank) {
                 this.setTargetBlank();
@@ -1041,19 +942,13 @@ if (typeof module === 'object') {
             window.removeEventListener('resize', this.windowResizeHandler);
 
             for (i = 0; i < this.elements.length; i += 1) {
-                this.elements[i].removeEventListener('mouseover', this.editorAnchorObserverWrapper);
                 this.elements[i].removeEventListener('keyup', this.checkSelectionWrapper);
                 this.elements[i].removeEventListener('blur', this.checkSelectionWrapper);
                 this.elements[i].removeEventListener('paste', this.pasteWrapper);
                 this.elements[i].removeAttribute('contentEditable');
                 this.elements[i].removeAttribute('data-medium-element');
             }
-        },
 
-        htmlEntities: function (str) {
-            // converts special characters (like <) into their escaped/encoded values (like &lt;).
-            // This allows you to show to display the string without the browser reading it as HTML.
-            return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
         },
 
         bindPaste: function () {
@@ -1064,25 +959,17 @@ if (typeof module === 'object') {
                     p;
 
                 this.classList.remove('medium-editor-placeholder');
-                if (!self.options.forcePlainText && !self.options.cleanPastedHTML) {
+                if (!self.options.forcePlainText) {
                     return this;
                 }
 
                 if (e.clipboardData && e.clipboardData.getData && !e.defaultPrevented) {
                     e.preventDefault();
-
-                    if (self.options.cleanPastedHTML && e.clipboardData.getData('text/html')) {
-                        return self.cleanPaste(e.clipboardData.getData('text/html'));
-                    }
                     if (!self.options.disableReturn) {
                         paragraphs = e.clipboardData.getData('text/plain').split(/[\r\n]/g);
                         for (p = 0; p < paragraphs.length; p += 1) {
                             if (paragraphs[p] !== '') {
-                                if (navigator.userAgent.match(/firefox/i) && p === 0) {
-                                    html += self.htmlEntities(paragraphs[p]);
-                                } else {
-                                    html += '<p>' + self.htmlEntities(paragraphs[p]) + '</p>';
-                                }
+                                html += '<p>' + paragraphs[p] + '</p>';
                             }
                         }
                         document.execCommand('insertHTML', false, html);
@@ -1116,193 +1003,6 @@ if (typeof module === 'object') {
                 this.elements[i].addEventListener('keypress', placeholderWrapper);
             }
             return this;
-        },
-
-        cleanPaste: function (text) {
-
-            /*jslint regexp: true*/
-            /*
-                jslint does not allow character negation, because the negation
-                will not match any unicode characters. In the regexes in this
-                block, negation is used specifically to match the end of an html
-                tag, and in fact unicode characters *should* be allowed.
-            */
-            var i, elList, workEl,
-                el = this.getSelectionElement(),
-                multiline = /<p|<br|<div/.test(text),
-                replacements = [
-
-                    // replace two bogus tags that begin pastes from google docs
-                    [new RegExp(/<[^>]*docs-internal-guid[^>]*>/gi), ""],
-                    [new RegExp(/<\/b>(<br[^>]*>)?$/gi), ""],
-
-                     // un-html spaces and newlines inserted by OS X
-                    [new RegExp(/<span class="Apple-converted-space">\s+<\/span>/g), ' '],
-                    [new RegExp(/<br class="Apple-interchange-newline">/g), '<br>'],
-
-                    // replace google docs italics+bold with a span to be replaced once the html is inserted
-                    [new RegExp(/<span[^>]*(font-style:italic;font-weight:bold|font-weight:bold;font-style:italic)[^>]*>/gi), '<span class="replace-with italic bold">'],
-
-                    // replace google docs italics with a span to be replaced once the html is inserted
-                    [new RegExp(/<span[^>]*font-style:italic[^>]*>/gi), '<span class="replace-with italic">'],
-
-                    //[replace google docs bolds with a span to be replaced once the html is inserted
-                    [new RegExp(/<span[^>]*font-weight:bold[^>]*>/gi), '<span class="replace-with bold">'],
-
-                     // replace manually entered b/i/a tags with real ones
-                    [new RegExp(/&lt;(\/?)(i|b|a)&gt;/gi), '<$1$2>'],
-
-                     // replace manually a tags with real ones, converting smart-quotes from google docs
-                    [new RegExp(/&lt;a\s+href=(&quot;|&rdquo;|&ldquo;|“|”)([^&]+)(&quot;|&rdquo;|&ldquo;|“|”)&gt;/gi), '<a href="$2">']
-
-                ];
-            /*jslint regexp: false*/
-
-            for (i = 0; i < replacements.length; i += 1) {
-                text = text.replace(replacements[i][0], replacements[i][1]);
-            }
-
-            if (multiline) {
-
-                // double br's aren't converted to p tags, but we want paragraphs.
-                elList = text.split('<br><br>');
-
-                this.pasteHTML('<p>' + elList.join('</p><p>') + '</p>');
-                document.execCommand('insertText', false, "\n");
-
-                // block element cleanup
-                elList = el.querySelectorAll('p,div,br');
-                for (i = 0; i < elList.length; i += 1) {
-
-                    workEl = elList[i];
-
-                    switch (workEl.tagName.toLowerCase()) {
-                    case 'p':
-                    case 'div':
-                        this.filterCommonBlocks(workEl);
-                        break;
-                    case 'br':
-                        this.filterLineBreak(workEl);
-                        break;
-                    }
-
-                }
-
-
-            } else {
-
-                this.pasteHTML(text);
-
-            }
-
-        },
-
-        pasteHTML: function (html) {
-            var elList, workEl, i, fragmentBody, pasteBlock = document.createDocumentFragment();
-
-            pasteBlock.appendChild(document.createElement('body'));
-
-            fragmentBody = pasteBlock.querySelector('body');
-            fragmentBody.innerHTML = html;
-
-            this.cleanupSpans(fragmentBody);
-
-            elList = fragmentBody.querySelectorAll('*');
-            for (i = 0; i < elList.length; i += 1) {
-
-                workEl = elList[i];
-
-                // delete ugly attributes
-                workEl.removeAttribute('class');
-                workEl.removeAttribute('style');
-                workEl.removeAttribute('dir');
-
-                if (workEl.tagName.toLowerCase() === 'meta') {
-                    workEl.parentNode.removeChild(workEl);
-                }
-
-            }
-            document.execCommand('insertHTML', false, fragmentBody.innerHTML.replace(/&nbsp;/g, ' '));
-        },
-        isCommonBlock: function (el) {
-            return (el && (el.tagName.toLowerCase() === 'p' || el.tagName.toLowerCase() === 'div'));
-        },
-        filterCommonBlocks: function (el) {
-            if (/^\s*$/.test(el.innerText)) {
-                el.parentNode.removeChild(el);
-            }
-        },
-        filterLineBreak: function (el) {
-            if (this.isCommonBlock(el.previousElementSibling)) {
-
-                // remove stray br's following common block elements
-                el.parentNode.removeChild(el);
-
-            } else if (this.isCommonBlock(el.parentNode) && (el.parentNode.firstChild === el || el.parentNode.lastChild === el)) {
-
-                // remove br's just inside open or close tags of a div/p
-                el.parentNode.removeChild(el);
-
-            } else if (el.parentNode.childElementCount === 1) {
-
-                // and br's that are the only child of a div/p
-                this.removeWithParent(el);
-
-            }
-
-        },
-
-        // remove an element, including its parent, if it is the only element within its parent
-        removeWithParent: function (el) {
-            if (el && el.parentNode) {
-                if (el.parentNode.parentNode && el.parentNode.childElementCount === 1) {
-                    el.parentNode.parentNode.removeChild(el.parentNode);
-                } else {
-                    el.parentNode.removeChild(el.parentNode);
-                }
-            }
-        },
-
-        cleanupSpans: function (container_el) {
-
-            var i,
-                el,
-                new_el,
-                spans = container_el.querySelectorAll('.replace-with');
-
-            for (i = 0; i < spans.length; i += 1) {
-
-                el = spans[i];
-                new_el = document.createElement(el.classList.contains('bold') ? 'b' : 'i');
-
-                if (el.classList.contains('bold') && el.classList.contains('italic')) {
-
-                    // add an i tag as well if this has both italics and bold
-                    new_el.innerHTML = '<i>' + el.innerHTML + '</i>';
-
-                } else {
-
-                    new_el.innerHTML = el.innerHTML;
-
-                }
-                el.parentNode.replaceChild(new_el, el);
-
-            }
-
-            spans = container_el.querySelectorAll('span');
-            for (i = 0; i < spans.length; i += 1) {
-
-                el = spans[i];
-
-                // remove empty spans, replace others with their contents
-                if (/^\s*$/.test()) {
-                    el.parentNode.removeChild(el);
-                } else {
-                    el.parentNode.replaceChild(document.createTextNode(el.innerText), el);
-                }
-
-            }
-
         }
 
     };
