@@ -107,7 +107,7 @@ if (typeof module === 'object') {
             disableReturn: false,
             disableDoubleReturn: false,
             disableToolbar: false,
-            elementSelection: 'editable'
+            elementSelection: 'editable',
             firstHeader: 'h3',
             forcePlainText: true,
             placeholder: 'Type your text',
