@@ -107,6 +107,7 @@ if (typeof module === 'object') {
             disableReturn: false,
             disableDoubleReturn: false,
             disableToolbar: false,
+            elementSelection: 'editable',
             firstHeader: 'h3',
             forcePlainText: true,
             placeholder: 'Type your text',
@@ -120,16 +121,13 @@ if (typeof module === 'object') {
         isIE: ((navigator.appName === 'Microsoft Internet Explorer') || ((navigator.appName === 'Netscape') && (new RegExp('Trident/.*rv:([0-9]{1,}[.0-9]{0,})').exec(navigator.userAgent) !== null))),
 
         init: function (elements, options) {
-            this.elements = typeof elements === 'string' ? document.querySelectorAll(elements) : elements;
-            if (this.elements.nodeType === 1) {
-                this.elements = [this.elements];
-            }
-            if (this.elements.length === 0) {
-                return;
-            }
             this.parentElements = ['p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'blockquote', 'pre'];
             this.id = document.querySelectorAll('.medium-editor-toolbar').length + 1;
             this.options = extend(options, this.defaults);
+            this.setElementSelection(elements);
+            if (this.elements.length === 0) {
+                return;
+            }
             return this.setup();
         },
 
@@ -141,8 +139,20 @@ if (typeof module === 'object') {
                 .setPlaceholders()
                 .bindWindowActions();
         },
+        
+        setElementSelection: function(selector){
+            this.elementSelection = selector;
+            this.updateElementList();
+        },
+        updateElementList: function(){
+            this.elements = typeof this.elementSelection === 'string' ? document.querySelectorAll(this.elementSelection) : this.elementSelection;
+            if (this.elements.nodeType === 1) {
+                this.elements = [this.elements];
+            }
+        },
 
         initElements: function () {
+            this.updateElementList();
             var i,
                 addToolbar = false;
             for (i = 0; i < this.elements.length; i += 1) {
