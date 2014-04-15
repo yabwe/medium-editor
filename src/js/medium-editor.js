@@ -107,6 +107,7 @@ if (typeof module === 'object') {
             disableReturn: false,
             disableDoubleReturn: false,
             disableToolbar: false,
+            elementSelection: 'editable'
             firstHeader: 'h3',
             forcePlainText: true,
             placeholder: 'Type your text',
@@ -120,10 +121,7 @@ if (typeof module === 'object') {
         isIE: ((navigator.appName === 'Microsoft Internet Explorer') || ((navigator.appName === 'Netscape') && (new RegExp('Trident/.*rv:([0-9]{1,}[.0-9]{0,})').exec(navigator.userAgent) !== null))),
 
         init: function (elements, options) {
-            this.elements = typeof elements === 'string' ? document.querySelectorAll(elements) : elements;
-            if (this.elements.nodeType === 1) {
-                this.elements = [this.elements];
-            }
+            this.setElementSelection(elements);
             if (this.elements.length === 0) {
                 return;
             }
@@ -143,6 +141,7 @@ if (typeof module === 'object') {
         },
 
         initElements: function () {
+            this.updateElementList();
             var i,
                 addToolbar = false;
             for (i = 0; i < this.elements.length; i += 1) {
@@ -164,6 +163,17 @@ if (typeof module === 'object') {
                     .bindAnchorPreview();
             }
             return this;
+        },
+        
+        setElementSelection: function(selector){
+            this.elementSelection = selector;
+            this.updateElementList();
+        },
+        updateElementList: function(){
+            this.elements = typeof this.elementSelection === 'string' ? document.querySelectorAll(this.elementSelection) : this.elementSelection;
+            if (this.elements.nodeType === 1) {
+                this.elements = [this.elements];
+            }
         },
 
         serialize: function () {
