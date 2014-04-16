@@ -807,7 +807,7 @@ if (typeof module === 'object') {
                 defaultLeft,
                 timer;
 
-            self.anchorPreview.querySelector('i').innerHTML = anchor_el.href;
+            self.anchorPreview.querySelector('i').textContent = anchor_el.href;
             halfOffsetWidth = self.anchorPreview.offsetWidth / 2;
             defaultLeft = self.options.diffLeft - halfOffsetWidth;
 
