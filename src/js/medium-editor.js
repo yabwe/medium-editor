@@ -107,7 +107,6 @@ if (typeof module === 'object') {
             disableReturn: false,
             disableDoubleReturn: false,
             disableToolbar: false,
-            elementSelection: 'editable',
             firstHeader: 'h3',
             forcePlainText: true,
             placeholder: 'Type your text',
@@ -164,12 +163,13 @@ if (typeof module === 'object') {
             }
             return this;
         },
-        
-        setElementSelection: function(selector){
+
+        setElementSelection: function (selector) {
             this.elementSelection = selector;
             this.updateElementList();
         },
-        updateElementList: function(){
+
+        updateElementList: function () {
             this.elements = typeof this.elementSelection === 'string' ? document.querySelectorAll(this.elementSelection) : this.elementSelection;
             if (this.elements.nodeType === 1) {
                 this.elements = [this.elements];
@@ -794,20 +794,20 @@ if (typeof module === 'object') {
         },
 
         // TODO: break method
-        showAnchorPreview: function (anchor_el) {
+        showAnchorPreview: function (anchorEl) {
             if (this.anchorPreview.classList.contains('medium-editor-anchor-preview-active')) {
                 return true;
             }
 
             var self = this,
                 buttonHeight = 40,
-                boundary = anchor_el.getBoundingClientRect(),
+                boundary = anchorEl.getBoundingClientRect(),
                 middleBoundary = (boundary.left + boundary.right) / 2,
                 halfOffsetWidth,
                 defaultLeft,
                 timer;
 
-            self.anchorPreview.querySelector('i').textContent = anchor_el.href;
+            self.anchorPreview.querySelector('i').textContent = anchorEl.href;
             halfOffsetWidth = self.anchorPreview.offsetWidth / 2;
             defaultLeft = self.options.diffLeft - halfOffsetWidth;
 
@@ -818,7 +818,7 @@ if (typeof module === 'object') {
                 }
             }, 100);
 
-            self.observeAnchorPreview(anchor_el);
+            self.observeAnchorPreview(anchorEl);
 
             self.anchorPreview.classList.add('medium-toolbar-arrow-over');
             self.anchorPreview.classList.remove('medium-toolbar-arrow-under');
