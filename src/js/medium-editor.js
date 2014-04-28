@@ -145,7 +145,7 @@ if (typeof module === 'object') {
             var i,
                 addToolbar = false;
             for (i = 0; i < this.elements.length; i += 1) {
-                if (!this.options.disableEditing && !this.elements[i].getAttribute('data-disable-editing')){
+                if (!this.options.disableEditing && !this.elements[i].getAttribute('data-disable-editing')) {
                     this.elements[i].setAttribute('contentEditable', true);
                 }
                 if (!this.elements[i].getAttribute('data-placeholder')) {

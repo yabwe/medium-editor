@@ -105,6 +105,7 @@ if (typeof module === 'object') {
             disableReturn: false,
             disableDoubleReturn: false,
             disableToolbar: false,
+            disableEditing: false,
             firstHeader: 'h3',
             forcePlainText: true,
             placeholder: 'Type your text',
@@ -142,7 +143,9 @@ if (typeof module === 'object') {
             var i,
                 addToolbar = false;
             for (i = 0; i < this.elements.length; i += 1) {
-                this.elements[i].setAttribute('contentEditable', true);
+                if (!this.options.disableEditing && !this.elements[i].getAttribute('data-disable-editing')) {
+                    this.elements[i].setAttribute('contentEditable', true);
+                }
                 if (!this.elements[i].getAttribute('data-placeholder')) {
                     this.elements[i].setAttribute('data-placeholder', this.options.placeholder);
                 }
