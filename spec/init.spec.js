@@ -80,6 +80,7 @@ describe('Initialization TestCase', function () {
                 disableDoubleReturn: false,
                 disableEditing: false,
                 disableToolbar: false,
+                elementsContainer: document.body,
                 firstHeader: 'h3',
                 forcePlainText: true,
                 cleanPastedHTML: false,
@@ -133,6 +134,27 @@ describe('Initialization TestCase', function () {
             expect(editor1.id).toBe(1);
             expect(editor2.id).toBe(2);
             expect(editor3.id).toBe(3);
+        });
+
+        it('should use document.body as element container when no container element is specified', function () {
+            spyOn(document.body, 'appendChild').and.callThrough();
+            (function () {
+                return new MediumEditor('.editor');
+            }());
+            expect(document.body.appendChild).toHaveBeenCalled();
+        });
+
+        it('should accept a custom element container for MediumEditor elements', function () {
+            var div = document.createElement('div');
+            document.body.appendChild(div);
+            spyOn(div, 'appendChild').and.callThrough();
+            (function () {
+                return new MediumEditor('.editor', {
+                    elementsContainer: div
+                });
+            }());
+            expect(div.appendChild).toHaveBeenCalled();
+            document.body.removeChild(div);
         });
     });
 });
