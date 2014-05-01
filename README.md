@@ -281,7 +281,8 @@ The source files are located inside the __src__ directory.
      1	t_kjaergaard            0.2%
      1	typify                  0.2%
      1	waffleio                0.2%
-     1	zzjin                   0.2%```
+     1	zzjin                   0.2%
+```
 
 ## License
 
