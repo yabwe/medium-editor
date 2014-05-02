@@ -7,7 +7,8 @@
   ],
   "description": "Medium.com WYSIWYG editor clone written in pure JavaScript.",
   "main": ["dist/js/medium-editor.js",
-           "dist/css/medium-editor.css"],
+           "dist/css/medium-editor.css",
+           "dist/css/themes/default.css"],
   "keywords": [
     "wysiwyg",
     "medium",
