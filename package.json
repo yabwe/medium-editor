@@ -33,7 +33,8 @@
     "grunt-plato": "~1.0.0",
     "brfs": "1.1.1",
     "grunt-sass": "~0.12.0",
-    "grunt-jsbeautifier": "~0.2.6"
+    "grunt-jsbeautifier": "~0.2.6",
+    "grunt-contrib-cssmin": "~0.9.0"
   },
   "scripts": {
     "test": "grunt test --verbose"
