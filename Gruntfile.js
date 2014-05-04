@@ -69,9 +69,10 @@ module.exports = function (grunt) {
         strict: {
             options: {
                 'box-sizing': false,
-                'import': 2,
                 'compatible-vendor-prefixes': false,
-                'gradients': false
+                'fallback-colors': false,
+                'gradients': false,
+                'import': 2
             },
             src: 'dist/css/**/*.css'
         }
