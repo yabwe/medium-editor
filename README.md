@@ -182,6 +182,10 @@ A simple example the uses [rangy](https://code.google.com/p/rangy/) and the [CSS
 
 [Pavel Linkesch](https://github.com/orthes) has developed a jQuery plugin to upload images following Medium.com functionality. Check it out at [http://orthes.github.io/medium-editor-insert-plugin/](http://orthes.github.io/medium-editor-insert-plugin/)
 
+## Laravel
+
+[Zvonko Biškup](https://github.com/codeforest) has written an [awesome tutorial](http://www.codeforest.net/laravel-wysiwyg-editor) about how to integrate MediumEditor into your Laravel Project.
+
 ## Rails Gem
 
 [Ahmet Sezgin Duran](https://github.com/marjinal1st/)  gemified Medium Editor for Rails asset pipeline, check it out at [https://github.com/marjinal1st/medium-editor-rails](https://github.com/marjinal1st/medium-editor-rails).
