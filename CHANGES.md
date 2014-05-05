@@ -1,3 +1,18 @@
+1.8.6 / 2014-05-03
+==================
+
+* Adds non-minified CSS files to bower.json
+
+
+1.8.5 / 2014-05-01
+==================
+
+* Changes to the element list or element selector now take effect on reactivation
+* Changed innerHTML to textContent to prevent XSS through twisted href values
+* Checks for data-disable-return on element on paste
+* Adds disableEditing and elementsContainer options
+
+
 1.8.0 / 2014-04-12
 ==================
 

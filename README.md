@@ -54,8 +54,7 @@ If you want to support IE9, you will need to use a classList pollyfill, like Eli
 * __anchorPreviewHideDelay__: time in milliseconds to show the anchor tag preview after the mouse has left the anchor tag. Default: 500
 * __buttons__: the set of buttons to display on the toolbar. Default: ['bold', 'italic', 'underline', 'anchor', 'header1', 'header2', 'quote']
 * __buttonLabels__: type of labels on the buttons. Values: 'fontawesome', `{'bold': '<b>b</b>', 'italic': '<i>i</i>'}`. Default: false
-* __checkLinkFormat__: enables/disables check for http on anchor links. Default:
-   false
+* __checkLinkFormat__: enables/disables check for http on anchor links. Default: false
 * __cleanPastedHTML__: cleans pasted content from different sources, like google docs etc. Default: false
 * __delay__: time in milliseconds to show the toolbar or anchor tag preview. Default: 0
 * __diffLeft__: value in pixels to be added to the X axis positioning of the toolbar. Default: 0
@@ -64,6 +63,7 @@ If you want to support IE9, you will need to use a classList pollyfill, like Eli
 * __disableDoubleReturn__:  allows/disallows two (or more) empty new lines. You can also set specific element behavior by using setting a data-disable-double-return attribute. Default: false
 * __disableToolbar__: enables/disables the toolbar, adding only the contenteditable behavior. You can also set specific element behavior by using setting a data-disable-toolbar attribute. Default: false
 * __disableEditing__: enables/disables adding the contenteditable behavior. Useful for using the toolbar with customized buttons/actions. You can also set specific element behavior by using setting a data-disable-editing attribute. Default: false
+* __elementsContainer__: specifies a DOM node to contain MediumEditor's toolbar and anchor preview elements. Default: document.body
 * __firstHeader__: HTML tag to be used as first header. Default: h3
 * __forcePlainText__: Forces pasting as plain text. Default: true
 * __placeholder__: Defines the default placeholder for empty contenteditables. You can overwrite it by setting a data-placeholder attribute on your elements. Default: 'Type your text'
@@ -182,6 +182,10 @@ A simple example the uses [rangy](https://code.google.com/p/rangy/) and the [CSS
 
 [Pavel Linkesch](https://github.com/orthes) has developed a jQuery plugin to upload images following Medium.com functionality. Check it out at [http://orthes.github.io/medium-editor-insert-plugin/](http://orthes.github.io/medium-editor-insert-plugin/)
 
+## Laravel
+
+[Zvonko Biškup](https://github.com/codeforest) has written an [awesome tutorial](http://www.codeforest.net/laravel-wysiwyg-editor) about how to integrate MediumEditor into your Laravel Project.
+
 ## Rails Gem
 
 [Ahmet Sezgin Duran](https://github.com/marjinal1st/)  gemified Medium Editor for Rails asset pipeline, check it out at [https://github.com/marjinal1st/medium-editor-rails](https://github.com/marjinal1st/medium-editor-rails).
@@ -224,15 +228,15 @@ The source files are located inside the __src__ directory.
 ## Contributors
 
 ```
-project  : medium-editor
+ project  : medium-editor
  repo age : 11 months
- active   : 129 days
- commits  : 493
- files    : 50
+ active   : 141 days
+ commits  : 516
+ files    : 56
  authors  :
-   363	Davi Ferreira           73.6%
-    20	Maxime de Visscher      4.1%
-    12	Andy Yaco-Mink          2.4%
+   379	Davi Ferreira           73.4%
+    20	Maxime de Visscher      3.9%
+    12	Andy Yaco-Mink          2.3%
      8	Derek Odegard           1.6%
      8	Jarl Gunnar T. Flaten   1.6%
      8	Pedro Nasser            1.6%
@@ -243,19 +247,22 @@ project  : medium-editor
      3	Andrew Hubbs            0.6%
      3	Dmitri Cherniak         0.6%
      3	Nikita Korotaev         0.6%
+     3	OmniaGM                 0.6%
      3	Troels Knak-Nielsen     0.6%
      3	arol                    0.6%
      3	ʞuıɯ-oɔɐʎ ʎpuɐ          0.6%
      2	Ethan Turkeltaub        0.4%
      2	Jacob Magnusson         0.4%
-     2	OmniaGM                 0.4%
+     2	mako                    0.4%
      1	Adam Mulligan           0.2%
      1	Alberto Gasparin        0.2%
      1	Bitdeli Chef            0.2%
+     1	Cenk Dölek             0.2%
      1	David Collien           0.2%
      1	David Hellsing          0.2%
      1	Denis Gorbachev         0.2%
      1	Diana Liao              0.2%
+     1	Jack Parker             0.2%
      1	Jeff Welch              0.2%
      1	Mark Kraemer            0.2%
      1	Max                     0.2%
@@ -267,17 +274,20 @@ project  : medium-editor
      1	Noah Paessel            0.2%
      1	Pavel Linkesch          0.2%
      1	Robert Koritnik         0.2%
+     1	Sarah Squire            0.2%
      1	Scott Carleton          0.2%
      1	Søren Torp Petersen     0.2%
      1	Tom MacWright           0.2%
      1	happyaccidents          0.2%
+     1	mako yass               0.2%
      1	mbrookes                0.2%
      1	muescha                 0.2%
      1	shaohua                 0.2%
      1	t_kjaergaard            0.2%
      1	typify                  0.2%
      1	waffleio                0.2%
-     1	zzjin                   0.2%```
+     1	zzjin                   0.2%
+```
 
 ## License
 

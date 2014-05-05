@@ -13,31 +13,6 @@ module.exports = function (grunt) {
             globalConfig: globalConfig
         };
 
-    gruntConfig.jsbeautifier = {
-        files: ['src/js/**/*.js', 'spec/*.js', 'Gruntfile.js'],
-        options: {
-            js: {
-                braceStyle: "collapse",
-                breakChainedMethods: false,
-                e4x: false,
-                evalCode: false,
-                indentChar: " ",
-                indentLevel: 0,
-                indentSize: 4,
-                indentWithTabs: false,
-                jslintHappy: true,
-                keepArrayIndentation: true,
-                keepFunctionIndentation: true,
-                maxPreserveNewlines: 5,
-                preserveNewlines: true,
-                spaceBeforeConditional: true,
-                spaceInParen: false,
-                unescapeStrings: false,
-                wrapLineLength: 0
-            }
-        }
-    };
-
     gruntConfig.jslint = {
         client: {
             src: ['src/js/**/*.js', 'spec/*.js', 'Gruntfile.js'],
@@ -94,9 +69,10 @@ module.exports = function (grunt) {
         strict: {
             options: {
                 'box-sizing': false,
-                'import': 2,
                 'compatible-vendor-prefixes': false,
-                'gradients': false
+                'fallback-colors': false,
+                'gradients': false,
+                'import': 2
             },
             src: 'dist/css/**/*.css'
         }
@@ -105,7 +81,6 @@ module.exports = function (grunt) {
     gruntConfig.sass = {
         dist: {
             options: {
-                outputStyle: 'compressed',
                 includePaths: ['src/sass/']
             },
             files: {
@@ -119,12 +94,25 @@ module.exports = function (grunt) {
         }
     };
 
+    gruntConfig.cssmin = {
+        minify: {
+            expand: true,
+            cwd: 'dist/css/',
+            src: ['**/*.css', '!*.min.css'],
+            dest: 'dist/css/',
+            ext: '.min.css'
+        }
+    };
+
     gruntConfig.autoprefixer = {
-        singleFile: {
-            src: 'dist/css/medium-editor.css',
+        main: {
+            expand: true,
+            flatten: true,
+            src: 'dist/css/*.css',
+            dest: 'dist/css/',
             browsers: autoprefixerBrowsers
         },
-        multipleFiles: {
+        themes: {
             expand: true,
             flatten: true,
             src: 'dist/css/themes/*.css',
@@ -171,7 +159,6 @@ module.exports = function (grunt) {
     grunt.initConfig(gruntConfig);
 
     grunt.loadNpmTasks('grunt-contrib-uglify');
-    grunt.loadNpmTasks('grunt-jsbeautifier');
     grunt.loadNpmTasks('grunt-jslint');
     grunt.loadNpmTasks('grunt-contrib-jasmine');
     grunt.loadNpmTasks('grunt-autoprefixer');
@@ -180,10 +167,11 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-contrib-watch');
     grunt.loadNpmTasks('grunt-contrib-concat');
     grunt.loadNpmTasks('grunt-plato');
+    grunt.loadNpmTasks('grunt-contrib-cssmin');
 
-    grunt.registerTask('test', ['jsbeautifier', 'jslint', 'jasmine:suite', 'csslint']);
-    grunt.registerTask('js', ['jsbeautifier', 'jslint', 'jasmine:suite', 'uglify', 'concat']);
-    grunt.registerTask('css', ['sass', 'autoprefixer', 'csslint']);
+    grunt.registerTask('test', ['jslint', 'jasmine:suite', 'csslint']);
+    grunt.registerTask('js', ['jslint', 'jasmine:suite', 'uglify', 'concat']);
+    grunt.registerTask('css', ['sass', 'cssmin', 'autoprefixer', 'csslint']);
     grunt.registerTask('default', ['js', 'css']);
 
     grunt.registerTask('spec', 'Runs a task on a specified file', function (taskName, fileName) {
