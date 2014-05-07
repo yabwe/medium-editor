@@ -1031,6 +1031,7 @@ if (typeof module === 'object') {
             if (this.options.targetBlank) {
                 this.setTargetBlank();
             }
+            this.checkSelection();
             this.showToolbarActions();
             input.value = '';
         },
