@@ -609,10 +609,7 @@ if (typeof module === 'object') {
 
         checkActiveButtons: function () {
             var elements = Array.prototype.slice.call(this.elements),
-                parentNode = this.selection.anchorNode;
-            if (!parentNode.tagName) {
-                parentNode = this.selection.anchorNode.parentNode;
-            }
+                parentNode = this.getSelectedParentElement();
             while (parentNode.tagName !== undefined && this.parentElements.indexOf(parentNode.tagName.toLowerCase) === -1) {
                 this.activateButton(parentNode.tagName.toLowerCase());
                 this.callExtensions('checkState', parentNode);
@@ -704,6 +701,7 @@ if (typeof module === 'object') {
 
         triggerAnchorAction: function () {
             var selectedParentElement = this.getSelectedParentElement();
+            console.log(selectedParentElement.tagName);
             if (selectedParentElement.tagName &&
                     selectedParentElement.tagName.toLowerCase() === 'a') {
                 document.execCommand('unlink', false, null);
