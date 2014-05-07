@@ -21,8 +21,14 @@ describe('Placeholder TestCase', function () {
         expect(editor.elements[0].className).toContain('medium-editor-placeholder');
     });
 
-    it('should not set a placeholder form elements with text content', function () {
+    it('should not set a placeholder for elements with text content', function () {
         this.el.innerHTML = 'some text';
+        var editor = new MediumEditor('.editor');
+        expect(editor.elements[0].className).not.toContain('medium-editor-placeholder');
+    });
+
+    it('should not set a placeholder for elements with images only', function () {
+        this.el.innerHTML = '<img src="foo.jpg">';
         var editor = new MediumEditor('.editor');
         expect(editor.elements[0].className).not.toContain('medium-editor-placeholder');
     });

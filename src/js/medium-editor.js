@@ -1142,7 +1142,8 @@ if (typeof module === 'object') {
         setPlaceholders: function () {
             var i,
                 activatePlaceholder = function (el) {
-                    if (el.textContent.replace(/^\s+|\s+$/g, '') === '') {
+                    if (!(el.querySelector('img')) &&
+                            el.textContent.replace(/^\s+|\s+$/g, '') === '') {
                         el.classList.add('medium-editor-placeholder');
                     }
                 },
