@@ -701,7 +701,6 @@ if (typeof module === 'object') {
 
         triggerAnchorAction: function () {
             var selectedParentElement = this.getSelectedParentElement();
-            console.log(selectedParentElement.tagName);
             if (selectedParentElement.tagName &&
                     selectedParentElement.tagName.toLowerCase() === 'a') {
                 document.execCommand('unlink', false, null);
