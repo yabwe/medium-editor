@@ -690,7 +690,9 @@ if (typeof module === 'object') {
         },
 
         triggerAnchorAction: function () {
-            if (this.getSelectedParentElement().tagName.toLowerCase() === 'a') {
+            var selectedParentElement = this.getSelectedParentElement();
+            if (selectedParentElement.tagName &&
+                    selectedParentElement.tagName.toLowerCase() === 'a') {
                 document.execCommand('unlink', false, null);
             } else {
                 if (this.anchorForm.style.display === 'block') {
