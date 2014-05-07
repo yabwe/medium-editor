@@ -95,11 +95,18 @@ module.exports = function (grunt) {
     };
 
     gruntConfig.cssmin = {
-        minify: {
+        main: {
             expand: true,
             cwd: 'dist/css/',
-            src: ['**/*.css', '!*.min.css'],
+            src: ['*.css', '!*.min.css'],
             dest: 'dist/css/',
+            ext: '.min.css'
+        },
+        themes: {
+            expand: true,
+            cwd: 'dist/css/themes/',
+            src: ['*.css', '!*.min.css'],
+            dest: 'dist/css/themes/',
             ext: '.min.css'
         }
     };
@@ -107,15 +114,15 @@ module.exports = function (grunt) {
     gruntConfig.autoprefixer = {
         main: {
             expand: true,
-            flatten: true,
-            src: 'dist/css/*.css',
+            cwd: 'dist/css/',
+            src: ['*.css', '!*.min.css'],
             dest: 'dist/css/',
             browsers: autoprefixerBrowsers
         },
         themes: {
             expand: true,
-            flatten: true,
-            src: 'dist/css/themes/*.css',
+            cwd: 'dist/css/themes/',
+            src: ['*.css', '!*.min.css'],
             dest: 'dist/css/themes/',
             browsers: autoprefixerBrowsers
         }
@@ -171,7 +178,7 @@ module.exports = function (grunt) {
 
     grunt.registerTask('test', ['jslint', 'jasmine:suite', 'csslint']);
     grunt.registerTask('js', ['jslint', 'jasmine:suite', 'uglify', 'concat']);
-    grunt.registerTask('css', ['sass', 'cssmin', 'autoprefixer', 'csslint']);
+    grunt.registerTask('css', ['sass', 'autoprefixer', 'cssmin', 'csslint']);
     grunt.registerTask('default', ['js', 'css']);
 
     grunt.registerTask('spec', 'Runs a task on a specified file', function (taskName, fileName) {

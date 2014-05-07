@@ -35,31 +35,26 @@
 @keyframes pop-upwards {
   0% {
     -webkit-transform: matrix(0.97, 0, 0, 1, 0, 12);
-    -ms-transform: matrix(0.97, 0, 0, 1, 0, 12);
     transform: matrix(0.97, 0, 0, 1, 0, 12);
     opacity: 0; }
 
   20% {
     -webkit-transform: matrix(0.99, 0, 0, 1, 0, 2);
-    -ms-transform: matrix(0.99, 0, 0, 1, 0, 2);
     transform: matrix(0.99, 0, 0, 1, 0, 2);
     opacity: 0.7; }
 
   40% {
     -webkit-transform: matrix(1, 0, 0, 1, 0, -1);
-    -ms-transform: matrix(1, 0, 0, 1, 0, -1);
     transform: matrix(1, 0, 0, 1, 0, -1);
     opacity: 1; }
 
   70% {
     -webkit-transform: matrix(1, 0, 0, 1, 0, 0);
-    -ms-transform: matrix(1, 0, 0, 1, 0, 0);
     transform: matrix(1, 0, 0, 1, 0, 0);
     opacity: 1; }
 
   100% {
     -webkit-transform: matrix(1, 0, 0, 1, 0, 0);
-    -ms-transform: matrix(1, 0, 0, 1, 0, 0);
     transform: matrix(1, 0, 0, 1, 0, 0);
     opacity: 1; } }
 
