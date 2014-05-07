@@ -1,3 +1,10 @@
+1.8.8 / 2014-05-08
+==================
+
+* Fixes unlink behavior on Firefox
+* Fixes white space behavior at the end of anchors
+
+
 1.8.6 / 2014-05-03
 ==================
 
