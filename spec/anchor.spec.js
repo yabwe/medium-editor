@@ -79,7 +79,20 @@ describe('Anchor Button TestCase', function () {
             fireEvent(input, 'keyup', 13);
             expect(editor.createLink).toHaveBeenCalled();
         });
+        it('shouldn\'t create a link when user presses enter without value', function () {
+            spyOn(MediumEditor.prototype, 'createLink').and.callThrough();
+            var editor = new MediumEditor('.editor'),
+                button,
+                input;
 
+            selectElementContents(editor.elements[0]);
+            button = editor.toolbar.querySelector('[data-element="a"]');
+            fireEvent(button, 'click');
+            input = editor.anchorForm.querySelector('input');
+            input.value = '';
+            fireEvent(input, 'keyup', 13);
+            expect(editor.elements[0].querySelector('a')).toBeNull();
+        });
         it('should add http:// if need be and checkLinkFormat option is set to true', function () {
             var editor = new MediumEditor('.editor', {
                 checkLinkFormat: true

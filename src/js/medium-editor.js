@@ -1025,6 +1025,10 @@ if (typeof module === 'object') {
         },
 
         createLink: function (input) {
+            if (input.value.trim().length === 0) {
+                this.hideToolbarActions();
+                return;
+            }
             restoreSelection(this.savedSelection);
             if (this.options.checkLinkFormat) {
                 input.value = this.checkLinkFormat(input.value);
@@ -1036,6 +1040,7 @@ if (typeof module === 'object') {
             this.checkSelection();
             this.showToolbarActions();
             input.value = '';
+            
         },
 
         bindWindowActions: function () {
