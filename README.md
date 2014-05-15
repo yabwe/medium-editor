@@ -70,6 +70,9 @@ If you want to support IE9, you will need to use a classList pollyfill, like Eli
 * __secondHeader__: HTML tag to be used as second header. Default: h4
 * __targetBlank__: enables/disables target="\_blank" for anchor tags. Default: false
 * __extensions__: extension to use (see _Extensions_) for more. Default: {}
+* __activeButtonClass__: CSS class added to active buttons. Default: 'medium-editor-button-active'
+* __firstButtonClass__: CSS class added to the first button. Default: 'medium-editor-button-first'
+* __lastButtonClass__: CSS class added to the last button. Default: 'medium-editor-button-last'
 
 Example:
 

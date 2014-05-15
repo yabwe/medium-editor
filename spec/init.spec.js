@@ -92,7 +92,10 @@ describe('Initialization TestCase', function () {
                 targetBlank: false,
                 anchorPreviewHideDelay: 500,
                 checkLinkFormat: false,
-                extensions: {}
+                extensions: {},
+                activeButtonClass: 'medium-editor-button-active',
+                firstButtonClass: 'medium-editor-button-first',
+                lastButtonClass: 'medium-editor-button-last'
             },
                 editor = new MediumEditor('.editor');
             expect(editor.options).toEqual(defaultOptions);
