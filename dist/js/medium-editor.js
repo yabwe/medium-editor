@@ -1041,7 +1041,6 @@ if (typeof module === 'object') {
             this.checkSelection();
             this.showToolbarActions();
             input.value = '';
-            
         },
 
         bindWindowActions: function () {
