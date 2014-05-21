@@ -112,7 +112,10 @@ if (typeof module === 'object') {
             placeholder: 'Type your text',
             secondHeader: 'h4',
             targetBlank: false,
-            extensions: {}
+            extensions: {},
+            activeButtonClass: 'medium-editor-button-active',
+            firstButtonClass: 'medium-editor-button-first',
+            lastButtonClass: 'medium-editor-button-last'
         },
 
         // http://stackoverflow.com/questions/17907445/how-to-detect-ie11#comment30165888_17907562
@@ -599,7 +602,7 @@ if (typeof module === 'object') {
             var buttons = this.toolbarActions.querySelectorAll('button'),
                 i;
             for (i = 0; i < buttons.length; i += 1) {
-                buttons[i].classList.remove('medium-editor-button-active');
+                buttons[i].classList.remove(this.options.activeButtonClass);
             }
             this.checkActiveButtons();
             return this;
@@ -622,8 +625,8 @@ if (typeof module === 'object') {
 
         activateButton: function (tag) {
             var el = this.toolbar.querySelector('[data-element="' + tag + '"]');
-            if (el !== null && el.className.indexOf('medium-editor-button-active') === -1) {
-                el.className += ' medium-editor-button-active';
+            if (el !== null && el.className.indexOf(this.options.activeButtonClass) === -1) {
+                el.className += ' ' + this.options.activeButtonClass;
             }
         },
 
@@ -637,10 +640,10 @@ if (typeof module === 'object') {
                     if (self.selection === undefined) {
                         self.checkSelection();
                     }
-                    if (this.className.indexOf('medium-editor-button-active') > -1) {
-                        this.classList.remove('medium-editor-button-active');
+                    if (this.className.indexOf(self.options.activeButtonClass) > -1) {
+                        this.classList.remove(self.options.activeButtonClass);
                     } else {
-                        this.className += ' medium-editor-button-active';
+                        this.className += ' ' + self.options.activeButtonClass;
                     }
                     if (this.hasAttribute('data-action')) {
                         self.execAction(this.getAttribute('data-action'), e);
@@ -655,8 +658,8 @@ if (typeof module === 'object') {
 
         setFirstAndLastItems: function (buttons) {
             if (buttons.length > 0) {
-                buttons[0].className += ' medium-editor-button-first';
-                buttons[buttons.length - 1].className += ' medium-editor-button-last';
+                buttons[0].className += ' ' + this.options.firstButtonClass;
+                buttons[buttons.length - 1].className += ' ' + this.options.lastButtonClass;
             }
             return this;
         },
