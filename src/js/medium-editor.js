@@ -791,9 +791,17 @@ if (typeof module === 'object') {
             }, 100);
         },
 
+        saveSelection: function() {
+            this.savedSelection = saveSelection();
+        },
+
+        restoreSelection: function() {
+            restoreSelection(this.savedSelection);
+        },
+
         showAnchorForm: function (link_value) {
             this.toolbarActions.style.display = 'none';
-            this.savedSelection = saveSelection();
+            this.saveSelection();
             this.anchorForm.style.display = 'block';
             this.keepToolbarAlive = true;
             this.anchorInput.focus();
