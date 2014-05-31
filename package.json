@@ -36,6 +36,7 @@
     "grunt-contrib-cssmin": "~0.9.0"
   },
   "scripts": {
-    "test": "grunt test --verbose"
+    "test": "grunt test --verbose",
+    "start": "open ./demo/index.html"
   }
 }
