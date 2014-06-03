@@ -491,7 +491,8 @@ if (typeof module === 'object') {
             if (this.keepToolbarAlive !== true && !this.options.disableToolbar) {
                 newSelection = window.getSelection();
                 if (newSelection.toString().trim() === '' ||
-                    (this.options.allowMultiParagraphSelection === false && this.hasMultiParagraphs())) {
+                    (this.options.allowMultiParagraphSelection === false && this.hasMultiParagraphs()) ||
+                    this.selectionInContentEditableFalse()) {
                     this.hideToolbarActions();
                 } else {
                     selectionElement = this.getSelectionElement();
@@ -566,6 +567,40 @@ if (typeof module === 'object') {
                 result = getMediumElement(parent);
             }
             return result;
+        },
+
+        selectionInContentEditableFalse: function () {
+            var selection = window.getSelection(),
+                range, current, parent,
+                result,
+                getMediumElement = function (e) {
+                    var localParent = e;
+                    try {
+                        while ( localParent.getAttribute('contenteditable') !== 'false' ) {
+                            localParent = localParent.parentNode;
+                        }
+                    } catch (errb) {
+                        return false;
+                    }
+                    return localParent;
+                };
+            // First try on current node
+            try {
+                range = selection.getRangeAt(0);
+                current = range.commonAncestorContainer;
+                parent = current.parentNode;
+
+                if (current.nodeName !== '#text' && current.getAttribute('contenteditable') === 'false') {
+                    result = current;
+
+                } else {
+                    result = getMediumElement(parent);
+                }
+                // If not search in the parent nodes.
+            } catch (err) {
+                result = getMediumElement(parent);
+            }
+            return (result && result.getAttribute('contenteditable') === 'false');
         },
 
         setToolbarPosition: function () {

@@ -82,6 +82,27 @@ describe('Toolbar TestCase', function () {
             document.body.removeChild(element);
         });
 
+        it('should not display toolbar when selected text within an element with contenteditable="false"', function (done) {
+            var element = document.createElement('div'),
+                editor = null;
+
+            element.className = 'editor';
+            this.el.innerHTML = 'lorem ipsum <div id="cef_el" contenteditable="false">dolor</div>';
+            document.body.appendChild(element);
+
+            editor = new MediumEditor(document.querySelectorAll('.editor'), { delay: 0 });
+
+            selectElementContents(document.getElementById('cef_el'));
+            editor.checkSelection();
+
+            setTimeout(function(){
+                expect(editor.toolbar.classList.contains('medium-editor-toolbar-active')).toBe(false);
+                done();
+            }, 500);
+
+
+        });
+
         // jasmine 2.0 changed async tests, runs no longer exists
         xit('should show the toolbar if it\'s text are selected even though one or more elements that has a data attr of disable-toolbar', function () {
             var value,
@@ -140,5 +161,6 @@ describe('Toolbar TestCase', function () {
             // Remove the new element from the DOM
             document.body.removeChild(element);
         });
+
     });
 });
