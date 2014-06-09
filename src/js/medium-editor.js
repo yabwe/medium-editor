@@ -1015,11 +1015,8 @@ if (typeof module === 'object') {
         },
 
         checkLinkFormat: function (value) {
-            var re = /^https?:\/\//;
-            if (value.match(re)) {
-                return value;
-            }
-            return "http://" + value;
+            var re = /^(https?|ftps?|rtmpt?):\/\/|mailto:/;
+            return (re.test(value) ? '' : 'http://') + value;
         },
 
         setTargetBlank: function () {

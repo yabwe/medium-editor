@@ -103,7 +103,17 @@ describe('Anchor Button TestCase', function () {
             editor.createLink(input);
             expect(editor.elements[0].querySelector('a').href).toBe('http://test.com/');
         });
-
+        it('should not change protocol when a valid one is included', function () {
+            var editor = new MediumEditor('.editor', {
+                checkLinkFormat: true
+            }),
+                input = editor.anchorForm.querySelector('input'),
+                validUrl = 'mailto:test.com';
+            selectElementContents(editor.elements[0]);
+            input.value = validUrl;
+            editor.createLink(input);
+            expect(editor.elements[0].querySelector('a').href).toBe(validUrl);
+        });
         it('should add target="_blank" when respective option is set to true', function () {
             var editor = new MediumEditor('.editor', {
                 targetBlank: true
