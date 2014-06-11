@@ -1,3 +1,14 @@
+1.8.14 / 2014-06-11
+===================
+
+* Fixes bug where if you had an empty blockquote the placeholder would still be active
+* Fixes bug that would create link without values
+* Exposes save/restoreSelection()
+* Allows customization of active/first/last button classes
+* Adds a script to run app from the cli
+* Adds protocols to checkLinkFormat regex
+
+
 1.8.8 / 2014-05-08
 ==================
 
