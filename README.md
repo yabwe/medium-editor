@@ -150,36 +150,38 @@ An extension is an object that has essentially two functions `getButton` and `ch
 
 A simple example the uses [rangy](https://code.google.com/p/rangy/) and the [CSS Class Applier Module](https://code.google.com/p/rangy/wiki/CSSClassApplierModule) to support highlighting of text:
 
-    rangy.init();
+```js
+rangy.init();
 
-    function Highlighter() {
-        this.button = document.createElement('button');
-        this.button.className = 'medium-editor-action';
-        this.button.innerText = 'H';
-        this.button.onclick = this.onClick.bind(this);
-        this.classApplier = rangy.createCssClassApplier("highlight", {
-            elementTagName: 'mark',
-            normalize: true
-        });
-    }
-    Highlighter.prototype.onClick = function() {
-        this.classApplier.toggleSelection();
-    }
-    Highlighter.prototype.getButton = function() {
-        return this.button;
-    }
-    Highlighter.prototype.checkState = function (node) {
-        if(node.tagName == 'MARK') {
-            this.button.classList.add('medium-editor-button-active');
-        }
-    }
-
-    var e = new MediumEditor('.editor', {
-        buttons: ['highlight', 'bold', 'italic', 'underline'],
-        extensions: {
-            'highlight': new Highlighter()
-        }
+function Highlighter() {
+    this.button = document.createElement('button');
+    this.button.className = 'medium-editor-action';
+    this.button.innerText = 'H';
+    this.button.onclick = this.onClick.bind(this);
+    this.classApplier = rangy.createCssClassApplier("highlight", {
+        elementTagName: 'mark',
+        normalize: true
     });
+}
+Highlighter.prototype.onClick = function() {
+    this.classApplier.toggleSelection();
+};
+Highlighter.prototype.getButton = function() {
+    return this.button;
+};
+Highlighter.prototype.checkState = function (node) {
+    if(node.tagName == 'MARK') {
+        this.button.classList.add('medium-editor-button-active');
+    }
+};
+
+var e = new MediumEditor('.editor', {
+    buttons: ['highlight', 'bold', 'italic', 'underline'],
+    extensions: {
+        'highlight': new Highlighter()
+    }
+});
+```
 
 ## Image Upload
 
