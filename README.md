@@ -146,6 +146,10 @@ An extension is an object that has essentially two functions `getButton` and `ch
   determine the state is entirely up to you. `checkState` will be called multiple times and will receive a [DOM `Element`](https://developer.mozilla.org/en-US/docs/Web/API/element)
   as parameter.
 
+Properties
+
+* `parent` add this property to your extension class constructor to be able to access the Medium Editor instance through the `base` property
+
 ### Example
 
 A simple example the uses [rangy](https://code.google.com/p/rangy/) and the [CSS Class Applier Module](https://code.google.com/p/rangy/wiki/CSSClassApplierModule) to support highlighting of text:
