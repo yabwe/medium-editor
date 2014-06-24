@@ -23,7 +23,7 @@
     <p style="text-align: center;"><small><a style="color: #333;" target="_blank" href="http://www.goodreads.com/reader/475-great-expectations">Source</a></small></p>
     <script src="../dist/js/medium-editor.js"></script>
     <script>
-        function Extentension() {
+        function Extension() {
           this.parent = true;
 
           this.button = document.createElement('button');
@@ -32,25 +32,25 @@
           this.button.onclick = this.onClick.bind(this);
         }
 
-        Extentension.prototype.getButton = function() {
+        Extension.prototype.getButton = function() {
           return this.button;
         };
 
-        Extentension.prototype.onClick = function() {
+        Extension.prototype.onClick = function() {
           alert('This is editor: #' + this.base.id);
         };
 
         var one = new MediumEditor('.one', {
             buttons: ['extension'],
             extensions: {
-              extension: new Extentension()
+              extension: new Extension()
             }
         });
 
         var two = new MediumEditor('.two', {
             buttons: ['extension'],
             extensions: {
-              extension: new Extentension()
+              extension: new Extension()
             }
         });
     </script>
