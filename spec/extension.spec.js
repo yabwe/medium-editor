@@ -1,6 +1,6 @@
 /*global MediumEditor, describe, it, expect, spyOn,
          afterEach, beforeEach, selectElementContents,
-         jasmine, fireEvent, tearDown, console*/
+         jasmine, fireEvent, tearDown*/
 
 describe('Extensions TestCase', function () {
     'use strict';
