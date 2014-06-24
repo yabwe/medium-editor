@@ -1,6 +1,6 @@
 /*global MediumEditor, describe, it, expect, spyOn,
          afterEach, beforeEach, selectElementContents,
-         jasmine, fireEvent, tearDown*/
+         jasmine, fireEvent, tearDown, console*/
 
 describe('Extensions TestCase', function () {
     'use strict';
@@ -104,5 +104,40 @@ describe('Extensions TestCase', function () {
             expect(editor.toolbar.querySelectorAll('.extension-button').length).toBe(0);
         });
 
+    });
+
+    describe('Pass editor instance', function () {
+        var ExtensionOne = function () {
+                this.parent = true;
+            },
+            ExtensionTwo = function () {},
+            extOne = new ExtensionOne(),
+            extTwo = new ExtensionTwo();
+
+        it('should check if extension class has parent attribute', function () {
+            var editor = new MediumEditor('.editor', {
+                extensions: {
+                    'one': extOne,
+                    'two': extTwo
+                }
+            });
+
+            expect(editor instanceof MediumEditor).toBeTruthy();
+            expect(extOne.parent).toBeTruthy();
+            expect(extTwo.parent).toBeUndefined();
+        });
+
+        it('should set the base attribute to be an instance of editor', function () {
+            var editor = new MediumEditor('.editor', {
+                extensions: {
+                    'one': extOne,
+                    'two': extTwo
+                }
+            });
+
+            expect(editor instanceof MediumEditor).toBeTruthy();
+            expect(extOne.base instanceof MediumEditor).toBeTruthy();
+            expect(extTwo.base).toBeUndefined();
+        });
     });
 });
