@@ -146,7 +146,11 @@ An extension is an object that has essentially two functions `getButton` and `ch
   determine the state is entirely up to you. `checkState` will be called multiple times and will receive a [DOM `Element`](https://developer.mozilla.org/en-US/docs/Web/API/element)
   as parameter.
 
-### Example
+Properties
+
+* `parent` add this property to your extension class constructor and set it to true to be able to access the Medium Editor instance through the `base` property that will be set during the initialization
+
+### Examples
 
 A simple example the uses [rangy](https://code.google.com/p/rangy/) and the [CSS Class Applier Module](https://code.google.com/p/rangy/wiki/CSSClassApplierModule) to support highlighting of text:
 
@@ -179,6 +183,41 @@ var e = new MediumEditor('.editor', {
     buttons: ['highlight', 'bold', 'italic', 'underline'],
     extensions: {
         'highlight': new Highlighter()
+    }
+});
+```
+
+A simple example that uses the `parent` attribute:
+
+```js
+function Extension() {
+  this.parent = true;
+
+  this.button = document.createElement('button');
+  this.button.className = 'medium-editor-action';
+  this.button.innerText = 'X';
+  this.button.onclick = this.onClick.bind(this);
+}
+
+Extension.prototype.getButton = function() {
+  return this.button;
+};
+
+Extension.prototype.onClick = function() {
+  alert('This is editor: #' + this.base.id);
+};
+
+var one = new MediumEditor('.one', {
+    buttons: ['extension'],
+    extensions: {
+      extension: new Extension()
+    }
+});
+
+var two = new MediumEditor('.two', {
+    buttons: ['extension'],
+    extensions: {
+      extension: new Extension()
     }
 });
 ```
