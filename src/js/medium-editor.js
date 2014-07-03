@@ -336,8 +336,8 @@ if (typeof module === 'object') {
         buttonTemplate: function (btnType) {
             var buttonLabels = this.getButtonLabels(this.options.buttonLabels),
                 buttonTemplates = {
-                    'bold': '<button class="medium-editor-action medium-editor-action-bold" data-action="bold" data-element="b">' + buttonLabels.bold + '</button>',
-                    'italic': '<button class="medium-editor-action medium-editor-action-italic" data-action="italic" data-element="i">' + buttonLabels.italic + '</button>',
+                    'bold': '<button class="medium-editor-action medium-editor-action-bold" data-action="bold" data-element="b,strong">' + buttonLabels.bold + '</button>',
+                    'italic': '<button class="medium-editor-action medium-editor-action-italic" data-action="italic" data-element="i,em">' + buttonLabels.italic + '</button>',
                     'underline': '<button class="medium-editor-action medium-editor-action-underline" data-action="underline" data-element="u">' + buttonLabels.underline + '</button>',
                     'strikethrough': '<button class="medium-editor-action medium-editor-action-strikethrough" data-action="strikethrough" data-element="strike"><strike>A</strike></button>',
                     'superscript': '<button class="medium-editor-action medium-editor-action-superscript" data-action="superscript" data-element="sup">' + buttonLabels.superscript + '</button>',
@@ -494,7 +494,10 @@ if (typeof module === 'object') {
                 if (e && self.clickingIntoArchorForm(e)) {
                     return false;
                 }
-
+                // for safari while editing link to avoid closing of toolbar
+                if(navigator.userAgent.indexOf("Safari") > -1 && e.type=="blur"){
+                    return false
+                }
                 clearTimeout(timer);
                 timer = setTimeout(function () {
                     self.checkSelection();
@@ -534,6 +537,11 @@ if (typeof module === 'object') {
         clickingIntoArchorForm: function (e) {
             var self = this;
             if (e.type && e.type.toLowerCase() === 'blur' && e.relatedTarget && e.relatedTarget === self.anchorInput) {
+                return true;
+            }else if(e.type && (e.type.toLowerCase() === 'mousedown' || e.type.toLowerCase() === 'mouseup' || e.type.toLowerCase() === 'blur' ) &&
+                ((e.target && e.target === self.anchorInput) || (e.toElement && e.toElement === self.anchorInput) ||
+                    (document.activeElement == self.anchorInput)) ){
+                //while editing link, for IE and FF
                 return true;
             }
             return false;
@@ -650,7 +658,15 @@ if (typeof module === 'object') {
         },
 
         activateButton: function (tag) {
+            //revamp this method for IE as it throws out different tag elements.
+            var elli = this.toolbar.querySelectorAll('.medium-editor-action');
             var el = this.toolbar.querySelector('[data-element="' + tag + '"]');
+            for(var i =0; i<elli.length;i++){
+                var tags = elli[i].getAttribute('data-element').split(',');
+                if(tags.indexOf(tag) > -1){
+                    el = elli[i];
+                }
+            }
             if (el !== null && el.className.indexOf(this.options.activeButtonClass) === -1) {
                 el.className += ' ' + this.options.activeButtonClass;
             }
@@ -715,15 +731,43 @@ if (typeof module === 'object') {
 
         getSelectedParentElement: function () {
             var selectedParentElement = null,
-                range = this.selectionRange;
+                range = this.selectionRange,
+                selection = this.selection;
+
+            function getStartNode(node){
+                while(node != null && !node.hasAttributes('data-medium-element')){
+                    if(node.textContent == node.parentNode.textContent){
+                        node = node.parentNode;
+                    }else{
+                        break;
+                    }
+                }
+                return node;
+            };
+            function getLastNode(node){
+                while(node != null && node.childNodes[0]){
+                    if(node.textContent == node.childNodes[0].textContent){
+                        node = node.childNodes[0];
+                    }else{
+                        break;
+                    }
+                }
+                return node;
+            };
+
+            if(selection.anchorNode.textContent.length == selection.anchorOffset){
+                var start = getStartNode(selection.anchorNode);
+                var end =  getStartNode(selection.focusNode);
+                range.setStart((selection.anchorNode.nextSibling)?selection.anchorNode.nextSibling:(start.nextSibling)?start.nextSibling:start, 0);
+            }
+
             if (this.rangeSelectsSingleNode(range)) {
                 selectedParentElement = range.startContainer.childNodes[range.startOffset];
-            } else if (range.startContainer.nodeType === 3) {
-                selectedParentElement = range.startContainer.parentNode;
             } else {
                 selectedParentElement = range.startContainer;
             }
-            return selectedParentElement;
+            selectedParentElement = getLastNode(selectedParentElement);
+            return (selectedParentElement.nodeType == 3)?selectedParentElement.parentNode:selectedParentElement;
         },
 
         triggerAnchorAction: function () {
@@ -1255,13 +1299,13 @@ if (typeof module === 'object') {
                     workEl = elList[i];
 
                     switch (workEl.tagName.toLowerCase()) {
-                    case 'p':
-                    case 'div':
-                        this.filterCommonBlocks(workEl);
-                        break;
-                    case 'br':
-                        this.filterLineBreak(workEl);
-                        break;
+                        case 'p':
+                        case 'div':
+                            this.filterCommonBlocks(workEl);
+                            break;
+                        case 'br':
+                            this.filterLineBreak(workEl);
+                            break;
                     }
 
                 }
