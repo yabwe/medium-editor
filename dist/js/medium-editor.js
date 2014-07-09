@@ -536,14 +536,14 @@ if (typeof module === 'object') {
             this.hideToolbarActions();
         },
 
-        getSelectionElement: function () {
+        findMatchingSelectionParent: function( testElementFunction ) {
             var selection = window.getSelection(),
                 range, current, parent,
                 result,
-                getMediumElement = function (e) {
+                getElement = function (e) {
                     var localParent = e;
                     try {
-                        while (!localParent.getAttribute('data-medium-element')) {
+                        while (!testElementFunction( localParent )) {
                             localParent = localParent.parentNode;
                         }
                     } catch (errb) {
@@ -557,50 +557,28 @@ if (typeof module === 'object') {
                 current = range.commonAncestorContainer;
                 parent = current.parentNode;
 
-                if (current.getAttribute('data-medium-element')) {
+                if (testElementFunction( current )) {
                     result = current;
                 } else {
-                    result = getMediumElement(parent);
+                    result = getElement(parent);
                 }
                 // If not search in the parent nodes.
             } catch (err) {
-                result = getMediumElement(parent);
+                result = getElement(parent);
             }
             return result;
         },
 
+        getSelectionElement: function () {
+            return this.findMatchingSelectionParent( function(el) {
+                return el.getAttribute('data-medium-element');
+            } );
+        },
+
         selectionInContentEditableFalse: function () {
-            var selection = window.getSelection(),
-                range, current, parent,
-                result,
-                getMediumElement = function (e) {
-                    var localParent = e;
-                    try {
-                        while ( localParent.getAttribute('contenteditable') !== 'false' ) {
-                            localParent = localParent.parentNode;
-                        }
-                    } catch (errb) {
-                        return false;
-                    }
-                    return localParent;
-                };
-            // First try on current node
-            try {
-                range = selection.getRangeAt(0);
-                current = range.commonAncestorContainer;
-                parent = current.parentNode;
-
-                if (current.nodeName !== '#text' && current.getAttribute('contenteditable') === 'false') {
-                    result = current;
-
-                } else {
-                    result = getMediumElement(parent);
-                }
-                // If not search in the parent nodes.
-            } catch (err) {
-                result = getMediumElement(parent);
-            }
-            return (result && result.getAttribute('contenteditable') === 'false');
+            return this.findMatchingSelectionParent( function(el) {
+                return (el && el.nodeName !== '#text' && el.getAttribute('contenteditable') === 'false');
+            } );
         },
 
         setToolbarPosition: function () {
