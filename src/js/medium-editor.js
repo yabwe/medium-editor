@@ -141,7 +141,8 @@ if (typeof module === 'object') {
                 .bindSelect()
                 .bindPaste()
                 .setPlaceholders()
-                .bindWindowActions();
+                .bindWindowActions()
+                .passInstance();
         },
 
         initElements: function () {
@@ -223,6 +224,29 @@ if (typeof module === 'object') {
                     }
                 }
             }
+        },
+
+        /**
+         * Pass current Medium Editor instance to all extensions
+         * if extension constructor has 'parent' attribute set to 'true'
+         *
+         */
+        passInstance: function () {
+            var self = this,
+                ext,
+                name;
+
+            for (name in self.options.extensions) {
+                if (self.options.extensions.hasOwnProperty(name)) {
+                    ext = self.options.extensions[name];
+
+                    if (ext.parent) {
+                        ext.base = self;
+                    }
+                }
+            }
+
+            return self;
         },
 
         bindParagraphCreation: function (index) {
@@ -1028,11 +1052,8 @@ if (typeof module === 'object') {
         },
 
         checkLinkFormat: function (value) {
-            var re = /^https?:\/\//;
-            if (value.match(re)) {
-                return value;
-            }
-            return "http://" + value;
+            var re = /^(https?|ftps?|rtmpt?):\/\/|mailto:/;
+            return (re.test(value) ? '' : 'http://') + value;
         },
 
         setTargetBlank: function () {
