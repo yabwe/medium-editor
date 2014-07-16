@@ -495,8 +495,8 @@ if (typeof module === 'object') {
                     return false;
                 }
                 // for safari while editing link to avoid closing of toolbar
-                if(navigator.userAgent.indexOf("Safari") > -1 && e.type=="blur"){
-                    return false
+                if(navigator.userAgent.indexOf("Safari") > -1 && e.type === "blur"){
+                    return false;
                 }
                 clearTimeout(timer);
                 timer = setTimeout(function () {
@@ -538,7 +538,8 @@ if (typeof module === 'object') {
             var self = this;
             if (e.type && e.type.toLowerCase() === 'blur' && e.relatedTarget && e.relatedTarget === self.anchorInput) {
                 return true;
-            }else if(e.type && (e.type.toLowerCase() === 'mousedown' || e.type.toLowerCase() === 'mouseup' || e.type.toLowerCase() === 'blur' ) &&
+            }
+            if(e.type && (e.type.toLowerCase() === 'mousedown' || e.type.toLowerCase() === 'mouseup' || e.type.toLowerCase() === 'blur' ) &&
                 ((e.target && e.target === self.anchorInput) || (e.toElement && e.toElement === self.anchorInput) ||
                     (document.activeElement == self.anchorInput)) ){
                 //while editing link, for IE and FF
@@ -659,10 +660,11 @@ if (typeof module === 'object') {
 
         activateButton: function (tag) {
             //revamp this method for IE as it throws out different tag elements.
-            var elli = this.toolbar.querySelectorAll('.medium-editor-action');
-            var el = this.toolbar.querySelector('[data-element="' + tag + '"]');
-            for(var i =0; i<elli.length;i++){
-                var tags = elli[i].getAttribute('data-element').split(',');
+            var elli = this.toolbar.querySelectorAll('.medium-editor-action'),
+                el = this.toolbar.querySelector('[data-element="' + tag + '"]'),
+                i,tags;
+            for(i = 0; i < elli.length; i++){
+                tags = elli[i].getAttribute('data-element').split(',');
                 if(tags.indexOf(tag) > -1){
                     el = elli[i];
                 }
@@ -732,33 +734,34 @@ if (typeof module === 'object') {
         getSelectedParentElement: function () {
             var selectedParentElement = null,
                 range = this.selectionRange,
-                selection = this.selection;
+                selection = this.selection,
+                start, end;
 
             function getStartNode(node){
-                while(node != null && !node.hasAttributes('data-medium-element')){
-                    if(node.textContent == node.parentNode.textContent){
+                while(node !== null && !node.hasAttributes('data-medium-element')){
+                    if(node.textContent === node.parentNode.textContent){
                         node = node.parentNode;
                     }else{
                         break;
                     }
                 }
                 return node;
-            };
+            }
             function getLastNode(node){
-                while(node != null && node.childNodes[0]){
-                    if(node.textContent == node.childNodes[0].textContent){
+                while(node !== null && node.childNodes[0]){
+                    if(node.textContent === node.childNodes[0].textContent){
                         node = node.childNodes[0];
                     }else{
                         break;
                     }
                 }
                 return node;
-            };
+            }
 
-            if(selection.anchorNode.textContent.length == selection.anchorOffset){
-                var start = getStartNode(selection.anchorNode);
-                var end =  getStartNode(selection.focusNode);
-                range.setStart((selection.anchorNode.nextSibling)?selection.anchorNode.nextSibling:(start.nextSibling)?start.nextSibling:start, 0);
+            if(selection.anchorNode.textContent.length === selection.anchorOffset){
+                start = getStartNode(selection.anchorNode);
+                end =  getStartNode(selection.focusNode);
+                range.setStart(selection.anchorNode.nextSibling || (start.nextSibling || start), 0);
             }
 
             if (this.rangeSelectsSingleNode(range)) {
@@ -767,7 +770,7 @@ if (typeof module === 'object') {
                 selectedParentElement = range.startContainer;
             }
             selectedParentElement = getLastNode(selectedParentElement);
-            return (selectedParentElement.nodeType == 3)?selectedParentElement.parentNode:selectedParentElement;
+            return (selectedParentElement.nodeType === 3)?selectedParentElement.parentNode:selectedParentElement;
         },
 
         triggerAnchorAction: function () {
