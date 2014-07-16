@@ -879,7 +879,8 @@ if (typeof module === 'object') {
 
         // TODO: break method
         showAnchorPreview: function (anchorEl) {
-            if (this.anchorPreview.classList.contains('medium-editor-anchor-preview-active')) {
+            if (this.anchorPreview.classList.contains('medium-editor-anchor-preview-active') 
+                || anchorEl.getAttribute('data-disable-preview')) {
                 return true;
             }
 
