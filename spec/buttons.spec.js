@@ -32,7 +32,7 @@ describe('Buttons TestCase', function () {
             selectElementContents(editor.elements[0]);
             fireEvent(editor.elements[0], 'mouseup');
             jasmine.clock().tick(1);
-            button = editor.toolbar.querySelector('[data-element="b"]');
+            button = editor.toolbar.querySelector('[data-element="b,strong"]');
             expect(button.className).toContain('medium-editor-button-active');
         });
     });
@@ -48,7 +48,7 @@ describe('Buttons TestCase', function () {
             selectElementContents(editor.elements[0]);
             fireEvent(editor.elements[0], 'mouseup');
             jasmine.clock().tick(1);
-            button = editor.toolbar.querySelector('[data-element="b"]');
+            button = editor.toolbar.querySelector('[data-element="b,strong"]');
             fireEvent(button, 'click');
             expect(button.className).toContain('medium-editor-button-active');
         });
@@ -60,7 +60,7 @@ describe('Buttons TestCase', function () {
             selectElementContents(editor.elements[0]);
             fireEvent(editor.elements[0], 'mouseup');
             jasmine.clock().tick(1);
-            button = editor.toolbar.querySelector('[data-element="b"]');
+            button = editor.toolbar.querySelector('[data-element="b,strong"]');
             editor.selection = undefined;
             fireEvent(button, 'click');
             expect(editor.checkSelection).toHaveBeenCalled();
@@ -73,7 +73,7 @@ describe('Buttons TestCase', function () {
             selectElementContents(editor.elements[0]);
             fireEvent(editor.elements[0], 'mouseup');
             jasmine.clock().tick(1);
-            button = editor.toolbar.querySelector('[data-element="b"]');
+            button = editor.toolbar.querySelector('[data-element="b,strong"]');
             expect(button.className).toContain('medium-editor-button-active');
             fireEvent(button, 'click');
             expect(button.className).not.toContain('medium-editor-button-active');
@@ -86,7 +86,7 @@ describe('Buttons TestCase', function () {
             selectElementContents(editor.elements[0]);
             fireEvent(editor.elements[0], 'mouseup');
             jasmine.clock().tick(1);
-            button = editor.toolbar.querySelector('[data-element="b"]');
+            button = editor.toolbar.querySelector('[data-element="b,strong"]');
             fireEvent(button, 'click');
             expect(editor.execAction).toHaveBeenCalled();
         });
@@ -98,7 +98,7 @@ describe('Buttons TestCase', function () {
             selectElementContents(editor.elements[0]);
             fireEvent(editor.elements[0], 'mouseup');
             jasmine.clock().tick(1);
-            button = editor.toolbar.querySelector('[data-element="i"]');
+            button = editor.toolbar.querySelector('[data-element="i,em"]');
             fireEvent(button, 'click');
             expect(document.execCommand).toHaveBeenCalled();
             expect(this.el.innerHTML).toBe('<i>lorem ipsum</i>');
@@ -111,7 +111,7 @@ describe('Buttons TestCase', function () {
             selectElementContents(editor.elements[0]);
             fireEvent(editor.elements[0], 'mouseup');
             jasmine.clock().tick(1);
-            button = editor.toolbar.querySelector('[data-element="b"]');
+            button = editor.toolbar.querySelector('[data-element="b,strong"]');
             fireEvent(button, 'click');
             expect(editor.execAction).toHaveBeenCalled();
         });
