@@ -541,7 +541,7 @@ if (typeof module === 'object') {
             }
             if(e.type && (e.type.toLowerCase() === 'mousedown' || e.type.toLowerCase() === 'mouseup' || e.type.toLowerCase() === 'blur' ) &&
                 ((e.target && e.target === self.anchorInput) || (e.toElement && e.toElement === self.anchorInput) ||
-                    (document.activeElement == self.anchorInput)) ){
+                    (document.activeElement === self.anchorInput)) ){
                 //while editing link, for IE and FF
                 return true;
             }
@@ -663,7 +663,7 @@ if (typeof module === 'object') {
             var elli = this.toolbar.querySelectorAll('.medium-editor-action'),
                 el = this.toolbar.querySelector('[data-element="' + tag + '"]'),
                 i,tags;
-            for(i = 0; i < elli.length; i++){
+            for(i = 0; i < elli.length; i += 1){
                 tags = elli[i].getAttribute('data-element').split(',');
                 if(tags.indexOf(tag) > -1){
                     el = elli[i];
@@ -735,7 +735,7 @@ if (typeof module === 'object') {
             var selectedParentElement = null,
                 range = this.selectionRange,
                 selection = this.selection,
-                start, end;
+                start;
 
             function getStartNode(node){
                 while(node !== null && !node.hasAttributes('data-medium-element')){
@@ -760,7 +760,7 @@ if (typeof module === 'object') {
 
             if(selection.anchorNode.textContent.length === selection.anchorOffset){
                 start = getStartNode(selection.anchorNode);
-                end =  getStartNode(selection.focusNode);
+                //end =  getStartNode(selection.focusNode);
                 range.setStart(selection.anchorNode.nextSibling || (start.nextSibling || start), 0);
             }
 
