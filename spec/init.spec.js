@@ -93,6 +93,7 @@ describe('Initialization TestCase', function () {
                 anchorPreviewHideDelay: 500,
                 checkLinkFormat: false,
                 extensions: {},
+                useRangy:false,
                 activeButtonClass: 'medium-editor-button-active',
                 firstButtonClass: 'medium-editor-button-first',
                 lastButtonClass: 'medium-editor-button-last'

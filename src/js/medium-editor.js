@@ -24,9 +24,9 @@ if (typeof module === 'object') {
         }
         return b;
     }
-
     // http://stackoverflow.com/questions/5605401/insert-link-in-contenteditable-element
     // by Tim Down
+
     function saveSelection() {
         var i,
             len,
@@ -53,17 +53,17 @@ if (typeof module === 'object') {
             }
         }
     }
-
     // http://stackoverflow.com/questions/1197401/how-can-i-get-the-element-the-caret-is-in-with-javascript-when-using-contentedi
     // by You
+
     function getSelectionStart() {
         var node = document.getSelection().anchorNode,
             startNode = (node && node.nodeType === 3 ? node.parentNode : node);
         return startNode;
     }
-
     // http://stackoverflow.com/questions/4176923/html-of-selected-text
     // by Tim Down
+
     function getSelectionHtml() {
         var i,
             html = '',
@@ -86,7 +86,6 @@ if (typeof module === 'object') {
         }
         return html;
     }
-
     // https://github.com/jashkenas/underscore
     function isElement(obj) {
         return !!(obj && obj.nodeType === 1);
@@ -115,6 +114,7 @@ if (typeof module === 'object') {
             secondHeader: 'h4',
             targetBlank: false,
             extensions: {},
+            useRangy:false,
             activeButtonClass: 'medium-editor-button-active',
             firstButtonClass: 'medium-editor-button-first',
             lastButtonClass: 'medium-editor-button-last'
@@ -249,6 +249,37 @@ if (typeof module === 'object') {
             return self;
         },
 
+        getSelection:function(){
+            /* uncomment the below lines of code if you like to use rangy.getSelection instead of window.getSelection
+               i have just commented it to clear the jslint build issue.
+
+               include rangy-core.js from the
+                 NPM    https://www.npmjs.org/package/rangy-browser
+                 Repository 	git://github.com/kapouer/rangy-browser.git (git)
+                 Homepage 	http://code.google.com/p/rangy/
+             */
+
+
+            var sel;
+//            var rangyObj = (typeof rangy)? rangy :{};
+//            if(this.options.useRangy === true && rangyObj.getSelection === "undefined")
+//            {
+//                this.options.useRangy = false;
+//            }
+//            if(!this.options.useRangy){
+                sel =  window.getSelection();
+//            }else{
+//                sel = rangyObj.getSelection();
+//            }
+            return sel;
+
+        },
+
+        getNativeSelection:function(){
+            var sel = this.getSelection();
+            return (sel.nativeSelection !== "undefined")?sel.nativeSelection:sel;
+        },
+
         bindParagraphCreation: function (index) {
             var self = this;
             this.elements[index].addEventListener('keypress', function (e) {
@@ -281,6 +312,7 @@ if (typeof module === 'object') {
                         }
                     }
                 }
+                self.hideToolbarActions();
             });
             return this;
         },
@@ -498,8 +530,11 @@ if (typeof module === 'object') {
                 if(navigator.userAgent.indexOf("Safari") > -1 && e.type === "blur"){
                     return false;
                 }
-                clearTimeout(timer);
-                timer = setTimeout(function () {
+                if(e.type === "keyup"){
+                    self.hideAnchorPreview();
+                }
+                window.clearTimeout(timer);
+                timer = window.setTimeout(function () {
                     self.checkSelection();
                 }, self.options.delay);
             };
@@ -518,7 +553,7 @@ if (typeof module === 'object') {
                 selectionElement;
 
             if (this.keepToolbarAlive !== true && !this.options.disableToolbar) {
-                newSelection = window.getSelection();
+                newSelection = this.getSelection();
                 if (newSelection.toString().trim() === '' ||
                     (this.options.allowMultiParagraphSelection === false && this.hasMultiParagraphs())) {
                     this.hideToolbarActions();
@@ -571,7 +606,7 @@ if (typeof module === 'object') {
         },
 
         getSelectionElement: function () {
-            var selection = window.getSelection(),
+            var selection = this.getSelection(),
                 range, current, parent,
                 result,
                 getMediumElement = function (e) {
@@ -605,7 +640,7 @@ if (typeof module === 'object') {
 
         setToolbarPosition: function () {
             var buttonHeight = 50,
-                selection = window.getSelection(),
+                selection = this.getSelection(),
                 range = selection.getRangeAt(0),
                 boundary = range.getBoundingClientRect(),
                 defaultLeft = (this.options.diffLeft) - (this.toolbar.offsetWidth / 2),
@@ -716,7 +751,7 @@ if (typeof module === 'object') {
             } else if (action === 'anchor') {
                 this.triggerAnchorAction(e);
             } else if (action === 'image') {
-                document.execCommand('insertImage', false, window.getSelection());
+                document.execCommand('insertImage', false, this.getSelection());
             } else {
                 document.execCommand(action, false, null);
                 this.setToolbarPosition();
@@ -776,7 +811,7 @@ if (typeof module === 'object') {
         triggerAnchorAction: function () {
             var selectedParentElement = this.getSelectedParentElement();
             if (selectedParentElement.tagName &&
-                    selectedParentElement.tagName.toLowerCase() === 'a') {
+                selectedParentElement.tagName.toLowerCase() === 'a') {
                 document.execCommand('unlink', false, null);
             } else {
                 if (this.anchorForm.style.display === 'block') {
@@ -845,6 +880,7 @@ if (typeof module === 'object') {
             this.keepToolbarAlive = false;
             if (this.toolbar !== undefined) {
                 this.toolbar.classList.remove('medium-editor-toolbar-active');
+                this.anchorForm.style.display = 'none';
             }
         },
 
@@ -854,9 +890,9 @@ if (typeof module === 'object') {
             this.anchorForm.style.display = 'none';
             this.toolbarActions.style.display = 'block';
             this.keepToolbarAlive = false;
-            clearTimeout(timer);
-            timer = setTimeout(function () {
-                if (self.toolbar && !self.toolbar.classList.contains('medium-editor-toolbar-active')) {
+            window.clearTimeout(timer);
+            timer = window.setTimeout(function () {
+                if (self.toolbar && !self.toolbar.classList.contains('medium-editor-toolbar-active') && window.getSelection().toString().trim() !== "") {
                     self.toolbar.classList.add('medium-editor-toolbar-active');
                 }
             }, 100);
@@ -871,12 +907,13 @@ if (typeof module === 'object') {
         },
 
         showAnchorForm: function (link_value) {
+            this.setToolbarPosition();
             this.toolbarActions.style.display = 'none';
             this.saveSelection();
             this.anchorForm.style.display = 'block';
             this.keepToolbarAlive = true;
-            this.anchorInput.focus();
             this.anchorInput.value = link_value || '';
+            this.anchorInput.focus();
         },
 
         bindAnchorForm: function () {
@@ -888,7 +925,9 @@ if (typeof module === 'object') {
             this.anchorInput.addEventListener('keyup', function (e) {
                 if (e.keyCode === 13) {
                     e.preventDefault();
-                    self.createLink(this);
+                    if (this.value.trim() !== '') {
+                        self.createLink(this);
+                    }
                 }
             });
             this.anchorInput.addEventListener('click', function (e) {
@@ -931,8 +970,8 @@ if (typeof module === 'object') {
             halfOffsetWidth = self.anchorPreview.offsetWidth / 2;
             defaultLeft = self.options.diffLeft - halfOffsetWidth;
 
-            clearTimeout(timer);
-            timer = setTimeout(function () {
+            window.clearTimeout(timer);
+            timer = window.setTimeout(function () {
                 if (self.anchorPreview && !self.anchorPreview.classList.contains('medium-editor-anchor-preview-active')) {
                     self.anchorPreview.classList.add('medium-editor-anchor-preview-active');
                 }
@@ -968,7 +1007,7 @@ if (typeof module === 'object') {
                         over = false;
                     }
                 },
-                interval_timer = setInterval(function () {
+                interval_timer = window.setInterval(function () {
                     if (over) {
                         return true;
                     }
@@ -978,7 +1017,7 @@ if (typeof module === 'object') {
                         self.hideAnchorPreview();
 
                         // cleanup
-                        clearInterval(interval_timer);
+                        window.clearInterval(interval_timer);
                         self.anchorPreview.removeEventListener('mouseover', stamp);
                         self.anchorPreview.removeEventListener('mouseout', unstamp);
                         anchorEl.removeEventListener('mouseover', stamp);
@@ -1002,8 +1041,8 @@ if (typeof module === 'object') {
             anchorPreview.innerHTML = this.anchorPreviewTemplate();
             this.options.elementsContainer.appendChild(anchorPreview);
 
-            anchorPreview.addEventListener('click', function () {
-                self.anchorPreviewClickHandler();
+            anchorPreview.addEventListener('click', function (e) {
+                self.anchorPreviewClickHandler(e);
             });
 
             return anchorPreview;
@@ -1020,12 +1059,12 @@ if (typeof module === 'object') {
 
                 var self = this,
                     range = document.createRange(),
-                    sel = window.getSelection();
+                    sel = this.getSelection();
 
                 range.selectNodeContents(self.activeAnchor);
                 sel.removeAllRanges();
                 sel.addRange(range);
-                setTimeout(function () {
+                window.setTimeout(function () {
                     if (self.activeAnchor) {
                         self.showAnchorForm(self.activeAnchor.href);
                     }
@@ -1033,8 +1072,9 @@ if (typeof module === 'object') {
                 }, 100 + self.options.delay);
 
             }
-
-            this.hideAnchorPreview();
+            else{
+                this.hideAnchorPreview();
+            }
         },
 
         editorAnchorObserver: function (e) {
@@ -1064,7 +1104,7 @@ if (typeof module === 'object') {
                 this.activeAnchor.addEventListener('mouseout', leaveAnchor);
                 // show the anchor preview according to the configured delay
                 // if the mouse has not left the anchor tag in that time
-                setTimeout(function () {
+                window.setTimeout(function () {
                     if (overAnchor) {
                         self.showAnchorPreview(e.target);
                     }
@@ -1096,10 +1136,13 @@ if (typeof module === 'object') {
             if (el.tagName.toLowerCase() === 'a') {
                 el.target = '_blank';
             } else {
-                el = el.getElementsByTagName('a');
-                for (i = 0; i < el.length; i += 1) {
-                    el[i].target = '_blank';
+                for (i = 0; i < this.elements.length; i += 1) {
+                    el = this.elements[i].getElementsByTagName('a');
+                    for (i = 0; i < el.length; i += 1) {
+                        el[i].target = '_blank';
+                    }
                 }
+
             }
         },
 
@@ -1125,8 +1168,8 @@ if (typeof module === 'object') {
             var timerResize,
                 self = this;
             this.windowResizeHandler = function () {
-                clearTimeout(timerResize);
-                timerResize = setTimeout(function () {
+                window.clearTimeout(timerResize);
+                timerResize = window.setTimeout(function () {
                     if (self.toolbar && self.toolbar.classList.contains('medium-editor-toolbar-active')) {
                         self.setToolbarPosition();
                     }
@@ -1184,7 +1227,7 @@ if (typeof module === 'object') {
             this.pasteWrapper = function (e) {
                 var paragraphs,
                     html = '',
-                    p;
+                    p,newNode;
 
                 this.classList.remove('medium-editor-placeholder');
                 if (!self.options.forcePlainText && !self.options.cleanPastedHTML) {
@@ -1210,7 +1253,25 @@ if (typeof module === 'object') {
                         }
                         document.execCommand('insertHTML', false, html);
                     } else {
-                        document.execCommand('insertHTML', false, e.clipboardData.getData('text/plain'));
+                        html = e.clipboardData.getData('text/plain').replace(/\r\n/g, '<br/>');
+                        document.execCommand('insertHTML', false, html);
+                    }
+                }else if((e.originalEvent || e).clipboardData && (e.originalEvent || e).clipboardData.getData ){
+                    html = (e.originalEvent || e).clipboardData.getData('text/plain');
+                    html = html.replace(/\r\n/g, '<br/>').replace(/\n/g, '<br/>');
+                    document.execCommand('insertHTML', false, html);
+                }else{
+                    html = window.clipboardData.getData("text") || "";
+                    html = html.replace(/\r\n/g, '<br/>');
+                    if (html !== "") {
+                        if (window.getSelection) {
+                            newNode = document.createElement("span");
+                            newNode.innerHTML = html;
+                            window.getSelection().getRangeAt(0).insertNode(newNode);
+                            window.getSelection().removeAllRanges();
+                        } else {
+                            document.selection.createRange().pasteHTML(html);
+                        }
                     }
                 }
             };
@@ -1224,8 +1285,8 @@ if (typeof module === 'object') {
             var i,
                 activatePlaceholder = function (el) {
                     if (!(el.querySelector('img')) &&
-                            !(el.querySelector('blockquote')) &&
-                            el.textContent.replace(/^\s+|\s+$/g, '') === '') {
+                        !(el.querySelector('blockquote')) &&
+                        el.textContent.replace(/^\s+|\s+$/g, '') === '') {
                         el.classList.add('medium-editor-placeholder');
                     }
                 },
@@ -1247,11 +1308,11 @@ if (typeof module === 'object') {
 
             /*jslint regexp: true*/
             /*
-                jslint does not allow character negation, because the negation
-                will not match any unicode characters. In the regexes in this
-                block, negation is used specifically to match the end of an html
-                tag, and in fact unicode characters *should* be allowed.
-            */
+             jslint does not allow character negation, because the negation
+             will not match any unicode characters. In the regexes in this
+             block, negation is used specifically to match the end of an html
+             tag, and in fact unicode characters *should* be allowed.
+             */
             var i, elList, workEl,
                 el = this.getSelectionElement(),
                 multiline = /<p|<br|<div/.test(text),
@@ -1261,7 +1322,7 @@ if (typeof module === 'object') {
                     [new RegExp(/<[^>]*docs-internal-guid[^>]*>/gi), ""],
                     [new RegExp(/<\/b>(<br[^>]*>)?$/gi), ""],
 
-                     // un-html spaces and newlines inserted by OS X
+                    // un-html spaces and newlines inserted by OS X
                     [new RegExp(/<span class="Apple-converted-space">\s+<\/span>/g), ' '],
                     [new RegExp(/<br class="Apple-interchange-newline">/g), '<br>'],
 
@@ -1274,10 +1335,10 @@ if (typeof module === 'object') {
                     //[replace google docs bolds with a span to be replaced once the html is inserted
                     [new RegExp(/<span[^>]*font-weight:bold[^>]*>/gi), '<span class="replace-with bold">'],
 
-                     // replace manually entered b/i/a tags with real ones
+                    // replace manually entered b/i/a tags with real ones
                     [new RegExp(/&lt;(\/?)(i|b|a)&gt;/gi), '<$1$2>'],
 
-                     // replace manually a tags with real ones, converting smart-quotes from google docs
+                    // replace manually a tags with real ones, converting smart-quotes from google docs
                     [new RegExp(/&lt;a\s+href=(&quot;|&rdquo;|&ldquo;|“|”)([^&]+)(&quot;|&rdquo;|&ldquo;|“|”)&gt;/gi), '<a href="$2">']
 
                 ];
@@ -1431,5 +1492,6 @@ if (typeof module === 'object') {
         }
 
     };
+
 
 }(window, document));
