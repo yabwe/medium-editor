@@ -9,14 +9,12 @@
 .medium-editor-toolbar {
   border: 1px solid #000;
   background-color: #242424;
-  background: -webkit-gradient(linear, left bottom, left top, from(#242424), to(rgba(36, 36, 36, 0.75)));
   background: -webkit-linear-gradient(bottom, #242424, rgba(36, 36, 36, 0.75));
   background: linear-gradient(bottom, #242424, rgba(36, 36, 36, 0.75));
   border-radius: 5px;
-  -webkit-box-shadow: 0 0 3px #000;
   box-shadow: 0 0 3px #000;
   -webkit-transition: top 0.075s ease-out, left 0.075s ease-out;
-  transition: top 0.075s ease-out, left 0.075s ease-out; }
+          transition: top 0.075s ease-out, left 0.075s ease-out; }
   .medium-editor-toolbar li button {
     min-width: 50px;
     height: 50px;
@@ -26,13 +24,11 @@
     border-left: 1px solid rgba(255, 255, 255, 0.1);
     background-color: #242424;
     color: #fff;
-    background: -webkit-gradient(linear, left bottom, left top, from(#242424), to(rgba(36, 36, 36, 0.89)));
     background: -webkit-linear-gradient(bottom, #242424, rgba(36, 36, 36, 0.89));
     background: linear-gradient(bottom, #242424, rgba(36, 36, 36, 0.89));
-    -webkit-box-shadow: 0 2px 2px rgba(0, 0, 0, 0.3);
     box-shadow: 0 2px 2px rgba(0, 0, 0, 0.3);
     -webkit-transition: background-color 0.2s ease-in;
-    transition: background-color 0.2s ease-in; }
+            transition: background-color 0.2s ease-in; }
     .medium-editor-toolbar li button:hover {
       background-color: #000;
       color: yellow; }
@@ -45,7 +41,6 @@
   .medium-editor-toolbar li .medium-editor-button-active {
     background-color: #000;
     color: #fff;
-    background: -webkit-gradient(linear, left bottom, left top, from(#242424), to(rgba(0, 0, 0, 0.89)));
     background: -webkit-linear-gradient(bottom, #242424, rgba(0, 0, 0, 0.89));
     background: linear-gradient(bottom, #242424, rgba(0, 0, 0, 0.89)); }
 
@@ -57,9 +52,8 @@
     height: 50px;
     background: #242424;
     color: #ccc;
-    -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
-    box-sizing: border-box; }
+         box-sizing: border-box; }
   .medium-editor-toolbar-form-anchor a {
     color: #fff; }
 
