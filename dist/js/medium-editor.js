@@ -515,7 +515,8 @@ if (typeof module === 'object') {
             if (this.keepToolbarAlive !== true && !this.options.disableToolbar) {
                 newSelection = window.getSelection();
                 if (newSelection.toString().trim() === '' ||
-                    (this.options.allowMultiParagraphSelection === false && this.hasMultiParagraphs())) {
+                    (this.options.allowMultiParagraphSelection === false && this.hasMultiParagraphs()) ||
+                    this.selectionInContentEditableFalse()) {
                     this.hideToolbarActions();
                 } else {
                     selectionElement = this.getSelectionElement();
@@ -559,14 +560,14 @@ if (typeof module === 'object') {
             this.hideToolbarActions();
         },
 
-        getSelectionElement: function () {
+        findMatchingSelectionParent: function( testElementFunction ) {
             var selection = window.getSelection(),
                 range, current, parent,
                 result,
-                getMediumElement = function (e) {
+                getElement = function (e) {
                     var localParent = e;
                     try {
-                        while (!localParent.getAttribute('data-medium-element')) {
+                        while (!testElementFunction( localParent )) {
                             localParent = localParent.parentNode;
                         }
                     } catch (errb) {
@@ -580,16 +581,28 @@ if (typeof module === 'object') {
                 current = range.commonAncestorContainer;
                 parent = current.parentNode;
 
-                if (current.getAttribute('data-medium-element')) {
+                if (testElementFunction( current )) {
                     result = current;
                 } else {
-                    result = getMediumElement(parent);
+                    result = getElement(parent);
                 }
                 // If not search in the parent nodes.
             } catch (err) {
-                result = getMediumElement(parent);
+                result = getElement(parent);
             }
             return result;
+        },
+
+        getSelectionElement: function () {
+            return this.findMatchingSelectionParent( function(el) {
+                return el.getAttribute('data-medium-element');
+            } );
+        },
+
+        selectionInContentEditableFalse: function () {
+            return this.findMatchingSelectionParent( function(el) {
+                return (el && el.nodeName !== '#text' && el.getAttribute('contenteditable') === 'false');
+            } );
         },
 
         setToolbarPosition: function () {
@@ -866,7 +879,8 @@ if (typeof module === 'object') {
 
         // TODO: break method
         showAnchorPreview: function (anchorEl) {
-            if (this.anchorPreview.classList.contains('medium-editor-anchor-preview-active')) {
+            if (this.anchorPreview.classList.contains('medium-editor-anchor-preview-active') 
+                || anchorEl.getAttribute('data-disable-preview')) {
                 return true;
             }
 
