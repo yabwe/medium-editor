@@ -1,3 +1,11 @@
+1.9.0 / 2014-08-08
+==================
+
+* Extensions
+* Disables the toolbar when selecting within an element that has contenteditable="false"
+* Fixes hidden placeholder content override
+
+
 1.8.14 / 2014-06-11
 ===================
 
