@@ -129,6 +129,11 @@ This is handy when you need to capture modifications other thats outside of `key
 
 `input` is supported by Chrome, Firefox, IE9 and other modern browsers. If you want to read more or support older browsers, check [Listening to events of a contenteditable HTML element](http://stackoverflow.com/questions/7802784/listening-to-events-of-a-contenteditable-html-element/7804973#7804973) and [Detect changes in the DOM](http://stackoverflow.com/questions/3219758/detect-changes-in-the-dom)
 
+## MediumButton
+
+Patrick Stillhar developed a new and improved way to add buttons to our toolbar. Check it out at:
+[https://stillhart.biz/project/MediumButton/](https://stillhart.biz/project/MediumButton/)
+
 ## Extensions
 
 To add additional additional functions that are not supported by the native [browser API](https://developer.mozilla.org/de/docs/Rich-Text_Editing_in_Mozilla) you can
