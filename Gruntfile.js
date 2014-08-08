@@ -72,6 +72,7 @@ module.exports = function (grunt) {
                 'compatible-vendor-prefixes': false,
                 'fallback-colors': false,
                 'gradients': false,
+                'important': false,
                 'import': 2
             },
             src: 'dist/css/**/*.css'
