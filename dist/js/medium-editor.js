@@ -499,11 +499,20 @@ if (typeof module === 'object') {
                 }, self.options.delay);
             };
 
+            this.clickInEditor = function (e) {
+                self.hideToolbarActions(true);
+                self.setToolbarPosition();
+            }
+
             document.documentElement.addEventListener('mouseup', this.checkSelectionWrapper);
 
             for (i = 0; i < this.elements.length; i += 1) {
                 this.elements[i].addEventListener('keyup', this.checkSelectionWrapper);
                 this.elements[i].addEventListener('blur', this.checkSelectionWrapper);
+                //console.log(this.elements[i]);
+                //this.elements[i].addEventListener('click', this.checkSelectionWrapper);
+
+                this.elements[i].onclick = this.clickInEditor;
             }
             return this;
         },
@@ -517,11 +526,17 @@ if (typeof module === 'object') {
                 if (newSelection.toString().trim() === '' ||
                     (this.options.allowMultiParagraphSelection === false && this.hasMultiParagraphs()) ||
                     this.selectionInContentEditableFalse()) {
-                    this.hideToolbarActions();
+                    
+                    if ( !this.options.staticToolbar ) {
+                        this.hideToolbarActions();
+                    }
+
                 } else {
                     selectionElement = this.getSelectionElement();
-                    if (!selectionElement || selectionElement.getAttribute('data-disable-toolbar')) {
-                        this.hideToolbarActions();
+                    if (!selectionElement || selectionElement.getAttribute('data-disable-toolbar') ) {
+                        if ( !this.options.staticToolbar) {
+                            this.hideToolbarActions();
+                        }
                     } else {
                         this.checkSelectionElement(newSelection, selectionElement);
                     }
@@ -557,7 +572,10 @@ if (typeof module === 'object') {
                     return;
                 }
             }
-            this.hideToolbarActions();
+            
+            if ( !this.options.staticToolbar ) {
+                this.hideToolbarActions();
+            }
         },
 
         findMatchingSelectionParent: function( testElementFunction ) {
@@ -606,28 +624,51 @@ if (typeof module === 'object') {
         },
 
         setToolbarPosition: function () {
-            var buttonHeight = 50,
-                selection = window.getSelection(),
-                range = selection.getRangeAt(0),
-                boundary = range.getBoundingClientRect(),
-                defaultLeft = (this.options.diffLeft) - (this.toolbar.offsetWidth / 2),
-                middleBoundary = (boundary.left + boundary.right) / 2,
-                halfOffsetWidth = this.toolbar.offsetWidth / 2;
-            if (boundary.top < buttonHeight) {
-                this.toolbar.classList.add('medium-toolbar-arrow-over');
-                this.toolbar.classList.remove('medium-toolbar-arrow-under');
-                this.toolbar.style.top = buttonHeight + boundary.bottom - this.options.diffTop + window.pageYOffset - this.toolbar.offsetHeight + 'px';
-            } else {
-                this.toolbar.classList.add('medium-toolbar-arrow-under');
-                this.toolbar.classList.remove('medium-toolbar-arrow-over');
-                this.toolbar.style.top = boundary.top + this.options.diffTop + window.pageYOffset - this.toolbar.offsetHeight + 'px';
+
+            if ( this.options.staticToolbar ) { 
+                var container = this.elements[0];
+                this.toolbar.classList.add('medium-editor-toolbar-active');
+
+                this.toolbar.style.top = container.offsetTop + "px";
+                this.toolbar.style.left = container.offsetLeft + "px";
+
+                var boundary2 = {
+                    width: container.offsetWidth,
+                    height: container.offsetHeight,
+                    left: container.offsetLeft,
+                    right: container.offsetLeft + container.offsetWidth,
+                    top: container.offsetTop,
+                    bottom: container.offsetTop + container.offsetHeight
+                };
+                console.log(boundary2);
             }
-            if (middleBoundary < halfOffsetWidth) {
-                this.toolbar.style.left = defaultLeft + halfOffsetWidth + 'px';
-            } else if ((window.innerWidth - middleBoundary) < halfOffsetWidth) {
-                this.toolbar.style.left = window.innerWidth + defaultLeft - halfOffsetWidth + 'px';
-            } else {
-                this.toolbar.style.left = defaultLeft + middleBoundary + 'px';
+            else {
+
+                var buttonHeight = 50,
+                    selection = window.getSelection(),
+                    range = selection.getRangeAt(0),
+                    boundary = range.getBoundingClientRect(),
+                    defaultLeft = (this.options.diffLeft) - (this.toolbar.offsetWidth / 2),
+                    middleBoundary = (boundary.left + boundary.right) / 2,
+                    halfOffsetWidth = this.toolbar.offsetWidth / 2;
+
+                if (boundary.top < buttonHeight) {
+                    this.toolbar.classList.add('medium-toolbar-arrow-over');
+                    this.toolbar.classList.remove('medium-toolbar-arrow-under');
+                    this.toolbar.style.top = buttonHeight + boundary.bottom - this.options.diffTop + window.pageYOffset - this.toolbar.offsetHeight + 'px';
+                } else {
+                    this.toolbar.classList.add('medium-toolbar-arrow-under');
+                    this.toolbar.classList.remove('medium-toolbar-arrow-over');
+                    this.toolbar.style.top = boundary.top + this.options.diffTop + window.pageYOffset - this.toolbar.offsetHeight + 'px';
+                }
+                if (middleBoundary < halfOffsetWidth) {
+                    this.toolbar.style.left = defaultLeft + halfOffsetWidth + 'px';
+                } else if ((window.innerWidth - middleBoundary) < halfOffsetWidth) {
+                    this.toolbar.style.left = window.innerWidth + defaultLeft - halfOffsetWidth + 'px';
+                } else {
+                    this.toolbar.style.left = defaultLeft + middleBoundary + 'px';
+                }
+
             }
 
             this.hideAnchorPreview();
@@ -805,10 +846,15 @@ if (typeof module === 'object') {
             return firstChild;
         },
 
-        hideToolbarActions: function () {
+        hideToolbarActions: function ( ) {
+
             this.keepToolbarAlive = false;
-            if (this.toolbar !== undefined) {
+            if (this.toolbar !== undefined ) {
                 this.toolbar.classList.remove('medium-editor-toolbar-active');
+            }
+            else if ( this.options.staticToolbar ) {
+
+              //  this.setToolbarPosition();
             }
         },
 
@@ -821,7 +867,7 @@ if (typeof module === 'object') {
             clearTimeout(timer);
             timer = setTimeout(function () {
                 if (self.toolbar && !self.toolbar.classList.contains('medium-editor-toolbar-active')) {
-                    self.toolbar.classList.add('medium-editor-toolbar-active');
+                   // self.toolbar.classList.add('medium-editor-toolbar-active');
                 }
             }, 100);
         },
@@ -1069,7 +1115,7 @@ if (typeof module === 'object') {
         },
 
         createLink: function (input) {
-            if (input.value.trim().length === 0) {
+            if (input.value.trim().length === 0 && !this.options.staticToolbar ) {
                 this.hideToolbarActions();
                 return;
             }
@@ -1097,7 +1143,13 @@ if (typeof module === 'object') {
                     }
                 }, 100);
             };
+
+            this.windowScrollHandler = function() {
+
+            }
+
             window.addEventListener('resize', this.windowResizeHandler);
+            window.addEventListener('scroll', this.windowScrollHandler);
             return this;
         },
 
@@ -1187,6 +1239,7 @@ if (typeof module === 'object') {
 
         setPlaceholders: function () {
             var i,
+                self = this,
                 activatePlaceholder = function (el) {
                     if (!(el.querySelector('img')) &&
                             !(el.querySelector('blockquote')) &&
@@ -1199,7 +1252,11 @@ if (typeof module === 'object') {
                     if (e.type !== 'keypress') {
                         activatePlaceholder(this);
                     }
+
+                        self.hideToolbarActions();
+
                 };
+
             for (i = 0; i < this.elements.length; i += 1) {
                 activatePlaceholder(this.elements[i]);
                 this.elements[i].addEventListener('blur', placeholderWrapper);
