@@ -888,16 +888,13 @@ if (typeof module === 'object') {
             return firstChild;
         },
 
-        hideToolbarActions: function ( ) {
+        hideToolbarActions: function () {
 
             this.keepToolbarAlive = false;
-            if (this.toolbar !== undefined ) {
+            if (this.toolbar !== undefined) {
                 this.toolbar.classList.remove('medium-editor-toolbar-active');
             }
-            else if ( this.options.staticToolbar ) {
 
-              //  this.setToolbarPosition();
-            }
         },
 
         showToolbarActions: function () {
@@ -909,7 +906,7 @@ if (typeof module === 'object') {
             clearTimeout(timer);
             timer = setTimeout(function () {
                 if (self.toolbar && !self.toolbar.classList.contains('medium-editor-toolbar-active')) {
-                   // self.toolbar.classList.add('medium-editor-toolbar-active');
+                    self.toolbar.classList.add('medium-editor-toolbar-active');
                 }
             }, 100);
         },
