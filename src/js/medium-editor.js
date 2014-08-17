@@ -629,7 +629,6 @@ if (typeof module === 'object') {
 
             if ( this.options.staticToolbar ) { 
                 var container = this.elements[0];
-                this.toolbar.classList.add('medium-editor-toolbar-active');
 
                 this.toolbar.style.top = container.offsetTop + "px";
                 this.toolbar.style.left = container.offsetLeft + "px";
@@ -670,9 +669,10 @@ if (typeof module === 'object') {
                 } else {
                     this.toolbar.style.left = defaultLeft + middleBoundary + 'px';
                 }
+                
 
             }
-
+            this.toolbar.classList.add('medium-editor-toolbar-active');
             this.hideAnchorPreview();
 
             return this;
