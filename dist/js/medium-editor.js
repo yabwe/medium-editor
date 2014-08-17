@@ -138,7 +138,8 @@ if (typeof module === 'object') {
             this.initElements()
                 .bindSelect()
                 .bindPaste()
-                .setPlaceholders()
+               // .setPlaceholders()
+                .bindElementActions()
                 .bindWindowActions()
                 .passInstance();
         },
@@ -183,6 +184,48 @@ if (typeof module === 'object') {
             if (this.elements.nodeType === 1) {
                 this.elements = [this.elements];
             }
+        },
+
+        bindElementActions: function() {
+            var i,
+                self = this,
+
+                // Two functions to handle placeholders
+                activatePlaceholder = function (el) {
+                    if (!(el.querySelector('img')) &&
+                            !(el.querySelector('blockquote')) &&
+                            el.textContent.replace(/^\s+|\s+$/g, '') === '') {
+                        el.classList.add('medium-editor-placeholder');
+                    }
+                },
+                placeholderWrapper = function (el, e) {
+                    el.classList.remove('medium-editor-placeholder');
+                    if (e.type !== 'keypress') {
+                        activatePlaceholder(el);
+                    }
+                };
+
+
+            for (i = 0; i < this.elements.length; i += 1) {
+
+                // Active all of the placeholders
+                activatePlaceholder(this.elements[i]);
+
+                // Set up the blur event on the elements
+                this.elements[i].addEventListener('blur', function(){
+                    // Activate the placeholder
+                    placeholderWrapper(this, event);
+
+                    // Hide the toolbar
+                    self.hideToolbarActions();
+                });
+
+                // Set up the keypress events
+                this.elements[i].addEventListener('keypress', function(){
+                    placeholderWrapper(this,event);
+                });
+            }
+            return this;
         },
 
         serialize: function () {
@@ -624,10 +667,12 @@ if (typeof module === 'object') {
         },
 
         setToolbarPosition: function () {
+
             this.toolbar.classList.add('medium-editor-toolbar-active');
+
             if ( this.options.staticToolbar ) { 
                 var container = this.elements[0];
-               // this.toolbar.classList.add('medium-editor-toolbar-active');
+
                 this.toolbar.style.top = container.offsetTop - this.toolbar.offsetHeight + "px";
                 this.toolbar.style.left = container.offsetLeft + "px";
 
@@ -659,7 +704,6 @@ if (typeof module === 'object') {
                     this.toolbar.style.left = defaultLeft + middleBoundary + 'px';
                 }
                 
-
             }
             
             this.hideAnchorPreview();
@@ -1244,9 +1288,7 @@ if (typeof module === 'object') {
                         activatePlaceholder(this);
                     }
 
-                    if ( !this.options.staticToolbar ){ 
                         self.hideToolbarActions();
-                    }
 
                 };
 

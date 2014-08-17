@@ -140,7 +140,7 @@ if (typeof module === 'object') {
             this.initElements()
                 .bindSelect()
                 .bindPaste()
-                .setPlaceholders()
+                .bindElementActions()
                 .bindWindowActions()
                 .passInstance();
         },
@@ -185,6 +185,53 @@ if (typeof module === 'object') {
             if (this.elements.nodeType === 1) {
                 this.elements = [this.elements];
             }
+        },
+
+        /**
+         * This handles blur and keypress events on elements
+         * Including Placeholders, and tooldbar hiding on blur
+         */
+        bindElementActions: function() {
+            var i,
+                self = this,
+
+                // Two functions to handle placeholders
+                activatePlaceholder = function (el) {
+                    if (!(el.querySelector('img')) &&
+                            !(el.querySelector('blockquote')) &&
+                            el.textContent.replace(/^\s+|\s+$/g, '') === '') {
+                        el.classList.add('medium-editor-placeholder');
+                    }
+                },
+                placeholderWrapper = function (el, e) {
+                    el.classList.remove('medium-editor-placeholder');
+                    if (e.type !== 'keypress') {
+                        activatePlaceholder(el);
+                    }
+                };
+
+
+            for (i = 0; i < this.elements.length; i += 1) {
+
+                // Active all of the placeholders
+                activatePlaceholder(this.elements[i]);
+
+                // Set up the blur event on the elements
+                this.elements[i].addEventListener('blur', function(){
+                    // Activate the placeholder
+                    placeholderWrapper(this, event);
+
+                    // Hide the toolbar
+                    self.hideToolbarActions();
+                });
+
+                // Set up the keypress events
+                this.elements[i].addEventListener('keypress', function(){
+                    placeholderWrapper(this,event);
+                });
+            }
+
+            return this;
         },
 
         serialize: function () {
@@ -1227,34 +1274,6 @@ if (typeof module === 'object') {
             };
             for (i = 0; i < this.elements.length; i += 1) {
                 this.elements[i].addEventListener('paste', this.pasteWrapper);
-            }
-            return this;
-        },
-
-        setPlaceholders: function () {
-            var i,
-                self = this,
-                activatePlaceholder = function (el) {
-                    if (!(el.querySelector('img')) &&
-                            !(el.querySelector('blockquote')) &&
-                            el.textContent.replace(/^\s+|\s+$/g, '') === '') {
-                        el.classList.add('medium-editor-placeholder');
-                    }
-                },
-                placeholderWrapper = function (e) {
-                    this.classList.remove('medium-editor-placeholder');
-                    if (e.type !== 'keypress') {
-                        activatePlaceholder(this);
-                    }
-
-                        self.hideToolbarActions();
-
-                };
-
-            for (i = 0; i < this.elements.length; i += 1) {
-                activatePlaceholder(this.elements[i]);
-                this.elements[i].addEventListener('blur', placeholderWrapper);
-                this.elements[i].addEventListener('keypress', placeholderWrapper);
             }
             return this;
         },
