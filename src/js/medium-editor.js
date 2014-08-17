@@ -157,7 +157,7 @@ if (typeof module === 'object') {
                     this.elements[i].setAttribute('data-placeholder', this.options.placeholder);
                 }
                 this.elements[i].setAttribute('data-medium-element', true);
-                this.bindParagraphCreation(i).bindReturn(i).bindTab(i);
+                this.bindParagraphCreation(i);
                 if (!this.options.disableToolbar && !this.elements[i].getAttribute('data-disable-toolbar')) {
                     addToolbar = true;
                 }
@@ -215,6 +215,9 @@ if (typeof module === 'object') {
 
                 // Active all of the placeholders
                 activatePlaceholder(this.elements[i]);
+
+                // Bind the return and tab keypress events
+                this.bindReturn(i).bindTab(i);
 
                 // Set up the blur event on the elements
                 this.elements[i].addEventListener('blur', function(){

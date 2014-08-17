@@ -138,7 +138,6 @@ if (typeof module === 'object') {
             this.initElements()
                 .bindSelect()
                 .bindPaste()
-               // .setPlaceholders()
                 .bindElementActions()
                 .bindWindowActions()
                 .passInstance();
@@ -156,7 +155,7 @@ if (typeof module === 'object') {
                     this.elements[i].setAttribute('data-placeholder', this.options.placeholder);
                 }
                 this.elements[i].setAttribute('data-medium-element', true);
-                this.bindParagraphCreation(i).bindReturn(i).bindTab(i);
+                this.bindParagraphCreation(i);
                 if (!this.options.disableToolbar && !this.elements[i].getAttribute('data-disable-toolbar')) {
                     addToolbar = true;
                 }
@@ -186,6 +185,10 @@ if (typeof module === 'object') {
             }
         },
 
+        /**
+         * This handles blur and keypress events on elements
+         * Including Placeholders, and tooldbar hiding on blur
+         */
         bindElementActions: function() {
             var i,
                 self = this,
@@ -211,6 +214,9 @@ if (typeof module === 'object') {
                 // Active all of the placeholders
                 activatePlaceholder(this.elements[i]);
 
+                // Bind the return and tab keypress events
+                this.bindReturn(i).bindTab(i);
+
                 // Set up the blur event on the elements
                 this.elements[i].addEventListener('blur', function(){
                     // Activate the placeholder
@@ -225,6 +231,7 @@ if (typeof module === 'object') {
                     placeholderWrapper(this,event);
                 });
             }
+
             return this;
         },
 
@@ -368,6 +375,12 @@ if (typeof module === 'object') {
                     if (tag === 'pre') {
                         e.preventDefault();
                         document.execCommand('insertHtml', null, '    ');
+                    }
+
+                    // Deal with list structures
+                    if ( tag == 'li' ) {
+                        e.preventDefault();
+                        document.execCommand('indent', e);
                     }
                 }
             });
@@ -1268,34 +1281,6 @@ if (typeof module === 'object') {
             };
             for (i = 0; i < this.elements.length; i += 1) {
                 this.elements[i].addEventListener('paste', this.pasteWrapper);
-            }
-            return this;
-        },
-
-        setPlaceholders: function () {
-            var i,
-                self = this,
-                activatePlaceholder = function (el) {
-                    if (!(el.querySelector('img')) &&
-                            !(el.querySelector('blockquote')) &&
-                            el.textContent.replace(/^\s+|\s+$/g, '') === '') {
-                        el.classList.add('medium-editor-placeholder');
-                    }
-                },
-                placeholderWrapper = function (e) {
-                    this.classList.remove('medium-editor-placeholder');
-                    if (e.type !== 'keypress') {
-                        activatePlaceholder(this);
-                    }
-
-                        self.hideToolbarActions();
-
-                };
-
-            for (i = 0; i < this.elements.length; i += 1) {
-                activatePlaceholder(this.elements[i]);
-                this.elements[i].addEventListener('blur', placeholderWrapper);
-                this.elements[i].addEventListener('keypress', placeholderWrapper);
             }
             return this;
         },
