@@ -624,23 +624,13 @@ if (typeof module === 'object') {
         },
 
         setToolbarPosition: function () {
-
+            this.toolbar.classList.add('medium-editor-toolbar-active');
             if ( this.options.staticToolbar ) { 
                 var container = this.elements[0];
-                this.toolbar.classList.add('medium-editor-toolbar-active');
-
-                this.toolbar.style.top = container.offsetTop + "px";
+               // this.toolbar.classList.add('medium-editor-toolbar-active');
+                this.toolbar.style.top = container.offsetTop - this.toolbar.offsetHeight + "px";
                 this.toolbar.style.left = container.offsetLeft + "px";
 
-                var boundary2 = {
-                    width: container.offsetWidth,
-                    height: container.offsetHeight,
-                    left: container.offsetLeft,
-                    right: container.offsetLeft + container.offsetWidth,
-                    top: container.offsetTop,
-                    bottom: container.offsetTop + container.offsetHeight
-                };
-                console.log(boundary2);
             }
             else {
 
@@ -668,9 +658,10 @@ if (typeof module === 'object') {
                 } else {
                     this.toolbar.style.left = defaultLeft + middleBoundary + 'px';
                 }
+                
 
             }
-
+            
             this.hideAnchorPreview();
 
             return this;
@@ -1253,7 +1244,9 @@ if (typeof module === 'object') {
                         activatePlaceholder(this);
                     }
 
+                    if ( !this.options.staticToolbar ){ 
                         self.hideToolbarActions();
+                    }
 
                 };
 
