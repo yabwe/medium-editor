@@ -230,6 +230,9 @@ if (typeof module === 'object') {
                 this.elements[i].addEventListener('keypress', function(){
                     placeholderWrapper(this,event);
                 });
+
+                // Onclick
+                this.elements[i].onclick = this.clickInEditor;
             }
 
             return this;
@@ -375,12 +378,6 @@ if (typeof module === 'object') {
                     if (tag === 'pre') {
                         e.preventDefault();
                         document.execCommand('insertHtml', null, '    ');
-                    }
-
-                    // Deal with list structures
-                    if ( tag == 'li' ) {
-                        e.preventDefault();
-                        document.execCommand('indent', e);
                     }
                 }
             });
@@ -556,7 +553,7 @@ if (typeof module === 'object') {
             };
 
             this.clickInEditor = function (e) {
-                self.hideToolbarActions(true);
+
                 self.setToolbarPosition();
             }
 
@@ -565,10 +562,7 @@ if (typeof module === 'object') {
             for (i = 0; i < this.elements.length; i += 1) {
                 this.elements[i].addEventListener('keyup', this.checkSelectionWrapper);
                 this.elements[i].addEventListener('blur', this.checkSelectionWrapper);
-                //console.log(this.elements[i]);
-                //this.elements[i].addEventListener('click', this.checkSelectionWrapper);
-
-                this.elements[i].onclick = this.clickInEditor;
+                this.elements[i].addEventListener('click', this.checkSelectionWrapper);
             }
             return this;
         },
