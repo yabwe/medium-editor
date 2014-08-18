@@ -326,6 +326,19 @@ if (typeof module === 'object') {
                         e.preventDefault();
                         document.execCommand('insertHtml', null, '    ');
                     }
+
+                    // Tab to indent list structures!
+                    if ( tag === 'li' ) {
+                        e.preventDefault();
+
+                        // If Shift is down, outdent, otherwise indent
+                        if ( e.shiftKey ) {
+                            document.execCommand('outdent', e);
+                        }
+                        else {
+                            document.execCommand('indent', e);   
+                        }
+                    }
                 }
             });
             return this;
