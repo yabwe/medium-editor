@@ -187,57 +187,83 @@ if (typeof module === 'object') {
             }
         },
 
+        bindBlur: function(i) {
+            var self = this;
+
+            // Set up the blur event on the elements
+            this.elements[i].addEventListener('blur', function(){
+                // Activate the placeholder
+                self.placeholderWrapper(this, event);
+
+                // Hide the toolbar after a small delay so we can prevent this on toolbar click
+                setTimeout(function(){
+                    if ( !self.keepToolbarAlive ) {
+                        self.hideToolbarActions();
+                    }
+                }, 200);
+            });
+
+            return this;
+        },
+
+        bindKeypress: function(i) {
+            var self = this;
+
+            // Set up the keypress events
+            this.elements[i].addEventListener('keypress', function(){
+                self.placeholderWrapper(this,event);
+            });
+
+            return this;
+        },
+
+        bindClick: function(i) {
+            var self = this;
+
+            this.elements[i].addEventListener('click', function(){
+                self.setToolbarPosition();
+            });
+
+            return this;
+        },
+
         /**
          * This handles blur and keypress events on elements
          * Including Placeholders, and tooldbar hiding on blur
          */
         bindElementActions: function() {
-            var i,
-                self = this,
-
-                // Two functions to handle placeholders
-                activatePlaceholder = function (el) {
-                    if (!(el.querySelector('img')) &&
-                            !(el.querySelector('blockquote')) &&
-                            el.textContent.replace(/^\s+|\s+$/g, '') === '') {
-                        el.classList.add('medium-editor-placeholder');
-                    }
-                },
-                placeholderWrapper = function (el, e) {
-                    el.classList.remove('medium-editor-placeholder');
-                    if (e.type !== 'keypress') {
-                        activatePlaceholder(el);
-                    }
-                };
-
+            var i;
 
             for (i = 0; i < this.elements.length; i += 1) {
 
                 // Active all of the placeholders
-                activatePlaceholder(this.elements[i]);
+                this.activatePlaceholder(this.elements[i]);
 
                 // Bind the return and tab keypress events
-                this.bindReturn(i).bindTab(i);
-
-                // Set up the blur event on the elements
-                this.elements[i].addEventListener('blur', function(){
-                    // Activate the placeholder
-                    placeholderWrapper(this, event);
-
-                    // Hide the toolbar
-                    self.hideToolbarActions();
-                });
-
-                // Set up the keypress events
-                this.elements[i].addEventListener('keypress', function(){
-                    placeholderWrapper(this,event);
-                });
-
-                // Onclick
-                this.elements[i].onclick = this.clickInEditor;
+                this.bindReturn(i)
+                    .bindTab(i)
+                    .bindBlur(i)
+                    .bindClick(i)
+                    .bindKeypress(i);
+                
             }
 
             return this;
+        },
+
+        // Two functions to handle placeholders
+        activatePlaceholder:  function (el) {
+            if (!(el.querySelector('img')) &&
+                    !(el.querySelector('blockquote')) &&
+                    el.textContent.replace(/^\s+|\s+$/g, '') === '') {
+                el.classList.add('medium-editor-placeholder');
+            }
+        },
+        placeholderWrapper: function (el, e) {
+            el.classList.remove('medium-editor-placeholder');
+            if (e.type !== 'keypress') {
+                this.activatePlaceholder(el);
+            }
         },
 
         serialize: function () {
@@ -554,10 +580,6 @@ if (typeof module === 'object') {
                 }, self.options.delay);
             };
 
-            this.clickInEditor = function (e) {
-
-                self.setToolbarPosition();
-            }
 
             document.documentElement.addEventListener('mouseup', this.checkSelectionWrapper);
 
@@ -626,6 +648,7 @@ if (typeof module === 'object') {
             }
             
             if ( !this.options.staticToolbar ) {
+
                 this.hideToolbarActions();
             }
         },
@@ -676,25 +699,32 @@ if (typeof module === 'object') {
         },
 
         setToolbarPosition: function () {
+            var container = this.elements[0],
+            buttonHeight = 50,
+            selection = window.getSelection(),
+            range,
+            boundary,
+            middleBoundary,
+            defaultLeft = (this.options.diffLeft) - (this.toolbar.offsetWidth / 2),
+            halfOffsetWidth = this.toolbar.offsetWidth / 2;
+
+            if ( selection.focusNode === null ) {
+                return this;
+            }
 
             this.toolbar.classList.add('medium-editor-toolbar-active');
 
             if ( this.options.staticToolbar ) { 
-                var container = this.elements[0];
 
                 this.toolbar.style.top = container.offsetTop - this.toolbar.offsetHeight + "px";
                 this.toolbar.style.left = container.offsetLeft + "px";
 
             }
             else {
-
-                var buttonHeight = 50,
-                    selection = window.getSelection(),
-                    range = selection.getRangeAt(0),
-                    boundary = range.getBoundingClientRect(),
-                    defaultLeft = (this.options.diffLeft) - (this.toolbar.offsetWidth / 2),
-                    middleBoundary = (boundary.left + boundary.right) / 2,
-                    halfOffsetWidth = this.toolbar.offsetWidth / 2;
+                
+                range = selection.getRangeAt(0);
+                boundary = range.getBoundingClientRect();
+                middleBoundary = (boundary.left + boundary.right) / 2;
 
                 if (boundary.top < buttonHeight) {
                     this.toolbar.classList.add('medium-toolbar-arrow-over');
