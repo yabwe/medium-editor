@@ -25,6 +25,17 @@ if (typeof module === 'object') {
         return b;
     }
 
+    function isDescendant(parent, child) {
+         var node = child.parentNode;
+         while (node !== null) {
+             if (node === parent) {
+                 return true;
+             }
+             node = node.parentNode;
+         }
+         return false;
+    }
+
     // http://stackoverflow.com/questions/5605401/insert-link-in-contenteditable-element
     // by Tim Down
     function saveSelection() {
@@ -114,6 +125,7 @@ if (typeof module === 'object') {
             placeholder: 'Type your text',
             secondHeader: 'h4',
             targetBlank: false,
+            anchorTarget: false,
             extensions: {},
             activeButtonClass: 'medium-editor-button-active',
             firstButtonClass: 'medium-editor-button-first',
@@ -467,18 +479,30 @@ if (typeof module === 'object') {
         toolbarFormAnchor: function () {
             var anchor = document.createElement('div'),
                 input = document.createElement('input'),
-                a = document.createElement('a');
+                target_label = document.createElement('label'),
+                target = document.createElement('input'),
+                close = document.createElement('a');
 
-            a.setAttribute('href', '#');
-            a.innerHTML = '&times;';
+            close.setAttribute('href', '#');
+            close.innerHTML = '&times;';
 
             input.setAttribute('type', 'text');
             input.setAttribute('placeholder', this.options.anchorInputPlaceholder);
 
+
+            target.setAttribute('type', 'checkbox');
+            target_label.innerHTML = "Open in New Window?";
+            target_label.appendChild(target);
+            
+
             anchor.className = 'medium-editor-toolbar-form-anchor';
             anchor.id = 'medium-editor-toolbar-form-anchor';
             anchor.appendChild(input);
-            anchor.appendChild(a);
+            anchor.appendChild(close);
+
+            if ( this.options.anchorTarget ) {
+                anchor.appendChild(target_label);
+            }
 
             return anchor;
         },
@@ -515,6 +539,7 @@ if (typeof module === 'object') {
                 selectionElement;
 
             if (this.keepToolbarAlive !== true && !this.options.disableToolbar) {
+
                 newSelection = window.getSelection();
                 if (newSelection.toString().trim() === '' ||
                     (this.options.allowMultiParagraphSelection === false && this.hasMultiParagraphs()) ||
@@ -534,9 +559,11 @@ if (typeof module === 'object') {
 
         clickingIntoArchorForm: function (e) {
             var self = this;
+
             if (e.type && e.type.toLowerCase() === 'blur' && e.relatedTarget && e.relatedTarget === self.anchorInput) {
                 return true;
             }
+
             return false;
         },
 
@@ -850,6 +877,7 @@ if (typeof module === 'object') {
                 self = this;
             this.anchorForm.addEventListener('click', function (e) {
                 e.stopPropagation();
+                self.keepToolbarAlive = true;
             });
             this.anchorInput.addEventListener('keyup', function (e) {
                 if (e.keyCode === 13) {
@@ -862,10 +890,21 @@ if (typeof module === 'object') {
                 e.stopPropagation();
                 self.keepToolbarAlive = true;
             });
-            this.anchorInput.addEventListener('blur', function () {
-                self.keepToolbarAlive = false;
-                self.checkSelection();
-            });
+
+            // Hide the anchor form when focusing outside of it.
+            document.body.addEventListener('click', function (e) {
+                if (e.target !== self.anchorForm && !isDescendant(self.anchorForm, e.target) ) {
+                    self.keepToolbarAlive = false;
+                    self.checkSelection();
+                }
+            }, true);
+            document.body.addEventListener('focus', function (e) {
+                if (e.target !== self.anchorForm && !isDescendant(self.anchorForm, e.target) ) {
+                    self.keepToolbarAlive = false;
+                    self.checkSelection();
+                }
+            }, true);
+
             linkCancel.addEventListener('click', function (e) {
                 e.preventDefault();
                 self.showToolbarActions();
@@ -1075,14 +1114,19 @@ if (typeof module === 'object') {
                 this.hideToolbarActions();
                 return;
             }
+
             restoreSelection(this.savedSelection);
+
             if (this.options.checkLinkFormat) {
                 input.value = this.checkLinkFormat(input.value);
             }
+
             document.execCommand('createLink', false, input.value);
+
             if (this.options.targetBlank) {
                 this.setTargetBlank();
             }
+
             this.checkSelection();
             this.showToolbarActions();
             input.value = '';

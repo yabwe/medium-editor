@@ -132,9 +132,9 @@
 
 .medium-editor-toolbar-form-anchor {
   display: none; }
-  .medium-editor-toolbar-form-anchor input, .medium-editor-toolbar-form-anchor a {
+  .medium-editor-toolbar-form-anchor input[type="text"], .medium-editor-toolbar-form-anchor a {
     font-family: HelveticaNeue, Helvetica, Arial, sans-serif; }
-  .medium-editor-toolbar-form-anchor input {
+  .medium-editor-toolbar-form-anchor input[type="text"] {
     margin: 0;
     padding: 6px;
     width: 316px;
@@ -142,7 +142,7 @@
     font-size: 14px;
     -moz-box-sizing: border-box;
          box-sizing: border-box; }
-    .medium-editor-toolbar-form-anchor input:focus {
+    .medium-editor-toolbar-form-anchor input[type="text"]:focus {
       outline: 0;
       border: none;
       box-shadow: none;

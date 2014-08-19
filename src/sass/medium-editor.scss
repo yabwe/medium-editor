@@ -97,12 +97,12 @@
 
 .medium-editor-toolbar-form-anchor {
     display: none;
-    input,
+    input[type="text"],
     a {
         font-family: HelveticaNeue, Helvetica, Arial, sans-serif;
     }
 
-    input {
+    input[type="text"] {
         margin: 0;
         padding: 6px;
         width: 316px;

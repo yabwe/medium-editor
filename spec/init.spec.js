@@ -90,6 +90,7 @@ describe('Initialization TestCase', function () {
                 buttons: ['bold', 'italic', 'underline', 'anchor', 'header1', 'header2', 'quote'],
                 buttonLabels: false,
                 targetBlank: false,
+                anchorTarget: false,
                 anchorPreviewHideDelay: 500,
                 checkLinkFormat: false,
                 extensions: {},
