@@ -425,8 +425,8 @@ if (typeof module === 'object') {
             this.toolbar = this.createToolbar();
             this.keepToolbarAlive = false;
             this.anchorForm = this.toolbar.querySelector('.medium-editor-toolbar-form-anchor');
-            this.anchorInput = this.anchorForm.querySelector('input[type="text"]');
-            this.anchorTarget = this.anchorForm.querySelector('input[type="checkbox"]');
+            this.anchorInput = this.anchorForm.querySelector('input.medium-editor-toolbar-anchor-input');
+            this.anchorTarget = this.anchorForm.querySelector('input.medium-editor-toolbar-anchor-target');
             this.toolbarActions = this.toolbar.querySelector('.medium-editor-toolbar-actions');
             this.anchorPreview = this.createAnchorPreview();
 
@@ -482,16 +482,24 @@ if (typeof module === 'object') {
                 input = document.createElement('input'),
                 target_label = document.createElement('label'),
                 target = document.createElement('input'),
-                close = document.createElement('a');
+                close = document.createElement('a'),
+                save = document.createElement('a');
 
             close.setAttribute('href', '#');
+            close.className = 'medium-editor-toobar-anchor-close';
             close.innerHTML = '&times;';
 
+            save.setAttribute('href', '#');
+            save.className = 'medium-editor-toobar-anchor-save';
+            save.innerHTML = '&#10003;';
+
             input.setAttribute('type', 'text');
+            input.className = 'medium-editor-toolbar-anchor-input';
             input.setAttribute('placeholder', this.options.anchorInputPlaceholder);
 
 
             target.setAttribute('type', 'checkbox');
+            target.className = 'medium-editor-toolbar-anchor-target';
             target_label.innerHTML = "Open in New Window?";
             target_label.appendChild(target);
             
@@ -499,6 +507,8 @@ if (typeof module === 'object') {
             anchor.className = 'medium-editor-toolbar-form-anchor';
             anchor.id = 'medium-editor-toolbar-form-anchor';
             anchor.appendChild(input);
+
+            anchor.appendChild(save);
             anchor.appendChild(close);
 
             if ( this.options.anchorTarget ) {
@@ -874,8 +884,10 @@ if (typeof module === 'object') {
         },
 
         bindAnchorForm: function () {
-            var linkCancel = this.anchorForm.querySelector('a'),
+            var linkCancel = this.anchorForm.querySelector('a.medium-editor-toobar-anchor-close'),
+                linkSave = this.anchorForm.querySelector('a.medium-editor-toobar-anchor-save'),
                 self = this;
+
             this.anchorForm.addEventListener('click', function (e) {
                 e.stopPropagation();
                 self.keepToolbarAlive = true;
@@ -896,6 +908,19 @@ if (typeof module === 'object') {
                     self.createLink(this, target);
                 }
             });
+
+            linkSave.addEventListener('click', function(e) {
+                var target;
+
+                if ( self.options.anchorTarget && self.anchorTarget.checked ) {
+                    target = "_blank";
+                }
+                else {
+                    target = "_self";
+                }
+                
+                self.createLink(self.anchorInput, target);
+            }, true);
 
             this.anchorInput.addEventListener('click', function (e) {
                 // make sure not to hide form when cliking into the input

@@ -97,12 +97,13 @@
 
 .medium-editor-toolbar-form-anchor {
     display: none;
-    input[type="text"],
+
+    input,
     a {
         font-family: HelveticaNeue, Helvetica, Arial, sans-serif;
     }
 
-    input[type="text"] {
+    input.medium-editor-toolbar-anchor-input, label {
         margin: 0;
         padding: 6px;
         width: 316px;
@@ -116,6 +117,11 @@
             -webkit-appearance: none;
                -moz-appearance: none;
         }
+    }
+
+    label {
+        display: block;
+
     }
 
     a {
