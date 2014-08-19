@@ -423,7 +423,8 @@ if (typeof module === 'object') {
             this.toolbar = this.createToolbar();
             this.keepToolbarAlive = false;
             this.anchorForm = this.toolbar.querySelector('.medium-editor-toolbar-form-anchor');
-            this.anchorInput = this.anchorForm.querySelector('input');
+            this.anchorInput = this.anchorForm.querySelector('input[type="text"]');
+            this.anchorTarget = this.anchorForm.querySelector('input[type="checkbox"]');
             this.toolbarActions = this.toolbar.querySelector('.medium-editor-toolbar-actions');
             this.anchorPreview = this.createAnchorPreview();
 
@@ -489,17 +490,18 @@ if (typeof module === 'object') {
 
 
             target.setAttribute('type', 'checkbox');
-
             target_label.innerHTML = "Open in New Window?";
             target_label.appendChild(target);
-        
             
 
             anchor.className = 'medium-editor-toolbar-form-anchor';
             anchor.id = 'medium-editor-toolbar-form-anchor';
             anchor.appendChild(input);
             anchor.appendChild(close);
-            anchor.appendChild(target_label);
+
+            if ( this.options.anchorTarget ) {
+                anchor.appendChild(target_label);
+            }
 
             return anchor;
         },
@@ -556,10 +558,8 @@ if (typeof module === 'object') {
 
         clickingIntoArchorForm: function (e) {
             var self = this;
-            console.log('here');
 
             if (e.type && e.type.toLowerCase() === 'blur' && e.relatedTarget && e.relatedTarget === self.anchorInput) {
-                console.log('here2');
                 return true;
             }
 
@@ -878,12 +878,23 @@ if (typeof module === 'object') {
                 e.stopPropagation();
                 self.keepToolbarAlive = true;
             });
+
             this.anchorInput.addEventListener('keyup', function (e) {
+                var target;
+
                 if (e.keyCode === 13) {
                     e.preventDefault();
-                    self.createLink(this);
+                    if ( self.options.anchorTarget && self.anchorTarget.checked ) {
+                        target = "_blank";
+                    }
+                    else {
+                        target = "_self";
+                    }
+                    
+                    self.createLink(this, target);
                 }
             });
+
             this.anchorInput.addEventListener('click', function (e) {
                 // make sure not to hide form when cliking into the input
                 e.stopPropagation();
@@ -892,13 +903,13 @@ if (typeof module === 'object') {
 
             // Hide the anchor form when focusing outside of it.
             document.body.addEventListener('click', function (e) {
-                if (e.target !== self.anchorForm && !isDescendant(self.anchorForm, e.target) ) {
+                if (e.target !== self.anchorForm && !isDescendant(self.anchorForm, e.target) && !isDescendant(self.toolbarActions, e.target) ) {
                     self.keepToolbarAlive = false;
                     self.checkSelection();
                 }
             }, true);
             document.body.addEventListener('focus', function (e) {
-                if (e.target !== self.anchorForm && !isDescendant(self.anchorForm, e.target) ) {
+                if (e.target !== self.anchorForm && !isDescendant(self.anchorForm, e.target) && !isDescendant(self.toolbarActions, e.target) ) {
                     self.keepToolbarAlive = false;
                     self.checkSelection();
                 }
@@ -1108,7 +1119,7 @@ if (typeof module === 'object') {
             }
         },
 
-        createLink: function (input) {
+        createLink: function (input, target) {
             if (input.value.trim().length === 0) {
                 this.hideToolbarActions();
                 return;
@@ -1122,7 +1133,7 @@ if (typeof module === 'object') {
 
             document.execCommand('createLink', false, input.value);
 
-            if (this.options.targetBlank) {
+            if (this.options.targetBlank || target === "_blank" ) {
                 this.setTargetBlank();
             }
 
