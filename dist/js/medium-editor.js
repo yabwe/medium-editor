@@ -566,22 +566,22 @@ if (typeof module === 'object') {
         },
 
         toolbarFormAnchor: function () {
-           var anchor = document.createElement('div'),
+            var anchor = document.createElement('div'),
                input = document.createElement('input'),
                a = document.createElement('a');
 
-           a.setAttribute('href', '#');
-           a.innerHTML = '&times;';
+            a.setAttribute('href', '#');
+            a.innerHTML = '&times;';
 
-           input.setAttribute('type', 'text');
-           input.setAttribute('placeholder', this.options.anchorInputPlaceholder);
+            input.setAttribute('type', 'text');
+            input.setAttribute('placeholder', this.options.anchorInputPlaceholder);
 
-           anchor.className = 'medium-editor-toolbar-form-anchor';
-           anchor.id = 'medium-editor-toolbar-form-anchor';
-           anchor.appendChild(input);
-           anchor.appendChild(a);
+            anchor.className = 'medium-editor-toolbar-form-anchor';
+            anchor.id = 'medium-editor-toolbar-form-anchor';
+            anchor.appendChild(input);
+            anchor.appendChild(a);
 
-           return anchor;
+            return anchor;
         },
 
         bindSelect: function () {
@@ -601,7 +601,6 @@ if (typeof module === 'object') {
                     self.checkSelection();
                 }, self.options.delay);
             };
-
 
             document.documentElement.addEventListener('mouseup', this.checkSelectionWrapper);
 
@@ -660,7 +659,6 @@ if (typeof module === 'object') {
             var i;
             this.selection = newSelection;
             this.selectionRange = this.selection.getRangeAt(0);
-
             for (i = 0; i < this.elements.length; i += 1) {
                 if (this.elements[i] === selectionElement) {
                     this.setToolbarButtonStates()
@@ -671,7 +669,6 @@ if (typeof module === 'object') {
             }
             
             if ( !this.options.staticToolbar ) {
-
                 this.hideToolbarActions();
             }
         },
@@ -721,7 +718,7 @@ if (typeof module === 'object') {
             } );
         },
 
-        setToolbarPosition: function (dont_activate) {
+        setToolbarPosition: function () {
             var container = this.elements[0],
             buttonHeight = 50,
             selection = window.getSelection(),
@@ -735,9 +732,9 @@ if (typeof module === 'object') {
                 return this;
             }
 
-            if ( dont_activate === undefined || dont_activate === null ){
-                this.toolbar.classList.add('medium-editor-toolbar-active');
-            }
+           
+            this.toolbar.classList.add('medium-editor-toolbar-active');
+            
 
             if ( this.options.staticToolbar ) { 
 
@@ -1230,7 +1227,7 @@ if (typeof module === 'object') {
             }
         },
 
-        createLink: function (input, target) {
+        createLink: function (input) {
             if (input.value.trim().length === 0) {
                 this.hideToolbarActions();
                 return;
@@ -1258,16 +1255,15 @@ if (typeof module === 'object') {
                         self.setToolbarPosition();
                     }
                 }, 100);
-
             };
 
+            // Add a scroll event for sticky toolbar
             if ( this.options.staticToolbar && this.options.stickyToolbar ) { 
 
+                // On scroll, re-position the toolbar
                 window.addEventListener('scroll', function() {
                     if (self.toolbar && self.toolbar.classList.contains('medium-editor-toolbar-active')) {
-
-                        
-                        self.setToolbarPosition(1);
+                        self.setToolbarPosition();
                     }
                 }, true);
             }
