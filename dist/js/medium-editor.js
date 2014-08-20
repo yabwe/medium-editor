@@ -198,20 +198,29 @@ if (typeof module === 'object') {
         },
 
         bindBlur: function(i) {
-            var self = this;
+            var self = this,
+                blurFunction = function(e){
+                    // If it's not part of the editor, or the toolbar
+                    if ( e.target !== self.toolbar
+                        && e.target !== self.elements[0]
+                        && !isDescendant(self.elements[0], e.target)
+                        && !isDescendant(self.toolbar, e.target)) {
 
-            // Set up the blur event on the elements
-            this.elements[i].addEventListener('blur', function(){
-                // Activate the placeholder
-                self.placeholderWrapper(this, event);
+                        // Activate the placeholder
+                        self.placeholderWrapper(this, e);
 
-                // Hide the toolbar after a small delay so we can prevent this on toolbar click
-                setTimeout(function(){
-                    if ( !self.keepToolbarAlive ) {
-                        self.hideToolbarActions();
+                        // Hide the toolbar after a small delay so we can prevent this on toolbar click
+                        setTimeout(function(){
+                            if ( !self.keepToolbarAlive ) {
+                                self.hideToolbarActions();
+                            }
+                        }, 200);
                     }
-                }, 200);
-            });
+                };
+
+            // Hide the toolbar when focusing outside of the editor.
+            document.body.addEventListener('click', blurFunction, true);
+            document.body.addEventListener('focus', blurFunction, true);
 
             return this;
         },
@@ -231,7 +240,9 @@ if (typeof module === 'object') {
             var self = this;
 
             this.elements[i].addEventListener('click', function(){
-                self.setToolbarPosition();
+                if ( self.options.staticToolbar ) {
+                    self.setToolbarPosition();
+                }
             });
 
             return this;
@@ -674,6 +685,7 @@ if (typeof module === 'object') {
             var i;
             this.selection = newSelection;
             this.selectionRange = this.selection.getRangeAt(0);
+
             for (i = 0; i < this.elements.length; i += 1) {
                 if (this.elements[i] === selectionElement) {
                     this.setToolbarButtonStates()
@@ -734,7 +746,7 @@ if (typeof module === 'object') {
             } );
         },
 
-        setToolbarPosition: function () {
+        setToolbarPosition: function (dont_activate) {
             var container = this.elements[0],
             buttonHeight = 50,
             selection = window.getSelection(),
@@ -748,11 +760,33 @@ if (typeof module === 'object') {
                 return this;
             }
 
-            this.toolbar.classList.add('medium-editor-toolbar-active');
+            if ( dont_activate === undefined || dont_activate === null ){
+                this.toolbar.classList.add('medium-editor-toolbar-active');
+            }
 
             if ( this.options.staticToolbar ) { 
 
-                this.toolbar.style.top = container.offsetTop - this.toolbar.offsetHeight + "px";
+                if ( this.options.stickyToolbar ) {
+
+                    // If it's beyond the height of the editor, position it at the bottom of the editor
+                    if ( window.scrollY > (this.elements[0].offsetTop + this.elements[0].offsetHeight - this.toolbar.offsetHeight)) {
+                        this.toolbar.style.top = (this.elements[0].offsetTop + this.elements[0].offsetHeight) + 'px';
+                    }
+                    // Stick the toolbar to the top of the window
+                    else if ( window.scrollY > (this.elements[0].offsetTop - this.toolbar.offsetHeight) ) {
+                        this.toolbar.classList.add('sticky-toolbar');
+                        this.toolbar.style.top = "0px";
+                    }
+                    // Normal static toolbar position
+                    else {
+                        this.toolbar.classList.remove('sticky-toolbar');
+                        this.toolbar.style.top = container.offsetTop - this.toolbar.offsetHeight + "px";
+                    }
+                   
+                } 
+                else {
+                    this.toolbar.style.top = container.offsetTop - this.toolbar.offsetHeight + "px";
+                }
                 this.toolbar.style.left = container.offsetLeft + "px";
 
             }
@@ -1025,6 +1059,7 @@ if (typeof module === 'object') {
             linkSave.addEventListener('click', function(e) {
                 var target;
 
+                e.preventDefault();
                 if ( self.options.anchorTarget && self.anchorTarget.checked ) {
                     target = "_blank";
                 }
@@ -1292,8 +1327,19 @@ if (typeof module === 'object') {
                         self.setToolbarPosition();
                     }
                 }, 100);
+
             };
 
+            if ( this.options.staticToolbar && this.options.stickyToolbar ) { 
+
+                window.addEventListener('scroll', function() {
+                    if (self.toolbar && self.toolbar.classList.contains('medium-editor-toolbar-active')) {
+
+                        
+                        self.setToolbarPosition(1);
+                    }
+                }, true);
+            }
             window.addEventListener('resize', this.windowResizeHandler);
             return this;
         },
