@@ -135,7 +135,7 @@ describe('Anchor Button TestCase', function () {
 
             selectElementContents(editor.elements[0]);
             button = editor.toolbar.querySelector('[data-element="a"]');
-            cancel = editor.anchorForm.querySelector('a.medium-editor-toobar-anchor-close');
+            cancel = editor.anchorForm.querySelector('a');
             fireEvent(button, 'click');
             expect(editor.anchorForm.style.display).toBe('block');
             fireEvent(cancel, 'click');

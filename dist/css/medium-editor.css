@@ -121,13 +121,7 @@
   cursor: pointer; }
 
 .medium-editor-toolbar-active, .medium-editor-anchor-preview-active {
-  visibility: visible;
-  /*-webkit-animation: pop-upwards 160ms forwards linear;
-       -moz-animation: pop-upwards 160ms forwards linear;
-        -ms-animation: pop-upwards 160ms forwards linear;
-         -o-animation: pop-upwards 160ms forwards linear;
-            animation: pop-upwards 160ms forwards linear;
-    transition: top .075s ease-out, left .075s ease-out;*/ }
+  visibility: visible; }
 
 .medium-editor-action-bold {
   font-weight: bolder; }
@@ -139,7 +133,7 @@
   display: none; }
   .medium-editor-toolbar-form-anchor input, .medium-editor-toolbar-form-anchor a {
     font-family: HelveticaNeue, Helvetica, Arial, sans-serif; }
-  .medium-editor-toolbar-form-anchor .medium-editor-toolbar-anchor-input, .medium-editor-toolbar-form-anchor label {
+  .medium-editor-toolbar-form-anchor input {
     margin: 0;
     padding: 6px;
     width: 316px;
@@ -147,14 +141,12 @@
     font-size: 14px;
     -moz-box-sizing: border-box;
          box-sizing: border-box; }
-    .medium-editor-toolbar-form-anchor .medium-editor-toolbar-anchor-input:focus, .medium-editor-toolbar-form-anchor label:focus {
+    .medium-editor-toolbar-form-anchor input:focus {
       outline: 0;
       border: none;
       box-shadow: none;
       -webkit-appearance: none;
       -moz-appearance: none; }
-  .medium-editor-toolbar-form-anchor label {
-    display: block; }
   .medium-editor-toolbar-form-anchor a {
     display: inline-block;
     margin: 0 10px;

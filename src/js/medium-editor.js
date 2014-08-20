@@ -125,7 +125,6 @@ if (typeof module === 'object') {
             placeholder: 'Type your text',
             secondHeader: 'h4',
             targetBlank: false,
-            anchorTarget: false,
             extensions: {},
             activeButtonClass: 'medium-editor-button-active',
             firstButtonClass: 'medium-editor-button-first',
@@ -517,8 +516,7 @@ if (typeof module === 'object') {
             this.toolbar = this.createToolbar();
             this.keepToolbarAlive = false;
             this.anchorForm = this.toolbar.querySelector('.medium-editor-toolbar-form-anchor');
-            this.anchorInput = this.anchorForm.querySelector('input.medium-editor-toolbar-anchor-input');
-            this.anchorTarget = this.anchorForm.querySelector('input.medium-editor-toolbar-anchor-target');
+            this.anchorInput = this.anchorForm.querySelector('input');
             this.toolbarActions = this.toolbar.querySelector('.medium-editor-toolbar-actions');
             this.anchorPreview = this.createAnchorPreview();
 
@@ -570,44 +568,22 @@ if (typeof module === 'object') {
         },
 
         toolbarFormAnchor: function () {
-            var anchor = document.createElement('div'),
-                input = document.createElement('input'),
-                target_label = document.createElement('label'),
-                target = document.createElement('input'),
-                close = document.createElement('a'),
-                save = document.createElement('a');
+           var anchor = document.createElement('div'),
+               input = document.createElement('input'),
+               a = document.createElement('a');
 
-            close.setAttribute('href', '#');
-            close.className = 'medium-editor-toobar-anchor-close';
-            close.innerHTML = '&times;';
+           a.setAttribute('href', '#');
+           a.innerHTML = '&times;';
 
-            save.setAttribute('href', '#');
-            save.className = 'medium-editor-toobar-anchor-save';
-            save.innerHTML = '&#10003;';
+           input.setAttribute('type', 'text');
+           input.setAttribute('placeholder', this.options.anchorInputPlaceholder);
 
-            input.setAttribute('type', 'text');
-            input.className = 'medium-editor-toolbar-anchor-input';
-            input.setAttribute('placeholder', this.options.anchorInputPlaceholder);
+           anchor.className = 'medium-editor-toolbar-form-anchor';
+           anchor.id = 'medium-editor-toolbar-form-anchor';
+           anchor.appendChild(input);
+           anchor.appendChild(a);
 
-
-            target.setAttribute('type', 'checkbox');
-            target.className = 'medium-editor-toolbar-anchor-target';
-            target_label.innerHTML = "Open in New Window?";
-            target_label.appendChild(target);
-            
-
-            anchor.className = 'medium-editor-toolbar-form-anchor';
-            anchor.id = 'medium-editor-toolbar-form-anchor';
-            anchor.appendChild(input);
-
-            anchor.appendChild(save);
-            anchor.appendChild(close);
-
-            if ( this.options.anchorTarget ) {
-                anchor.appendChild(target_label);
-            }
-
-            return anchor;
+           return anchor;
         },
 
         bindSelect: function () {
@@ -644,7 +620,6 @@ if (typeof module === 'object') {
                 selectionElement;
 
             if (this.keepToolbarAlive !== true && !this.options.disableToolbar) {
-
                 newSelection = window.getSelection();
                 if (newSelection.toString().trim() === '' ||
                     (this.options.allowMultiParagraphSelection === false && this.hasMultiParagraphs()) ||
@@ -670,11 +645,9 @@ if (typeof module === 'object') {
 
         clickingIntoArchorForm: function (e) {
             var self = this;
-
             if (e.type && e.type.toLowerCase() === 'blur' && e.relatedTarget && e.relatedTarget === self.anchorInput) {
                 return true;
             }
-
             return false;
         },
 
@@ -1035,65 +1008,26 @@ if (typeof module === 'object') {
         },
 
         bindAnchorForm: function () {
-            var linkCancel = this.anchorForm.querySelector('a.medium-editor-toobar-anchor-close'),
-                linkSave = this.anchorForm.querySelector('a.medium-editor-toobar-anchor-save'),
+            var linkCancel = this.anchorForm.querySelector('a'),
                 self = this;
-
             this.anchorForm.addEventListener('click', function (e) {
                 e.stopPropagation();
-                self.keepToolbarAlive = true;
             });
-
             this.anchorInput.addEventListener('keyup', function (e) {
-                var target;
-
                 if (e.keyCode === 13) {
                     e.preventDefault();
-                    if ( self.options.anchorTarget && self.anchorTarget.checked ) {
-                        target = "_blank";
-                    }
-                    else {
-                        target = "_self";
-                    }
-                    
-                    self.createLink(this, target);
+                    self.createLink(this);
                 }
             });
-
-            linkSave.addEventListener('click', function(e) {
-                var target;
-
-                e.preventDefault();
-                if ( self.options.anchorTarget && self.anchorTarget.checked ) {
-                    target = "_blank";
-                }
-                else {
-                    target = "_self";
-                }
-                
-                self.createLink(self.anchorInput, target);
-            }, true);
-
             this.anchorInput.addEventListener('click', function (e) {
                 // make sure not to hide form when cliking into the input
                 e.stopPropagation();
                 self.keepToolbarAlive = true;
             });
-
-            // Hide the anchor form when focusing outside of it.
-            document.body.addEventListener('click', function (e) {
-                if (e.target !== self.anchorForm && !isDescendant(self.anchorForm, e.target) && !isDescendant(self.toolbarActions, e.target) ) {
-                    self.keepToolbarAlive = false;
-                    self.checkSelection();
-                }
-            }, true);
-            document.body.addEventListener('focus', function (e) {
-                if (e.target !== self.anchorForm && !isDescendant(self.anchorForm, e.target) && !isDescendant(self.toolbarActions, e.target) ) {
-                    self.keepToolbarAlive = false;
-                    self.checkSelection();
-                }
-            }, true);
-
+            this.anchorInput.addEventListener('blur', function () {
+                self.keepToolbarAlive = false;
+                self.checkSelection();
+            });
             linkCancel.addEventListener('click', function (e) {
                 e.preventDefault();
                 self.showToolbarActions();
@@ -1299,23 +1233,18 @@ if (typeof module === 'object') {
         },
 
         createLink: function (input, target) {
-            if (input.value.trim().length === 0 && !this.options.staticToolbar ) {
+            if (input.value.trim().length === 0) {
                 this.hideToolbarActions();
                 return;
             }
-
             restoreSelection(this.savedSelection);
-
             if (this.options.checkLinkFormat) {
                 input.value = this.checkLinkFormat(input.value);
             }
-
             document.execCommand('createLink', false, input.value);
-
-            if (this.options.targetBlank || target === "_blank" ) {
+            if (this.options.targetBlank) {
                 this.setTargetBlank();
             }
-
             this.checkSelection();
             this.showToolbarActions();
             input.value = '';
