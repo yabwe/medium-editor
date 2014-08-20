@@ -568,22 +568,22 @@ if (typeof module === 'object') {
         },
 
         toolbarFormAnchor: function () {
-           var anchor = document.createElement('div'),
+            var anchor = document.createElement('div'),
                input = document.createElement('input'),
                a = document.createElement('a');
 
-           a.setAttribute('href', '#');
-           a.innerHTML = '&times;';
+            a.setAttribute('href', '#');
+            a.innerHTML = '&times;';
 
-           input.setAttribute('type', 'text');
-           input.setAttribute('placeholder', this.options.anchorInputPlaceholder);
+            input.setAttribute('type', 'text');
+            input.setAttribute('placeholder', this.options.anchorInputPlaceholder);
 
-           anchor.className = 'medium-editor-toolbar-form-anchor';
-           anchor.id = 'medium-editor-toolbar-form-anchor';
-           anchor.appendChild(input);
-           anchor.appendChild(a);
+            anchor.className = 'medium-editor-toolbar-form-anchor';
+            anchor.id = 'medium-editor-toolbar-form-anchor';
+            anchor.appendChild(input);
+            anchor.appendChild(a);
 
-           return anchor;
+            return anchor;
         },
 
         bindSelect: function () {
