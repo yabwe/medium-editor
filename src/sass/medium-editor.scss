@@ -84,12 +84,6 @@
 
 .medium-editor-toolbar-active, .medium-editor-anchor-preview-active {
     visibility: visible;
-    /*-webkit-animation: pop-upwards 160ms forwards linear;
-       -moz-animation: pop-upwards 160ms forwards linear;
-        -ms-animation: pop-upwards 160ms forwards linear;
-         -o-animation: pop-upwards 160ms forwards linear;
-            animation: pop-upwards 160ms forwards linear;
-    transition: top .075s ease-out, left .075s ease-out;*/
 }
 
 .medium-editor-action-bold {
@@ -102,13 +96,12 @@
 
 .medium-editor-toolbar-form-anchor {
     display: none;
-
     input,
     a {
         font-family: HelveticaNeue, Helvetica, Arial, sans-serif;
     }
 
-    .medium-editor-toolbar-anchor-input, label {
+    input {
         margin: 0;
         padding: 6px;
         width: 316px;
@@ -122,11 +115,6 @@
             -webkit-appearance: none;
                -moz-appearance: none;
         }
-    }
-
-    label {
-        display: block;
-
     }
 
     a {
