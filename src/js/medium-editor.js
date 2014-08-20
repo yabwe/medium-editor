@@ -209,7 +209,7 @@ if (typeof module === 'object') {
                         && !isDescendant(self.toolbar, e.target)) {
 
                         // Activate the placeholder
-                        self.placeholderWrapper(this, e);
+                        self.placeholderWrapper(self.elements[0], e);
 
                         // Hide the toolbar after a small delay so we can prevent this on toolbar click
                         setTimeout(function(){
@@ -276,9 +276,11 @@ if (typeof module === 'object') {
 
         // Two functions to handle placeholders
         activatePlaceholder:  function (el) {
+
             if (!(el.querySelector('img')) &&
                     !(el.querySelector('blockquote')) &&
                     el.textContent.replace(/^\s+|\s+$/g, '') === '') {
+
                 el.classList.add('medium-editor-placeholder');
             }
         },
