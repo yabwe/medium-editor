@@ -109,10 +109,6 @@
       font-size: 12px;
       font-family: 'Menlo', monospace; }
 
-.sticky-toolbar {
-  position: fixed;
-  top: 1px; }
-
 .medium-editor-anchor-preview i {
   display: inline-block;
   margin: 5px 5px 5px 10px;
@@ -122,6 +118,17 @@
 
 .medium-editor-toolbar-active, .medium-editor-anchor-preview-active {
   visibility: visible; }
+
+.sticky-toolbar {
+  position: fixed;
+  top: 1px; }
+
+.stalker-toolbar {
+  -webkit-animation: pop-upwards 160ms forwards linear;
+  -ms-animation: pop-upwards 160ms forwards linear;
+  animation: pop-upwards 160ms forwards linear;
+  -webkit-transition: top 0.075s ease-out, left 0.075s ease-out;
+          transition: top 0.075s ease-out, left 0.075s ease-out; }
 
 .medium-editor-action-bold {
   font-weight: bolder; }

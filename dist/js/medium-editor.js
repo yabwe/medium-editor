@@ -525,6 +525,13 @@ if (typeof module === 'object') {
             var toolbar = document.createElement('div');
             toolbar.id = 'medium-editor-toolbar-' + this.id;
             toolbar.className = 'medium-editor-toolbar';
+
+            if ( this.options.staticToolbar ) {
+                toolbar.className += " static-toolbar";
+            } else {
+                toolbar.className += " stalker-toolbar";
+            }
+
             toolbar.appendChild(this.toolbarButtons());
             toolbar.appendChild(this.toolbarFormAnchor());
             this.options.elementsContainer.appendChild(toolbar);
@@ -732,9 +739,7 @@ if (typeof module === 'object') {
                 return this;
             }
 
-           
             this.toolbar.classList.add('medium-editor-toolbar-active');
-            
 
             if ( this.options.staticToolbar ) { 
 

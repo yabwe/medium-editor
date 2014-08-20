@@ -66,10 +66,7 @@
     }
 }
 
-.sticky-toolbar {
-    position: fixed;
-    top: 1px;
-}
+
 
 .medium-editor-anchor-preview {
     i {
@@ -81,9 +78,22 @@
     }
 }
 
-
 .medium-editor-toolbar-active, .medium-editor-anchor-preview-active {
     visibility: visible;
+}
+
+.sticky-toolbar {
+    position: fixed;
+    top: 1px;
+}
+
+.stalker-toolbar {
+    -webkit-animation: pop-upwards 160ms forwards linear;
+        -moz-animation: pop-upwards 160ms forwards linear;
+        -ms-animation: pop-upwards 160ms forwards linear;
+        -o-animation: pop-upwards 160ms forwards linear;
+            animation: pop-upwards 160ms forwards linear;
+    transition: top .075s ease-out, left .075s ease-out;
 }
 
 .medium-editor-action-bold {
