@@ -1026,7 +1026,8 @@ if (typeof module === 'object') {
 
             linkSave.addEventListener('click', function(e) {
                 var target;
-
+                
+                e.preventDefault();
                 if ( self.options.anchorTarget && self.anchorTarget.checked ) {
                     target = "_blank";
                 }
