@@ -205,7 +205,8 @@ if (typeof module === 'object') {
                     if ( e.target !== self.toolbar
                         && e.target !== self.elements[0]
                         && !isDescendant(self.elements[0], e.target)
-                        && !isDescendant(self.toolbar, e.target)) {
+                        && !isDescendant(self.toolbar, e.target)
+                        && !isDescendant(self.anchorPreview, e.target)) {
 
                         // Activate the placeholder
                         self.placeholderWrapper(self.elements[0], e);
@@ -1187,7 +1188,7 @@ if (typeof module === 'object') {
                 }
 
                 // only show when hovering on anchors
-                if (this.toolbar.classList.contains('medium-editor-toolbar-active')) {
+                if (this.toolbar.classList.contains('medium-editor-toolbar-active') && !this.options.staticToolbar ) {
                     // only show when toolbar is not present
                     return true;
                 }
