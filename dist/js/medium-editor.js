@@ -728,6 +728,8 @@ if (typeof module === 'object') {
 
         setToolbarPosition: function () {
             var container = this.elements[0],
+            containerRect = container.getBoundingClientRect(),
+            containerTop = containerRect.top + window.scrollY,
             buttonHeight = 50,
             selection = window.getSelection(),
             range,
@@ -739,6 +741,7 @@ if (typeof module === 'object') {
             if ( selection.focusNode === null ) {
                 return this;
             }
+           
 
             this.toolbar.classList.add('medium-editor-toolbar-active');
 
@@ -751,21 +754,21 @@ if (typeof module === 'object') {
                         this.toolbar.style.top = (this.elements[0].offsetTop + this.elements[0].offsetHeight) + 'px';
                     }
                     // Stick the toolbar to the top of the window
-                    else if ( window.scrollY > (this.elements[0].offsetTop - this.toolbar.offsetHeight) ) {
+                    else if ( window.scrollY > (containerTop - this.toolbar.offsetHeight) ) {
                         this.toolbar.classList.add('sticky-toolbar');
                         this.toolbar.style.top = "0px";
                     }
                     // Normal static toolbar position
                     else {
                         this.toolbar.classList.remove('sticky-toolbar');
-                        this.toolbar.style.top = container.offsetTop - this.toolbar.offsetHeight + "px";
+                        this.toolbar.style.top = containerTop - this.toolbar.offsetHeight + "px";
                     }
                    
                 } 
                 else {
-                    this.toolbar.style.top = container.offsetTop - this.toolbar.offsetHeight + "px";
+                    this.toolbar.style.top = containerTop - this.toolbar.offsetHeight + "px";
                 }
-                this.toolbar.style.left = container.offsetLeft + "px";
+                this.toolbar.style.left = containerRect.left + "px";
 
             }
             else {
