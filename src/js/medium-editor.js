@@ -752,8 +752,8 @@ if (typeof module === 'object') {
                 if ( this.options.stickyToolbar ) {
 
                     // If it's beyond the height of the editor, position it at the bottom of the editor
-                    if ( window.scrollY > (this.elements[0].offsetTop + this.elements[0].offsetHeight - this.toolbar.offsetHeight)) {
-                        this.toolbar.style.top = (this.elements[0].offsetTop + this.elements[0].offsetHeight) + 'px';
+                    if ( window.scrollY > (containerTop + this.elements[0].offsetHeight - this.toolbar.offsetHeight)) {
+                        this.toolbar.style.top = (containerTop + this.elements[0].offsetHeight) + 'px';
                     }
                     // Stick the toolbar to the top of the window
                     else if ( window.scrollY > (containerTop - this.toolbar.offsetHeight) ) {
