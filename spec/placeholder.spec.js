@@ -51,7 +51,7 @@ describe('Placeholder TestCase', function () {
         var editor = new MediumEditor('.editor');
         expect(editor.elements[0].className).not.toContain('medium-editor-placeholder');
         editor.elements[0].innerHTML = '';
-        fireEvent(editor.elements[0], 'blur');
+        fireEvent(document.querySelector('div'), 'click');
         expect(editor.elements[0].className).toContain('medium-editor-placeholder');
     });
 
@@ -59,7 +59,7 @@ describe('Placeholder TestCase', function () {
         var editor = new MediumEditor('.editor');
         expect(editor.elements[0].className).toContain('medium-editor-placeholder');
         editor.elements[0].innerHTML = 'some text';
-        fireEvent(editor.elements[0], 'blur');
+        fireEvent(document.querySelector('div'), 'click');
         expect(editor.elements[0].className).not.toContain('medium-editor-placeholder');
     });
 

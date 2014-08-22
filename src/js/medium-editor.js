@@ -25,6 +25,17 @@ if (typeof module === 'object') {
         return b;
     }
 
+    function isDescendant(parent, child) {
+         var node = child.parentNode;
+         while (node !== null) {
+             if (node === parent) {
+                 return true;
+             }
+             node = node.parentNode;
+         }
+         return false;
+    }
+
     // http://stackoverflow.com/questions/5605401/insert-link-in-contenteditable-element
     // by Tim Down
     function saveSelection() {
@@ -140,7 +151,7 @@ if (typeof module === 'object') {
             this.initElements()
                 .bindSelect()
                 .bindPaste()
-                .setPlaceholders()
+                .bindElementActions()
                 .bindWindowActions()
                 .passInstance();
         },
@@ -157,7 +168,7 @@ if (typeof module === 'object') {
                     this.elements[i].setAttribute('data-placeholder', this.options.placeholder);
                 }
                 this.elements[i].setAttribute('data-medium-element', true);
-                this.bindParagraphCreation(i).bindReturn(i).bindTab(i);
+                this.bindParagraphCreation(i);
                 if (!this.options.disableToolbar && !this.elements[i].getAttribute('data-disable-toolbar')) {
                     addToolbar = true;
                 }
@@ -184,6 +195,99 @@ if (typeof module === 'object') {
             this.elements = typeof this.elementSelection === 'string' ? document.querySelectorAll(this.elementSelection) : this.elementSelection;
             if (this.elements.nodeType === 1) {
                 this.elements = [this.elements];
+            }
+        },
+
+        bindBlur: function(i) {
+            var self = this,
+                blurFunction = function(e){
+                    // If it's not part of the editor, or the toolbar
+                    if ( e.target !== self.toolbar
+                        && e.target !== self.elements[0]
+                        && !isDescendant(self.elements[0], e.target)
+                        && !isDescendant(self.toolbar, e.target)
+                        && !isDescendant(self.anchorPreview, e.target)) {
+
+                        // Activate the placeholder
+                        self.placeholderWrapper(self.elements[0], e);
+
+                        // Hide the toolbar after a small delay so we can prevent this on toolbar click
+                        setTimeout(function(){
+                            if ( !self.keepToolbarAlive ) {
+                                self.hideToolbarActions();
+                            }
+                        }, 200);
+                    }
+                };
+
+            // Hide the toolbar when focusing outside of the editor.
+            document.body.addEventListener('click', blurFunction, true);
+            document.body.addEventListener('focus', blurFunction, true);
+
+            return this;
+        },
+
+        bindKeypress: function(i) {
+            var self = this;
+
+            // Set up the keypress events
+            this.elements[i].addEventListener('keypress', function(){
+                self.placeholderWrapper(this,event);
+            });
+
+            return this;
+        },
+
+        bindClick: function(i) {
+            var self = this;
+
+            this.elements[i].addEventListener('click', function(){
+                if ( self.options.staticToolbar ) {
+                    self.setToolbarPosition();
+                }
+            });
+
+            return this;
+        },
+
+        /**
+         * This handles blur and keypress events on elements
+         * Including Placeholders, and tooldbar hiding on blur
+         */
+        bindElementActions: function() {
+            var i;
+
+            for (i = 0; i < this.elements.length; i += 1) {
+
+                // Active all of the placeholders
+                this.activatePlaceholder(this.elements[i]);
+
+                // Bind the return and tab keypress events
+                this.bindReturn(i)
+                    .bindTab(i)
+                    .bindBlur(i)
+                    .bindClick(i)
+                    .bindKeypress(i);
+                
+            }
+
+            return this;
+        },
+
+        // Two functions to handle placeholders
+        activatePlaceholder:  function (el) {
+
+            if (!(el.querySelector('img')) &&
+                    !(el.querySelector('blockquote')) &&
+                    el.textContent.replace(/^\s+|\s+$/g, '') === '') {
+
+                el.classList.add('medium-editor-placeholder');
+            }
+        },
+        placeholderWrapper: function (el, e) {
+            el.classList.remove('medium-editor-placeholder');
+            if (e.type !== 'keypress') {
+                this.activatePlaceholder(el);
             }
         },
 
@@ -424,6 +528,13 @@ if (typeof module === 'object') {
             var toolbar = document.createElement('div');
             toolbar.id = 'medium-editor-toolbar-' + this.id;
             toolbar.className = 'medium-editor-toolbar';
+
+            if ( this.options.staticToolbar ) {
+                toolbar.className += " static-toolbar";
+            } else {
+                toolbar.className += " stalker-toolbar";
+            }
+
             toolbar.appendChild(this.toolbarButtons());
             toolbar.appendChild(this.toolbarFormAnchor());
             this.options.elementsContainer.appendChild(toolbar);
@@ -466,8 +577,8 @@ if (typeof module === 'object') {
 
         toolbarFormAnchor: function () {
             var anchor = document.createElement('div'),
-                input = document.createElement('input'),
-                a = document.createElement('a');
+               input = document.createElement('input'),
+               a = document.createElement('a');
 
             a.setAttribute('href', '#');
             a.innerHTML = '&times;';
@@ -506,6 +617,7 @@ if (typeof module === 'object') {
             for (i = 0; i < this.elements.length; i += 1) {
                 this.elements[i].addEventListener('keyup', this.checkSelectionWrapper);
                 this.elements[i].addEventListener('blur', this.checkSelectionWrapper);
+                this.elements[i].addEventListener('click', this.checkSelectionWrapper);
             }
             return this;
         },
@@ -519,11 +631,17 @@ if (typeof module === 'object') {
                 if (newSelection.toString().trim() === '' ||
                     (this.options.allowMultiParagraphSelection === false && this.hasMultiParagraphs()) ||
                     this.selectionInContentEditableFalse()) {
-                    this.hideToolbarActions();
+                    
+                    if ( !this.options.staticToolbar ) {
+                        this.hideToolbarActions();
+                    }
+
                 } else {
                     selectionElement = this.getSelectionElement();
-                    if (!selectionElement || selectionElement.getAttribute('data-disable-toolbar')) {
-                        this.hideToolbarActions();
+                    if (!selectionElement || selectionElement.getAttribute('data-disable-toolbar') ) {
+                        if ( !this.options.staticToolbar) {
+                            this.hideToolbarActions();
+                        }
                     } else {
                         this.checkSelectionElement(newSelection, selectionElement);
                     }
@@ -559,7 +677,10 @@ if (typeof module === 'object') {
                     return;
                 }
             }
-            this.hideToolbarActions();
+            
+            if ( !this.options.staticToolbar ) {
+                this.hideToolbarActions();
+            }
         },
 
         findMatchingSelectionParent: function( testElementFunction ) {
@@ -608,30 +729,75 @@ if (typeof module === 'object') {
         },
 
         setToolbarPosition: function () {
-            var buttonHeight = 50,
-                selection = window.getSelection(),
-                range = selection.getRangeAt(0),
-                boundary = range.getBoundingClientRect(),
-                defaultLeft = (this.options.diffLeft) - (this.toolbar.offsetWidth / 2),
-                middleBoundary = (boundary.left + boundary.right) / 2,
-                halfOffsetWidth = this.toolbar.offsetWidth / 2;
-            if (boundary.top < buttonHeight) {
-                this.toolbar.classList.add('medium-toolbar-arrow-over');
-                this.toolbar.classList.remove('medium-toolbar-arrow-under');
-                this.toolbar.style.top = buttonHeight + boundary.bottom - this.options.diffTop + window.pageYOffset - this.toolbar.offsetHeight + 'px';
-            } else {
-                this.toolbar.classList.add('medium-toolbar-arrow-under');
-                this.toolbar.classList.remove('medium-toolbar-arrow-over');
-                this.toolbar.style.top = boundary.top + this.options.diffTop + window.pageYOffset - this.toolbar.offsetHeight + 'px';
-            }
-            if (middleBoundary < halfOffsetWidth) {
-                this.toolbar.style.left = defaultLeft + halfOffsetWidth + 'px';
-            } else if ((window.innerWidth - middleBoundary) < halfOffsetWidth) {
-                this.toolbar.style.left = window.innerWidth + defaultLeft - halfOffsetWidth + 'px';
-            } else {
-                this.toolbar.style.left = defaultLeft + middleBoundary + 'px';
-            }
+            var container = this.elements[0],
+            containerRect = container.getBoundingClientRect(),
+            containerTop = containerRect.top + window.scrollY,
+            buttonHeight = 50,
+            selection = window.getSelection(),
+            range,
+            boundary,
+            middleBoundary,
+            defaultLeft = (this.options.diffLeft) - (this.toolbar.offsetWidth / 2),
+            halfOffsetWidth = this.toolbar.offsetWidth / 2;
 
+            if ( selection.focusNode === null ) {
+                return this;
+            }
+           
+
+            this.toolbar.classList.add('medium-editor-toolbar-active');
+
+            if ( this.options.staticToolbar ) { 
+
+                if ( this.options.stickyToolbar ) {
+
+                    // If it's beyond the height of the editor, position it at the bottom of the editor
+                    if ( window.scrollY > (containerTop + this.elements[0].offsetHeight - this.toolbar.offsetHeight)) {
+                        this.toolbar.style.top = (containerTop + this.elements[0].offsetHeight) + 'px';
+                    }
+                    // Stick the toolbar to the top of the window
+                    else if ( window.scrollY > (containerTop - this.toolbar.offsetHeight) ) {
+                        this.toolbar.classList.add('sticky-toolbar');
+                        this.toolbar.style.top = "0px";
+                    }
+                    // Normal static toolbar position
+                    else {
+                        this.toolbar.classList.remove('sticky-toolbar');
+                        this.toolbar.style.top = containerTop - this.toolbar.offsetHeight + "px";
+                    }
+                   
+                } 
+                else {
+                    this.toolbar.style.top = containerTop - this.toolbar.offsetHeight + "px";
+                }
+                this.toolbar.style.left = containerRect.left + "px";
+
+            }
+            else {
+                
+                range = selection.getRangeAt(0);
+                boundary = range.getBoundingClientRect();
+                middleBoundary = (boundary.left + boundary.right) / 2;
+
+                if (boundary.top < buttonHeight) {
+                    this.toolbar.classList.add('medium-toolbar-arrow-over');
+                    this.toolbar.classList.remove('medium-toolbar-arrow-under');
+                    this.toolbar.style.top = buttonHeight + boundary.bottom - this.options.diffTop + window.pageYOffset - this.toolbar.offsetHeight + 'px';
+                } else {
+                    this.toolbar.classList.add('medium-toolbar-arrow-under');
+                    this.toolbar.classList.remove('medium-toolbar-arrow-over');
+                    this.toolbar.style.top = boundary.top + this.options.diffTop + window.pageYOffset - this.toolbar.offsetHeight + 'px';
+                }
+                if (middleBoundary < halfOffsetWidth) {
+                    this.toolbar.style.left = defaultLeft + halfOffsetWidth + 'px';
+                } else if ((window.innerWidth - middleBoundary) < halfOffsetWidth) {
+                    this.toolbar.style.left = window.innerWidth + defaultLeft - halfOffsetWidth + 'px';
+                } else {
+                    this.toolbar.style.left = defaultLeft + middleBoundary + 'px';
+                }
+                
+            }
+            
             this.hideAnchorPreview();
 
             return this;
@@ -808,10 +974,12 @@ if (typeof module === 'object') {
         },
 
         hideToolbarActions: function () {
+
             this.keepToolbarAlive = false;
             if (this.toolbar !== undefined) {
                 this.toolbar.classList.remove('medium-editor-toolbar-active');
             }
+
         },
 
         showToolbarActions: function () {
@@ -1023,7 +1191,7 @@ if (typeof module === 'object') {
                 }
 
                 // only show when hovering on anchors
-                if (this.toolbar.classList.contains('medium-editor-toolbar-active')) {
+                if (this.toolbar.classList.contains('medium-editor-toolbar-active') && !this.options.staticToolbar ) {
                     // only show when toolbar is not present
                     return true;
                 }
@@ -1099,6 +1267,17 @@ if (typeof module === 'object') {
                     }
                 }, 100);
             };
+
+            // Add a scroll event for sticky toolbar
+            if ( this.options.staticToolbar && this.options.stickyToolbar ) { 
+
+                // On scroll, re-position the toolbar
+                window.addEventListener('scroll', function() {
+                    if (self.toolbar && self.toolbar.classList.contains('medium-editor-toolbar-active')) {
+                        self.setToolbarPosition();
+                    }
+                }, true);
+            }
             window.addEventListener('resize', this.windowResizeHandler);
             return this;
         },
@@ -1183,29 +1362,6 @@ if (typeof module === 'object') {
             };
             for (i = 0; i < this.elements.length; i += 1) {
                 this.elements[i].addEventListener('paste', this.pasteWrapper);
-            }
-            return this;
-        },
-
-        setPlaceholders: function () {
-            var i,
-                activatePlaceholder = function (el) {
-                    if (!(el.querySelector('img')) &&
-                            !(el.querySelector('blockquote')) &&
-                            el.textContent.replace(/^\s+|\s+$/g, '') === '') {
-                        el.classList.add('medium-editor-placeholder');
-                    }
-                },
-                placeholderWrapper = function (e) {
-                    this.classList.remove('medium-editor-placeholder');
-                    if (e.type !== 'keypress') {
-                        activatePlaceholder(this);
-                    }
-                };
-            for (i = 0; i < this.elements.length; i += 1) {
-                activatePlaceholder(this.elements[i]);
-                this.elements[i].addEventListener('blur', placeholderWrapper);
-                this.elements[i].addEventListener('keypress', placeholderWrapper);
             }
             return this;
         },
