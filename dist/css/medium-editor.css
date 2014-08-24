@@ -134,7 +134,7 @@
   display: none; }
   .medium-editor-toolbar-form-anchor input, .medium-editor-toolbar-form-anchor a {
     font-family: HelveticaNeue, Helvetica, Arial, sans-serif; }
-  .medium-editor-toolbar-form-anchor input {
+  .medium-editor-toolbar-form-anchor .medium-editor-toolbar-anchor-input, .medium-editor-toolbar-form-anchor label {
     margin: 0;
     padding: 6px;
     width: 316px;
@@ -142,12 +142,14 @@
     font-size: 14px;
     -moz-box-sizing: border-box;
          box-sizing: border-box; }
-    .medium-editor-toolbar-form-anchor input:focus {
+    .medium-editor-toolbar-form-anchor .medium-editor-toolbar-anchor-input:focus, .medium-editor-toolbar-form-anchor label:focus {
       outline: 0;
       border: none;
       box-shadow: none;
       -webkit-appearance: none;
       -moz-appearance: none; }
+  .medium-editor-toolbar-form-anchor label {
+    display: block; }
   .medium-editor-toolbar-form-anchor a {
     display: inline-block;
     margin: 0 10px;

@@ -45,7 +45,7 @@ $medium_editor_link_color:    #fff;
 }
 
 .medium-editor-toolbar-form-anchor {
-    input {
+    .medium-editor-toolbar-anchor-input {
         height: $medium_editor_button_size;
         background: $medium_editor_bgcolor;
         color: $medium_editor_link_color;
