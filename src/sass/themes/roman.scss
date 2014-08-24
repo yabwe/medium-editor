@@ -59,7 +59,7 @@ $medium_editor_border_radius: 5px;
     color: #999;
     border-radius: $medium_editor_border_radius;
 
-    input {
+    .medium-editor-toolbar-anchor-input {
         margin: 0;
         height: $medium_editor_button_size;
         background: $medium_editor_bgcolor;

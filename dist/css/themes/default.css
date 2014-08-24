@@ -48,7 +48,7 @@
   background: #242424;
   color: #999;
   border-radius: 5px; }
-  .medium-editor-toolbar-form-anchor input {
+  .medium-editor-toolbar-form-anchor .medium-editor-toolbar-anchor-input {
     height: 50px;
     background: #242424;
     color: #ccc;
