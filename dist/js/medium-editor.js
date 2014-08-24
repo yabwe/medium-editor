@@ -340,15 +340,14 @@ if (typeof module === 'object') {
                     }
 
                     // Tab to indent list structures!
-                    if ( tag === 'li' ) {
+                    if (tag === 'li') {
                         e.preventDefault();
 
                         // If Shift is down, outdent, otherwise indent
-                        if ( e.shiftKey ) {
+                        if (e.shiftKey) {
                             document.execCommand('outdent', e);
-                        }
-                        else {
-                            document.execCommand('indent', e);   
+                        } else {
+                            document.execCommand('indent', e);
                         }
                     }
                 }
@@ -513,7 +512,7 @@ if (typeof module === 'object') {
             target.className = 'medium-editor-toolbar-anchor-target';
             target_label.innerHTML = "Open in New Window?";
             target_label.appendChild(target);
-            
+
 
             anchor.className = 'medium-editor-toolbar-form-anchor';
             anchor.id = 'medium-editor-toolbar-form-anchor';
@@ -522,7 +521,7 @@ if (typeof module === 'object') {
             anchor.appendChild(save);
             anchor.appendChild(close);
 
-            if ( this.options.anchorTarget ) {
+            if (this.options.anchorTarget) {
                 anchor.appendChild(target_label);
             }
 
@@ -611,14 +610,14 @@ if (typeof module === 'object') {
             this.hideToolbarActions();
         },
 
-        findMatchingSelectionParent: function( testElementFunction ) {
+        findMatchingSelectionParent: function(testElementFunction) {
             var selection = window.getSelection(),
                 range, current, parent,
                 result,
                 getElement = function (e) {
                     var localParent = e;
                     try {
-                        while (!testElementFunction( localParent )) {
+                        while (!testElementFunction(localParent)) {
                             localParent = localParent.parentNode;
                         }
                     } catch (errb) {
@@ -632,7 +631,7 @@ if (typeof module === 'object') {
                 current = range.commonAncestorContainer;
                 parent = current.parentNode;
 
-                if (testElementFunction( current )) {
+                if (testElementFunction(current)) {
                     result = current;
                 } else {
                     result = getElement(parent);
@@ -645,15 +644,15 @@ if (typeof module === 'object') {
         },
 
         getSelectionElement: function () {
-            return this.findMatchingSelectionParent( function(el) {
+            return this.findMatchingSelectionParent(function(el) {
                 return el.getAttribute('data-medium-element');
-            } );
+            });
         },
 
         selectionInContentEditableFalse: function () {
-            return this.findMatchingSelectionParent( function(el) {
+            return this.findMatchingSelectionParent(function(el) {
                 return (el && el.nodeName !== '#text' && el.getAttribute('contenteditable') === 'false');
-            } );
+            });
         },
 
         setToolbarPosition: function () {
@@ -909,13 +908,13 @@ if (typeof module === 'object') {
 
                 if (e.keyCode === 13) {
                     e.preventDefault();
-                    if ( self.options.anchorTarget && self.anchorTarget.checked ) {
+                    if (self.options.anchorTarget && self.anchorTarget.checked) {
                         target = "_blank";
                     }
                     else {
                         target = "_self";
                     }
-                    
+
                     self.createLink(this, target);
                 }
             });
@@ -923,13 +922,13 @@ if (typeof module === 'object') {
             linkSave.addEventListener('click', function(e) {
                 var target;
                 e.preventDefault();
-                if ( self.options.anchorTarget && self.anchorTarget.checked ) {
+                if ( self.options.anchorTarget && self.anchorTarget.checked) {
                     target = "_blank";
                 }
                 else {
                     target = "_self";
                 }
-                
+
                 self.createLink(self.anchorInput, target);
             }, true);
 
@@ -941,13 +940,13 @@ if (typeof module === 'object') {
 
             // Hide the anchor form when focusing outside of it.
             document.body.addEventListener('click', function (e) {
-                if (e.target !== self.anchorForm && !isDescendant(self.anchorForm, e.target) && !isDescendant(self.toolbarActions, e.target) ) {
+                if (e.target !== self.anchorForm && !isDescendant(self.anchorForm, e.target) && !isDescendant(self.toolbarActions, e.target)) {
                     self.keepToolbarAlive = false;
                     self.checkSelection();
                 }
             }, true);
             document.body.addEventListener('focus', function (e) {
-                if (e.target !== self.anchorForm && !isDescendant(self.anchorForm, e.target) && !isDescendant(self.toolbarActions, e.target) ) {
+                if (e.target !== self.anchorForm && !isDescendant(self.anchorForm, e.target) && !isDescendant(self.toolbarActions, e.target)) {
                     self.keepToolbarAlive = false;
                     self.checkSelection();
                 }
@@ -968,7 +967,7 @@ if (typeof module === 'object') {
 
         // TODO: break method
         showAnchorPreview: function (anchorEl) {
-            if (this.anchorPreview.classList.contains('medium-editor-anchor-preview-active') 
+            if (this.anchorPreview.classList.contains('medium-editor-anchor-preview-active')
                 || anchorEl.getAttribute('data-disable-preview')) {
                 return true;
             }
@@ -1171,7 +1170,7 @@ if (typeof module === 'object') {
 
             document.execCommand('createLink', false, input.value);
 
-            if (this.options.targetBlank || target === "_blank" ) {
+            if (this.options.targetBlank || target === "_blank") {
                 this.setTargetBlank();
             }
 
