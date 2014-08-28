@@ -1169,6 +1169,11 @@ if (typeof module === 'object') {
             if (this.options.checkLinkFormat) {
                 input.value = this.checkLinkFormat(input.value);
             }
+            
+            // Add http protocol if the url doesn't start with one
+            if(!/^(https?|ftps?|rtmpt?):\/\/|mailto:/.test(input.value)) {
+              input.value = "http://" + input.value;
+            }
 
             document.execCommand('createLink', false, input.value);
 
