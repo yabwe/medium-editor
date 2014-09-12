@@ -1199,6 +1199,8 @@ if (typeof module === 'object') {
         },
 
         createLink: function (input, target, buttonClass) {
+            var i, event;
+
             if (input.value.trim().length === 0) {
                 this.hideToolbarActions();
                 return;
@@ -1218,6 +1220,14 @@ if (typeof module === 'object') {
 
             if (buttonClass) {
                 this.setButtonClass(buttonClass);
+            }
+
+            if (this.options.targetBlank || target === "_blank" || buttonClass) {
+                event = document.createEvent("HTMLEvents");
+                event.initEvent("input", true, true, window);
+                for (i = 0; i < this.elements.length; i += 1) {
+                    this.elements[i].dispatchEvent(event);
+                }
             }
 
             this.checkSelection();
