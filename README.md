@@ -69,6 +69,8 @@ If you want to support IE9, you will need to use a classList pollyfill, like Eli
 * __placeholder__: Defines the default placeholder for empty contenteditables. You can overwrite it by setting a data-placeholder attribute on your elements. Default: 'Type your text'
 * __secondHeader__: HTML tag to be used as second header. Default: h4
 * __targetBlank__: enables/disables target="\_blank" for anchor tags. Default: false
+* __anchorButton__: enables/disables adding class __anchorButtonClass__ to anchor tags. Default: false
+* __anchorButtonClass__: class to add to anchor tags, when __anchorButton__ is set to true. Default: btn
 * __extensions__: extension to use (see _Extensions_) for more. Default: {}
 * __activeButtonClass__: CSS class added to active buttons. Default: 'medium-editor-button-active'
 * __firstButtonClass__: CSS class added to the first button. Default: 'medium-editor-button-first'
