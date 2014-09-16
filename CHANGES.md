@@ -1,3 +1,12 @@
+1.9.4 / 2014-09-16
+==================
+
+* Adds support for tab based indenting and outdenting of <ul> and <ol>
+* Adds a save button to the anchor form
+* Improves toolbar positioning
+* Adds anchorButton and anchorButtonClass options
+
+
 1.9.0 / 2014-08-08
 ==================
 
