@@ -1,0 +1,17 @@
+.btn {
+  display: inline-block;
+  margin-bottom: 0;
+  font-weight: normal;
+  text-align: center;
+  vertical-align: middle;
+  background: #efefef;
+  border: 1px solid #ccc;
+  white-space: nowrap;
+  padding: 6px 12px;
+  border-radius: 4px;
+  color: #333;
+  text-decoration: none;
+  &:hover {
+    text-decoration: underline;
+  }
+}

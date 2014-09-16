@@ -91,6 +91,8 @@ describe('Initialization TestCase', function () {
                 buttonLabels: false,
                 targetBlank: false,
                 anchorTarget: false,
+                anchorButton: false,
+                anchorButtonClass: 'btn',
                 anchorPreviewHideDelay: 500,
                 checkLinkFormat: false,
                 extensions: {},

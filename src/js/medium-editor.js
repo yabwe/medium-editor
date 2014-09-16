@@ -126,6 +126,8 @@ if (typeof module === 'object') {
             secondHeader: 'h4',
             targetBlank: false,
             anchorTarget: false,
+            anchorButton: false,
+            anchorButtonClass: 'btn',
             extensions: {},
             activeButtonClass: 'medium-editor-button-active',
             firstButtonClass: 'medium-editor-button-first',
@@ -439,6 +441,7 @@ if (typeof module === 'object') {
             this.anchorForm = this.toolbar.querySelector('.medium-editor-toolbar-form-anchor');
             this.anchorInput = this.anchorForm.querySelector('input.medium-editor-toolbar-anchor-input');
             this.anchorTarget = this.anchorForm.querySelector('input.medium-editor-toolbar-anchor-target');
+            this.anchorButton = this.anchorForm.querySelector('input.medium-editor-toolbar-anchor-button');
             this.toolbarActions = this.toolbar.querySelector('.medium-editor-toolbar-actions');
             this.anchorPreview = this.createAnchorPreview();
 
@@ -494,6 +497,8 @@ if (typeof module === 'object') {
                 input = document.createElement('input'),
                 target_label = document.createElement('label'),
                 target = document.createElement('input'),
+                button_label = document.createElement('label'),
+                button = document.createElement('input'),
                 close = document.createElement('a'),
                 save = document.createElement('a');
 
@@ -513,7 +518,12 @@ if (typeof module === 'object') {
             target.setAttribute('type', 'checkbox');
             target.className = 'medium-editor-toolbar-anchor-target';
             target_label.innerHTML = "Open in New Window?";
-            target_label.appendChild(target);
+            target_label.insertBefore(target, target_label.firstChild);
+
+            button.setAttribute('type', 'checkbox');
+            button.className = 'medium-editor-toolbar-anchor-button';
+            button_label.innerHTML = "Button";
+            button_label.insertBefore(button, button_label.firstChild);
 
 
             anchor.className = 'medium-editor-toolbar-form-anchor';
@@ -525,6 +535,10 @@ if (typeof module === 'object') {
 
             if (this.options.anchorTarget) {
                 anchor.appendChild(target_label);
+            }
+
+            if (this.options.anchorButton) {
+                anchor.appendChild(button_label);
             }
 
             return anchor;
@@ -907,7 +921,8 @@ if (typeof module === 'object') {
             });
 
             this.anchorInput.addEventListener('keyup', function (e) {
-                var target;
+                var button = null,
+                    target;
 
                 if (e.keyCode === 13) {
                     e.preventDefault();
@@ -918,12 +933,17 @@ if (typeof module === 'object') {
                         target = "_self";
                     }
 
-                    self.createLink(this, target);
+                    if (self.options.anchorButton && self.anchorButton.checked) {
+                        button = self.options.anchorButtonClass;
+                    }
+
+                    self.createLink(this, target, button);
                 }
             });
 
             linkSave.addEventListener('click', function(e) {
-                var target;
+                var button = null,
+                    target;
                 e.preventDefault();
                 if ( self.options.anchorTarget && self.anchorTarget.checked) {
                     target = "_blank";
@@ -932,7 +952,11 @@ if (typeof module === 'object') {
                     target = "_self";
                 }
 
-                self.createLink(self.anchorInput, target);
+                if (self.options.anchorButton && self.anchorButton.checked) {
+                    button = self.options.anchorButtonClass;
+                }
+
+                self.createLink(self.anchorInput, target, button);
             }, true);
 
             this.anchorInput.addEventListener('click', function (e) {
@@ -1159,7 +1183,27 @@ if (typeof module === 'object') {
             }
         },
 
-        createLink: function (input, target) {
+        setButtonClass: function (buttonClass) {
+            var el = getSelectionStart(),
+                classes = buttonClass.split(' '),
+                i, j;
+            if (el.tagName.toLowerCase() === 'a') {
+                for (j = 0; j < classes.length; j += 1) {
+                    el.classList.add(classes[j]);
+                }
+            } else {
+                el = el.getElementsByTagName('a');
+                for (i = 0; i < el.length; i += 1) {
+                    for (j = 0; j < classes.length; j += 1) {
+                        el[i].classList.add(classes[j]);
+                    }
+                }
+            }
+        },
+
+        createLink: function (input, target, buttonClass) {
+            var i, event;
+
             if (input.value.trim().length === 0) {
                 this.hideToolbarActions();
                 return;
@@ -1175,6 +1219,18 @@ if (typeof module === 'object') {
 
             if (this.options.targetBlank || target === "_blank") {
                 this.setTargetBlank();
+            }
+
+            if (buttonClass) {
+                this.setButtonClass(buttonClass);
+            }
+
+            if (this.options.targetBlank || target === "_blank" || buttonClass) {
+                event = document.createEvent("HTMLEvents");
+                event.initEvent("input", true, true, window);
+                for (i = 0; i < this.elements.length; i += 1) {
+                    this.elements[i].dispatchEvent(event);
+                }
             }
 
             this.checkSelection();
