@@ -627,36 +627,31 @@ if (typeof module === 'object') {
         },
 
         findMatchingSelectionParent: function(testElementFunction) {
-            var selection = window.getSelection(),
-                range, current, parent,
-                result,
-                getElement = function (e) {
-                    var localParent = e;
-                    try {
-                        while (!testElementFunction(localParent)) {
-                            localParent = localParent.parentNode;
-                        }
-                    } catch (errb) {
-                        return false;
-                    }
-                    return localParent;
-                };
-            // First try on current node
-            try {
-                range = selection.getRangeAt(0);
-                current = range.commonAncestorContainer;
-                parent = current.parentNode;
+            var selection = window.getSelection(), range, current;
 
-                if (testElementFunction(current)) {
-                    result = current;
-                } else {
-                    result = getElement(parent);
-                }
-                // If not search in the parent nodes.
-            } catch (err) {
-                result = getElement(parent);
+            if (selection.rangeCount === 0) {
+                return false;
             }
-            return result;
+
+            range = selection.getRangeAt(0);
+            current = range.commonAncestorContainer;
+
+            do {
+              if (current.nodeType === 1){
+                if ( testElementFunction(current) )
+                {
+                    return current;
+                }
+                // do not traverse upwards past the nearest containing editor
+                if (current.getAttribute('data-medium-element')) {
+                    return false;
+                }
+              }
+
+              current = current.parentNode;
+            } while (current);
+
+            return false;
         },
 
         getSelectionElement: function () {
