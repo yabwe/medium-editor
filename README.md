@@ -105,6 +105,10 @@ Medium Editor, by default, will show only the buttons listed above to avoid a hu
 * __unorderedlist__
 * __orderedlist__
 * __pre__
+* __justifyLeft__
+* __justifyFull__
+* __justifyCenter__
+* __justifyRight__
 * __image__ (this simply converts selected text to an image tag)
 * __indent__ (moves the selected text up one level)
 * __outdent__ (moves the selected text down one level)
