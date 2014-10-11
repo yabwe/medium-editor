@@ -1334,7 +1334,8 @@ if (typeof module === 'object') {
                         }
                         document.execCommand('insertHTML', false, html);
                     } else {
-                        document.execCommand('insertHTML', false, e.clipboardData.getData('text/plain'));
+                        html = self.htmlEntities(e.clipboardData.getData('text/plain'));
+                        document.execCommand('insertHTML', false, html);
                     }
                 }
             };
