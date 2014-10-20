@@ -1,3 +1,11 @@
+1.9.7 / 2014-10-20
+==================
+
+* Adds justify buttons
+* Fix #308 by passing clipboard content through self.htmlEntities before inserting
+* Minor bug fixes
+
+
 1.9.4 / 2014-09-16
 ==================
 
