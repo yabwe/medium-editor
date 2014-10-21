@@ -288,7 +288,7 @@ if (typeof module === 'object') {
                     editorElement = self.getSelectionElement();
 
                     if (!(self.options.disableReturn || editorElement.getAttribute('data-disable-return')) &&
-                        tagName !== 'li' && !this.isListItemChild(node)) {
+                        tagName !== 'li' && !self.isListItemChild(node)) {
                         if (!e.shiftKey) {
                             document.execCommand('formatBlock', false, 'p');
                         }
