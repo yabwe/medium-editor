@@ -1181,9 +1181,9 @@ if (typeof module === 'object') {
             return (re.test(value) ? '' : 'http://') + value;
         },
 
-        setTargetBlank: function () {
-            var el = getSelectionStart(),
-                i;
+        setTargetBlank: function (el) {
+            var i;
+            el = el || getSelectionStart();
             if (el.tagName.toLowerCase() === 'a') {
                 el.target = '_blank';
             } else {
@@ -1425,12 +1425,17 @@ if (typeof module === 'object') {
                 document.execCommand('insertText', false, "\n");
 
                 // block element cleanup
-                elList = el.querySelectorAll('p,div,br');
+                elList = el.querySelectorAll('a,p,div,br');
                 for (i = 0; i < elList.length; i += 1) {
 
                     workEl = elList[i];
 
                     switch (workEl.tagName.toLowerCase()) {
+                    case 'a':
+                        if (this.options.targetBlank){
+                          this.setTargetBlank(workEl);
+                        }
+                        break;
                     case 'p':
                     case 'div':
                         this.filterCommonBlocks(workEl);
