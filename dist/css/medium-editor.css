@@ -58,22 +58,6 @@
             transform: matrix(1, 0, 0, 1, 0, 0);
     opacity: 1; } }
 
-.btn {
-  display: inline-block;
-  margin-bottom: 0;
-  font-weight: normal;
-  text-align: center;
-  vertical-align: middle;
-  background: #efefef;
-  border: 1px solid #ccc;
-  white-space: nowrap;
-  padding: 6px 12px;
-  border-radius: 4px;
-  color: #333;
-  text-decoration: none; }
-  .btn:hover {
-    text-decoration: underline; }
-
 .medium-toolbar-arrow-under:after, .medium-toolbar-arrow-over:before {
   position: absolute;
   left: 50%;
