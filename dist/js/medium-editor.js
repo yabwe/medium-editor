@@ -6,6 +6,13 @@ function MediumEditor(elements, options) {
 if (typeof module === 'object') {
     module.exports = MediumEditor;
 }
+// AMD support
+else if (typeof define === 'function' && define.amd) {
+    define(function () {
+        'use strict';
+        return MediumEditor;
+    });    
+}
 
 (function (window, document) {
     'use strict';
