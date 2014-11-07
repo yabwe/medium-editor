@@ -11,7 +11,7 @@ else if (typeof define === 'function' && define.amd) {
     define(function () {
         'use strict';
         return MediumEditor;
-    });    
+    });
 }
 
 (function (window, document) {
@@ -285,7 +285,7 @@ else if (typeof define === 'function' && define.amd) {
                 var node = getSelectionStart(),
                     tagName,
                     editorElement;
-                    
+
                 if (node && node.getAttribute('data-medium-element') && node.children.length === 0 && !(self.options.disableReturn || node.getAttribute('data-disable-return'))) {
                     document.execCommand('formatBlock', false, 'p');
                 }
