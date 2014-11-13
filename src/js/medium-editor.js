@@ -49,7 +49,7 @@ else if (typeof define === 'function' && define.amd) {
         var i,
             len,
             ranges,
-            sel = window.getSelection();
+            sel = this.options.contentWindow.getSelection();
         if (sel.getRangeAt && sel.rangeCount) {
             ranges = [];
             for (i = 0, len = sel.rangeCount; i < len; i += 1) {
@@ -63,7 +63,7 @@ else if (typeof define === 'function' && define.amd) {
     function restoreSelection(savedSel) {
         var i,
             len,
-            sel = window.getSelection();
+            sel = this.options.contentWindow.getSelection();
         if (savedSel) {
             sel.removeAllRanges();
             for (i = 0, len = savedSel.length; i < len; i += 1) {
@@ -75,7 +75,7 @@ else if (typeof define === 'function' && define.amd) {
     // http://stackoverflow.com/questions/1197401/how-can-i-get-the-element-the-caret-is-in-with-javascript-when-using-contentedi
     // by You
     function getSelectionStart() {
-        var node = document.getSelection().anchorNode,
+        var node = this.options.ownerDocument.getSelection().anchorNode,
             startNode = (node && node.nodeType === 3 ? node.parentNode : node);
         return startNode;
     }
@@ -88,18 +88,18 @@ else if (typeof define === 'function' && define.amd) {
             sel,
             len,
             container;
-        if (window.getSelection !== undefined) {
-            sel = window.getSelection();
+        if (this.options.contentWindow.getSelection !== undefined) {
+            sel = this.options.contentWindow.getSelection();
             if (sel.rangeCount) {
-                container = document.createElement('div');
+                container = this.options.ownerDocument.createElement('div');
                 for (i = 0, len = sel.rangeCount; i < len; i += 1) {
                     container.appendChild(sel.getRangeAt(i).cloneContents());
                 }
                 html = container.innerHTML;
             }
-        } else if (document.selection !== undefined) {
-            if (document.selection.type === 'Text') {
-                html = document.selection.createRange().htmlText;
+        } else if (this.options.ownerDocument.selection !== undefined) {
+            if (this.options.ownerDocument.selection.type === 'Text') {
+                html = this.options.ownerDocument.selection.createRange().htmlText;
             }
         }
         return html;
@@ -127,6 +127,8 @@ else if (typeof define === 'function' && define.amd) {
             disableToolbar: false,
             disableEditing: false,
             elementsContainer: false,
+            contentWindow: window,
+            ownerDocument: document,
             firstHeader: 'h3',
             forcePlainText: true,
             placeholder: 'Type your text',
@@ -146,13 +148,13 @@ else if (typeof define === 'function' && define.amd) {
         isIE: ((navigator.appName === 'Microsoft Internet Explorer') || ((navigator.appName === 'Netscape') && (new RegExp('Trident/.*rv:([0-9]{1,}[.0-9]{0,})').exec(navigator.userAgent) !== null))),
 
         init: function (elements, options) {
+            this.options = extend(options, this.defaults);
             this.setElementSelection(elements);
             if (this.elements.length === 0) {
                 return;
             }
             this.parentElements = ['p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'blockquote', 'pre'];
             this.id = document.querySelectorAll('.medium-editor-toolbar').length + 1;
-            this.options = extend(options, this.defaults);
             return this.setup();
         },
 
@@ -202,7 +204,7 @@ else if (typeof define === 'function' && define.amd) {
         },
 
         updateElementList: function () {
-            this.elements = typeof this.elementSelection === 'string' ? document.querySelectorAll(this.elementSelection) : this.elementSelection;
+            this.elements = typeof this.elementSelection === 'string' ? this.options.ownerDocument.querySelectorAll(this.elementSelection) : this.elementSelection;
             if (this.elements.nodeType === 1) {
                 this.elements = [this.elements];
             }
@@ -273,7 +275,7 @@ else if (typeof define === 'function' && define.amd) {
         bindParagraphCreation: function (index) {
             var self = this;
             this.elements[index].addEventListener('keypress', function (e) {
-                var node = getSelectionStart(),
+                var node = getSelectionStart.call(self),
                     tagName;
                 if (e.which === 32) {
                     tagName = node.tagName.toLowerCase();
@@ -284,7 +286,7 @@ else if (typeof define === 'function' && define.amd) {
             });
 
             this.elements[index].addEventListener('keyup', function (e) {
-                var node = getSelectionStart(),
+                var node = getSelectionStart.call(self),
                     tagName,
                     editorElement;
 
@@ -292,7 +294,7 @@ else if (typeof define === 'function' && define.amd) {
                     document.execCommand('formatBlock', false, 'p');
                 }
                 if (e.which === 13) {
-                    node = getSelectionStart();
+                    node = getSelectionStart.call(self);
                     tagName = node.tagName.toLowerCase();
                     editorElement = self.getSelectionElement();
 
@@ -334,7 +336,7 @@ else if (typeof define === 'function' && define.amd) {
                     if (self.options.disableReturn || this.getAttribute('data-disable-return')) {
                         e.preventDefault();
                     } else if (self.options.disableDoubleReturn || this.getAttribute('data-disable-double-return')) {
-                        var node = getSelectionStart();
+                        var node = getSelectionStart.call(self);
                         if (node && node.innerText === '\n') {
                             e.preventDefault();
                         }
@@ -345,10 +347,11 @@ else if (typeof define === 'function' && define.amd) {
         },
 
         bindTab: function (index) {
+            var self = this;
             this.elements[index].addEventListener('keydown', function (e) {
                 if (e.which === 9) {
                     // Override tab only for pre nodes
-                    var tag = getSelectionStart().tagName.toLowerCase();
+                    var tag = getSelectionStart.call(self).tagName.toLowerCase();
                     if (tag === 'pre') {
                         e.preventDefault();
                         document.execCommand('insertHtml', null, '    ');
@@ -600,7 +603,7 @@ else if (typeof define === 'function' && define.amd) {
 
             if (this.keepToolbarAlive !== true && !this.options.disableToolbar) {
 
-                newSelection = window.getSelection();
+                newSelection = this.options.contentWindow.getSelection();
                 if (newSelection.toString().trim() === '' ||
                     (this.options.allowMultiParagraphSelection === false && this.hasMultiParagraphs()) ||
                     this.selectionInContentEditableFalse()) {
@@ -628,7 +631,7 @@ else if (typeof define === 'function' && define.amd) {
         },
 
         hasMultiParagraphs: function () {
-            var selectionHtml = getSelectionHtml().replace(/<[\S]+><\/[\S]+>/gim, ''),
+            var selectionHtml = getSelectionHtml.call(this).replace(/<[\S]+><\/[\S]+>/gim, ''),
                 hasMultiParagraphs = selectionHtml.match(/<(p|h[0-6]|blockquote)>([\s\S]*?)<\/(p|h[0-6]|blockquote)>/g);
 
             return (hasMultiParagraphs ? hasMultiParagraphs.length : 0);
@@ -650,7 +653,7 @@ else if (typeof define === 'function' && define.amd) {
         },
 
         findMatchingSelectionParent: function(testElementFunction) {
-            var selection = window.getSelection(), range, current;
+            var selection = this.options.contentWindow.getSelection(), range, current;
 
             if (selection.rangeCount === 0) {
                 return false;
@@ -691,7 +694,7 @@ else if (typeof define === 'function' && define.amd) {
 
         setToolbarPosition: function () {
             var buttonHeight = 50,
-                selection = window.getSelection(),
+                selection = this.options.contentWindow.getSelection(),
                 range = selection.getRangeAt(0),
                 boundary = range.getBoundingClientRect(),
                 defaultLeft = (this.options.diffLeft) - (this.toolbar.offsetWidth / 2),
@@ -700,16 +703,16 @@ else if (typeof define === 'function' && define.amd) {
             if (boundary.top < buttonHeight) {
                 this.toolbar.classList.add('medium-toolbar-arrow-over');
                 this.toolbar.classList.remove('medium-toolbar-arrow-under');
-                this.toolbar.style.top = buttonHeight + boundary.bottom - this.options.diffTop + window.pageYOffset - this.toolbar.offsetHeight + 'px';
+                this.toolbar.style.top = buttonHeight + boundary.bottom - this.options.diffTop + this.options.contentWindow.pageYOffset - this.toolbar.offsetHeight + 'px';
             } else {
                 this.toolbar.classList.add('medium-toolbar-arrow-under');
                 this.toolbar.classList.remove('medium-toolbar-arrow-over');
-                this.toolbar.style.top = boundary.top + this.options.diffTop + window.pageYOffset - this.toolbar.offsetHeight + 'px';
+                this.toolbar.style.top = boundary.top + this.options.diffTop + this.options.contentWindow.pageYOffset - this.toolbar.offsetHeight + 'px';
             }
             if (middleBoundary < halfOffsetWidth) {
                 this.toolbar.style.left = defaultLeft + halfOffsetWidth + 'px';
-            } else if ((window.innerWidth - middleBoundary) < halfOffsetWidth) {
-                this.toolbar.style.left = window.innerWidth + defaultLeft - halfOffsetWidth + 'px';
+            } else if ((this.options.contentWindow.innerWidth - middleBoundary) < halfOffsetWidth) {
+                this.toolbar.style.left = this.options.contentWindow.innerWidth + defaultLeft - halfOffsetWidth + 'px';
             } else {
                 this.toolbar.style.left = defaultLeft + middleBoundary + 'px';
             }
@@ -793,9 +796,9 @@ else if (typeof define === 'function' && define.amd) {
             } else if (action === 'anchor') {
                 this.triggerAnchorAction(e);
             } else if (action === 'image') {
-                document.execCommand('insertImage', false, window.getSelection());
+                this.options.ownerDocument.execCommand('insertImage', false, this.options.contentWindow.getSelection());
             } else {
-                document.execCommand(action, false, null);
+                this.options.ownerDocument.execCommand(action, false, null);
                 this.setToolbarPosition();
             }
         },
@@ -825,7 +828,7 @@ else if (typeof define === 'function' && define.amd) {
             var selectedParentElement = this.getSelectedParentElement();
             if (selectedParentElement.tagName &&
                     selectedParentElement.tagName.toLowerCase() === 'a') {
-                document.execCommand('unlink', false, null);
+                this.options.ownerDocument.execCommand('unlink', false, null);
             } else {
                 if (this.anchorForm.style.display === 'block') {
                     this.showToolbarActions();
@@ -843,7 +846,7 @@ else if (typeof define === 'function' && define.amd) {
             // https://developer.mozilla.org/en-US/docs/Rich-Text_Editing_in_Mozilla
             if (el === 'blockquote' && selectionData.el &&
                 selectionData.el.parentNode.tagName.toLowerCase() === 'blockquote') {
-                return document.execCommand('outdent', false, null);
+                return this.options.ownerDocument.execCommand('outdent', false, null);
             }
             if (selectionData.tagName === el) {
                 el = 'p';
@@ -854,11 +857,11 @@ else if (typeof define === 'function' && define.amd) {
             // http://stackoverflow.com/questions/1816223/rich-text-editor-with-blockquote-function/1821777#1821777
             if (this.isIE) {
                 if (el === 'blockquote') {
-                    return document.execCommand('indent', false, el);
+                    return this.options.ownerDocument.execCommand('indent', false, el);
                 }
                 el = '<' + el + '>';
             }
-            return document.execCommand('formatBlock', false, el);
+            return this.options.ownerDocument.execCommand('formatBlock', false, el);
         },
 
         getSelectionData: function (el) {
@@ -911,11 +914,11 @@ else if (typeof define === 'function' && define.amd) {
         },
 
         saveSelection: function() {
-            this.savedSelection = saveSelection();
+            this.savedSelection = saveSelection.call(this);
         },
 
         restoreSelection: function() {
-            restoreSelection(this.savedSelection);
+            restoreSelection.call(this, this.savedSelection);
         },
 
         showAnchorForm: function (link_value) {
@@ -984,13 +987,13 @@ else if (typeof define === 'function' && define.amd) {
             });
 
             // Hide the anchor form when focusing outside of it.
-            document.body.addEventListener('click', function (e) {
+            this.options.ownerDocument.body.addEventListener('click', function (e) {
                 if (e.target !== self.anchorForm && !isDescendant(self.anchorForm, e.target) && !isDescendant(self.toolbarActions, e.target)) {
                     self.keepToolbarAlive = false;
                     self.checkSelection();
                 }
             }, true);
-            document.body.addEventListener('focus', function (e) {
+            this.options.ownerDocument.body.addEventListener('focus', function (e) {
                 if (e.target !== self.anchorForm && !isDescendant(self.anchorForm, e.target) && !isDescendant(self.toolbarActions, e.target)) {
                     self.keepToolbarAlive = false;
                     self.checkSelection();
@@ -1000,7 +1003,7 @@ else if (typeof define === 'function' && define.amd) {
             linkCancel.addEventListener('click', function (e) {
                 e.preventDefault();
                 self.showToolbarActions();
-                restoreSelection(self.savedSelection);
+                restoreSelection.call(self, self.savedSelection);
             });
             return this;
         },
@@ -1040,11 +1043,11 @@ else if (typeof define === 'function' && define.amd) {
 
             self.anchorPreview.classList.add('medium-toolbar-arrow-over');
             self.anchorPreview.classList.remove('medium-toolbar-arrow-under');
-            self.anchorPreview.style.top = Math.round(buttonHeight + boundary.bottom - self.options.diffTop + window.pageYOffset - self.anchorPreview.offsetHeight) + 'px';
+            self.anchorPreview.style.top = Math.round(buttonHeight + boundary.bottom - self.options.diffTop + this.options.contentWindow.pageYOffset - self.anchorPreview.offsetHeight) + 'px';
             if (middleBoundary < halfOffsetWidth) {
                 self.anchorPreview.style.left = defaultLeft + halfOffsetWidth + 'px';
-            } else if ((window.innerWidth - middleBoundary) < halfOffsetWidth) {
-                self.anchorPreview.style.left = window.innerWidth + defaultLeft - halfOffsetWidth + 'px';
+            } else if ((this.options.contentWindow.innerWidth - middleBoundary) < halfOffsetWidth) {
+                self.anchorPreview.style.left = this.options.contentWindow.innerWidth + defaultLeft - halfOffsetWidth + 'px';
             } else {
                 self.anchorPreview.style.left = defaultLeft + middleBoundary + 'px';
             }
@@ -1093,7 +1096,7 @@ else if (typeof define === 'function' && define.amd) {
 
         createAnchorPreview: function () {
             var self = this,
-                anchorPreview = document.createElement('div');
+                anchorPreview = this.options.ownerDocument.createElement('div');
 
             anchorPreview.id = 'medium-editor-anchor-preview-' + this.id;
             anchorPreview.className = 'medium-editor-anchor-preview';
@@ -1117,8 +1120,8 @@ else if (typeof define === 'function' && define.amd) {
             if (this.activeAnchor) {
 
                 var self = this,
-                    range = document.createRange(),
-                    sel = window.getSelection();
+                    range = this.options.ownerDocument.createRange(),
+                    sel = this.options.contentWindow.getSelection();
 
                 range.selectNodeContents(self.activeAnchor);
                 sel.removeAllRanges();
@@ -1190,7 +1193,7 @@ else if (typeof define === 'function' && define.amd) {
 
         setTargetBlank: function (el) {
             var i;
-            el = el || getSelectionStart();
+            el = el || getSelectionStart.call(this);
             if (el.tagName.toLowerCase() === 'a') {
                 el.target = '_blank';
             } else {
@@ -1202,7 +1205,7 @@ else if (typeof define === 'function' && define.amd) {
         },
 
         setButtonClass: function (buttonClass) {
-            var el = getSelectionStart(),
+            var el = getSelectionStart.call(this),
                 classes = buttonClass.split(' '),
                 i, j;
             if (el.tagName.toLowerCase() === 'a') {
@@ -1227,13 +1230,13 @@ else if (typeof define === 'function' && define.amd) {
                 return;
             }
 
-            restoreSelection(this.savedSelection);
+            restoreSelection.call(this, this.savedSelection);
 
             if (this.options.checkLinkFormat) {
                 input.value = this.checkLinkFormat(input.value);
             }
 
-            document.execCommand('createLink', false, input.value);
+            this.options.ownerDocument.execCommand('createLink', false, input.value);
 
             if (this.options.targetBlank || target === "_blank") {
                 this.setTargetBlank();
@@ -1244,8 +1247,8 @@ else if (typeof define === 'function' && define.amd) {
             }
 
             if (this.options.targetBlank || target === "_blank" || buttonClass) {
-                event = document.createEvent("HTMLEvents");
-                event.initEvent("input", true, true, window);
+                event = this.options.ownerDocument.createEvent("HTMLEvents");
+                event.initEvent("input", true, true, this.options.contentWindow);
                 for (i = 0; i < this.elements.length; i += 1) {
                     this.elements[i].dispatchEvent(event);
                 }
@@ -1267,7 +1270,7 @@ else if (typeof define === 'function' && define.amd) {
                     }
                 }, 100);
             };
-            window.addEventListener('resize', this.windowResizeHandler);
+            this.options.contentWindow.addEventListener('resize', this.windowResizeHandler);
             return this;
         },
 
@@ -1294,8 +1297,8 @@ else if (typeof define === 'function' && define.amd) {
                 delete this.anchorPreview;
             }
 
-            document.documentElement.removeEventListener('mouseup', this.checkSelectionWrapper);
-            window.removeEventListener('resize', this.windowResizeHandler);
+            this.options.ownerDocument.documentElement.removeEventListener('mouseup', this.checkSelectionWrapper);
+            this.options.contentWindow.removeEventListener('resize', this.windowResizeHandler);
 
             for (i = 0; i < this.elements.length; i += 1) {
                 this.elements[i].removeEventListener('mouseover', this.editorAnchorObserverWrapper);
@@ -1343,10 +1346,10 @@ else if (typeof define === 'function' && define.amd) {
                                 }
                             }
                         }
-                        document.execCommand('insertHTML', false, html);
+                        self.options.ownerDocument.execCommand('insertHTML', false, html);
                     } else {
                         html = self.htmlEntities(e.clipboardData.getData('text/plain'));
-                        document.execCommand('insertHTML', false, html);
+                        self.options.ownerDocument.execCommand('insertHTML', false, html);
                     }
                 }
             };
@@ -1429,7 +1432,7 @@ else if (typeof define === 'function' && define.amd) {
                 elList = text.split('<br><br>');
 
                 this.pasteHTML('<p>' + elList.join('</p><p>') + '</p>');
-                document.execCommand('insertText', false, "\n");
+                this.options.ownerDocument.execCommand('insertText', false, "\n");
 
                 // block element cleanup
                 elList = el.querySelectorAll('a,p,div,br');
@@ -1464,9 +1467,9 @@ else if (typeof define === 'function' && define.amd) {
         },
 
         pasteHTML: function (html) {
-            var elList, workEl, i, fragmentBody, pasteBlock = document.createDocumentFragment();
+            var elList, workEl, i, fragmentBody, pasteBlock = this.options.ownerDocument.createDocumentFragment();
 
-            pasteBlock.appendChild(document.createElement('body'));
+            pasteBlock.appendChild(this.options.ownerDocument.createElement('body'));
 
             fragmentBody = pasteBlock.querySelector('body');
             fragmentBody.innerHTML = html;
@@ -1488,7 +1491,7 @@ else if (typeof define === 'function' && define.amd) {
                 }
 
             }
-            document.execCommand('insertHTML', false, fragmentBody.innerHTML.replace(/&nbsp;/g, ' '));
+            this.options.ownerDocument.execCommand('insertHTML', false, fragmentBody.innerHTML.replace(/&nbsp;/g, ' '));
         },
         isCommonBlock: function (el) {
             return (el && (el.tagName.toLowerCase() === 'p' || el.tagName.toLowerCase() === 'div'));
@@ -1539,7 +1542,7 @@ else if (typeof define === 'function' && define.amd) {
             for (i = 0; i < spans.length; i += 1) {
 
                 el = spans[i];
-                new_el = document.createElement(el.classList.contains('bold') ? 'b' : 'i');
+                new_el = this.options.ownerDocument.createElement(el.classList.contains('bold') ? 'b' : 'i');
 
                 if (el.classList.contains('bold') && el.classList.contains('italic')) {
 
@@ -1564,7 +1567,7 @@ else if (typeof define === 'function' && define.amd) {
                 if (/^\s*$/.test()) {
                     el.parentNode.removeChild(el);
                 } else {
-                    el.parentNode.replaceChild(document.createTextNode(el.innerText), el);
+                    el.parentNode.replaceChild(this.options.ownerDocument.createTextNode(el.innerText), el);
                 }
 
             }
