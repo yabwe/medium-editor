@@ -1,3 +1,10 @@
+1.9.10 / 2014-11-17
+===================
+
+* Adds custom doc and win functionality, now you can specify the editor container
+* Minor bugfixes
+
+
 1.9.8 / 2014-10-21
 ==================
 
