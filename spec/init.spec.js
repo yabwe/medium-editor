@@ -81,6 +81,8 @@ describe('Initialization TestCase', function () {
                 disableEditing: false,
                 disableToolbar: false,
                 elementsContainer: document.body,
+                contentWindow: window,
+                ownerDocument: document,
                 firstHeader: 'h3',
                 forcePlainText: true,
                 cleanPastedHTML: false,
