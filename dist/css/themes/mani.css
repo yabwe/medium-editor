@@ -43,8 +43,7 @@
     height: 50px;
     background: #dee7f0;
     color: #40648a;
-    -moz-box-sizing: border-box;
-         box-sizing: border-box; }
+    box-sizing: border-box; }
   .medium-editor-toolbar-form-anchor a {
     color: #40648a; }
 

@@ -99,8 +99,7 @@
       font-size: 14px;
       line-height: 1.33;
       text-decoration: none;
-      -moz-box-sizing: border-box;
-           box-sizing: border-box; }
+      box-sizing: border-box; }
     .medium-editor-toolbar li .medium-editor-action-underline, .medium-editor-anchor-preview li .medium-editor-action-underline {
       text-decoration: underline; }
     .medium-editor-toolbar li .medium-editor-action-pre, .medium-editor-anchor-preview li .medium-editor-action-pre {
@@ -140,8 +139,7 @@
     width: 316px;
     border: none;
     font-size: 14px;
-    -moz-box-sizing: border-box;
-         box-sizing: border-box; }
+    box-sizing: border-box; }
     .medium-editor-toolbar-form-anchor .medium-editor-toolbar-anchor-input:focus, .medium-editor-toolbar-form-anchor label:focus {
       outline: 0;
       border: none;
