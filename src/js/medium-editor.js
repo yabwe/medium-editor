@@ -154,7 +154,8 @@ else if (typeof define === 'function' && define.amd) {
                 return;
             }
             this.parentElements = ['p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'blockquote', 'pre'];
-            this.id = document.querySelectorAll('.medium-editor-toolbar').length + 1;
+            this.options.elementsContainer || (this.options.elementsContainer = document.body);
+            this.id = this.options.elementsContainer.querySelectorAll('.medium-editor-toolbar').length + 1;
             return this.setup();
         },
 
@@ -187,9 +188,6 @@ else if (typeof define === 'function' && define.amd) {
             }
             // Init toolbar
             if (addToolbar) {
-                if (!this.options.elementsContainer) {
-                    this.options.elementsContainer = document.body;
-                }
                 this.initToolbar()
                     .bindButtons()
                     .bindAnchorForm()
