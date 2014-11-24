@@ -22,7 +22,7 @@
   "license": "THE BEER-WARE LICENSE",
   "devDependencies": {
     "grunt": "~0.4.5",
-    "grunt-autoprefixer": "~1.0.0",
+    "grunt-autoprefixer": "~2.0.0",
     "grunt-contrib-uglify": "~0.6.0",
     "grunt-contrib-jasmine": "~0.8.0",
     "grunt-contrib-csslint": "~0.3.1",
