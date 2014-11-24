@@ -18,8 +18,7 @@
     border-right: 1px solid #357ebd;
     background-color: transparent;
     color: #fff;
-    -moz-box-sizing: border-box;
-         box-sizing: border-box;
+    box-sizing: border-box;
     -webkit-transition: background-color 0.2s ease-in, color 0.2s ease-in;
             transition: background-color 0.2s ease-in, color 0.2s ease-in; }
     .medium-editor-toolbar li button:hover {
