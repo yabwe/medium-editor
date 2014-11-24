@@ -289,38 +289,38 @@ The source files are located inside the __src__ directory.
 ```
  project  : medium-editor
  repo age : 1 year, 6 months
- active   : 188 days
- commits  : 622
+ active   : 190 days
+ commits  : 638
  files    : 58
  authors  :
-   444	Davi Ferreira           71.4%
-    20	Maxime de Visscher      3.2%
-    18	Andy Yaco-Mink          2.9%
+   451	Davi Ferreira           70.7%
+    20	Maxime de Visscher      3.1%
+    18	Andy Yaco-Mink          2.8%
      8	Jarl Gunnar T. Flaten   1.3%
+     8	Seif                    1.3%
      8	Derek Odegard           1.3%
      8	Pedro Nasser            1.3%
-     8	Seif                    1.3%
      7	OmniaGM                 1.1%
-     6	Pascal                  1.0%
-     6	Dayjo                   1.0%
+     7	Alfonso (the fonz) de la Osa 1.1%
+     6	Pascal                  0.9%
+     6	Dayjo                   0.9%
      5	Raul Matei              0.8%
      5	Martin Thurau           0.8%
-     4	minikomi                0.6%
      4	Sebastian Zuchmanski    0.6%
+     4	minikomi                0.6%
      3	ʞuıɯ-oɔɐʎ ʎpuɐ  0.5%
-     3	Dmitri Cherniak         0.5%
      3	Andrew Hubbs            0.5%
+     3	Dmitri Cherniak         0.5%
      3	Troels Knak-Nielsen     0.5%
      3	arol                    0.5%
      3	Nikita Korotaev         0.5%
      3	Pavel Linkesch          0.5%
      2	mako                    0.3%
      2	Alexander Hofbauer      0.3%
+     2	Son Tran-Nguyen         0.3%
      2	Ethan Turkeltaub        0.3%
      2	Jacob Magnusson         0.3%
-     1	Patrick Kempff          0.2%
-     1	Peleg Rosenthal         0.2%
-     1	Randson Oliveira        0.2%
+     1	Richard Park            0.2%
      1	Robert Koritnik         0.2%
      1	Sarah Squire            0.2%
      1	Scott Carleton          0.2%
@@ -335,9 +335,8 @@ The source files are located inside the __src__ directory.
      1	typify                  0.2%
      1	waffleio                0.2%
      1	zzjin                   0.2%
-     1	Moore Adam              0.2%
+     1	Nic Malan               0.2%
      1	Alberto Gasparin        0.2%
-     1	Alfonso (the fonz) de la Osa 0.2%
      1	Bitdeli Chef            0.2%
      1	Carlos Alexandre Fuechter 0.2%
      1	Cenk Dölek            0.2%
@@ -356,10 +355,13 @@ The source files are located inside the __src__ directory.
      1	Maxime Dantec           0.2%
      1	Maxime De Visscher      0.2%
      1	Michael Kay             0.2%
+     1	Moore Adam              0.2%
      1	Adam Mulligan           0.2%
-     1	Nic Malan               0.2%
      1	Nick Semenkovich        0.2%
      1	Noah Paessel            0.2%
+     1	Patrick Kempff          0.2%
+     1	Peleg Rosenthal         0.2%
+     1	Randson Oliveira        0.2%
 ```
 
 ## License

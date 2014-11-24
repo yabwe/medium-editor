@@ -1,3 +1,11 @@
+1.9.13 / 2014-11-24
+===================
+
+* Adds a strikethrough option in buttonLabel
+* Now uses `options.elementsContainer` to calculate ID
+* Removes events during deactivate
+
+
 1.9.10 / 2014-11-17
 ===================
 
