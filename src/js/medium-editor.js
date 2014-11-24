@@ -159,6 +159,7 @@ else if (typeof define === 'function' && define.amd) {
         },
 
         setup: function () {
+            this.events = [];
             this.isActive = true;
             this.initElements()
                 .bindSelect()
@@ -166,6 +167,28 @@ else if (typeof define === 'function' && define.amd) {
                 .setPlaceholders()
                 .bindWindowActions()
                 .passInstance();
+        },
+
+        on: function(target, event, listener, useCapture) {
+            target.addEventListener(event, listener, useCapture);
+            this.events.push([target, event, listener, useCapture]);
+        },
+
+        off: function(target, event, listener, useCapture) {
+            var index = this.events.indexOf([target, event, listener, useCapture]),
+                e;
+            if(index !== -1) {
+                e = this.events.splice(index, 1);
+                e[0].removeEventListener(e[1], e[2], e[3]);
+            }
+        },
+
+        removeAllEvents: function() {
+            var e = this.events.pop();
+            while(e) {
+                e[0].removeEventListener(e[1], e[2], e[3]);
+                e = this.events.pop();
+            }
         },
 
         initElements: function () {
@@ -274,7 +297,7 @@ else if (typeof define === 'function' && define.amd) {
 
         bindParagraphCreation: function (index) {
             var self = this;
-            this.elements[index].addEventListener('keypress', function (e) {
+            this.on(this.elements[index], 'keypress', function (e) {
                 var node = getSelectionStart.call(self),
                     tagName;
                 if (e.which === 32) {
@@ -285,7 +308,7 @@ else if (typeof define === 'function' && define.amd) {
                 }
             });
 
-            this.elements[index].addEventListener('keyup', function (e) {
+            this.on(this.elements[index], 'keyup', function (e) {
                 var node = getSelectionStart.call(self),
                     tagName,
                     editorElement;
@@ -331,7 +354,7 @@ else if (typeof define === 'function' && define.amd) {
 
         bindReturn: function (index) {
             var self = this;
-            this.elements[index].addEventListener('keypress', function (e) {
+            this.on(this.elements[index], 'keypress', function (e) {
                 if (e.which === 13) {
                     if (self.options.disableReturn || this.getAttribute('data-disable-return')) {
                         e.preventDefault();
@@ -348,7 +371,7 @@ else if (typeof define === 'function' && define.amd) {
 
         bindTab: function (index) {
             var self = this;
-            this.elements[index].addEventListener('keydown', function (e) {
+            this.on(this.elements[index], 'keydown', function (e) {
                 if (e.which === 9) {
                     // Override tab only for pre nodes
                     var tag = getSelectionStart.call(self).tagName.toLowerCase();
@@ -590,11 +613,11 @@ else if (typeof define === 'function' && define.amd) {
                 }, self.options.delay);
             };
 
-            document.documentElement.addEventListener('mouseup', this.checkSelectionWrapper);
+            this.on(document.documentElement, 'mouseup', this.checkSelectionWrapper);
 
             for (i = 0; i < this.elements.length; i += 1) {
-                this.elements[i].addEventListener('keyup', this.checkSelectionWrapper);
-                this.elements[i].addEventListener('blur', this.checkSelectionWrapper);
+                this.on(this.elements[i], 'keyup', this.checkSelectionWrapper);
+                this.on(this.elements[i], 'blur', this.checkSelectionWrapper);
             }
             return this;
         },
@@ -776,7 +799,7 @@ else if (typeof define === 'function' && define.amd) {
                     }
                 };
             for (i = 0; i < buttons.length; i += 1) {
-                buttons[i].addEventListener('click', triggerAction);
+                this.on(buttons[i], 'click', triggerAction);
             }
             this.setFirstAndLastItems(buttons);
             return this;
@@ -938,12 +961,12 @@ else if (typeof define === 'function' && define.amd) {
                 linkSave = this.anchorForm.querySelector('a.medium-editor-toobar-anchor-save'),
                 self = this;
 
-            this.anchorForm.addEventListener('click', function (e) {
+            this.on(this.anchorForm, 'click', function (e) {
                 e.stopPropagation();
                 self.keepToolbarAlive = true;
             });
 
-            this.anchorInput.addEventListener('keyup', function (e) {
+            this.on(this.anchorInput, 'keyup', function (e) {
                 var button = null,
                     target;
 
@@ -964,7 +987,7 @@ else if (typeof define === 'function' && define.amd) {
                 }
             });
 
-            linkSave.addEventListener('click', function(e) {
+            this.on(linkSave, 'click', function(e) {
                 var button = null,
                     target;
                 e.preventDefault();
@@ -982,27 +1005,27 @@ else if (typeof define === 'function' && define.amd) {
                 self.createLink(self.anchorInput, target, button);
             }, true);
 
-            this.anchorInput.addEventListener('click', function (e) {
+            this.on(this.anchorInput, 'click', function (e) {
                 // make sure not to hide form when cliking into the input
                 e.stopPropagation();
                 self.keepToolbarAlive = true;
             });
 
             // Hide the anchor form when focusing outside of it.
-            this.options.ownerDocument.body.addEventListener('click', function (e) {
+            this.on(this.options.ownerDocument.body, 'click', function (e) {
                 if (e.target !== self.anchorForm && !isDescendant(self.anchorForm, e.target) && !isDescendant(self.toolbarActions, e.target)) {
                     self.keepToolbarAlive = false;
                     self.checkSelection();
                 }
             }, true);
-            this.options.ownerDocument.body.addEventListener('focus', function (e) {
+            this.on(this.options.ownerDocument.body, 'focus', function (e) {
                 if (e.target !== self.anchorForm && !isDescendant(self.anchorForm, e.target) && !isDescendant(self.toolbarActions, e.target)) {
                     self.keepToolbarAlive = false;
                     self.checkSelection();
                 }
             }, true);
 
-            linkCancel.addEventListener('click', function (e) {
+            this.on(linkCancel, 'click', function (e) {
                 e.preventDefault();
                 self.showToolbarActions();
                 restoreSelection.call(self, self.savedSelection);
@@ -1082,18 +1105,18 @@ else if (typeof define === 'function' && define.amd) {
 
                         // cleanup
                         clearInterval(interval_timer);
-                        self.anchorPreview.removeEventListener('mouseover', stamp);
-                        self.anchorPreview.removeEventListener('mouseout', unstamp);
-                        anchorEl.removeEventListener('mouseover', stamp);
-                        anchorEl.removeEventListener('mouseout', unstamp);
+                        self.off(self.anchorPreview, 'mouseover', stamp);
+                        self.off(self.anchorPreview, 'mouseout', unstamp);
+                        self.off(anchorEl, 'mouseover', stamp);
+                        self.off(anchorEl, 'mouseout', unstamp);
 
                     }
                 }, 200);
 
-            self.anchorPreview.addEventListener('mouseover', stamp);
-            self.anchorPreview.addEventListener('mouseout', unstamp);
-            anchorEl.addEventListener('mouseover', stamp);
-            anchorEl.addEventListener('mouseout', unstamp);
+            this.on(self.anchorPreview, 'mouseover', stamp);
+            this.on(self.anchorPreview, 'mouseout', unstamp);
+            this.on(anchorEl, 'mouseover', stamp);
+            this.on(anchorEl, 'mouseout', unstamp);
         },
 
         createAnchorPreview: function () {
@@ -1105,7 +1128,7 @@ else if (typeof define === 'function' && define.amd) {
             anchorPreview.innerHTML = this.anchorPreviewTemplate();
             this.options.elementsContainer.appendChild(anchorPreview);
 
-            anchorPreview.addEventListener('click', function () {
+            this.on(anchorPreview, 'click', function () {
                 self.anchorPreviewClickHandler();
             });
 
@@ -1146,7 +1169,7 @@ else if (typeof define === 'function' && define.amd) {
                 leaveAnchor = function () {
                     // mark the anchor as no longer hovered, and stop listening
                     overAnchor = false;
-                    self.activeAnchor.removeEventListener('mouseout', leaveAnchor);
+                    self.off(self.activeAnchor, 'mouseout', leaveAnchor);
                 };
 
             if (e.target && e.target.tagName.toLowerCase() === 'a') {
@@ -1164,7 +1187,7 @@ else if (typeof define === 'function' && define.amd) {
                     return true;
                 }
                 this.activeAnchor = e.target;
-                this.activeAnchor.addEventListener('mouseout', leaveAnchor);
+                this.on(this.activeAnchor, 'mouseout', leaveAnchor);
                 // show the anchor preview according to the configured delay
                 // if the mouse has not left the anchor tag in that time
                 setTimeout(function () {
@@ -1183,7 +1206,7 @@ else if (typeof define === 'function' && define.amd) {
                 self.editorAnchorObserver(e);
             };
             for (i = 0; i < this.elements.length; i += 1) {
-                this.elements[i].addEventListener('mouseover', this.editorAnchorObserverWrapper);
+                this.on(this.elements[i], 'mouseover', this.editorAnchorObserverWrapper);
             }
             return this;
         },
@@ -1200,6 +1223,7 @@ else if (typeof define === 'function' && define.amd) {
                 el.target = '_blank';
             } else {
                 el = el.getElementsByTagName('a');
+
                 for (i = 0; i < el.length; i += 1) {
                     el[i].target = '_blank';
                 }
@@ -1272,7 +1296,7 @@ else if (typeof define === 'function' && define.amd) {
                     }
                 }, 100);
             };
-            this.options.contentWindow.addEventListener('resize', this.windowResizeHandler);
+            this.on(this.options.contentWindow, 'resize', this.windowResizeHandler);
             return this;
         },
 
@@ -1299,18 +1323,12 @@ else if (typeof define === 'function' && define.amd) {
                 delete this.anchorPreview;
             }
 
-            this.options.ownerDocument.documentElement.removeEventListener('mouseup', this.checkSelectionWrapper);
-            this.options.contentWindow.removeEventListener('resize', this.windowResizeHandler);
-
             for (i = 0; i < this.elements.length; i += 1) {
-                this.elements[i].removeEventListener('mouseover', this.editorAnchorObserverWrapper);
-                this.elements[i].removeEventListener('keyup', this.checkSelectionWrapper);
-                this.elements[i].removeEventListener('blur', this.checkSelectionWrapper);
-                this.elements[i].removeEventListener('paste', this.pasteWrapper);
                 this.elements[i].removeAttribute('contentEditable');
                 this.elements[i].removeAttribute('data-medium-element');
             }
 
+            this.removeAllEvents();
         },
 
         htmlEntities: function (str) {
@@ -1356,7 +1374,7 @@ else if (typeof define === 'function' && define.amd) {
                 }
             };
             for (i = 0; i < this.elements.length; i += 1) {
-                this.elements[i].addEventListener('paste', this.pasteWrapper);
+                this.on(this.elements[i], 'paste', this.pasteWrapper);
             }
             return this;
         },
@@ -1378,8 +1396,8 @@ else if (typeof define === 'function' && define.amd) {
                 };
             for (i = 0; i < this.elements.length; i += 1) {
                 activatePlaceholder(this.elements[i]);
-                this.elements[i].addEventListener('blur', placeholderWrapper);
-                this.elements[i].addEventListener('keypress', placeholderWrapper);
+                this.on(this.elements[i], 'blur', placeholderWrapper);
+                this.on(this.elements[i], 'keypress', placeholderWrapper);
             }
             return this;
         },
