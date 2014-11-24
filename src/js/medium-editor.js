@@ -169,17 +169,26 @@ else if (typeof define === 'function' && define.amd) {
                 .passInstance();
         },
 
-        on: function(target, event, listener) {
-            target.addEventListener(event, listener);
-            this.events.push(function() {
-                target.removeEventListener(event, listener);
-            });
+        on: function(target, event, listener, useCapture) {
+            target.addEventListener(event, listener, useCapture);
+            this.events.push([target, event, listener, useCapture]);
+        },
+
+        off: function(target, event, listener, useCapture) {
+            var index = this.events.indexOf([target, event, listener, useCapture]),
+                e;
+            if(index !== -1) {
+                e = this.events.splice(index, 1);
+                e[0].removeEventListener(e[1], e[2], e[3]);
+            }
         },
 
         removeAllEvents: function() {
-            this.events.forEach(function(off) {
-                off();
-            });
+            var e = this.events.pop();
+            while(e) {
+                e[0].removeEventListener(e[1], e[2], e[3]);
+                e = this.events.pop();
+            }
         },
 
         initElements: function () {
@@ -1094,10 +1103,10 @@ else if (typeof define === 'function' && define.amd) {
 
                         // cleanup
                         clearInterval(interval_timer);
-                        self.anchorPreview.removeEventListener('mouseover', stamp);
-                        self.anchorPreview.removeEventListener('mouseout', unstamp);
-                        anchorEl.removeEventListener('mouseover', stamp);
-                        anchorEl.removeEventListener('mouseout', unstamp);
+                        self.off(self.anchorPreview, 'mouseover', stamp);
+                        self.off(self.anchorPreview, 'mouseout', unstamp);
+                        self.off(anchorEl, 'mouseover', stamp);
+                        self.off(anchorEl, 'mouseout', unstamp);
 
                     }
                 }, 200);
@@ -1158,7 +1167,7 @@ else if (typeof define === 'function' && define.amd) {
                 leaveAnchor = function () {
                     // mark the anchor as no longer hovered, and stop listening
                     overAnchor = false;
-                    self.activeAnchor.removeEventListener('mouseout', leaveAnchor);
+                    self.off(self.activeAnchor, 'mouseout', leaveAnchor);
                 };
 
             if (e.target && e.target.tagName.toLowerCase() === 'a') {
@@ -1312,14 +1321,7 @@ else if (typeof define === 'function' && define.amd) {
                 delete this.anchorPreview;
             }
 
-            this.options.ownerDocument.documentElement.removeEventListener('mouseup', this.checkSelectionWrapper);
-            this.options.contentWindow.removeEventListener('resize', this.windowResizeHandler);
-
             for (i = 0; i < this.elements.length; i += 1) {
-                this.elements[i].removeEventListener('mouseover', this.editorAnchorObserverWrapper);
-                this.elements[i].removeEventListener('keyup', this.checkSelectionWrapper);
-                this.elements[i].removeEventListener('blur', this.checkSelectionWrapper);
-                this.elements[i].removeEventListener('paste', this.pasteWrapper);
                 this.elements[i].removeAttribute('contentEditable');
                 this.elements[i].removeAttribute('data-medium-element');
             }
