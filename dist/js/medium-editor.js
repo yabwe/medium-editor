@@ -827,9 +827,11 @@ else if (typeof define === 'function' && define.amd) {
         },
 
         setToolbarPosition: function () {
-            var container = this.elements[0],
+            // document.documentElement for IE 9
+            var scrollTop = (document.documentElement && document.documentElement.scrollTop) || document.body.scrollTop,
+            container = this.elements[0],
             containerRect = container.getBoundingClientRect(),
-            containerTop = containerRect.top + window.scrollY,
+            containerTop = containerRect.top + scrollTop,
             buttonHeight = 50,
             selection = window.getSelection(),
             range,
@@ -842,7 +844,6 @@ else if (typeof define === 'function' && define.amd) {
                 return this;
             }
            
-
             this.toolbar.classList.add('medium-editor-toolbar-active');
 
             if ( this.options.staticToolbar ) { 
@@ -850,11 +851,11 @@ else if (typeof define === 'function' && define.amd) {
                 if ( this.options.stickyToolbar ) {
 
                     // If it's beyond the height of the editor, position it at the bottom of the editor
-                    if ( window.scrollY > (containerTop + this.elements[0].offsetHeight - this.toolbar.offsetHeight)) {
+                    if ( scrollTop > (containerTop + this.elements[0].offsetHeight - this.toolbar.offsetHeight)) {
                         this.toolbar.style.top = (containerTop + this.elements[0].offsetHeight) + 'px';
                     }
                     // Stick the toolbar to the top of the window
-                    else if ( window.scrollY > (containerTop - this.toolbar.offsetHeight) ) {
+                    else if ( scrollTop > (containerTop - this.toolbar.offsetHeight) ) {
                         this.toolbar.classList.add('sticky-toolbar');
                         this.toolbar.style.top = "0px";
                     }
@@ -864,10 +865,10 @@ else if (typeof define === 'function' && define.amd) {
                         this.toolbar.style.top = containerTop - this.toolbar.offsetHeight + "px";
                     }
                    
-                } 
-                else {
+                } else {
                     this.toolbar.style.top = containerTop - this.toolbar.offsetHeight + "px";
                 }
+
                 this.toolbar.style.left = containerRect.left + "px";
 
             } else {
