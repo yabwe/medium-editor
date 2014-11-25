@@ -30,7 +30,7 @@ describe('Toolbar TestCase', function () {
         it('should create a new element for the editor toolbar', function () {
             expect(document.querySelectorAll('.medium-editor-toolbar').length).toBe(0);
             var editor = new MediumEditor('.editor');
-            expect(editor.toolbar.className).toBe('medium-editor-toolbar');
+            expect(editor.toolbar.className).toMatch(/medium-editor-toolbar/);
             expect(document.querySelectorAll('.medium-editor-toolbar').length).toBe(1);
         });
     });
