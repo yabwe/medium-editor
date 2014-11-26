@@ -304,7 +304,7 @@ else if (typeof define === 'function' && define.amd) {
                     .bindBlur(i)
                     .bindClick(i)
                     .bindKeypress(i);
-                
+
             }
 
             return this;
@@ -782,7 +782,7 @@ else if (typeof define === 'function' && define.amd) {
                     return;
                 }
             }
-            
+
             if ( !this.options.staticToolbar ) {
                 this.hideToolbarActions();
             }
@@ -845,10 +845,10 @@ else if (typeof define === 'function' && define.amd) {
             if ( selection.focusNode === null ) {
                 return this;
             }
-           
+
             this.toolbar.classList.add('medium-editor-toolbar-active');
 
-            if ( this.options.staticToolbar ) { 
+            if ( this.options.staticToolbar ) {
 
                 if ( this.options.stickyToolbar ) {
 
@@ -866,7 +866,7 @@ else if (typeof define === 'function' && define.amd) {
                         this.toolbar.classList.remove('sticky-toolbar');
                         this.toolbar.style.top = containerTop - this.toolbar.offsetHeight + "px";
                     }
-                   
+
                 } else {
                     this.toolbar.style.top = containerTop - this.toolbar.offsetHeight + "px";
                 }
@@ -1452,7 +1452,7 @@ else if (typeof define === 'function' && define.amd) {
             };
 
             // Add a scroll event for sticky toolbar
-            if ( this.options.staticToolbar && this.options.stickyToolbar ) { 
+            if ( this.options.staticToolbar && this.options.stickyToolbar ) {
 
                 // On scroll, re-position the toolbar
                 window.addEventListener('scroll', function() {
@@ -1461,7 +1461,7 @@ else if (typeof define === 'function' && define.amd) {
                     }
                 }, true);
             }
-            
+
             this.on(this.options.contentWindow, 'resize', this.windowResizeHandler);
             return this;
         },
