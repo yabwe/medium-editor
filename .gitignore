@@ -9,3 +9,4 @@ npm-debug.log
 _SpecRunner.html
 reports/
 coverage/
+._*

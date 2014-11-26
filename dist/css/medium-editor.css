@@ -116,7 +116,13 @@
   cursor: pointer; }
 
 .medium-editor-toolbar-active, .medium-editor-anchor-preview-active {
-  visibility: visible;
+  visibility: visible; }
+
+.sticky-toolbar {
+  position: fixed;
+  top: 1px; }
+
+.stalker-toolbar {
   -webkit-animation: pop-upwards 160ms forwards linear;
   -ms-animation: pop-upwards 160ms forwards linear;
   animation: pop-upwards 160ms forwards linear;
