@@ -735,6 +735,9 @@ else if (typeof define === 'function' && define.amd) {
 
                     if ( !this.options.staticToolbar ) {
                         this.hideToolbarActions();
+                    } else if (this.anchorForm.style.display === 'block') {
+                        this.setToolbarButtonStates();
+                        this.showToolbarActions();
                     }
 
                 } else {
