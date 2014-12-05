@@ -20,7 +20,7 @@ IE 9+ ✔ | Latest ✔ | Latest ✔ | Latest ✔ | Latest ✔ |
 
 # Basic usage
 
-![screenshot](https://raw.github.com/daviferreira/medium-editor/master/demo/img/medium-editor.jpg)
+https://raw.github.com/daviferreira/medium-editor/master/demo/img/medium-editor.jpg
 
 __demo__: [http://daviferreira.github.io/medium-editor/](http://daviferreira.github.io/medium-editor/)
 
