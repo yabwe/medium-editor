@@ -276,6 +276,9 @@ else if (typeof define === 'function' && define.amd) {
             var self = this;
 
             this.elements[i].addEventListener('click', function(){
+                // Remove placeholder
+                this.classList.remove('medium-editor-placeholder');
+
                 if ( self.options.staticToolbar ) {
                     self.setToolbarPosition();
                 }
@@ -452,7 +455,7 @@ else if (typeof define === 'function' && define.amd) {
                         e.preventDefault();
                     } else if (self.options.disableDoubleReturn || this.getAttribute('data-disable-double-return')) {
                         var node = getSelectionStart.call(self);
-                        if (node && node.innerText === '\n') {
+                        if (node && node.textContent === '\n') {
                             e.preventDefault();
                         }
                     }
@@ -1684,7 +1687,7 @@ else if (typeof define === 'function' && define.amd) {
             return (el && (el.tagName.toLowerCase() === 'p' || el.tagName.toLowerCase() === 'div'));
         },
         filterCommonBlocks: function (el) {
-            if (/^\s*$/.test(el.innerText)) {
+            if (/^\s*$/.test(el.textContent)) {
                 el.parentNode.removeChild(el);
             }
         },
@@ -1754,7 +1757,7 @@ else if (typeof define === 'function' && define.amd) {
                 if (/^\s*$/.test()) {
                     el.parentNode.removeChild(el);
                 } else {
-                    el.parentNode.replaceChild(this.options.ownerDocument.createTextNode(el.innerText), el);
+                    el.parentNode.replaceChild(this.options.ownerDocument.createTextNode(el.textContent), el);
                 }
 
             }
