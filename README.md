@@ -175,7 +175,7 @@ rangy.init();
 function Highlighter() {
     this.button = document.createElement('button');
     this.button.className = 'medium-editor-action';
-    this.button.innerText = 'H';
+    this.button.textContent = 'H';
     this.button.onclick = this.onClick.bind(this);
     this.classApplier = rangy.createCssClassApplier("highlight", {
         elementTagName: 'mark',
@@ -210,7 +210,7 @@ function Extension() {
 
   this.button = document.createElement('button');
   this.button.className = 'medium-editor-action';
-  this.button.innerText = 'X';
+  this.button.textContent = 'X';
   this.button.onclick = this.onClick.bind(this);
 }
 
