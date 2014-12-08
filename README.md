@@ -49,7 +49,7 @@ var elements = document.querySelectorAll('.editable'),
 
 ## IE9
 
-If you want to support IE9, you will need to use a classList pollyfill, like Eli Gray's, available at [https://github.com/eligrey/classList.js](https://github.com/eligrey/classList.js).
+If you want to support IE9, you will need to use a classList pollyfill, like Eli Grey's, available at [https://github.com/eligrey/classList.js](https://github.com/eligrey/classList.js).
 
 ## Initialization options
 
@@ -146,12 +146,12 @@ Patrick Stillhar developed a new and improved way to add buttons to our toolbar.
 
 ## Extensions
 
-To add additional additional functions that are not supported by the native [browser API](https://developer.mozilla.org/de/docs/Rich-Text_Editing_in_Mozilla) you can
+To add additional functions that are not supported by the native [browser API](https://developer.mozilla.org/en/docs/Rich-Text_Editing_in_Mozilla) you can
 write extensions that are then integrated into the toolbar. The Extension API is currently unstable and very minimal.
 
 An extension is an object that has essentially two functions `getButton` and `checkState`.
 
-* `getButton` is called when the editor is initialized and should return a element that is integrated into the toolbar.
+* `getButton` is called when the editor is initialized and should return an element that is integrated into the toolbar.
   Usually this will be a `<button>` element like the onces Medium Editor uses. All event handling on this button is
   _entirely up to you_ so you should either keep a reference or bind your eventhandlers before returning it. You can
   also return a HTML-String that is then integrated into the toolbar also this is not really useful.
@@ -163,7 +163,7 @@ An extension is an object that has essentially two functions `getButton` and `ch
 
 Properties
 
-* `parent` add this property to your extension class constructor and set it to true to be able to access the Medium Editor instance through the `base` property that will be set during the initialization
+* `parent` add this property to your extension class constructor and set it to `true` to be able to access the Medium Editor instance through the `base` property that will be set during the initialization
 
 ### Examples
 
@@ -237,9 +237,9 @@ var two = new MediumEditor('.two', {
 });
 ```
 
-## Image Upload
+## Image Upload & embeds
 
-[Pavel Linkesch](https://github.com/orthes) has developed a jQuery plugin to upload images following Medium.com functionality. Check it out at [http://orthes.github.io/medium-editor-insert-plugin/](http://orthes.github.io/medium-editor-insert-plugin/)
+[Pavel Linkesch](https://github.com/orthes) has developed a jQuery plugin to upload images & embed content (from Twitter, Youtube, Vimeo, etc.) following Medium.com functionality. Check it out at [http://orthes.github.io/medium-editor-insert-plugin/](http://orthes.github.io/medium-editor-insert-plugin/)
 
 ## Laravel
 
