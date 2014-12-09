@@ -455,7 +455,7 @@ else if (typeof define === 'function' && define.amd) {
                         e.preventDefault();
                     } else if (self.options.disableDoubleReturn || this.getAttribute('data-disable-double-return')) {
                         var node = getSelectionStart.call(self);
-                        if (node && node.textContent === '\n') {
+                        if (node && node.innerText === '\n') {
                             e.preventDefault();
                         }
                     }
@@ -1687,7 +1687,7 @@ else if (typeof define === 'function' && define.amd) {
             return (el && (el.tagName.toLowerCase() === 'p' || el.tagName.toLowerCase() === 'div'));
         },
         filterCommonBlocks: function (el) {
-            if (/^\s*$/.test(el.textContent)) {
+            if (/^\s*$/.test(el.innerText)) {
                 el.parentNode.removeChild(el);
             }
         },
@@ -1757,7 +1757,7 @@ else if (typeof define === 'function' && define.amd) {
                 if (/^\s*$/.test()) {
                     el.parentNode.removeChild(el);
                 } else {
-                    el.parentNode.replaceChild(this.options.ownerDocument.createTextNode(el.textContent), el);
+                    el.parentNode.replaceChild(this.options.ownerDocument.createTextNode(el.innerText), el);
                 }
 
             }
