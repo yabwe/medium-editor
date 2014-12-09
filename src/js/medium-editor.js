@@ -267,7 +267,7 @@ else if (typeof define === 'function' && define.amd) {
             var self = this;
 
             // Set up the keypress events
-            this.elements[i].addEventListener('keypress', function(){
+            this.elements[i].addEventListener('keypress', function(event){
                 self.placeholderWrapper(this,event);
             });
 
