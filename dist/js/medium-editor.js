@@ -108,6 +108,39 @@ else if (typeof define === 'function' && define.amd) {
         return !!(obj && obj.nodeType === 1);
     }
 
+    // http://stackoverflow.com/questions/6690752/insert-html-at-caret-in-a-contenteditable-div
+    function insertHTMLCommand(doc, html) {
+        var selection, range, el, fragment, node, lastNode;
+
+        if (doc.queryCommandSupported('insertHTML')) {
+            return doc.execCommand('insertHTML', false, html);
+        }
+
+        selection = window.getSelection();
+        if (selection.getRangeAt && selection.rangeCount) {
+            range = selection.getRangeAt(0);
+            range.deleteContents();
+
+            el = doc.createElement("div");
+            el.innerHTML = html;
+            fragment = doc.createDocumentFragment();
+            while (el.firstChild) {
+                node = el.firstChild;
+                lastNode = fragment.appendChild(node);
+            }
+            range.insertNode(fragment);
+
+            // Preserve the selection:
+            if (lastNode) {
+                range = range.cloneRange();
+                range.setStartAfter(lastNode);
+                range.collapse(true);
+                selection.removeAllRanges();
+                selection.addRange(range);
+            }
+        }
+    }
+
     MediumEditor.prototype = {
         defaults: {
             allowMultiParagraphSelection: true,
@@ -265,7 +298,7 @@ else if (typeof define === 'function' && define.amd) {
             var self = this;
 
             // Set up the keypress events
-            this.elements[i].addEventListener('keypress', function(){
+            this.elements[i].addEventListener('keypress', function(event){
                 self.placeholderWrapper(this,event);
             });
 
@@ -455,7 +488,7 @@ else if (typeof define === 'function' && define.amd) {
                         e.preventDefault();
                     } else if (self.options.disableDoubleReturn || this.getAttribute('data-disable-double-return')) {
                         var node = getSelectionStart.call(self);
-                        if (node && node.innerText === '\n') {
+                        if (node && node.textContent === '\n') {
                             e.preventDefault();
                         }
                     }
@@ -1512,21 +1545,34 @@ else if (typeof define === 'function' && define.amd) {
             this.pasteWrapper = function (e) {
                 var paragraphs,
                     html = '',
-                    p;
+                    p,
+                    dataFormatHTML = 'text/html',
+                    dataFormatPlain = 'text/plain';
 
                 this.classList.remove('medium-editor-placeholder');
                 if (!self.options.forcePlainText && !self.options.cleanPastedHTML) {
                     return this;
                 }
 
+                if (window.clipboardData && e.clipboardData === undefined) {
+                    e.clipboardData = window.clipboardData;
+                    // If window.clipboardData exists, but e.clipboardData doesn't exist,
+                    // we're probably in IE. IE only has two possibilities for clipboard
+                    // data format: 'Text' and 'URL'.
+                    //
+                    // Of the two, we want 'Text':
+                    dataFormatHTML = 'Text';
+                    dataFormatPlain = 'Text';
+                }
+
                 if (e.clipboardData && e.clipboardData.getData && !e.defaultPrevented) {
                     e.preventDefault();
 
-                    if (self.options.cleanPastedHTML && e.clipboardData.getData('text/html')) {
-                        return self.cleanPaste(e.clipboardData.getData('text/html'));
+                    if (self.options.cleanPastedHTML && e.clipboardData.getData(dataFormatHTML)) {
+                        return self.cleanPaste(e.clipboardData.getData(dataFormatHTML));
                     }
                     if (!(self.options.disableReturn || this.getAttribute('data-disable-return'))) {
-                        paragraphs = e.clipboardData.getData('text/plain').split(/[\r\n]/g);
+                        paragraphs = e.clipboardData.getData(dataFormatPlain).split(/[\r\n]/g);
                         for (p = 0; p < paragraphs.length; p += 1) {
                             if (paragraphs[p] !== '') {
                                 if (navigator.userAgent.match(/firefox/i) && p === 0) {
@@ -1536,10 +1582,10 @@ else if (typeof define === 'function' && define.amd) {
                                 }
                             }
                         }
-                        self.options.ownerDocument.execCommand('insertHTML', false, html);
+                        insertHTMLCommand(self.options.ownerDocument, html);
                     } else {
-                        html = self.htmlEntities(e.clipboardData.getData('text/plain'));
-                        self.options.ownerDocument.execCommand('insertHTML', false, html);
+                        html = self.htmlEntities(e.clipboardData.getData(dataFormatPlain));
+                        insertHTMLCommand(self.options.ownerDocument, html);
                     }
                 }
             };
@@ -1687,7 +1733,7 @@ else if (typeof define === 'function' && define.amd) {
             return (el && (el.tagName.toLowerCase() === 'p' || el.tagName.toLowerCase() === 'div'));
         },
         filterCommonBlocks: function (el) {
-            if (/^\s*$/.test(el.innerText)) {
+            if (/^\s*$/.test(el.textContent)) {
                 el.parentNode.removeChild(el);
             }
         },
@@ -1757,7 +1803,7 @@ else if (typeof define === 'function' && define.amd) {
                 if (/^\s*$/.test()) {
                     el.parentNode.removeChild(el);
                 } else {
-                    el.parentNode.replaceChild(this.options.ownerDocument.createTextNode(el.innerText), el);
+                    el.parentNode.replaceChild(this.options.ownerDocument.createTextNode(el.textContent), el);
                 }
 
             }
