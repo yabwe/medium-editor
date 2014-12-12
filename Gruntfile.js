@@ -97,6 +97,10 @@ module.exports = function (grunt) {
 
     gruntConfig.cssmin = {
         main: {
+            options: {
+              noAdvanced: true
+            },
+
             expand: true,
             cwd: 'dist/css/',
             src: ['*.css', '!*.min.css'],
@@ -104,6 +108,10 @@ module.exports = function (grunt) {
             ext: '.min.css'
         },
         themes: {
+            options: {
+              noAdvanced: true
+            },
+
             expand: true,
             cwd: 'dist/css/themes/',
             src: ['*.css', '!*.min.css'],
