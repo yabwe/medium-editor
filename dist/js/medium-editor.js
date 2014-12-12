@@ -276,6 +276,9 @@ else if (typeof define === 'function' && define.amd) {
             var self = this;
 
             this.elements[i].addEventListener('click', function(){
+                // Remove placeholder
+                this.classList.remove('medium-editor-placeholder');
+
                 if ( self.options.staticToolbar ) {
                     self.setToolbarPosition();
                 }
