@@ -767,7 +767,7 @@ else if (typeof define === 'function' && define.amd) {
             if (this.keepToolbarAlive !== true && !this.options.disableToolbar) {
 
                 newSelection = this.options.contentWindow.getSelection();
-                if (newSelection.toString().trim() === '' ||
+                if ((!this.options.updateOnEmptySelection && newSelection.toString().trim() === '') ||
                     (this.options.allowMultiParagraphSelection === false && this.hasMultiParagraphs()) ||
                     this.selectionInContentEditableFalse()) {
 
@@ -912,7 +912,7 @@ else if (typeof define === 'function' && define.amd) {
 
                 this.toolbar.style.left = containerRect.left + "px";
 
-            } else {
+            } else if (!selection.isCollapsed) {
                 range = selection.getRangeAt(0);
                 boundary = range.getBoundingClientRect();
                 middleBoundary = (boundary.left + boundary.right) / 2;

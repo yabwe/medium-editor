@@ -81,6 +81,19 @@ describe('Selection TestCase', function () {
                 expect(editor.setToolbarButtonStates).toHaveBeenCalled();
                 expect(editor.showToolbarActions).toHaveBeenCalled();
             });
+
+            it('should update button states when updateOnEmptySelection is true and the selection is empty', function () {
+              spyOn(MediumEditor.prototype, 'setToolbarButtonStates').and.callThrough();
+
+              var editor = new MediumEditor('.editor', {
+                  updateOnEmptySelection: true
+              });
+
+              selectElementContents(this.el, { collapse: 'toStart' });
+              editor.checkSelection();
+
+              expect(editor.setToolbarButtonStates.calls.count()).toEqual(1);
+            });
         });
     });
 
