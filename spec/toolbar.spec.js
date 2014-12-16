@@ -1,6 +1,6 @@
 /*global MediumEditor, describe, it, expect, spyOn,
          afterEach, beforeEach, selectElementContents, runs,
-         waitsFor, tearDown, xit */
+         fireEvent, waitsFor, tearDown, xit */
 
 describe('Toolbar TestCase', function () {
     'use strict';
@@ -101,6 +101,18 @@ describe('Toolbar TestCase', function () {
             }, 500);
 
 
+        });
+
+        it('should call onHideToolbar when toolbar is hidden', function () {
+            var editor = new MediumEditor('.editor');
+            editor.onHideToolbar = function() {};
+
+            spyOn(editor, 'onHideToolbar').and.callThrough();
+
+            fireEvent(editor.elements[0], 'focus');
+            fireEvent(editor.elements[0], 'blur');
+
+            expect(editor.onHideToolbar).toHaveBeenCalled();
         });
 
         // jasmine 2.0 changed async tests, runs no longer exists

@@ -1116,6 +1116,9 @@ else if (typeof define === 'function' && define.amd) {
             this.keepToolbarAlive = false;
             if (this.toolbar !== undefined) {
                 this.toolbar.classList.remove('medium-editor-toolbar-active');
+                if (this.onHideToolbar) {
+                    this.onHideToolbar();
+                }
             }
         },
 
