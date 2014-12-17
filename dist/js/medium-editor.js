@@ -436,6 +436,11 @@ else if (typeof define === 'function' && define.amd) {
                 }
             });
 
+            var keyDownCode = 0;
+            this.on(this.elements[index], 'keydown', function (e) {
+                keyDownCode = e.which;
+            });
+
             this.on(this.elements[index], 'keyup', function (e) {
                 var node = getSelectionStart.call(self),
                     tagName,
@@ -444,7 +449,7 @@ else if (typeof define === 'function' && define.amd) {
                 if (node && node.getAttribute('data-medium-element') && node.children.length === 0 && !(self.options.disableReturn || node.getAttribute('data-disable-return'))) {
                     document.execCommand('formatBlock', false, 'p');
                 }
-                if (e.which === 13) {
+                if (e.which === 13 && e.which === keyDownCode ) {
                     node = getSelectionStart.call(self);
                     tagName = node.tagName.toLowerCase();
                     editorElement = self.getSelectionElement();
@@ -482,8 +487,14 @@ else if (typeof define === 'function' && define.amd) {
 
         bindReturn: function (index) {
             var self = this;
+
+            var keyDownCode = 0;
+            this.on(this.elements[index], 'keydown', function (e) {
+                keyDownCode = e.which;
+            });
+
             this.on(this.elements[index], 'keypress', function (e) {
-                if (e.which === 13) {
+                if (e.which === 13 && e.which === keyDownCode ) {
                     if (self.options.disableReturn || this.getAttribute('data-disable-return')) {
                         e.preventDefault();
                     } else if (self.options.disableDoubleReturn || this.getAttribute('data-disable-double-return')) {
@@ -1157,11 +1168,16 @@ else if (typeof define === 'function' && define.amd) {
                 self.keepToolbarAlive = true;
             });
 
+            var keyDownCode = 0;
+            this.on(this.anchorInput, 'keydown', function (e) {
+                keyDownCode = e.which;
+            });
+
             this.on(this.anchorInput, 'keyup', function (e) {
                 var button = null,
                     target;
 
-                if (e.keyCode === 13) {
+                if (e.keyCode === 13 && e.keyCode === keyDownCode) {
                     e.preventDefault();
                     if (self.options.anchorTarget && self.anchorTarget.checked) {
                         target = "_blank";
