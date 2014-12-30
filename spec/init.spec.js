@@ -144,6 +144,21 @@ describe('Initialization TestCase', function () {
             expect(editor3.id).toBe(3);
         });
 
+        it('should not reset ID when deactivated and then re-initialized', function () {
+            var secondEditor = document.createElement('div'),
+                editor1 = new MediumEditor('.editor'),
+                editor2;
+
+            secondEditor.className = 'editor-two';
+            document.body.appendChild(secondEditor);
+
+            editor2 = new MediumEditor('.editor-two');
+            editor1.deactivate();
+            editor1.init('.editor');
+
+            expect(editor1.id).not.toEqual(editor2.id);
+        });
+
         it('should use document.body as element container when no container element is specified', function () {
             spyOn(document.body, 'appendChild').and.callThrough();
             (function () {
