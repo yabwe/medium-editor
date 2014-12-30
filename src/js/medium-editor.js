@@ -428,9 +428,10 @@ else if (typeof define === 'function' && define.amd) {
         bindParagraphCreation: function (index) {
             var self = this;
             this.on(this.elements[index], 'keypress', function (e) {
-                var node = getSelectionStart.call(self),
+                var node,
                     tagName;
                 if (e.which === 32) {
+                    node = getSelectionStart.call(self);
                     tagName = node.tagName.toLowerCase();
                     if (tagName === 'a') {
                         document.execCommand('unlink', false, null);
