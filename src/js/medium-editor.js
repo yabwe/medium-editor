@@ -159,6 +159,7 @@ else if (typeof define === 'function' && define.amd) {
             disableDoubleReturn: false,
             disableToolbar: false,
             disableEditing: false,
+            disablePlaceholders: false,
             elementsContainer: false,
             contentWindow: window,
             ownerDocument: document,
@@ -278,7 +279,9 @@ else if (typeof define === 'function' && define.amd) {
                         && !isDescendant(self.anchorPreview, e.target)) {
 
                         // Activate the placeholder
-                        self.placeholderWrapper(self.elements[0], e);
+                        if (!self.options.disablePlaceholders) {
+                            self.placeholderWrapper(self.elements[0], e);
+                        }
 
                         // Hide the toolbar after a small delay so we can prevent this on toolbar click
                         setTimeout(function(){
@@ -297,6 +300,10 @@ else if (typeof define === 'function' && define.amd) {
         },
 
         bindKeypress: function(i) {
+            if (this.options.disablePlaceholders) {
+                return this;
+            }
+
             var self = this;
 
             // Set up the keypress events
@@ -311,8 +318,10 @@ else if (typeof define === 'function' && define.amd) {
             var self = this;
 
             this.elements[i].addEventListener('click', function(){
-                // Remove placeholder
-                this.classList.remove('medium-editor-placeholder');
+                if (!self.options.disablePlaceholders) {
+                    // Remove placeholder
+                    this.classList.remove('medium-editor-placeholder');
+                }
 
                 if ( self.options.staticToolbar ) {
                     self.setToolbarPosition();
@@ -331,8 +340,10 @@ else if (typeof define === 'function' && define.amd) {
 
             for (i = 0; i < this.elements.length; i += 1) {
 
-                // Active all of the placeholders
-                this.activatePlaceholder(this.elements[i]);
+                if (!this.options.disablePlaceholders) {
+                    // Active all of the placeholders
+                    this.activatePlaceholder(this.elements[i]);
+                }
 
                 // Bind the return and tab keypress events
                 this.bindReturn(i)
@@ -1598,6 +1609,10 @@ else if (typeof define === 'function' && define.amd) {
         },
 
         setPlaceholders: function () {
+            if (this.options.disablePlaceholders) {
+                return this;
+            }
+
             var i,
                 activatePlaceholder = function (el) {
                     if (!(el.querySelector('img')) &&
