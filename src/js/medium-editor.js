@@ -663,7 +663,7 @@ else if (typeof define === 'function' && define.amd) {
                 btn,
                 ext;
 
-            ul.id = 'medium-editor-toolbar-actions';
+            ul.id = 'medium-editor-toolbar-actions' + this.id;
             ul.className = 'medium-editor-toolbar-actions clearfix';
 
             for (i = 0; i < btns.length; i += 1) {
@@ -723,7 +723,7 @@ else if (typeof define === 'function' && define.amd) {
 
 
             anchor.className = 'medium-editor-toolbar-form-anchor';
-            anchor.id = 'medium-editor-toolbar-form-anchor';
+            anchor.id = 'medium-editor-toolbar-form-anchor-' + this.id;
             anchor.appendChild(input);
 
             anchor.appendChild(save);

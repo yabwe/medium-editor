@@ -71,7 +71,7 @@ describe('Anchor Preview TestCase', function () {
 
             // blur the editable area and focus onto the input for the anchor form
             spyOn(MediumEditor.prototype, 'hideToolbarActions').and.callThrough();
-            fireEvent(editor.elements[0], 'blur', undefined, undefined, editor.elements[0], document.querySelector('#medium-editor-toolbar-form-anchor input'));
+            fireEvent(editor.elements[0], 'blur', undefined, undefined, editor.elements[0], document.querySelector('#medium-editor-toolbar-form-anchor-' + editor.id + ' input'));
             jasmine.clock().tick(1);
             expect(editor.hideToolbarActions).not.toHaveBeenCalled();
 
