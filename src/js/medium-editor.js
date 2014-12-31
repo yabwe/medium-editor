@@ -1114,7 +1114,7 @@ else if (typeof define === 'function' && define.amd) {
 
         hideToolbarActions: function () {
             this.keepToolbarAlive = false;
-            if (this.toolbar !== undefined) {
+            if (this.toolbar !== undefined && this.toolbar.classList.contains('medium-editor-toolbar-active')) {
                 this.toolbar.classList.remove('medium-editor-toolbar-active');
                 if (this.onHideToolbar) {
                     this.onHideToolbar();

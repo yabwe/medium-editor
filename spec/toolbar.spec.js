@@ -105,6 +105,7 @@ describe('Toolbar TestCase', function () {
 
         it('should call onHideToolbar when toolbar is hidden', function () {
             var editor = new MediumEditor('.editor');
+            editor.toolbar.classList.add('medium-editor-toolbar-active');
             editor.onHideToolbar = function() {};
 
             spyOn(editor, 'onHideToolbar').and.callThrough();
