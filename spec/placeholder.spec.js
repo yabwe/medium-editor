@@ -76,4 +76,21 @@ describe('Placeholder TestCase', function () {
         expect(placeholder).toEqual("'Custom placeholder'");
     });
 
+    it('should not set placeholder for empty elements when disablePlaceholders is set to true', function () {
+        var editor = new MediumEditor('.editor', {
+            disablePlaceholders: true
+        });
+        expect(editor.elements[0].className).not.toContain('medium-editor-placeholder');
+    });
+
+    it('should not add a placeholder to empty elements on blur when disablePlaceholders is set to true', function () {
+        this.el.innerHTML = 'some text';
+        var editor = new MediumEditor('.editor', {
+            disablePlaceholders: true
+        });
+        expect(editor.elements[0].className).not.toContain('medium-editor-placeholder');
+        editor.elements[0].innerHTML = '';
+        fireEvent(document.querySelector('div'), 'click');
+        expect(editor.elements[0].className).not.toContain('medium-editor-placeholder');
+    });
 });
