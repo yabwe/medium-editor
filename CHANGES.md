@@ -1,3 +1,20 @@
+2.0.0 / 2015-01-06
+==================
+
+* Adds static toolbar feature
+* Now uses textContent instead of innerText
+* Fixes plain text paste on IE
+* Hides placeholder on mouse click
+* Adds a 'collapse' option to 'selectElementContents' helper
+* Allows toolbar button states to change when selection is collapsed
+* In hideToolbarActions, calls an optional 'onHideToolbar' method
+* Ensures that ul.id and anchor.id are unique
+* Avoids grabbing selection on keypress for contenteditable except for spacebar
+* Supports disabling anchorForm, avoiding unnecessary event handling and element creation
+* Supports disabling placeholders, including not attaching event handlers when not needed
+* Various minor bug fixes and improvements
+
+
 1.9.13 / 2014-11-24
 ===================
 

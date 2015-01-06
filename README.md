@@ -70,7 +70,7 @@ If you want to support IE9, you will need to use a classList pollyfill, like Eli
 
 ### Toolbar options
 * __activeButtonClass__: CSS class added to active buttons in the toolbar. Default: 'medium-editor-button-active'
-* __buttons__: the set of buttons to display on the toolbar. Default: ['bold', 'italic', 'underline', 'anchor', 'header1', 'header2', 'quote'] 
+* __buttons__: the set of buttons to display on the toolbar. Default: ['bold', 'italic', 'underline', 'anchor', 'header1', 'header2', 'quote']
 * __buttonLabels__: type of labels on the buttons. Values: 'fontawesome', `{'bold': '<b>b</b>', 'italic': '<i>i</i>'}`. Default: false
 * __diffLeft__: value in pixels to be added to the X axis positioning of the toolbar. Default: 0
 * __diffTop__: value in pixels to be added to the Y axis positioning of the toolbar. Default: -10
@@ -299,80 +299,88 @@ The source files are located inside the __src__ directory.
 
 ```
  project  : medium-editor
- repo age : 1 year, 6 months
- active   : 190 days
- commits  : 638
- files    : 58
+ repo age : 1 year, 7 months
+ active   : 206 days
+ commits  : 694
+ files    : 59
  authors  :
-   451	Davi Ferreira           70.7%
-    20	Maxime de Visscher      3.1%
-    18	Andy Yaco-Mink          2.8%
-     8	Jarl Gunnar T. Flaten   1.3%
-     8	Seif                    1.3%
-     8	Derek Odegard           1.3%
-     8	Pedro Nasser            1.3%
-     7	OmniaGM                 1.1%
-     7	Alfonso (the fonz) de la Osa 1.1%
-     6	Pascal                  0.9%
-     6	Dayjo                   0.9%
-     5	Raul Matei              0.8%
-     5	Martin Thurau           0.8%
-     4	Sebastian Zuchmanski    0.6%
-     4	minikomi                0.6%
-     3	ʞuıɯ-oɔɐʎ ʎpuɐ  0.5%
-     3	Andrew Hubbs            0.5%
-     3	Dmitri Cherniak         0.5%
-     3	Troels Knak-Nielsen     0.5%
-     3	arol                    0.5%
-     3	Nikita Korotaev         0.5%
-     3	Pavel Linkesch          0.5%
-     2	mako                    0.3%
-     2	Alexander Hofbauer      0.3%
-     2	Son Tran-Nguyen         0.3%
-     2	Ethan Turkeltaub        0.3%
-     2	Jacob Magnusson         0.3%
-     1	Richard Park            0.2%
-     1	Robert Koritnik         0.2%
-     1	Sarah Squire            0.2%
-     1	Scott Carleton          0.2%
-     1	Søren Torp Petersen    0.2%
-     1	Tom MacWright           0.2%
-     1	happyaccidents          0.2%
-     1	mako yass               0.2%
-     1	mbrookes                0.2%
-     1	muescha                 0.2%
-     1	shaohua                 0.2%
-     1	t_kjaergaard            0.2%
-     1	typify                  0.2%
-     1	waffleio                0.2%
-     1	zzjin                   0.2%
-     1	Nic Malan               0.2%
-     1	Alberto Gasparin        0.2%
-     1	Bitdeli Chef            0.2%
-     1	Carlos Alexandre Fuechter 0.2%
-     1	Cenk Dölek            0.2%
-     1	David Collien           0.2%
-     1	David Hellsing          0.2%
-     1	Denis Gorbachev         0.2%
-     1	Diana Liao              0.2%
-     1	Harshil Shah            0.2%
-     1	IndieSquidge            0.2%
-     1	Ionică Bizău          0.2%
-     1	Jack Parker             0.2%
-     1	Jeff Welch              0.2%
-     1	Johann Troendle         0.2%
-     1	Mark Kraemer            0.2%
-     1	Max                     0.2%
-     1	Maxime Dantec           0.2%
-     1	Maxime De Visscher      0.2%
-     1	Michael Kay             0.2%
-     1	Moore Adam              0.2%
-     1	Adam Mulligan           0.2%
-     1	Nick Semenkovich        0.2%
-     1	Noah Paessel            0.2%
-     1	Patrick Kempff          0.2%
-     1	Peleg Rosenthal         0.2%
-     1	Randson Oliveira        0.2%
+   478	Davi Ferreira                 68.9%
+    20	Maxime de Visscher            2.9%
+    18	Andy Yaco-Mink                2.6%
+     9	Noah Chase                    1.3%
+     8	Jarl Gunnar T. Flaten         1.2%
+     8	Seif                          1.2%
+     8	Derek Odegard                 1.2%
+     8	Pedro Nasser                  1.2%
+     7	Aidan Threadgold              1.0%
+     7	Alfonso (the fonz) de la Osa  1.0%
+     7	OmniaGM                       1.0%
+     6	Pascal                        0.9%
+     6	Dayjo                         0.9%
+     5	Nate Mielnik                  0.7%
+     5	Raul Matei                    0.7%
+     5	Martin Thurau                 0.7%
+     4	Sebastian Zuchmanski          0.6%
+     4	minikomi                      0.6%
+     3	Troels Knak-Nielsen           0.4%
+     3	Pavel Linkesch                0.4%
+     3	Dmitri Cherniak               0.4%
+     3	ʞuıɯ-oɔɐʎ ʎpuɐ                0.4%
+     3	Andrew Hubbs                  0.4%
+     3	Nikita Korotaev               0.4%
+     3	arol                          0.4%
+     2	Son Tran-Nguyen               0.3%
+     2	Alexander Hofbauer            0.3%
+     2	Ethan Turkeltaub              0.3%
+     2	Jacob Magnusson               0.3%
+     2	Jeremy                        0.3%
+     2	Joel                          0.3%
+     2	jj                            0.3%
+     2	mako                          0.3%
+     1	Max                           0.1%
+     1	Maxime De Visscher            0.1%
+     1	Johann Troendle               0.1%
+     1	Michael Kay                   0.1%
+     1	Moore Adam                    0.1%
+     1	Jeff Welch                    0.1%
+     1	Nic Malan                     0.1%
+     1	Nick Semenkovich              0.1%
+     1	Jack Parker                   0.1%
+     1	Ionică Bizău                  0.1%
+     1	Noah Paessel                  0.1%
+     1	IndieSquidge                  0.1%
+     1	Harshil Shah                  0.1%
+     1	Patrick Kempff                0.1%
+     1	Diana Liao                    0.1%
+     1	Denis Gorbachev               0.1%
+     1	Peleg Rosenthal               0.1%
+     1	Randson Oliveira              0.1%
+     1	David Hellsing                0.1%
+     1	Richard Park                  0.1%
+     1	Robert Koritnik               0.1%
+     1	Sarah Squire                  0.1%
+     1	Scott Carleton                0.1%
+     1	David Collien                 0.1%
+     1	Dave Jarvis                   0.1%
+     1	Adam Mulligan                 0.1%
+     1	Søren Torp Petersen           0.1%
+     1	Tom MacWright                 0.1%
+     1	Cenk Dölek                    0.1%
+     1	Carlos Alexandre Fuechter     0.1%
+     1	happyaccidents                0.1%
+     1	zzjin                         0.1%
+     1	Alberto Gasparin              0.1%
+     1	mako yass                     0.1%
+     1	mbrookes                      0.1%
+     1	Bitdeli Chef                  0.1%
+     1	muescha                       0.1%
+     1	shaohua                       0.1%
+     1	t_kjaergaard                  0.1%
+     1	typify                        0.1%
+     1	valentinnew                   0.1%
+     1	waffleio                      0.1%
+     1	Mark Kraemer                  0.1%
+     1	Maxime Dantec                 0.1%
 ```
 
 ## License
