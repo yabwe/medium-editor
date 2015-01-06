@@ -181,6 +181,8 @@ else if (typeof define === 'function' && define.amd) {
         isIE: ((navigator.appName === 'Microsoft Internet Explorer') || ((navigator.appName === 'Netscape') && (new RegExp('Trident/.*rv:([0-9]{1,}[.0-9]{0,})').exec(navigator.userAgent) !== null))),
 
         init: function (elements, options) {
+            var uniqueId = 1;
+
             this.options = extend(options, this.defaults);
             this.setElementSelection(elements);
             if (this.elements.length === 0) {
@@ -190,7 +192,13 @@ else if (typeof define === 'function' && define.amd) {
             if (!this.options.elementsContainer) {
                 this.options.elementsContainer = document.body;
             }
-            this.id = this.options.elementsContainer.querySelectorAll('.medium-editor-toolbar').length + 1;
+
+            while (this.options.elementsContainer.querySelector('#medium-editor-toolbar-' + uniqueId)) {
+                uniqueId = uniqueId + 1;
+            }
+
+            this.id = uniqueId;
+
             return this.setup();
         },
 
@@ -657,7 +665,7 @@ else if (typeof define === 'function' && define.amd) {
                 btn,
                 ext;
 
-            ul.id = 'medium-editor-toolbar-actions';
+            ul.id = 'medium-editor-toolbar-actions' + this.id;
             ul.className = 'medium-editor-toolbar-actions clearfix';
 
             for (i = 0; i < btns.length; i += 1) {
@@ -717,7 +725,7 @@ else if (typeof define === 'function' && define.amd) {
 
 
             anchor.className = 'medium-editor-toolbar-form-anchor';
-            anchor.id = 'medium-editor-toolbar-form-anchor';
+            anchor.id = 'medium-editor-toolbar-form-anchor-' + this.id;
             anchor.appendChild(input);
 
             anchor.appendChild(save);
