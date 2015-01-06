@@ -9,8 +9,7 @@
   border: 1px solid #357ebd;
   background-color: #428bca;
   border-radius: 4px;
-  -webkit-transition: top 0.075s ease-out, left 0.075s ease-out;
-          transition: top 0.075s ease-out, left 0.075s ease-out; }
+  transition: top 0.075s ease-out, left 0.075s ease-out; }
   .medium-editor-toolbar li button {
     min-width: 60px;
     height: 60px;
@@ -19,8 +18,7 @@
     background-color: transparent;
     color: #fff;
     box-sizing: border-box;
-    -webkit-transition: background-color 0.2s ease-in, color 0.2s ease-in;
-            transition: background-color 0.2s ease-in, color 0.2s ease-in; }
+    transition: background-color 0.2s ease-in, color 0.2s ease-in; }
     .medium-editor-toolbar li button:hover {
       background-color: #3276b1;
       color: #fff; }

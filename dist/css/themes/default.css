@@ -9,12 +9,10 @@
 .medium-editor-toolbar {
   border: 1px solid #000;
   background-color: #242424;
-  background: -webkit-linear-gradient(bottom, #242424, rgba(36, 36, 36, 0.75));
   background: linear-gradient(bottom, #242424, rgba(36, 36, 36, 0.75));
   border-radius: 5px;
   box-shadow: 0 0 3px #000;
-  -webkit-transition: top 0.075s ease-out, left 0.075s ease-out;
-          transition: top 0.075s ease-out, left 0.075s ease-out; }
+  transition: top 0.075s ease-out, left 0.075s ease-out; }
   .medium-editor-toolbar li button {
     min-width: 50px;
     height: 50px;
@@ -24,11 +22,9 @@
     border-left: 1px solid rgba(255, 255, 255, 0.1);
     background-color: #242424;
     color: #fff;
-    background: -webkit-linear-gradient(bottom, #242424, rgba(36, 36, 36, 0.89));
     background: linear-gradient(bottom, #242424, rgba(36, 36, 36, 0.89));
     box-shadow: 0 2px 2px rgba(0, 0, 0, 0.3);
-    -webkit-transition: background-color 0.2s ease-in;
-            transition: background-color 0.2s ease-in; }
+    transition: background-color 0.2s ease-in; }
     .medium-editor-toolbar li button:hover {
       background-color: #000;
       color: yellow; }
@@ -41,7 +37,6 @@
   .medium-editor-toolbar li .medium-editor-button-active {
     background-color: #000;
     color: #fff;
-    background: -webkit-linear-gradient(bottom, #242424, rgba(0, 0, 0, 0.89));
     background: linear-gradient(bottom, #242424, rgba(0, 0, 0, 0.89)); }
 
 .medium-editor-toolbar-form-anchor {
