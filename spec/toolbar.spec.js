@@ -33,6 +33,22 @@ describe('Toolbar TestCase', function () {
             expect(editor.toolbar.className).toMatch(/medium-editor-toolbar/);
             expect(document.querySelectorAll('.medium-editor-toolbar').length).toBe(1);
         });
+
+        it('should not create an anchor form element if disableAnchorForm is set to true', function() {
+            expect(document.querySelectorAll('.medium-editor-toolbar-form-anchor').length).toBe(0);
+            var editor = new MediumEditor('.editor', {
+                disableAnchorForm: true
+            });
+            expect(editor.toolbar.querySelectorAll('.medium-editor-toolbar-form-anchor').length).toBe(0);
+        });
+
+        it('should not call MediumEditor\'s toolbarFormAnchor method if disableAnchorForm is set to true', function() {
+            spyOn(MediumEditor.prototype, 'toolbarFormAnchor').and.callThrough();
+            var editor = new MediumEditor('.editor', {
+                disableAnchorForm: true
+            });
+            expect(editor.toolbarFormAnchor).not.toHaveBeenCalled();
+        });
     });
 
     describe('Deactive', function () {

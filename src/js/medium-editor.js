@@ -159,6 +159,7 @@ else if (typeof define === 'function' && define.amd) {
             disableDoubleReturn: false,
             disableToolbar: false,
             disableEditing: false,
+            disableAnchorForm: false,
             elementsContainer: false,
             contentWindow: window,
             ownerDocument: document,
@@ -630,13 +631,15 @@ else if (typeof define === 'function' && define.amd) {
             }
             this.toolbar = this.createToolbar();
             this.keepToolbarAlive = false;
-            this.anchorForm = this.toolbar.querySelector('.medium-editor-toolbar-form-anchor');
-            this.anchorInput = this.anchorForm.querySelector('input.medium-editor-toolbar-anchor-input');
-            this.anchorTarget = this.anchorForm.querySelector('input.medium-editor-toolbar-anchor-target');
-            this.anchorButton = this.anchorForm.querySelector('input.medium-editor-toolbar-anchor-button');
             this.toolbarActions = this.toolbar.querySelector('.medium-editor-toolbar-actions');
             this.anchorPreview = this.createAnchorPreview();
 
+            if (!this.options.disableAnchorForm) {
+                this.anchorForm = this.toolbar.querySelector('.medium-editor-toolbar-form-anchor');
+                this.anchorInput = this.anchorForm.querySelector('input.medium-editor-toolbar-anchor-input');
+                this.anchorTarget = this.anchorForm.querySelector('input.medium-editor-toolbar-anchor-target');
+                this.anchorButton = this.anchorForm.querySelector('input.medium-editor-toolbar-anchor-button');   
+            }
             return this;
         },
 
@@ -652,7 +655,9 @@ else if (typeof define === 'function' && define.amd) {
             }
 
             toolbar.appendChild(this.toolbarButtons());
-            toolbar.appendChild(this.toolbarFormAnchor());
+            if (!this.options.disableAnchorForm) {
+                toolbar.appendChild(this.toolbarFormAnchor());
+            }
             this.options.elementsContainer.appendChild(toolbar);
             return toolbar;
         },
@@ -751,7 +756,7 @@ else if (typeof define === 'function' && define.amd) {
             this.checkSelectionWrapper = function (e) {
 
                 // Do not close the toolbar when bluring the editable area and clicking into the anchor form
-                if (e && self.clickingIntoArchorForm(e)) {
+                if (!self.options.disableAnchorForm && e && self.clickingIntoArchorForm(e)) {
                     return false;
                 }
 
@@ -784,7 +789,7 @@ else if (typeof define === 'function' && define.amd) {
 
                     if ( !this.options.staticToolbar ) {
                         this.hideToolbarActions();
-                    } else if (this.anchorForm.style.display === 'block') {
+                    } else if (this.anchorForm && this.anchorForm.style.display === 'block') {
                         this.setToolbarButtonStates();
                         this.showToolbarActions();
                     }
@@ -1023,7 +1028,9 @@ else if (typeof define === 'function' && define.amd) {
                 this.setToolbarPosition();
                 this.setToolbarButtonStates();
             } else if (action === 'anchor') {
-                this.triggerAnchorAction(e);
+                if (!this.options.disableAnchorForm) {
+                    this.triggerAnchorAction(e);
+                }
             } else if (action === 'image') {
                 this.options.ownerDocument.execCommand('insertImage', false, this.options.contentWindow.getSelection());
             } else {
@@ -1058,7 +1065,7 @@ else if (typeof define === 'function' && define.amd) {
             if (selectedParentElement.tagName &&
                     selectedParentElement.tagName.toLowerCase() === 'a') {
                 this.options.ownerDocument.execCommand('unlink', false, null);
-            } else {
+            } else if (this.anchorForm) {
                 if (this.anchorForm.style.display === 'block') {
                     this.showToolbarActions();
                 } else {
@@ -1134,7 +1141,9 @@ else if (typeof define === 'function' && define.amd) {
         showToolbarActions: function () {
             var self = this,
                 timer;
-            this.anchorForm.style.display = 'none';
+            if (this.anchorForm) {
+                this.anchorForm.style.display = 'none';
+            }
             this.toolbarActions.style.display = 'block';
             this.keepToolbarAlive = false;
             clearTimeout(timer);
@@ -1154,6 +1163,10 @@ else if (typeof define === 'function' && define.amd) {
         },
 
         showAnchorForm: function (link_value) {
+            if (!this.anchorForm) {
+                return;
+            }
+
             this.toolbarActions.style.display = 'none';
             this.saveSelection();
             this.anchorForm.style.display = 'block';
@@ -1164,6 +1177,10 @@ else if (typeof define === 'function' && define.amd) {
         },
 
         bindAnchorForm: function () {
+            if (!this.anchorForm) {
+                return this;
+            }
+
             var linkCancel = this.anchorForm.querySelector('a.medium-editor-toobar-anchor-close'),
                 linkSave = this.anchorForm.querySelector('a.medium-editor-toobar-anchor-save'),
                 self = this;
@@ -1349,7 +1366,7 @@ else if (typeof define === 'function' && define.amd) {
         },
 
         anchorPreviewClickHandler: function (e) {
-            if (this.activeAnchor) {
+            if (!this.options.disableAnchorForm && this.activeAnchor) {
 
                 var self = this,
                     range = this.options.ownerDocument.createRange(),
