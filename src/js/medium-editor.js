@@ -304,8 +304,8 @@ else if (typeof define === 'function' && define.amd) {
                 };
 
             // Hide the toolbar when focusing outside of the editor.
-            document.body.addEventListener('click', blurFunction, true);
-            document.body.addEventListener('focus', blurFunction, true);
+            this.on(document.body, 'click', blurFunction, true);
+            this.on(document.body, 'focus', blurFunction, true);
 
             return this;
         },
@@ -318,7 +318,7 @@ else if (typeof define === 'function' && define.amd) {
             var self = this;
 
             // Set up the keypress events
-            this.elements[i].addEventListener('keypress', function(event){
+            this.on(this.elements[i], 'keypress', function(event){
                 self.placeholderWrapper(this,event);
             });
 
@@ -328,7 +328,7 @@ else if (typeof define === 'function' && define.amd) {
         bindClick: function(i) {
             var self = this;
 
-            this.elements[i].addEventListener('click', function(){
+            this.on(this.elements[i], 'click', function(){
                 if (!self.options.disablePlaceholders) {
                     // Remove placeholder
                     this.classList.remove('medium-editor-placeholder');
@@ -782,7 +782,7 @@ else if (typeof define === 'function' && define.amd) {
             for (i = 0; i < this.elements.length; i += 1) {
                 this.on(this.elements[i], 'keyup', this.checkSelectionWrapper);
                 this.on(this.elements[i], 'blur', this.checkSelectionWrapper);
-                this.elements[i].addEventListener('click', this.checkSelectionWrapper);
+                this.on(this.elements[i], 'click', this.checkSelectionWrapper);
             }
             return this;
         },
@@ -1536,7 +1536,7 @@ else if (typeof define === 'function' && define.amd) {
             if ( this.options.staticToolbar && this.options.stickyToolbar ) {
 
                 // On scroll, re-position the toolbar
-                window.addEventListener('scroll', function() {
+                this.on(window, 'scroll', function() {
                     if (self.toolbar && self.toolbar.classList.contains('medium-editor-toolbar-active')) {
                         self.setToolbarPosition();
                     }
