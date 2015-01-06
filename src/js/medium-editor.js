@@ -269,6 +269,7 @@ else if (typeof define === 'function' && define.amd) {
 
         bindBlur: function(i) {
             var self = this,
+                timeout,
                 blurFunction = function(e){
                     // If it's not part of the editor, or the toolbar
                     if ( e.target !== self.toolbar
@@ -280,8 +281,9 @@ else if (typeof define === 'function' && define.amd) {
                         // Activate the placeholder
                         self.placeholderWrapper(self.elements[0], e);
 
+                        clearTimeout(timeout);
                         // Hide the toolbar after a small delay so we can prevent this on toolbar click
-                        setTimeout(function(){
+                        timeout = setTimeout(function(){
                             if ( !self.keepToolbarAlive ) {
                                 self.hideToolbarActions();
                             }
@@ -1112,8 +1114,11 @@ else if (typeof define === 'function' && define.amd) {
 
         hideToolbarActions: function () {
             this.keepToolbarAlive = false;
-            if (this.toolbar !== undefined) {
+            if (this.toolbar !== undefined && this.toolbar.classList.contains('medium-editor-toolbar-active')) {
                 this.toolbar.classList.remove('medium-editor-toolbar-active');
+                if (this.onHideToolbar) {
+                    this.onHideToolbar();
+                }
             }
         },
 
