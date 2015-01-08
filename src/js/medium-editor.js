@@ -1220,6 +1220,11 @@ else if (typeof define === 'function' && define.amd) {
 
                     self.createLink(this, target, button);
                 }
+                else if (e.keyCode === 27) {
+                    e.preventDefault();
+                    self.showToolbarActions();
+                    restoreSelection.call(self, self.savedSelection);
+                }
             });
 
             this.on(linkSave, 'click', function(e) {
