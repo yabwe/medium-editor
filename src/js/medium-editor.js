@@ -1,6 +1,4 @@
 /*global module, console, define*/
-var DEBOUNCE_INTERVAL = 50;
-
 function MediumEditor(elements, options) {
     'use strict';
     return this.init(elements, options);
@@ -40,7 +38,8 @@ else if (typeof define === 'function' && define.amd) {
 
     // https://github.com/jashkenas/underscore
     function debounce(func, wait) {
-        var timeout, 
+        var DEBOUNCE_INTERVAL = 50,
+            timeout, 
             args, 
             context, 
             timestamp, 
