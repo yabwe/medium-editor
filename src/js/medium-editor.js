@@ -320,6 +320,10 @@ else if (typeof define === 'function' && define.amd) {
             }
         },
 
+        // handleBlur is debounced because:
+        // - This method could be called many times due to the type of event handlers that are calling it
+        // - We want a slight delay so that other events in the stack can run, some of which may
+        //   prevent the toolbar from being hidden (via this.keepToolbarAlive).
         handleBlur: debounce(function() {
             if ( !this.keepToolbarAlive ) {
                 this.hideToolbarActions();
@@ -1208,6 +1212,8 @@ else if (typeof define === 'function' && define.amd) {
             }
             this.toolbarActions.style.display = 'block';
             this.keepToolbarAlive = false;
+            // Using setTimeout + options.delay because:
+            // We will actually be displaying the toolbar, which should be controlled by options.delay
             setTimeout(function () {
                 self.showToolbar();
             }, this.options.delay);
@@ -1430,6 +1436,8 @@ else if (typeof define === 'function' && define.amd) {
                 range.selectNodeContents(self.activeAnchor);
                 sel.removeAllRanges();
                 sel.addRange(range);
+                // Using setTimeout + options.delay because:
+                // We may actually be displaying the anchor preview, which should be controlled by options.delay
                 setTimeout(function () {
                     if (self.activeAnchor) {
                         self.showAnchorForm(self.activeAnchor.href);
@@ -1467,8 +1475,9 @@ else if (typeof define === 'function' && define.amd) {
                 }
                 this.activeAnchor = e.target;
                 this.on(this.activeAnchor, 'mouseout', leaveAnchor);
-                // show the anchor preview according to the configured delay
-                // if the mouse has not left the anchor tag in that time
+                // Using setTimeout + options.delay because:
+                // - We're going to show the anchor preview according to the configured delay
+                //   if the mouse has not left the anchor tag in that time
                 setTimeout(function () {
                     if (overAnchor) {
                         self.showAnchorPreview(e.target);
@@ -1568,6 +1577,9 @@ else if (typeof define === 'function' && define.amd) {
             }
         },
 
+        // handleResize is debounced because:
+        // - It will be called when the browser is resizing, which can fire many times very quickly
+        // - For some event (like resize) a slight lag in UI responsiveness is OK and provides performance benefits
         handleResize: debounce(function() {
             this.positionToolbarIfShown();
         }),
