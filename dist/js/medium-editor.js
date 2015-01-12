@@ -30,6 +30,49 @@ else if (typeof define === 'function' && define.amd) {
         return b;
     }
 
+    // https://github.com/jashkenas/underscore
+    var now = Date.now || function() {
+        return new Date().getTime();
+    };
+
+    // https://github.com/jashkenas/underscore
+    function debounce(func, wait) {
+        var DEBOUNCE_INTERVAL = 50,
+            timeout, 
+            args, 
+            context, 
+            timestamp, 
+            result,
+            later;
+
+        if (!wait && wait !== 0) {
+            wait = DEBOUNCE_INTERVAL;
+        }
+        later = function() {
+            var last = now() - timestamp;
+            if (last < wait && last > 0) {
+                timeout = setTimeout(later, wait - last);
+            } else {
+                timeout = null;
+                result = func.apply(context, args);
+                if (!timeout) {
+                    context = args = null;
+                }
+            }
+        };
+
+        return function() {
+            context = this;
+            args = arguments;
+            timestamp = now();
+            if (!timeout) {
+                timeout = setTimeout(later, wait);
+            }
+
+            return result;
+        };
+    }
+
     function isDescendant(parent, child) {
          var node = child.parentNode;
          while (node !== null) {
@@ -275,9 +318,18 @@ else if (typeof define === 'function' && define.amd) {
             }
         },
 
+        // handleBlur is debounced because:
+        // - This method could be called many times due to the type of event handlers that are calling it
+        // - We want a slight delay so that other events in the stack can run, some of which may
+        //   prevent the toolbar from being hidden (via this.keepToolbarAlive).
+        handleBlur: debounce(function() {
+            if ( !this.keepToolbarAlive ) {
+                this.hideToolbarActions();
+            }
+        }),
+
         bindBlur: function(i) {
             var self = this,
-                timeout,
                 blurFunction = function(e){
                     // If it's not part of the editor, or the toolbar
                     if ( e.target !== self.toolbar
@@ -291,13 +343,8 @@ else if (typeof define === 'function' && define.amd) {
                             self.placeholderWrapper(self.elements[0], e);
                         }
 
-                        clearTimeout(timeout);
                         // Hide the toolbar after a small delay so we can prevent this on toolbar click
-                        timeout = setTimeout(function(){
-                            if ( !self.keepToolbarAlive ) {
-                                self.hideToolbarActions();
-                            }
-                        }, 200);
+                        self.handleBlur();
                     }
                 };
 
@@ -759,20 +806,15 @@ else if (typeof define === 'function' && define.amd) {
 
         bindSelect: function () {
             var self = this,
-                timer = '',
                 i;
 
             this.checkSelectionWrapper = function (e) {
-
                 // Do not close the toolbar when bluring the editable area and clicking into the anchor form
                 if (!self.options.disableAnchorForm && e && self.clickingIntoArchorForm(e)) {
                     return false;
                 }
 
-                clearTimeout(timer);
-                timer = setTimeout(function () {
-                    self.checkSelection();
-                }, self.options.delay);
+                self.checkSelection();
             };
 
             this.on(document.documentElement, 'mouseup', this.checkSelectionWrapper);
@@ -910,7 +952,7 @@ else if (typeof define === 'function' && define.amd) {
                 return this;
             }
 
-            this.toolbar.classList.add('medium-editor-toolbar-active');
+            this.showToolbar();
 
             if ( this.options.staticToolbar ) {
 
@@ -1137,9 +1179,18 @@ else if (typeof define === 'function' && define.amd) {
             return firstChild;
         },
 
-        hideToolbarActions: function () {
-            this.keepToolbarAlive = false;
-            if (this.toolbar !== undefined && this.toolbar.classList.contains('medium-editor-toolbar-active')) {
+        isToolbarShown: function() {
+            return this.toolbar && this.toolbar.classList.contains('medium-editor-toolbar-active');
+        },
+
+        showToolbar: function() {
+            if (this.toolbar && !this.isToolbarShown()) {
+                this.toolbar.classList.add('medium-editor-toolbar-active');
+            }
+        },
+
+        hideToolbar: function() {
+            if (this.isToolbarShown()) {
                 this.toolbar.classList.remove('medium-editor-toolbar-active');
                 if (this.onHideToolbar) {
                     this.onHideToolbar();
@@ -1147,20 +1198,23 @@ else if (typeof define === 'function' && define.amd) {
             }
         },
 
+        hideToolbarActions: function () {
+            this.keepToolbarAlive = false;
+            this.hideToolbar();
+        },
+
         showToolbarActions: function () {
-            var self = this,
-                timer;
+            var self = this;
             if (this.anchorForm) {
                 this.anchorForm.style.display = 'none';
             }
             this.toolbarActions.style.display = 'block';
             this.keepToolbarAlive = false;
-            clearTimeout(timer);
-            timer = setTimeout(function () {
-                if (self.toolbar && !self.toolbar.classList.contains('medium-editor-toolbar-active')) {
-                    self.toolbar.classList.add('medium-editor-toolbar-active');
-                }
-            }, 100);
+            // Using setTimeout + options.delay because:
+            // We will actually be displaying the toolbar, which should be controlled by options.delay
+            setTimeout(function () {
+                self.showToolbar();
+            }, this.options.delay);
         },
 
         saveSelection: function() {
@@ -1217,6 +1271,11 @@ else if (typeof define === 'function' && define.amd) {
                     }
 
                     self.createLink(this, target, button);
+                }
+                else if (e.keyCode === 27) {
+                    e.preventDefault();
+                    self.showToolbarActions();
+                    restoreSelection.call(self, self.savedSelection);
                 }
             });
 
@@ -1283,19 +1342,11 @@ else if (typeof define === 'function' && define.amd) {
                 boundary = anchorEl.getBoundingClientRect(),
                 middleBoundary = (boundary.left + boundary.right) / 2,
                 halfOffsetWidth,
-                defaultLeft,
-                timer;
+                defaultLeft;
 
             self.anchorPreview.querySelector('i').textContent = anchorEl.href;
             halfOffsetWidth = self.anchorPreview.offsetWidth / 2;
             defaultLeft = self.options.diffLeft - halfOffsetWidth;
-
-            clearTimeout(timer);
-            timer = setTimeout(function () {
-                if (self.anchorPreview && !self.anchorPreview.classList.contains('medium-editor-anchor-preview-active')) {
-                    self.anchorPreview.classList.add('medium-editor-anchor-preview-active');
-                }
-            }, 100);
 
             self.observeAnchorPreview(anchorEl);
 
@@ -1308,6 +1359,10 @@ else if (typeof define === 'function' && define.amd) {
                 self.anchorPreview.style.left = this.options.contentWindow.innerWidth + defaultLeft - halfOffsetWidth + 'px';
             } else {
                 self.anchorPreview.style.left = defaultLeft + middleBoundary + 'px';
+            }
+
+            if (this.anchorPreview && !this.anchorPreview.classList.contains('medium-editor-anchor-preview-active')) {
+                this.anchorPreview.classList.add('medium-editor-anchor-preview-active');
             }
 
             return this;
@@ -1384,12 +1439,14 @@ else if (typeof define === 'function' && define.amd) {
                 range.selectNodeContents(self.activeAnchor);
                 sel.removeAllRanges();
                 sel.addRange(range);
+                // Using setTimeout + options.delay because:
+                // We may actually be displaying the anchor preview, which should be controlled by options.delay
                 setTimeout(function () {
                     if (self.activeAnchor) {
                         self.showAnchorForm(self.activeAnchor.href);
                     }
                     self.keepToolbarAlive = false;
-                }, 100 + self.options.delay);
+                }, this.options.delay);
 
             }
 
@@ -1415,21 +1472,20 @@ else if (typeof define === 'function' && define.amd) {
                 }
 
                 // only show when hovering on anchors
-                if (this.toolbar.classList.contains('medium-editor-toolbar-active')) {
+                if (this.isToolbarShown()) {
                     // only show when toolbar is not present
                     return true;
                 }
                 this.activeAnchor = e.target;
                 this.on(this.activeAnchor, 'mouseout', leaveAnchor);
-                // show the anchor preview according to the configured delay
-                // if the mouse has not left the anchor tag in that time
+                // Using setTimeout + options.delay because:
+                // - We're going to show the anchor preview according to the configured delay
+                //   if the mouse has not left the anchor tag in that time
                 setTimeout(function () {
                     if (overAnchor) {
                         self.showAnchorPreview(e.target);
                     }
-                }, self.options.delay);
-
-
+                }, this.options.delay);
             }
         },
 
@@ -1518,30 +1574,33 @@ else if (typeof define === 'function' && define.amd) {
             input.value = '';
         },
 
+        positionToolbarIfShown: function() {
+            if (this.isToolbarShown()) {
+                this.setToolbarPosition();
+            }
+        },
+
+        // handleResize is debounced because:
+        // - It will be called when the browser is resizing, which can fire many times very quickly
+        // - For some event (like resize) a slight lag in UI responsiveness is OK and provides performance benefits
+        handleResize: debounce(function() {
+            this.positionToolbarIfShown();
+        }),
+
         bindWindowActions: function () {
-            var timerResize,
-                self = this;
-            this.windowResizeHandler = function () {
-                clearTimeout(timerResize);
-                timerResize = setTimeout(function () {
-                    if (self.toolbar && self.toolbar.classList.contains('medium-editor-toolbar-active')) {
-                        self.setToolbarPosition();
-                    }
-                }, 100);
-            };
+            var self = this;
 
             // Add a scroll event for sticky toolbar
             if ( this.options.staticToolbar && this.options.stickyToolbar ) {
-
                 // On scroll, re-position the toolbar
                 this.on(window, 'scroll', function() {
-                    if (self.toolbar && self.toolbar.classList.contains('medium-editor-toolbar-active')) {
-                        self.setToolbarPosition();
-                    }
+                    self.positionToolbarIfShown();
                 }, true);
             }
 
-            this.on(this.options.contentWindow, 'resize', this.windowResizeHandler);
+            this.on(this.options.contentWindow, 'resize', function() {
+                self.handleResize();
+            });
             return this;
         },
 
