@@ -1,6 +1,6 @@
 /*global MediumEditor, describe, it, expect, spyOn,
          afterEach, beforeEach, selectElementContents, runs,
-         fireEvent, waitsFor, tearDown, xit */
+         jasmine, fireEvent, waitsFor, tearDown, xit */
 
 describe('Toolbar TestCase', function () {
     'use strict';
@@ -32,6 +32,23 @@ describe('Toolbar TestCase', function () {
             var editor = new MediumEditor('.editor');
             expect(editor.toolbar.className).toMatch(/medium-editor-toolbar/);
             expect(document.querySelectorAll('.medium-editor-toolbar').length).toBe(1);
+        });
+
+        it('should call the onShowToolbar callback if set', function () {
+            this.el.innerHTML = 'specOnShowToolbarTest';
+            var editor = new MediumEditor('.editor');
+            editor.onShowToolbar = function() {};
+            spyOn(editor, 'onShowToolbar').and.callThrough();
+            jasmine.clock().install();
+            try {
+                selectElementContents(this.el);
+                editor.checkSelection();
+                jasmine.clock().tick(501);
+                expect(editor.toolbar.classList.contains('medium-editor-toolbar-active')).toBe(true);
+                expect(editor.onShowToolbar).toHaveBeenCalled();
+            } finally {
+                jasmine.clock().uninstall();
+            }
         });
 
         it('should not create an anchor form element if disableAnchorForm is set to true', function() {
