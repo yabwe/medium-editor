@@ -254,7 +254,9 @@ else if (typeof define === 'function' && define.amd) {
                 .setPlaceholders()
                 .bindElementActions()
                 .bindWindowActions()
-                .passInstance();
+                .passInstance()
+                // Calls an init() function on all registered extensions.
+                .initializeExtensions();
         },
 
         on: function(target, event, listener, useCapture) {
@@ -492,6 +494,28 @@ else if (typeof define === 'function' && define.amd) {
             return self;
         },
 
+        /**
+         * Calls an init() function on all registered extensions
+         * Checks whether init() exists before calling
+         *
+         */
+        initializeExtensions: function () {
+            var self = this,
+                ext,
+                name;
+
+            for (name in self.options.extensions) {
+                if (self.options.extensions.hasOwnProperty(name)) {
+                    ext = self.options.extensions[name];
+                    if (ext.init !== undefined) { 
+                        ext.init();
+                    }
+                }
+            }
+
+            return self;
+        },
+
         bindParagraphCreation: function (index) {
             var self = this;
             this.on(this.elements[index], 'keypress', function (e) {
@@ -691,8 +715,8 @@ else if (typeof define === 'function' && define.amd) {
             this.anchorPreview = this.createAnchorPreview();
 
             if (!this.options.disableAnchorForm) {
-                this.anchorForm = this.toolbar.querySelector('.medium-editor-toolbar-form-anchor');
-                this.anchorInput = this.anchorForm.querySelector('input.medium-editor-toolbar-anchor-input');
+                this.anchorForm = this.toolbar.querySelector('.medium-editor-toolbar-form');
+                this.anchorInput = this.anchorForm.querySelector('input.medium-editor-toolbar-input');
                 this.anchorTarget = this.anchorForm.querySelector('input.medium-editor-toolbar-anchor-target');
                 this.anchorButton = this.anchorForm.querySelector('input.medium-editor-toolbar-anchor-button');   
             }
@@ -706,6 +730,10 @@ else if (typeof define === 'function' && define.amd) {
 
             if ( this.options.staticToolbar ) {
                 toolbar.className += " static-toolbar";
+                if ( this.options.fixToolbar) {
+                    // fixed-toolbar used instead of sticky-toolbar to keep the toolbar fixed to the top of the page.
+                    toolbar.className += " fixed-toolbar";
+                }
             } else {
                 toolbar.className += " stalker-toolbar";
             }
@@ -763,15 +791,15 @@ else if (typeof define === 'function' && define.amd) {
                 save = document.createElement('a');
 
             close.setAttribute('href', '#');
-            close.className = 'medium-editor-toobar-anchor-close';
+            close.className = 'medium-editor-toobar-close';
             close.innerHTML = '&times;';
 
             save.setAttribute('href', '#');
-            save.className = 'medium-editor-toobar-anchor-save';
+            save.className = 'medium-editor-toobar-save';
             save.innerHTML = '&#10003;';
 
             input.setAttribute('type', 'text');
-            input.className = 'medium-editor-toolbar-anchor-input';
+            input.className = 'medium-editor-toolbar-input';
             input.setAttribute('placeholder', this.options.anchorInputPlaceholder);
 
 
@@ -786,7 +814,7 @@ else if (typeof define === 'function' && define.amd) {
             button_label.insertBefore(button, button_label.firstChild);
 
 
-            anchor.className = 'medium-editor-toolbar-form-anchor';
+            anchor.className = 'medium-editor-toolbar-form';
             anchor.id = 'medium-editor-toolbar-form-anchor-' + this.id;
             anchor.appendChild(input);
 
@@ -954,7 +982,7 @@ else if (typeof define === 'function' && define.amd) {
 
             this.showToolbar();
 
-            if ( this.options.staticToolbar ) {
+            if ( this.options.staticToolbar) {
 
                 if ( this.options.stickyToolbar ) {
 
@@ -974,11 +1002,20 @@ else if (typeof define === 'function' && define.amd) {
                     }
 
                 } else {
-                    this.toolbar.style.top = containerTop - this.toolbar.offsetHeight + "px";
+                    if( this.options.fixToolbar ){
+                        this.toolbar.style.top = "0px";
+                    } else {
+                        this.toolbar.style.top = containerTop - this.toolbar.offsetHeight + "px";
+                    }
                 }
 
-                this.toolbar.style.left = containerRect.left + "px";
-
+                if( this.options.fixToolbar ){
+                    var center = (containerRect.left + (containerRect.width / 2));
+                    this.toolbar.style.left = (center - halfOffsetWidth) + "px";
+                } else {
+                    this.toolbar.style.left = containerRect.left + "px";
+                }
+                
             } else if (!selection.isCollapsed) {
                 range = selection.getRangeAt(0);
                 boundary = range.getBoundingClientRect();
@@ -1057,6 +1094,11 @@ else if (typeof define === 'function' && define.amd) {
                     if (this.hasAttribute('data-action')) {
                         self.execAction(this.getAttribute('data-action'), e);
                     }
+                    // Allows extension buttons to show a form
+                    // TO DO: Improve this
+                    if (this.hasAttribute('data-show-form')) {
+                        self.showForm(this.getAttribute('data-form-id'), e);
+                    }
                 };
             for (i = 0; i < buttons.length; i += 1) {
                 this.on(buttons[i], 'click', triggerAction);
@@ -1088,6 +1130,17 @@ else if (typeof define === 'function' && define.amd) {
                 this.options.ownerDocument.execCommand(action, false, null);
                 this.setToolbarPosition();
             }
+        },
+
+        // Method to show an extension's form
+        // TO DO: Improve this
+        showForm: function (formId, e) {
+            this.toolbarActions.style.display = 'none';
+            this.saveSelection();
+            var form = document.getElementById(formId);
+            form.style.display = 'block';
+            this.setToolbarPosition();
+            this.keepToolbarAlive = true;
         },
 
         // http://stackoverflow.com/questions/15867542/range-object-get-selection-parent-node-chrome-vs-firefox
@@ -1244,8 +1297,8 @@ else if (typeof define === 'function' && define.amd) {
                 return this;
             }
 
-            var linkCancel = this.anchorForm.querySelector('a.medium-editor-toobar-anchor-close'),
-                linkSave = this.anchorForm.querySelector('a.medium-editor-toobar-anchor-save'),
+            var linkCancel = this.anchorForm.querySelector('a.medium-editor-toobar-close'),
+                linkSave = this.anchorForm.querySelector('a.medium-editor-toobar-save'),
                 self = this;
 
             this.on(this.anchorForm, 'click', function (e) {
@@ -1572,6 +1625,16 @@ else if (typeof define === 'function' && define.amd) {
             this.checkSelection();
             this.showToolbarActions();
             input.value = '';
+        },
+
+        // Helper method to insert HTML.
+        // Simply calls insertHTMLCommand() while setting doc argument.
+        insertHTML: function (html) {
+            restoreSelection.call(this, this.savedSelection);
+
+            insertHTMLCommand(this.options.ownerDocument, html);
+
+            this.checkSelection();
         },
 
         positionToolbarIfShown: function() {
