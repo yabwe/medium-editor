@@ -80,7 +80,7 @@ If you want to support IE9, you will need to use a classList pollyfill, like Eli
 * __onHideToolbar__: optional callback that will be called each time the toolbar is actually hidden for this instance of medium-editor.
 * __staticToolbar__: enable/disable the toolbar always displaying in the same location relative to the medium-editor element. Default: false
 * __stickyToolbar__: enable/disable the toolbar "sticking" to the medium-editor element when the page is being scrolled. Default: false
-* __fixToolbar__: enable/disable the toolbar being fixed to the top of the page. Use this instead of __stickyToolbar__. Default: false
+* __fixToolbar__: enable/disable the toolbar being "fixed" to the top of the page. Use this instead of _stickyToolbar_. Default: false
 * __updateOnEmptySelection__: update the state of the toolbar buttons even when the selection is collapse (there is no selection, just a cursor). Default: false
 
 ### Anchor form options
@@ -173,7 +173,7 @@ An extension is an object that has essentially two functions `getButton` and `ch
   determine the state is entirely up to you. `checkState` will be called multiple times and will receive a [DOM `Element`](https://developer.mozilla.org/en-US/docs/Web/API/element)
   as parameter.
 
-* `init` is called after the editor instance is passed to the extension. You would do extra initialization for your extension. This method is primarily created for you to do some initialization with access to the editor instance, such as adding a form to the toolbar. See __Adding a Form__.
+* `init` is called after the editor instance is passed to the extension. You would use this method to do extra initialization for your extension, such as adding a form to the toolbar. This method is primarily created for you to do some initialization after the editor instance is passed to the extension. See __Simple table example__.
 
 Properties
 
@@ -252,6 +252,7 @@ var two = new MediumEditor('.two', {
 ```
 
 A simple table button example that uses a form:
+_Creating a form is entirely up to you, but it must follow a certain structure and contain certain classes._
 
 ```js
 function Table(options) {
