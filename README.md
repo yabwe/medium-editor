@@ -327,11 +327,7 @@ Table.prototype.onClick = function() {
 // Handle the closing of the form
 Table.prototype.onClose = function(e) {
     e.preventDefault();
-    this.base.showToolbarActions();
-    this.form.style.display = 'none';
-    this.base.setToolbarPosition();
-    this.base.keepToolbarAlive = true;
-    this.base.restoreSelection.call(this.base, this.base.savedSelection);
+    this.hideForm();
 };
 
 // Handle the adding of the table.
