@@ -281,25 +281,25 @@ Table.prototype.init = function() {
     
     // This button closes the form
     this.close.setAttribute('href', '#');
-    this.close.className = 'medium-editor-toobar-anchor-close';
+    this.close.className = 'medium-editor-toobar-close';
     this.close.innerHTML = '&times;';
     // Handle the closing of the form
     this.close.onclick = this.onClose.bind(this);
     
     // This button performs some action
     this.save.setAttribute('href', '#');
-    this.save.className = 'medium-editor-toobar-anchor-save';
+    this.save.className = 'medium-editor-toobar-save';
     this.save.innerHTML = '&#10003;';
     // Handle the saving
     this.save.onclick = this.onSave.bind(this);
     
     // Setup the column count input
     this.columnInput.setAttribute('type', 'text');
-    this.columnInput.className = 'medium-editor-toolbar-anchor-input';
+    this.columnInput.className = 'medium-editor-toolbar-input';
     this.columnInput.setAttribute('placeholder', 'Column Count');
     // Setup the row count input
     this.rowInput.setAttribute('type', 'text');
-    this.rowInput.className = 'medium-editor-toolbar-anchor-input';
+    this.rowInput.className = 'medium-editor-toolbar-input';
     this.rowInput.setAttribute('placeholder', 'Row Count');
 
     // Make sure you add the medium editor form class for styling
