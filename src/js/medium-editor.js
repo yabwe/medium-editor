@@ -734,7 +734,7 @@ else if (typeof define === 'function' && define.amd) {
             for (i = 0; i < btns.length; i += 1) {
                 if (this.options.extensions.hasOwnProperty(btns[i])) {
                     ext = this.options.extensions[btns[i]];
-                    btn = ext.getButton !== undefined ? ext.getButton() : null;
+                    btn = ext.getButton !== undefined ? ext.getButton(this) : null;
                 } else {
                     btn = this.buttonTemplate(btns[i]);
                 }
