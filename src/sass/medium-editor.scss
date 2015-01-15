@@ -86,6 +86,11 @@
     top: 1px;
 }
 
+.fixed-toolbar {
+    position: fixed;
+    top: 0;
+}
+
 .stalker-toolbar {
     -webkit-animation: pop-upwards 160ms forwards linear;
        -moz-animation: pop-upwards 160ms forwards linear;
@@ -103,7 +108,7 @@
     font-style: italic;
 }
 
-.medium-editor-toolbar-form-anchor {
+.medium-editor-toolbar-form {
     display: none;
 
     input,

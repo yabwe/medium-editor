@@ -80,6 +80,7 @@ If you want to support IE9, you will need to use a classList pollyfill, like Eli
 * __onHideToolbar__: optional callback that will be called each time the toolbar is actually hidden for this instance of medium-editor.
 * __staticToolbar__: enable/disable the toolbar always displaying in the same location relative to the medium-editor element. Default: false
 * __stickyToolbar__: enable/disable the toolbar "sticking" to the medium-editor element when the page is being scrolled. Default: false
+* __fixToolbar__: enable/disable the toolbar being fixed to the top of the page. Use this instead of __stickyToolbar__. Default: false
 * __updateOnEmptySelection__: update the state of the toolbar buttons even when the selection is collapse (there is no selection, just a cursor). Default: false
 
 ### Anchor form options
@@ -160,10 +161,10 @@ Patrick Stillhar developed a new and improved way to add buttons to our toolbar.
 To add additional functions that are not supported by the native [browser API](https://developer.mozilla.org/en/docs/Rich-Text_Editing_in_Mozilla) you can
 write extensions that are then integrated into the toolbar. The Extension API is currently unstable and very minimal.
 
-An extension is an object that has essentially two functions `getButton` and `checkState`.
+An extension is an object that has essentially two functions `getButton` and `checkState` as well as an optional function `init`.
 
 * `getButton` is called when the editor is initialized and should return an element that is integrated into the toolbar.
-  Usually this will be a `<button>` element like the onces Medium Editor uses. All event handling on this button is
+  Usually this will be a `<button>` element like the ones Medium Editor uses. All event handling on this button is
   _entirely up to you_ so you should either keep a reference or bind your eventhandlers before returning it. You can
   also return a HTML-String that is then integrated into the toolbar also this is not really useful.
 
@@ -171,6 +172,8 @@ An extension is an object that has essentially two functions `getButton` and `ch
   responsability is to toggle the current _state_ of the button. I.e. marking is a _on_ or _off_. Again the method on how
   determine the state is entirely up to you. `checkState` will be called multiple times and will receive a [DOM `Element`](https://developer.mozilla.org/en-US/docs/Web/API/element)
   as parameter.
+
+* `init` is called after the editor instance is passed to the extension. You would do extra initialization for your extension. This method is primarily created for you to do some initialization with access to the editor instance, such as adding a form to the toolbar. See __Adding a Form__.
 
 Properties
 
@@ -246,6 +249,151 @@ var two = new MediumEditor('.two', {
       extension: new Extension()
     }
 });
+```
+
+A simple table button example that uses a form:
+
+```js
+function Table(options) {
+    this.parent = true;
+    this.options = options;
+    this.button = document.createElement('button');
+    this.button.className = 'medium-editor-action';
+    this.button.textContent = 'T';
+    this.button.onclick = this.onClick.bind(this);
+}
+
+Table.prototype.init = function() {
+    // Create an ID for your form
+    var formId = 'medium-editor-toolbar-form-table-' + this.base.id;
+    // This tells medium editor to show the extension's form
+    this.button.setAttribute('data-show-form', 'true');
+    // This tells medium editor which form to show
+    this.button.setAttribute('data-form-id', formId);
+    
+    // Start creating your form
+    this.form = document.createElement('div'),
+    this.close = document.createElement('a'),
+    this.save = document.createElement('a'),
+    this.columnInput = document.createElement('input'),
+    this.rowInput = document.createElement('input');
+    
+    // This button closes the form
+    this.close.setAttribute('href', '#');
+    this.close.className = 'medium-editor-toobar-anchor-close';
+    this.close.innerHTML = '&times;';
+    // Handle the closing of the form
+    this.close.onclick = this.onClose.bind(this);
+    
+    // This button performs some action
+    this.save.setAttribute('href', '#');
+    this.save.className = 'medium-editor-toobar-anchor-save';
+    this.save.innerHTML = '&#10003;';
+    // Handle the saving
+    this.save.onclick = this.onSave.bind(this);
+    
+    // Setup the column count input
+    this.columnInput.setAttribute('type', 'text');
+    this.columnInput.className = 'medium-editor-toolbar-anchor-input';
+    this.columnInput.setAttribute('placeholder', 'Column Count');
+    // Setup the row count input
+    this.rowInput.setAttribute('type', 'text');
+    this.rowInput.className = 'medium-editor-toolbar-anchor-input';
+    this.rowInput.setAttribute('placeholder', 'Row Count');
+
+    // Make sure you add the medium editor form class for styling
+    this.form.className = 'medium-editor-toolbar-form';
+    this.form.id = formId;
+
+    // Add the inputs to the form
+    this.form.appendChild(this.columnInput);
+    this.form.appendChild(this.rowInput);
+    // Add the buttons to the form
+    this.form.appendChild(this.save);
+    this.form.appendChild(this.close);
+    // Add the form to the toolbar
+    toolbar.appendChild(this.form);
+};
+
+// Medium editor will show the form.
+// You can do some work here like setting default values on the inputs.
+Table.prototype.onClick = function() {
+    this.columnInput.focus();
+    this.columnInput.value = this.options.defaultColumns || '3';
+    this.rowInput.value = this.options.defaultRows || '2';
+};
+
+// Handle the closing of the form
+Table.prototype.onClose = function(e) {
+    e.preventDefault();
+    this.base.showToolbarActions();
+    this.form.style.display = 'none';
+    this.base.setToolbarPosition();
+    this.base.keepToolbarAlive = true;
+    this.base.restoreSelection.call(this.base, this.base.savedSelection);
+};
+
+// Handle the adding of the table.
+Table.prototype.onSave = function(e) {
+    e.preventDefault();
+    var columnCount = this.columnInput.value;
+    var rowCount = this.rowInput.value;
+    var table = this.createTable(columnCount, rowCount);
+
+    this.base.insertHTML(wrap.innerHTML);
+    this.hideForm();
+};
+
+Table.prototype.hideForm = function(e) {
+    this.base.showToolbarActions();
+    this.form.style.display = 'none';
+    this.base.setToolbarPosition();
+};
+
+// Create the table element.
+Table.prototype.createTable = function(cols, rows) {
+    var table = document.createElement('table'),
+        header = document.createElement('thead'),
+        headerRow = document.createElement('tr'),
+        body = document.createElement('tbody'),
+        wrap = document.createElement('div');
+
+    for (var c = 1; c <= cols; c++) {
+        var headerCol = document.createElement('th');
+        headerCol.innerHTML = '...';
+        headerRow.appendChild(headerCol);   
+    }
+
+    header.appendChild(headerRow);
+
+    for (var r = 1; r <= rows; r++) {
+        var bodyRow = document.createElement('tr');
+        for (var c = 1; c <= this.options.defaultColumns; c++) {
+            var bodyCol = document.createElement('td');
+            bodyCol.innerHTML = '...';
+            bodyRow.appendChild(bodyCol);       
+        }
+        body.appendChild(bodyRow);
+    }
+
+    table.appendChild(header);
+    table.appendChild(body);
+
+    wrap.appendChild(table);
+
+    return wrap;
+};
+
+var one = new MediumEditor('.one', {
+    buttons: ['table'],
+    extensions: {
+        'table': new Table({
+            defaultColumns: 3,
+            defaultRows: 2
+        })
+    }
+});
+
 ```
 
 ## Image Upload & embeds
