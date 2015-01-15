@@ -142,14 +142,14 @@
   display: none; }
   .medium-editor-toolbar-form input, .medium-editor-toolbar-form a {
     font-family: HelveticaNeue, Helvetica, Arial, sans-serif; }
-  .medium-editor-toolbar-form .medium-editor-toolbar-anchor-input, .medium-editor-toolbar-form label {
+  .medium-editor-toolbar-form .medium-editor-toolbar-input, .medium-editor-toolbar-form label {
     margin: 0;
     padding: 6px;
     width: 316px;
     border: none;
     font-size: 14px;
     box-sizing: border-box; }
-    .medium-editor-toolbar-form .medium-editor-toolbar-anchor-input:focus, .medium-editor-toolbar-form label:focus {
+    .medium-editor-toolbar-form .medium-editor-toolbar-input:focus, .medium-editor-toolbar-form label:focus {
       outline: 0;
       border: none;
       box-shadow: none;
