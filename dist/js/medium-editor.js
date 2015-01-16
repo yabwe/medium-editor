@@ -1030,9 +1030,18 @@ else if (typeof define === 'function' && define.amd) {
                     this.toolbar.style.top = containerTop - this.toolbar.offsetHeight + "px";
                 }
 
-                //this.toolbar.style.left = containerRect.left + "px";
-                this.toolbar.style.left = (containerCenter - halfOffsetWidth) + "px";
-
+                if (this.options.toolbarAlign) {
+                    if (this.options.toolbarAlign === 'left') {
+                        this.toolbar.style.left = containerRect.left + "px";
+                    } else if (this.options.toolbarAlign === 'center') {
+                        this.toolbar.style.left = (containerCenter - halfOffsetWidth) + "px";
+                    } else {
+                        this.toolbar.style.left = (containerRect.right - this.toolbar.offsetWidth) + "px";
+                    }
+                } else {
+                    this.toolbar.style.left = (containerCenter - halfOffsetWidth) + "px";
+                }
+                
             } else if (!selection.isCollapsed) {
                 range = selection.getRangeAt(0);
                 boundary = range.getBoundingClientRect();
