@@ -80,6 +80,7 @@ If you want to support IE9, you will need to use a classList pollyfill, like Eli
 * __onHideToolbar__: optional callback that will be called each time the toolbar is actually hidden for this instance of medium-editor.
 * __staticToolbar__: enable/disable the toolbar always displaying in the same location relative to the medium-editor element. Default: false
 * __stickyToolbar__: enable/disable the toolbar "sticking" to the medium-editor element when the page is being scrolled. Default: false
+* __toolbarAlign__: `left`|`center`|`right` - Aligns the toolbar relative to the medium-editor element.
 * __updateOnEmptySelection__: update the state of the toolbar buttons even when the selection is collapse (there is no selection, just a cursor). Default: false
 
 ### Anchor form options
