@@ -36,39 +36,44 @@ else if (typeof define === 'function' && define.amd) {
     };
 
     // https://github.com/jashkenas/underscore
-    function debounce(func, wait) {
-        var DEBOUNCE_INTERVAL = 50,
-            timeout, 
-            args, 
+    function throttle(func, wait) {
+        var THROTTLE_INTERVAL = 50,
             context, 
-            timestamp, 
+            args, 
             result,
+            timeout = null,
+            previous = 0,
             later;
 
         if (!wait && wait !== 0) {
-            wait = DEBOUNCE_INTERVAL;
+            wait = THROTTLE_INTERVAL;
         }
+
         later = function() {
-            var last = now() - timestamp;
-            if (last < wait && last > 0) {
-                timeout = setTimeout(later, wait - last);
-            } else {
-                timeout = null;
-                result = func.apply(context, args);
-                if (!timeout) {
-                    context = args = null;
-                }
+            previous = now();
+            timeout = null;
+            result = func.apply(context, args);
+            if (!timeout) {
+                context = args = null;
             }
         };
 
         return function() {
+            var currNow = now(),
+                remaining = wait - (currNow - previous);
             context = this;
             args = arguments;
-            timestamp = now();
-            if (!timeout) {
-                timeout = setTimeout(later, wait);
+            if (remaining <= 0 || remaining > wait) {
+                clearTimeout(timeout);
+                timeout = null;
+                previous = currNow;
+                result = func.apply(context, args);
+                if (!timeout) {
+                    context = args = null;
+                }
+            } else if (!timeout) {
+                timeout = setTimeout(later, remaining);
             }
-
             return result;
         };
     }
@@ -248,7 +253,8 @@ else if (typeof define === 'function' && define.amd) {
         setup: function () {
             this.events = [];
             this.isActive = true;
-            this.initElements()
+            this.initThrottledMethods()
+                .initElements()
                 .bindSelect()
                 .bindPaste()
                 .setPlaceholders()
@@ -277,6 +283,29 @@ else if (typeof define === 'function' && define.amd) {
                 e[0].removeEventListener(e[1], e[2], e[3]);
                 e = this.events.pop();
             }
+        },
+
+        initThrottledMethods: function() {
+            var self = this;
+
+            // handleResize is throttled because:
+            // - It will be called when the browser is resizing, which can fire many times very quickly
+            // - For some event (like resize) a slight lag in UI responsiveness is OK and provides performance benefits
+            this.handleResize = throttle(function() {
+                self.positionToolbarIfShown();
+            });
+
+            // handleBlur is throttled because:
+            // - This method could be called many times due to the type of event handlers that are calling it
+            // - We want a slight delay so that other events in the stack can run, some of which may
+            //   prevent the toolbar from being hidden (via this.keepToolbarAlive).
+            this.handleBlur = throttle(function() {
+                if ( !self.keepToolbarAlive ) {
+                    self.hideToolbarActions();
+                }
+            });
+
+            return this;
         },
 
         initElements: function () {
@@ -317,16 +346,6 @@ else if (typeof define === 'function' && define.amd) {
                 this.elements = [this.elements];
             }
         },
-
-        // handleBlur is debounced because:
-        // - This method could be called many times due to the type of event handlers that are calling it
-        // - We want a slight delay so that other events in the stack can run, some of which may
-        //   prevent the toolbar from being hidden (via this.keepToolbarAlive).
-        handleBlur: debounce(function() {
-            if ( !this.keepToolbarAlive ) {
-                this.hideToolbarActions();
-            }
-        }),
 
         bindBlur: function(i) {
             var self = this,
@@ -733,7 +752,7 @@ else if (typeof define === 'function' && define.amd) {
             for (i = 0; i < btns.length; i += 1) {
                 if (this.options.extensions.hasOwnProperty(btns[i])) {
                     ext = this.options.extensions[btns[i]];
-                    btn = ext.getButton !== undefined ? ext.getButton() : null;
+                    btn = ext.getButton !== undefined ? ext.getButton(this) : null;
                 } else {
                     btn = this.buttonTemplate(btns[i]);
                 }
@@ -1579,13 +1598,6 @@ else if (typeof define === 'function' && define.amd) {
                 this.setToolbarPosition();
             }
         },
-
-        // handleResize is debounced because:
-        // - It will be called when the browser is resizing, which can fire many times very quickly
-        // - For some event (like resize) a slight lag in UI responsiveness is OK and provides performance benefits
-        handleResize: debounce(function() {
-            this.positionToolbarIfShown();
-        }),
 
         bindWindowActions: function () {
             var self = this;
