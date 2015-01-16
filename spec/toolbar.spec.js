@@ -1,6 +1,6 @@
 /*global MediumEditor, describe, it, expect, spyOn,
          afterEach, beforeEach, selectElementContents, runs,
-         fireEvent, waitsFor, tearDown, xit */
+         fireEvent, waitsFor, tearDown, xit, jasmine */
 
 describe('Toolbar TestCase', function () {
     'use strict';
@@ -9,6 +9,9 @@ describe('Toolbar TestCase', function () {
         this.el = document.createElement('div');
         this.el.className = 'editor';
         document.body.appendChild(this.el);
+        this.elTwo = document.createElement('div');
+        this.elTwo.id = 'editor-div-two';
+        document.body.appendChild(this.elTwo);
     });
 
     afterEach(function () {
@@ -63,6 +66,15 @@ describe('Toolbar TestCase', function () {
     });
 
     describe('Disable', function () {
+
+        beforeEach(function () {
+            jasmine.clock().install();
+        });
+
+        afterEach(function () {
+            jasmine.clock().uninstall();
+        });
+
         it('should not show the toolbar on elements when option disableToolbar is set to true', function () {
             var editor = new MediumEditor('.editor', {
                 disableToolbar: true
@@ -98,7 +110,7 @@ describe('Toolbar TestCase', function () {
             document.body.removeChild(element);
         });
 
-        it('should not display toolbar when selected text within an element with contenteditable="false"', function (done) {
+        it('should not display toolbar when selected text within an element with contenteditable="false"', function () {
             var element = document.createElement('div'),
                 editor = null;
 
@@ -111,12 +123,8 @@ describe('Toolbar TestCase', function () {
             selectElementContents(document.getElementById('cef_el'));
             editor.checkSelection();
 
-            setTimeout(function(){
-                expect(editor.toolbar.classList.contains('medium-editor-toolbar-active')).toBe(false);
-                done();
-            }, 500);
-
-
+            jasmine.clock().tick(51);
+            expect(editor.toolbar.classList.contains('medium-editor-toolbar-active')).toBe(false);
         });
 
         it('should call onHideToolbar when toolbar is hidden', function () {
@@ -130,6 +138,34 @@ describe('Toolbar TestCase', function () {
             fireEvent(editor.elements[0], 'blur');
 
             expect(editor.onHideToolbar).toHaveBeenCalled();
+        });
+
+        it('should hide the toolbar for one medium-editor instance when another medium-editor instance shows its toolbar', function() {
+            var editorOne,
+                editorTwo;
+
+            this.el.innerHTML = '<span id="editor-span-1">lorem ipsum</span>';
+            this.elTwo.innerHTML = '<span id="editor-span-2">lorem ipsum</span>';
+
+            editorOne = new MediumEditor('.editor', { updateOnEmptySelection: true, delay: 0, staticToolbar: true });
+            editorTwo = new MediumEditor('#editor-div-two', { updateOnEmptySelection: true, delay: 0, staticToolbar: true });
+
+            selectElementContents(document.getElementById('editor-span-1'));
+            fireEvent(editorOne.elements[0], 'focus');
+
+            jasmine.clock().tick(51);
+
+            expect(editorOne.toolbar.classList.contains('medium-editor-toolbar-active')).toBe(true);
+            expect(editorTwo.toolbar.classList.contains('medium-editor-toolbar-active')).toBe(false);
+
+            fireEvent(editorOne.elements[0], 'blur');
+            selectElementContents(document.getElementById('editor-span-2'));
+            fireEvent(editorTwo.elements[0], 'focus');
+
+            jasmine.clock().tick(51);
+
+            expect(editorOne.toolbar.classList.contains('medium-editor-toolbar-active')).toBe(false);
+            expect(editorTwo.toolbar.classList.contains('medium-editor-toolbar-active')).toBe(true);
         });
 
         // jasmine 2.0 changed async tests, runs no longer exists
