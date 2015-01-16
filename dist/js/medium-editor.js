@@ -1205,6 +1205,9 @@ else if (typeof define === 'function' && define.amd) {
         showToolbar: function() {
             if (this.toolbar && !this.isToolbarShown()) {
                 this.toolbar.classList.add('medium-editor-toolbar-active');
+                if (this.onShowToolbar) {
+                    this.onShowToolbar();
+                }
             }
         },
 
