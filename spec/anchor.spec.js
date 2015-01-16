@@ -138,7 +138,7 @@ describe('Anchor Button TestCase', function () {
             save = editor.toolbar.querySelector('[data-element="a"]');
             fireEvent(save, 'click');
 
-            input = editor.anchorForm.querySelector('input.medium-editor-toolbar-anchor-input');
+            input = editor.anchorForm.querySelector('input.medium-editor-toolbar-input');
             input.value = 'test';
 
             button = editor.anchorForm.querySelector('input.medium-editor-toolbar-anchor-button');
