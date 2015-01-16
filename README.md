@@ -160,12 +160,15 @@ Patrick Stillhar developed a new and improved way to add buttons to our toolbar.
 To add additional functions that are not supported by the native [browser API](https://developer.mozilla.org/en/docs/Rich-Text_Editing_in_Mozilla) you can
 write extensions that are then integrated into the toolbar. The Extension API is currently unstable and very minimal.
 
-An extension is an object that has essentially two functions `getButton` and `checkState`.
+An extension is an object that has essentially three functions `getButton`, `getForm` and `checkState`.
 
 * `getButton` is called when the editor is initialized and should return an element that is integrated into the toolbar.
-  Usually this will be a `<button>` element like the onces Medium Editor uses. All event handling on this button is
+  Usually this will be a `<button>` element like the ones Medium Editor uses. All event handling on this button is
   _entirely up to you_ so you should either keep a reference or bind your eventhandlers before returning it. You can
   also return a HTML-String that is then integrated into the toolbar also this is not really useful.
+
+* `getForm` is called when the editor is initialized and should return an element that is integrated into the toolbar.
+  Usually this will be a `<div>` element that would contain some `input` elements. Handling the saving and canceling of the form is _entirely up to you_ so you should either keep a reference or bind your eventhandlers before returning it.
 
 * `checkState` is called whenever a user selects some text in the area where the Medium Editor instance is running. It's
   responsability is to toggle the current _state_ of the button. I.e. marking is a _on_ or _off_. Again the method on how
@@ -175,6 +178,8 @@ An extension is an object that has essentially two functions `getButton` and `ch
 Properties
 
 * `parent` add this property to your extension class constructor and set it to `true` to be able to access the Medium Editor instance through the `base` property that will be set during the initialization
+
+* `hasForm` add this property to your extension class constructor and set it to `true` to tell Medium Editor that your extension contains a form. Medium editor will handle opening the form for you on your extension's button click.
 
 ### Examples
 
@@ -245,6 +250,134 @@ var two = new MediumEditor('.two', {
     extensions: {
       extension: new Extension()
     }
+});
+```
+
+A simple table example that uses the `hasForm` attribute:
+
+```js
+function Table(options) {
+    this.parent = true;
+    this.hasForm = true;
+    this.options = options;
+}
+
+Table.prototype.init = function() {
+    this.createButton();
+    this.createForm();
+};
+
+Table.prototype.createButton = function() {
+    this.button = document.createElement('button');
+    this.button.className = 'medium-editor-action';
+    this.button.textContent = 'T';
+    if(this.base.options.buttonLabels === 'fontawesome'){
+        this.button.innerHTML = '<i class="fa fa-table"></i>'; 
+    }
+    this.button.onclick = this.onClick.bind(this);
+};
+
+Table.prototype.createForm = function() {
+    this.form = document.createElement('div'),
+    this.close = document.createElement('a'),
+    this.save = document.createElement('a'),
+    this.columnInput = document.createElement('input'),
+    this.rowInput = document.createElement('input');
+
+    this.close.setAttribute('href', '#');
+    this.close.innerHTML = '&times;';
+    this.close.onclick = this.onClose.bind(this);
+
+    this.save.setAttribute('href', '#');
+    this.save.innerHTML = '&#10003;';
+    this.save.onclick = this.onSave.bind(this);
+
+    this.columnInput.setAttribute('type', 'text');
+    // Add the input CSS class for correct styling
+    this.columnInput.className = 'medium-editor-toolbar-input';
+    this.columnInput.setAttribute('placeholder', 'Column Count');
+
+    this.rowInput.setAttribute('type', 'text');
+    // Add the input CSS class for correct styling
+    this.rowInput.className = 'medium-editor-toolbar-input';
+    this.rowInput.setAttribute('placeholder', 'Row Count');
+
+    this.form.appendChild(this.columnInput);
+    this.form.appendChild(this.rowInput);
+
+    this.form.appendChild(this.save);
+    this.form.appendChild(this.close);
+};
+
+Table.prototype.getButton = function() {
+    return this.button;
+};
+
+Table.prototype.getForm = function() {
+    return this.form;
+};
+
+Table.prototype.onClick = function() {
+    this.columnInput.value = this.options.defaultColumns;
+    this.rowInput.value = this.options.defaultRows;
+};
+
+Table.prototype.onClose = function(e) {
+    e.preventDefault();
+    this.base.hideForm(this.form);
+};
+
+Table.prototype.onSave = function(e) {
+    e.preventDefault();
+    var columnCount = this.columnInput.value;
+    var rowCount = this.rowInput.value;
+    var table = this.createTable(columnCount, rowCount);
+
+    this.base.pasteHTML(table.innerHTML);
+    this.base.hideForm(this.form);
+};
+
+// Create the table element.
+Table.prototype.createTable = function(cols, rows) {
+    var table = document.createElement('table'),
+        header = document.createElement('thead'),
+        headerRow = document.createElement('tr'),
+        body = document.createElement('tbody'),
+        wrap = document.createElement('div');
+
+    for (var h = 1; h <= cols; h++) {
+        var headerCol = document.createElement('th');
+        headerCol.innerHTML = '...';
+        headerRow.appendChild(headerCol);   
+    }
+
+    header.appendChild(headerRow);
+
+    for (var r = 1; r <= rows; r++) {
+        var bodyRow = document.createElement('tr');
+        for (var c = 1; c <= this.options.defaultColumns; c++) {
+            var bodyCol = document.createElement('td');
+            bodyCol.innerHTML = '...';
+            bodyRow.appendChild(bodyCol);       
+        }
+        body.appendChild(bodyRow);
+    }
+
+    table.appendChild(header);
+    table.appendChild(body);
+    wrap.appendChild(table);
+
+    return wrap;
+};
+
+// When creating your Medium Editor
+var editor = new MediumEditor('.editable', {
+    buttons: ['table'],
+    extensions: {
+        'table': new Table({
+            defaultColumns: 3,
+            defaultRows: 2
+        }),
 });
 ```
 
