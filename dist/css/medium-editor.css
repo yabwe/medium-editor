@@ -134,26 +134,26 @@
 .medium-editor-action-italic {
   font-style: italic; }
 
-.medium-editor-toolbar-form-anchor {
+.medium-editor-toolbar-form {
   display: none; }
-  .medium-editor-toolbar-form-anchor input, .medium-editor-toolbar-form-anchor a {
+  .medium-editor-toolbar-form input, .medium-editor-toolbar-form a {
     font-family: HelveticaNeue, Helvetica, Arial, sans-serif; }
-  .medium-editor-toolbar-form-anchor .medium-editor-toolbar-anchor-input, .medium-editor-toolbar-form-anchor label {
+  .medium-editor-toolbar-form .medium-editor-toolbar-input, .medium-editor-toolbar-form label {
     margin: 0;
     padding: 6px;
     width: 316px;
     border: none;
     font-size: 14px;
     box-sizing: border-box; }
-    .medium-editor-toolbar-form-anchor .medium-editor-toolbar-anchor-input:focus, .medium-editor-toolbar-form-anchor label:focus {
+    .medium-editor-toolbar-form .medium-editor-toolbar-input:focus, .medium-editor-toolbar-form label:focus {
       outline: 0;
       border: none;
       box-shadow: none;
       -webkit-appearance: none;
       -moz-appearance: none; }
-  .medium-editor-toolbar-form-anchor label {
+  .medium-editor-toolbar-form label {
     display: block; }
-  .medium-editor-toolbar-form-anchor a {
+  .medium-editor-toolbar-form a {
     display: inline-block;
     margin: 0 10px;
     text-decoration: none;

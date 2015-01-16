@@ -32,16 +32,16 @@
     color: #000;
     background: linear-gradient(bottom, #dee7f0, rgba(0, 0, 0, 0.1)); }
 
-.medium-editor-toolbar-form-anchor {
+.medium-editor-toolbar-form {
   background: #dee7f0;
   color: #999;
   border-radius: 2px; }
-  .medium-editor-toolbar-form-anchor .medium-editor-toolbar-anchor-input {
+  .medium-editor-toolbar-form .medium-editor-toolbar-input {
     height: 50px;
     background: #dee7f0;
     color: #40648a;
     box-sizing: border-box; }
-  .medium-editor-toolbar-form-anchor a {
+  .medium-editor-toolbar-form a {
     color: #40648a; }
 
 .medium-editor-toolbar-anchor-preview {
