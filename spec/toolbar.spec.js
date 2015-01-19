@@ -144,6 +144,41 @@ describe('Toolbar TestCase', function () {
             expect(editor.toolbar.classList.contains('medium-editor-toolbar-active')).toBe(false);
         });
 
+        it('should enable bold button in toolbar when bold text is selected', function() {
+            var editor = null;
+
+            this.el.innerHTML = 'lorem ipsum <b><div id="cef_el">dolor</div></b>';
+
+            editor = new MediumEditor(document.querySelectorAll('.editor'), { delay: 0 });
+
+            selectElementContents(document.getElementById('cef_el'));
+            editor.checkSelection();
+
+            jasmine.clock().tick(51);
+            expect(editor.toolbar.querySelector('button[data-action="bold"]').classList.contains('medium-editor-button-active')).toBe(true);
+        });
+
+        it('should not activate buttons in toolbar when stopSelectionUpdates has been called, but should activate buttons after startSelectionUpdates is called', function() {
+            var editor = null;
+
+            this.el.innerHTML = 'lorem ipsum <b><div id="cef_el">dolor</div></b>';
+
+            editor = new MediumEditor(document.querySelectorAll('.editor'), { delay: 0 });
+
+            selectElementContents(document.getElementById('cef_el'));
+            editor.stopSelectionUpdates();
+            editor.checkSelection();
+
+            jasmine.clock().tick(51);
+            expect(editor.toolbar.querySelector('button[data-action="bold"]').classList.contains('medium-editor-button-active')).toBe(false);
+
+            editor.startSelectionUpdates();
+            editor.checkSelection();
+
+            jasmine.clock().tick(51);
+            expect(editor.toolbar.querySelector('button[data-action="bold"]').classList.contains('medium-editor-button-active')).toBe(true);
+        });
+
         it('should call onHideToolbar when toolbar is hidden', function () {
             var editor = new MediumEditor('.editor');
             editor.toolbar.classList.add('medium-editor-toolbar-active');
