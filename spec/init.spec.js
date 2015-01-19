@@ -83,6 +83,7 @@ describe('Initialization TestCase', function () {
                 disableAnchorForm: false,
                 disablePlaceholders: false,
                 elementsContainer: document.body,
+                standardizeSelectionStart: false,
                 contentWindow: window,
                 ownerDocument: document,
                 firstHeader: 'h3',

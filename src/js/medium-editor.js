@@ -1,4 +1,4 @@
-/*global module, console, define*/
+/*global module, console, define, NodeFilter */
 function MediumEditor(elements, options) {
     'use strict';
     return this.init(elements, options);
@@ -88,6 +88,35 @@ else if (typeof define === 'function' && define.amd) {
              node = node.parentNode;
          }
          return false;
+    }
+
+    // Find the next node in the DOM tree that represents any text that is being
+    // displayed directly next to the targetNode (passed as an argument)
+    // Text that appears directly next to the current node can be:
+    //  - A sibling text node
+    //  - A descendant of a sibling element
+    //  - A sibling text node of an ancestor
+    //  - A descendant of a sibling element of an ancestor
+    function findAdjacentTextNodeWithContent(rootNode, targetNode, ownerDocument) {
+        var pastTarget = false,
+            nextNode,
+            nodeIterator = ownerDocument.createNodeIterator(rootNode, NodeFilter.SHOW_TEXT);
+
+        // Use a native NodeIterator to iterate over all the text nodes that are descendants
+        // of the rootNode.  Once past the targetNode, choose the first non-empty text node
+        nextNode = nodeIterator.nextNode();
+        while (nextNode) {
+            if (nextNode === targetNode) {
+                pastTarget = true;
+            } else if (pastTarget) {
+                if (nextNode.nodeType === 3 && nextNode.nodeValue.length > 0) {
+                    break;
+                }
+            }
+            nextNode = nodeIterator.nextNode();
+        }
+
+        return nextNode;
     }
 
     // http://stackoverflow.com/questions/5605401/insert-link-in-contenteditable-element
@@ -209,6 +238,7 @@ else if (typeof define === 'function' && define.amd) {
             disableAnchorForm: false,
             disablePlaceholders: false,
             elementsContainer: false,
+            standardizeSelectionStart: false,
             contentWindow: window,
             ownerDocument: document,
             firstHeader: 'h3',
@@ -897,9 +927,48 @@ else if (typeof define === 'function' && define.amd) {
         },
 
         checkSelectionElement: function (newSelection, selectionElement) {
-            var i;
+            var i,
+                adjacentNode,
+                offset = 0,
+                newRange;
             this.selection = newSelection;
             this.selectionRange = this.selection.getRangeAt(0);
+
+            /* 
+            * In firefox, there are cases (ie doubleclick of a word) where the selectionRange start
+            * will be at the very end of an element.  In other browsers, the selectionRange start
+            * would instead be at the very beginning of an element that actually has content.
+            * example:
+            *   <span>foo</span><span>bar</span>
+            * 
+            * If the text 'bar' is selected, most browsers will have the selectionRange start at the beginning
+            * of the 'bar' span.  However, there are cases where firefox will have the selectionRange start
+            * at the end of the 'foo' span.  The contenteditable behavior will be ok, but if there are any
+            * properties on the 'bar' span, they won't be reflected accurately in the toolbar
+            * (ie 'Bold' button wouldn't be active)
+            * 
+            * So, for cases where the selectionRange start is at the end of an element/node, find the next
+            * adjacent text node that actually has content in it, and move the selectionRange start there.
+            */
+            if (
+                this.options.standardizeSelectionStart &&
+                this.selectionRange.startOffset === this.selectionRange.startContainer.nodeValue.length
+                ) {
+                adjacentNode = findAdjacentTextNodeWithContent(this.getSelectionElement(), this.selectionRange.startContainer, this.options.ownerDocument);
+                if (adjacentNode) {
+                    offset = 0;
+                    while(adjacentNode.nodeValue.substr(offset, 1).trim().length === 0) {
+                        offset = offset + 1;
+                    }
+                    newRange = this.options.ownerDocument.createRange();
+                    newRange.setStart(adjacentNode, offset);
+                    newRange.setEnd(this.selectionRange.endContainer, this.selectionRange.endOffset);
+                    this.selection.removeAllRanges();
+                    this.selection.addRange(newRange);
+                    this.selectionRange = newRange;
+                }
+            }
+
             for (i = 0; i < this.elements.length; i += 1) {
                 if (this.elements[i] === selectionElement) {
                     this.setToolbarButtonStates()
