@@ -39,8 +39,8 @@ else if (typeof define === 'function' && define.amd) {
     // https://github.com/jashkenas/underscore
     function throttle(func, wait) {
         var THROTTLE_INTERVAL = 50,
-            context, 
-            args, 
+            context,
+            args,
             result,
             timeout = null,
             previous = 0,
@@ -321,6 +321,8 @@ else if (typeof define === 'function' && define.amd) {
                     this.elements[i].setAttribute('data-placeholder', this.options.placeholder);
                 }
                 this.elements[i].setAttribute('data-medium-element', true);
+                this.elements[i].setAttribute('role', 'textbox');
+                this.elements[i].setAttribute('aria-multiline', true);
                 this.bindParagraphCreation(i);
                 if (!this.options.disableToolbar && !this.elements[i].getAttribute('data-disable-toolbar')) {
                     addToolbar = true;
@@ -714,7 +716,7 @@ else if (typeof define === 'function' && define.amd) {
                 this.anchorForm = this.toolbar.querySelector('.medium-editor-toolbar-form-anchor');
                 this.anchorInput = this.anchorForm.querySelector('input.medium-editor-toolbar-anchor-input');
                 this.anchorTarget = this.anchorForm.querySelector('input.medium-editor-toolbar-anchor-target');
-                this.anchorButton = this.anchorForm.querySelector('input.medium-editor-toolbar-anchor-button');   
+                this.anchorButton = this.anchorForm.querySelector('input.medium-editor-toolbar-anchor-button');
             }
             return this;
         },

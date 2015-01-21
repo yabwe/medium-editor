@@ -42,5 +42,17 @@ describe('Elements TestCase', function () {
             expect(editor.elements.length).toBe(1);
             expect(this.el.getAttribute('data-medium-element')).toEqual('true');
         });
+
+        it('should set element role attribute to textbox', function () {
+            var editor = new MediumEditor('.editor');
+            expect(editor.elements.length).toBe(1);
+            expect(this.el.getAttribute('role')).toEqual('textbox');
+        });
+
+        it('should set element aria multiline attribute to true', function () {
+            var editor = new MediumEditor('.editor');
+            expect(editor.elements.length).toBe(1);
+            expect(this.el.getAttribute('aria-multiline')).toEqual('true');
+        });
     });
 });
