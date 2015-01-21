@@ -62,6 +62,31 @@ describe('Activate/Deactivate TestCase', function () {
             expect(editor.events.length).toBe(0);
         });
 
+        it('should abort any pending throttled event handlers', function () {
+            var editor, triggerEvents;
+
+            editor = new MediumEditor('.editor', {delay: 5});
+            triggerEvents = function() {
+                fireEvent(window, 'resize', null, false);
+                fireEvent(document.body, 'click', null, false, document.body);
+                fireEvent(document.body, 'blur', null, false);
+            };
+
+            // fire event (handler executed immediately)
+            triggerEvents();
+            jasmine.clock().tick(1);
+
+            // fire event again (handler delayed because of throttle)
+            triggerEvents();
+
+            spyOn(editor, 'positionToolbarIfShown').and.callThrough(); // via: handleResize
+            spyOn(editor, 'hideToolbarActions').and.callThrough(); // via: handleBlur
+            editor.deactivate();
+            jasmine.clock().tick(600);
+            expect(editor.positionToolbarIfShown).not.toHaveBeenCalled();
+            expect(editor.hideToolbarActions).not.toHaveBeenCalled();
+        });
+
         // regression test for https://github.com/daviferreira/medium-editor/issues/197
         it('should not crash when deactivated immediately after a mouse click', function () {
             var editor = new MediumEditor('.editor');
