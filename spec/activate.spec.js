@@ -82,7 +82,7 @@ describe('Activate/Deactivate TestCase', function () {
             spyOn(editor, 'positionToolbarIfShown').and.callThrough(); // via: handleResize
             spyOn(editor, 'hideToolbarActions').and.callThrough(); // via: handleBlur
             editor.deactivate();
-            jasmine.clock().tick(600);
+            jasmine.clock().tick(1000); // arbitrary – must be longer than THROTTLE_INTERVAL
             expect(editor.positionToolbarIfShown).not.toHaveBeenCalled();
             expect(editor.hideToolbarActions).not.toHaveBeenCalled();
         });

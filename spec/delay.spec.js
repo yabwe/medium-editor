@@ -37,7 +37,7 @@ describe('Delay TestCase', function () {
 
         editor.deactivate();
         editor.delay(spy);
-        jasmine.clock().tick(500);
+        jasmine.clock().tick(100);
         expect(spy).not.toHaveBeenCalled();
     });
 });
