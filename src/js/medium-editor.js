@@ -181,6 +181,36 @@ else if (typeof define === 'function' && define.amd) {
         return html;
     }
 
+    /**
+     *  Find the caret position within an element irrespective of any inline tags it may contain.
+     *
+     *  @param {DOMElement} An element containing the cursor to find offsets relative to.
+     *  @param {Range} A Range representing cursor position. Will window.getSelection if none is passed.
+     *  @return {Object} 'left' and 'right' attributes contain offsets from begining and end of Element
+     */
+    function getCaretOffsets(element, range) {
+        var preCaretRange, postCaretRange;
+
+        if (!range) {
+            range = window.getSelection().getRangeAt(0);
+        }
+
+        preCaretRange = range.cloneRange();
+        postCaretRange = range.cloneRange();
+
+        preCaretRange.selectNodeContents(element);
+        preCaretRange.setEnd(range.endContainer, range.endOffset);
+
+        postCaretRange.selectNodeContents(element);
+        postCaretRange.setStart(range.endContainer, range.endOffset);
+
+        return {
+            left: preCaretRange.toString().length,
+            right: postCaretRange.toString().length
+        };
+    }
+
+
     // https://github.com/jashkenas/underscore
     function isElement(obj) {
         return !!(obj && obj.nodeType === 1);
@@ -434,6 +464,22 @@ else if (typeof define === 'function' && define.amd) {
             return this;
         },
 
+        bindKeypress: function(i) {
+            if (this.options.disablePlaceholders) {
+                return this;
+            }
+
+            var self = this;
+
+            // Set up the keypress events
+            this.on(this.elements[i], 'keypress', function(event){
+
+                self.placeholderWrapper(this,event);
+            });
+
+            return this;
+        },
+
         bindClick: function(i) {
             var self = this;
 
@@ -467,7 +513,7 @@ else if (typeof define === 'function' && define.amd) {
 
                 // Bind the return and tab keypress events
                 this.bindReturn(i)
-                    .bindTab(i)
+                    .bindKeydown(i)
                     .bindBlur(i)
                     .bindClick(i);
             }
@@ -572,7 +618,8 @@ else if (typeof define === 'function' && define.amd) {
             this.on(this.elements[index], 'keyup', function (e) {
                 var node = getSelectionStart.call(self),
                     tagName,
-                    editorElement;
+                    editorElement,
+                    replacement;
 
                 if (node && node.getAttribute('data-medium-element') && node.children.length === 0 && !(self.options.disableReturn || node.getAttribute('data-disable-return'))) {
                     self.options.ownerDocument.execCommand('formatBlock', false, 'p');
@@ -585,7 +632,26 @@ else if (typeof define === 'function' && define.amd) {
                     if (!(self.options.disableReturn || editorElement.getAttribute('data-disable-return')) &&
                         tagName !== 'li' && !self.isListItemChild(node)) {
                         if (!e.shiftKey) {
-                            self.options.ownerDocument.execCommand('formatBlock', false, 'p');
+
+                            // paragraph creation should not be forced within a header tag
+                            if (/h\d/.test(tagName))
+                            {
+                                // returns at the begining of headers should cleanup the stray header tags
+                                // they create by default, replacing them with paragraphs
+                                if (getCaretOffsets(node).left === 0 
+                                    && node.previousElementSibling 
+                                    && node.previousElementSibling.tagName.toLowerCase() === tagName ) {
+    
+                                    replacement = self.options.ownerDocument.createElement('p');
+                                    replacement.innerHTML = node.previousElementSibling.innerHTML;
+                                    node.previousElementSibling.parentNode.replaceChild( replacement, node.previousElementSibling );
+                                }
+                            }
+                            else
+                            {
+                                self.options.ownerDocument.execCommand('formatBlock', false, 'p');
+                            }
+
                         }
                         if (tagName === 'a') {
                             self.options.ownerDocument.execCommand('unlink', false, null);
@@ -630,9 +696,10 @@ else if (typeof define === 'function' && define.amd) {
             return this;
         },
 
-        bindTab: function (index) {
+        bindKeydown: function (index) {
             var self = this;
             this.on(this.elements[index], 'keydown', function (e) {
+
                 if (e.which === 9) {
                     // Override tab only for pre nodes
                     var tag = getSelectionStart.call(self).tagName.toLowerCase();
@@ -653,8 +720,30 @@ else if (typeof define === 'function' && define.amd) {
                         }
                     }
                 }
+                else if ( e.which === 8 )
+                {
+                    // Bind backspace key
+                    self.onBackspace(e);
+                }
             });
             return this;
+        },
+
+        onBackspace: function( e ) {
+
+            var node = getSelectionStart.call(this),
+                tagName = node.tagName.toLowerCase();
+
+            if ( /h\d/.test(tagName) && getCaretOffsets(node).left === 0 ) {
+                // backspacing the begining of a header into an empty previous element will
+                // change the tagName of the current node to prevent one, delete previous node and cancel the event.
+                if (/^(\s+|<br\/?>)?$/.test(node.previousElementSibling.innerHTML))
+                {
+                    node.previousElementSibling.parentNode.removeChild( node.previousElementSibling );
+                    e.preventDefault();
+                }
+            }
+
         },
 
         buttonTemplate: function (btnType) {
