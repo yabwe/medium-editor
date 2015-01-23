@@ -78,7 +78,7 @@ describe('Protect Header Tags TestCase', function () {
             sel.addRange(range);
 
             // hit backspace
-            editor.onBackspace( { which: 8, preventDefault: function(){ } });
+            editor.onBlockModifier( { which: 8, preventDefault: function(){ } });
 
             el = document.getElementById("header");
             expect(el).toBeDefined();

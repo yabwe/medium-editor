@@ -618,8 +618,7 @@ else if (typeof define === 'function' && define.amd) {
             this.on(this.elements[index], 'keyup', function (e) {
                 var node = getSelectionStart.call(self),
                     tagName,
-                    editorElement,
-                    replacement;
+                    editorElement;
 
                 if (node && node.getAttribute('data-medium-element') && node.children.length === 0 && !(self.options.disableReturn || node.getAttribute('data-disable-return'))) {
                     self.options.ownerDocument.execCommand('formatBlock', false, 'p');
@@ -634,20 +633,7 @@ else if (typeof define === 'function' && define.amd) {
                         if (!e.shiftKey) {
 
                             // paragraph creation should not be forced within a header tag
-                            if (/h\d/.test(tagName))
-                            {
-                                // returns at the begining of headers should cleanup the stray header tags
-                                // they create by default, replacing them with paragraphs
-                                if (getCaretOffsets(node).left === 0 
-                                    && node.previousElementSibling 
-                                    && node.previousElementSibling.tagName.toLowerCase() === tagName ) {
-    
-                                    replacement = self.options.ownerDocument.createElement('p');
-                                    replacement.innerHTML = node.previousElementSibling.innerHTML;
-                                    node.previousElementSibling.parentNode.replaceChild( replacement, node.previousElementSibling );
-                                }
-                            }
-                            else
+                            if (!/h\d/.test(tagName))
                             {
                                 self.options.ownerDocument.execCommand('formatBlock', false, 'p');
                             }
@@ -720,28 +706,70 @@ else if (typeof define === 'function' && define.amd) {
                         }
                     }
                 }
-                else if ( e.which === 8 )
+                else if ( e.which === 8 || e.which === 46 || e.which === 13 )
                 {
-                    // Bind backspace key
-                    self.onBackspace(e);
+
+                    // Bind keys which can create or destroy a block element: backspace, delete, return
+                    self.onBlockModifier(e);
+
                 }
             });
             return this;
         },
 
-        onBackspace: function( e ) {
+        onBlockModifier: function( e ) {
 
-            var node = getSelectionStart.call(this),
-                tagName = node.tagName.toLowerCase();
+            var range, sel, p, node = getSelectionStart.call(this),
+                tagName = node.tagName.toLowerCase(),
+                isEmpty = /^(\s+|<br\/?>)?$/i,
+                isHeader = /h\d/i;
 
-            if ( /h\d/.test(tagName) && getCaretOffsets(node).left === 0 ) {
-                // backspacing the begining of a header into an empty previous element will
-                // change the tagName of the current node to prevent one, delete previous node and cancel the event.
-                if (/^(\s+|<br\/?>)?$/.test(node.previousElementSibling.innerHTML))
+            if ( (e.which === 8 || e.which === 13) // backspace or return
+                    && isHeader.test(tagName) // in a header
+                    && getCaretOffsets(node).left === 0 ) // at the very end of the block
+            {
+                if ( e.which === 8 && node.previousElementSibling && isEmpty.test(node.previousElementSibling.innerHTML) )
                 {
+                    // backspacing the begining of a header into an empty previous element will
+                    // change the tagName of the current node to prevent one
+                    // instead delete previous node and cancel the event.
                     node.previousElementSibling.parentNode.removeChild( node.previousElementSibling );
                     e.preventDefault();
                 }
+                else if ( e.which === 13 )
+                {
+                    // hitting return in the begining of a header will create empty header elements before the current one
+                    // instead, make "<p><br></p>" element, which are what happens if you hit return in an empty paragraph
+                    p = this.options.ownerDocument.createElement('p');
+                    p.innerHTML = '<br>';
+                    node.previousElementSibling.parentNode.insertBefore( p, node );
+                    e.preventDefault();
+                }
+
+            }
+            else if ( e.which === 46 // delete
+                && !isHeader.test(tagName) // not in a header
+                && isEmpty.test(node.innerHTML) // in an empty tag
+                && isHeader.test(node.nextElementSibling.tagName) ) // when the next tag *is* a header
+            {
+                    // hitting delete in an empty element preceding a header, ex:
+                    //  <p>[CURSOR]</p><h1>Header</h1>
+                    // Will cause the h1 to become a paragraph.
+                    // Instead, delete the paragraph node and move the cursor to the begining of the h1
+
+                    // remove node and move cursor to start of header
+                    range = document.createRange();
+                    sel = window.getSelection();
+
+                    range.setStart(node.nextElementSibling, 0);
+                    range.collapse(true);
+
+                    sel.removeAllRanges();
+                    sel.addRange(range);
+
+                    node.previousElementSibling.parentNode.removeChild(node);
+
+                    e.preventDefault();
             }
 
         },
