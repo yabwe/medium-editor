@@ -310,7 +310,6 @@ else if (typeof define === 'function' && define.amd) {
         },
 
         initElements: function () {
-            this.updateElementList();
             var i,
                 addToolbar = false;
             for (i = 0; i < this.elements.length; i += 1) {
@@ -337,15 +336,19 @@ else if (typeof define === 'function' && define.amd) {
         },
 
         setElementSelection: function (selector) {
-            this.elementSelection = selector;
-            this.updateElementList();
-        },
-
-        updateElementList: function () {
-            this.elements = typeof this.elementSelection === 'string' ? this.options.ownerDocument.querySelectorAll(this.elementSelection) : this.elementSelection;
-            if (this.elements.nodeType === 1) {
-                this.elements = [this.elements];
+            if (!selector) {
+                selector = [];
             }
+            // If string, use as query selector
+            if (typeof selector === 'string') {
+                selector = this.options.ownerDocument.querySelectorAll(selector);
+            }
+            // If element, put into array
+            if (isElement(selector)) {
+                selector = [selector];
+            }
+            // Convert NodeList (or other array like object) into an array
+            this.elements = Array.prototype.slice.apply(selector);
         },
 
         bindBlur: function(i) {
