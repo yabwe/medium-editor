@@ -38,8 +38,8 @@ else if (typeof define === 'function' && define.amd) {
     // https://github.com/jashkenas/underscore
     function throttle(func, wait) {
         var THROTTLE_INTERVAL = 50,
-            context, 
-            args, 
+            context,
+            args,
             result,
             timeout = null,
             previous = 0,
@@ -87,6 +87,35 @@ else if (typeof define === 'function' && define.amd) {
              node = node.parentNode;
          }
          return false;
+    }
+
+    // Find the next node in the DOM tree that represents any text that is being
+    // displayed directly next to the targetNode (passed as an argument)
+    // Text that appears directly next to the current node can be:
+    //  - A sibling text node
+    //  - A descendant of a sibling element
+    //  - A sibling text node of an ancestor
+    //  - A descendant of a sibling element of an ancestor
+    function findAdjacentTextNodeWithContent(rootNode, targetNode, ownerDocument) {
+        var pastTarget = false,
+            nextNode,
+            nodeIterator = ownerDocument.createNodeIterator(rootNode, NodeFilter.SHOW_TEXT);
+
+        // Use a native NodeIterator to iterate over all the text nodes that are descendants
+        // of the rootNode.  Once past the targetNode, choose the first non-empty text node
+        nextNode = nodeIterator.nextNode();
+        while (nextNode) {
+            if (nextNode === targetNode) {
+                pastTarget = true;
+            } else if (pastTarget) {
+                if (nextNode.nodeType === 3 && nextNode.nodeValue.length > 0) {
+                    break;
+                }
+            }
+            nextNode = nodeIterator.nextNode();
+        }
+
+        return nextNode;
     }
 
     // http://stackoverflow.com/questions/5605401/insert-link-in-contenteditable-element
@@ -208,6 +237,7 @@ else if (typeof define === 'function' && define.amd) {
             disableAnchorForm: false,
             disablePlaceholders: false,
             elementsContainer: false,
+            standardizeSelectionStart: false,
             contentWindow: window,
             ownerDocument: document,
             firstHeader: 'h3',
@@ -269,12 +299,23 @@ else if (typeof define === 'function' && define.amd) {
         },
 
         off: function(target, event, listener, useCapture) {
-            var index = this.events.indexOf([target, event, listener, useCapture]),
+            var index = this.indexOfListener(target, event, listener, useCapture),
                 e;
             if(index !== -1) {
-                e = this.events.splice(index, 1);
+                e = this.events.splice(index, 1)[0];
                 e[0].removeEventListener(e[1], e[2], e[3]);
             }
+        },
+
+        indexOfListener: function(target, event, listener, useCapture) {
+            var i, n, item;
+            for (i = 0, n = this.events.length; i < n; i = i + 1) {
+                item = this.events[i];
+                if (item[0] === target && item[1] === event && item[2] === listener && item[3] === useCapture) {
+                    return i;
+                }
+            }
+            return -1;
         },
 
         removeAllEvents: function() {
@@ -320,6 +361,8 @@ else if (typeof define === 'function' && define.amd) {
                     this.elements[i].setAttribute('data-placeholder', this.options.placeholder);
                 }
                 this.elements[i].setAttribute('data-medium-element', true);
+                this.elements[i].setAttribute('role', 'textbox');
+                this.elements[i].setAttribute('aria-multiline', true);
                 this.bindParagraphCreation(i);
                 if (!this.options.disableToolbar && !this.elements[i].getAttribute('data-disable-toolbar')) {
                     addToolbar = true;
@@ -616,26 +659,26 @@ else if (typeof define === 'function' && define.amd) {
         buttonTemplate: function (btnType) {
             var buttonLabels = this.getButtonLabels(this.options.buttonLabels),
                 buttonTemplates = {
-                    'bold': '<button class="medium-editor-action medium-editor-action-bold" data-action="bold" data-element="b">' + buttonLabels.bold + '</button>',
-                    'italic': '<button class="medium-editor-action medium-editor-action-italic" data-action="italic" data-element="i">' + buttonLabels.italic + '</button>',
-                    'underline': '<button class="medium-editor-action medium-editor-action-underline" data-action="underline" data-element="u">' + buttonLabels.underline + '</button>',
-                    'strikethrough': '<button class="medium-editor-action medium-editor-action-strikethrough" data-action="strikethrough" data-element="strike">' + buttonLabels.strikethrough +'</button>',
-                    'superscript': '<button class="medium-editor-action medium-editor-action-superscript" data-action="superscript" data-element="sup">' + buttonLabels.superscript + '</button>',
-                    'subscript': '<button class="medium-editor-action medium-editor-action-subscript" data-action="subscript" data-element="sub">' + buttonLabels.subscript + '</button>',
-                    'anchor': '<button class="medium-editor-action medium-editor-action-anchor" data-action="anchor" data-element="a">' + buttonLabels.anchor + '</button>',
-                    'image': '<button class="medium-editor-action medium-editor-action-image" data-action="image" data-element="img">' + buttonLabels.image + '</button>',
-                    'header1': '<button class="medium-editor-action medium-editor-action-header1" data-action="append-' + this.options.firstHeader + '" data-element="' + this.options.firstHeader + '">' + buttonLabels.header1 + '</button>',
-                    'header2': '<button class="medium-editor-action medium-editor-action-header2" data-action="append-' + this.options.secondHeader + '" data-element="' + this.options.secondHeader + '">' + buttonLabels.header2 + '</button>',
-                    'quote': '<button class="medium-editor-action medium-editor-action-quote" data-action="append-blockquote" data-element="blockquote">' + buttonLabels.quote + '</button>',
-                    'orderedlist': '<button class="medium-editor-action medium-editor-action-orderedlist" data-action="insertorderedlist" data-element="ol">' + buttonLabels.orderedlist + '</button>',
-                    'unorderedlist': '<button class="medium-editor-action medium-editor-action-unorderedlist" data-action="insertunorderedlist" data-element="ul">' + buttonLabels.unorderedlist + '</button>',
-                    'pre': '<button class="medium-editor-action medium-editor-action-pre" data-action="append-pre" data-element="pre">' + buttonLabels.pre + '</button>',
-                    'indent': '<button class="medium-editor-action medium-editor-action-indent" data-action="indent" data-element="ul">' + buttonLabels.indent + '</button>',
-                    'outdent': '<button class="medium-editor-action medium-editor-action-outdent" data-action="outdent" data-element="ul">' + buttonLabels.outdent + '</button>',
-                    'justifyCenter': '<button class="medium-editor-action medium-editor-action-justifyCenter" data-action="justifyCenter" data-element="">' + buttonLabels.justifyCenter + '</button>',
-                    'justifyFull': '<button class="medium-editor-action medium-editor-action-justifyFull" data-action="justifyFull" data-element="">' + buttonLabels.justifyFull + '</button>',
-                    'justifyLeft': '<button class="medium-editor-action medium-editor-action-justifyLeft" data-action="justifyLeft" data-element="">' + buttonLabels.justifyLeft + '</button>',
-                    'justifyRight': '<button class="medium-editor-action medium-editor-action-justifyRight" data-action="justifyRight" data-element="">' + buttonLabels.justifyRight + '</button>'
+                    'bold': '<button class="medium-editor-action medium-editor-action-bold" data-action="bold" data-element="b" aria-label="bold">' + buttonLabels.bold + '</button>',
+                    'italic': '<button class="medium-editor-action medium-editor-action-italic" data-action="italic" data-element="i" aria-label="italic">' + buttonLabels.italic + '</button>',
+                    'underline': '<button class="medium-editor-action medium-editor-action-underline" data-action="underline" data-element="u" aria-label="underline">' + buttonLabels.underline + '</button>',
+                    'strikethrough': '<button class="medium-editor-action medium-editor-action-strikethrough" data-action="strikethrough" data-element="strike" aria-label="strike through">' + buttonLabels.strikethrough +'</button>',
+                    'superscript': '<button class="medium-editor-action medium-editor-action-superscript" data-action="superscript" data-element="sup" aria-label="superscript">' + buttonLabels.superscript + '</button>',
+                    'subscript': '<button class="medium-editor-action medium-editor-action-subscript" data-action="subscript" data-element="sub" aria-label="subscript">' + buttonLabels.subscript + '</button>',
+                    'anchor': '<button class="medium-editor-action medium-editor-action-anchor" data-action="anchor" data-element="a" aria-label="link">' + buttonLabels.anchor + '</button>',
+                    'image': '<button class="medium-editor-action medium-editor-action-image" data-action="image" data-element="img" aria-label="image">' + buttonLabels.image + '</button>',
+                    'header1': '<button class="medium-editor-action medium-editor-action-header1" data-action="append-' + this.options.firstHeader + '" data-element="' + this.options.firstHeader + '" aria-label="h1">' + buttonLabels.header1 + '</button>',
+                    'header2': '<button class="medium-editor-action medium-editor-action-header2" data-action="append-' + this.options.secondHeader + '" data-element="' + this.options.secondHeader + ' "aria-label="h2">' + buttonLabels.header2 + '</button>',
+                    'quote': '<button class="medium-editor-action medium-editor-action-quote" data-action="append-blockquote" data-element="blockquote" aria-label="blockquote">' + buttonLabels.quote + '</button>',
+                    'orderedlist': '<button class="medium-editor-action medium-editor-action-orderedlist" data-action="insertorderedlist" data-element="ol" aria-label="ordered list">' + buttonLabels.orderedlist + '</button>',
+                    'unorderedlist': '<button class="medium-editor-action medium-editor-action-unorderedlist" data-action="insertunorderedlist" data-element="ul" aria-label="unordered list">' + buttonLabels.unorderedlist + '</button>',
+                    'pre': '<button class="medium-editor-action medium-editor-action-pre" data-action="append-pre" data-element="pre" aria-label="preformatted text">' + buttonLabels.pre + '</button>',
+                    'indent': '<button class="medium-editor-action medium-editor-action-indent" data-action="indent" data-element="ul" aria-label="indent">' + buttonLabels.indent + '</button>',
+                    'outdent': '<button class="medium-editor-action medium-editor-action-outdent" data-action="outdent" data-element="ul" aria-label="outdent">' + buttonLabels.outdent + '</button>',
+                    'justifyCenter': '<button class="medium-editor-action medium-editor-action-justifyCenter" data-action="justifyCenter" data-element="" aria-label="center justify">' + buttonLabels.justifyCenter + '</button>',
+                    'justifyFull': '<button class="medium-editor-action medium-editor-action-justifyFull" data-action="justifyFull" data-element="" aria-label="full justify">' + buttonLabels.justifyFull + '</button>',
+                    'justifyLeft': '<button class="medium-editor-action medium-editor-action-justifyLeft" data-action="justifyLeft" data-element="" aria-label="left justify">' + buttonLabels.justifyLeft + '</button>',
+                    'justifyRight': '<button class="medium-editor-action medium-editor-action-justifyRight" data-action="justifyRight" data-element="" aria-label="right justify">' + buttonLabels.justifyRight + '</button>'
                 };
             return buttonTemplates[btnType] || false;
         },
@@ -713,7 +756,7 @@ else if (typeof define === 'function' && define.amd) {
                 this.anchorForm = this.toolbar.querySelector('.medium-editor-toolbar-form-anchor');
                 this.anchorInput = this.anchorForm.querySelector('input.medium-editor-toolbar-anchor-input');
                 this.anchorTarget = this.anchorForm.querySelector('input.medium-editor-toolbar-anchor-target');
-                this.anchorButton = this.anchorForm.querySelector('input.medium-editor-toolbar-anchor-button');   
+                this.anchorButton = this.anchorForm.querySelector('input.medium-editor-toolbar-anchor-button');
             }
             return this;
         },
@@ -846,11 +889,21 @@ else if (typeof define === 'function' && define.amd) {
             return this;
         },
 
+        stopSelectionUpdates: function() {
+            this.preventSelectionUpdates = true;
+        },
+
+        startSelectionUpdates: function() {
+            this.preventSelectionUpdates = false;
+        },
+
         checkSelection: function () {
             var newSelection,
                 selectionElement;
 
-            if (this.keepToolbarAlive !== true && !this.options.disableToolbar) {
+            if (!this.preventSelectionUpdates &&
+                this.keepToolbarAlive !== true &&
+                !this.options.disableToolbar) {
 
                 newSelection = this.options.contentWindow.getSelection();
                 if ((!this.options.updateOnEmptySelection && newSelection.toString().trim() === '') ||
@@ -896,9 +949,48 @@ else if (typeof define === 'function' && define.amd) {
         },
 
         checkSelectionElement: function (newSelection, selectionElement) {
-            var i;
+            var i,
+                adjacentNode,
+                offset = 0,
+                newRange;
             this.selection = newSelection;
             this.selectionRange = this.selection.getRangeAt(0);
+
+            /* 
+            * In firefox, there are cases (ie doubleclick of a word) where the selectionRange start
+            * will be at the very end of an element.  In other browsers, the selectionRange start
+            * would instead be at the very beginning of an element that actually has content.
+            * example:
+            *   <span>foo</span><span>bar</span>
+            * 
+            * If the text 'bar' is selected, most browsers will have the selectionRange start at the beginning
+            * of the 'bar' span.  However, there are cases where firefox will have the selectionRange start
+            * at the end of the 'foo' span.  The contenteditable behavior will be ok, but if there are any
+            * properties on the 'bar' span, they won't be reflected accurately in the toolbar
+            * (ie 'Bold' button wouldn't be active)
+            * 
+            * So, for cases where the selectionRange start is at the end of an element/node, find the next
+            * adjacent text node that actually has content in it, and move the selectionRange start there.
+            */
+            if (
+                this.options.standardizeSelectionStart &&
+                this.selectionRange.startOffset === this.selectionRange.startContainer.nodeValue.length
+                ) {
+                adjacentNode = findAdjacentTextNodeWithContent(this.getSelectionElement(), this.selectionRange.startContainer, this.options.ownerDocument);
+                if (adjacentNode) {
+                    offset = 0;
+                    while(adjacentNode.nodeValue.substr(offset, 1).trim().length === 0) {
+                        offset = offset + 1;
+                    }
+                    newRange = this.options.ownerDocument.createRange();
+                    newRange.setStart(adjacentNode, offset);
+                    newRange.setEnd(this.selectionRange.endContainer, this.selectionRange.endOffset);
+                    this.selection.removeAllRanges();
+                    this.selection.addRange(newRange);
+                    this.selectionRange = newRange;
+                }
+            }
+
             for (i = 0; i < this.elements.length; i += 1) {
                 if (this.elements[i] === selectionElement) {
                     this.setToolbarButtonStates()
