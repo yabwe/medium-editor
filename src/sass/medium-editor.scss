@@ -150,5 +150,6 @@
         left: 0;
         content: attr(data-placeholder) !important;
         font-style: italic;
+        white-space: pre;
     }
 }
