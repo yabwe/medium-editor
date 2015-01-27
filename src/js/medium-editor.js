@@ -269,7 +269,7 @@ else if (typeof define === 'function' && define.amd) {
             }
             this.parentElements = ['p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'blockquote', 'pre'];
             if (!this.options.elementsContainer) {
-                this.options.elementsContainer = document.body;
+                this.options.elementsContainer = this.options.ownerDocument.body;
             }
 
             while (this.options.elementsContainer.querySelector('#medium-editor-toolbar-' + uniqueId)) {
@@ -423,8 +423,8 @@ else if (typeof define === 'function' && define.amd) {
                 };
 
             // Hide the toolbar when focusing outside of the editor.
-            this.on(document.body, 'click', blurFunction, true);
-            this.on(document.body, 'focus', blurFunction, true);
+            this.on(this.options.ownerDocument.body, 'click', blurFunction, true);
+            this.on(this.options.ownerDocument.body, 'focus', blurFunction, true);
 
             return this;
         },
@@ -575,7 +575,7 @@ else if (typeof define === 'function' && define.amd) {
                     node = getSelectionStart.call(self);
                     tagName = node.tagName.toLowerCase();
                     if (tagName === 'a') {
-                        document.execCommand('unlink', false, null);
+                        self.options.ownerDocument.execCommand('unlink', false, null);
                     }
                 }
             });
@@ -586,7 +586,7 @@ else if (typeof define === 'function' && define.amd) {
                     editorElement;
 
                 if (node && node.getAttribute('data-medium-element') && node.children.length === 0 && !(self.options.disableReturn || node.getAttribute('data-disable-return'))) {
-                    document.execCommand('formatBlock', false, 'p');
+                    self.options.ownerDocument.execCommand('formatBlock', false, 'p');
                 }
                 if (e.which === 13) {
                     node = getSelectionStart.call(self);
@@ -596,10 +596,10 @@ else if (typeof define === 'function' && define.amd) {
                     if (!(self.options.disableReturn || editorElement.getAttribute('data-disable-return')) &&
                         tagName !== 'li' && !self.isListItemChild(node)) {
                         if (!e.shiftKey) {
-                            document.execCommand('formatBlock', false, 'p');
+                            self.options.ownerDocument.execCommand('formatBlock', false, 'p');
                         }
                         if (tagName === 'a') {
-                            document.execCommand('unlink', false, null);
+                            self.options.ownerDocument.execCommand('unlink', false, null);
                         }
                     }
                 }
@@ -649,7 +649,7 @@ else if (typeof define === 'function' && define.amd) {
                     var tag = getSelectionStart.call(self).tagName.toLowerCase();
                     if (tag === 'pre') {
                         e.preventDefault();
-                        document.execCommand('insertHtml', null, '    ');
+                        self.options.ownerDocument.execCommand('insertHtml', null, '    ');
                     }
 
                     // Tab to indent list structures!
@@ -658,9 +658,9 @@ else if (typeof define === 'function' && define.amd) {
 
                         // If Shift is down, outdent, otherwise indent
                         if (e.shiftKey) {
-                            document.execCommand('outdent', e);
+                            self.options.ownerDocument.execCommand('outdent', e);
                         } else {
-                            document.execCommand('indent', e);
+                            self.options.ownerDocument.execCommand('indent', e);
                         }
                     }
                 }
@@ -774,7 +774,7 @@ else if (typeof define === 'function' && define.amd) {
         },
 
         createToolbar: function () {
-            var toolbar = document.createElement('div');
+            var toolbar = this.options.ownerDocument.createElement('div');
             toolbar.id = 'medium-editor-toolbar-' + this.id;
             toolbar.className = 'medium-editor-toolbar';
 
@@ -795,7 +795,7 @@ else if (typeof define === 'function' && define.amd) {
         //TODO: actionTemplate
         toolbarButtons: function () {
             var btns = this.options.buttons,
-                ul = document.createElement('ul'),
+                ul = this.options.ownerDocument.createElement('ul'),
                 li,
                 i,
                 btn,
@@ -813,7 +813,7 @@ else if (typeof define === 'function' && define.amd) {
                 }
 
                 if (btn) {
-                    li = document.createElement('li');
+                    li = this.options.ownerDocument.createElement('li');
                     if (isElement(btn)) {
                         li.appendChild(btn);
                     } else {
@@ -827,14 +827,14 @@ else if (typeof define === 'function' && define.amd) {
         },
 
         toolbarFormAnchor: function () {
-            var anchor = document.createElement('div'),
-                input = document.createElement('input'),
-                target_label = document.createElement('label'),
-                target = document.createElement('input'),
-                button_label = document.createElement('label'),
-                button = document.createElement('input'),
-                close = document.createElement('a'),
-                save = document.createElement('a');
+            var anchor = this.options.ownerDocument.createElement('div'),
+                input = this.options.ownerDocument.createElement('input'),
+                target_label = this.options.ownerDocument.createElement('label'),
+                target = this.options.ownerDocument.createElement('input'),
+                button_label = this.options.ownerDocument.createElement('label'),
+                button = this.options.ownerDocument.createElement('input'),
+                close = this.options.ownerDocument.createElement('a'),
+                save = this.options.ownerDocument.createElement('a');
 
             close.setAttribute('href', '#');
             close.className = 'medium-editor-toobar-anchor-close';
@@ -891,7 +891,7 @@ else if (typeof define === 'function' && define.amd) {
                 self.checkSelection();
             };
 
-            this.on(document.documentElement, 'mouseup', this.checkSelectionWrapper);
+            this.on(this.options.ownerDocument.documentElement, 'mouseup', this.checkSelectionWrapper);
 
             for (i = 0; i < this.elements.length; i += 1) {
                 this.on(this.elements[i], 'keyup', this.checkSelectionWrapper);
@@ -1059,12 +1059,12 @@ else if (typeof define === 'function' && define.amd) {
 
         setToolbarPosition: function () {
             // document.documentElement for IE 9
-            var scrollTop = (document.documentElement && document.documentElement.scrollTop) || document.body.scrollTop,
+            var scrollTop = (this.options.ownerDocument.documentElement && this.options.ownerDocument.documentElement.scrollTop) || this.options.ownerDocument.body.scrollTop,
             container = this.elements[0],
             containerRect = container.getBoundingClientRect(),
             containerTop = containerRect.top + scrollTop,
             buttonHeight = 50,
-            selection = window.getSelection(),
+            selection = this.options.contentWindow.getSelection(),
             range,
             boundary,
             middleBoundary,
@@ -1712,7 +1712,7 @@ else if (typeof define === 'function' && define.amd) {
             // Add a scroll event for sticky toolbar
             if ( this.options.staticToolbar && this.options.stickyToolbar ) {
                 // On scroll, re-position the toolbar
-                this.on(window, 'scroll', function() {
+                this.on(this.options.contentWindow, 'scroll', function() {
                     self.positionToolbarIfShown();
                 }, true);
             }
@@ -1774,8 +1774,8 @@ else if (typeof define === 'function' && define.amd) {
                     return this;
                 }
 
-                if (window.clipboardData && e.clipboardData === undefined) {
-                    e.clipboardData = window.clipboardData;
+                if (self.options.contentWindow.clipboardData && e.clipboardData === undefined) {
+                    e.clipboardData = self.options.contentWindow.clipboardData;
                     // If window.clipboardData exists, but e.clipboardData doesn't exist,
                     // we're probably in IE. IE only has two possibilities for clipboard
                     // data format: 'Text' and 'URL'.
