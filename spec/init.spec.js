@@ -49,13 +49,38 @@ describe('Initialization TestCase', function () {
         it('should allow a list of html elements as parameters', function () {
             var elements = document.querySelectorAll('span'),
                 editor = new MediumEditor(elements);
-            expect(editor.elements).toBe(elements);
+            expect(editor.elements.length).toEqual(elements.length);
         });
 
         it('should allow a single element as parameter', function () {
             var element = document.querySelector('span'),
                 editor = new MediumEditor(element);
             expect(editor.elements).toEqual([element]);
+        });
+
+        it('should always initalize elements as an Array', function() {
+            var nodeList = document.querySelectorAll('span'),
+                node = document.querySelector('span'),
+                editor = new MediumEditor(nodeList);
+
+            // nodeList is a NodeList, similar to an array but not of the same type
+            expect(editor.elements.length).toEqual(nodeList.length);
+            expect(typeof editor.elements).not.toBe(typeof nodeList);
+            editor.deactivate();
+
+            editor = new MediumEditor('span');
+            expect(editor.elements.length).toEqual(nodeList.length);
+            editor.deactivate();
+
+            editor = new MediumEditor(node);
+            expect(editor.elements.length).toEqual(1);
+            expect(editor.elements[0]).toBe(node);
+            editor.deactivate();
+
+            editor = new MediumEditor();
+            expect(editor.elements).not.toBe(null);
+            expect(editor.elements.length).toBe(0);
+            editor.deactivate();
         });
     });
 

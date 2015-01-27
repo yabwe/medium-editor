@@ -362,7 +362,6 @@ else if (typeof define === 'function' && define.amd) {
         },
 
         initElements: function () {
-            this.updateElementList();
             var i,
                 addToolbar = false;
             for (i = 0; i < this.elements.length; i += 1) {
@@ -391,15 +390,19 @@ else if (typeof define === 'function' && define.amd) {
         },
 
         setElementSelection: function (selector) {
-            this.elementSelection = selector;
-            this.updateElementList();
-        },
-
-        updateElementList: function () {
-            this.elements = typeof this.elementSelection === 'string' ? this.options.ownerDocument.querySelectorAll(this.elementSelection) : this.elementSelection;
-            if (this.elements.nodeType === 1) {
-                this.elements = [this.elements];
+            if (!selector) {
+                selector = [];
             }
+            // If string, use as query selector
+            if (typeof selector === 'string') {
+                selector = this.options.ownerDocument.querySelectorAll(selector);
+            }
+            // If element, put into array
+            if (isElement(selector)) {
+                selector = [selector];
+            }
+            // Convert NodeList (or other array like object) into an array
+            this.elements = Array.prototype.slice.apply(selector);
         },
 
         bindBlur: function(i) {
@@ -414,7 +417,7 @@ else if (typeof define === 'function' && define.amd) {
 
                         // Activate the placeholder
                         if (!self.options.disablePlaceholders) {
-                            self.placeholderWrapper(self.elements[0], e);
+                            self.placeholderWrapper(e, self.elements[0]);
                         }
 
                         // Hide the toolbar after a small delay so we can prevent this on toolbar click
@@ -425,21 +428,6 @@ else if (typeof define === 'function' && define.amd) {
             // Hide the toolbar when focusing outside of the editor.
             this.on(this.options.ownerDocument.body, 'click', blurFunction, true);
             this.on(this.options.ownerDocument.body, 'focus', blurFunction, true);
-
-            return this;
-        },
-
-        bindKeypress: function(i) {
-            if (this.options.disablePlaceholders) {
-                return this;
-            }
-
-            var self = this;
-
-            // Set up the keypress events
-            this.on(this.elements[i], 'keypress', function(event){
-                self.placeholderWrapper(this,event);
-            });
 
             return this;
         },
@@ -479,9 +467,7 @@ else if (typeof define === 'function' && define.amd) {
                 this.bindReturn(i)
                     .bindTab(i)
                     .bindBlur(i)
-                    .bindClick(i)
-                    .bindKeypress(i);
-
+                    .bindClick(i);
             }
 
             return this;
@@ -489,7 +475,6 @@ else if (typeof define === 'function' && define.amd) {
 
         // Two functions to handle placeholders
         activatePlaceholder:  function (el) {
-
             if (!(el.querySelector('img')) &&
                     !(el.querySelector('blockquote')) &&
                     el.textContent.replace(/^\s+|\s+$/g, '') === '') {
@@ -497,9 +482,10 @@ else if (typeof define === 'function' && define.amd) {
                 el.classList.add('medium-editor-placeholder');
             }
         },
-        placeholderWrapper: function (el, e) {
+        placeholderWrapper: function (evt, el) {
+            el = el || evt.target;
             el.classList.remove('medium-editor-placeholder');
-            if (e.type !== 'keypress') {
+            if (evt.type !== 'keypress') {
                 this.activatePlaceholder(el);
             }
         },
@@ -1816,29 +1802,14 @@ else if (typeof define === 'function' && define.amd) {
         },
 
         setPlaceholders: function () {
-            if (this.options.disablePlaceholders) {
-                return this;
+            if (!this.options.disablePlaceholders && this.elements && this.elements.length) {
+                this.elements.forEach(function(el) {
+                    this.activatePlaceholder(el);
+                    this.on(el, 'blur', this.placeholderWrapper.bind(this));
+                    this.on(el, 'keypress', this.placeholderWrapper.bind(this));
+                }.bind(this));
             }
 
-            var i,
-                activatePlaceholder = function (el) {
-                    if (!(el.querySelector('img')) &&
-                            !(el.querySelector('blockquote')) &&
-                            el.textContent.replace(/^\s+|\s+$/g, '') === '') {
-                        el.classList.add('medium-editor-placeholder');
-                    }
-                },
-                placeholderWrapper = function (e) {
-                    this.classList.remove('medium-editor-placeholder');
-                    if (e.type !== 'keypress') {
-                        activatePlaceholder(this);
-                    }
-                };
-            for (i = 0; i < this.elements.length; i += 1) {
-                activatePlaceholder(this.elements[i]);
-                this.on(this.elements[i], 'blur', placeholderWrapper);
-                this.on(this.elements[i], 'keypress', placeholderWrapper);
-            }
             return this;
         },
 
