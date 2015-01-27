@@ -39,8 +39,8 @@ else if (typeof define === 'function' && define.amd) {
     // https://github.com/jashkenas/underscore
     function throttle(func, wait) {
         var THROTTLE_INTERVAL = 50,
-            context, 
-            args, 
+            context,
+            args,
             result,
             timeout = null,
             previous = 0,
@@ -270,12 +270,23 @@ else if (typeof define === 'function' && define.amd) {
         },
 
         off: function(target, event, listener, useCapture) {
-            var index = this.events.indexOf([target, event, listener, useCapture]),
+            var index = this.indexOfListener(target, event, listener, useCapture),
                 e;
             if(index !== -1) {
-                e = this.events.splice(index, 1);
+                e = this.events.splice(index, 1)[0];
                 e[0].removeEventListener(e[1], e[2], e[3]);
             }
+        },
+
+        indexOfListener: function(target, event, listener, useCapture) {
+            var i, n, item;
+            for (i = 0, n = this.events.length; i < n; i = i + 1) {
+                item = this.events[i];
+                if (item[0] === target && item[1] === event && item[2] === listener && item[3] === useCapture) {
+                    return i;
+                }
+            }
+            return -1;
         },
 
         removeAllEvents: function() {
@@ -714,7 +725,7 @@ else if (typeof define === 'function' && define.amd) {
                 this.anchorForm = this.toolbar.querySelector('.medium-editor-toolbar-form-anchor');
                 this.anchorInput = this.anchorForm.querySelector('input.medium-editor-toolbar-anchor-input');
                 this.anchorTarget = this.anchorForm.querySelector('input.medium-editor-toolbar-anchor-target');
-                this.anchorButton = this.anchorForm.querySelector('input.medium-editor-toolbar-anchor-button');   
+                this.anchorButton = this.anchorForm.querySelector('input.medium-editor-toolbar-anchor-button');
             }
             return this;
         },
