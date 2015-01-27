@@ -319,6 +319,15 @@ else if (typeof define === 'function' && define.amd) {
             return -1;
         },
 
+        delay: function(fn) {
+            var self = this;
+            setTimeout(function() {
+                if (self.isActive) {
+                    fn();
+                }
+            }, this.options.delay);
+        },
+
         removeAllEvents: function() {
             var e = this.events.pop();
             while(e) {
@@ -334,7 +343,9 @@ else if (typeof define === 'function' && define.amd) {
             // - It will be called when the browser is resizing, which can fire many times very quickly
             // - For some event (like resize) a slight lag in UI responsiveness is OK and provides performance benefits
             this.handleResize = throttle(function() {
-                self.positionToolbarIfShown();
+                if (self.isActive) {
+                    self.positionToolbarIfShown();
+                }
             });
 
             // handleBlur is throttled because:
@@ -342,7 +353,7 @@ else if (typeof define === 'function' && define.amd) {
             // - We want a slight delay so that other events in the stack can run, some of which may
             //   prevent the toolbar from being hidden (via this.keepToolbarAlive).
             this.handleBlur = throttle(function() {
-                if ( !self.keepToolbarAlive ) {
+                if (self.isActive && !self.keepToolbarAlive) {
                     self.hideToolbarActions();
                 }
             });
@@ -1327,9 +1338,9 @@ else if (typeof define === 'function' && define.amd) {
             this.keepToolbarAlive = false;
             // Using setTimeout + options.delay because:
             // We will actually be displaying the toolbar, which should be controlled by options.delay
-            setTimeout(function () {
+            this.delay(function () {
                 self.showToolbar();
-            }, this.options.delay);
+            });
         },
 
         saveSelection: function() {
@@ -1556,12 +1567,12 @@ else if (typeof define === 'function' && define.amd) {
                 sel.addRange(range);
                 // Using setTimeout + options.delay because:
                 // We may actually be displaying the anchor preview, which should be controlled by options.delay
-                setTimeout(function () {
+                this.delay(function () {
                     if (self.activeAnchor) {
                         self.showAnchorForm(self.activeAnchor.href);
                     }
                     self.keepToolbarAlive = false;
-                }, this.options.delay);
+                });
 
             }
 
@@ -1596,11 +1607,11 @@ else if (typeof define === 'function' && define.amd) {
                 // Using setTimeout + options.delay because:
                 // - We're going to show the anchor preview according to the configured delay
                 //   if the mouse has not left the anchor tag in that time
-                setTimeout(function () {
+                this.delay(function () {
                     if (overAnchor) {
                         self.showAnchorPreview(e.target);
                     }
-                }, this.options.delay);
+                });
             }
         },
 
