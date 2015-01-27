@@ -1,3 +1,16 @@
+2.1.0 / 2015-01-27
+==================
+
+* Handles ESC key in link editor
+* Standardizes usage of setTimeout for UX delays vs debouncing vs deferring
+* Adds an optional onShowToolbar method
+* Supports enabling/disabling checkSelection updates externally
+* Standardizes where in the DOM a range begins
+* Adds ARIA role information
+* Fixes off() not removing any event listeners
+* Misc minor bug fixes and improvements
+
+
 2.0.0 / 2015-01-06
 ==================
 
