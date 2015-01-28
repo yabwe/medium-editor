@@ -1,4 +1,4 @@
-/*global module, require*/
+/*global module, require, process*/
 
 module.exports = function (grunt) {
     'use strict';
@@ -19,7 +19,40 @@ module.exports = function (grunt) {
             'src/js/paste.js',
             'src/js/extension-anchor.js',
             'src/js/core.js'
-        ];
+        ],
+        browsers = [ {
+            browserName: "internet explorer",
+            version: "9",
+            platform: "WIN7"
+        }, {
+            browserName: "internet explorer",
+            version: "11",
+            platform: "WIN8.1"
+        }, {
+            browserName: "chrome",
+            platform: "WIN8.1"
+        }, {
+            browserName: "firefox",
+            platform: "WIN8.1"
+        }, {
+            browserName: "safari",
+            platform: "OS X 10.10"
+        }, {
+            browserName: "firefox",
+            platform: "OS X 10.10"
+        }, {
+            browserName: "googlechrome",
+            platform: "OS X 10.10"
+        }];
+
+    gruntConfig.connect = {
+        server: {
+            options: {
+                base: '',
+                port: 9999
+            }
+        }
+    };
 
     gruntConfig.jslint = {
         client: {
@@ -183,6 +216,23 @@ module.exports = function (grunt) {
         }
     };
 
+    gruntConfig['saucelabs-jasmine'] = {
+        all: {
+            options: {
+                urls: ['http://127.0.0.1:9999/_SpecRunner.html'],
+                tunnelTimeout: 5,
+                build: process.env.TRAVIS_JOB_ID,
+                concurrency: 3,
+                browsers: browsers,
+                sauceConfig: {
+                    'public': 'public',
+                    build: process.env.TRAVIS_JOB_ID,
+                    name: 'medium-editor-tests'
+                }
+            }
+        }
+    };
+
     grunt.initConfig(gruntConfig);
 
     require('time-grunt')(grunt);
@@ -194,6 +244,8 @@ module.exports = function (grunt) {
     });
 
     grunt.registerTask('test', ['jslint', 'concat', 'jasmine:suite', 'csslint']);
+    grunt.registerTask('travis', ['connect', 'jslint', 'concat', 'jasmine:suite', 'csslint', 'saucelabs-jasmine']);
+    grunt.registerTask('sauce', ['connect', 'saucelabs-jasmine']);
     grunt.registerTask('js', ['jslint', 'concat', 'jasmine:suite', 'uglify']);
     grunt.registerTask('css', ['sass', 'autoprefixer', 'cssmin', 'csslint']);
     grunt.registerTask('default', ['js', 'css']);
