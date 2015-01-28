@@ -300,35 +300,13 @@ else if (typeof define === 'function' && define.amd) {
             // Init toolbar
             if (addToolbar) {
                 this.passInstance()
-                    .initExtensions()
+                    .callExtensions('init')
                     .initToolbar()
                     .bindButtons()
                     .bindAnchorForm()
                     .bindAnchorPreview();
             }
             return this;
-        },
-
-        /**
-         * Calls an init() function on all registered extensions
-         * Checks whether init() exists before calling
-         *
-         */
-        initExtensions: function () {
-            var self = this,
-                ext,
-                name;
-
-            for (name in self.options.extensions) {
-                if (self.options.extensions.hasOwnProperty(name)) {
-                    ext = self.options.extensions[name];
-                    if (ext.init !== undefined) { 
-                        ext.init();
-                    }
-                }
-            }
-
-            return self;
         },
 
         setElementSelection: function (selector) {
@@ -492,6 +470,7 @@ else if (typeof define === 'function' && define.amd) {
                     }
                 }
             }
+            return this;
         },
 
         /**
