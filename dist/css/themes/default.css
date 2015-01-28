@@ -44,16 +44,16 @@
     background: -webkit-linear-gradient(bottom, #242424, rgba(0, 0, 0, 0.89));
     background: linear-gradient(bottom, #242424, rgba(0, 0, 0, 0.89)); }
 
-.medium-editor-toolbar-form-anchor {
+.medium-editor-toolbar-form {
   background: #242424;
   color: #999;
   border-radius: 5px; }
-  .medium-editor-toolbar-form-anchor .medium-editor-toolbar-anchor-input {
+  .medium-editor-toolbar-form .medium-editor-toolbar-input {
     height: 50px;
     background: #242424;
     color: #ccc;
     box-sizing: border-box; }
-  .medium-editor-toolbar-form-anchor a {
+  .medium-editor-toolbar-form a {
     color: #fff; }
 
 .medium-editor-toolbar-anchor-preview {

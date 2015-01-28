@@ -103,7 +103,7 @@
     font-style: italic;
 }
 
-.medium-editor-toolbar-form-anchor {
+.medium-editor-toolbar-form {
     display: none;
 
     input,
@@ -111,7 +111,7 @@
         font-family: HelveticaNeue, Helvetica, Arial, sans-serif;
     }
 
-    .medium-editor-toolbar-anchor-input, label {
+    .medium-editor-toolbar-input, label {
         margin: 0;
         padding: 6px;
         width: 316px;
