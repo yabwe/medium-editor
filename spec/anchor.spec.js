@@ -138,7 +138,7 @@ describe('Anchor Button TestCase', function () {
             save = editor.toolbar.querySelector('[data-element="a"]');
             fireEvent(save, 'click');
 
-            input = editor.anchorForm.querySelector('input.medium-editor-toolbar-anchor-input');
+            input = editor.anchorForm.querySelector('input.medium-editor-toolbar-input');
             input.value = 'test';
 
             button = editor.anchorForm.querySelector('input.medium-editor-toolbar-anchor-button');
@@ -170,7 +170,7 @@ describe('Anchor Button TestCase', function () {
 
             selectElementContents(editor.elements[0]);
             button = editor.toolbar.querySelector('[data-element="a"]');
-            cancel = editor.anchorForm.querySelector('a.medium-editor-toobar-anchor-close');
+            cancel = editor.anchorForm.querySelector('a.medium-editor-toobar-close');
             fireEvent(button, 'click');
             expect(editor.anchorForm.style.display).toBe('block');
             fireEvent(cancel, 'click');
