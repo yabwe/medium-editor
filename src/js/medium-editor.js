@@ -708,10 +708,11 @@ else if (typeof define === 'function' && define.amd) {
                 isHeader = /h\d/i;
 
             if ( (e.which === 8 || e.which === 13) // backspace or return
+                    && node.previousElementSibling 
                     && isHeader.test(tagName) // in a header
                     && getCaretOffsets(node).left === 0 ) // at the very end of the block
             {
-                if ( e.which === 8 && node.previousElementSibling && isEmpty.test(node.previousElementSibling.innerHTML) )
+                if ( e.which === 8 && isEmpty.test(node.previousElementSibling.innerHTML) )
                 {
                     // backspacing the begining of a header into an empty previous element will
                     // change the tagName of the current node to prevent one
@@ -731,6 +732,8 @@ else if (typeof define === 'function' && define.amd) {
 
             }
             else if ( e.which === 46 // delete
+                && node.nextElementSibling
+                && node.previousElementSibling
                 && !isHeader.test(tagName) // not in a header
                 && isEmpty.test(node.innerHTML) // in an empty tag
                 && isHeader.test(node.nextElementSibling.tagName) ) // when the next tag *is* a header
