@@ -22,17 +22,30 @@ IE 9+ ✔ | Latest ✔ | Latest ✔ | Latest ✔ | Latest ✔ |
 
 __demo__: [http://daviferreira.github.io/medium-editor/](http://daviferreira.github.io/medium-editor/)
 
-First, you need to attach medium editor's stylesheet to your page:
+### Installation
+
+**Via bower:**
+
+Run in your console: `bower install medium-editor`
+
+**Manual installation:**
+
+Download the [latest release](https://github.com/daviferreira/medium-editor/releases) and attach medium editor's stylesheets to your page:
 
 ```html
 <link rel="stylesheet" href="css/medium-editor.css"> <!-- Core -->
 <link rel="stylesheet" href="css/themes/default.css"> <!-- or any other theme -->
 ```
 
-The next step is to reference the editor's script and instantiate a new MediumEditor object:
+The next step is to reference the editor's script
 
 ```html
 <script src="js/medium-editor.js"></script>
+```
+
+### Usage
+You can now instantiate a new MediumEditor object:
+```html
 <script>var editor = new MediumEditor('.editable');</script>
 ```
 
