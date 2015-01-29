@@ -464,22 +464,6 @@ else if (typeof define === 'function' && define.amd) {
             return this;
         },
 
-        bindKeypress: function(i) {
-            if (this.options.disablePlaceholders) {
-                return this;
-            }
-
-            var self = this;
-
-            // Set up the keypress events
-            this.on(this.elements[i], 'keypress', function(event){
-
-                self.placeholderWrapper(this,event);
-            });
-
-            return this;
-        },
-
         bindClick: function(i) {
             var self = this;
 
