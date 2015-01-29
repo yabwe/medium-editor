@@ -636,7 +636,6 @@ else if (typeof define === 'function' && define.amd) {
                             {
                                 self.options.ownerDocument.execCommand('formatBlock', false, 'p');
                             }
-
                         }
                         if (tagName === 'a') {
                             self.options.ownerDocument.execCommand('unlink', false, null);
