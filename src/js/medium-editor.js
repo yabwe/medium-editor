@@ -109,7 +109,7 @@ else if (typeof define === 'function' && define.amd) {
             if (nextNode === targetNode) {
                 pastTarget = true;
             } else if (pastTarget) {
-                if (nextNode.nodeType === 3 && nextNode.nodeValue.length > 0) {
+                if (nextNode.nodeType === 3 && nextNode.nodeValue && nextNode.nodeValue.length > 0) {
                     break;
                 }
             }
@@ -709,7 +709,7 @@ else if (typeof define === 'function' && define.amd) {
                 isHeader = /h\d/i;
 
             if ( (e.which === 8 || e.which === 13) // backspace or return
-                    && node.previousElementSibling 
+                    && node.previousElementSibling
                     && isHeader.test(tagName) // in a header
                     && getCaretOffsets(node).left === 0 ) // at the very end of the block
             {
@@ -934,7 +934,7 @@ else if (typeof define === 'function' && define.amd) {
                 if (extensions.hasOwnProperty(name)) {
                     ext = extensions[name];
                     if(ext.hasForm){
-                       form = ext.getForm !== undefined ? ext.getForm() : null; 
+                       form = ext.getForm !== undefined ? ext.getForm() : null;
                     }
                     if (form) {
                         id = 'medium-editor-toolbar-form-'+name+'-'+this.id;
@@ -1089,26 +1089,27 @@ else if (typeof define === 'function' && define.amd) {
             this.selection = newSelection;
             this.selectionRange = this.selection.getRangeAt(0);
 
-            /* 
+            /*
             * In firefox, there are cases (ie doubleclick of a word) where the selectionRange start
             * will be at the very end of an element.  In other browsers, the selectionRange start
             * would instead be at the very beginning of an element that actually has content.
             * example:
             *   <span>foo</span><span>bar</span>
-            * 
+            *
             * If the text 'bar' is selected, most browsers will have the selectionRange start at the beginning
             * of the 'bar' span.  However, there are cases where firefox will have the selectionRange start
             * at the end of the 'foo' span.  The contenteditable behavior will be ok, but if there are any
             * properties on the 'bar' span, they won't be reflected accurately in the toolbar
             * (ie 'Bold' button wouldn't be active)
-            * 
+            *
             * So, for cases where the selectionRange start is at the end of an element/node, find the next
             * adjacent text node that actually has content in it, and move the selectionRange start there.
             */
             if (
                 this.options.standardizeSelectionStart &&
-                this.selectionRange.startOffset === this.selectionRange.startContainer.nodeValue.length
-                ) {
+                this.selectionRange.startContainer.nodeValue &&
+                (this.selectionRange.startOffset === this.selectionRange.startContainer.nodeValue.length)
+            ) {
                 adjacentNode = findAdjacentTextNodeWithContent(this.getSelectionElement(), this.selectionRange.startContainer, this.options.ownerDocument);
                 if (adjacentNode) {
                     offset = 0;
@@ -1233,7 +1234,7 @@ else if (typeof define === 'function' && define.amd) {
                 } else {
                     this.toolbar.style.left = (containerCenter - halfOffsetWidth) + "px";
                 }
-                
+
             } else if (!selection.isCollapsed) {
                 range = selection.getRangeAt(0);
                 boundary = range.getBoundingClientRect();
