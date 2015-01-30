@@ -19,6 +19,9 @@
     "wysiwyg",
     "rich-text"
   ],
+  "publishConfig": {
+    "registry": "http://registry.npmjs.org/"
+  },
   "license": "THE BEER-WARE LICENSE",
   "devDependencies": {
     "grunt": "~0.4.5",
