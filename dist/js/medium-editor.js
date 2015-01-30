@@ -180,6 +180,36 @@ else if (typeof define === 'function' && define.amd) {
         return html;
     }
 
+    /**
+     *  Find the caret position within an element irrespective of any inline tags it may contain.
+     *
+     *  @param {DOMElement} An element containing the cursor to find offsets relative to.
+     *  @param {Range} A Range representing cursor position. Will window.getSelection if none is passed.
+     *  @return {Object} 'left' and 'right' attributes contain offsets from begining and end of Element
+     */
+    function getCaretOffsets(element, range) {
+        var preCaretRange, postCaretRange;
+
+        if (!range) {
+            range = window.getSelection().getRangeAt(0);
+        }
+
+        preCaretRange = range.cloneRange();
+        postCaretRange = range.cloneRange();
+
+        preCaretRange.selectNodeContents(element);
+        preCaretRange.setEnd(range.endContainer, range.endOffset);
+
+        postCaretRange.selectNodeContents(element);
+        postCaretRange.setStart(range.endContainer, range.endOffset);
+
+        return {
+            left: preCaretRange.toString().length,
+            right: postCaretRange.toString().length
+        };
+    }
+
+
     // https://github.com/jashkenas/underscore
     function isElement(obj) {
         return !!(obj && obj.nodeType === 1);
@@ -467,7 +497,7 @@ else if (typeof define === 'function' && define.amd) {
 
                 // Bind the return and tab keypress events
                 this.bindReturn(i)
-                    .bindTab(i)
+                    .bindKeydown(i)
                     .bindBlur(i)
                     .bindClick(i);
             }
@@ -585,7 +615,12 @@ else if (typeof define === 'function' && define.amd) {
                     if (!(self.options.disableReturn || editorElement.getAttribute('data-disable-return')) &&
                         tagName !== 'li' && !self.isListItemChild(node)) {
                         if (!e.shiftKey) {
-                            self.options.ownerDocument.execCommand('formatBlock', false, 'p');
+
+                            // paragraph creation should not be forced within a header tag
+                            if (!/h\d/.test(tagName))
+                            {
+                                self.options.ownerDocument.execCommand('formatBlock', false, 'p');
+                            }
                         }
                         if (tagName === 'a') {
                             self.options.ownerDocument.execCommand('unlink', false, null);
@@ -630,9 +665,10 @@ else if (typeof define === 'function' && define.amd) {
             return this;
         },
 
-        bindTab: function (index) {
+        bindKeydown: function (index) {
             var self = this;
             this.on(this.elements[index], 'keydown', function (e) {
+
                 if (e.which === 9) {
                     // Override tab only for pre nodes
                     var tag = getSelectionStart.call(self).tagName.toLowerCase();
@@ -653,8 +689,75 @@ else if (typeof define === 'function' && define.amd) {
                         }
                     }
                 }
+                else if ( e.which === 8 || e.which === 46 || e.which === 13 )
+                {
+
+                    // Bind keys which can create or destroy a block element: backspace, delete, return
+                    self.onBlockModifier(e);
+
+                }
             });
             return this;
+        },
+
+        onBlockModifier: function( e ) {
+
+            var range, sel, p, node = getSelectionStart.call(this),
+                tagName = node.tagName.toLowerCase(),
+                isEmpty = /^(\s+|<br\/?>)?$/i,
+                isHeader = /h\d/i;
+
+            if ( (e.which === 8 || e.which === 13) // backspace or return
+                    && node.previousElementSibling 
+                    && isHeader.test(tagName) // in a header
+                    && getCaretOffsets(node).left === 0 ) // at the very end of the block
+            {
+                if ( e.which === 8 && isEmpty.test(node.previousElementSibling.innerHTML) )
+                {
+                    // backspacing the begining of a header into an empty previous element will
+                    // change the tagName of the current node to prevent one
+                    // instead delete previous node and cancel the event.
+                    node.previousElementSibling.parentNode.removeChild( node.previousElementSibling );
+                    e.preventDefault();
+                }
+                else if ( e.which === 13 )
+                {
+                    // hitting return in the begining of a header will create empty header elements before the current one
+                    // instead, make "<p><br></p>" element, which are what happens if you hit return in an empty paragraph
+                    p = this.options.ownerDocument.createElement('p');
+                    p.innerHTML = '<br>';
+                    node.previousElementSibling.parentNode.insertBefore( p, node );
+                    e.preventDefault();
+                }
+
+            }
+            else if ( e.which === 46 // delete
+                && node.nextElementSibling
+                && node.previousElementSibling
+                && !isHeader.test(tagName) // not in a header
+                && isEmpty.test(node.innerHTML) // in an empty tag
+                && isHeader.test(node.nextElementSibling.tagName) ) // when the next tag *is* a header
+            {
+                    // hitting delete in an empty element preceding a header, ex:
+                    //  <p>[CURSOR]</p><h1>Header</h1>
+                    // Will cause the h1 to become a paragraph.
+                    // Instead, delete the paragraph node and move the cursor to the begining of the h1
+
+                    // remove node and move cursor to start of header
+                    range = document.createRange();
+                    sel = window.getSelection();
+
+                    range.setStart(node.nextElementSibling, 0);
+                    range.collapse(true);
+
+                    sel.removeAllRanges();
+                    sel.addRange(range);
+
+                    node.previousElementSibling.parentNode.removeChild(node);
+
+                    e.preventDefault();
+            }
+
         },
 
         buttonTemplate: function (btnType) {
