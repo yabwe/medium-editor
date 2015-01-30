@@ -1,6 +1,6 @@
 {
   "name": "medium-editor",
-  "version": "2.1.0",
+  "version": "2.1.1",
   "author": "Davi Ferreira <hi@daviferreira.com>",
   "description": "Medium.com WYSIWYG editor clone.",
   "main": "src/js/medium-editor.js",
