@@ -100,6 +100,7 @@ If you want to support IE9, you will need to use a classList pollyfill, like Eli
 * __anchorButton__: enables/disables adding class __anchorButtonClass__ to anchor tags. Default: false
 * __anchorButtonClass__: class to add to anchor tags, when __anchorButton__ is set to true. Default: btn
 * __anchorInputPlaceholder__: text to be shown as placeholder of the anchor input. Default: _Paste or type a link_
+* __anchorInputCheckboxLabel__: text to be shown for the anchor new window target. Default: _Open in new window_
 * __anchorPreviewHideDelay__: time in milliseconds to show the anchor tag preview after the mouse has left the anchor tag. Default: 500
 * __checkLinkFormat__: enables/disables check for common URL protocols on anchor links. Default: false
 * __disableAnchorForm__: enables/disables the built-in anchor url collection ux, including DOM element creation and attaching event handlers.  When disabled, medium-editor will not automatically handle collecting a url if a 'anchor' button is included in the toolbar. Default: false

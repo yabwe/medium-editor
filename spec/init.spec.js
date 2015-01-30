@@ -98,6 +98,7 @@ describe('Initialization TestCase', function () {
         it('should have a default set of options', function () {
             var defaultOptions = {
                 anchorInputPlaceholder: 'Paste or type a link',
+                anchorInputCheckboxLabel: 'Open in new window',
                 delay: 0,
                 diffLeft: 0,
                 diffTop: -10,
@@ -137,6 +138,7 @@ describe('Initialization TestCase', function () {
         it('should accept custom options values', function () {
             var options = {
                 anchorInputPlaceholder: 'test',
+                anchorInputCheckboxLabel: 'new window?',
                 diffLeft: 10,
                 diffTop: 5,
                 firstHeader: 'h2',

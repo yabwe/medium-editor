@@ -222,6 +222,7 @@ else if (typeof define === 'function' && define.amd) {
         defaults: {
             allowMultiParagraphSelection: true,
             anchorInputPlaceholder: 'Paste or type a link',
+            anchorInputCheckboxLabel: 'Open in new window',
             anchorPreviewHideDelay: 500,
             buttons: ['bold', 'italic', 'underline', 'anchor', 'header1', 'header2', 'quote'],
             buttonLabels: false,
@@ -867,7 +868,7 @@ else if (typeof define === 'function' && define.amd) {
 
             target.setAttribute('type', 'checkbox');
             target.className = 'medium-editor-toolbar-anchor-target';
-            target_label.innerHTML = "Open in New Window?";
+            target_label.innerHTML = this.options.anchorInputCheckboxLabel;
             target_label.insertBefore(target, target_label.firstChild);
 
             button.setAttribute('type', 'checkbox');
