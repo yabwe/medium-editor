@@ -1,3 +1,7 @@
+2.1.2 / 2015-01-30
+==================
+* Specify default npm registry (`http://registry.npmjs.org`)
+
 2.1.1 / 2015-01-30
 ==================
 * Adds support for newlines in placeholder attribute
