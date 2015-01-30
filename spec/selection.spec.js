@@ -92,7 +92,7 @@ describe('Selection TestCase', function () {
               selectElementContents(this.el, { collapse: 'toStart' });
               editor.checkSelection();
 
-              expect(editor.setToolbarButtonStates.calls.count()).toEqual(1);
+              expect(editor.setToolbarButtonStates).toHaveBeenCalled();
             });
         });
     });

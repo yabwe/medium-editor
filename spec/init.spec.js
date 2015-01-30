@@ -65,7 +65,8 @@ describe('Initialization TestCase', function () {
 
             // nodeList is a NodeList, similar to an array but not of the same type
             expect(editor.elements.length).toEqual(nodeList.length);
-            expect(typeof editor.elements).not.toBe(typeof nodeList);
+            expect(typeof nodeList.forEach).toBe('undefined');
+            expect(typeof editor.elements.forEach).toBe('function');
             editor.deactivate();
 
             editor = new MediumEditor('span');
