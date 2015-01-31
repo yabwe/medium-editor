@@ -83,16 +83,16 @@ describe('Selection TestCase', function () {
             });
 
             it('should update button states when updateOnEmptySelection is true and the selection is empty', function () {
-              spyOn(MediumEditor.prototype, 'setToolbarButtonStates').and.callThrough();
+                spyOn(MediumEditor.prototype, 'setToolbarButtonStates').and.callThrough();
 
-              var editor = new MediumEditor('.editor', {
-                  updateOnEmptySelection: true
-              });
+                var editor = new MediumEditor('.editor', {
+                    updateOnEmptySelection: true
+                });
 
-              selectElementContents(this.el, { collapse: 'toStart' });
-              editor.checkSelection();
+                selectElementContents(this.el, { collapse: 'toStart' });
+                editor.checkSelection();
 
-              expect(editor.setToolbarButtonStates).toHaveBeenCalled();
+                expect(editor.setToolbarButtonStates).toHaveBeenCalled();
             });
         });
     });

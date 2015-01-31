@@ -40,7 +40,7 @@ describe('Toolbar TestCase', function () {
         it('should call the onShowToolbar callback if set', function () {
             this.el.innerHTML = 'specOnShowToolbarTest';
             var editor = new MediumEditor('.editor');
-            editor.onShowToolbar = function() {};
+            editor.onShowToolbar = function () {};
             spyOn(editor, 'onShowToolbar').and.callThrough();
             jasmine.clock().install();
             try {
@@ -54,7 +54,7 @@ describe('Toolbar TestCase', function () {
             }
         });
 
-        it('should not create an anchor form element if disableAnchorForm is set to true', function() {
+        it('should not create an anchor form element if disableAnchorForm is set to true', function () {
             expect(document.querySelectorAll('.medium-editor-toolbar-form-anchor').length).toBe(0);
             var editor = new MediumEditor('.editor', {
                 disableAnchorForm: true
@@ -62,7 +62,7 @@ describe('Toolbar TestCase', function () {
             expect(editor.toolbar.querySelectorAll('.medium-editor-toolbar-form-anchor').length).toBe(0);
         });
 
-        it('should not call MediumEditor\'s toolbarFormAnchor method if disableAnchorForm is set to true', function() {
+        it('should not call MediumEditor\'s toolbarFormAnchor method if disableAnchorForm is set to true', function () {
             spyOn(MediumEditor.prototype, 'toolbarFormAnchor').and.callThrough();
             var editor = new MediumEditor('.editor', {
                 disableAnchorForm: true
@@ -144,7 +144,7 @@ describe('Toolbar TestCase', function () {
             expect(editor.toolbar.classList.contains('medium-editor-toolbar-active')).toBe(false);
         });
 
-        it('should enable bold button in toolbar when bold text is selected', function() {
+        it('should enable bold button in toolbar when bold text is selected', function () {
             var editor = null;
 
             this.el.innerHTML = 'lorem ipsum <b><div id="cef_el">dolor</div></b>';
@@ -158,7 +158,7 @@ describe('Toolbar TestCase', function () {
             expect(editor.toolbar.querySelector('button[data-action="bold"]').classList.contains('medium-editor-button-active')).toBe(true);
         });
 
-        it('should not activate buttons in toolbar when stopSelectionUpdates has been called, but should activate buttons after startSelectionUpdates is called', function() {
+        it('should not activate buttons in toolbar when stopSelectionUpdates has been called, but should activate buttons after startSelectionUpdates is called', function () {
             var editor = null;
 
             this.el.innerHTML = 'lorem ipsum <b><div id="cef_el">dolor</div></b>';
@@ -182,7 +182,7 @@ describe('Toolbar TestCase', function () {
         it('should call onHideToolbar when toolbar is hidden', function () {
             var editor = new MediumEditor('.editor');
             editor.toolbar.classList.add('medium-editor-toolbar-active');
-            editor.onHideToolbar = function() {};
+            editor.onHideToolbar = function () {};
 
             spyOn(editor, 'onHideToolbar').and.callThrough();
 
@@ -192,7 +192,7 @@ describe('Toolbar TestCase', function () {
             expect(editor.onHideToolbar).toHaveBeenCalled();
         });
 
-        it('should hide the toolbar for one medium-editor instance when another medium-editor instance shows its toolbar', function() {
+        it('should hide the toolbar for one medium-editor instance when another medium-editor instance shows its toolbar', function () {
             var editorOne,
                 editorTwo;
 

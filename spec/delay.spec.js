@@ -18,7 +18,7 @@ describe('Delay TestCase', function () {
         tearDown(this.el);
     });
 
-    it('should call function after delay', function() {
+    it('should call function after delay', function () {
         var editor, spy;
 
         editor = new MediumEditor('.editor', {delay: 100});

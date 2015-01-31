@@ -18,8 +18,8 @@ describe('Events TestCase', function () {
         tearDown(this.el);
     });
 
-    describe('On', function() {
-        it('should bind listener', function() {
+    describe('On', function () {
+        it('should bind listener', function () {
             var el, editor, spy;
             el = document.createElement('div');
             spy = jasmine.createSpy('handler');
@@ -31,8 +31,8 @@ describe('Events TestCase', function () {
         });
     });
 
-    describe('Off', function() {
-        it('should unbind listener', function() {
+    describe('Off', function () {
+        it('should unbind listener', function () {
             var el, editor, spy;
             el = document.createElement('div');
             spy = jasmine.createSpy('handler');

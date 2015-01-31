@@ -66,7 +66,7 @@ describe('Activate/Deactivate TestCase', function () {
             var editor, triggerEvents;
 
             editor = new MediumEditor('.editor', {delay: 5});
-            triggerEvents = function() {
+            triggerEvents = function () {
                 fireEvent(window, 'resize', null, false);
                 fireEvent(document.body, 'click', null, false, document.body);
                 fireEvent(document.body, 'blur', null, false);

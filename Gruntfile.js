@@ -20,8 +20,7 @@ module.exports = function (grunt) {
                 browser: true,
                 unparam: true,
                 todo: true,
-                debug: true,
-                white: true
+                debug: true
             }
         }
     };
@@ -98,7 +97,7 @@ module.exports = function (grunt) {
     gruntConfig.cssmin = {
         main: {
             options: {
-              noAdvanced: true
+                noAdvanced: true
             },
 
             expand: true,
@@ -109,7 +108,7 @@ module.exports = function (grunt) {
         },
         themes: {
             options: {
-              noAdvanced: true
+                noAdvanced: true
             },
 
             expand: true,

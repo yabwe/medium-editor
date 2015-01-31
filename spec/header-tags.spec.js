@@ -24,9 +24,10 @@ describe('Protect Header Tags TestCase', function () {
 
             // place cursor at begining of header
             var editor = new MediumEditor('.editor'),
-            el = document.getElementById("header"),
-            range = document.createRange(),
-            sel = window.getSelection();
+                el = document.getElementById("header"),
+                range = document.createRange(),
+                sel = window.getSelection();
+
             range.setStart(el, 0);
             range.collapse(true);
             sel.removeAllRanges();
@@ -47,9 +48,9 @@ describe('Protect Header Tags TestCase', function () {
 
             // place cursor at begining of header
             var editor = new MediumEditor('.editor'),
-            el = document.getElementById("header"),
-            range = document.createRange(),
-            sel = window.getSelection();
+                el = document.getElementById("header"),
+                range = document.createRange(),
+                sel = window.getSelection();
             range.setStart(el, 0);
             range.collapse(true);
             sel.removeAllRanges();
@@ -68,24 +69,24 @@ describe('Protect Header Tags TestCase', function () {
 
             // place cursor at begining of header
             var editor = new MediumEditor('.editor'),
-            original_html = document.getElementById("editor").innerHTML,
-            el = document.getElementById("header"),
-            range = document.createRange(),
-            sel = window.getSelection();
+                originalHTML = document.getElementById("editor").innerHTML,
+                el = document.getElementById("header"),
+                range = document.createRange(),
+                sel = window.getSelection();
             range.setStart(el, 0);
             range.collapse(true);
             sel.removeAllRanges();
             sel.addRange(range);
 
             // hit backspace
-            editor.onBlockModifier( { which: 8, preventDefault: function(){ } });
+            editor.onBlockModifier({ which: 8, preventDefault: function () { } });
 
             el = document.getElementById("header");
             expect(el).toBeDefined();
             expect(el.tagName).toBe('H2');
 
             el = document.getElementById("editor");
-            expect(el.innerHTML).not.toBe(original_html);
+            expect(el.innerHTML).not.toBe(originalHTML);
 
         });
 
