@@ -437,13 +437,21 @@ if (typeof module === 'object') {
             this.elements = Array.prototype.slice.apply(selector);
         },
 
-        bindBlur: function (i) {
+        bindBlur: function () {
             var self = this,
                 blurFunction = function (e) {
+                    var isDescendantOfEditorElements = false,
+                        i;
+                    for (i = 0; i < self.elements.length; i += 1) {
+                        if (isDescendant(self.elements[i], e.target)) {
+                            isDescendantOfEditorElements = true;
+                            break;
+                        }
+                    }
                     // If it's not part of the editor, or the toolbar
                     if (e.target !== self.toolbar
-                            && e.target !== self.elements[0]
-                            && !isDescendant(self.elements[0], e.target)
+                            && self.elements.indexOf(e.target) === -1
+                            && !isDescendantOfEditorElements
                             && !isDescendant(self.toolbar, e.target)
                             && !isDescendant(self.anchorPreview, e.target)) {
 
@@ -498,7 +506,7 @@ if (typeof module === 'object') {
                 // Bind the return and tab keypress events
                 this.bindReturn(i)
                     .bindKeydown(i)
-                    .bindBlur(i)
+                    .bindBlur()
                     .bindClick(i);
             }
 

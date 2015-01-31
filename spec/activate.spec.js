@@ -1,6 +1,6 @@
 /*global MediumEditor, describe, it, expect, spyOn, jasmine, fireEvent,
          afterEach, beforeEach, selectElementContents, runs, waitsFor,
-         tearDown */
+         tearDown, xit */
 
 describe('Activate/Deactivate TestCase', function () {
     'use strict';
@@ -85,6 +85,50 @@ describe('Activate/Deactivate TestCase', function () {
             jasmine.clock().tick(1000); // arbitrary – must be longer than THROTTLE_INTERVAL
             expect(editor.positionToolbarIfShown).not.toHaveBeenCalled();
             expect(editor.hideToolbarActions).not.toHaveBeenCalled();
+        });
+
+        // regression test for https://github.com/daviferreira/medium-editor/issues/390
+        xit('should work with multiple elements of the same class', function () {
+            var editor,
+                el,
+                elements = [],
+                i;
+
+            for (i = 0; i < 3; i += 1) {
+                el = document.createElement('div');
+                el.className = 'editor';
+                el.textContent = i;
+                elements.push(
+                    document.body.appendChild(el)
+                );
+            }
+
+            jasmine.clock().install();
+
+            editor = new MediumEditor('.editor');
+
+            spyOn(editor, 'hideToolbarActions').and.callThrough(); // via: handleBlur
+
+            selectElementContents(editor.elements[0]);
+            fireEvent(editor.elements[0], 'click');
+            jasmine.clock().tick(51);
+            expect(editor.hideToolbarActions).not.toHaveBeenCalled();
+
+            selectElementContents(editor.elements[1]);
+            fireEvent(editor.elements[1], 'click');
+            jasmine.clock().tick(51);
+            expect(editor.hideToolbarActions).not.toHaveBeenCalled();
+
+            selectElementContents(editor.elements[2]);
+            fireEvent(editor.elements[2], 'click');
+            jasmine.clock().tick(51);
+            expect(editor.hideToolbarActions).not.toHaveBeenCalled();
+
+            elements.forEach(function (el) {
+                document.body.removeChild(el);
+            });
+
+            jasmine.clock().uninstall();
         });
 
         // regression test for https://github.com/daviferreira/medium-editor/issues/197
