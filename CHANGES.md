@@ -1,6 +1,13 @@
+2.1.3 / 2015-01-31
+==================
+* Fix issue with multiple elements with the same class 
+  on the same editor instance
+
+
 2.1.2 / 2015-01-30
 ==================
 * Specify default npm registry (`http://registry.npmjs.org`)
+
 
 2.1.1 / 2015-01-30
 ==================
@@ -9,6 +16,7 @@
 * Adds support for changing 'open in new window' label text
 * Fixes bug where `nodeValue` could unexpectedly be null
 * A couple of fixes to make tests a bit more reliable when run in the browser
+
 
 2.1.0 / 2015-01-27
 ==================
