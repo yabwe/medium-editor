@@ -1,6 +1,7 @@
 /*global MediumEditor, describe, it, expect, spyOn,
          afterEach, beforeEach, selectElementContents,
-         jasmine, fireEvent, console, tearDown*/
+         jasmine, fireEvent, console, tearDown,
+         selectElementContentsAndFire */
 
 describe('Anchor Button TestCase', function () {
     'use strict';
@@ -23,8 +24,7 @@ describe('Anchor Button TestCase', function () {
             spyOn(MediumEditor.prototype, 'showAnchorForm').and.callThrough();
             var button,
                 editor = new MediumEditor('.editor');
-            selectElementContents(editor.elements[0]);
-            fireEvent(editor.elements[0], 'mouseup');
+            selectElementContentsAndFire(editor.elements[0]);
             jasmine.clock().tick(1);
             button = editor.toolbar.querySelector('[data-element="a"]');
             fireEvent(button, 'click');
@@ -37,8 +37,7 @@ describe('Anchor Button TestCase', function () {
             spyOn(MediumEditor.prototype, 'showToolbarActions').and.callThrough();
             var button,
                 editor = new MediumEditor('.editor');
-            selectElementContents(editor.elements[0]);
-            fireEvent(editor.elements[0], 'mouseup');
+            selectElementContentsAndFire(editor.elements[0]);
             jasmine.clock().tick(1);
             button = editor.toolbar.querySelector('[data-element="a"]');
             editor.anchorForm.style.display = 'block';
@@ -53,8 +52,7 @@ describe('Anchor Button TestCase', function () {
             this.el.innerHTML = '<a href="#">link</a>';
             var button,
                 editor = new MediumEditor('.editor');
-            selectElementContents(editor.elements[0]);
-            fireEvent(editor.elements[0], 'mouseup');
+            selectElementContentsAndFire(editor.elements[0]);
             jasmine.clock().tick(1);
             button = editor.toolbar.querySelector('[data-element="a"]');
             fireEvent(button, 'click');

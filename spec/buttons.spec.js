@@ -1,6 +1,7 @@
 /*global MediumEditor, describe, it, expect, spyOn,
          afterEach, beforeEach, selectElementContents,
-         jasmine, fireEvent, tearDown*/
+         jasmine, fireEvent, tearDown,
+         selectElementContentsAndFire */
 
 describe('Buttons TestCase', function () {
     'use strict';
@@ -29,8 +30,7 @@ describe('Buttons TestCase', function () {
             var button,
                 editor = new MediumEditor('.editor');
             this.el.innerHTML = '<b>lorem ipsum</b>';
-            selectElementContents(editor.elements[0]);
-            fireEvent(editor.elements[0], 'mouseup');
+            selectElementContentsAndFire(editor.elements[0]);
             jasmine.clock().tick(1);
             button = editor.toolbar.querySelector('[data-element="b"]');
             expect(button.className).toContain('medium-editor-button-active');
@@ -45,8 +45,7 @@ describe('Buttons TestCase', function () {
         it('should set active class on click', function () {
             var button,
                 editor = new MediumEditor('.editor');
-            selectElementContents(editor.elements[0]);
-            fireEvent(editor.elements[0], 'mouseup');
+            selectElementContentsAndFire(editor.elements[0]);
             jasmine.clock().tick(1);
             button = editor.toolbar.querySelector('[data-element="b"]');
             fireEvent(button, 'click');
@@ -57,8 +56,7 @@ describe('Buttons TestCase', function () {
             spyOn(MediumEditor.prototype, 'checkSelection');
             var button,
                 editor = new MediumEditor('.editor');
-            selectElementContents(editor.elements[0]);
-            fireEvent(editor.elements[0], 'mouseup');
+            selectElementContentsAndFire(editor.elements[0]);
             jasmine.clock().tick(1);
             button = editor.toolbar.querySelector('[data-element="b"]');
             editor.selection = undefined;
@@ -70,8 +68,7 @@ describe('Buttons TestCase', function () {
             this.el.innerHTML = '<b>lorem ipsum</b>';
             var button,
                 editor = new MediumEditor('.editor');
-            selectElementContents(editor.elements[0]);
-            fireEvent(editor.elements[0], 'mouseup');
+            selectElementContentsAndFire(editor.elements[0]);
             jasmine.clock().tick(1);
             button = editor.toolbar.querySelector('[data-element="b"]');
             expect(button.className).toContain('medium-editor-button-active');
@@ -83,8 +80,7 @@ describe('Buttons TestCase', function () {
             spyOn(MediumEditor.prototype, 'execAction');
             var button,
                 editor = new MediumEditor('.editor');
-            selectElementContents(editor.elements[0]);
-            fireEvent(editor.elements[0], 'mouseup');
+            selectElementContentsAndFire(editor.elements[0]);
             jasmine.clock().tick(1);
             button = editor.toolbar.querySelector('[data-element="b"]');
             fireEvent(button, 'click');
@@ -95,8 +91,7 @@ describe('Buttons TestCase', function () {
             spyOn(document, 'execCommand').and.callThrough();
             var button,
                 editor = new MediumEditor('.editor');
-            selectElementContents(editor.elements[0]);
-            fireEvent(editor.elements[0], 'mouseup');
+            selectElementContentsAndFire(editor.elements[0]);
             jasmine.clock().tick(1);
             button = editor.toolbar.querySelector('[data-element="i"]');
             fireEvent(button, 'click');
@@ -108,8 +103,7 @@ describe('Buttons TestCase', function () {
             spyOn(MediumEditor.prototype, 'execAction');
             var button,
                 editor = new MediumEditor('.editor');
-            selectElementContents(editor.elements[0]);
-            fireEvent(editor.elements[0], 'mouseup');
+            selectElementContentsAndFire(editor.elements[0]);
             jasmine.clock().tick(1);
             button = editor.toolbar.querySelector('[data-element="b"]');
             fireEvent(button, 'click');
@@ -120,8 +114,7 @@ describe('Buttons TestCase', function () {
             spyOn(MediumEditor.prototype, 'triggerAnchorAction');
             var button,
                 editor = new MediumEditor('.editor');
-            selectElementContents(editor.elements[0]);
-            fireEvent(editor.elements[0], 'mouseup');
+            selectElementContentsAndFire(editor.elements[0]);
             jasmine.clock().tick(1);
             button = editor.toolbar.querySelector('[data-element="a"]');
             fireEvent(button, 'click');
@@ -138,8 +131,7 @@ describe('Buttons TestCase', function () {
             spyOn(MediumEditor.prototype, 'execFormatBlock');
             var button,
                 editor = new MediumEditor('.editor');
-            selectElementContents(editor.elements[0]);
-            fireEvent(editor.elements[0], 'mouseup');
+            selectElementContentsAndFire(editor.elements[0]);
             jasmine.clock().tick(1);
             button = editor.toolbar.querySelector('[data-element="h3"]');
             fireEvent(button, 'click');
@@ -150,8 +142,7 @@ describe('Buttons TestCase', function () {
             this.el.innerHTML = '<p><b>lorem ipsum</b></p>';
             var button,
                 editor = new MediumEditor('.editor');
-            selectElementContents(editor.elements[0]);
-            fireEvent(editor.elements[0], 'mouseup');
+            selectElementContentsAndFire(editor.elements[0]);
             jasmine.clock().tick(1);
             button = editor.toolbar.querySelector('[data-element="h3"]');
             fireEvent(button, 'click');
@@ -162,8 +153,7 @@ describe('Buttons TestCase', function () {
             this.el.innerHTML = '<h3><b>lorem ipsum</b></h3>';
             var button,
                 editor = new MediumEditor('.editor');
-            selectElementContents(editor.elements[0]);
-            fireEvent(editor.elements[0], 'mouseup');
+            selectElementContentsAndFire(editor.elements[0]);
             jasmine.clock().tick(1);
             button = editor.toolbar.querySelector('[data-element="h3"]');
             fireEvent(button, 'click');

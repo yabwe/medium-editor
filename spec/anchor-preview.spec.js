@@ -23,7 +23,8 @@ describe('Anchor Preview TestCase', function () {
             var editor = new MediumEditor('.editor', {
                 delay: 200
             }),
-                sel = window.getSelection();
+                sel = window.getSelection(),
+                nextRange;
 
             // show preview
             spyOn(MediumEditor.prototype, 'showAnchorPreview').and.callThrough();
@@ -48,8 +49,10 @@ describe('Anchor Preview TestCase', function () {
 
             // selecting other text should close the toolbar
             spyOn(MediumEditor.prototype, 'hideToolbarActions').and.callThrough();
+            nextRange = document.createRange();
+            nextRange.selectNodeContents(document.getElementById('another-element'));
             sel.removeAllRanges();
-            sel.addRange(document.createRange().selectNodeContents(document.getElementById('another-element')));
+            sel.addRange(nextRange);
             fireEvent(document.documentElement, 'mouseup');
             jasmine.clock().tick(200);
             expect(editor.hideToolbarActions).toHaveBeenCalled();

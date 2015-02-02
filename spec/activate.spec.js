@@ -1,6 +1,6 @@
 /*global MediumEditor, describe, it, expect, spyOn, jasmine, fireEvent,
          afterEach, beforeEach, selectElementContents, runs, waitsFor,
-         tearDown, xit */
+         tearDown, xit, selectElementContentsAndFire */
 
 describe('Activate/Deactivate TestCase', function () {
     'use strict';
@@ -109,18 +109,16 @@ describe('Activate/Deactivate TestCase', function () {
 
             spyOn(editor, 'hideToolbarActions').and.callThrough(); // via: handleBlur
 
-            selectElementContents(editor.elements[0]);
-            fireEvent(editor.elements[0], 'click');
+            selectElementContentsAndFire(editor.elements[0], { eventToFire: 'click' });
             jasmine.clock().tick(51);
             expect(editor.hideToolbarActions).not.toHaveBeenCalled();
 
-            selectElementContents(editor.elements[1]);
-            fireEvent(editor.elements[1], 'click');
+            selectElementContentsAndFire(editor.elements[1], { eventToFire: 'click' });
             jasmine.clock().tick(51);
             expect(editor.hideToolbarActions).not.toHaveBeenCalled();
 
             selectElementContents(editor.elements[2]);
-            fireEvent(editor.elements[2], 'click');
+            selectElementContentsAndFire(editor.elements[2], { eventToFire: 'click' });
             jasmine.clock().tick(51);
             expect(editor.hideToolbarActions).not.toHaveBeenCalled();
 
@@ -143,6 +141,7 @@ describe('Activate/Deactivate TestCase', function () {
             editor.deactivate();
 
             jasmine.clock().tick(501);
+            expect(true).toBe(true);
         });
     });
 });
