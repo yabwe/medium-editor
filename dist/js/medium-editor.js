@@ -98,7 +98,7 @@ if (typeof module === 'object') {
     function findAdjacentTextNodeWithContent(rootNode, targetNode, ownerDocument) {
         var pastTarget = false,
             nextNode,
-            nodeIterator = ownerDocument.createNodeIterator(rootNode, NodeFilter.SHOW_TEXT);
+            nodeIterator = ownerDocument.createNodeIterator(rootNode, NodeFilter.SHOW_TEXT, null, false);
 
         // Use a native NodeIterator to iterate over all the text nodes that are descendants
         // of the rootNode.  Once past the targetNode, choose the first non-empty text node
