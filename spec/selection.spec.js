@@ -1,6 +1,7 @@
 /*global MediumEditor, describe, it, expect, spyOn,
          afterEach, beforeEach, fireEvent, waits,
-         jasmine, selectElementContents, tearDown*/
+         jasmine, selectElementContents, tearDown,
+         selectElementContentsAndFire */
 
 describe('Selection TestCase', function () {
     'use strict';
@@ -10,6 +11,7 @@ describe('Selection TestCase', function () {
         this.el.className = 'editor';
         this.el.innerHTML = 'lorem ipsum';
         document.body.appendChild(this.el);
+        jasmine.clock().install();
     });
 
     afterEach(function () {
@@ -19,7 +21,6 @@ describe('Selection TestCase', function () {
 
     describe('CheckSelection', function () {
         it('should check for selection on mouseup event', function () {
-            jasmine.clock().install();
             spyOn(MediumEditor.prototype, 'checkSelection');
             var editor = new MediumEditor('.editor');
             fireEvent(editor.elements[0], 'mouseup');
@@ -28,7 +29,6 @@ describe('Selection TestCase', function () {
         });
 
         it('should check for selection on keyup', function () {
-            jasmine.clock().install();
             spyOn(MediumEditor.prototype, 'checkSelection');
             var editor = new MediumEditor('.editor');
             fireEvent(editor.elements[0], 'keyup');
@@ -62,10 +62,8 @@ describe('Selection TestCase', function () {
 
             it('should show the toolbar when something is selected', function () {
                 var editor = new MediumEditor('.editor');
-                jasmine.clock().install();
                 expect(editor.toolbar.classList.contains('medium-editor-toolbar-active')).toBe(false);
-                selectElementContents(this.el);
-                editor.checkSelection();
+                selectElementContentsAndFire(this.el);
                 jasmine.clock().tick(501);
                 expect(editor.toolbar.classList.contains('medium-editor-toolbar-active')).toBe(true);
             });
@@ -75,8 +73,8 @@ describe('Selection TestCase', function () {
                 spyOn(MediumEditor.prototype, 'setToolbarButtonStates').and.callThrough();
                 spyOn(MediumEditor.prototype, 'showToolbarActions').and.callThrough();
                 var editor = new MediumEditor('.editor');
-                selectElementContents(this.el);
-                editor.checkSelection();
+                selectElementContentsAndFire(this.el);
+                jasmine.clock().tick(51);
                 expect(editor.setToolbarPosition).toHaveBeenCalled();
                 expect(editor.setToolbarButtonStates).toHaveBeenCalled();
                 expect(editor.showToolbarActions).toHaveBeenCalled();
@@ -89,8 +87,8 @@ describe('Selection TestCase', function () {
                     updateOnEmptySelection: true
                 });
 
-                selectElementContents(this.el, { collapse: 'toStart' });
-                editor.checkSelection();
+                selectElementContentsAndFire(this.el, { collapse: 'toStart' });
+                jasmine.clock().tick(51);
 
                 expect(editor.setToolbarButtonStates).toHaveBeenCalled();
             });

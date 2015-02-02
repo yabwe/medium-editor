@@ -23,6 +23,12 @@ function fireEvent (element, event, keyCode, ctrlKey, target, relatedTarget) {
    }
 }
 
+function selectElementContentsAndFire(el, options) {
+    options = options || {};
+    selectElementContents(el, options);
+    fireEvent(el, options.eventToFire || 'mouseup');
+}
+
 function selectElementContents(el, options) {
     options = options || {};
 

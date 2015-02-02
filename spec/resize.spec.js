@@ -1,6 +1,6 @@
 /*global MediumEditor, describe, it, expect,
          afterEach, beforeEach, fireEvent, spyOn,
-         selectElementContents, jasmine, tearDown,
+         selectElementContentsAndFire, jasmine, tearDown,
          console, xit*/
 
 describe('Resize TestCase', function () {
@@ -21,14 +21,14 @@ describe('Resize TestCase', function () {
 
     it('should reset toolbar position on window resize', function () {
         var editor = new MediumEditor('.editor');
-        selectElementContents(editor.elements[0]);
-        fireEvent(editor.elements[0], 'mouseup');
+        selectElementContentsAndFire(editor.elements[0]);
         jasmine.clock().tick(101);
         expect(editor.toolbar.className.indexOf('active') > -1).toBe(true);
         spyOn(editor, 'setToolbarPosition');
         fireEvent(window, 'resize');
         jasmine.clock().tick(101);
         expect(editor.setToolbarPosition).toHaveBeenCalled();
+        editor.deactivate();
     });
 
     // I believe some other test is breaking this one, it passes when runs alone
