@@ -1619,7 +1619,7 @@ if (typeof module === 'object') {
             }
 
             var self = this,
-                buttonHeight = 40,
+                buttonHeight = 50,
                 boundary = anchorEl.getBoundingClientRect(),
                 middleBoundary = (boundary.left + boundary.right) / 2,
                 halfOffsetWidth,
@@ -1633,7 +1633,7 @@ if (typeof module === 'object') {
 
             self.anchorPreview.classList.add('medium-toolbar-arrow-over');
             self.anchorPreview.classList.remove('medium-toolbar-arrow-under');
-            self.anchorPreview.style.top = Math.round(buttonHeight + boundary.bottom - self.options.diffTop + this.options.contentWindow.pageYOffset - self.anchorPreview.offsetHeight) + 'px';
+            self.anchorPreview.style.top = Math.round(buttonHeight + boundary.bottom + self.options.diffTop + this.options.contentWindow.pageYOffset - self.anchorPreview.offsetHeight) + 'px';
             if (middleBoundary < halfOffsetWidth) {
                 self.anchorPreview.style.left = defaultLeft + halfOffsetWidth + 'px';
             } else if ((this.options.contentWindow.innerWidth - middleBoundary) < halfOffsetWidth) {
