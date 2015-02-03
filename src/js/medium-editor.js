@@ -220,7 +220,9 @@ if (typeof module === 'object') {
         var selection, range, el, fragment, node, lastNode;
 
         if (doc.queryCommandSupported('insertHTML')) {
-            return doc.execCommand('insertHTML', false, html);
+            try {
+                return doc.execCommand('insertHTML', false, html);
+            } catch (ignore) {}
         }
 
         selection = window.getSelection();
@@ -1952,11 +1954,7 @@ if (typeof module === 'object') {
                         paragraphs = e.clipboardData.getData(dataFormatPlain).split(/[\r\n]/g);
                         for (p = 0; p < paragraphs.length; p += 1) {
                             if (paragraphs[p] !== '') {
-                                if (navigator.userAgent.match(/firefox/i) && p === 0) {
-                                    html += self.htmlEntities(paragraphs[p]);
-                                } else {
-                                    html += '<p>' + self.htmlEntities(paragraphs[p]) + '</p>';
-                                }
+                                html += '<p>' + self.htmlEntities(paragraphs[p]) + '</p>';
                             }
                         }
                         insertHTMLCommand(self.options.ownerDocument, html);
