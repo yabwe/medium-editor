@@ -108,7 +108,7 @@ if (typeof module === 'object') {
             if (nextNode === targetNode) {
                 pastTarget = true;
             } else if (pastTarget) {
-                if (nextNode.nodeType === 3 && nextNode.nodeValue && nextNode.nodeValue.length > 0) {
+                if (nextNode.nodeType === 3 && nextNode.nodeValue && nextNode.nodeValue.trim().length > 0) {
                     break;
                 }
             }
