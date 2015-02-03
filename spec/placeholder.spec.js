@@ -66,14 +66,24 @@ describe('Placeholder TestCase', function () {
     it('should add the default placeholder text when data-placeholder is not present', function () {
         var editor = new MediumEditor('.editor'),
             placeholder = window.getComputedStyle(editor.elements[0], ':after').getPropertyValue('content');
-        expect(placeholder).toEqual("'" + editor.options.placeholder + "'");
+        if (placeholder.indexOf('attr(') === 0) {
+            // In firefox, getComputedStyle().getPropertyValue('content') can return attr() instead of what attr() evaluates to
+            expect(placeholder).toEqual('attr(data-placeholder)');
+        } else {
+            expect(placeholder).toEqual("'" + editor.options.placeholder + "'");
+        }
     });
 
     it('should use the data-placeholder when it is present', function () {
         this.el.setAttribute('data-placeholder', 'Custom placeholder');
         var editor = new MediumEditor('.editor'),
             placeholder = window.getComputedStyle(editor.elements[0], ':after').getPropertyValue('content');
-        expect(placeholder).toEqual("'Custom placeholder'");
+        if (placeholder.indexOf("attr(") === 0) {
+            // In firefox, getComputedStyle().getPropertyValue('content') can return attr() instead of what attr() evaluates to
+            expect(placeholder).toEqual("attr(data-placeholder)");
+        } else {
+            expect(placeholder).toEqual("'Custom placeholder'");
+        }
     });
 
     it('should not set placeholder for empty elements when disablePlaceholders is set to true', function () {
