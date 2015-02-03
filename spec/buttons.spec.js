@@ -153,7 +153,7 @@ describe('Buttons TestCase', function () {
             this.el.innerHTML = '<h3><b>lorem ipsum</b></h3>';
             var button,
                 editor = new MediumEditor('.editor');
-            selectElementContentsAndFire(editor.elements[0]);
+            selectElementContentsAndFire(editor.elements[0].firstChild);
             jasmine.clock().tick(1);
             button = editor.toolbar.querySelector('[data-element="h3"]');
             fireEvent(button, 'click');
