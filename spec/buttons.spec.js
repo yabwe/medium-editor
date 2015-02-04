@@ -96,7 +96,8 @@ describe('Buttons TestCase', function () {
             button = editor.toolbar.querySelector('[data-element="i"]');
             fireEvent(button, 'click');
             expect(document.execCommand).toHaveBeenCalled();
-            expect(this.el.innerHTML).toBe('<i>lorem ipsum</i>');
+            // IE won't generate an `<i>` tag here. it generates an `<em>`:
+            expect(this.el.innerHTML).toMatch(/(<i>|<em>)lorem ipsum(<\/i>|<\/em>)/);
         });
 
         it('should execute the button action', function () {
