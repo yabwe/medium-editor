@@ -1,6 +1,7 @@
 /*global MediumEditor, describe, it, expect, spyOn,
          afterEach, beforeEach, selectElementContents,
-         jasmine, fireEvent, console, tearDown*/
+         jasmine, fireEvent, console, tearDown,
+         selectElementContentsAndFire */
 
 describe('Clean pasted HTML', function () {
     'use strict';
@@ -20,9 +21,8 @@ describe('Clean pasted HTML', function () {
     });
 
     it('Multi-line rich-text pastes', function () {
-        var i, range,
+        var i,
             editorEl = this.el,
-            sel = window.getSelection(),
             editor = new MediumEditor('.editor', {
                 delay: 200,
                 forcePlainText: false,
@@ -51,10 +51,7 @@ describe('Clean pasted HTML', function () {
             // move caret to editor
             editorEl.innerHTML = '<span id="editor-inner">&nbsp</span>';
 
-            range = document.createRange();
-            range.selectNodeContents(document.getElementById('editor-inner'));
-            sel.removeAllRanges();
-            sel.addRange(range);
+            selectElementContentsAndFire(editorEl);
 
             editor.cleanPaste(tests[i].paste);
             jasmine.clock().tick(100);
