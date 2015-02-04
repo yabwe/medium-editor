@@ -1825,26 +1825,7 @@ if (typeof module === 'object') {
         createLink: function (input, target, buttonClass) {
             var i, event;
 
-            if (input.value.trim().length === 0) {
-                this.hideToolbarActions();
-                return;
-            }
-
-            restoreSelection.call(this, this.savedSelection);
-
-            if (this.options.checkLinkFormat) {
-                input.value = this.checkLinkFormat(input.value);
-            }
-
-            this.options.ownerDocument.execCommand('createLink', false, input.value);
-
-            if (this.options.targetBlank || target === "_blank") {
-                this.setTargetBlank();
-            }
-
-            if (buttonClass) {
-                this.setButtonClass(buttonClass);
-            }
+            this.createLinkInternal(input.value, target, buttonClass);
 
             if (this.options.targetBlank || target === "_blank" || buttonClass) {
                 event = this.options.ownerDocument.createEvent("HTMLEvents");
@@ -1857,6 +1838,29 @@ if (typeof module === 'object') {
             this.checkSelection();
             this.showToolbarActions();
             input.value = '';
+        },
+
+        createLinkInternal: function (url, target, buttonClass) {
+            if (!url || url.trim().length === 0) {
+                this.hideToolbarActions();
+                return;
+            }
+
+            restoreSelection.call(this, this.savedSelection);
+
+            if (this.options.checkLinkFormat) {
+                url = this.checkLinkFormat(url);
+            }
+
+            this.options.ownerDocument.execCommand('createLink', false, url);
+
+            if (this.options.targetBlank || target === "_blank") {
+                this.setTargetBlank();
+            }
+
+            if (buttonClass) {
+                this.setButtonClass(buttonClass);
+            }
         },
 
         positionToolbarIfShown: function () {
