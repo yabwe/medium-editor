@@ -61,9 +61,8 @@ describe('Clean pasted HTML', function () {
     });
 
     it('Inline rich-text pastes', function () {
-        var i, range,
+        var i,
             editorEl = this.el,
-            sel = window.getSelection(),
             editor = new MediumEditor('.editor', {
                 delay: 200,
                 forcePlainText: false,
@@ -85,16 +84,19 @@ describe('Clean pasted HTML', function () {
         for (i = 0; i < tests.length; i += 1) {
 
             // move caret to editor
-            editorEl.innerHTML = 'Before <span id="editor-inner">&nbsp</span> after.';
+            editorEl.innerHTML = 'Before&nbsp;<span id="editor-inner">&nbsp;</span>&nbsp;after.';
 
-            range = document.createRange();
-            range.selectNodeContents(document.getElementById('editor-inner'));
-            sel.removeAllRanges();
-            sel.addRange(range);
+            selectElementContents(document.getElementById('editor-inner'));
 
             editor.cleanPaste(tests[i].paste);
             jasmine.clock().tick(100);
-            expect(editorEl.innerHTML).toEqual('Before&nbsp;' + tests[i].output + '&nbsp;after.');
+            if (editorEl.innerHTML.indexOf('<span id="editor-inner">') !== -1) {
+                // Firefox and IE: doing an insertHTML while this <span> is selected results in the html being inserted inside of the span
+                expect(editorEl.innerHTML).toEqual('Before&nbsp;<span id="editor-inner">' + tests[i].output + '</span>&nbsp;after.');
+            } else {
+                // Chrome, Safari, and our test suite: doing an insertHTML while this <span> is selected results in the span being replaced completely
+                expect(editorEl.innerHTML).toEqual('Before&nbsp;' + tests[i].output + '&nbsp;after.');
+            }
         }
 
     });
