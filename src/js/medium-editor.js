@@ -1040,6 +1040,7 @@ if (typeof module === 'object') {
             }
 
             className = 'medium-editor-dragover';
+
             onDrag = function (e) {
                 e.preventDefault();
                 e.dataTransfer.dropEffect = "copy";
@@ -1062,7 +1063,7 @@ if (typeof module === 'object') {
                         fileReader = new FileReader();
                         fileReader.readAsDataURL(file);
 
-                        id = 'medium-img-' + Math.random();
+                        id = 'medium-img-' + (+new Date());
                         insertHTMLCommand(self.options.ownerDocument, '<img class="medium-image-loading" id="' + id + '" />');
 
                         fileReader.onload = function () {
