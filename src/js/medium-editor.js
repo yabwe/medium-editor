@@ -17,6 +17,304 @@ if (typeof module === 'object') {
 (function (window, document) {
     'use strict';
 
+    var now,
+        DefaultButton,
+        ButtonsData = {
+            'bold': {
+                name: 'bold',
+                action: 'bold',
+                tagNames: ['b', 'strong'],
+                styles: [{
+                    prop: 'font-weight',
+                    value: 'bold'
+                }],
+                html: '<button class="medium-editor-action medium-editor-action-bold" data-action="bold" data-element="b" aria-label="bold">{content}</button>',
+                contentDefault: '<b>B</b>',
+                contentFA: '<i class="fa fa-bold"></i>'
+            },
+            'italic': {
+                name: 'italic',
+                action: 'italic',
+                tagNames: ['i', 'em'],
+                styles: [{
+                    prop: 'font-style',
+                    value: 'italic'
+                }],
+                html: '<button class="medium-editor-action medium-editor-action-italic" data-action="italic" data-element="i" aria-label="italic">{content}</button>',
+                contentDefault: '<b><i>I</i></b>',
+                contentFA: '<i class="fa fa-italic"></i>'
+            },
+            'underline': {
+                name: 'underline',
+                action: 'underline',
+                tagNames: ['u'],
+                styles: [{
+                    prop: 'text-decoration',
+                    value: 'underline'
+                }],
+                html: '<button class="medium-editor-action medium-editor-action-underline" data-action="underline" data-element="u" aria-label="underline">{content}</button>',
+                contentDefault: '<b><u>U</u></b>',
+                contentFA: '<i class="fa fa-underline"></i>'
+            },
+            'strikethrough': {
+                name: 'strikethrough',
+                action: 'strikethrough',
+                tagNames: ['strike'],
+                styles: [{
+                    prop: 'text-decoration',
+                    value: 'line-through'
+                }],
+                html: '<button class="medium-editor-action medium-editor-action-strikethrough" data-action="strikethrough" data-element="strike" aria-label="strike through">{content}</button>',
+                contentDefault: '<s>A</s>',
+                contentFA: '<i class="fa fa-strikethrough"></i>'
+            },
+            'superscript': {
+                name: 'superscript',
+                action: 'superscript',
+                tagNames: ['sup'],
+                style: [],
+                html: '<button class="medium-editor-action medium-editor-action-superscript" data-action="superscript" data-element="sup" aria-label="superscript">{content}</button>',
+                contentDefault: '<b>x<sup>1</sup></b>',
+                contentFA: '<i class="fa fa-superscript"></i>'
+            },
+            'subscript': {
+                name: 'subscript',
+                action: 'subscript',
+                tagNames: ['sub'],
+                styles: [],
+                html: '<button class="medium-editor-action medium-editor-action-subscript" data-action="subscript" data-element="sub" aria-label="subscript">{content}</button>',
+                contentDefault: '<b>x<sub>1</sub></b>',
+                contentFA: '<i class="fa fa-subscript"></i>'
+            },
+            'anchor': {
+                name: 'anchor',
+                action: 'anchor',
+                tagNames: ['a'],
+                styles: [],
+                html: '<button class="medium-editor-action medium-editor-action-anchor" data-action="anchor" data-element="a" aria-label="link">{content}</button>',
+                contentDefault: '<b>#</b>',
+                contentFA: '<i class="fa fa-link"></i>'
+            },
+            'image': {
+                name: 'image',
+                action: 'image',
+                tagNames: ['img'],
+                styles: [],
+                html: '<button class="medium-editor-action medium-editor-action-image" data-action="image" data-element="img" aria-label="image">{content}</button>',
+                contentDefault: '<b>image</b>',
+                contentFA: '<i class="fa fa-picture-o"></i>'
+            },
+            'quote': {
+                name: 'quote',
+                action: 'append-blockquote',
+                tagNames: ['blockquote'],
+                styles: [],
+                html: '<button class="medium-editor-action medium-editor-action-quote" data-action="append-blockquote" data-element="blockquote" aria-label="blockquote">{content}</button>',
+                contentDefault: '<b>&ldquo;</b>',
+                contentFA: '<i class="fa fa-quote-right"></i>'
+            },
+            'orderedlist': {
+                name: 'orderedlist',
+                action: 'insertorderedlist',
+                tagNames: ['ol'],
+                styles: [],
+                html: '<button class="medium-editor-action medium-editor-action-orderedlist" data-action="insertorderedlist" data-element="ol" aria-label="ordered list">{content}</button>',
+                contentDefault: '<b>1.</b>',
+                contentFA: '<i class="fa fa-list-ol"></i>'
+            },
+            'unorderedlist': {
+                name: 'unorderedlist',
+                action: 'insertunorderedlist',
+                tagNames: ['ul'],
+                styles: [],
+                html: '<button class="medium-editor-action medium-editor-action-unorderedlist" data-action="insertunorderedlist" data-element="ul" aria-label="unordered list">{content}</button>',
+                contentDefault: '<b>&bull;</b>',
+                contentFA: '<i class="fa fa-list-ul"></i>'
+            },
+            'pre': {
+                name: 'pre',
+                action: 'append-pre',
+                tagNames: ['pre'],
+                styles: [],
+                html: '<button class="medium-editor-action medium-editor-action-pre" data-action="append-pre" data-element="pre" aria-label="preformatted text">{content}</button>',
+                contentDefault: '<b>0101</b>',
+                contentFA: '<i class="fa fa-code fa-lg"></i>'
+            },
+            'indent': {
+                name: 'indent',
+                action: 'indent',
+                tagNames: ['ol', 'ul'],
+                styles: [],
+                html: '<button class="medium-editor-action medium-editor-action-indent" data-action="indent" data-element="ul" aria-label="indent">{content}</button>',
+                contentDefault: '<b>&rarr;</b>',
+                contentFA: '<i class="fa fa-indent"></i>'
+            },
+            'outdent': {
+                name: 'outdent',
+                action: 'outdent',
+                tagNames: ['ol', 'ul'],
+                styles: [],
+                html: '<button class="medium-editor-action medium-editor-action-outdent" data-action="outdent" data-element="ul" aria-label="outdent">{content}</button>',
+                contentDefault: '<b>&larr;</b>',
+                contentFA: '<i class="fa fa-outdent"></i>'
+            },
+            'justifyCenter': {
+                name: 'justifyCenter',
+                action: 'justifyCenter',
+                tagNames: [],
+                styles: [{
+                    prop: 'text-align',
+                    value: 'center'
+                }],
+                html: '<button class="medium-editor-action medium-editor-action-justifyCenter" data-action="justifyCenter" data-element="" aria-label="center justify">{content}</button>',
+                contentDefault: '<b>C</b>',
+                contentFA: '<i class="fa fa-align-center"></i>'
+            },
+            'justifyFull': {
+                name: 'justifyFull',
+                action: 'justifyFull',
+                tagNames: [],
+                styles: [{
+                    prop: 'text-align',
+                    value: 'justify'
+                }],
+                html: '<button class="medium-editor-action medium-editor-action-justifyFull" data-action="justifyFull" data-element="" aria-label="full justify">{content}</button>',
+                contentDefault: '<b>J</b>',
+                contentFA: '<i class="fa fa-align-justify"></i>'
+            },
+            'justifyLeft': {
+                name: 'justifyLeft',
+                action: 'justifyLeft',
+                tagNames: [],
+                styles: [{
+                    prop: 'text-align',
+                    value: 'left'
+                }],
+                html: '<button class="medium-editor-action medium-editor-action-justifyLeft" data-action="justifyLeft" data-element="" aria-label="left justify">{content}</button>',
+                contentDefault: '<b>L</b>',
+                contentFA: '<i class="fa fa-align-left"></i>'
+            },
+            'justifyRight': {
+                name: 'justifyRight',
+                action: 'justifyRight',
+                tagNames: [],
+                styles: [{
+                    prop: 'text-align',
+                    value: 'right'
+                }],
+                html: '<button class="medium-editor-action medium-editor-action-justifyRight" data-action="justifyRight" data-element="" aria-label="right justify">{content}</button>',
+                contentDefault: '<b>R</b>',
+                contentFA: '<i class="fa fa-align-right"></i>'
+            },
+            'header1': {
+                name: 'header1',
+                action: function (options) {
+                    return 'append-' + options.firstHeader;
+                },
+                tagNames: function (options) {
+                    return [options.firstHeader];
+                },
+                styles: [],
+                html: function (options) {
+                    return '<button class="medium-editor-action medium-editor-action-header1" data-action="append-' + options.firstHeader + '" data-element="' + options.firstHeader + '" aria-label="h1">{content}</button>';
+                },
+                contentDefault: '<b>H1</b>'
+            },
+            'header2': {
+                name: 'header2',
+                action: function (options) {
+                    return 'append-' + options.secondHeader;
+                },
+                tagNames: function (options) {
+                    return [options.secondHeader];
+                },
+                styles: [],
+                html: function (options) {
+                    return '<button class="medium-editor-action medium-editor-action-header2" data-action="append-' + options.secondHeader + '" data-element="' + options.secondHeader + '" aria-label="h2">{content}</button>';
+                },
+                contentDefault: '<b>H2</b>'
+            }
+        };
+
+    DefaultButton = function (options, instance) {
+        this.options = options;
+        this.parent = instance;
+        this.button = this.createButton();
+        this.parent.on(this.button, 'click', this.handleClick.bind(this));
+    };
+
+    DefaultButton.prototype = {
+        getButton: function () {
+            return this.button;
+        },
+        createButton: function () {
+            var buttonHtml = (typeof this.options.html === 'function' ? this.options.html(this.parent.options) : this.options.html),
+                content = this.options.contentDefault,
+                tempWrapper = this.parent.options.ownerDocument.createElement('div');
+            if (this.options.buttonLabels) {
+                if (this.options.buttonLabels === 'fontawesome' && this.options.contentFA) {
+                    content = this.options.contentFA;
+                } else if (typeof this.options.buttonLabels === 'object' && this.options.buttonLabels[this.options.name]) {
+                    content = this.options.buttonLabels[this.options.name];
+                }
+            }
+            tempWrapper.innerHTML = buttonHtml.replace('{content}', content);
+            return tempWrapper.removeChild(tempWrapper.firstChild);
+        },
+        handleClick: function (evt) {
+            var action;
+            if (!this.parent.selection) {
+                this.parent.checkSelection();
+            }
+
+            if (this.isActive()) {
+                this.deactivate();
+            } else {
+                this.activate();
+            }
+
+            if (this.options.action) {
+                action = (typeof this.options.action === 'function' ? this.options.action(this.parent.options) : this.options.action);
+                this.parent.execAction(action, evt);
+            }
+            if (this.options.form) {
+                this.parent.showForm(this.form, evt);
+            }
+        },
+        isActive: function () {
+            return this.button.classList.contains(this.parent.options.activeButtonClass);
+        },
+        deactivate: function () {
+            this.button.classList.remove(this.parent.options.activeButtonClass);
+        },
+        activate: function () {
+            this.button.classList.add(this.parent.options.activeButtonClass);
+        },
+        shouldActivate: function (node) {
+            var isMatch = false,
+                tagNames;
+            if (node.nodeType === 3) {
+                return false;
+            }
+
+            if (this.options.tagNames && node.tagName) {
+                tagNames = (typeof this.options.tagNames === 'function') ? this.options.tagNames(this.parent.options) : this.options.tagNames;
+                isMatch = tagNames.indexOf(node.tagName.toLowerCase() !== -1);
+            }
+
+            if (!isMatch && this.options.styles) {
+                this.options.styles.forEach(function (style) {
+                    isMatch = (this.parent.options.contentWindow.getComputedStyle(node, null).getPropertyValue(style.prop) === style.value);
+                    if (isMatch) {
+                        return false;
+                    }
+                }.bind(this));
+            }
+
+            return isMatch;
+        }
+    };
+
     function extend(b, a) {
         var prop;
         if (b === undefined) {
@@ -31,7 +329,7 @@ if (typeof module === 'object') {
     }
 
     // https://github.com/jashkenas/underscore
-    var now = Date.now || function () {
+    now = Date.now || function () {
         return new Date().getTime();
     };
 
@@ -768,93 +1066,6 @@ if (typeof module === 'object') {
 
         },
 
-        buttonTemplate: function (btnType) {
-            var buttonLabels = this.getButtonLabels(this.options.buttonLabels),
-                buttonTemplates = {
-                    'bold': '<button class="medium-editor-action medium-editor-action-bold" data-action="bold" data-element="b" aria-label="bold">' + buttonLabels.bold + '</button>',
-                    'italic': '<button class="medium-editor-action medium-editor-action-italic" data-action="italic" data-element="i" aria-label="italic">' + buttonLabels.italic + '</button>',
-                    'underline': '<button class="medium-editor-action medium-editor-action-underline" data-action="underline" data-element="u" aria-label="underline">' + buttonLabels.underline + '</button>',
-                    'strikethrough': '<button class="medium-editor-action medium-editor-action-strikethrough" data-action="strikethrough" data-element="strike" aria-label="strike through">' + buttonLabels.strikethrough + '</button>',
-                    'superscript': '<button class="medium-editor-action medium-editor-action-superscript" data-action="superscript" data-element="sup" aria-label="superscript">' + buttonLabels.superscript + '</button>',
-                    'subscript': '<button class="medium-editor-action medium-editor-action-subscript" data-action="subscript" data-element="sub" aria-label="subscript">' + buttonLabels.subscript + '</button>',
-                    'anchor': '<button class="medium-editor-action medium-editor-action-anchor" data-action="anchor" data-element="a" aria-label="link">' + buttonLabels.anchor + '</button>',
-                    'image': '<button class="medium-editor-action medium-editor-action-image" data-action="image" data-element="img" aria-label="image">' + buttonLabels.image + '</button>',
-                    'header1': '<button class="medium-editor-action medium-editor-action-header1" data-action="append-' + this.options.firstHeader + '" data-element="' + this.options.firstHeader + '" aria-label="h1">' + buttonLabels.header1 + '</button>',
-                    'header2': '<button class="medium-editor-action medium-editor-action-header2" data-action="append-' + this.options.secondHeader + '" data-element="' + this.options.secondHeader + ' "aria-label="h2">' + buttonLabels.header2 + '</button>',
-                    'quote': '<button class="medium-editor-action medium-editor-action-quote" data-action="append-blockquote" data-element="blockquote" aria-label="blockquote">' + buttonLabels.quote + '</button>',
-                    'orderedlist': '<button class="medium-editor-action medium-editor-action-orderedlist" data-action="insertorderedlist" data-element="ol" aria-label="ordered list">' + buttonLabels.orderedlist + '</button>',
-                    'unorderedlist': '<button class="medium-editor-action medium-editor-action-unorderedlist" data-action="insertunorderedlist" data-element="ul" aria-label="unordered list">' + buttonLabels.unorderedlist + '</button>',
-                    'pre': '<button class="medium-editor-action medium-editor-action-pre" data-action="append-pre" data-element="pre" aria-label="preformatted text">' + buttonLabels.pre + '</button>',
-                    'indent': '<button class="medium-editor-action medium-editor-action-indent" data-action="indent" data-element="ul" aria-label="indent">' + buttonLabels.indent + '</button>',
-                    'outdent': '<button class="medium-editor-action medium-editor-action-outdent" data-action="outdent" data-element="ul" aria-label="outdent">' + buttonLabels.outdent + '</button>',
-                    'justifyCenter': '<button class="medium-editor-action medium-editor-action-justifyCenter" data-action="justifyCenter" data-element="" aria-label="center justify">' + buttonLabels.justifyCenter + '</button>',
-                    'justifyFull': '<button class="medium-editor-action medium-editor-action-justifyFull" data-action="justifyFull" data-element="" aria-label="full justify">' + buttonLabels.justifyFull + '</button>',
-                    'justifyLeft': '<button class="medium-editor-action medium-editor-action-justifyLeft" data-action="justifyLeft" data-element="" aria-label="left justify">' + buttonLabels.justifyLeft + '</button>',
-                    'justifyRight': '<button class="medium-editor-action medium-editor-action-justifyRight" data-action="justifyRight" data-element="" aria-label="right justify">' + buttonLabels.justifyRight + '</button>'
-                };
-            return buttonTemplates[btnType] || false;
-        },
-
-        // TODO: break method
-        getButtonLabels: function (buttonLabelType) {
-            var customButtonLabels,
-                attrname,
-                buttonLabels = {
-                    'bold': '<b>B</b>',
-                    'italic': '<b><i>I</i></b>',
-                    'underline': '<b><u>U</u></b>',
-                    'strikethrough': '<s>A</s>',
-                    'superscript': '<b>x<sup>1</sup></b>',
-                    'subscript': '<b>x<sub>1</sub></b>',
-                    'anchor': '<b>#</b>',
-                    'image': '<b>image</b>',
-                    'header1': '<b>H1</b>',
-                    'header2': '<b>H2</b>',
-                    'quote': '<b>&ldquo;</b>',
-                    'orderedlist': '<b>1.</b>',
-                    'unorderedlist': '<b>&bull;</b>',
-                    'pre': '<b>0101</b>',
-                    'indent': '<b>&rarr;</b>',
-                    'outdent': '<b>&larr;</b>',
-                    'justifyCenter': '<b>C</b>',
-                    'justifyFull': '<b>J</b>',
-                    'justifyLeft': '<b>L</b>',
-                    'justifyRight': '<b>R</b>'
-                };
-            if (buttonLabelType === 'fontawesome') {
-                customButtonLabels = {
-                    'bold': '<i class="fa fa-bold"></i>',
-                    'italic': '<i class="fa fa-italic"></i>',
-                    'underline': '<i class="fa fa-underline"></i>',
-                    'strikethrough': '<i class="fa fa-strikethrough"></i>',
-                    'superscript': '<i class="fa fa-superscript"></i>',
-                    'subscript': '<i class="fa fa-subscript"></i>',
-                    'anchor': '<i class="fa fa-link"></i>',
-                    'image': '<i class="fa fa-picture-o"></i>',
-                    'quote': '<i class="fa fa-quote-right"></i>',
-                    'orderedlist': '<i class="fa fa-list-ol"></i>',
-                    'unorderedlist': '<i class="fa fa-list-ul"></i>',
-                    'pre': '<i class="fa fa-code fa-lg"></i>',
-                    'indent': '<i class="fa fa-indent"></i>',
-                    'outdent': '<i class="fa fa-outdent"></i>',
-                    'justifyCenter': '<i class="fa fa-align-center"></i>',
-                    'justifyFull': '<i class="fa fa-align-justify"></i>',
-                    'justifyLeft': '<i class="fa fa-align-left"></i>',
-                    'justifyRight': '<i class="fa fa-align-right"></i>'
-                };
-            } else if (typeof buttonLabelType === 'object') {
-                customButtonLabels = buttonLabelType;
-            }
-            if (typeof customButtonLabels === 'object') {
-                for (attrname in customButtonLabels) {
-                    if (customButtonLabels.hasOwnProperty(attrname)) {
-                        buttonLabels[attrname] = customButtonLabels[attrname];
-                    }
-                }
-            }
-            return buttonLabels;
-        },
-
         initToolbar: function () {
             if (this.toolbar) {
                 return this;
@@ -913,7 +1124,10 @@ if (typeof module === 'object') {
                         btn.setAttribute('data-form', 'medium-editor-toolbar-form-' + btns[i] + '-' + this.id);
                     }
                 } else {
-                    btn = this.buttonTemplate(btns[i]);
+                    ext = new DefaultButton(ButtonsData[btns[i]], this);
+                    //ext.init(this);
+                    btn = ext.getButton();
+                    this.options.extensions[btns[i]] = ext;
                 }
 
                 if (btn) {
@@ -1267,8 +1481,18 @@ if (typeof module === 'object') {
         },
 
         setToolbarButtonStates: function () {
-            var buttons = this.toolbarActions.querySelectorAll('button'),
-                i;
+            var buttons = this.toolbarActions.querySelectorAll('button[data-form]'),
+                i,
+                name,
+                ext;
+            for (name in this.options.extensions) {
+                if (this.options.extensions.hasOwnProperty(name)) {
+                    ext = this.options.extensions[name];
+                    if (ext.deactivate) {
+                        ext.deactivate();
+                    }
+                }
+            }
             for (i = 0; i < buttons.length; i += 1) {
                 buttons[i].classList.remove(this.options.activeButtonClass);
             }
@@ -1278,10 +1502,23 @@ if (typeof module === 'object') {
 
         checkActiveButtons: function () {
             var elements = Array.prototype.slice.call(this.elements),
-                parentNode = this.getSelectedParentElement();
+                parentNode = this.getSelectedParentElement(),
+                name,
+                ext;
             while (parentNode.tagName !== undefined && this.parentElements.indexOf(parentNode.tagName.toLowerCase) === -1) {
                 this.activateButton(parentNode.tagName.toLowerCase());
-                this.callExtensions('checkState', parentNode);
+                for (name in this.options.extensions) {
+                    if (this.options.extensions.hasOwnProperty(name)) {
+                        ext = this.options.extensions[name];
+                        if (ext.checkState) {
+                            ext.checkState(parentNode);
+                        } else if (ext.isActive) {
+                            if (!ext.isActive() && ext.shouldActivate(parentNode)) {
+                                ext.activate();
+                            }
+                        }
+                    }
+                }
 
                 // we can abort the search upwards if we leave the contentEditable element
                 if (elements.indexOf(parentNode) !== -1) {
@@ -1299,7 +1536,7 @@ if (typeof module === 'object') {
         },
 
         bindButtons: function () {
-            var buttons = this.toolbar.querySelectorAll('button'),
+            var buttons = this.toolbar.querySelectorAll('button[data-form]'),
                 i,
                 self = this,
                 triggerAction = function (e) {
@@ -1313,19 +1550,14 @@ if (typeof module === 'object') {
                     } else {
                         this.className += ' ' + self.options.activeButtonClass;
                     }
-                    if (this.hasAttribute('data-action')) {
-                        self.execAction(this.getAttribute('data-action'), e);
-                    }
                     // Allows extension buttons to show a form
                     // TO DO: Improve this
-                    if (this.hasAttribute('data-form')) {
-                        self.showForm(this.getAttribute('data-form'), e);
-                    }
+                    self.showForm(this.getAttribute('data-form'), e);
                 };
             for (i = 0; i < buttons.length; i += 1) {
                 this.on(buttons[i], 'click', triggerAction);
             }
-            this.setFirstAndLastItems(buttons);
+            this.setFirstAndLastItems(this.toolbar.querySelectorAll('button'));
             return this;
         },
 
