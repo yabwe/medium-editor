@@ -1136,15 +1136,7 @@ else if (typeof define === 'function' && define.amd) {
             }
         },
 
-        findMatchingSelectionParent: function(testElementFunction) {
-            var selection = this.options.contentWindow.getSelection(), range, current;
-
-            if (selection.rangeCount === 0) {
-                return false;
-            }
-
-            range = selection.getRangeAt(0);
-            current = range.commonAncestorContainer;
+        traverseUp: function( current, testElementFunction ) {
 
             do {
               if (current.nodeType === 1){
@@ -1162,6 +1154,21 @@ else if (typeof define === 'function' && define.amd) {
             } while (current);
 
             return false;
+
+        },
+
+        findMatchingSelectionParent: function(testElementFunction) {
+            var selection = this.options.contentWindow.getSelection(), range, current;
+
+            if (selection.rangeCount === 0) {
+                return false;
+            }
+
+            range = selection.getRangeAt(0);
+            current = range.commonAncestorContainer;
+
+            return this.traverseUp(current, testElementFunction);
+
         },
 
         getSelectionElement: function () {
@@ -2137,7 +2144,10 @@ else if (typeof define === 'function' && define.amd) {
             var i,
                 el,
                 new_el,
-                spans = container_el.querySelectorAll('.replace-with');
+                spans = container_el.querySelectorAll('.replace-with'),
+                isCEF = function(el) {
+                    return (el && el.nodeName !== '#text' && el.getAttribute('contenteditable') === 'false');
+                };
 
             for (i = 0; i < spans.length; i += 1) {
 
@@ -2162,6 +2172,11 @@ else if (typeof define === 'function' && define.amd) {
             for (i = 0; i < spans.length; i += 1) {
 
                 el = spans[i];
+
+                // bail if span is in contenteditable = false
+                if (this.traverseUp(el, isCEF)) {
+                    return false;
+                }
 
                 // remove empty spans, replace others with their contents
                 if (/^\s*$/.test()) {

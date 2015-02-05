@@ -2145,7 +2145,10 @@ else if (typeof define === 'function' && define.amd) {
             var i,
                 el,
                 new_el,
-                spans = container_el.querySelectorAll('.replace-with');
+                spans = container_el.querySelectorAll('.replace-with'),
+                isCEF = function(el) {
+                    return (el && el.nodeName !== '#text' && el.getAttribute('contenteditable') === 'false');
+                };
 
             for (i = 0; i < spans.length; i += 1) {
 
@@ -2172,9 +2175,9 @@ else if (typeof define === 'function' && define.amd) {
                 el = spans[i];
 
                 // bail if span is in contenteditable = false
-                if (this.traverseUp(el, function(el) {
-                    return (el && el.nodeName !== '#text' && el.getAttribute('contenteditable') === 'false');
-                })) return false;
+                if (this.traverseUp(el, isCEF)) {
+                    return false;
+                }
 
                 // remove empty spans, replace others with their contents
                 if (/^\s*$/.test()) {
