@@ -170,3 +170,36 @@
     content: attr(data-placeholder) !important;
     font-style: italic;
     white-space: pre; }
+
+.medium-editor-dragover {
+  background: #ddd; }
+
+.medium-image-loading {
+  width: 40px;
+  height: 40px;
+  background-color: #333;
+  display: inline-block;
+  border-radius: 100%;
+  -webkit-animation: medium-image-loading-animation 1s infinite ease-in-out;
+          animation: medium-image-loading-animation 1s infinite ease-in-out; }
+
+@-webkit-keyframes medium-image-loading-animation {
+
+  0% {
+    -webkit-transform: scale(0);
+            transform: scale(0); }
+
+  100% {
+    -webkit-transform: scale(1);
+            transform: scale(1);
+    opacity: 0; } }
+
+@keyframes medium-image-loading-animation {
+  0% {
+    -webkit-transform: scale(0);
+            transform: scale(0); }
+
+  100% {
+    -webkit-transform: scale(1);
+            transform: scale(1);
+    opacity: 0; } }
