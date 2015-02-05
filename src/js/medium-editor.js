@@ -1,4 +1,4 @@
-/*global module, console, define, NodeFilter */
+/*global module, console, define, NodeFilter, FileReader */
 function MediumEditor(elements, options) {
     'use strict';
     return this.init(elements, options);
@@ -270,6 +270,7 @@ if (typeof module === 'object') {
             disableAnchorForm: false,
             disablePlaceholders: false,
             elementsContainer: false,
+            imageDragging: true,
             standardizeSelectionStart: false,
             contentWindow: window,
             ownerDocument: document,
@@ -319,6 +320,7 @@ if (typeof module === 'object') {
             this.initThrottledMethods()
                 .initElements()
                 .bindSelect()
+                .bindDragDrop()
                 .bindPaste()
                 .setPlaceholders()
                 .bindElementActions()
@@ -1025,6 +1027,64 @@ if (typeof module === 'object') {
                 this.on(this.elements[i], 'keyup', this.checkSelectionWrapper);
                 this.on(this.elements[i], 'blur', this.checkSelectionWrapper);
                 this.on(this.elements[i], 'click', this.checkSelectionWrapper);
+            }
+            return this;
+        },
+
+
+        bindDragDrop: function () {
+            var self = this, i, className, onDrag, onDrop, element;
+
+            if (!self.options.imageDragging) {
+                return;
+            }
+
+            className = 'medium-editor-dragover';
+            onDrag = function (e) {
+                e.preventDefault();
+                e.dataTransfer.dropEffect = "copy";
+
+                if (e.type === "dragover") {
+                    this.classList.add(className);
+                } else {
+                    this.classList.remove(className);
+                }
+            };
+
+            onDrop = function (e) {
+                var files;
+                e.preventDefault();
+                e.stopPropagation();
+                files = Array.prototype.slice.call(e.dataTransfer.files, 0);
+                files.some(function (file) {
+                    if (file.type.match("image")) {
+                        var fileReader, id;
+                        fileReader = new FileReader();
+                        fileReader.readAsDataURL(file);
+
+                        id = 'medium-img-' + Math.random();
+                        insertHTMLCommand(self.options.ownerDocument, '<img class="medium-image-loading" id="' + id + '" />');
+
+                        fileReader.onload = function () {
+                            var img = document.getElementById(id);
+                            if (img) {
+                                img.removeAttribute('id');
+                                img.removeAttribute('class');
+                                img.src = fileReader.result;
+                            }
+                        };
+                    }
+                });
+                this.classList.remove(className);
+            };
+
+            for (i = 0; i < this.elements.length; i += 1) {
+                element = this.elements[i];
+
+
+                this.on(element, 'dragover', onDrag);
+                this.on(element, 'dragleave', onDrag);
+                this.on(element, 'drop', onDrop);
             }
             return this;
         },
