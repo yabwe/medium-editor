@@ -76,7 +76,7 @@ If you want to support IE9, you will need to use a classList pollyfill, like Eli
 * __extensions__: extension to use (see _Extensions_) for more. Default: {}
 * __firstHeader__: HTML tag to be used as first header. Default: h3
 * __forcePlainText__: Forces pasting as plain text. Default: true
-* __imageDragging--: Allows image drag and drop into the editor. Default: true
+* __imageDragging__: Allows image drag and drop into the editor. Default: true
 * __placeholder__: Defines the default placeholder for empty contenteditables when __disablePlaceholders__ is not set to true. You can overwrite it by setting a data-placeholder attribute on your elements. Default: 'Type your text'
 * __secondHeader__: HTML tag to be used as second header. Default: h4
 * __standardizeSelectionStart__: Standardizes how the beginning of a range is decided between browsers whenever the selected text is analyzed for updating toolbar buttons status
