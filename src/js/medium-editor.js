@@ -1,4 +1,4 @@
-/*global module, console, define, NodeFilter */
+/*global module, console, define, NodeFilter, FileReader */
 function MediumEditor(elements, options) {
     'use strict';
     return this.init(elements, options);
@@ -1033,15 +1033,14 @@ if (typeof module === 'object') {
 
 
         bindDragDrop: function () {
-            var self = this,
-                i;
+            var self = this, i, className, onDrag, onDrop, element;
 
             if (!self.options.imageDragging) {
                 return;
             }
 
-            var className = 'medium-editor-dragover';
-            var onDrag = function (e) {
+            className = 'medium-editor-dragover';
+            onDrag = function (e) {
                 e.preventDefault();
                 e.dataTransfer.dropEffect = "copy";
 
@@ -1052,17 +1051,18 @@ if (typeof module === 'object') {
                 }
             };
 
-            var onDrop = function (e) {
+            onDrop = function (e) {
                 var files;
                 e.preventDefault();
                 e.stopPropagation();
                 files = Array.prototype.slice.call(e.dataTransfer.files, 0);
                 files.some(function (file) {
                     if (file.type.match("image")) {
-                        var fileReader = new FileReader();
+                        var fileReader, id;
+                        fileReader = new FileReader();
                         fileReader.readAsDataURL(file);
 
-                        var id = 'medium-img-' + Math.random();
+                        id = 'medium-img-' + Math.random();
                         insertHTMLCommand(self.options.ownerDocument, '<img class="medium-image-loading" id="' + id + '" />');
 
                         fileReader.onload = function () {
@@ -1079,7 +1079,7 @@ if (typeof module === 'object') {
             };
 
             for (i = 0; i < this.elements.length; i += 1) {
-                var element = this.elements[i];
+                element = this.elements[i];
 
 
                 this.on(element, 'dragover', onDrag);
