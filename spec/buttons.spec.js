@@ -96,7 +96,8 @@ describe('Buttons TestCase', function () {
             button = editor.toolbar.querySelector('[data-element="i"]');
             fireEvent(button, 'click');
             expect(document.execCommand).toHaveBeenCalled();
-            expect(this.el.innerHTML).toBe('<i>lorem ipsum</i>');
+            // IE won't generate an `<i>` tag here. it generates an `<em>`:
+            expect(this.el.innerHTML).toMatch(/(<i>|<em>)lorem ipsum(<\/i>|<\/em>)/);
         });
 
         it('should execute the button action', function () {
@@ -146,14 +147,17 @@ describe('Buttons TestCase', function () {
             jasmine.clock().tick(1);
             button = editor.toolbar.querySelector('[data-element="h3"]');
             fireEvent(button, 'click');
-            expect(this.el.innerHTML).toBe('<h3><b>lorem ipsum</b></h3>');
+            // depending on the styling you have,
+            // IE might strip the <b> out when it applies the H3 here.
+            // so, make the <b> match optional in the output:
+            expect(this.el.innerHTML).toMatch(/<h3>(<b>)?lorem ipsum(<\/b>)?<\/h3>/);
         });
 
         it('should get back to a p element if parent element is the same as the action', function () {
             this.el.innerHTML = '<h3><b>lorem ipsum</b></h3>';
             var button,
                 editor = new MediumEditor('.editor');
-            selectElementContentsAndFire(editor.elements[0]);
+            selectElementContentsAndFire(editor.elements[0].firstChild);
             jasmine.clock().tick(1);
             button = editor.toolbar.querySelector('[data-element="h3"]');
             fireEvent(button, 'click');

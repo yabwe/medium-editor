@@ -22,6 +22,7 @@ describe('Events TestCase', function () {
         it('should bind listener', function () {
             var el, editor, spy;
             el = document.createElement('div');
+            el = document.body.appendChild(el);
             spy = jasmine.createSpy('handler');
             editor = new MediumEditor('.editor');
             editor.on(el, 'click', spy);
