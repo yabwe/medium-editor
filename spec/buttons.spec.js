@@ -32,7 +32,7 @@ describe('Buttons TestCase', function () {
             this.el.innerHTML = '<b>lorem ipsum</b>';
             selectElementContentsAndFire(editor.elements[0]);
             jasmine.clock().tick(1);
-            button = editor.toolbar.querySelector('[data-element="b"]');
+            button = editor.toolbar.querySelector('[data-action="bold"]');
             expect(button.className).toContain('medium-editor-button-active');
         });
     });
@@ -47,7 +47,7 @@ describe('Buttons TestCase', function () {
                 editor = new MediumEditor('.editor');
             selectElementContentsAndFire(editor.elements[0]);
             jasmine.clock().tick(1);
-            button = editor.toolbar.querySelector('[data-element="b"]');
+            button = editor.toolbar.querySelector('[data-action="bold"]');
             fireEvent(button, 'click');
             expect(button.className).toContain('medium-editor-button-active');
         });
@@ -58,7 +58,7 @@ describe('Buttons TestCase', function () {
                 editor = new MediumEditor('.editor');
             selectElementContentsAndFire(editor.elements[0]);
             jasmine.clock().tick(1);
-            button = editor.toolbar.querySelector('[data-element="b"]');
+            button = editor.toolbar.querySelector('[data-action="bold"]');
             editor.selection = undefined;
             fireEvent(button, 'click');
             expect(editor.checkSelection).toHaveBeenCalled();
@@ -70,7 +70,7 @@ describe('Buttons TestCase', function () {
                 editor = new MediumEditor('.editor');
             selectElementContentsAndFire(editor.elements[0]);
             jasmine.clock().tick(1);
-            button = editor.toolbar.querySelector('[data-element="b"]');
+            button = editor.toolbar.querySelector('[data-action="bold"]');
             expect(button.className).toContain('medium-editor-button-active');
             fireEvent(button, 'click');
             expect(button.className).not.toContain('medium-editor-button-active');
@@ -82,7 +82,7 @@ describe('Buttons TestCase', function () {
                 editor = new MediumEditor('.editor');
             selectElementContentsAndFire(editor.elements[0]);
             jasmine.clock().tick(1);
-            button = editor.toolbar.querySelector('[data-element="b"]');
+            button = editor.toolbar.querySelector('[data-action="bold"]');
             fireEvent(button, 'click');
             expect(editor.execAction).toHaveBeenCalled();
         });
@@ -93,7 +93,7 @@ describe('Buttons TestCase', function () {
                 editor = new MediumEditor('.editor');
             selectElementContentsAndFire(editor.elements[0]);
             jasmine.clock().tick(1);
-            button = editor.toolbar.querySelector('[data-element="i"]');
+            button = editor.toolbar.querySelector('[data-action="italic"]');
             fireEvent(button, 'click');
             expect(document.execCommand).toHaveBeenCalled();
             // IE won't generate an `<i>` tag here. it generates an `<em>`:
@@ -106,7 +106,7 @@ describe('Buttons TestCase', function () {
                 editor = new MediumEditor('.editor');
             selectElementContentsAndFire(editor.elements[0]);
             jasmine.clock().tick(1);
-            button = editor.toolbar.querySelector('[data-element="b"]');
+            button = editor.toolbar.querySelector('[data-action="bold"]');
             fireEvent(button, 'click');
             expect(editor.execAction).toHaveBeenCalled();
         });
@@ -117,7 +117,7 @@ describe('Buttons TestCase', function () {
                 editor = new MediumEditor('.editor');
             selectElementContentsAndFire(editor.elements[0]);
             jasmine.clock().tick(1);
-            button = editor.toolbar.querySelector('[data-element="a"]');
+            button = editor.toolbar.querySelector('[data-action="anchor"]');
             fireEvent(button, 'click');
             expect(editor.triggerAnchorAction).toHaveBeenCalled();
         });
@@ -134,7 +134,7 @@ describe('Buttons TestCase', function () {
                 editor = new MediumEditor('.editor');
             selectElementContentsAndFire(editor.elements[0]);
             jasmine.clock().tick(1);
-            button = editor.toolbar.querySelector('[data-element="h3"]');
+            button = editor.toolbar.querySelector('[data-action="append-h3"]');
             fireEvent(button, 'click');
             expect(editor.execFormatBlock).toHaveBeenCalled();
         });
@@ -145,7 +145,7 @@ describe('Buttons TestCase', function () {
                 editor = new MediumEditor('.editor');
             selectElementContentsAndFire(editor.elements[0]);
             jasmine.clock().tick(1);
-            button = editor.toolbar.querySelector('[data-element="h3"]');
+            button = editor.toolbar.querySelector('[data-action="append-h3"]');
             fireEvent(button, 'click');
             // depending on the styling you have,
             // IE might strip the <b> out when it applies the H3 here.
@@ -159,7 +159,7 @@ describe('Buttons TestCase', function () {
                 editor = new MediumEditor('.editor');
             selectElementContentsAndFire(editor.elements[0].firstChild);
             jasmine.clock().tick(1);
-            button = editor.toolbar.querySelector('[data-element="h3"]');
+            button = editor.toolbar.querySelector('[data-action="append-h3"]');
             fireEvent(button, 'click');
             expect(this.el.innerHTML).toBe('<p><b>lorem ipsum</b></p>');
         });
