@@ -1696,7 +1696,7 @@ if (typeof module === 'object') {
                 halfOffsetWidth,
                 defaultLeft;
 
-            self.anchorPreview.querySelector('i').textContent = anchorEl.href;
+            self.anchorPreview.querySelector('i').textContent = anchorEl.attributes.href.value;
             halfOffsetWidth = self.anchorPreview.offsetWidth / 2;
             defaultLeft = self.options.diffLeft - halfOffsetWidth;
 
@@ -1795,7 +1795,7 @@ if (typeof module === 'object') {
                 // We may actually be displaying the anchor preview, which should be controlled by options.delay
                 this.delay(function () {
                     if (self.activeAnchor) {
-                        self.showAnchorForm(self.activeAnchor.href);
+                        self.showAnchorForm(self.activeAnchor.attributes.href.value);
                     }
                     self.keepToolbarAlive = false;
                 });
