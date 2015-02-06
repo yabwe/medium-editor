@@ -717,7 +717,6 @@ if (typeof module === 'object') {
         },
 
         onBlockModifier: function (e) {
-
             var range, sel, p, node = getSelectionStart.call(this),
                 tagName = node.tagName.toLowerCase(),
                 isEmpty = /^(\s+|<br\/?>)?$/i,
@@ -743,8 +742,6 @@ if (typeof module === 'object') {
                     node.previousElementSibling.parentNode.insertBefore(p, node);
                     e.preventDefault();
                 }
-
-            // delete
             } else if (e.which === keyCode.DELETE
                         && node.nextElementSibling
                         && node.previousElementSibling
@@ -773,7 +770,6 @@ if (typeof module === 'object') {
 
                 e.preventDefault();
             }
-
         },
 
         buttonTemplate: function (btnType) {
