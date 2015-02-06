@@ -87,11 +87,7 @@
 }
 
 .stalker-toolbar {
-    -webkit-animation: pop-upwards 160ms forwards linear;
-       -moz-animation: pop-upwards 160ms forwards linear;
-        -ms-animation: pop-upwards 160ms forwards linear;
-         -o-animation: pop-upwards 160ms forwards linear;
-            animation: pop-upwards 160ms forwards linear;
+    animation: pop-upwards 160ms forwards linear;
     transition: top .075s ease-out, left .075s ease-out;
 }
 
@@ -122,8 +118,7 @@
             outline: 0;
             border: none;
             box-shadow: none;
-            -webkit-appearance: none;
-               -moz-appearance: none;
+            appearance: none;
         }
     }
 
