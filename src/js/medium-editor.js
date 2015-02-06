@@ -18,6 +18,7 @@ if (typeof module === 'object') {
     'use strict';
 
     var now,
+        keyCode,
         DefaultButton,
         ButtonsData = {
             'bold': {
@@ -318,7 +319,9 @@ if (typeof module === 'object') {
     // https://github.com/jashkenas/underscore
     now = Date.now || function () {
         return new Date().getTime();
-    }, keyCode = {
+    };
+
+    keyCode = {
         BACKSPACE: 8,
         TAB: 9,
         ENTER: 13,
@@ -1144,10 +1147,6 @@ if (typeof module === 'object') {
             this.commands.forEach(function (extension) {
                 if (typeof extension.getButton === 'function') {
                     btn = extension.getButton(this);
-                    if (isElement(btn) && extension.hasForm) {
-                        btn.setAttribute('data-form', 'medium-editor-toolbar-form-' + extension.name + '-' + this.id);
-                    }
-
                     li = this.options.ownerDocument.createElement('li');
                     if (isElement(btn)) {
                         li.appendChild(btn);
