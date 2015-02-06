@@ -76,6 +76,7 @@ If you want to support IE9, you will need to use a classList pollyfill, like Eli
 * __extensions__: extension to use (see _Extensions_) for more. Default: {}
 * __firstHeader__: HTML tag to be used as first header. Default: h3
 * __forcePlainText__: Forces pasting as plain text. Default: true
+* __imageDragging__: Allows image drag and drop into the editor. Default: true
 * __placeholder__: Defines the default placeholder for empty contenteditables when __disablePlaceholders__ is not set to true. You can overwrite it by setting a data-placeholder attribute on your elements. Default: 'Type your text'
 * __secondHeader__: HTML tag to be used as second header. Default: h4
 * __standardizeSelectionStart__: Standardizes how the beginning of a range is decided between browsers whenever the selected text is analyzed for updating toolbar buttons status
@@ -287,7 +288,7 @@ Table.prototype.createButton = function() {
     this.button.className = 'medium-editor-action';
     this.button.textContent = 'T';
     if(this.base.options.buttonLabels === 'fontawesome'){
-        this.button.innerHTML = '<i class="fa fa-table"></i>'; 
+        this.button.innerHTML = '<i class="fa fa-table"></i>';
     }
     this.button.onclick = this.onClick.bind(this);
 };
@@ -363,7 +364,7 @@ Table.prototype.createTable = function(cols, rows) {
     for (var h = 1; h <= cols; h++) {
         var headerCol = document.createElement('th');
         headerCol.innerHTML = '...';
-        headerRow.appendChild(headerCol);   
+        headerRow.appendChild(headerCol);
     }
 
     header.appendChild(headerRow);
@@ -373,7 +374,7 @@ Table.prototype.createTable = function(cols, rows) {
         for (var c = 1; c <= this.options.defaultColumns; c++) {
             var bodyCol = document.createElement('td');
             bodyCol.innerHTML = '...';
-            bodyRow.appendChild(bodyCol);       
+            bodyRow.appendChild(bodyCol);
         }
         body.appendChild(bodyRow);
     }
@@ -433,8 +434,6 @@ The source files are located inside the __src__ directory.
 
 ## Contributing
 
-[![Stories in Ready](https://badge.waffle.io/daviferreira/medium-editor.png)](https://waffle.io/daviferreira/medium-editor)
-
 1. Fork it
 2. Create your feature branch (`git checkout -b my-new-feature`)
 3. Test your changes to the best of your ability.
@@ -448,48 +447,53 @@ The source files are located inside the __src__ directory.
 ```
  project  : medium-editor
  repo age : 1 year, 8 months
- active   : 217 days
- commits  : 730
- files    : 61
+ active   : 233 days
+ commits  : 804
+ files    : 62
  authors  :
-   497	Davi Ferreira           68.1%
-    20	Maxime de Visscher      2.7%
-    18	Andy Yaco-Mink          2.5%
-    15	Nate Mielnik            2.1%
-     9	Noah Chase              1.2%
-     8	Derek Odegard           1.1%
-     8	Jarl Gunnar T. Flaten   1.1%
-     8	Pedro Nasser            1.1%
-     8	Seif                    1.1%
-     7	Aidan Threadgold        1.0%
-     7	Alfonso (the fonz) de la Osa 1.0%
-     7	OmniaGM                 1.0%
-     6	Dayjo                   0.8%
-     6	Pascal                  0.8%
-     5	Martin Thurau           0.7%
-     5	Raul Matei              0.7%
+   520	Davi Ferreira           64.7%
+    30	Andy Yaco-Mink          3.7%
+    30	Nate Mielnik            3.7%
+    20	Maxime de Visscher      2.5%
+    18	Noah Chase              2.2%
+     8	Derek Odegard           1.0%
+     8	Jarl Gunnar T. Flaten   1.0%
+     8	Pedro Nasser            1.0%
+     8	Seif                    1.0%
+     7	Aidan Threadgold        0.9%
+     7	Alfonso (the fonz) de la Osa 0.9%
+     7	Charl Gottschalk        0.9%
+     7	OmniaGM                 0.9%
+     6	Dayjo                   0.7%
+     6	Pascal                  0.7%
+     5	Martin Thurau           0.6%
+     5	Raul Matei              0.6%
      4	Sebastian Zuchmanski    0.5%
      4	minikomi                0.5%
      3	Andrew Hubbs            0.4%
      3	Brian Reavis            0.4%
      3	Dmitri Cherniak         0.4%
+     3	Javier Marín            0.4%
      3	Nikita Korotaev         0.4%
+     3	Patrick Cavanaugh       0.4%
      3	Pavel Linkesch          0.4%
      3	Troels Knak-Nielsen     0.4%
      3	arol                    0.4%
      3	ʞuıɯ-oɔɐʎ ʎpuɐ          0.4%
-     2	Alexander Hofbauer      0.3%
-     2	Ethan Turkeltaub        0.3%
-     2	Jacob Magnusson         0.3%
-     2	Jeremy                  0.3%
-     2	Joel                    0.3%
-     2	Karl Sander             0.3%
-     2	Son Tran-Nguyen         0.3%
-     2	jj                      0.3%
-     2	mako                    0.3%
+     2	Alexander Hofbauer      0.2%
+     2	Ethan Turkeltaub        0.2%
+     2	Jacob Magnusson         0.2%
+     2	Jeremy                  0.2%
+     2	Joel                    0.2%
+     2	Karl Sander             0.2%
+     2	Son Tran-Nguyen         0.2%
+     2	jj                      0.2%
+     2	mako                    0.2%
      1	Adam Mulligan           0.1%
      1	Alberto Gasparin        0.1%
      1	Bitdeli Chef            0.1%
+     1	Brooke McKim            0.1%
+     1	Bruno Peres             0.1%
      1	Carlos Alexandre Fuechter 0.1%
      1	Cenk Dölek             0.1%
      1	Dave Jarvis             0.1%
@@ -497,6 +501,7 @@ The source files are located inside the __src__ directory.
      1	David Hellsing          0.1%
      1	Denis Gorbachev         0.1%
      1	Diana Liao              0.1%
+     1	Enrico Berti            0.1%
      1	Harshil Shah            0.1%
      1	IndieSquidge            0.1%
      1	Ionică Bizău            0.1%
@@ -513,7 +518,6 @@ The source files are located inside the __src__ directory.
      1	Nic Malan               0.1%
      1	Nick Semenkovich        0.1%
      1	Noah Paessel            0.1%
-     1	Patrick Cavanaugh       0.1%
      1	Patrick Kempff          0.1%
      1	Peleg Rosenthal         0.1%
      1	Randson Oliveira        0.1%

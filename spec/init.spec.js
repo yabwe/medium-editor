@@ -110,6 +110,7 @@ describe('Initialization TestCase', function () {
                 disableAnchorForm: false,
                 disablePlaceholders: false,
                 elementsContainer: document.body,
+                imageDragging: true,
                 standardizeSelectionStart: false,
                 contentWindow: window,
                 ownerDocument: document,

@@ -1,4 +1,4 @@
-/*global module, console, define, NodeFilter */
+/*global module, console, define, NodeFilter, FileReader */
 function MediumEditor(elements, options) {
     'use strict';
     return this.init(elements, options);
@@ -557,6 +557,7 @@ if (typeof module === 'object') {
             disableAnchorForm: false,
             disablePlaceholders: false,
             elementsContainer: false,
+            imageDragging: true,
             standardizeSelectionStart: false,
             contentWindow: window,
             ownerDocument: document,
@@ -607,6 +608,7 @@ if (typeof module === 'object') {
                 .initCommands()
                 .initElements()
                 .bindSelect()
+                .bindDragDrop()
                 .bindPaste()
                 .setPlaceholders()
                 .bindElementActions()
@@ -1256,6 +1258,65 @@ if (typeof module === 'object') {
             return this;
         },
 
+
+        bindDragDrop: function () {
+            var self = this, i, className, onDrag, onDrop, element;
+
+            if (!self.options.imageDragging) {
+                return;
+            }
+
+            className = 'medium-editor-dragover';
+
+            onDrag = function (e) {
+                e.preventDefault();
+                e.dataTransfer.dropEffect = "copy";
+
+                if (e.type === "dragover") {
+                    this.classList.add(className);
+                } else {
+                    this.classList.remove(className);
+                }
+            };
+
+            onDrop = function (e) {
+                var files;
+                e.preventDefault();
+                e.stopPropagation();
+                files = Array.prototype.slice.call(e.dataTransfer.files, 0);
+                files.some(function (file) {
+                    if (file.type.match("image")) {
+                        var fileReader, id;
+                        fileReader = new FileReader();
+                        fileReader.readAsDataURL(file);
+
+                        id = 'medium-img-' + (+new Date());
+                        insertHTMLCommand(self.options.ownerDocument, '<img class="medium-image-loading" id="' + id + '" />');
+
+                        fileReader.onload = function () {
+                            var img = document.getElementById(id);
+                            if (img) {
+                                img.removeAttribute('id');
+                                img.removeAttribute('class');
+                                img.src = fileReader.result;
+                            }
+                        };
+                    }
+                });
+                this.classList.remove(className);
+            };
+
+            for (i = 0; i < this.elements.length; i += 1) {
+                element = this.elements[i];
+
+
+                this.on(element, 'dragover', onDrag);
+                this.on(element, 'dragleave', onDrag);
+                this.on(element, 'drop', onDrop);
+            }
+            return this;
+        },
+
         stopSelectionUpdates: function () {
             this.preventSelectionUpdates = true;
         },
@@ -1371,15 +1432,7 @@ if (typeof module === 'object') {
             }
         },
 
-        findMatchingSelectionParent: function (testElementFunction) {
-            var selection = this.options.contentWindow.getSelection(), range, current;
-
-            if (selection.rangeCount === 0) {
-                return false;
-            }
-
-            range = selection.getRangeAt(0);
-            current = range.commonAncestorContainer;
+        traverseUp: function (current, testElementFunction) {
 
             do {
                 if (current.nodeType === 1) {
@@ -1396,6 +1449,21 @@ if (typeof module === 'object') {
             } while (current);
 
             return false;
+
+        },
+
+        findMatchingSelectionParent: function (testElementFunction) {
+            var selection = this.options.contentWindow.getSelection(), range, current;
+
+            if (selection.rangeCount === 0) {
+                return false;
+            }
+
+            range = selection.getRangeAt(0);
+            current = range.commonAncestorContainer;
+
+            return this.traverseUp(current, testElementFunction);
+
         },
 
         getSelectionElement: function () {
@@ -2383,7 +2451,10 @@ if (typeof module === 'object') {
             var i,
                 el,
                 new_el,
-                spans = container_el.querySelectorAll('.replace-with');
+                spans = container_el.querySelectorAll('.replace-with'),
+                isCEF = function (el) {
+                    return (el && el.nodeName !== '#text' && el.getAttribute('contenteditable') === 'false');
+                };
 
             for (i = 0; i < spans.length; i += 1) {
 
@@ -2408,6 +2479,11 @@ if (typeof module === 'object') {
             for (i = 0; i < spans.length; i += 1) {
 
                 el = spans[i];
+
+                // bail if span is in contenteditable = false
+                if (this.traverseUp(el, isCEF)) {
+                    return false;
+                }
 
                 // remove empty spans, replace others with their contents
                 if (/^\s*$/.test()) {
