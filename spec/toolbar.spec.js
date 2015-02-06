@@ -87,7 +87,6 @@ describe('Toolbar TestCase', function () {
 
             editor = new MediumEditor(document.getElementById('editor-for-toolbar-test'), { delay: 0 });
             selectElementContentsAndFire(document.getElementById('bold_dolorOne'));
-            selectElementContents(document.getElementById('bold_dolorOne'));
 
             jasmine.clock().tick(51);
             expect(editor.toolbar.querySelector('button[data-action="bold"]').classList.contains('medium-editor-button-active')).toBe(true);

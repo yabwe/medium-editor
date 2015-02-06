@@ -25,10 +25,6 @@ if (typeof module === 'object') {
                 action: 'bold',
                 aria: 'bold',
                 tagNames: ['b', 'strong'],
-                style: {
-                    prop: 'font-weight',
-                    value: 'bold'
-                },
                 contentDefault: '<b>B</b>',
                 contentFA: '<i class="fa fa-bold"></i>'
             },
@@ -256,6 +252,8 @@ if (typeof module === 'object') {
             return button;
         },
         handleClick: function (evt) {
+            evt.preventDefault();
+            evt.stopPropagation();
             var action = this.getAction();
             if (!this.base.selection) {
                 this.base.checkSelection();
@@ -270,9 +268,9 @@ if (typeof module === 'object') {
             if (action) {
                 this.base.execAction(action, evt);
             }
-            if (this.options.form) {
-                this.base.showForm(this.form, evt);
-            }
+            //if (this.options.form) {
+            //    this.base.showForm(this.form, evt);
+            //}
         },
         isActive: function () {
             return this.button.classList.contains(this.base.options.activeButtonClass);
@@ -1100,7 +1098,6 @@ if (typeof module === 'object') {
                 return this;
             }
             this.toolbar = this.createToolbar();
-            this.addExtensionForms();
             this.keepToolbarAlive = false;
             this.toolbarActions = this.toolbar.querySelector('.medium-editor-toolbar-actions');
             this.anchorPreview = this.createAnchorPreview();
@@ -1163,9 +1160,6 @@ if (typeof module === 'object') {
         },
 
         addExtensionForms: function () {
-            //var extensions = this.options.extensions,
-            //    ext,
-            //    name,
             var form,
                 id;
 
@@ -1177,7 +1171,6 @@ if (typeof module === 'object') {
                     id = 'medium-editor-toolbar-form-' + extension.name + '-' + this.id;
                     form.className = 'medium-editor-toolbar-form';
                     form.id = id;
-                    //ext.getForm().id = id;
                     this.toolbar.appendChild(form);
                 }
             }.bind(this));
@@ -1562,18 +1555,11 @@ if (typeof module === 'object') {
         },
 
         setToolbarButtonStates: function () {
-            //var buttons = this.toolbarActions.querySelectorAll('button[data-form]'),
-            //    i,
-            //    name,
-            //    ext;
             this.commands.forEach(function (extension) {
                 if (typeof extension.deactivate === 'function') {
                     extension.deactivate();
                 }
             }.bind(this));
-            //for (i = 0; i < buttons.length; i += 1) {
-            //    buttons[i].classList.remove(this.options.activeButtonClass);
-            //}
             this.checkActiveButtons();
             return this;
         },
@@ -1610,27 +1596,6 @@ if (typeof module === 'object') {
         },
 
         bindButtons: function () {
-            var buttons = this.toolbar.querySelectorAll('button[data-form]'),
-                i,
-                self = this,
-                triggerAction = function (e) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    if (self.selection === undefined) {
-                        self.checkSelection();
-                    }
-                    if (this.className.indexOf(self.options.activeButtonClass) > -1) {
-                        this.classList.remove(self.options.activeButtonClass);
-                    } else {
-                        this.className += ' ' + self.options.activeButtonClass;
-                    }
-                    // Allows extension buttons to show a form
-                    // TO DO: Improve this
-                    self.showForm(this.getAttribute('data-form'), e);
-                };
-            for (i = 0; i < buttons.length; i += 1) {
-                this.on(buttons[i], 'click', triggerAction);
-            }
             this.setFirstAndLastItems(this.toolbar.querySelectorAll('button'));
             return this;
         },
