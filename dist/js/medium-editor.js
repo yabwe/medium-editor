@@ -1,3 +1,147 @@
+var mediumEditorUtil;
+
+(function (window, document) {
+    'use strict';
+
+    mediumEditorUtil = {
+
+        extend: function extend(b, a) {
+            var prop;
+            if (b === undefined) {
+                return a;
+            }
+            for (prop in a) {
+                if (a.hasOwnProperty(prop) && b.hasOwnProperty(prop) === false) {
+                    b[prop] = a[prop];
+                }
+            }
+            return b;
+        },
+
+        // Find the next node in the DOM tree that represents any text that is being
+        // displayed directly next to the targetNode (passed as an argument)
+        // Text that appears directly next to the current node can be:
+        //  - A sibling text node
+        //  - A descendant of a sibling element
+        //  - A sibling text node of an ancestor
+        //  - A descendant of a sibling element of an ancestor
+        findAdjacentTextNodeWithContent: function findAdjacentTextNodeWithContent(rootNode, targetNode, ownerDocument) {
+            var pastTarget = false,
+                nextNode,
+                nodeIterator = ownerDocument.createNodeIterator(rootNode, NodeFilter.SHOW_TEXT, null, false);
+
+            // Use a native NodeIterator to iterate over all the text nodes that are descendants
+            // of the rootNode.  Once past the targetNode, choose the first non-empty text node
+            nextNode = nodeIterator.nextNode();
+            while (nextNode) {
+                if (nextNode === targetNode) {
+                    pastTarget = true;
+                } else if (pastTarget) {
+                    if (nextNode.nodeType === 3 && nextNode.nodeValue && nextNode.nodeValue.trim().length > 0) {
+                        break;
+                    }
+                }
+                nextNode = nodeIterator.nextNode();
+            }
+
+            return nextNode;
+        },
+
+        isDescendant: function isDescendant(parent, child) {
+            var node = child.parentNode;
+            while (node !== null) {
+                if (node === parent) {
+                    return true;
+                }
+                node = node.parentNode;
+            }
+            return false;
+        },
+
+        // https://github.com/jashkenas/underscore
+        isElement: function isElement(obj) {
+            return !!(obj && obj.nodeType === 1);
+        },
+
+        // https://github.com/jashkenas/underscore
+        keyCode: {
+            BACKSPACE: 8,
+            TAB: 9,
+            ENTER: 13,
+            ESCAPE: 27,
+            SPACE: 32,
+            DELETE: 46
+        },
+
+        now: function now() {
+            return Date.now || new Date().getTime();
+        },
+
+        // https://github.com/jashkenas/underscore
+        throttle: function throttle(func, wait) {
+            var THROTTLE_INTERVAL = 50,
+                context,
+                args,
+                result,
+                timeout = null,
+                previous = 0,
+                later;
+
+            if (!wait && wait !== 0) {
+                wait = THROTTLE_INTERVAL;
+            }
+
+            later = function () {
+                previous = mediumEditorUtil.now();
+                timeout = null;
+                result = func.apply(context, args);
+                if (!timeout) {
+                    context = args = null;
+                }
+            };
+
+            return function () {
+                var currNow = mediumEditorUtil.now(),
+                    remaining = wait - (currNow - previous);
+                context = this;
+                args = arguments;
+                if (remaining <= 0 || remaining > wait) {
+                    clearTimeout(timeout);
+                    timeout = null;
+                    previous = currNow;
+                    result = func.apply(context, args);
+                    if (!timeout) {
+                        context = args = null;
+                    }
+                } else if (!timeout) {
+                    timeout = setTimeout(later, remaining);
+                }
+                return result;
+            };
+        },
+
+        traverseUp: function (current, testElementFunction) {
+
+            do {
+                if (current.nodeType === 1) {
+                    if (testElementFunction(current)) {
+                        return current;
+                    }
+                    // do not traverse upwards past the nearest containing editor
+                    if (current.getAttribute('data-medium-element')) {
+                        return false;
+                    }
+                }
+
+                current = current.parentNode;
+            } while (current);
+
+            return false;
+
+        }
+    };
+}(window, document));
+
 function MediumEditor(elements, options) {
     'use strict';
     return this.init(elements, options);
@@ -15,114 +159,6 @@ if (typeof module === 'object') {
 
 (function (window, document) {
     'use strict';
-
-    function extend(b, a) {
-        var prop;
-        if (b === undefined) {
-            return a;
-        }
-        for (prop in a) {
-            if (a.hasOwnProperty(prop) && b.hasOwnProperty(prop) === false) {
-                b[prop] = a[prop];
-            }
-        }
-        return b;
-    }
-
-    // https://github.com/jashkenas/underscore
-    var now = Date.now || function () {
-        return new Date().getTime();
-    }, keyCode = {
-        BACKSPACE: 8,
-        TAB: 9,
-        ENTER: 13,
-        ESCAPE: 27,
-        SPACE: 32,
-        DELETE: 46
-    };
-
-    // https://github.com/jashkenas/underscore
-    function throttle(func, wait) {
-        var THROTTLE_INTERVAL = 50,
-            context,
-            args,
-            result,
-            timeout = null,
-            previous = 0,
-            later;
-
-        if (!wait && wait !== 0) {
-            wait = THROTTLE_INTERVAL;
-        }
-
-        later = function () {
-            previous = now();
-            timeout = null;
-            result = func.apply(context, args);
-            if (!timeout) {
-                context = args = null;
-            }
-        };
-
-        return function () {
-            var currNow = now(),
-                remaining = wait - (currNow - previous);
-            context = this;
-            args = arguments;
-            if (remaining <= 0 || remaining > wait) {
-                clearTimeout(timeout);
-                timeout = null;
-                previous = currNow;
-                result = func.apply(context, args);
-                if (!timeout) {
-                    context = args = null;
-                }
-            } else if (!timeout) {
-                timeout = setTimeout(later, remaining);
-            }
-            return result;
-        };
-    }
-
-    function isDescendant(parent, child) {
-        var node = child.parentNode;
-        while (node !== null) {
-            if (node === parent) {
-                return true;
-            }
-            node = node.parentNode;
-        }
-        return false;
-    }
-
-    // Find the next node in the DOM tree that represents any text that is being
-    // displayed directly next to the targetNode (passed as an argument)
-    // Text that appears directly next to the current node can be:
-    //  - A sibling text node
-    //  - A descendant of a sibling element
-    //  - A sibling text node of an ancestor
-    //  - A descendant of a sibling element of an ancestor
-    function findAdjacentTextNodeWithContent(rootNode, targetNode, ownerDocument) {
-        var pastTarget = false,
-            nextNode,
-            nodeIterator = ownerDocument.createNodeIterator(rootNode, NodeFilter.SHOW_TEXT, null, false);
-
-        // Use a native NodeIterator to iterate over all the text nodes that are descendants
-        // of the rootNode.  Once past the targetNode, choose the first non-empty text node
-        nextNode = nodeIterator.nextNode();
-        while (nextNode) {
-            if (nextNode === targetNode) {
-                pastTarget = true;
-            } else if (pastTarget) {
-                if (nextNode.nodeType === 3 && nextNode.nodeValue && nextNode.nodeValue.trim().length > 0) {
-                    break;
-                }
-            }
-            nextNode = nodeIterator.nextNode();
-        }
-
-        return nextNode;
-    }
 
     // http://stackoverflow.com/questions/5605401/insert-link-in-contenteditable-element
     // by Tim Down
@@ -215,12 +251,6 @@ if (typeof module === 'object') {
         };
     }
 
-
-    // https://github.com/jashkenas/underscore
-    function isElement(obj) {
-        return !!(obj && obj.nodeType === 1);
-    }
-
     // http://stackoverflow.com/questions/6690752/insert-html-at-caret-in-a-contenteditable-div
     function insertHTMLCommand(doc, html) {
         var selection, range, el, fragment, node, lastNode;
@@ -301,7 +331,7 @@ if (typeof module === 'object') {
         init: function (elements, options) {
             var uniqueId = 1;
 
-            this.options = extend(options, this.defaults);
+            this.options = mediumEditorUtil.extend(options, this.defaults);
             this.setElementSelection(elements);
             if (this.elements.length === 0) {
                 return;
@@ -382,7 +412,7 @@ if (typeof module === 'object') {
             // handleResize is throttled because:
             // - It will be called when the browser is resizing, which can fire many times very quickly
             // - For some event (like resize) a slight lag in UI responsiveness is OK and provides performance benefits
-            this.handleResize = throttle(function () {
+            this.handleResize = mediumEditorUtil.throttle(function () {
                 if (self.isActive) {
                     self.positionToolbarIfShown();
                 }
@@ -392,7 +422,7 @@ if (typeof module === 'object') {
             // - This method could be called many times due to the type of event handlers that are calling it
             // - We want a slight delay so that other events in the stack can run, some of which may
             //   prevent the toolbar from being hidden (via this.keepToolbarAlive).
-            this.handleBlur = throttle(function () {
+            this.handleBlur = mediumEditorUtil.throttle(function () {
                 if (self.isActive && !self.keepToolbarAlive) {
                     self.hideToolbarActions();
                 }
@@ -440,7 +470,7 @@ if (typeof module === 'object') {
                 selector = this.options.ownerDocument.querySelectorAll(selector);
             }
             // If element, put into array
-            if (isElement(selector)) {
+            if (mediumEditorUtil.isElement(selector)) {
                 selector = [selector];
             }
             // Convert NodeList (or other array like object) into an array
@@ -453,7 +483,7 @@ if (typeof module === 'object') {
                     var isDescendantOfEditorElements = false,
                         i;
                     for (i = 0; i < self.elements.length; i += 1) {
-                        if (isDescendant(self.elements[i], e.target)) {
+                        if (mediumEditorUtil.isDescendant(self.elements[i], e.target)) {
                             isDescendantOfEditorElements = true;
                             break;
                         }
@@ -462,8 +492,8 @@ if (typeof module === 'object') {
                     if (e.target !== self.toolbar
                             && self.elements.indexOf(e.target) === -1
                             && !isDescendantOfEditorElements
-                            && !isDescendant(self.toolbar, e.target)
-                            && !isDescendant(self.anchorPreview, e.target)) {
+                            && !mediumEditorUtil.isDescendant(self.toolbar, e.target)
+                            && !mediumEditorUtil.isDescendant(self.anchorPreview, e.target)) {
 
                         // Activate the placeholder
                         if (!self.options.disablePlaceholders) {
@@ -608,7 +638,7 @@ if (typeof module === 'object') {
             this.on(this.elements[index], 'keypress', function (e) {
                 var node,
                     tagName;
-                if (e.which === keyCode.SPACE) {
+                if (e.which === mediumEditorUtil.keyCode.SPACE) {
                     node = getSelectionStart.call(self);
                     tagName = node.tagName.toLowerCase();
                     if (tagName === 'a') {
@@ -625,7 +655,7 @@ if (typeof module === 'object') {
                 if (node && node.getAttribute('data-medium-element') && node.children.length === 0 && !(self.options.disableReturn || node.getAttribute('data-disable-return'))) {
                     self.options.ownerDocument.execCommand('formatBlock', false, 'p');
                 }
-                if (e.which === keyCode.ENTER) {
+                if (e.which === mediumEditorUtil.keyCode.ENTER) {
                     node = getSelectionStart.call(self);
                     tagName = node.tagName.toLowerCase();
                     editorElement = self.getSelectionElement();
@@ -668,7 +698,7 @@ if (typeof module === 'object') {
         bindReturn: function (index) {
             var self = this;
             this.on(this.elements[index], 'keypress', function (e) {
-                if (e.which === keyCode.ENTER) {
+                if (e.which === mediumEditorUtil.keyCode.ENTER) {
                     if (self.options.disableReturn || this.getAttribute('data-disable-return')) {
                         e.preventDefault();
                     } else if (self.options.disableDoubleReturn || this.getAttribute('data-disable-double-return')) {
@@ -686,7 +716,7 @@ if (typeof module === 'object') {
             var self = this;
             this.on(this.elements[index], 'keydown', function (e) {
 
-                if (e.which === keyCode.TAB) {
+                if (e.which === mediumEditorUtil.keyCode.TAB) {
                     // Override tab only for pre nodes
                     var tag = getSelectionStart.call(self).tagName.toLowerCase();
                     if (tag === 'pre') {
@@ -705,7 +735,7 @@ if (typeof module === 'object') {
                             self.options.ownerDocument.execCommand('indent', e);
                         }
                     }
-                } else if (e.which === keyCode.BACKSPACE || e.which === keyCode.DELETE || e.which === keyCode.ENTER) {
+                } else if (e.which === mediumEditorUtil.keyCode.BACKSPACE || e.which === mediumEditorUtil.keyCode.DELETE || e.which === mediumEditorUtil.keyCode.ENTER) {
 
                     // Bind keys which can create or destroy a block element: backspace, delete, return
                     self.onBlockModifier(e);
@@ -721,19 +751,19 @@ if (typeof module === 'object') {
                 isEmpty = /^(\s+|<br\/?>)?$/i,
                 isHeader = /h\d/i;
 
-            if ((e.which === keyCode.BACKSPACE || e.which === keyCode.ENTER)
+            if ((e.which === mediumEditorUtil.keyCode.BACKSPACE || e.which === mediumEditorUtil.keyCode.ENTER)
                     && node.previousElementSibling
                     // in a header
                     && isHeader.test(tagName)
                     // at the very end of the block
                     && getCaretOffsets(node).left === 0) {
-                if (e.which === keyCode.BACKSPACE && isEmpty.test(node.previousElementSibling.innerHTML)) {
+                if (e.which === mediumEditorUtil.keyCode.BACKSPACE && isEmpty.test(node.previousElementSibling.innerHTML)) {
                     // backspacing the begining of a header into an empty previous element will
                     // change the tagName of the current node to prevent one
                     // instead delete previous node and cancel the event.
                     node.previousElementSibling.parentNode.removeChild(node.previousElementSibling);
                     e.preventDefault();
-                } else if (e.which === keyCode.ENTER) {
+                } else if (e.which === mediumEditorUtil.keyCode.ENTER) {
                     // hitting return in the begining of a header will create empty header elements before the current one
                     // instead, make "<p><br></p>" element, which are what happens if you hit return in an empty paragraph
                     p = this.options.ownerDocument.createElement('p');
@@ -741,7 +771,7 @@ if (typeof module === 'object') {
                     node.previousElementSibling.parentNode.insertBefore(p, node);
                     e.preventDefault();
                 }
-            } else if (e.which === keyCode.DELETE
+            } else if (e.which === mediumEditorUtil.keyCode.DELETE
                         && node.nextElementSibling
                         && node.previousElementSibling
                         // not in a header
@@ -921,7 +951,7 @@ if (typeof module === 'object') {
 
                 if (btn) {
                     li = this.options.ownerDocument.createElement('li');
-                    if (isElement(btn)) {
+                    if (mediumEditorUtil.isElement(btn)) {
                         li.appendChild(btn);
                     } else {
                         li.innerHTML = btn;
@@ -1177,7 +1207,7 @@ if (typeof module === 'object') {
             if (this.options.standardizeSelectionStart &&
                     this.selectionRange.startContainer.nodeValue &&
                     (this.selectionRange.startOffset === this.selectionRange.startContainer.nodeValue.length)) {
-                adjacentNode = findAdjacentTextNodeWithContent(this.getSelectionElement(), this.selectionRange.startContainer, this.options.ownerDocument);
+                adjacentNode = mediumEditorUtil.findAdjacentTextNodeWithContent(this.getSelectionElement(), this.selectionRange.startContainer, this.options.ownerDocument);
                 if (adjacentNode) {
                     offset = 0;
                     while (adjacentNode.nodeValue.substr(offset, 1).trim().length === 0) {
@@ -1206,26 +1236,6 @@ if (typeof module === 'object') {
             }
         },
 
-        traverseUp: function (current, testElementFunction) {
-
-            do {
-                if (current.nodeType === 1) {
-                    if (testElementFunction(current)) {
-                        return current;
-                    }
-                    // do not traverse upwards past the nearest containing editor
-                    if (current.getAttribute('data-medium-element')) {
-                        return false;
-                    }
-                }
-
-                current = current.parentNode;
-            } while (current);
-
-            return false;
-
-        },
-
         findMatchingSelectionParent: function (testElementFunction) {
             var selection = this.options.contentWindow.getSelection(), range, current;
 
@@ -1236,7 +1246,7 @@ if (typeof module === 'object') {
             range = selection.getRangeAt(0);
             current = range.commonAncestorContainer;
 
-            return this.traverseUp(current, testElementFunction);
+            return mediumEditorUtil.traverseUp(current, testElementFunction);
 
         },
 
@@ -1614,7 +1624,7 @@ if (typeof module === 'object') {
                 var button = null,
                     target;
 
-                if (e.keyCode === keyCode.ENTER) {
+                if (e.keyCode === mediumEditorUtil.keyCode.ENTER) {
                     e.preventDefault();
                     if (self.options.anchorTarget && self.anchorTarget.checked) {
                         target = "_blank";
@@ -1627,7 +1637,7 @@ if (typeof module === 'object') {
                     }
 
                     self.createLink(this, target, button);
-                } else if (e.keyCode === keyCode.ESCAPE) {
+                } else if (e.keyCode === mediumEditorUtil.keyCode.ESCAPE) {
                     e.preventDefault();
                     self.showToolbarActions();
                     restoreSelection.call(self, self.savedSelection);
@@ -1659,13 +1669,13 @@ if (typeof module === 'object') {
 
             // Hide the anchor form when focusing outside of it.
             this.on(this.options.ownerDocument.body, 'click', function (e) {
-                if (e.target !== self.anchorForm && !isDescendant(self.anchorForm, e.target) && !isDescendant(self.toolbarActions, e.target)) {
+                if (e.target !== self.anchorForm && !mediumEditorUtil.isDescendant(self.anchorForm, e.target) && !mediumEditorUtil.isDescendant(self.toolbarActions, e.target)) {
                     self.keepToolbarAlive = false;
                     self.checkSelection();
                 }
             }, true);
             this.on(this.options.ownerDocument.body, 'focus', function (e) {
-                if (e.target !== self.anchorForm && !isDescendant(self.anchorForm, e.target) && !isDescendant(self.toolbarActions, e.target)) {
+                if (e.target !== self.anchorForm && !mediumEditorUtil.isDescendant(self.anchorForm, e.target) && !mediumEditorUtil.isDescendant(self.toolbarActions, e.target)) {
                     self.keepToolbarAlive = false;
                     self.checkSelection();
                 }
@@ -2240,7 +2250,7 @@ if (typeof module === 'object') {
                 el = spans[i];
 
                 // bail if span is in contenteditable = false
-                if (this.traverseUp(el, isCEF)) {
+                if (mediumEditorUtil.traverseUp(el, isCEF)) {
                     return false;
                 }
 
