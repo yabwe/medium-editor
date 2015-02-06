@@ -124,8 +124,7 @@
 
 .stalker-toolbar {
   -webkit-animation: pop-upwards 160ms forwards linear;
-  -ms-animation: pop-upwards 160ms forwards linear;
-  animation: pop-upwards 160ms forwards linear;
+          animation: pop-upwards 160ms forwards linear;
   -webkit-transition: top 0.075s ease-out, left 0.075s ease-out;
           transition: top 0.075s ease-out, left 0.075s ease-out; }
 
@@ -150,8 +149,7 @@
       outline: 0;
       border: none;
       box-shadow: none;
-      -webkit-appearance: none;
-      -moz-appearance: none; }
+      appearance: none; }
   .medium-editor-toolbar-form label {
     display: block; }
   .medium-editor-toolbar-form a {
@@ -184,7 +182,6 @@
           animation: medium-image-loading-animation 1s infinite ease-in-out; }
 
 @-webkit-keyframes medium-image-loading-animation {
-
   0% {
     -webkit-transform: scale(0);
             transform: scale(0); }
