@@ -23,176 +23,176 @@ if (typeof module === 'object') {
             'bold': {
                 name: 'bold',
                 action: 'bold',
+                aria: 'bold',
                 tagNames: ['b', 'strong'],
                 style: {
                     prop: 'font-weight',
                     value: 'bold'
                 },
-                html: '<button class="medium-editor-action medium-editor-action-bold" data-action="bold" aria-label="bold">{content}</button>',
                 contentDefault: '<b>B</b>',
                 contentFA: '<i class="fa fa-bold"></i>'
             },
             'italic': {
                 name: 'italic',
                 action: 'italic',
+                aria: 'italic',
                 tagNames: ['i', 'em'],
                 style: {
                     prop: 'font-style',
                     value: 'italic'
                 },
-                html: '<button class="medium-editor-action medium-editor-action-italic" data-action="italic" aria-label="italic">{content}</button>',
                 contentDefault: '<b><i>I</i></b>',
                 contentFA: '<i class="fa fa-italic"></i>'
             },
             'underline': {
                 name: 'underline',
                 action: 'underline',
+                aria: 'underline',
                 tagNames: ['u'],
                 style: {
                     prop: 'text-decoration',
                     value: 'underline'
                 },
-                html: '<button class="medium-editor-action medium-editor-action-underline" data-action="underline" aria-label="underline">{content}</button>',
                 contentDefault: '<b><u>U</u></b>',
                 contentFA: '<i class="fa fa-underline"></i>'
             },
             'strikethrough': {
                 name: 'strikethrough',
                 action: 'strikethrough',
+                aria: 'strike through',
                 tagNames: ['strike'],
                 style: {
                     prop: 'text-decoration',
                     value: 'line-through'
                 },
-                html: '<button class="medium-editor-action medium-editor-action-strikethrough" data-action="strikethrough" aria-label="strike through">{content}</button>',
                 contentDefault: '<s>A</s>',
                 contentFA: '<i class="fa fa-strikethrough"></i>'
             },
             'superscript': {
                 name: 'superscript',
                 action: 'superscript',
+                aria: 'superscript',
                 tagNames: ['sup'],
-                html: '<button class="medium-editor-action medium-editor-action-superscript" data-action="superscript" aria-label="superscript">{content}</button>',
                 contentDefault: '<b>x<sup>1</sup></b>',
                 contentFA: '<i class="fa fa-superscript"></i>'
             },
             'subscript': {
                 name: 'subscript',
                 action: 'subscript',
+                aria: 'subscript',
                 tagNames: ['sub'],
-                html: '<button class="medium-editor-action medium-editor-action-subscript" data-action="subscript" aria-label="subscript">{content}</button>',
                 contentDefault: '<b>x<sub>1</sub></b>',
                 contentFA: '<i class="fa fa-subscript"></i>'
             },
             'anchor': {
                 name: 'anchor',
                 action: 'anchor',
+                aria: 'link',
                 tagNames: ['a'],
-                html: '<button class="medium-editor-action medium-editor-action-anchor" data-action="anchor" aria-label="link">{content}</button>',
                 contentDefault: '<b>#</b>',
                 contentFA: '<i class="fa fa-link"></i>'
             },
             'image': {
                 name: 'image',
                 action: 'image',
+                aria: 'image',
                 tagNames: ['img'],
-                html: '<button class="medium-editor-action medium-editor-action-image" data-action="image" aria-label="image">{content}</button>',
                 contentDefault: '<b>image</b>',
                 contentFA: '<i class="fa fa-picture-o"></i>'
             },
             'quote': {
                 name: 'quote',
                 action: 'append-blockquote',
+                aria: 'blockquote',
                 tagNames: ['blockquote'],
-                html: '<button class="medium-editor-action medium-editor-action-quote" data-action="append-blockquote" aria-label="blockquote">{content}</button>',
                 contentDefault: '<b>&ldquo;</b>',
                 contentFA: '<i class="fa fa-quote-right"></i>'
             },
             'orderedlist': {
                 name: 'orderedlist',
                 action: 'insertorderedlist',
+                aria: 'ordered list',
                 tagNames: ['ol'],
-                html: '<button class="medium-editor-action medium-editor-action-orderedlist" data-action="insertorderedlist" aria-label="ordered list">{content}</button>',
                 contentDefault: '<b>1.</b>',
                 contentFA: '<i class="fa fa-list-ol"></i>'
             },
             'unorderedlist': {
                 name: 'unorderedlist',
                 action: 'insertunorderedlist',
+                aria: 'unordered list',
                 tagNames: ['ul'],
-                html: '<button class="medium-editor-action medium-editor-action-unorderedlist" data-action="insertunorderedlist" aria-label="unordered list">{content}</button>',
                 contentDefault: '<b>&bull;</b>',
                 contentFA: '<i class="fa fa-list-ul"></i>'
             },
             'pre': {
                 name: 'pre',
                 action: 'append-pre',
+                aria: 'preformatted text',
                 tagNames: ['pre'],
-                html: '<button class="medium-editor-action medium-editor-action-pre" data-action="append-pre" aria-label="preformatted text">{content}</button>',
                 contentDefault: '<b>0101</b>',
                 contentFA: '<i class="fa fa-code fa-lg"></i>'
             },
             'indent': {
                 name: 'indent',
                 action: 'indent',
+                aria: 'indent',
                 tagNames: [],
-                html: '<button class="medium-editor-action medium-editor-action-indent" data-action="indent" aria-label="indent">{content}</button>',
                 contentDefault: '<b>&rarr;</b>',
                 contentFA: '<i class="fa fa-indent"></i>'
             },
             'outdent': {
                 name: 'outdent',
                 action: 'outdent',
+                aria: 'outdent',
                 tagNames: [],
-                html: '<button class="medium-editor-action medium-editor-action-outdent" data-action="outdent" aria-label="outdent">{content}</button>',
                 contentDefault: '<b>&larr;</b>',
                 contentFA: '<i class="fa fa-outdent"></i>'
             },
             'justifyCenter': {
                 name: 'justifyCenter',
                 action: 'justifyCenter',
+                aria: 'center justify',
                 tagNames: [],
                 style: {
                     prop: 'text-align',
                     value: 'center'
                 },
-                html: '<button class="medium-editor-action medium-editor-action-justifyCenter" data-action="justifyCenter" aria-label="center justify">{content}</button>',
                 contentDefault: '<b>C</b>',
                 contentFA: '<i class="fa fa-align-center"></i>'
             },
             'justifyFull': {
                 name: 'justifyFull',
                 action: 'justifyFull',
+                aria: 'full justify',
                 tagNames: [],
                 style: {
                     prop: 'text-align',
                     value: 'justify'
                 },
-                html: '<button class="medium-editor-action medium-editor-action-justifyFull" data-action="justifyFull" aria-label="full justify">{content}</button>',
                 contentDefault: '<b>J</b>',
                 contentFA: '<i class="fa fa-align-justify"></i>'
             },
             'justifyLeft': {
                 name: 'justifyLeft',
                 action: 'justifyLeft',
+                aria: 'left justify',
                 tagNames: [],
                 style: {
                     prop: 'text-align',
                     value: 'left'
                 },
-                html: '<button class="medium-editor-action medium-editor-action-justifyLeft" data-action="justifyLeft" aria-label="left justify">{content}</button>',
                 contentDefault: '<b>L</b>',
                 contentFA: '<i class="fa fa-align-left"></i>'
             },
             'justifyRight': {
                 name: 'justifyRight',
                 action: 'justifyRight',
+                aria: 'right justify',
                 tagNames: [],
                 style: {
                     prop: 'text-align',
                     value: 'right'
                 },
-                html: '<button class="medium-editor-action medium-editor-action-justifyRight" data-action="justifyRight" aria-label="right justify">{content}</button>',
                 contentDefault: '<b>R</b>',
                 contentFA: '<i class="fa fa-align-right"></i>'
             },
@@ -201,11 +201,9 @@ if (typeof module === 'object') {
                 action: function (options) {
                     return 'append-' + options.firstHeader;
                 },
+                aria: 'h1',
                 tagNames: function (options) {
                     return [options.firstHeader];
-                },
-                html: function (options) {
-                    return '<button class="medium-editor-action medium-editor-action-header1" data-action="append-' + options.firstHeader + '" aria-label="h1">{content}</button>';
                 },
                 contentDefault: '<b>H1</b>'
             },
@@ -214,11 +212,9 @@ if (typeof module === 'object') {
                 action: function (options) {
                     return 'append-' + options.secondHeader;
                 },
+                aria: 'h2',
                 tagNames: function (options) {
                     return [options.secondHeader];
-                },
-                html: function (options) {
-                    return '<button class="medium-editor-action medium-editor-action-header2" data-action="append-' + options.secondHeader + '" aria-label="h2">{content}</button>';
                 },
                 contentDefault: '<b>H2</b>'
             }
@@ -236,22 +232,31 @@ if (typeof module === 'object') {
         getButton: function () {
             return this.button;
         },
+        getAction: function () {
+            return (typeof this.options.action === 'function') ? this.options.action(this.base.options) : this.options.action;
+        },
+        getTagNames: function () {
+            return (typeof this.options.tagNames === 'function') ? this.options.tagNames(this.base.options) : this.options.tagNames;
+        },
         createButton: function () {
-            var buttonHtml = (typeof this.options.html === 'function' ? this.options.html(this.base.options) : this.options.html),
-                content = this.options.contentDefault,
-                tempWrapper = this.base.options.ownerDocument.createElement('div');
+            var button = this.base.options.ownerDocument.createElement('button'),
+                content = this.options.contentDefault;
+            button.classList.add('medium-editor-action');
+            button.classList.add('medium-editor-action-' + this.name);
+            button.setAttribute('data-action', this.getAction());
+            button.setAttribute('aria-label', this.options.aria);
             if (this.base.options.buttonLabels) {
                 if (this.base.options.buttonLabels === 'fontawesome' && this.options.contentFA) {
                     content = this.options.contentFA;
-                } else if (typeof this.base.options.buttonLabels === 'object' && this.base.options.buttonLabels[this.options.name]) {
+                } else if (typeof this.base.options.buttonLabels === 'object' && this.base.options.buttonLabels[this.name]) {
                     content = this.base.options.buttonLabels[this.options.name];
                 }
             }
-            tempWrapper.innerHTML = buttonHtml.replace('{content}', content);
-            return tempWrapper.removeChild(tempWrapper.firstChild);
+            button.innerHTML = content;
+            return button;
         },
         handleClick: function (evt) {
-            var action;
+            var action = this.getAction();
             if (!this.base.selection) {
                 this.base.checkSelection();
             }
@@ -262,8 +267,7 @@ if (typeof module === 'object') {
                 this.activate();
             }
 
-            if (this.options.action) {
-                action = (typeof this.options.action === 'function' ? this.options.action(this.base.options) : this.options.action);
+            if (action) {
                 this.base.execAction(action, evt);
             }
             if (this.options.form) {
@@ -283,13 +287,12 @@ if (typeof module === 'object') {
         },
         shouldActivate: function (node) {
             var isMatch = false,
-                tagNames;
+                tagNames = this.getTagNames();
             if (this.knownState === false || this.knownState === true) {
                 return this.knownState;
             }
 
-            if (this.options.tagNames && node.tagName) {
-                tagNames = (typeof this.options.tagNames === 'function') ? this.options.tagNames(this.base.options) : this.options.tagNames;
+            if (tagNames && tagNames.length > 0 && node.tagName) {
                 isMatch = tagNames.indexOf(node.tagName.toLowerCase()) !== -1;
             }
 
@@ -1587,6 +1590,9 @@ if (typeof module === 'object') {
             } else {
                 this.options.ownerDocument.execCommand(action, false, null);
                 this.setToolbarPosition();
+                if (action.indexOf('justify') === 0) {
+                    this.setToolbarButtonStates();
+                }
             }
         },
 
