@@ -33,6 +33,13 @@ if (typeof module === 'object') {
     // https://github.com/jashkenas/underscore
     var now = Date.now || function () {
         return new Date().getTime();
+    }, keyCode = {
+        BACKSPACE: 8,
+        TAB: 9,
+        ENTER: 13,
+        ESCAPE: 27,
+        SPACE: 32,
+        DELETE: 46
     };
 
     // https://github.com/jashkenas/underscore
@@ -602,7 +609,7 @@ if (typeof module === 'object') {
             this.on(this.elements[index], 'keypress', function (e) {
                 var node,
                     tagName;
-                if (e.which === 32) {
+                if (e.which === keyCode.SPACE) {
                     node = getSelectionStart.call(self);
                     tagName = node.tagName.toLowerCase();
                     if (tagName === 'a') {
@@ -619,7 +626,7 @@ if (typeof module === 'object') {
                 if (node && node.getAttribute('data-medium-element') && node.children.length === 0 && !(self.options.disableReturn || node.getAttribute('data-disable-return'))) {
                     self.options.ownerDocument.execCommand('formatBlock', false, 'p');
                 }
-                if (e.which === 13) {
+                if (e.which === keyCode.ENTER) {
                     node = getSelectionStart.call(self);
                     tagName = node.tagName.toLowerCase();
                     editorElement = self.getSelectionElement();
@@ -662,7 +669,7 @@ if (typeof module === 'object') {
         bindReturn: function (index) {
             var self = this;
             this.on(this.elements[index], 'keypress', function (e) {
-                if (e.which === 13) {
+                if (e.which === keyCode.ENTER) {
                     if (self.options.disableReturn || this.getAttribute('data-disable-return')) {
                         e.preventDefault();
                     } else if (self.options.disableDoubleReturn || this.getAttribute('data-disable-double-return')) {
@@ -680,7 +687,7 @@ if (typeof module === 'object') {
             var self = this;
             this.on(this.elements[index], 'keydown', function (e) {
 
-                if (e.which === 9) {
+                if (e.which === keyCode.TAB) {
                     // Override tab only for pre nodes
                     var tag = getSelectionStart.call(self).tagName.toLowerCase();
                     if (tag === 'pre') {
@@ -699,7 +706,7 @@ if (typeof module === 'object') {
                             self.options.ownerDocument.execCommand('indent', e);
                         }
                     }
-                } else if (e.which === 8 || e.which === 46 || e.which === 13) {
+                } else if (e.which === keyCode.BACKSPACE || e.which === keyCode.DELETE || e.which === keyCode.ENTER) {
 
                     // Bind keys which can create or destroy a block element: backspace, delete, return
                     self.onBlockModifier(e);
@@ -716,20 +723,19 @@ if (typeof module === 'object') {
                 isEmpty = /^(\s+|<br\/?>)?$/i,
                 isHeader = /h\d/i;
 
-            // backspace or return
-            if ((e.which === 8 || e.which === 13)
+            if ((e.which === keyCode.BACKSPACE || e.which === keyCode.ENTER)
                     && node.previousElementSibling
                     // in a header
                     && isHeader.test(tagName)
                     // at the very end of the block
                     && getCaretOffsets(node).left === 0) {
-                if (e.which === 8 && isEmpty.test(node.previousElementSibling.innerHTML)) {
+                if (e.which === keyCode.BACKSPACE && isEmpty.test(node.previousElementSibling.innerHTML)) {
                     // backspacing the begining of a header into an empty previous element will
                     // change the tagName of the current node to prevent one
                     // instead delete previous node and cancel the event.
                     node.previousElementSibling.parentNode.removeChild(node.previousElementSibling);
                     e.preventDefault();
-                } else if (e.which === 13) {
+                } else if (e.which === keyCode.ENTER) {
                     // hitting return in the begining of a header will create empty header elements before the current one
                     // instead, make "<p><br></p>" element, which are what happens if you hit return in an empty paragraph
                     p = this.options.ownerDocument.createElement('p');
@@ -739,7 +745,7 @@ if (typeof module === 'object') {
                 }
 
             // delete
-            } else if (e.which === 46
+            } else if (e.which === keyCode.DELETE
                         && node.nextElementSibling
                         && node.previousElementSibling
                         // not in a header
@@ -1613,7 +1619,7 @@ if (typeof module === 'object') {
                 var button = null,
                     target;
 
-                if (e.keyCode === 13) {
+                if (e.keyCode === keyCode.ENTER) {
                     e.preventDefault();
                     if (self.options.anchorTarget && self.anchorTarget.checked) {
                         target = "_blank";
@@ -1626,7 +1632,7 @@ if (typeof module === 'object') {
                     }
 
                     self.createLink(this, target, button);
-                } else if (e.keyCode === 27) {
+                } else if (e.keyCode === keyCode.ESCAPE) {
                     e.preventDefault();
                     self.showToolbarActions();
                     restoreSelection.call(self, self.savedSelection);
