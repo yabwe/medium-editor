@@ -210,7 +210,9 @@ var mediumEditorUtil;
                 }
             }
             return false;
-        }
+        },
+
+        parentElements: ['p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'blockquote', 'pre']
     };
 }(window, document));
 
@@ -354,6 +356,26 @@ var meSelection;
                 selectedParentElement = range.startContainer;
             }
             return selectedParentElement;
+        },
+
+        getSelectionData: function (el) {
+            var tagName;
+
+            if (el && el.tagName) {
+                tagName = el.tagName.toLowerCase();
+            }
+
+            while (el && mediumEditorUtil.parentElements.indexOf(tagName) === -1) {
+                el = el.parentNode;
+                if (el && el.tagName) {
+                    tagName = el.tagName.toLowerCase();
+                }
+            }
+
+            return {
+                el: el,
+                tagName: tagName
+            };
         }
     };
 }(document, window));
@@ -937,7 +959,7 @@ if (typeof module === 'object') {
             if (this.elements.length === 0) {
                 return;
             }
-            this.parentElements = ['p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'blockquote', 'pre'];
+
             if (!this.options.elementsContainer) {
                 this.options.elementsContainer = this.options.ownerDocument.body;
             }
@@ -1856,7 +1878,7 @@ if (typeof module === 'object') {
                         }
                     }
                 };
-            while (parentNode.tagName !== undefined && this.parentElements.indexOf(parentNode.tagName.toLowerCase) === -1) {
+            while (parentNode.tagName !== undefined && mediumEditorUtil.parentElements.indexOf(parentNode.tagName.toLowerCase) === -1) {
                 this.activateButton(parentNode.tagName.toLowerCase());
                 this.commands.forEach(checkExtension.bind(this));
 
@@ -1946,7 +1968,7 @@ if (typeof module === 'object') {
         },
 
         execFormatBlock: function (el) {
-            var selectionData = this.getSelectionData(this.selection.anchorNode);
+            var selectionData = meSelection.getSelectionData(this.selection.anchorNode);
             // FF handles blockquote differently on formatBlock
             // allowing nesting, we need to use outdent
             // https://developer.mozilla.org/en-US/docs/Rich-Text_Editing_in_Mozilla
@@ -1968,34 +1990,6 @@ if (typeof module === 'object') {
                 el = '<' + el + '>';
             }
             return this.options.ownerDocument.execCommand('formatBlock', false, el);
-        },
-
-        getSelectionData: function (el) {
-            var tagName;
-
-            if (el && el.tagName) {
-                tagName = el.tagName.toLowerCase();
-            }
-
-            while (el && this.parentElements.indexOf(tagName) === -1) {
-                el = el.parentNode;
-                if (el && el.tagName) {
-                    tagName = el.tagName.toLowerCase();
-                }
-            }
-
-            return {
-                el: el,
-                tagName: tagName
-            };
-        },
-
-        getFirstChild: function (el) {
-            var firstChild = el.firstChild;
-            while (firstChild !== null && firstChild.nodeType !== 1) {
-                firstChild = firstChild.nextSibling;
-            }
-            return firstChild;
         },
 
         isToolbarShown: function () {

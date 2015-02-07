@@ -139,6 +139,26 @@ var meSelection;
                 selectedParentElement = range.startContainer;
             }
             return selectedParentElement;
+        },
+
+        getSelectionData: function (el) {
+            var tagName;
+
+            if (el && el.tagName) {
+                tagName = el.tagName.toLowerCase();
+            }
+
+            while (el && mediumEditorUtil.parentElements.indexOf(tagName) === -1) {
+                el = el.parentNode;
+                if (el && el.tagName) {
+                    tagName = el.tagName.toLowerCase();
+                }
+            }
+
+            return {
+                el: el,
+                tagName: tagName
+            };
         }
     };
 }(document, window));
