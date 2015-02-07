@@ -183,6 +183,7 @@ var mediumEditorUtil;
             }
         },
 
+        // TODO: not sure if this should be here
         setTargetBlank: function (el) {
             var i;
             if (el.tagName.toLowerCase() === 'a') {
@@ -194,6 +195,23 @@ var mediumEditorUtil;
                     el[i].target = '_blank';
                 }
             }
+        },
+
+        isListItemChild: function (node) {
+            var parentNode = node.parentNode,
+                tagName = parentNode.tagName.toLowerCase();
+            while (this.parentElements.indexOf(tagName) === -1 && tagName !== 'div') {
+                if (tagName === 'li') {
+                    return true;
+                }
+                parentNode = parentNode.parentNode;
+                if (parentNode && parentNode.tagName) {
+                    tagName = parentNode.tagName.toLowerCase();
+                } else {
+                    return false;
+                }
+            }
+            return false;
         }
     };
 }(window, document));
