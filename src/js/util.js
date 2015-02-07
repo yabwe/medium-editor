@@ -7,6 +7,18 @@ var mediumEditorUtil;
 
     mediumEditorUtil = {
 
+        // https://github.com/jashkenas/underscore
+        keyCode: {
+            BACKSPACE: 8,
+            TAB: 9,
+            ENTER: 13,
+            ESCAPE: 27,
+            SPACE: 32,
+            DELETE: 46
+        },
+
+        parentElements: ['p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'blockquote', 'pre'],
+
         extend: function extend(b, a) {
             var prop;
             if (b === undefined) {
@@ -63,16 +75,6 @@ var mediumEditorUtil;
         // https://github.com/jashkenas/underscore
         isElement: function isElement(obj) {
             return !!(obj && obj.nodeType === 1);
-        },
-
-        // https://github.com/jashkenas/underscore
-        keyCode: {
-            BACKSPACE: 8,
-            TAB: 9,
-            ENTER: 13,
-            ESCAPE: 27,
-            SPACE: 32,
-            DELETE: 46
         },
 
         now: function now() {
@@ -212,8 +214,6 @@ var mediumEditorUtil;
                 }
             }
             return false;
-        },
-
-        parentElements: ['p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'blockquote', 'pre']
+        }
     };
 }(window, document));
