@@ -295,7 +295,7 @@ if (typeof module === 'object') {
             }
 
             if (!isMatch && this.options.style) {
-                this.knownState = isMatch = (this.base.options.contentWindow.getComputedStyle(node, null).getPropertyValue(this.options.style.prop) === this.options.style.value);
+                this.knownState = isMatch = (this.base.options.contentWindow.getComputedStyle(node, null).getPropertyValue(this.options.style.prop).indexOf(this.options.style.value) !== -1);
             }
 
             return isMatch;
@@ -620,7 +620,6 @@ if (typeof module === 'object') {
                 .setPlaceholders()
                 .bindElementActions()
                 .bindWindowActions();
-                //.passInstance();
         },
 
         on: function (target, event, listener, useCapture) {
@@ -872,7 +871,7 @@ if (typeof module === 'object') {
 
             for (name in extensions) {
                 if (extensions.hasOwnProperty(name) && buttons.indexOf(name) === -1) {
-                    ext = this.initExtension(extensions[name]);
+                    ext = this.initExtension(extensions[name], name);
                 }
             }
 
@@ -904,29 +903,6 @@ if (typeof module === 'object') {
                 }
             }
             return this;
-        },
-
-        /**
-         * Pass current Medium Editor instance to all extensions
-         * if extension constructor has 'parent' attribute set to 'true'
-         *
-         */
-        passInstance: function () {
-            var self = this,
-                ext,
-                name;
-
-            for (name in self.options.extensions) {
-                if (self.options.extensions.hasOwnProperty(name)) {
-                    ext = self.options.extensions[name];
-
-                    if (ext.parent) {
-                        ext.base = self;
-                    }
-                }
-            }
-
-            return self;
         },
 
         bindParagraphCreation: function (index) {
@@ -1146,10 +1122,6 @@ if (typeof module === 'object') {
             this.commands.forEach(function (extension) {
                 if (typeof extension.getButton === 'function') {
                     btn = extension.getButton(this);
-                    if (isElement(btn) && extension.hasForm) {
-                        btn.setAttribute('data-form', 'medium-editor-toolbar-form-' + extension.name + '-' + this.id);
-                    }
-
                     li = this.options.ownerDocument.createElement('li');
                     if (isElement(btn)) {
                         li.appendChild(btn);

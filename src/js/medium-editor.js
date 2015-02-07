@@ -296,7 +296,7 @@ if (typeof module === 'object') {
             }
 
             if (!isMatch && this.options.style) {
-                this.knownState = isMatch = (this.base.options.contentWindow.getComputedStyle(node, null).getPropertyValue(this.options.style.prop) === this.options.style.value);
+                this.knownState = isMatch = (this.base.options.contentWindow.getComputedStyle(node, null).getPropertyValue(this.options.style.prop).indexOf(this.options.style.value) !== -1);
             }
 
             return isMatch;
