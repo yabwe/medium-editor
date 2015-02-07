@@ -1,6 +1,6 @@
 /*global MediumEditor, describe, it, expect, spyOn,
          afterEach, beforeEach, selectElementContents,
-         jasmine, fireEvent, tearDown,
+         jasmine, fireEvent, tearDown, console,
          selectElementContentsAndFire */
 
 describe('Buttons TestCase', function () {
@@ -15,26 +15,6 @@ describe('Buttons TestCase', function () {
 
     afterEach(function () {
         tearDown(this.el);
-    });
-
-    describe('Button Initial State', function () {
-        beforeEach(function () {
-            jasmine.clock().install();
-        });
-
-        afterEach(function () {
-            jasmine.clock().uninstall();
-        });
-
-        it('should activate button if selection already has the element', function () {
-            var button,
-                editor = new MediumEditor('.editor');
-            this.el.innerHTML = '<b>lorem ipsum</b>';
-            selectElementContentsAndFire(editor.elements[0]);
-            jasmine.clock().tick(1);
-            button = editor.toolbar.querySelector('[data-action="bold"]');
-            expect(button.className).toContain('medium-editor-button-active');
-        });
     });
 
     describe('Button click', function () {
@@ -85,19 +65,6 @@ describe('Buttons TestCase', function () {
             button = editor.toolbar.querySelector('[data-action="bold"]');
             fireEvent(button, 'click');
             expect(editor.execAction).toHaveBeenCalled();
-        });
-
-        it('should call the execCommand for native actions', function () {
-            spyOn(document, 'execCommand').and.callThrough();
-            var button,
-                editor = new MediumEditor('.editor');
-            selectElementContentsAndFire(editor.elements[0]);
-            jasmine.clock().tick(1);
-            button = editor.toolbar.querySelector('[data-action="italic"]');
-            fireEvent(button, 'click');
-            expect(document.execCommand).toHaveBeenCalled();
-            // IE won't generate an `<i>` tag here. it generates an `<em>`:
-            expect(this.el.innerHTML).toMatch(/(<i>|<em>)lorem ipsum(<\/i>|<\/em>)/);
         });
 
         it('should execute the button action', function () {
@@ -173,6 +140,387 @@ describe('Buttons TestCase', function () {
             expect(buttons[1].className).not.toContain('medium-editor-button-first');
             expect(buttons[1].className).not.toContain('medium-editor-button-last');
             expect(buttons[buttons.length - 1].className).toContain('medium-editor-button-last');
+        });
+    });
+
+    describe('Bold', function () {
+        beforeEach(function () {
+            jasmine.clock().install();
+        });
+
+        afterEach(function () {
+            jasmine.clock().uninstall();
+        });
+
+        it('button should be active if the selection already has the element', function () {
+            var button,
+                editor = new MediumEditor('.editor', {
+                    buttons: ['bold']
+                });
+            this.el.innerHTML = '<b>lorem ipsum</b>';
+            selectElementContentsAndFire(editor.elements[0]);
+            jasmine.clock().tick(1);
+            button = editor.toolbar.querySelector('[data-action="bold"]');
+            expect(button.classList.contains('medium-editor-button-active')).toBe(true);
+
+            fireEvent(button, 'click');
+            jasmine.clock().tick(1);
+            button = editor.toolbar.querySelector('[data-action="bold"]');
+            expect(button.classList.contains('medium-editor-button-active')).toBe(false);
+
+            this.el.innerHTML = '<strong>lorem ipsum</strong>';
+            selectElementContentsAndFire(editor.elements[0]);
+            jasmine.clock().tick(1);
+            button = editor.toolbar.querySelector('[data-action="bold"]');
+            expect(button.classList.contains('medium-editor-button-active')).toBe(true);
+        });
+    });
+
+    describe('Italics', function () {
+        beforeEach(function () {
+            jasmine.clock().install();
+        });
+
+        afterEach(function () {
+            jasmine.clock().uninstall();
+        });
+
+        it('should call the execCommand for native actions', function () {
+            spyOn(document, 'execCommand').and.callThrough();
+            var button,
+                editor = new MediumEditor('.editor');
+            selectElementContentsAndFire(editor.elements[0]);
+            jasmine.clock().tick(1);
+            button = editor.toolbar.querySelector('[data-action="italic"]');
+            fireEvent(button, 'click');
+            expect(document.execCommand).toHaveBeenCalled();
+            // IE won't generate an `<i>` tag here. it generates an `<em>`:
+            expect(this.el.innerHTML).toMatch(/(<i>|<em>)lorem ipsum(<\/i>|<\/em>)/);
+        });
+
+        it('button should be active if the selection already has the element', function () {
+            var button,
+                editor = new MediumEditor('.editor', {
+                    buttons: ['italic']
+                });
+            this.el.innerHTML = '<i>lorem ipsum</i>';
+            selectElementContentsAndFire(editor.elements[0]);
+            jasmine.clock().tick(1);
+            button = editor.toolbar.querySelector('[data-action="italic"]');
+            expect(button.classList.contains('medium-editor-button-active')).toBe(true);
+
+            fireEvent(button, 'click');
+            jasmine.clock().tick(1);
+            button = editor.toolbar.querySelector('[data-action="italic"]');
+            expect(button.classList.contains('medium-editor-button-active')).toBe(false);
+
+            this.el.innerHTML = '<em>lorem ipsum</em>';
+            selectElementContentsAndFire(editor.elements[0]);
+            jasmine.clock().tick(1);
+            button = editor.toolbar.querySelector('[data-action="italic"]');
+            expect(button.classList.contains('medium-editor-button-active')).toBe(true);
+        });
+
+        it('button should be active for other cases when text is italic', function () {
+            var button,
+                editor = new MediumEditor('.editor', {
+                    buttons: ['italic']
+                });
+            this.el.innerHTML = '<p><span id="italic-span" style="font-style: italic">lorem ipsum</span></p>';
+            selectElementContentsAndFire(document.getElementById('italic-span'));
+            jasmine.clock().tick(1);
+            button = editor.toolbar.querySelector('[data-action="italic"]');
+            expect(button.classList.contains('medium-editor-button-active')).toBe(true);
+
+            fireEvent(button, 'click');
+            jasmine.clock().tick(1);
+            button = editor.toolbar.querySelector('[data-action="italic"]');
+            expect(button.classList.contains('medium-editor-button-active')).toBe(false);
+            expect(this.el.innerHTML).toBe('<p><span id="italic-span">lorem ipsum</span></p>');
+        });
+    });
+
+    describe('Underline', function () {
+        beforeEach(function () {
+            jasmine.clock().install();
+        });
+
+        afterEach(function () {
+            jasmine.clock().uninstall();
+        });
+
+        it('button should be active if the selection already has the element', function () {
+            var button,
+                editor = new MediumEditor('.editor', {
+                    buttons: ['underline']
+                });
+            this.el.innerHTML = '<u>lorem ipsum</u>';
+            selectElementContentsAndFire(editor.elements[0]);
+            jasmine.clock().tick(1);
+            button = editor.toolbar.querySelector('[data-action="underline"]');
+            expect(button.classList.contains('medium-editor-button-active')).toBe(true);
+
+            fireEvent(button, 'click');
+            jasmine.clock().tick(1);
+            button = editor.toolbar.querySelector('[data-action="underline"]');
+            expect(button.classList.contains('medium-editor-button-active')).toBe(false);
+            expect(this.el.innerHTML).toBe('lorem ipsum');
+        });
+
+        it('button should be active for other cases when text is underlined', function () {
+            var button,
+                editor = new MediumEditor('.editor', {
+                    buttons: ['underline']
+                });
+            this.el.innerHTML = '<p><span id="underline-span" style="text-decoration: underline">lorem ipsum</span></p>';
+            selectElementContentsAndFire(document.getElementById('underline-span'));
+            jasmine.clock().tick(1);
+            button = editor.toolbar.querySelector('[data-action="underline"]');
+            expect(button.classList.contains('medium-editor-button-active')).toBe(true);
+
+            fireEvent(button, 'click');
+            jasmine.clock().tick(1);
+            button = editor.toolbar.querySelector('[data-action="underline"]');
+            expect(button.classList.contains('medium-editor-button-active')).toBe(false);
+            expect(this.el.innerHTML).toBe('<p><span id="underline-span">lorem ipsum</span></p>');
+        });
+    });
+
+    describe('Strikethrough', function () {
+        beforeEach(function () {
+            jasmine.clock().install();
+        });
+
+        afterEach(function () {
+            jasmine.clock().uninstall();
+        });
+
+        it('button should be active if the selection already has the element', function () {
+            var button,
+                editor = new MediumEditor('.editor', {
+                    buttons: ['strikethrough']
+                });
+            this.el.innerHTML = '<strike>lorem ipsum</strike>';
+            selectElementContentsAndFire(editor.elements[0]);
+            jasmine.clock().tick(1);
+            button = editor.toolbar.querySelector('[data-action="strikethrough"]');
+            expect(button.classList.contains('medium-editor-button-active')).toBe(true);
+
+            fireEvent(button, 'click');
+            jasmine.clock().tick(1);
+            button = editor.toolbar.querySelector('[data-action="strikethrough"]');
+            expect(button.classList.contains('medium-editor-button-active')).toBe(false);
+            expect(this.el.innerHTML).toBe('lorem ipsum');
+        });
+
+        it('button should be active for other cases when text is strikethrough', function () {
+            var button,
+                editor = new MediumEditor('.editor', {
+                    buttons: ['strikethrough']
+                });
+            this.el.innerHTML = '<p><span id="strike-span" style="text-decoration: line-through">lorem ipsum</span></p>';
+            selectElementContentsAndFire(document.getElementById('strike-span'));
+            jasmine.clock().tick(1);
+            button = editor.toolbar.querySelector('[data-action="strikethrough"]');
+            expect(button.classList.contains('medium-editor-button-active')).toBe(true);
+
+            fireEvent(button, 'click');
+            jasmine.clock().tick(1);
+            button = editor.toolbar.querySelector('[data-action="strikethrough"]');
+            expect(button.classList.contains('medium-editor-button-active')).toBe(false);
+            expect(this.el.innerHTML).toBe('<p><span id="strike-span">lorem ipsum</span></p>');
+        });
+    });
+
+    describe('Superscript', function () {
+        beforeEach(function () {
+            jasmine.clock().install();
+        });
+
+        afterEach(function () {
+            jasmine.clock().uninstall();
+        });
+
+        it('button should be active if the selection already has the element', function () {
+            var button,
+                editor = new MediumEditor('.editor', {
+                    buttons: ['superscript']
+                });
+            this.el.innerHTML = '<sup>lorem ipsum</sub>';
+            selectElementContentsAndFire(editor.elements[0]);
+            jasmine.clock().tick(1);
+            button = editor.toolbar.querySelector('[data-action="superscript"]');
+            expect(button.classList.contains('medium-editor-button-active')).toBe(true);
+
+            fireEvent(button, 'click');
+            jasmine.clock().tick(1);
+            button = editor.toolbar.querySelector('[data-action="superscript"]');
+            expect(button.classList.contains('medium-editor-button-active')).toBe(false);
+            expect(this.el.innerHTML).toBe('lorem ipsum');
+        });
+    });
+
+    describe('Subscript', function () {
+        beforeEach(function () {
+            jasmine.clock().install();
+        });
+
+        afterEach(function () {
+            jasmine.clock().uninstall();
+        });
+
+        it('button should be active if the selection already has the element', function () {
+            var button,
+                editor = new MediumEditor('.editor', {
+                    buttons: ['subscript']
+                });
+            this.el.innerHTML = '<sub>lorem ipsum</sub>';
+            selectElementContentsAndFire(editor.elements[0]);
+            jasmine.clock().tick(1);
+            button = editor.toolbar.querySelector('[data-action="subscript"]');
+            expect(button.classList.contains('medium-editor-button-active')).toBe(true);
+
+            fireEvent(button, 'click');
+            jasmine.clock().tick(1);
+            button = editor.toolbar.querySelector('[data-action="subscript"]');
+            expect(button.classList.contains('medium-editor-button-active')).toBe(false);
+            expect(this.el.innerHTML).toBe('lorem ipsum');
+        });
+    });
+
+    describe('Anchor', function () {
+        beforeEach(function () {
+            jasmine.clock().install();
+        });
+
+        afterEach(function () {
+            jasmine.clock().uninstall();
+        });
+
+        it('button should be active if the selection already has the element', function () {
+            var button,
+                editor = new MediumEditor('.editor', {
+                    buttons: ['anchor']
+                });
+            this.el.innerHTML = '<p><span id="span-lorem">lorem</span> <a href="#" id="link">ipsum</a></p>';
+            selectElementContentsAndFire(document.getElementById('link'));
+            jasmine.clock().tick(1);
+            button = editor.toolbar.querySelector('[data-action="anchor"]');
+            expect(button.classList.contains('medium-editor-button-active')).toBe(true);
+
+            selectElementContentsAndFire(document.getElementById('span-lorem'));
+            jasmine.clock().tick(1);
+            button = editor.toolbar.querySelector('[data-action="anchor"]');
+            expect(button.classList.contains('medium-editor-button-active')).toBe(false);
+        });
+    });
+
+    describe('Quote', function () {
+        beforeEach(function () {
+            jasmine.clock().install();
+        });
+
+        afterEach(function () {
+            jasmine.clock().uninstall();
+        });
+
+        it('button should not be active if the selection is not inside a blockquote', function () {
+            var button,
+                editor = new MediumEditor('.editor', {
+                    buttons: ['quote']
+                });
+            this.el.innerHTML = '<span id="span-lorem">lorem ipsum</span>';
+            selectElementContentsAndFire(document.getElementById('span-lorem'));
+            jasmine.clock().tick(1);
+            button = editor.toolbar.querySelector('[data-action="append-blockquote"]');
+            expect(button.classList.contains('medium-editor-button-active')).toBe(false);
+
+            fireEvent(button, 'click');
+            jasmine.clock().tick(1);
+            selectElementContentsAndFire(document.getElementById('span-lorem'));
+            button = editor.toolbar.querySelector('[data-action="append-blockquote"]');
+            expect(button.classList.contains('medium-editor-button-active')).toBe(true);
+        });
+    });
+
+    describe('OrderedList', function () {
+        beforeEach(function () {
+            jasmine.clock().install();
+        });
+
+        afterEach(function () {
+            jasmine.clock().uninstall();
+        });
+
+        it('button should be active if the selection already has the element', function () {
+            var button,
+                editor = new MediumEditor('.editor', {
+                    buttons: ['orderedlist']
+                });
+            this.el.innerHTML = '<ol><li id="li-lorem">lorem ipsum</li></ol>';
+            selectElementContentsAndFire(document.getElementById('li-lorem'));
+            jasmine.clock().tick(1);
+            button = editor.toolbar.querySelector('[data-action="insertorderedlist"]');
+            expect(button.classList.contains('medium-editor-button-active')).toBe(true);
+
+            fireEvent(button, 'click');
+            jasmine.clock().tick(1);
+            button = editor.toolbar.querySelector('[data-action="insertorderedlist"]');
+            expect(button.classList.contains('medium-editor-button-active')).toBe(false);
+        });
+    });
+
+    describe('UnorderedList', function () {
+        beforeEach(function () {
+            jasmine.clock().install();
+        });
+
+        afterEach(function () {
+            jasmine.clock().uninstall();
+        });
+
+        it('button should be active if the selection already has the element', function () {
+            var button,
+                editor = new MediumEditor('.editor', {
+                    buttons: ['unorderedlist']
+                });
+            this.el.innerHTML = '<ul><li id="li-lorem">lorem ipsum</li></ul>';
+            selectElementContentsAndFire(document.getElementById('li-lorem'));
+            jasmine.clock().tick(1);
+            button = editor.toolbar.querySelector('[data-action="insertunorderedlist"]');
+            expect(button.classList.contains('medium-editor-button-active')).toBe(true);
+
+            fireEvent(button, 'click');
+            jasmine.clock().tick(1);
+            button = editor.toolbar.querySelector('[data-action="insertunorderedlist"]');
+            expect(button.classList.contains('medium-editor-button-active')).toBe(false);
+        });
+    });
+
+    describe('Pre', function () {
+        beforeEach(function () {
+            jasmine.clock().install();
+        });
+
+        afterEach(function () {
+            jasmine.clock().uninstall();
+        });
+
+        it('button should be active if the selection already has the element', function () {
+            var button,
+                editor = new MediumEditor('.editor', {
+                    buttons: ['pre']
+                });
+            this.el.innerHTML = '<pre><span id="span-lorem">lorem ipsum</span></pre>';
+            selectElementContentsAndFire(document.getElementById('span-lorem'));
+            jasmine.clock().tick(1);
+            button = editor.toolbar.querySelector('[data-action="append-pre"]');
+            expect(button.classList.contains('medium-editor-button-active')).toBe(true);
+
+            fireEvent(button, 'click');
+            jasmine.clock().tick(1);
+            button = editor.toolbar.querySelector('[data-action="append-pre"]');
+            expect(button.classList.contains('medium-editor-button-active')).toBe(false);
         });
     });
 });

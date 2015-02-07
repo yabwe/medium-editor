@@ -55,7 +55,35 @@ describe('Extensions TestCase', function () {
             expect(ext2.aMethod).toHaveBeenCalledWith('theParam');
         });
 
+        it('should call init (and pass the instance of itself) on extensions if the method exists', function () {
+            var ExtensionOne = function () {
+                this.init = function (me) {
+                    this.me = me;
+                };
+            },
+                ExtensionTwo = function () {},
+                ext1,
+                ext2,
+                editor;
 
+            ExtensionTwo.prototype.init = function (me) {
+                this.me = me;
+            };
+
+            ext1 = new ExtensionOne();
+            ext2 = new ExtensionTwo();
+
+            editor = new MediumEditor('.editor', {
+                extensions: {
+                    'one': ext1,
+                    'two': ext2
+                }
+            });
+
+            expect(ext1.me instanceof MediumEditor).toBeTruthy();
+            expect(ext2.me instanceof MediumEditor).toBeTruthy();
+            editor.deactivate();
+        });
     });
 
     describe('Button integration', function () {
@@ -72,6 +100,9 @@ describe('Extensions TestCase', function () {
                 getButton: function () {
                     return '<button class="extension-button">XXX</button>';
                 }
+            },
+            ExtensionWithNoButton = function () {
+                this.init = function (me) {};
             };
 
         it('should include extensions button into toolbar', function () {
@@ -104,9 +135,26 @@ describe('Extensions TestCase', function () {
             expect(editor.toolbar.querySelectorAll('.extension-button').length).toBe(0);
         });
 
+        it('should not include buttons into the toolbar when an overriding extension is present', function () {
+            var ext = new ExtensionWithNoButton(),
+                editor;
+
+            spyOn(ext, 'init');
+            editor = new MediumEditor('.editor', {
+                buttons: ['bold', 'italic'],
+                extensions: {
+                    'bold': ext
+                }
+            });
+
+            expect(editor.toolbar.querySelectorAll('button[data-action="italic"]').length).toBe(1);
+            expect(editor.toolbar.querySelectorAll('button[data-action="bold"]').length).toBe(0);
+            expect(ext.init).toHaveBeenCalled();
+            expect(editor.commands.length).toBe(2);
+        });
     });
 
-    describe('Pass editor instance', function () {
+    describe('Set data in extensions', function () {
         var ExtensionOne = function () {
                 this.parent = true;
             },
@@ -138,6 +186,19 @@ describe('Extensions TestCase', function () {
             expect(editor instanceof MediumEditor).toBeTruthy();
             expect(extOne.base instanceof MediumEditor).toBeTruthy();
             expect(extTwo.base).toBeUndefined();
+        });
+
+        it('should set the name of the extension', function () {
+            var editor = new MediumEditor('.editor', {
+                extensions: {
+                    'one': extOne,
+                    'two': extTwo
+                }
+            });
+
+            expect(extOne.name).toBe('one');
+            expect(extTwo.name).toBe('two');
+            editor.deactivate();
         });
     });
 });
