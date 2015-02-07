@@ -140,6 +140,60 @@ var mediumEditorUtil;
 
             return false;
 
+        },
+
+        htmlEntities: function (str) {
+            // converts special characters (like <) into their escaped/encoded values (like &lt;).
+            // This allows you to show to display the string without the browser reading it as HTML.
+            return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+        },
+
+        // http://stackoverflow.com/questions/6690752/insert-html-at-caret-in-a-contenteditable-div
+        insertHTMLCommand: function (doc, html) {
+            var selection, range, el, fragment, node, lastNode;
+
+            if (doc.queryCommandSupported('insertHTML')) {
+                try {
+                    return doc.execCommand('insertHTML', false, html);
+                } catch (ignore) {}
+            }
+
+            selection = window.getSelection();
+            if (selection.getRangeAt && selection.rangeCount) {
+                range = selection.getRangeAt(0);
+                range.deleteContents();
+
+                el = doc.createElement("div");
+                el.innerHTML = html;
+                fragment = doc.createDocumentFragment();
+                while (el.firstChild) {
+                    node = el.firstChild;
+                    lastNode = fragment.appendChild(node);
+                }
+                range.insertNode(fragment);
+
+                // Preserve the selection:
+                if (lastNode) {
+                    range = range.cloneRange();
+                    range.setStartAfter(lastNode);
+                    range.collapse(true);
+                    selection.removeAllRanges();
+                    selection.addRange(range);
+                }
+            }
+        },
+
+        setTargetBlank: function (el) {
+            var i;
+            if (el.tagName.toLowerCase() === 'a') {
+                el.target = '_blank';
+            } else {
+                el = el.getElementsByTagName('a');
+
+                for (i = 0; i < el.length; i += 1) {
+                    el[i].target = '_blank';
+                }
+            }
         }
     };
 }(window, document));

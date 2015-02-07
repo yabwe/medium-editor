@@ -14,7 +14,9 @@ module.exports = function (grunt) {
         },
         srcFiles = [
             'src/js/util.js',
+            'src/js/selection.js',
             'src/js/button.js',
+            'src/js/paste.js',
             'src/js/core.js'
         ];
 
