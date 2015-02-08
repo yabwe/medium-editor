@@ -401,13 +401,17 @@ var editor = new MediumEditor('.editable', {
 
 [Pavel Linkesch](https://github.com/orthes) has developed a jQuery plugin to upload images & embed content (from Twitter, Youtube, Vimeo, etc.) following Medium.com functionality. Check it out at [http://orthes.github.io/medium-editor-insert-plugin/](http://orthes.github.io/medium-editor-insert-plugin/)
 
+## Markdown
+
+[Ionică Bizău](https://github.com/IonicaBizau) has created a Medium Editor extension, named [Medium Editor Markdown](https://github.com/IonicaBizau/medium-editor-markdown), to add the functionality to render the HTML into Markdown code. Check it out at [https://github.com/IonicaBizau/medium-editor-markdown](https://github.com/IonicaBizau/medium-editor-markdown).
+
 ## Laravel
 
 [Zvonko Biškup](https://github.com/codeforest) has written an [awesome tutorial](http://www.codeforest.net/laravel-wysiwyg-editor) about how to integrate MediumEditor into your Laravel Project.
 
 ## Rails Gem
 
-[Ahmet Sezgin Duran](https://github.com/marjinal1st/)  gemified Medium Editor for Rails asset pipeline, check it out at [https://github.com/marjinal1st/medium-editor-rails](https://github.com/marjinal1st/medium-editor-rails).
+[Ahmet Sezgin Duran](https://github.com/marjinal1st/) gemified Medium Editor for Rails asset pipeline, check it out at [https://github.com/marjinal1st/medium-editor-rails](https://github.com/marjinal1st/medium-editor-rails).
 
 ## Angular directive
 
