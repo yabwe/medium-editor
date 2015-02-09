@@ -199,7 +199,7 @@ if (typeof module === 'object') {
                     return 'append-' + options.firstHeader;
                 },
                 aria: function (options) {
-                  return options.firstHeader;
+                    return options.firstHeader;
                 },
                 tagNames: function (options) {
                     return [options.firstHeader];
@@ -212,7 +212,7 @@ if (typeof module === 'object') {
                     return 'append-' + options.secondHeader;
                 },
                 aria: function (options) {
-                  return options.secondHeader;
+                    return options.secondHeader;
                 },
                 tagNames: function (options) {
                     return [options.secondHeader];
@@ -236,8 +236,8 @@ if (typeof module === 'object') {
         getAction: function () {
             return (typeof this.options.action === 'function') ? this.options.action(this.base.options) : this.options.action;
         },
-        getAria: function() {
-          return (typeof this.options.aria === 'function') ? this.options.aria(this.base.options) : this.options.aria;
+        getAria: function () {
+            return (typeof this.options.aria === 'function') ? this.options.aria(this.base.options) : this.options.aria;
         },
         getTagNames: function () {
             return (typeof this.options.tagNames === 'function') ? this.options.tagNames(this.base.options) : this.options.tagNames;
