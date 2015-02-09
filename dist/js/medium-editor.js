@@ -1035,7 +1035,7 @@ if (typeof module === 'object') {
             var self = this, i, className, onDrag, onDrop, element;
 
             if (!self.options.imageDragging) {
-                return;
+                return this;
             }
 
             className = 'medium-editor-dragover';
