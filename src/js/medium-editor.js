@@ -224,12 +224,16 @@ if (typeof module === 'object') {
     DefaultButton = function (options, instance) {
         this.options = options;
         this.name = options.name;
-        this.base = instance;
-        this.button = this.createButton();
-        this.base.on(this.button, 'click', this.handleClick.bind(this));
+        this.init(instance);
     };
 
     DefaultButton.prototype = {
+        init: function (instance) {
+            this.base = instance;
+
+            this.button = this.createButton();
+            this.base.on(this.button, 'click', this.handleClick.bind(this));
+        },
         getButton: function () {
             return this.button;
         },
@@ -551,6 +555,11 @@ if (typeof module === 'object') {
             }
         }
     }
+
+    MediumEditor.statics = {
+        ButtonsData: ButtonsData,
+        DefaultButton: DefaultButton
+    };
 
     MediumEditor.prototype = {
         defaults: {
