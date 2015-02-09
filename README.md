@@ -405,6 +405,9 @@ var editor = new MediumEditor('.editable', {
 
 [Ionică Bizău](https://github.com/IonicaBizau) has created a Medium Editor extension, named [Medium Editor Markdown](https://github.com/IonicaBizau/medium-editor-markdown), to add the functionality to render the HTML into Markdown code. Check it out at [https://github.com/IonicaBizau/medium-editor-markdown](https://github.com/IonicaBizau/medium-editor-markdown).
 
+## Inserting custom HTML
+At [**@jillix**](https://github.com/jillix/), [Ionică Bizău](https://github.com/IonicaBizau) developed [a Medium Editor extension](https://github.com/jillix/medium-editor-custom-html) that allows inserting custom HTML into the editor. Check it out here: [https://github.com/jillix/medium-editor-custom-html](https://github.com/jillix/medium-editor-custom-html).
+
 ## Laravel
 
 [Zvonko Biškup](https://github.com/codeforest) has written an [awesome tutorial](http://www.codeforest.net/laravel-wysiwyg-editor) about how to integrate MediumEditor into your Laravel Project.
