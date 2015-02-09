@@ -325,7 +325,7 @@ Table.prototype.onClick = function() {
 
 Table.prototype.onClose = function(e) {
     e.preventDefault();
-    this.base.hideForm(this.form);
+    this.base.hideForm();
 };
 
 Table.prototype.onSave = function(e) {
@@ -333,9 +333,11 @@ Table.prototype.onSave = function(e) {
     var columnCount = this.columnInput.value;
     var rowCount = this.rowInput.value;
     var table = this.createTable(columnCount, rowCount);
-
+    // Restore Medium Editor's selection before pasting HTML
+    this.base.restoreSelection();
+    // Paste newly created table.
     this.base.pasteHTML(table.innerHTML);
-    this.base.hideForm(this.form);
+    this.base.hideForm();
 };
 
 // Create the table element.

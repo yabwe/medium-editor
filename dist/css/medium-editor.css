@@ -128,6 +128,9 @@
   animation: pop-upwards 160ms forwards linear;
   transition: top 0.075s ease-out, left 0.075s ease-out; }
 
+.toolbar-visible {
+  visibility: visible; }
+
 .medium-editor-action-bold {
   font-weight: bolder; }
 

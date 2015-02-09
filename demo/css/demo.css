@@ -85,3 +85,40 @@ blockquote {
     color: #555;
 }
 
+table {
+  width: 100%;
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+
+tr {
+  background-color: #fff;
+  color: #787a8d;
+}
+
+tr:nth-child(even) {
+  background-color: #f6f7fa;
+}
+
+td, th {
+  height: 42px;
+  line-height: 42px;
+  border: 1px solid #e6e7f1;
+  text-align: center;
+  padding: 0 1em;
+  white-space: -moz-pre-wrap !important;  /* Mozilla, since 1999 */
+  white-space: -pre-wrap;      /* Opera 4-6 */
+  white-space: -o-pre-wrap;    /* Opera 7 */
+  white-space: pre-wrap;       /* css-3 */
+  word-wrap: break-word;       /* Internet Explorer 5.5+ */
+  white-space: -webkit-pre-wrap; /* Newer versions of Chrome/Safari*/
+  word-break: break-all;
+  white-space: normal;
+}
+
+th {
+  background-color: #798299;
+  color: #edeef1;
+  text-transform: uppercase;
+  font-weight: bold;
+}

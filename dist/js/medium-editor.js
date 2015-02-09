@@ -299,35 +299,13 @@ else if (typeof define === 'function' && define.amd) {
             // Init toolbar
             if (addToolbar) {
                 this.passInstance()
-                    .initExtensions()
+                    .callExtensions('init')
                     .initToolbar()
                     .bindButtons()
                     .bindAnchorForm()
                     .bindAnchorPreview();
             }
             return this;
-        },
-
-        /**
-         * Calls an init() function on all registered extensions
-         * Checks whether init() exists before calling
-         *
-         */
-        initExtensions: function () {
-            var self = this,
-                ext,
-                name;
-
-            for (name in self.options.extensions) {
-                if (self.options.extensions.hasOwnProperty(name)) {
-                    ext = self.options.extensions[name];
-                    if (ext.init !== undefined) { 
-                        ext.init();
-                    }
-                }
-            }
-
-            return self;
         },
 
         setElementSelection: function (selector) {
@@ -491,6 +469,7 @@ else if (typeof define === 'function' && define.amd) {
                     }
                 }
             }
+            return this;
         },
 
         /**
@@ -1161,22 +1140,22 @@ else if (typeof define === 'function' && define.amd) {
         // Method to show an extension's form
         // TO DO: Improve this
         showForm: function (formId, e) {
-            this.toolbarActions.style.display = 'none';
             this.saveSelection();
-            var form = document.getElementById(formId);
-            form.style.display = 'block';
-            this.setToolbarPosition();
+            this.toolbarActions.style.display = 'none';
             this.keepToolbarAlive = true;
+            this.openExtensionForm = document.getElementById(formId);
+            this.openExtensionForm.style.display = 'block';
+            var inputs = this.openExtensionForm.getElementsByTagName('input');
+            inputs[0].focus();
+            this.setToolbarPosition();
         },
 
         // Method to show an extension's form
         // TO DO: Improve this
-        hideForm: function (form, e) {
-            var el = document.getElementById(form.id);
-            el.style.display = 'none';
+        hideForm: function () {
+            this.openExtensionForm.style.display = 'none';
             this.showToolbarActions();
             this.setToolbarPosition();
-            restoreSelection.call(this, this.savedSelection);
         },
 
         // http://stackoverflow.com/questions/15867542/range-object-get-selection-parent-node-chrome-vs-firefox
@@ -1290,6 +1269,9 @@ else if (typeof define === 'function' && define.amd) {
         hideToolbarActions: function () {
             this.keepToolbarAlive = false;
             this.hideToolbar();
+            if (this.openExtensionForm && this.openExtensionForm.style.display === 'block') {
+                this.hideForm();
+            }
         },
 
         showToolbarActions: function () {
@@ -1392,15 +1374,17 @@ else if (typeof define === 'function' && define.amd) {
                 self.keepToolbarAlive = true;
             });
 
-            // Hide the anchor form when focusing outside of it.
+            // Hide the anchor form or extension when focusing outside of it.
             this.on(this.options.ownerDocument.body, 'click', function (e) {
-                if (e.target !== self.anchorForm && !isDescendant(self.anchorForm, e.target) && !isDescendant(self.toolbarActions, e.target)) {
+                if (e.target !== self.anchorForm && !isDescendant(self.anchorForm, e.target) && !isDescendant(self.toolbarActions, e.target) &&
+                    e.target !== self.openExtensionForm && !isDescendant(self.openExtensionForm, e.target)) {
                     self.keepToolbarAlive = false;
                     self.checkSelection();
                 }
             }, true);
             this.on(this.options.ownerDocument.body, 'focus', function (e) {
-                if (e.target !== self.anchorForm && !isDescendant(self.anchorForm, e.target) && !isDescendant(self.toolbarActions, e.target)) {
+                if (e.target !== self.anchorForm && !isDescendant(self.anchorForm, e.target) && !isDescendant(self.toolbarActions, e.target) &&
+                    e.target !== self.openExtensionForm && !isDescendant(self.openExtensionForm, e.target)) {
                     self.keepToolbarAlive = false;
                     self.checkSelection();
                 }
