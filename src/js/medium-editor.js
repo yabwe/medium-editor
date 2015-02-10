@@ -66,6 +66,9 @@ if (typeof module === 'object') {
                 action: 'superscript',
                 aria: 'superscript',
                 tagNames: ['sup'],
+                /* firefox doesn't behave the way we want it to, so we can use queryCommandState for superscript
+                   https://github.com/guardian/scribe/blob/master/BROWSERINCONSISTENCIES.md#documentquerycommandstate */
+                // useQueryState: true
                 contentDefault: '<b>x<sup>1</sup></b>',
                 contentFA: '<i class="fa fa-superscript"></i>'
             },
@@ -74,6 +77,9 @@ if (typeof module === 'object') {
                 action: 'subscript',
                 aria: 'subscript',
                 tagNames: ['sub'],
+                /* firefox doesn't behave the way we want it to, so we can use queryCommandState for subscript
+                   https://github.com/guardian/scribe/blob/master/BROWSERINCONSISTENCIES.md#documentquerycommandstate */
+                // useQueryState: true
                 contentDefault: '<b>x<sub>1</sub></b>',
                 contentFA: '<i class="fa fa-subscript"></i>'
             },
@@ -297,13 +303,18 @@ if (typeof module === 'object') {
             this.button.classList.add(this.base.options.activeButtonClass);
             delete this.knownState;
         },
-        shouldActivate: function (node) {
+        queryCommandState: function () {
+            var queryState = null;
             if (this.options.useQueryState) {
                 try {
-                    return this.base.options.ownerDocument.queryCommandState(this.getAction());
-                } catch (ignore) {}
+                    queryState = this.base.options.ownerDocument.queryCommandState(this.getAction());
+                } catch (exc) {
+                    queryState = null;
+                }
             }
-
+            return queryState;
+        },
+        shouldActivate: function (node) {
             var isMatch = false,
                 tagNames = this.getTagNames();
             if (this.knownState === false || this.knownState === true) {
@@ -1567,6 +1578,8 @@ if (typeof module === 'object') {
 
         checkActiveButtons: function () {
             var elements = Array.prototype.slice.call(this.elements),
+                manualStateChecks = [],
+                queryState = null,
                 parentNode = this.getSelectedParentElement(),
                 checkExtension = function (extension) {
                     if (typeof extension.checkState === 'function') {
@@ -1577,9 +1590,29 @@ if (typeof module === 'object') {
                         }
                     }
                 };
+
+            // Loop through all commands
+            this.commands.forEach(function (command) {
+                // For those commands where we can use document.queryCommandState(), do so
+                if (typeof command.queryCommandState === 'function') {
+                    queryState = command.queryCommandState();
+                    // If queryCommandState returns a valid value, we can trust the browser
+                    // and don't need to do our manual checks
+                    if (queryState !== null) {
+                        if (queryState) {
+                            command.activate();
+                        }
+                        return;
+                    }
+                }
+                // We can't use queryCommandState for this command, so add to manualStateChecks
+                manualStateChecks.push(command);
+            });
+
+            // Climb up the DOM and do manual checks for whether a certain command is currently enabled for this node
             while (parentNode.tagName !== undefined && this.parentElements.indexOf(parentNode.tagName.toLowerCase) === -1) {
                 this.activateButton(parentNode.tagName.toLowerCase());
-                this.commands.forEach(checkExtension.bind(this));
+                manualStateChecks.forEach(checkExtension.bind(this));
 
                 // we can abort the search upwards if we leave the contentEditable element
                 if (elements.indexOf(parentNode) !== -1) {

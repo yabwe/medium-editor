@@ -150,6 +150,21 @@ describe('Buttons TestCase', function () {
             selectElementContentsAndFire(editor.elements[0]);
             expect(button.classList.contains('medium-editor-button-active')).toBe(true);
         });
+
+        it('button should be active for other cases when text is bold', function () {
+            var editor = new MediumEditor('.editor', {
+                    buttons: ['bold']
+                }),
+                button = editor.toolbar.querySelector('[data-action="bold"]');
+
+            this.el.innerHTML = '<p><span id="bold-span" style="font-weight: bold">lorem ipsum</span></p>';
+            selectElementContentsAndFire(document.getElementById('bold-span'));
+            expect(button.classList.contains('medium-editor-button-active')).toBe(true);
+
+            fireEvent(button, 'click');
+            expect(button.classList.contains('medium-editor-button-active')).toBe(false);
+            expect(this.el.innerHTML).toBe('<p><span id="bold-span">lorem ipsum</span></p>');
+        });
     });
 
     describe('Italics', function () {
@@ -343,32 +358,40 @@ describe('Buttons TestCase', function () {
     describe('OrderedList', function () {
         it('button should be active if the selection already has the element', function () {
             var editor = new MediumEditor('.editor', {
-                    buttons: ['orderedlist']
+                    buttons: ['orderedlist', 'unorderedlist']
                 }),
                 button = editor.toolbar.querySelector('[data-action="insertorderedlist"]');
 
             this.el.innerHTML = '<ol><li id="li-lorem">lorem ipsum</li></ol>';
             selectElementContentsAndFire(document.getElementById('li-lorem'));
             expect(button.classList.contains('medium-editor-button-active')).toBe(true);
+            // Unordered list should not be active
+            expect(editor.toolbar.querySelector('[data-action="insertunorderedlist"]').classList.contains('medium-editor-button-active')).toBe(false);
 
             fireEvent(button, 'click');
             expect(button.classList.contains('medium-editor-button-active')).toBe(false);
+            // Unordered list should not be active
+            expect(editor.toolbar.querySelector('[data-action="insertunorderedlist"]').classList.contains('medium-editor-button-active')).toBe(false);
         });
     });
 
     describe('UnorderedList', function () {
         it('button should be active if the selection already has the element', function () {
             var editor = new MediumEditor('.editor', {
-                    buttons: ['unorderedlist']
+                    buttons: ['unorderedlist', 'orderedlist']
                 }),
                 button = editor.toolbar.querySelector('[data-action="insertunorderedlist"]');
 
             this.el.innerHTML = '<ul><li id="li-lorem">lorem ipsum</li></ul>';
             selectElementContentsAndFire(document.getElementById('li-lorem'));
             expect(button.classList.contains('medium-editor-button-active')).toBe(true);
+            // Ordered list button should not be active
+            expect(editor.toolbar.querySelector('[data-action="insertorderedlist"]').classList.contains('medium-editor-button-active')).toBe(false);
 
             fireEvent(button, 'click');
             expect(button.classList.contains('medium-editor-button-active')).toBe(false);
+            // Ordered list button should not be active
+            expect(editor.toolbar.querySelector('[data-action="insertorderedlist"]').classList.contains('medium-editor-button-active')).toBe(false);
         });
     });
 
