@@ -26,6 +26,7 @@ if (typeof module === 'object') {
                 action: 'bold',
                 aria: 'bold',
                 tagNames: ['b', 'strong'],
+                useQueryState: true,
                 contentDefault: '<b>B</b>',
                 contentFA: '<i class="fa fa-bold"></i>'
             },
@@ -38,6 +39,7 @@ if (typeof module === 'object') {
                     prop: 'font-style',
                     value: 'italic'
                 },
+                useQueryState: true,
                 contentDefault: '<b><i>I</i></b>',
                 contentFA: '<i class="fa fa-italic"></i>'
             },
@@ -46,6 +48,7 @@ if (typeof module === 'object') {
                 action: 'underline',
                 aria: 'underline',
                 tagNames: ['u'],
+                useQueryState: true,
                 contentDefault: '<b><u>U</u></b>',
                 contentFA: '<i class="fa fa-underline"></i>'
             },
@@ -54,6 +57,7 @@ if (typeof module === 'object') {
                 action: 'strikethrough',
                 aria: 'strike through',
                 tagNames: ['strike'],
+                useQueryState: true,
                 contentDefault: '<s>A</s>',
                 contentFA: '<i class="fa fa-strikethrough"></i>'
             },
@@ -102,6 +106,7 @@ if (typeof module === 'object') {
                 action: 'insertorderedlist',
                 aria: 'ordered list',
                 tagNames: ['ol'],
+                useQueryState: true,
                 contentDefault: '<b>1.</b>',
                 contentFA: '<i class="fa fa-list-ol"></i>'
             },
@@ -110,6 +115,7 @@ if (typeof module === 'object') {
                 action: 'insertunorderedlist',
                 aria: 'unordered list',
                 tagNames: ['ul'],
+                useQueryState: true,
                 contentDefault: '<b>&bull;</b>',
                 contentFA: '<i class="fa fa-list-ul"></i>'
             },
@@ -146,6 +152,7 @@ if (typeof module === 'object') {
                     prop: 'text-align',
                     value: 'center'
                 },
+                useQueryState: true,
                 contentDefault: '<b>C</b>',
                 contentFA: '<i class="fa fa-align-center"></i>'
             },
@@ -158,6 +165,7 @@ if (typeof module === 'object') {
                     prop: 'text-align',
                     value: 'justify'
                 },
+                useQueryState: true,
                 contentDefault: '<b>J</b>',
                 contentFA: '<i class="fa fa-align-justify"></i>'
             },
@@ -170,6 +178,7 @@ if (typeof module === 'object') {
                     prop: 'text-align',
                     value: 'left'
                 },
+                useQueryState: true,
                 contentDefault: '<b>L</b>',
                 contentFA: '<i class="fa fa-align-left"></i>'
             },
@@ -182,6 +191,7 @@ if (typeof module === 'object') {
                     prop: 'text-align',
                     value: 'right'
                 },
+                useQueryState: true,
                 contentDefault: '<b>R</b>',
                 contentFA: '<i class="fa fa-align-right"></i>'
             },
@@ -288,6 +298,12 @@ if (typeof module === 'object') {
             delete this.knownState;
         },
         shouldActivate: function (node) {
+            if (this.options.useQueryState) {
+                try {
+                    return this.base.options.ownerDocument.queryCommandState(this.getAction());
+                } catch (ignore) {}
+            }
+
             var isMatch = false,
                 tagNames = this.getTagNames();
             if (this.knownState === false || this.knownState === true) {

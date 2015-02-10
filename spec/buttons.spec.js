@@ -215,7 +215,7 @@ describe('Buttons TestCase', function () {
             expect(this.el.innerHTML).toBe('lorem ipsum');
         });
 
-        xit('button should be active for other cases when text is underlined', function () {
+        it('button should be active for other cases when text is underlined', function () {
             var editor = new MediumEditor('.editor', {
                     buttons: ['underline']
                 }),
@@ -247,7 +247,7 @@ describe('Buttons TestCase', function () {
             expect(this.el.innerHTML).toBe('lorem ipsum');
         });
 
-        xit('button should be active for other cases when text is strikethrough', function () {
+        it('button should be active for other cases when text is strikethrough', function () {
             var editor = new MediumEditor('.editor', {
                     buttons: ['strikethrough']
                 }),
