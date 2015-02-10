@@ -512,41 +512,6 @@ if (typeof module === 'object') {
         return !!(obj && obj.nodeType === 1);
     }
 
-    // http://stackoverflow.com/questions/6690752/insert-html-at-caret-in-a-contenteditable-div
-    function insertHTMLCommand(doc, html) {
-        var selection, range, el, fragment, node, lastNode;
-
-        if (doc.queryCommandSupported('insertHTML')) {
-            try {
-                return doc.execCommand('insertHTML', false, html);
-            } catch (ignore) {}
-        }
-
-        selection = window.getSelection();
-        if (selection.getRangeAt && selection.rangeCount) {
-            range = selection.getRangeAt(0);
-            range.deleteContents();
-
-            el = doc.createElement("div");
-            el.innerHTML = html;
-            fragment = doc.createDocumentFragment();
-            while (el.firstChild) {
-                node = el.firstChild;
-                lastNode = fragment.appendChild(node);
-            }
-            range.insertNode(fragment);
-
-            // Preserve the selection:
-            if (lastNode) {
-                range = range.cloneRange();
-                range.setStartAfter(lastNode);
-                range.collapse(true);
-                selection.removeAllRanges();
-                selection.addRange(range);
-            }
-        }
-    }
-
     MediumEditor.statics = {
         ButtonsData: ButtonsData,
         DefaultButton: DefaultButton
@@ -1096,6 +1061,9 @@ if (typeof module === 'object') {
                 this.anchorTarget = this.anchorForm.querySelector('input.medium-editor-toolbar-anchor-target');
                 this.anchorButton = this.anchorForm.querySelector('input.medium-editor-toolbar-anchor-button');
             }
+
+            this.addExtensionForms();
+
             return this;
         },
 
@@ -1153,7 +1121,7 @@ if (typeof module === 'object') {
                 }
                 if (form) {
                     id = 'medium-editor-toolbar-form-' + extension.name + '-' + this.id;
-                    form.className = 'medium-editor-toolbar-form';
+                    form.className += ' medium-editor-toolbar-form';
                     form.id = id;
                     this.toolbar.appendChild(form);
                 }
@@ -1235,6 +1203,40 @@ if (typeof module === 'object') {
             return this;
         },
 
+        // http://stackoverflow.com/questions/6690752/insert-html-at-caret-in-a-contenteditable-div
+        insertHTML: function insertHTML(html) {
+            var selection, range, el, fragment, node, lastNode;
+
+            if (this.options.ownerDocument.queryCommandSupported('insertHTML')) {
+                try {
+                    return this.options.ownerDocument.execCommand('insertHTML', false, html);
+                } catch (ignore) {}
+            }
+
+            selection = window.getSelection();
+            if (selection.getRangeAt && selection.rangeCount) {
+                range = selection.getRangeAt(0);
+                range.deleteContents();
+
+                el = this.options.ownerDocument.createElement("div");
+                el.innerHTML = html;
+                fragment = this.options.ownerDocument.createDocumentFragment();
+                while (el.firstChild) {
+                    node = el.firstChild;
+                    lastNode = fragment.appendChild(node);
+                }
+                range.insertNode(fragment);
+
+                // Preserve the selection:
+                if (lastNode) {
+                    range = range.cloneRange();
+                    range.setStartAfter(lastNode);
+                    range.collapse(true);
+                    selection.removeAllRanges();
+                    selection.addRange(range);
+                }
+            }
+        },
 
         bindDragDrop: function () {
             var self = this, i, className, onDrag, onDrop, element;
@@ -1268,7 +1270,7 @@ if (typeof module === 'object') {
                         fileReader.readAsDataURL(file);
 
                         id = 'medium-img-' + (+new Date());
-                        insertHTMLCommand(self.options.ownerDocument, '<img class="medium-image-loading" id="' + id + '" />');
+                        self.insertHTML('<img class="medium-image-loading" id="' + id + '" />');
 
                         fileReader.onload = function () {
                             var img = document.getElementById(id);
@@ -2220,10 +2222,10 @@ if (typeof module === 'object') {
                                 html += '<p>' + self.htmlEntities(paragraphs[p]) + '</p>';
                             }
                         }
-                        insertHTMLCommand(self.options.ownerDocument, html);
+                        self.insertHTML(html);
                     } else {
                         html = self.htmlEntities(e.clipboardData.getData(dataFormatPlain));
-                        insertHTMLCommand(self.options.ownerDocument, html);
+                        self.insertHTML(html);
                     }
                 }
             };
@@ -2354,7 +2356,7 @@ if (typeof module === 'object') {
                 }
 
             }
-            insertHTMLCommand(this.options.ownerDocument, fragmentBody.innerHTML.replace(/&nbsp;/g, ' '));
+            this.insertHTML(fragmentBody.innerHTML.replace(/&nbsp;/g, ' '));
         },
         isCommonBlock: function (el) {
             return (el && (el.tagName.toLowerCase() === 'p' || el.tagName.toLowerCase() === 'div'));
