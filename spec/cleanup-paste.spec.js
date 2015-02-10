@@ -62,6 +62,7 @@ describe('Clean pasted HTML', function () {
 
     it('Inline rich-text pastes', function () {
         var i,
+            regex,
             editorEl = this.el,
             editor = new MediumEditor('.editor', {
                 delay: 200,
@@ -72,12 +73,12 @@ describe('Clean pasted HTML', function () {
                 {
                     source: 'Google docs',
                     paste: '<meta charset=\'utf-8\'><meta charset="utf-8"><b style="font-weight:normal;" id="docs-internal-guid-2f060cc5-1888-a396-af95-bfb31478c7ae"><span style="font-size:15px;font-family:Arial;color:#000000;background-color:transparent;font-weight:bold;font-style:normal;font-variant:normal;text-decoration:none;vertical-align:baseline;white-space:pre-wrap;">Bold,</span><span style="font-size:15px;font-family:Arial;color:#000000;background-color:transparent;font-weight:normal;font-style:normal;font-variant:normal;text-decoration:none;vertical-align:baseline;white-space:pre-wrap;"> </span><span style="font-size:15px;font-family:Arial;color:#000000;background-color:transparent;font-weight:normal;font-style:italic;font-variant:normal;text-decoration:none;vertical-align:baseline;white-space:pre-wrap;">italic,</span><span style="font-size:15px;font-family:Arial;color:#000000;background-color:transparent;font-weight:normal;font-style:normal;font-variant:normal;text-decoration:none;vertical-align:baseline;white-space:pre-wrap;"> </span><span style="font-size:15px;font-family:Arial;color:#000000;background-color:transparent;font-weight:bold;font-style:italic;font-variant:normal;text-decoration:none;vertical-align:baseline;white-space:pre-wrap;">bold and italic</span><span style="font-size:15px;font-family:Arial;color:#000000;background-color:transparent;font-weight:normal;font-style:normal;font-variant:normal;text-decoration:none;vertical-align:baseline;white-space:pre-wrap;">, and </span><a href="http://en.wikipedia.org/wiki/Link_(The_Legend_of_Zelda)" style="text-decoration:none;"><span style="font-size:15px;font-family:Arial;color:#1155cc;background-color:transparent;font-weight:normal;font-style:normal;font-variant:normal;text-decoration:underline;vertical-align:baseline;white-space:pre-wrap;">a link</span></a><span style="font-size:15px;font-family:Arial;color:#000000;background-color:transparent;font-weight:normal;font-style:normal;font-variant:normal;text-decoration:none;vertical-align:baseline;white-space:pre-wrap;">.</span></b>',
-                    output: '<b>Bold,</b> <i>italic,</i> <b><i>bold and italic</i></b>, and <a href="http://en.wikipedia.org/wiki/Link_(The_Legend_of_Zelda)">a link</a>.'
+                    output: "<b>Bold,</b> <i>italic,</i> <b><i>bold and italic</i></b>, and <a href=\"http://en.wikipedia.org/wiki/Link_\\(The_Legend_of_Zelda\\)\">a link</a>\\."
                 },
                 {
                     source: 'Inside editor',
                     paste: '<meta charset=\'utf-8\'><b style="color: rgb(0, 0, 0); font-family: \'Helvetica Neue\', Helvetica, Arial, sans-serif; font-size: 22.22222328186035px; font-style: normal; font-variant: normal; letter-spacing: normal; line-height: 30px; orphans: auto; text-align: start; text-indent: 0px; text-transform: none; white-space: normal; widows: auto; word-spacing: 0px; -webkit-text-stroke-width: 0px;">Bold,</b><span style="color: rgb(0, 0, 0); font-family: \'Helvetica Neue\', Helvetica, Arial, sans-serif; font-size: 22.22222328186035px; font-style: normal; font-variant: normal; font-weight: normal; letter-spacing: normal; line-height: 30px; orphans: auto; text-align: start; text-indent: 0px; text-transform: none; white-space: normal; widows: auto; word-spacing: 0px; -webkit-text-stroke-width: 0px; display: inline !important; float: none;"> </span><i style="color: rgb(0, 0, 0); font-family: \'Helvetica Neue\', Helvetica, Arial, sans-serif; font-size: 22.22222328186035px; font-variant: normal; font-weight: normal; letter-spacing: normal; line-height: 30px; orphans: auto; text-align: start; text-indent: 0px; text-transform: none; white-space: normal; widows: auto; word-spacing: 0px; -webkit-text-stroke-width: 0px;">italic,</i><span style="color: rgb(0, 0, 0); font-family: \'Helvetica Neue\', Helvetica, Arial, sans-serif; font-size: 22.22222328186035px; font-style: normal; font-variant: normal; font-weight: normal; letter-spacing: normal; line-height: 30px; orphans: auto; text-align: start; text-indent: 0px; text-transform: none; white-space: normal; widows: auto; word-spacing: 0px; -webkit-text-stroke-width: 0px; display: inline !important; float: none;"><span class="Apple-converted-space"> </span></span><b style="color: rgb(0, 0, 0); font-family: \'Helvetica Neue\', Helvetica, Arial, sans-serif; font-size: 22.22222328186035px; font-style: normal; font-variant: normal; letter-spacing: normal; line-height: 30px; orphans: auto; text-align: start; text-indent: 0px; text-transform: none; white-space: normal; widows: auto; word-spacing: 0px; -webkit-text-stroke-width: 0px;"><i>bold and italic</i></b><span style="color: rgb(0, 0, 0); font-family: \'Helvetica Neue\', Helvetica, Arial, sans-serif; font-size: 22.22222328186035px; font-style: normal; font-variant: normal; font-weight: normal; letter-spacing: normal; line-height: 30px; orphans: auto; text-align: start; text-indent: 0px; text-transform: none; white-space: normal; widows: auto; word-spacing: 0px; -webkit-text-stroke-width: 0px; display: inline !important; float: none;">, and<span class="Apple-converted-space"> </span></span><a href="http://en.wikipedia.org/wiki/Link_(The_Legend_of_Zelda)" style="color: black; font-family: \'Helvetica Neue\', Helvetica, Arial, sans-serif; font-size: 22.22222328186035px; font-style: normal; font-variant: normal; font-weight: normal; letter-spacing: normal; line-height: 30px; orphans: auto; text-align: start; text-indent: 0px; text-transform: none; white-space: normal; widows: auto; word-spacing: 0px; -webkit-text-stroke-width: 0px;">a link</a><span style="color: rgb(0, 0, 0); font-family: \'Helvetica Neue\', Helvetica, Arial, sans-serif; font-size: 22.22222328186035px; font-style: normal; font-variant: normal; font-weight: normal; letter-spacing: normal; line-height: 30px; orphans: auto; text-align: start; text-indent: 0px; text-transform: none; white-space: normal; widows: auto; word-spacing: 0px; -webkit-text-stroke-width: 0px; display: inline !important; float: none;">.</span>',
-                    output: '<b>Bold,</b> <i>italic,</i> <b><i>bold and italic</i></b>, and <a href="http://en.wikipedia.org/wiki/Link_(The_Legend_of_Zelda)">a link</a>.'
+                    output: "<b>Bold,</b> <i>italic,</i> <b><i>bold and italic</i></b>, and <a href=\"http://en.wikipedia.org/wiki/Link_\\(The_Legend_of_Zelda\\)\">a link</a>\\."
                 }
             ];
 
@@ -90,14 +91,12 @@ describe('Clean pasted HTML', function () {
 
             editor.cleanPaste(tests[i].paste);
             jasmine.clock().tick(100);
-            if (editorEl.innerHTML.indexOf('<span id="editor-inner">') !== -1) {
-                // Firefox and IE: doing an insertHTML while this <span> is selected results in the html being inserted inside of the span
-                expect(editorEl.innerHTML).toEqual('Before&nbsp;<span id="editor-inner">' + tests[i].output + '</span>&nbsp;after.');
-            } else {
-                // Chrome, Safari, and our test suite: doing an insertHTML while this <span> is selected results in the span being replaced completely
-                expect(editorEl.innerHTML).toEqual('Before&nbsp;' + tests[i].output + '&nbsp;after.');
-            }
-        }
 
+            // Firefox and IE: doing an insertHTML while this <span> is selected results in the html being inserted inside of the span
+            // Firefox replace the &nbsp; other either side of the <span> with a space
+            // Webkit: doing an insertHTML while this <span> is selected results in the span being replaced completely
+            regex = new RegExp("^Before(&nbsp;|\\s)(<span id=\"editor-inner\">)?" + tests[i].output + "(</span>)?(&nbsp;|\\s)after\\.$");
+            expect(regex.test(editorEl.innerHTML)).toBe(true);
+        }
     });
 });
