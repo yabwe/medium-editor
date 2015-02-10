@@ -45,10 +45,6 @@ if (typeof module === 'object') {
                 action: 'underline',
                 aria: 'underline',
                 tagNames: ['u'],
-                style: {
-                    prop: 'text-decoration',
-                    value: 'underline'
-                },
                 contentDefault: '<b><u>U</u></b>',
                 contentFA: '<i class="fa fa-underline"></i>'
             },
@@ -57,10 +53,6 @@ if (typeof module === 'object') {
                 action: 'strikethrough',
                 aria: 'strike through',
                 tagNames: ['strike'],
-                style: {
-                    prop: 'text-decoration',
-                    value: 'line-through'
-                },
                 contentDefault: '<s>A</s>',
                 contentFA: '<i class="fa fa-strikethrough"></i>'
             },
@@ -223,12 +215,16 @@ if (typeof module === 'object') {
     DefaultButton = function (options, instance) {
         this.options = options;
         this.name = options.name;
-        this.base = instance;
-        this.button = this.createButton();
-        this.base.on(this.button, 'click', this.handleClick.bind(this));
+        this.init(instance);
     };
 
     DefaultButton.prototype = {
+        init: function (instance) {
+            this.base = instance;
+
+            this.button = this.createButton();
+            this.base.on(this.button, 'click', this.handleClick.bind(this));
+        },
         getButton: function () {
             return this.button;
         },
@@ -550,6 +546,11 @@ if (typeof module === 'object') {
             }
         }
     }
+
+    MediumEditor.statics = {
+        ButtonsData: ButtonsData,
+        DefaultButton: DefaultButton
+    };
 
     MediumEditor.prototype = {
         defaults: {
@@ -1239,7 +1240,7 @@ if (typeof module === 'object') {
             var self = this, i, className, onDrag, onDrop, element;
 
             if (!self.options.imageDragging) {
-                return this;
+                return;
             }
 
             className = 'medium-editor-dragover';
