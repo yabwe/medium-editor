@@ -66,7 +66,7 @@ if (typeof module === 'object') {
                 action: 'superscript',
                 aria: 'superscript',
                 tagNames: ['sup'],
-                /* firefox doesn't behave the way we want it to, so we can use queryCommandState for superscript
+                /* firefox doesn't behave the way we want it to, so we CAN'T use queryCommandState for superscript
                    https://github.com/guardian/scribe/blob/master/BROWSERINCONSISTENCIES.md#documentquerycommandstate */
                 // useQueryState: true
                 contentDefault: '<b>x<sup>1</sup></b>',
@@ -77,7 +77,7 @@ if (typeof module === 'object') {
                 action: 'subscript',
                 aria: 'subscript',
                 tagNames: ['sub'],
-                /* firefox doesn't behave the way we want it to, so we can use queryCommandState for subscript
+                /* firefox doesn't behave the way we want it to, so we CAN'T use queryCommandState for subscript
                    https://github.com/guardian/scribe/blob/master/BROWSERINCONSISTENCIES.md#documentquerycommandstate */
                 // useQueryState: true
                 contentDefault: '<b>x<sub>1</sub></b>',
