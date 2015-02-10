@@ -46,10 +46,6 @@ if (typeof module === 'object') {
                 action: 'underline',
                 aria: 'underline',
                 tagNames: ['u'],
-                style: {
-                    prop: 'text-decoration',
-                    value: 'underline'
-                },
                 contentDefault: '<b><u>U</u></b>',
                 contentFA: '<i class="fa fa-underline"></i>'
             },
@@ -58,10 +54,6 @@ if (typeof module === 'object') {
                 action: 'strikethrough',
                 aria: 'strike through',
                 tagNames: ['strike'],
-                style: {
-                    prop: 'text-decoration',
-                    value: 'line-through'
-                },
                 contentDefault: '<s>A</s>',
                 contentFA: '<i class="fa fa-strikethrough"></i>'
             },
