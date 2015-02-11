@@ -1,7 +1,7 @@
 2.2.0 / 2015-02-05
 ==================
 * Fix bug in getSelectedParentElement + Fix tests in browsers
-* Fall back to shimmed insertHTML in cases where firefox throws 
+* Fall back to shimmed insertHTML in cases where firefox throws
   when calling insertHTML
 * Prevent "Argument not optional" error
 * Prevent infinite loop after findAdjacentTextNodeWithContent
@@ -13,7 +13,7 @@
 
 2.1.3 / 2015-01-31
 ==================
-* Fix issue with multiple elements with the same class 
+* Fix issue with multiple elements with the same class
   on the same editor instance
 
 
@@ -243,7 +243,7 @@
 
 * Adds ability to set custom labels on buttons
 * Updates uglify
-* Fixes bug where pressing enter on formatted list item would generate 
+* Fixes bug where pressing enter on formatted list item would generate
   a new list instead of a new list item
 
 
