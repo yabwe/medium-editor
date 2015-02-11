@@ -100,7 +100,7 @@
       line-height: 1.33;
       text-decoration: none;
       box-sizing: border-box; }
-      .medium-editor-toolbar li button:active, .medium-editor-anchor-preview li button:active {
+      .medium-editor-toolbar li button:focus, .medium-editor-anchor-preview li button:focus {
         outline: none; }
     .medium-editor-toolbar li .medium-editor-action-underline, .medium-editor-anchor-preview li .medium-editor-action-underline {
       text-decoration: underline; }
