@@ -964,14 +964,15 @@ if (typeof module === 'object') {
                 if (e.which === keyCode.TAB) {
                     // Override tab only for pre nodes
                     var node = getSelectionStart.call(self),
-                        tag = node.tagName.toLowerCase();
+                        tag = node && node.tagName.toLowerCase();
+
                     if (tag === 'pre') {
                         e.preventDefault();
                         self.options.ownerDocument.execCommand('insertHtml', null, '    ');
                     }
 
                     // Tab to indent list structures!
-                    if (self.isListItemChild(node)) {
+                    if (tag === 'li' || self.isListItemChild(node)) {
                         e.preventDefault();
 
                         // If Shift is down, outdent, otherwise indent
