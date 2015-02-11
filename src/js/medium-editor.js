@@ -1184,15 +1184,20 @@ if (typeof module === 'object') {
 
         bindSelect: function () {
             var self = this,
-                i;
+                i,
+                timer;
 
             this.checkSelectionWrapper = function (e) {
+                clearTimeout(timer);
+
                 // Do not close the toolbar when bluring the editable area and clicking into the anchor form
                 if (!self.options.disableAnchorForm && e && self.clickingIntoArchorForm(e)) {
                     return false;
                 }
 
-                self.checkSelection();
+                timer = setTimeout(function () {
+                    self.checkSelection();
+                }, 10);
             };
 
             this.on(this.options.ownerDocument.documentElement, 'mouseup', this.checkSelectionWrapper);
@@ -1200,8 +1205,9 @@ if (typeof module === 'object') {
             for (i = 0; i < this.elements.length; i += 1) {
                 this.on(this.elements[i], 'keyup', this.checkSelectionWrapper);
                 this.on(this.elements[i], 'blur', this.checkSelectionWrapper);
-                this.on(this.elements[i], 'click', this.checkSelectionWrapper);
+                this.on(this.elements[i], 'mouseup', this.checkSelectionWrapper);
             }
+
             return this;
         },
 
@@ -1307,6 +1313,7 @@ if (typeof module === 'object') {
         },
 
         checkSelection: function () {
+
             var newSelection,
                 selectionElement;
 
@@ -1315,6 +1322,7 @@ if (typeof module === 'object') {
                     !this.options.disableToolbar) {
 
                 newSelection = this.options.contentWindow.getSelection();
+
                 if ((!this.options.updateOnEmptySelection && newSelection.toString().trim() === '') ||
                         (this.options.allowMultiParagraphSelection === false && this.hasMultiParagraphs()) ||
                         this.selectionInContentEditableFalse()) {

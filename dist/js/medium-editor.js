@@ -1199,8 +1199,9 @@ if (typeof module === 'object') {
             for (i = 0; i < this.elements.length; i += 1) {
                 this.on(this.elements[i], 'keyup', this.checkSelectionWrapper);
                 this.on(this.elements[i], 'blur', this.checkSelectionWrapper);
-                this.on(this.elements[i], 'click', this.checkSelectionWrapper);
+                this.on(this.elements[i], 'mouseup', this.checkSelectionWrapper);
             }
+
             return this;
         },
 
@@ -1306,6 +1307,7 @@ if (typeof module === 'object') {
         },
 
         checkSelection: function () {
+
             var newSelection,
                 selectionElement;
 
@@ -1314,6 +1316,7 @@ if (typeof module === 'object') {
                     !this.options.disableToolbar) {
 
                 newSelection = this.options.contentWindow.getSelection();
+
                 if ((!this.options.updateOnEmptySelection && newSelection.toString().trim() === '') ||
                         (this.options.allowMultiParagraphSelection === false && this.hasMultiParagraphs()) ||
                         this.selectionInContentEditableFalse()) {
