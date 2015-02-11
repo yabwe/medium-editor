@@ -99,7 +99,8 @@
       font-size: 14px;
       line-height: 1.33;
       text-decoration: none;
-      box-sizing: border-box; }
+      box-sizing: border-box;
+      outline: none; }
     .medium-editor-toolbar li .medium-editor-action-underline, .medium-editor-anchor-preview li .medium-editor-action-underline {
       text-decoration: underline; }
     .medium-editor-toolbar li .medium-editor-action-pre, .medium-editor-anchor-preview li .medium-editor-action-pre {
