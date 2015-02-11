@@ -776,7 +776,7 @@ if (typeof module === 'object') {
                 // Bind the return and tab keypress events
                 this.bindReturn(i)
                     .bindKeydown(i)
-                    .bindBlur()
+                    //.bindBlur()
                     .bindClick(i);
             }
 
