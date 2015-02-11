@@ -1188,6 +1188,8 @@ if (typeof module === 'object') {
                 timer;
 
             this.checkSelectionWrapper = function (e) {
+                e.stopPropagation();
+
                 clearTimeout(timer);
 
                 // Do not close the toolbar when bluring the editable area and clicking into the anchor form
