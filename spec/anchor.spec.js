@@ -1,7 +1,7 @@
 /*global MediumEditor, describe, it, expect, spyOn,
-         afterEach, beforeEach, selectElementContents,
-         jasmine, fireEvent, console, tearDown,
-         selectElementContentsAndFire, xit */
+     afterEach, beforeEach, selectElementContents,
+     jasmine, fireEvent, console, tearDown,
+     selectElementContentsAndFire, xit */
 
 describe('Anchor Button TestCase', function () {
     'use strict';
@@ -38,7 +38,7 @@ describe('Anchor Button TestCase', function () {
             var button,
                 editor = new MediumEditor('.editor');
             selectElementContentsAndFire(editor.elements[0]);
-            jasmine.clock().tick(1);
+            jasmine.clock().tick(11); // checkSelection delay
             button = editor.toolbar.querySelector('[data-action="anchor"]');
             editor.anchorForm.style.display = 'block';
             fireEvent(button, 'click');
@@ -53,7 +53,7 @@ describe('Anchor Button TestCase', function () {
             var button,
                 editor = new MediumEditor('.editor');
             selectElementContentsAndFire(editor.elements[0]);
-            jasmine.clock().tick(1);
+            jasmine.clock().tick(11); // checkSelection delay
             button = editor.toolbar.querySelector('[data-action="anchor"]');
             fireEvent(button, 'click');
             expect(this.el.innerHTML, 'link');

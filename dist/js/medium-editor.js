@@ -775,7 +775,6 @@ if (typeof module === 'object') {
                 // Bind the return and tab keypress events
                 this.bindReturn(i)
                     .bindKeydown(i)
-                    .bindBlur()
                     .bindClick(i);
             }
 
@@ -963,15 +962,16 @@ if (typeof module === 'object') {
 
                 if (e.which === keyCode.TAB) {
                     // Override tab only for pre nodes
-                    var node = getSelectionStart.call(self),
-                        tag = node.tagName.toLowerCase();
+                    var node = getSelectionStart.call(self) || e.target,
+                        tag = node && node.tagName.toLowerCase();
+
                     if (tag === 'pre') {
                         e.preventDefault();
                         self.options.ownerDocument.execCommand('insertHtml', null, '    ');
                     }
 
                     // Tab to indent list structures!
-                    if (self.isListItemChild(node)) {
+                    if (tag === 'li' || self.isListItemChild(node)) {
                         e.preventDefault();
 
                         // If Shift is down, outdent, otherwise indent
@@ -1183,15 +1183,22 @@ if (typeof module === 'object') {
 
         bindSelect: function () {
             var self = this,
-                i;
+                i,
+                timer;
 
             this.checkSelectionWrapper = function (e) {
+                e.stopPropagation();
+
+                clearTimeout(timer);
+
                 // Do not close the toolbar when bluring the editable area and clicking into the anchor form
                 if (!self.options.disableAnchorForm && e && self.clickingIntoArchorForm(e)) {
                     return false;
                 }
 
-                self.checkSelection();
+                timer = setTimeout(function () {
+                    self.checkSelection();
+                }, 10);
             };
 
             this.on(this.options.ownerDocument.documentElement, 'mouseup', this.checkSelectionWrapper);
@@ -2154,6 +2161,9 @@ if (typeof module === 'object') {
             this.on(this.options.contentWindow, 'resize', function () {
                 self.handleResize();
             });
+
+            this.bindBlur();
+
             return this;
         },
 

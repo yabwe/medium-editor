@@ -736,7 +736,7 @@ if (typeof module === 'object') {
                 };
 
             // Hide the toolbar when focusing outside of the editor.
-            this.on(this.options.ownerDocument.body, 'mousedown', blurFunction, true);
+            this.on(this.options.ownerDocument.body, 'click', blurFunction, true);
             this.on(this.options.ownerDocument.body, 'focus', blurFunction, true);
 
             return this;
