@@ -776,7 +776,6 @@ if (typeof module === 'object') {
                 // Bind the return and tab keypress events
                 this.bindReturn(i)
                     .bindKeydown(i)
-                    .bindBlur()
                     .bindClick(i);
             }
 
@@ -2162,6 +2161,9 @@ if (typeof module === 'object') {
             this.on(this.options.contentWindow, 'resize', function () {
                 self.handleResize();
             });
+
+            this.bindBlur();
+
             return this;
         },
 
