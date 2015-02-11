@@ -1742,6 +1742,7 @@ if (typeof module === 'object') {
         hideToolbar: function () {
             if (this.isToolbarShown()) {
                 this.toolbar.classList.remove('medium-editor-toolbar-active');
+                // TODO: this should be an option?
                 if (this.onHideToolbar) {
                     this.onHideToolbar();
                 }
