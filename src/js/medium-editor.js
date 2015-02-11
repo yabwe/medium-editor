@@ -963,7 +963,7 @@ if (typeof module === 'object') {
 
                 if (e.which === keyCode.TAB) {
                     // Override tab only for pre nodes
-                    var node = getSelectionStart.call(self),
+                    var node = getSelectionStart.call(self) || e.target,
                         tag = node && node.tagName.toLowerCase();
 
                     if (tag === 'pre') {
