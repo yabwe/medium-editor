@@ -1,3 +1,14 @@
+2.3.0 / 2015-02-11
+==================
+* Fix various selection and positioning bugs
+* Introduce commands as combination of buttons and extensions
+* Update aria label so that setting secondHeader activates the toolbar
+* Don't use styles for detecting underline + strikethrough
+* Fix 'imageDragging: false' option
+* Fix list item tab identation
+* Add extension onHide command
+
+
 2.2.0 / 2015-02-05
 ==================
 * Fix bug in getSelectedParentElement + Fix tests in browsers
