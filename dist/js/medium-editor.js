@@ -1749,6 +1749,11 @@ if (typeof module === 'object') {
         },
 
         hideToolbarActions: function () {
+            this.commands.forEach(function (extension) {
+                if (extension.onHide && typeof extension.onHide === 'function') {
+                    extension.onHide();
+                }
+            });
             this.keepToolbarAlive = false;
             this.hideToolbar();
         },
