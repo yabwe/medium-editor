@@ -670,22 +670,15 @@ if (typeof module === 'object') {
 
         bindSelect: function () {
             var self = this,
-                i,
-                timer;
+                i;
 
             this.checkSelectionWrapper = function (e) {
-                e.stopPropagation();
-
-                clearTimeout(timer);
-
                 // Do not close the toolbar when bluring the editable area and clicking into the anchor form
                 if (!self.options.disableAnchorForm && e && self.clickingIntoArchorForm(e)) {
                     return false;
                 }
 
-                timer = setTimeout(function () {
-                    self.checkSelection();
-                }, 10);
+                self.checkSelection();
             };
 
             this.on(this.options.ownerDocument.documentElement, 'mouseup', this.checkSelectionWrapper);
