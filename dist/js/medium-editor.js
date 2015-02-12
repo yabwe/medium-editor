@@ -415,35 +415,6 @@ if (typeof module === 'object') {
         return nextNode;
     }
 
-    // http://stackoverflow.com/questions/5605401/insert-link-in-contenteditable-element
-    // by Tim Down
-    function saveSelection() {
-        var i,
-            len,
-            ranges,
-            sel = this.options.contentWindow.getSelection();
-        if (sel.getRangeAt && sel.rangeCount) {
-            ranges = [];
-            for (i = 0, len = sel.rangeCount; i < len; i += 1) {
-                ranges.push(sel.getRangeAt(i));
-            }
-            return ranges;
-        }
-        return null;
-    }
-
-    function restoreSelection(savedSel) {
-        var i,
-            len,
-            sel = this.options.contentWindow.getSelection();
-        if (savedSel) {
-            sel.removeAllRanges();
-            for (i = 0, len = savedSel.length; i < len; i += 1) {
-                sel.addRange(savedSel[i]);
-            }
-        }
-    }
-
     // http://stackoverflow.com/questions/1197401/how-can-i-get-the-element-the-caret-is-in-with-javascript-when-using-contentedi
     // by You
     function getSelectionStart() {
@@ -1631,7 +1602,7 @@ if (typeof module === 'object') {
             el.style.display = 'none';
             this.showToolbarActions();
             this.setToolbarPosition();
-            restoreSelection.call(this, this.savedSelection);
+            this.restoreSelection();
         },
 
         // http://stackoverflow.com/questions/15867542/range-object-get-selection-parent-node-chrome-vs-firefox
@@ -1764,12 +1735,92 @@ if (typeof module === 'object') {
             });
         },
 
+        // http://stackoverflow.com/questions/17678843/cant-restore-selection-after-html-modify-even-if-its-the-same-html
+        // Tim Down
         saveSelection: function () {
-            this.savedSelection = saveSelection.call(this);
+            this.selectionState = null;
+
+            var selection = this.options.contentWindow.getSelection(),
+                range,
+                preSelectionRange,
+                start,
+                editableElementIndex = -1;
+
+            if (selection.rangeCount > 0) {
+                range = selection.getRangeAt(0);
+                preSelectionRange = range.cloneRange();
+
+                // Find element current selection is inside
+                this.elements.forEach(function (el, index) {
+                    if (el === range.startContainer || isDescendant(el, range.startContainer)) {
+                        editableElementIndex = index;
+                        return false;
+                    }
+                });
+
+                if (editableElementIndex > -1) {
+                    preSelectionRange.selectNodeContents(this.elements[editableElementIndex]);
+                    preSelectionRange.setEnd(range.startContainer, range.startOffset);
+                    start = preSelectionRange.toString().length;
+
+                    this.selectionState = {
+                        start: start,
+                        end: start + range.toString().length,
+                        editableElementIndex: editableElementIndex
+                    };
+                }
+            }
         },
 
+        // http://stackoverflow.com/questions/17678843/cant-restore-selection-after-html-modify-even-if-its-the-same-html
+        // Tim Down
         restoreSelection: function () {
-            restoreSelection.call(this, this.savedSelection);
+            if (!this.selectionState) {
+                return;
+            }
+
+            var editableElement = this.elements[this.selectionState.editableElementIndex],
+                charIndex = 0,
+                range = this.options.ownerDocument.createRange(),
+                nodeStack = [editableElement],
+                node,
+                foundStart = false,
+                stop = false,
+                i,
+                sel,
+                nextCharIndex;
+
+            range.setStart(editableElement, 0);
+            range.collapse(true);
+
+            node = nodeStack.pop();
+            while (!stop && node) {
+                if (node.nodeType === 3) {
+                    nextCharIndex = charIndex + node.length;
+                    if (!foundStart && this.selectionState.start >= charIndex && this.selectionState.start <= nextCharIndex) {
+                        range.setStart(node, this.selectionState.start - charIndex);
+                        foundStart = true;
+                    }
+                    if (foundStart && this.selectionState.end >= charIndex && this.selectionState.end <= nextCharIndex) {
+                        range.setEnd(node, this.selectionState.end - charIndex);
+                        stop = true;
+                    }
+                    charIndex = nextCharIndex;
+                } else {
+                    i = node.childNodes.length - 1;
+                    while (i >= 0) {
+                        nodeStack.push(node.childNodes[i]);
+                        i -= 1;
+                    }
+                }
+                if (!stop) {
+                    node = nodeStack.pop();
+                }
+            }
+
+            sel = this.options.contentWindow.getSelection();
+            sel.removeAllRanges();
+            sel.addRange(range);
         },
 
         showAnchorForm: function (link_value) {
@@ -1820,7 +1871,7 @@ if (typeof module === 'object') {
                 } else if (e.keyCode === keyCode.ESCAPE) {
                     e.preventDefault();
                     self.showToolbarActions();
-                    restoreSelection.call(self, self.savedSelection);
+                    self.restoreSelection();
                 }
             });
 
@@ -1864,7 +1915,7 @@ if (typeof module === 'object') {
             this.on(linkCancel, 'click', function (e) {
                 e.preventDefault();
                 self.showToolbarActions();
-                restoreSelection.call(self, self.savedSelection);
+                self.restoreSelection();
             });
             return this;
         },
@@ -2082,6 +2133,7 @@ if (typeof module === 'object') {
         },
 
         createLink: function (input, target, buttonClass) {
+
             var i, event;
 
             this.createLinkInternal(input.value, target, buttonClass);
@@ -2105,7 +2157,7 @@ if (typeof module === 'object') {
                 return;
             }
 
-            restoreSelection.call(this, this.savedSelection);
+            this.restoreSelection();
 
             if (this.options.checkLinkFormat) {
                 url = this.checkLinkFormat(url);
