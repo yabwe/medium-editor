@@ -540,41 +540,6 @@ if (typeof module === 'object') {
         return !!(obj && obj.nodeType === 1);
     }
 
-    // http://stackoverflow.com/questions/6690752/insert-html-at-caret-in-a-contenteditable-div
-    function insertHTMLCommand(doc, html) {
-        var selection, range, el, fragment, node, lastNode;
-
-        if (doc.queryCommandSupported('insertHTML')) {
-            try {
-                return doc.execCommand('insertHTML', false, html);
-            } catch (ignore) {}
-        }
-
-        selection = window.getSelection();
-        if (selection.getRangeAt && selection.rangeCount) {
-            range = selection.getRangeAt(0);
-            range.deleteContents();
-
-            el = doc.createElement("div");
-            el.innerHTML = html;
-            fragment = doc.createDocumentFragment();
-            while (el.firstChild) {
-                node = el.firstChild;
-                lastNode = fragment.appendChild(node);
-            }
-            range.insertNode(fragment);
-
-            // Preserve the selection:
-            if (lastNode) {
-                range = range.cloneRange();
-                range.setStartAfter(lastNode);
-                range.collapse(true);
-                selection.removeAllRanges();
-                selection.addRange(range);
-            }
-        }
-    }
-
     MediumEditor.statics = {
         ButtonsData: ButtonsData,
         DefaultButton: DefaultButton
@@ -838,7 +803,6 @@ if (typeof module === 'object') {
                 // Bind the return and tab keypress events
                 this.bindReturn(i)
                     .bindKeydown(i)
-                    .bindBlur()
                     .bindClick(i);
             }
 
@@ -1026,14 +990,16 @@ if (typeof module === 'object') {
 
                 if (e.which === keyCode.TAB) {
                     // Override tab only for pre nodes
-                    var tag = getSelectionStart.call(self).tagName.toLowerCase();
+                    var node = getSelectionStart.call(self) || e.target,
+                        tag = node && node.tagName.toLowerCase();
+
                     if (tag === 'pre') {
                         e.preventDefault();
                         self.options.ownerDocument.execCommand('insertHtml', null, '    ');
                     }
 
                     // Tab to indent list structures!
-                    if (tag === 'li') {
+                    if (tag === 'li' || self.isListItemChild(node)) {
                         e.preventDefault();
 
                         // If Shift is down, outdent, otherwise indent
@@ -1124,6 +1090,9 @@ if (typeof module === 'object') {
                 this.anchorTarget = this.anchorForm.querySelector('input.medium-editor-toolbar-anchor-target');
                 this.anchorButton = this.anchorForm.querySelector('input.medium-editor-toolbar-anchor-button');
             }
+
+            this.addExtensionForms();
+
             return this;
         },
 
@@ -1181,7 +1150,7 @@ if (typeof module === 'object') {
                 }
                 if (form) {
                     id = 'medium-editor-toolbar-form-' + extension.name + '-' + this.id;
-                    form.className = 'medium-editor-toolbar-form';
+                    form.className += ' medium-editor-toolbar-form';
                     form.id = id;
                     this.toolbar.appendChild(form);
                 }
@@ -1242,15 +1211,22 @@ if (typeof module === 'object') {
 
         bindSelect: function () {
             var self = this,
-                i;
+                i,
+                timer;
 
             this.checkSelectionWrapper = function (e) {
+                e.stopPropagation();
+
+                clearTimeout(timer);
+
                 // Do not close the toolbar when bluring the editable area and clicking into the anchor form
                 if (!self.options.disableAnchorForm && e && self.clickingIntoArchorForm(e)) {
                     return false;
                 }
 
-                self.checkSelection();
+                timer = setTimeout(function () {
+                    self.checkSelection();
+                }, 10);
             };
 
             this.on(this.options.ownerDocument.documentElement, 'mouseup', this.checkSelectionWrapper);
@@ -1258,11 +1234,46 @@ if (typeof module === 'object') {
             for (i = 0; i < this.elements.length; i += 1) {
                 this.on(this.elements[i], 'keyup', this.checkSelectionWrapper);
                 this.on(this.elements[i], 'blur', this.checkSelectionWrapper);
-                this.on(this.elements[i], 'click', this.checkSelectionWrapper);
+                this.on(this.elements[i], 'mouseup', this.checkSelectionWrapper);
             }
+
             return this;
         },
 
+        // http://stackoverflow.com/questions/6690752/insert-html-at-caret-in-a-contenteditable-div
+        insertHTML: function insertHTML(html) {
+            var selection, range, el, fragment, node, lastNode;
+
+            if (this.options.ownerDocument.queryCommandSupported('insertHTML')) {
+                try {
+                    return this.options.ownerDocument.execCommand('insertHTML', false, html);
+                } catch (ignore) {}
+            }
+
+            selection = window.getSelection();
+            if (selection.getRangeAt && selection.rangeCount) {
+                range = selection.getRangeAt(0);
+                range.deleteContents();
+
+                el = this.options.ownerDocument.createElement("div");
+                el.innerHTML = html;
+                fragment = this.options.ownerDocument.createDocumentFragment();
+                while (el.firstChild) {
+                    node = el.firstChild;
+                    lastNode = fragment.appendChild(node);
+                }
+                range.insertNode(fragment);
+
+                // Preserve the selection:
+                if (lastNode) {
+                    range = range.cloneRange();
+                    range.setStartAfter(lastNode);
+                    range.collapse(true);
+                    selection.removeAllRanges();
+                    selection.addRange(range);
+                }
+            }
+        },
 
         bindDragDrop: function () {
             var self = this, i, className, onDrag, onDrop, element;
@@ -1296,7 +1307,7 @@ if (typeof module === 'object') {
                         fileReader.readAsDataURL(file);
 
                         id = 'medium-img-' + (+new Date());
-                        insertHTMLCommand(self.options.ownerDocument, '<img class="medium-image-loading" id="' + id + '" />');
+                        self.insertHTML('<img class="medium-image-loading" id="' + id + '" />');
 
                         fileReader.onload = function () {
                             var img = document.getElementById(id);
@@ -1331,6 +1342,7 @@ if (typeof module === 'object') {
         },
 
         checkSelection: function () {
+
             var newSelection,
                 selectionElement;
 
@@ -1339,6 +1351,7 @@ if (typeof module === 'object') {
                     !this.options.disableToolbar) {
 
                 newSelection = this.options.contentWindow.getSelection();
+
                 if ((!this.options.updateOnEmptySelection && newSelection.toString().trim() === '') ||
                         (this.options.allowMultiParagraphSelection === false && this.hasMultiParagraphs()) ||
                         this.selectionInContentEditableFalse()) {
@@ -1789,6 +1802,7 @@ if (typeof module === 'object') {
         hideToolbar: function () {
             if (this.isToolbarShown()) {
                 this.toolbar.classList.remove('medium-editor-toolbar-active');
+                // TODO: this should be an option?
                 if (this.onHideToolbar) {
                     this.onHideToolbar();
                 }
@@ -1796,6 +1810,11 @@ if (typeof module === 'object') {
         },
 
         hideToolbarActions: function () {
+            this.commands.forEach(function (extension) {
+                if (extension.onHide && typeof extension.onHide === 'function') {
+                    extension.onHide();
+                }
+            });
             this.keepToolbarAlive = false;
             this.hideToolbar();
         },
@@ -2192,6 +2211,9 @@ if (typeof module === 'object') {
             this.on(this.options.contentWindow, 'resize', function () {
                 self.handleResize();
             });
+
+            this.bindBlur();
+
             return this;
         },
 
@@ -2270,10 +2292,10 @@ if (typeof module === 'object') {
                                 html += '<p>' + self.htmlEntities(paragraphs[p]) + '</p>';
                             }
                         }
-                        insertHTMLCommand(self.options.ownerDocument, html);
+                        self.insertHTML(html);
                     } else {
                         html = self.htmlEntities(e.clipboardData.getData(dataFormatPlain));
-                        insertHTMLCommand(self.options.ownerDocument, html);
+                        self.insertHTML(html);
                     }
                 }
             };
@@ -2404,7 +2426,7 @@ if (typeof module === 'object') {
                 }
 
             }
-            insertHTMLCommand(this.options.ownerDocument, fragmentBody.innerHTML.replace(/&nbsp;/g, ' '));
+            this.insertHTML(fragmentBody.innerHTML.replace(/&nbsp;/g, ' '));
         },
         isCommonBlock: function (el) {
             return (el && (el.tagName.toLowerCase() === 'p' || el.tagName.toLowerCase() === 'div'));

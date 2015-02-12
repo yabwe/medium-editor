@@ -141,7 +141,7 @@ describe('Toolbar TestCase', function () {
 
             selectElementContentsAndFire(document.getElementById('editor-span-1'));
 
-            jasmine.clock().tick(1);
+            jasmine.clock().tick(11); // checkSelection delay
 
             expect(editorOne.toolbar.classList.contains('medium-editor-toolbar-active')).toBe(true);
             expect(editorTwo.toolbar.classList.contains('medium-editor-toolbar-active')).toBe(false);
@@ -149,7 +149,7 @@ describe('Toolbar TestCase', function () {
             selectElementContentsAndFire(document.getElementById('editor-span-2'));
             fireEvent(editorTwo.elements[0], 'focus');
 
-            jasmine.clock().tick(1);
+            jasmine.clock().tick(11); // checkSelection delay
 
             expect(editorOne.toolbar.classList.contains('medium-editor-toolbar-active')).toBe(false);
             expect(editorTwo.toolbar.classList.contains('medium-editor-toolbar-active')).toBe(true);

@@ -51,6 +51,9 @@
             line-height: 1.33;
             text-decoration: none;
             box-sizing: border-box;
+            &:focus {
+                outline: none;
+            }
         }
 
         .medium-editor-action-underline {
@@ -86,9 +89,8 @@
     top: 1px;
 }
 
-.stalker-toolbar {
+.medium-editor-toolbar-active.stalker-toolbar {
     animation: pop-upwards 160ms forwards linear;
-    transition: top .075s ease-out, left .075s ease-out;
 }
 
 .medium-editor-action-bold {
