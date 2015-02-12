@@ -94,33 +94,45 @@ describe('Anchor Button TestCase', function () {
         it('should add http:// if need be and checkLinkFormat option is set to true', function () {
             var editor = new MediumEditor('.editor', {
                 checkLinkFormat: true
-            });
+            }),
+                link;
+
             selectElementContentsAndFire(editor.elements[0]);
             editor.showAnchorForm('test.com');
             fireEvent(editor.anchorForm.querySelector('a.medium-editor-toobar-save'), 'click');
 
-            expect(editor.elements[0].querySelector('a').href).toBe('http://test.com/');
+            link = editor.elements[0].querySelector('a');
+            expect(link).not.toBeNull();
+            expect(link.href).toBe('http://test.com/');
         });
         it('should not change protocol when a valid one is included', function () {
             var editor = new MediumEditor('.editor', {
                 checkLinkFormat: true
             }),
-                validUrl = 'mailto:test.com';
+                validUrl = 'mailto:test.com',
+                link;
+
             selectElementContentsAndFire(editor.elements[0]);
             editor.showAnchorForm(validUrl);
             fireEvent(editor.anchorForm.querySelector('a.medium-editor-toobar-save'), 'click');
 
-            expect(editor.elements[0].querySelector('a').href).toBe(validUrl);
+            link = editor.elements[0].querySelector('a');
+            expect(link).not.toBeNull();
+            expect(link.href).toBe(validUrl);
         });
         it('should add target="_blank" when respective option is set to true', function () {
             var editor = new MediumEditor('.editor', {
                 targetBlank: true
-            });
+            }),
+                link;
+
             selectElementContentsAndFire(editor.elements[0]);
             editor.showAnchorForm('http://test.com');
             fireEvent(editor.anchorForm.querySelector('a.medium-editor-toobar-save'), 'click');
 
-            expect(editor.elements[0].querySelector('a').target).toBe('_blank');
+            link = editor.elements[0].querySelector('a');
+            expect(link).not.toBeNull();
+            expect(link.target).toBe('_blank');
         });
         it('should create a button when user selects this option and presses enter', function () {
             spyOn(MediumEditor.prototype, 'createLink').and.callThrough();
@@ -130,7 +142,8 @@ describe('Anchor Button TestCase', function () {
             }),
                 save,
                 input,
-                button;
+                button,
+                link;
 
             selectElementContents(editor.elements[0]);
             save = editor.toolbar.querySelector('[data-action="anchor"]');
@@ -145,8 +158,11 @@ describe('Anchor Button TestCase', function () {
 
             fireEvent(input, 'keyup', 13);
             expect(editor.createLink).toHaveBeenCalledWith(input, '_self', 'btn btn-default');
-            expect(editor.elements[0].querySelector('a').classList.contains('btn')).toBe(true);
-            expect(editor.elements[0].querySelector('a').classList.contains('btn-default')).toBe(true);
+
+            link = editor.elements[0].querySelector('a');
+            expect(link).not.toBeNull();
+            expect(link.classList.contains('btn')).toBe(true);
+            expect(link.classList.contains('btn-default')).toBe(true);
         });
     });
 

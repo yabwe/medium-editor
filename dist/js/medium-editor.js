@@ -1892,6 +1892,8 @@ if (typeof module === 'object') {
 
         checkActiveButtons: function () {
             var elements = Array.prototype.slice.call(this.elements),
+                manualStateChecks = [],
+                queryState = null,
                 parentNode = meSelection.getSelectedParentElement(this.selectionRange),
                 checkExtension = function (extension) {
                     if (typeof extension.checkState === 'function') {
@@ -1902,9 +1904,29 @@ if (typeof module === 'object') {
                         }
                     }
                 };
+
+            // Loop through all commands
+            this.commands.forEach(function (command) {
+                // For those commands where we can use document.queryCommandState(), do so
+                if (typeof command.queryCommandState === 'function') {
+                    queryState = command.queryCommandState();
+                    // If queryCommandState returns a valid value, we can trust the browser
+                    // and don't need to do our manual checks
+                    if (queryState !== null) {
+                        if (queryState) {
+                            command.activate();
+                        }
+                        return;
+                    }
+                }
+                // We can't use queryCommandState for this command, so add to manualStateChecks
+                manualStateChecks.push(command);
+            });
+
+            // Climb up the DOM and do manual checks for whether a certain command is currently enabled for this node
             while (parentNode.tagName !== undefined && mediumEditorUtil.parentElements.indexOf(parentNode.tagName.toLowerCase) === -1) {
                 this.activateButton(parentNode.tagName.toLowerCase());
-                this.commands.forEach(checkExtension.bind(this));
+                manualStateChecks.forEach(checkExtension.bind(this));
 
                 // we can abort the search upwards if we leave the contentEditable element
                 if (elements.indexOf(parentNode) !== -1) {
@@ -1974,6 +1996,28 @@ if (typeof module === 'object') {
             this.showToolbarActions();
             this.setToolbarPosition();
             this.restoreSelection();
+        },
+
+        // TODO: move these two methods to selection.js
+        // http://stackoverflow.com/questions/15867542/range-object-get-selection-parent-node-chrome-vs-firefox
+        rangeSelectsSingleNode: function (range) {
+            var startNode = range.startContainer;
+            return startNode === range.endContainer &&
+                startNode.hasChildNodes() &&
+                range.endOffset === range.startOffset + 1;
+        },
+
+        getSelectedParentElement: function () {
+            var selectedParentElement = null,
+                range = this.selectionRange;
+            if (this.rangeSelectsSingleNode(range) && range.startContainer.childNodes[range.startOffset].nodeType !== 3) {
+                selectedParentElement = range.startContainer.childNodes[range.startOffset];
+            } else if (range.startContainer.nodeType === 3) {
+                selectedParentElement = range.startContainer.parentNode;
+            } else {
+                selectedParentElement = range.startContainer;
+            }
+            return selectedParentElement;
         },
 
         triggerAnchorAction: function () {
@@ -2063,12 +2107,94 @@ if (typeof module === 'object') {
             });
         },
 
+        // http://stackoverflow.com/questions/17678843/cant-restore-selection-after-html-modify-even-if-its-the-same-html
+        // Tim Down
+        // TODO: move to selection.js and clean up old methods there
         saveSelection: function () {
-            this.savedSelection = meSelection.saveSelection.call(this);
+            this.selectionState = null;
+
+            var selection = this.options.contentWindow.getSelection(),
+                range,
+                preSelectionRange,
+                start,
+                editableElementIndex = -1;
+
+            if (selection.rangeCount > 0) {
+                range = selection.getRangeAt(0);
+                preSelectionRange = range.cloneRange();
+
+                // Find element current selection is inside
+                this.elements.forEach(function (el, index) {
+                    if (el === range.startContainer || mediumEditorUtil.isDescendant(el, range.startContainer)) {
+                        editableElementIndex = index;
+                        return false;
+                    }
+                });
+
+                if (editableElementIndex > -1) {
+                    preSelectionRange.selectNodeContents(this.elements[editableElementIndex]);
+                    preSelectionRange.setEnd(range.startContainer, range.startOffset);
+                    start = preSelectionRange.toString().length;
+
+                    this.selectionState = {
+                        start: start,
+                        end: start + range.toString().length,
+                        editableElementIndex: editableElementIndex
+                    };
+                }
+            }
         },
 
+        // http://stackoverflow.com/questions/17678843/cant-restore-selection-after-html-modify-even-if-its-the-same-html
+        // Tim Down
+        // TODO: move to selection.js and clean up old methods there
         restoreSelection: function () {
-            meSelection.restoreSelection.call(this, this.savedSelection);
+            if (!this.selectionState) {
+                return;
+            }
+
+            var editableElement = this.elements[this.selectionState.editableElementIndex],
+                charIndex = 0,
+                range = this.options.ownerDocument.createRange(),
+                nodeStack = [editableElement],
+                node,
+                foundStart = false,
+                stop = false,
+                i,
+                sel,
+                nextCharIndex;
+
+            range.setStart(editableElement, 0);
+            range.collapse(true);
+
+            node = nodeStack.pop();
+            while (!stop && node) {
+                if (node.nodeType === 3) {
+                    nextCharIndex = charIndex + node.length;
+                    if (!foundStart && this.selectionState.start >= charIndex && this.selectionState.start <= nextCharIndex) {
+                        range.setStart(node, this.selectionState.start - charIndex);
+                        foundStart = true;
+                    }
+                    if (foundStart && this.selectionState.end >= charIndex && this.selectionState.end <= nextCharIndex) {
+                        range.setEnd(node, this.selectionState.end - charIndex);
+                        stop = true;
+                    }
+                    charIndex = nextCharIndex;
+                } else {
+                    i = node.childNodes.length - 1;
+                    while (i >= 0) {
+                        nodeStack.push(node.childNodes[i]);
+                        i -= 1;
+                    }
+                }
+                if (!stop) {
+                    node = nodeStack.pop();
+                }
+            }
+
+            sel = this.options.contentWindow.getSelection();
+            sel.removeAllRanges();
+            sel.addRange(range);
         },
 
         showAnchorForm: function (link_value) {
@@ -2367,6 +2493,7 @@ if (typeof module === 'object') {
         },
 
         createLink: function (input, target, buttonClass) {
+
             var i, event;
 
             this.createLinkInternal(input.value, target, buttonClass);
