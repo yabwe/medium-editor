@@ -401,13 +401,20 @@ var editor = new MediumEditor('.editable', {
 
 [Pavel Linkesch](https://github.com/orthes) has developed a jQuery plugin to upload images & embed content (from Twitter, Youtube, Vimeo, etc.) following Medium.com functionality. Check it out at [http://orthes.github.io/medium-editor-insert-plugin/](http://orthes.github.io/medium-editor-insert-plugin/)
 
+## Markdown
+
+[Ionică Bizău](https://github.com/IonicaBizau) has created a Medium Editor extension, named [Medium Editor Markdown](https://github.com/IonicaBizau/medium-editor-markdown), to add the functionality to render the HTML into Markdown code. Check it out at [https://github.com/IonicaBizau/medium-editor-markdown](https://github.com/IonicaBizau/medium-editor-markdown).
+
+## Inserting custom HTML
+At [**@jillix**](https://github.com/jillix/), [Ionică Bizău](https://github.com/IonicaBizau) developed [a Medium Editor extension](https://github.com/jillix/medium-editor-custom-html) that allows inserting custom HTML into the editor. Check it out here: [https://github.com/jillix/medium-editor-custom-html](https://github.com/jillix/medium-editor-custom-html).
+
 ## Laravel
 
 [Zvonko Biškup](https://github.com/codeforest) has written an [awesome tutorial](http://www.codeforest.net/laravel-wysiwyg-editor) about how to integrate MediumEditor into your Laravel Project.
 
 ## Rails Gem
 
-[Ahmet Sezgin Duran](https://github.com/marjinal1st/)  gemified Medium Editor for Rails asset pipeline, check it out at [https://github.com/marjinal1st/medium-editor-rails](https://github.com/marjinal1st/medium-editor-rails).
+[Ahmet Sezgin Duran](https://github.com/marjinal1st/) gemified Medium Editor for Rails asset pipeline, check it out at [https://github.com/marjinal1st/medium-editor-rails](https://github.com/marjinal1st/medium-editor-rails).
 
 ## Angular directive
 
@@ -446,97 +453,101 @@ The source files are located inside the __src__ directory.
 
 ```
  project  : medium-editor
- repo age : 1 year, 8 months
- active   : 233 days
- commits  : 804
- files    : 62
- authors  :
-   520	Davi Ferreira           64.7%
-    30	Andy Yaco-Mink          3.7%
-    30	Nate Mielnik            3.7%
-    20	Maxime de Visscher      2.5%
-    18	Noah Chase              2.2%
-     8	Derek Odegard           1.0%
-     8	Jarl Gunnar T. Flaten   1.0%
-     8	Pedro Nasser            1.0%
-     8	Seif                    1.0%
-     7	Aidan Threadgold        0.9%
-     7	Alfonso (the fonz) de la Osa 0.9%
-     7	Charl Gottschalk        0.9%
-     7	OmniaGM                 0.9%
-     6	Dayjo                   0.7%
-     6	Pascal                  0.7%
-     5	Martin Thurau           0.6%
-     5	Raul Matei              0.6%
-     4	Sebastian Zuchmanski    0.5%
-     4	minikomi                0.5%
-     3	Andrew Hubbs            0.4%
-     3	Brian Reavis            0.4%
-     3	Dmitri Cherniak         0.4%
-     3	Javier Marín            0.4%
-     3	Nikita Korotaev         0.4%
-     3	Patrick Cavanaugh       0.4%
-     3	Pavel Linkesch          0.4%
-     3	Troels Knak-Nielsen     0.4%
-     3	arol                    0.4%
-     3	ʞuıɯ-oɔɐʎ ʎpuɐ          0.4%
-     2	Alexander Hofbauer      0.2%
-     2	Ethan Turkeltaub        0.2%
-     2	Jacob Magnusson         0.2%
-     2	Jeremy                  0.2%
-     2	Joel                    0.2%
-     2	Karl Sander             0.2%
-     2	Son Tran-Nguyen         0.2%
-     2	jj                      0.2%
-     2	mako                    0.2%
-     1	Adam Mulligan           0.1%
-     1	Alberto Gasparin        0.1%
-     1	Bitdeli Chef            0.1%
-     1	Brooke McKim            0.1%
-     1	Bruno Peres             0.1%
-     1	Carlos Alexandre Fuechter 0.1%
-     1	Cenk Dölek             0.1%
-     1	Dave Jarvis             0.1%
-     1	David Collien           0.1%
-     1	David Hellsing          0.1%
-     1	Denis Gorbachev         0.1%
-     1	Diana Liao              0.1%
-     1	Enrico Berti            0.1%
-     1	Harshil Shah            0.1%
-     1	IndieSquidge            0.1%
-     1	Ionică Bizău            0.1%
-     1	Jack Parker             0.1%
-     1	Jeff Bellsey            0.1%
-     1	Jeff Welch              0.1%
-     1	Johann Troendle         0.1%
-     1	Mark Kraemer            0.1%
-     1	Max                     0.1%
-     1	Maxime Dantec           0.1%
-     1	Maxime De Visscher      0.1%
-     1	Michael Kay             0.1%
-     1	Moore Adam              0.1%
-     1	Nic Malan               0.1%
-     1	Nick Semenkovich        0.1%
-     1	Noah Paessel            0.1%
-     1	Patrick Kempff          0.1%
-     1	Peleg Rosenthal         0.1%
-     1	Randson Oliveira        0.1%
-     1	Richard Park            0.1%
-     1	Robert Koritnik         0.1%
-     1	Sarah Squire            0.1%
-     1	Scott Carleton          0.1%
-     1	Søren Torp Petersen     0.1%
-     1	Tom MacWright           0.1%
-     1	happyaccidents          0.1%
-     1	mako yass               0.1%
-     1	mbrookes                0.1%
-     1	muescha                 0.1%
-     1	shaohua                 0.1%
-     1	t_kjaergaard            0.1%
-     1	typify                  0.1%
-     1	valentinnew             0.1%
-     1	waffleio                0.1%
-     1	zzjin                   0.1%
+repo age : 1 year, 8 months
+active   : 239 days
+commits  : 863
+files    : 62
+authors  :
+ 550	Davi Ferreira           63.7%
+  48	Nate Mielnik            5.6%
+  30	Andy Yaco-Mink          3.5%
+  21	Noah Chase              2.4%
+  20	Maxime de Visscher      2.3%
+   8	Derek Odegard           0.9%
+   8	Jarl Gunnar T. Flaten   0.9%
+   8	Pedro Nasser            0.9%
+   8	Seif                    0.9%
+   7	Aidan Threadgold        0.8%
+   7	Alfonso (the fonz) de la Osa 0.8%
+   7	Charl Gottschalk        0.8%
+   7	OmniaGM                 0.8%
+   6	Dayjo                   0.7%
+   6	Pascal                  0.7%
+   5	Martin Thurau           0.6%
+   5	Raul Matei              0.6%
+   4	Sebastian Zuchmanski    0.5%
+   4	minikomi                0.5%
+   3	Andrew Hubbs            0.3%
+   3	Brian Reavis            0.3%
+   3	Dmitri Cherniak         0.3%
+   3	Ionică Bizău            0.3%
+   3	Javier Marín            0.3%
+   3	Nikita Korotaev         0.3%
+   3	Patrick Cavanaugh       0.3%
+   3	Pavel Linkesch          0.3%
+   3	Troels Knak-Nielsen     0.3%
+   3	arol                    0.3%
+   3	ʞuıɯ-oɔɐʎ ʎpuɐ          0.3%
+   2	Alexander Hofbauer      0.2%
+   2	David Van Der Beek      0.2%
+   2	Ethan Turkeltaub        0.2%
+   2	Jacob Magnusson         0.2%
+   2	Jeremy                  0.2%
+   2	Joel                    0.2%
+   2	Karl Sander             0.2%
+   2	Robin Andersson         0.2%
+   2	Son Tran-Nguyen         0.2%
+   2	jj                      0.2%
+   2	mako                    0.2%
+   1	Adam Mulligan           0.1%
+   1	Alberto Gasparin        0.1%
+   1	Bitdeli Chef            0.1%
+   1	Brooke McKim            0.1%
+   1	Bruno Peres             0.1%
+   1	Carlos Alexandre Fuechter 0.1%
+   1	Cenk Dölek             0.1%
+   1	Chris                   0.1%
+   1	Dave Jarvis             0.1%
+   1	David Collien           0.1%
+   1	David Hellsing          0.1%
+   1	Denis Gorbachev         0.1%
+   1	Diana Liao              0.1%
+   1	Enrico Berti            0.1%
+   1	Harry Hogg              0.1%
+   1	Harshil Shah            0.1%
+   1	IndieSquidge            0.1%
+   1	Jack Parker             0.1%
+   1	Jeff Bellsey            0.1%
+   1	Jeff Welch              0.1%
+   1	Johann Troendle         0.1%
+   1	Mark Kraemer            0.1%
+   1	Max                     0.1%
+   1	Maxime Dantec           0.1%
+   1	Maxime De Visscher      0.1%
+   1	Michael Kay             0.1%
+   1	Moore Adam              0.1%
+   1	Nic Malan               0.1%
+   1	Nick Semenkovich        0.1%
+   1	Noah Paessel            0.1%
+   1	Patrick Kempff          0.1%
+   1	Peleg Rosenthal         0.1%
+   1	Randson Oliveira        0.1%
+   1	Richard Park            0.1%
+   1	Robert Koritnik         0.1%
+   1	Sarah Squire            0.1%
+   1	Scott Carleton          0.1%
+   1	Søren Torp Petersen     0.1%
+   1	Tom MacWright           0.1%
+   1	happyaccidents          0.1%
+   1	mako yass               0.1%
+   1	mbrookes                0.1%
+   1	muescha                 0.1%
+   1	shaohua                 0.1%
+   1	t_kjaergaard            0.1%
+   1	typify                  0.1%
+   1	valentinnew             0.1%
+   1	waffleio                0.1%
+   1	zzjin                   0.1%
 ```
 
 ## License

@@ -18,7 +18,6 @@ $medium_editor_border_radius: 5px;
     background: linear-gradient(bottom, $medium_editor_bgcolor, rgba($medium_editor_bgcolor, 0.75));
     border-radius: $medium_editor_border_radius;
     box-shadow: 0 0 3px #000;
-    transition: top .075s ease-out, left .075s ease-out;
 
     li {
         button {

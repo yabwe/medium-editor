@@ -663,7 +663,7 @@ var DefaultButton,
             }
 
             if (!isMatch && this.options.style) {
-                this.knownState = isMatch = (this.base.options.contentWindow.getComputedStyle(node, null).getPropertyValue(this.options.style.prop).indexOf(this.options.style.value) !== -1);
+                this.knownState = isMatch = (this.base.options.contentWindow.getComputedStyle(node, null).getPropertyValue(this.options.style.prop) === this.options.style.value);
             }
 
             return isMatch;
@@ -1167,7 +1167,6 @@ if (typeof module === 'object') {
                 // Bind the return and tab keypress events
                 this.bindReturn(i)
                     .bindKeydown(i)
-                    .bindBlur()
                     .bindClick(i);
             }
 
@@ -1338,14 +1337,16 @@ if (typeof module === 'object') {
 
                 if (e.which === mediumEditorUtil.keyCode.TAB) {
                     // Override tab only for pre nodes
-                    var tag = meSelection.getSelectionStart(self.options.ownerDocument).tagName.toLowerCase();
+                    var node = meSelection.getSelectionStart(self.options.ownerDocument),
+                        tag = node && node.tagName.toLowerCase();
+
                     if (tag === 'pre') {
                         e.preventDefault();
                         self.options.ownerDocument.execCommand('insertHtml', null, '    ');
                     }
 
                     // Tab to indent list structures!
-                    if (tag === 'li') {
+                    if (tag === 'li' || self.isListItemChild(node)) {
                         e.preventDefault();
 
                         // If Shift is down, outdent, otherwise indent
@@ -1436,6 +1437,9 @@ if (typeof module === 'object') {
                 this.anchorTarget = this.anchorForm.querySelector('input.medium-editor-toolbar-anchor-target');
                 this.anchorButton = this.anchorForm.querySelector('input.medium-editor-toolbar-anchor-button');
             }
+
+            this.addExtensionForms();
+
             return this;
         },
 
@@ -1493,7 +1497,7 @@ if (typeof module === 'object') {
                 }
                 if (form) {
                     id = 'medium-editor-toolbar-form-' + extension.name + '-' + this.id;
-                    form.className = 'medium-editor-toolbar-form';
+                    form.className += ' medium-editor-toolbar-form';
                     form.id = id;
                     this.toolbar.appendChild(form);
                 }
@@ -1554,15 +1558,22 @@ if (typeof module === 'object') {
 
         bindSelect: function () {
             var self = this,
-                i;
+                i,
+                timer;
 
             this.checkSelectionWrapper = function (e) {
+                e.stopPropagation();
+
+                clearTimeout(timer);
+
                 // Do not close the toolbar when bluring the editable area and clicking into the anchor form
                 if (!self.options.disableAnchorForm && e && self.clickingIntoArchorForm(e)) {
                     return false;
                 }
 
-                self.checkSelection();
+                timer = setTimeout(function () {
+                    self.checkSelection();
+                }, 10);
             };
 
             this.on(this.options.ownerDocument.documentElement, 'mouseup', this.checkSelectionWrapper);
@@ -1570,17 +1581,52 @@ if (typeof module === 'object') {
             for (i = 0; i < this.elements.length; i += 1) {
                 this.on(this.elements[i], 'keyup', this.checkSelectionWrapper);
                 this.on(this.elements[i], 'blur', this.checkSelectionWrapper);
-                this.on(this.elements[i], 'click', this.checkSelectionWrapper);
+                this.on(this.elements[i], 'mouseup', this.checkSelectionWrapper);
             }
+
             return this;
         },
 
+        // http://stackoverflow.com/questions/6690752/insert-html-at-caret-in-a-contenteditable-div
+        insertHTML: function insertHTML(html) {
+            var selection, range, el, fragment, node, lastNode;
+
+            if (this.options.ownerDocument.queryCommandSupported('insertHTML')) {
+                try {
+                    return this.options.ownerDocument.execCommand('insertHTML', false, html);
+                } catch (ignore) {}
+            }
+
+            selection = window.getSelection();
+            if (selection.getRangeAt && selection.rangeCount) {
+                range = selection.getRangeAt(0);
+                range.deleteContents();
+
+                el = this.options.ownerDocument.createElement("div");
+                el.innerHTML = html;
+                fragment = this.options.ownerDocument.createDocumentFragment();
+                while (el.firstChild) {
+                    node = el.firstChild;
+                    lastNode = fragment.appendChild(node);
+                }
+                range.insertNode(fragment);
+
+                // Preserve the selection:
+                if (lastNode) {
+                    range = range.cloneRange();
+                    range.setStartAfter(lastNode);
+                    range.collapse(true);
+                    selection.removeAllRanges();
+                    selection.addRange(range);
+                }
+            }
+        },
 
         bindDragDrop: function () {
             var self = this, i, className, onDrag, onDrop, element;
 
             if (!self.options.imageDragging) {
-                return;
+                return this;
             }
 
             className = 'medium-editor-dragover';
@@ -1643,6 +1689,7 @@ if (typeof module === 'object') {
         },
 
         checkSelection: function () {
+
             var newSelection,
                 selectionElement;
 
@@ -1651,6 +1698,7 @@ if (typeof module === 'object') {
                     !this.options.disableToolbar) {
 
                 newSelection = this.options.contentWindow.getSelection();
+
                 if ((!this.options.updateOnEmptySelection && newSelection.toString().trim() === '') ||
                         (this.options.allowMultiParagraphSelection === false && this.hasMultiParagraphs()) ||
                         meSelection.selectionInContentEditableFalse(this.options.contentWindow)) {
@@ -1984,6 +2032,7 @@ if (typeof module === 'object') {
         hideToolbar: function () {
             if (this.isToolbarShown()) {
                 this.toolbar.classList.remove('medium-editor-toolbar-active');
+                // TODO: this should be an option?
                 if (this.onHideToolbar) {
                     this.onHideToolbar();
                 }
@@ -1991,6 +2040,11 @@ if (typeof module === 'object') {
         },
 
         hideToolbarActions: function () {
+            this.commands.forEach(function (extension) {
+                if (extension.onHide && typeof extension.onHide === 'function') {
+                    extension.onHide();
+                }
+            });
             this.keepToolbarAlive = false;
             this.hideToolbar();
         },
@@ -2373,6 +2427,9 @@ if (typeof module === 'object') {
             this.on(this.options.contentWindow, 'resize', function () {
                 self.handleResize();
             });
+
+            this.bindBlur();
+
             return this;
         },
 

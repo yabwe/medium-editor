@@ -24,7 +24,7 @@ describe('Selection TestCase', function () {
             spyOn(MediumEditor.prototype, 'checkSelection');
             var editor = new MediumEditor('.editor');
             fireEvent(editor.elements[0], 'mouseup');
-            jasmine.clock().tick(1);
+            jasmine.clock().tick(11); // checkSelection delay
             expect(editor.checkSelection).toHaveBeenCalled();
         });
 
@@ -32,7 +32,7 @@ describe('Selection TestCase', function () {
             spyOn(MediumEditor.prototype, 'checkSelection');
             var editor = new MediumEditor('.editor');
             fireEvent(editor.elements[0], 'keyup');
-            jasmine.clock().tick(1);
+            jasmine.clock().tick(11); // checkSelection delay
             expect(editor.checkSelection).toHaveBeenCalled();
         });
 
