@@ -1736,6 +1736,8 @@ if (typeof module === 'object') {
             });
         },
 
+        // http://stackoverflow.com/questions/17678843/cant-restore-selection-after-html-modify-even-if-its-the-same-html
+        // Tim Down
         saveSelection: function () {
             this.selectionState = null;
 
@@ -1751,7 +1753,7 @@ if (typeof module === 'object') {
 
                 // Find element current selection is inside
                 this.elements.forEach(function (el, index) {
-                    if (isDescendant(el, range.startContainer)) {
+                    if (el === range.startContainer || isDescendant(el, range.startContainer)) {
                         editableElementIndex = index;
                         return false;
                     }
@@ -1771,6 +1773,8 @@ if (typeof module === 'object') {
             }
         },
 
+        // http://stackoverflow.com/questions/17678843/cant-restore-selection-after-html-modify-even-if-its-the-same-html
+        // Tim Down
         restoreSelection: function () {
             if (!this.selectionState) {
                 return;
@@ -1805,7 +1809,7 @@ if (typeof module === 'object') {
                     charIndex = nextCharIndex;
                 } else {
                     i = node.childNodes.length - 1;
-                    while (i) {
+                    while (i >= 0) {
                         nodeStack.push(node.childNodes[i]);
                         i -= 1;
                     }
@@ -2130,6 +2134,7 @@ if (typeof module === 'object') {
         },
 
         createLink: function (input, target, buttonClass) {
+
             var i, event;
 
             this.createLinkInternal(input.value, target, buttonClass);
