@@ -72,7 +72,9 @@ module.exports = function (grunt) {
                 'fallback-colors': false,
                 'gradients': false,
                 'important': false,
-                'import': 2
+                'import': 2,
+                'outline-none': false,
+                'adjoining-classes': false
             },
             src: 'dist/css/**/*.css'
         }

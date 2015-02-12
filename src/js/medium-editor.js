@@ -26,6 +26,7 @@ if (typeof module === 'object') {
                 action: 'bold',
                 aria: 'bold',
                 tagNames: ['b', 'strong'],
+                useQueryState: true,
                 contentDefault: '<b>B</b>',
                 contentFA: '<i class="fa fa-bold"></i>'
             },
@@ -38,6 +39,7 @@ if (typeof module === 'object') {
                     prop: 'font-style',
                     value: 'italic'
                 },
+                useQueryState: true,
                 contentDefault: '<b><i>I</i></b>',
                 contentFA: '<i class="fa fa-italic"></i>'
             },
@@ -46,6 +48,7 @@ if (typeof module === 'object') {
                 action: 'underline',
                 aria: 'underline',
                 tagNames: ['u'],
+                useQueryState: true,
                 contentDefault: '<b><u>U</u></b>',
                 contentFA: '<i class="fa fa-underline"></i>'
             },
@@ -54,6 +57,7 @@ if (typeof module === 'object') {
                 action: 'strikethrough',
                 aria: 'strike through',
                 tagNames: ['strike'],
+                useQueryState: true,
                 contentDefault: '<s>A</s>',
                 contentFA: '<i class="fa fa-strikethrough"></i>'
             },
@@ -62,6 +66,9 @@ if (typeof module === 'object') {
                 action: 'superscript',
                 aria: 'superscript',
                 tagNames: ['sup'],
+                /* firefox doesn't behave the way we want it to, so we CAN'T use queryCommandState for superscript
+                   https://github.com/guardian/scribe/blob/master/BROWSERINCONSISTENCIES.md#documentquerycommandstate */
+                // useQueryState: true
                 contentDefault: '<b>x<sup>1</sup></b>',
                 contentFA: '<i class="fa fa-superscript"></i>'
             },
@@ -70,6 +77,9 @@ if (typeof module === 'object') {
                 action: 'subscript',
                 aria: 'subscript',
                 tagNames: ['sub'],
+                /* firefox doesn't behave the way we want it to, so we CAN'T use queryCommandState for subscript
+                   https://github.com/guardian/scribe/blob/master/BROWSERINCONSISTENCIES.md#documentquerycommandstate */
+                // useQueryState: true
                 contentDefault: '<b>x<sub>1</sub></b>',
                 contentFA: '<i class="fa fa-subscript"></i>'
             },
@@ -102,6 +112,7 @@ if (typeof module === 'object') {
                 action: 'insertorderedlist',
                 aria: 'ordered list',
                 tagNames: ['ol'],
+                useQueryState: true,
                 contentDefault: '<b>1.</b>',
                 contentFA: '<i class="fa fa-list-ol"></i>'
             },
@@ -110,6 +121,7 @@ if (typeof module === 'object') {
                 action: 'insertunorderedlist',
                 aria: 'unordered list',
                 tagNames: ['ul'],
+                useQueryState: true,
                 contentDefault: '<b>&bull;</b>',
                 contentFA: '<i class="fa fa-list-ul"></i>'
             },
@@ -146,6 +158,7 @@ if (typeof module === 'object') {
                     prop: 'text-align',
                     value: 'center'
                 },
+                useQueryState: true,
                 contentDefault: '<b>C</b>',
                 contentFA: '<i class="fa fa-align-center"></i>'
             },
@@ -158,6 +171,7 @@ if (typeof module === 'object') {
                     prop: 'text-align',
                     value: 'justify'
                 },
+                useQueryState: true,
                 contentDefault: '<b>J</b>',
                 contentFA: '<i class="fa fa-align-justify"></i>'
             },
@@ -170,6 +184,7 @@ if (typeof module === 'object') {
                     prop: 'text-align',
                     value: 'left'
                 },
+                useQueryState: true,
                 contentDefault: '<b>L</b>',
                 contentFA: '<i class="fa fa-align-left"></i>'
             },
@@ -182,6 +197,7 @@ if (typeof module === 'object') {
                     prop: 'text-align',
                     value: 'right'
                 },
+                useQueryState: true,
                 contentDefault: '<b>R</b>',
                 contentFA: '<i class="fa fa-align-right"></i>'
             },
@@ -286,6 +302,17 @@ if (typeof module === 'object') {
         activate: function () {
             this.button.classList.add(this.base.options.activeButtonClass);
             delete this.knownState;
+        },
+        queryCommandState: function () {
+            var queryState = null;
+            if (this.options.useQueryState) {
+                try {
+                    queryState = this.base.options.ownerDocument.queryCommandState(this.getAction());
+                } catch (exc) {
+                    queryState = null;
+                }
+            }
+            return queryState;
         },
         shouldActivate: function (node) {
             var isMatch = false,
@@ -482,41 +509,6 @@ if (typeof module === 'object') {
     // https://github.com/jashkenas/underscore
     function isElement(obj) {
         return !!(obj && obj.nodeType === 1);
-    }
-
-    // http://stackoverflow.com/questions/6690752/insert-html-at-caret-in-a-contenteditable-div
-    function insertHTMLCommand(doc, html) {
-        var selection, range, el, fragment, node, lastNode;
-
-        if (doc.queryCommandSupported('insertHTML')) {
-            try {
-                return doc.execCommand('insertHTML', false, html);
-            } catch (ignore) {}
-        }
-
-        selection = window.getSelection();
-        if (selection.getRangeAt && selection.rangeCount) {
-            range = selection.getRangeAt(0);
-            range.deleteContents();
-
-            el = doc.createElement("div");
-            el.innerHTML = html;
-            fragment = doc.createDocumentFragment();
-            while (el.firstChild) {
-                node = el.firstChild;
-                lastNode = fragment.appendChild(node);
-            }
-            range.insertNode(fragment);
-
-            // Preserve the selection:
-            if (lastNode) {
-                range = range.cloneRange();
-                range.setStartAfter(lastNode);
-                range.collapse(true);
-                selection.removeAllRanges();
-                selection.addRange(range);
-            }
-        }
     }
 
     MediumEditor.statics = {
@@ -782,7 +774,6 @@ if (typeof module === 'object') {
                 // Bind the return and tab keypress events
                 this.bindReturn(i)
                     .bindKeydown(i)
-                    .bindBlur()
                     .bindClick(i);
             }
 
@@ -970,14 +961,16 @@ if (typeof module === 'object') {
 
                 if (e.which === keyCode.TAB) {
                     // Override tab only for pre nodes
-                    var tag = getSelectionStart.call(self).tagName.toLowerCase();
+                    var node = getSelectionStart.call(self) || e.target,
+                        tag = node && node.tagName.toLowerCase();
+
                     if (tag === 'pre') {
                         e.preventDefault();
                         self.options.ownerDocument.execCommand('insertHtml', null, '    ');
                     }
 
                     // Tab to indent list structures!
-                    if (tag === 'li') {
+                    if (tag === 'li' || self.isListItemChild(node)) {
                         e.preventDefault();
 
                         // If Shift is down, outdent, otherwise indent
@@ -1068,6 +1061,9 @@ if (typeof module === 'object') {
                 this.anchorTarget = this.anchorForm.querySelector('input.medium-editor-toolbar-anchor-target');
                 this.anchorButton = this.anchorForm.querySelector('input.medium-editor-toolbar-anchor-button');
             }
+
+            this.addExtensionForms();
+
             return this;
         },
 
@@ -1125,7 +1121,7 @@ if (typeof module === 'object') {
                 }
                 if (form) {
                     id = 'medium-editor-toolbar-form-' + extension.name + '-' + this.id;
-                    form.className = 'medium-editor-toolbar-form';
+                    form.className += ' medium-editor-toolbar-form';
                     form.id = id;
                     this.toolbar.appendChild(form);
                 }
@@ -1186,15 +1182,22 @@ if (typeof module === 'object') {
 
         bindSelect: function () {
             var self = this,
-                i;
+                i,
+                timer;
 
             this.checkSelectionWrapper = function (e) {
+                e.stopPropagation();
+
+                clearTimeout(timer);
+
                 // Do not close the toolbar when bluring the editable area and clicking into the anchor form
                 if (!self.options.disableAnchorForm && e && self.clickingIntoArchorForm(e)) {
                     return false;
                 }
 
-                self.checkSelection();
+                timer = setTimeout(function () {
+                    self.checkSelection();
+                }, 10);
             };
 
             this.on(this.options.ownerDocument.documentElement, 'mouseup', this.checkSelectionWrapper);
@@ -1202,11 +1205,46 @@ if (typeof module === 'object') {
             for (i = 0; i < this.elements.length; i += 1) {
                 this.on(this.elements[i], 'keyup', this.checkSelectionWrapper);
                 this.on(this.elements[i], 'blur', this.checkSelectionWrapper);
-                this.on(this.elements[i], 'click', this.checkSelectionWrapper);
+                this.on(this.elements[i], 'mouseup', this.checkSelectionWrapper);
             }
+
             return this;
         },
 
+        // http://stackoverflow.com/questions/6690752/insert-html-at-caret-in-a-contenteditable-div
+        insertHTML: function insertHTML(html) {
+            var selection, range, el, fragment, node, lastNode;
+
+            if (this.options.ownerDocument.queryCommandSupported('insertHTML')) {
+                try {
+                    return this.options.ownerDocument.execCommand('insertHTML', false, html);
+                } catch (ignore) {}
+            }
+
+            selection = window.getSelection();
+            if (selection.getRangeAt && selection.rangeCount) {
+                range = selection.getRangeAt(0);
+                range.deleteContents();
+
+                el = this.options.ownerDocument.createElement("div");
+                el.innerHTML = html;
+                fragment = this.options.ownerDocument.createDocumentFragment();
+                while (el.firstChild) {
+                    node = el.firstChild;
+                    lastNode = fragment.appendChild(node);
+                }
+                range.insertNode(fragment);
+
+                // Preserve the selection:
+                if (lastNode) {
+                    range = range.cloneRange();
+                    range.setStartAfter(lastNode);
+                    range.collapse(true);
+                    selection.removeAllRanges();
+                    selection.addRange(range);
+                }
+            }
+        },
 
         bindDragDrop: function () {
             var self = this, i, className, onDrag, onDrop, element;
@@ -1240,7 +1278,7 @@ if (typeof module === 'object') {
                         fileReader.readAsDataURL(file);
 
                         id = 'medium-img-' + (+new Date());
-                        insertHTMLCommand(self.options.ownerDocument, '<img class="medium-image-loading" id="' + id + '" />');
+                        self.insertHTML('<img class="medium-image-loading" id="' + id + '" />');
 
                         fileReader.onload = function () {
                             var img = document.getElementById(id);
@@ -1275,6 +1313,7 @@ if (typeof module === 'object') {
         },
 
         checkSelection: function () {
+
             var newSelection,
                 selectionElement;
 
@@ -1283,6 +1322,7 @@ if (typeof module === 'object') {
                     !this.options.disableToolbar) {
 
                 newSelection = this.options.contentWindow.getSelection();
+
                 if ((!this.options.updateOnEmptySelection && newSelection.toString().trim() === '') ||
                         (this.options.allowMultiParagraphSelection === false && this.hasMultiParagraphs()) ||
                         this.selectionInContentEditableFalse()) {
@@ -1522,6 +1562,8 @@ if (typeof module === 'object') {
 
         checkActiveButtons: function () {
             var elements = Array.prototype.slice.call(this.elements),
+                manualStateChecks = [],
+                queryState = null,
                 parentNode = this.getSelectedParentElement(),
                 checkExtension = function (extension) {
                     if (typeof extension.checkState === 'function') {
@@ -1532,9 +1574,29 @@ if (typeof module === 'object') {
                         }
                     }
                 };
+
+            // Loop through all commands
+            this.commands.forEach(function (command) {
+                // For those commands where we can use document.queryCommandState(), do so
+                if (typeof command.queryCommandState === 'function') {
+                    queryState = command.queryCommandState();
+                    // If queryCommandState returns a valid value, we can trust the browser
+                    // and don't need to do our manual checks
+                    if (queryState !== null) {
+                        if (queryState) {
+                            command.activate();
+                        }
+                        return;
+                    }
+                }
+                // We can't use queryCommandState for this command, so add to manualStateChecks
+                manualStateChecks.push(command);
+            });
+
+            // Climb up the DOM and do manual checks for whether a certain command is currently enabled for this node
             while (parentNode.tagName !== undefined && this.parentElements.indexOf(parentNode.tagName.toLowerCase) === -1) {
                 this.activateButton(parentNode.tagName.toLowerCase());
-                this.commands.forEach(checkExtension.bind(this));
+                manualStateChecks.forEach(checkExtension.bind(this));
 
                 // we can abort the search upwards if we leave the contentEditable element
                 if (elements.indexOf(parentNode) !== -1) {
@@ -1711,6 +1773,7 @@ if (typeof module === 'object') {
         hideToolbar: function () {
             if (this.isToolbarShown()) {
                 this.toolbar.classList.remove('medium-editor-toolbar-active');
+                // TODO: this should be an option?
                 if (this.onHideToolbar) {
                     this.onHideToolbar();
                 }
@@ -1718,6 +1781,11 @@ if (typeof module === 'object') {
         },
 
         hideToolbarActions: function () {
+            this.commands.forEach(function (extension) {
+                if (extension.onHide && typeof extension.onHide === 'function') {
+                    extension.onHide();
+                }
+            });
             this.keepToolbarAlive = false;
             this.hideToolbar();
         },
@@ -2195,6 +2263,9 @@ if (typeof module === 'object') {
             this.on(this.options.contentWindow, 'resize', function () {
                 self.handleResize();
             });
+
+            this.bindBlur();
+
             return this;
         },
 
@@ -2273,10 +2344,10 @@ if (typeof module === 'object') {
                                 html += '<p>' + self.htmlEntities(paragraphs[p]) + '</p>';
                             }
                         }
-                        insertHTMLCommand(self.options.ownerDocument, html);
+                        self.insertHTML(html);
                     } else {
                         html = self.htmlEntities(e.clipboardData.getData(dataFormatPlain));
-                        insertHTMLCommand(self.options.ownerDocument, html);
+                        self.insertHTML(html);
                     }
                 }
             };
@@ -2407,7 +2478,7 @@ if (typeof module === 'object') {
                 }
 
             }
-            insertHTMLCommand(this.options.ownerDocument, fragmentBody.innerHTML.replace(/&nbsp;/g, ' '));
+            this.insertHTML(fragmentBody.innerHTML.replace(/&nbsp;/g, ' '));
         },
         isCommonBlock: function (el) {
             return (el && (el.tagName.toLowerCase() === 'p' || el.tagName.toLowerCase() === 'div'));
