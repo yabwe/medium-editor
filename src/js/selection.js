@@ -38,35 +38,6 @@ var meSelection;
             }, contentWindow);
         },
 
-        // http://stackoverflow.com/questions/5605401/insert-link-in-contenteditable-element
-        // by Tim Down
-        saveSelection: function saveSelection() {
-            var i,
-                len,
-                ranges,
-                sel = this.options.contentWindow.getSelection();
-            if (sel.getRangeAt && sel.rangeCount) {
-                ranges = [];
-                for (i = 0, len = sel.rangeCount; i < len; i += 1) {
-                    ranges.push(sel.getRangeAt(i));
-                }
-                return ranges;
-            }
-            return null;
-        },
-
-        restoreSelection: function restoreSelection(savedSel) {
-            var i,
-                len,
-                sel = this.options.contentWindow.getSelection();
-            if (savedSel) {
-                sel.removeAllRanges();
-                for (i = 0, len = savedSel.length; i < len; i += 1) {
-                    sel.addRange(savedSel[i]);
-                }
-            }
-        },
-
         // http://stackoverflow.com/questions/4176923/html-of-selected-text
         // by Tim Down
         getSelectionHtml: function getSelectionHtml() {

@@ -20,6 +20,11 @@ if (typeof module === 'object') {
 (function (window, document) {
     'use strict';
 
+    MediumEditor.statics = {
+        ButtonsData: ButtonsData,
+        DefaultButton: DefaultButton
+    };
+
     MediumEditor.prototype = {
         defaults: {
             allowMultiParagraphSelection: true,
