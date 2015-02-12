@@ -403,8 +403,7 @@ describe('Buttons TestCase', function () {
     });
 
     describe('Justify', function () {
-        // TODO: fix, not sure why is failing :(
-        xit('buttons should deactivate other justify buttons', function () {
+        it('buttons should deactivate other justify buttons', function () {
             this.el.innerHTML = '<p id="justify-para-one">lorem ipsum</p>' +
                                 '<p id="justify-para-two" align="left">lorem ipsum</p>' +
                                 '<p id="justify-para-three" align="right">lorem ipsum</p>' +
