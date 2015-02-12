@@ -259,35 +259,6 @@ var meSelection;
             }, contentWindow);
         },
 
-        // http://stackoverflow.com/questions/5605401/insert-link-in-contenteditable-element
-        // by Tim Down
-        saveSelection: function saveSelection() {
-            var i,
-                len,
-                ranges,
-                sel = this.options.contentWindow.getSelection();
-            if (sel.getRangeAt && sel.rangeCount) {
-                ranges = [];
-                for (i = 0, len = sel.rangeCount; i < len; i += 1) {
-                    ranges.push(sel.getRangeAt(i));
-                }
-                return ranges;
-            }
-            return null;
-        },
-
-        restoreSelection: function restoreSelection(savedSel) {
-            var i,
-                len,
-                sel = this.options.contentWindow.getSelection();
-            if (savedSel) {
-                sel.removeAllRanges();
-                for (i = 0, len = savedSel.length; i < len; i += 1) {
-                    sel.addRange(savedSel[i]);
-                }
-            }
-        },
-
         // http://stackoverflow.com/questions/4176923/html-of-selected-text
         // by Tim Down
         getSelectionHtml: function getSelectionHtml() {
@@ -396,6 +367,7 @@ var DefaultButton,
             action: 'bold',
             aria: 'bold',
             tagNames: ['b', 'strong'],
+            useQueryState: true,
             contentDefault: '<b>B</b>',
             contentFA: '<i class="fa fa-bold"></i>'
         },
@@ -408,6 +380,7 @@ var DefaultButton,
                 prop: 'font-style',
                 value: 'italic'
             },
+            useQueryState: true,
             contentDefault: '<b><i>I</i></b>',
             contentFA: '<i class="fa fa-italic"></i>'
         },
@@ -416,10 +389,7 @@ var DefaultButton,
             action: 'underline',
             aria: 'underline',
             tagNames: ['u'],
-            style: {
-                prop: 'text-decoration',
-                value: 'underline'
-            },
+            useQueryState: true,
             contentDefault: '<b><u>U</u></b>',
             contentFA: '<i class="fa fa-underline"></i>'
         },
@@ -428,10 +398,7 @@ var DefaultButton,
             action: 'strikethrough',
             aria: 'strike through',
             tagNames: ['strike'],
-            style: {
-                prop: 'text-decoration',
-                value: 'line-through'
-            },
+            useQueryState: true,
             contentDefault: '<s>A</s>',
             contentFA: '<i class="fa fa-strikethrough"></i>'
         },
@@ -440,6 +407,9 @@ var DefaultButton,
             action: 'superscript',
             aria: 'superscript',
             tagNames: ['sup'],
+            /* firefox doesn't behave the way we want it to, so we CAN'T use queryCommandState for superscript
+               https://github.com/guardian/scribe/blob/master/BROWSERINCONSISTENCIES.md#documentquerycommandstate */
+            // useQueryState: true
             contentDefault: '<b>x<sup>1</sup></b>',
             contentFA: '<i class="fa fa-superscript"></i>'
         },
@@ -448,6 +418,9 @@ var DefaultButton,
             action: 'subscript',
             aria: 'subscript',
             tagNames: ['sub'],
+            /* firefox doesn't behave the way we want it to, so we CAN'T use queryCommandState for subscript
+               https://github.com/guardian/scribe/blob/master/BROWSERINCONSISTENCIES.md#documentquerycommandstate */
+            // useQueryState: true
             contentDefault: '<b>x<sub>1</sub></b>',
             contentFA: '<i class="fa fa-subscript"></i>'
         },
@@ -480,6 +453,7 @@ var DefaultButton,
             action: 'insertorderedlist',
             aria: 'ordered list',
             tagNames: ['ol'],
+            useQueryState: true,
             contentDefault: '<b>1.</b>',
             contentFA: '<i class="fa fa-list-ol"></i>'
         },
@@ -488,6 +462,7 @@ var DefaultButton,
             action: 'insertunorderedlist',
             aria: 'unordered list',
             tagNames: ['ul'],
+            useQueryState: true,
             contentDefault: '<b>&bull;</b>',
             contentFA: '<i class="fa fa-list-ul"></i>'
         },
@@ -524,6 +499,7 @@ var DefaultButton,
                 prop: 'text-align',
                 value: 'center'
             },
+            useQueryState: true,
             contentDefault: '<b>C</b>',
             contentFA: '<i class="fa fa-align-center"></i>'
         },
@@ -536,6 +512,7 @@ var DefaultButton,
                 prop: 'text-align',
                 value: 'justify'
             },
+            useQueryState: true,
             contentDefault: '<b>J</b>',
             contentFA: '<i class="fa fa-align-justify"></i>'
         },
@@ -548,6 +525,7 @@ var DefaultButton,
                 prop: 'text-align',
                 value: 'left'
             },
+            useQueryState: true,
             contentDefault: '<b>L</b>',
             contentFA: '<i class="fa fa-align-left"></i>'
         },
@@ -560,6 +538,7 @@ var DefaultButton,
                 prop: 'text-align',
                 value: 'right'
             },
+            useQueryState: true,
             contentDefault: '<b>R</b>',
             contentFA: '<i class="fa fa-align-right"></i>'
         },
@@ -568,7 +547,9 @@ var DefaultButton,
             action: function (options) {
                 return 'append-' + options.firstHeader;
             },
-            aria: 'h1',
+            aria: function (options) {
+                return options.firstHeader;
+            },
             tagNames: function (options) {
                 return [options.firstHeader];
             },
@@ -579,7 +560,9 @@ var DefaultButton,
             action: function (options) {
                 return 'append-' + options.secondHeader;
             },
-            aria: 'h2',
+            aria: function (options) {
+                return options.secondHeader;
+            },
             tagNames: function (options) {
                 return [options.secondHeader];
             },
@@ -590,17 +573,24 @@ var DefaultButton,
     DefaultButton = function (options, instance) {
         this.options = options;
         this.name = options.name;
-        this.base = instance;
-        this.button = this.createButton();
-        this.base.on(this.button, 'click', this.handleClick.bind(this));
+        this.init(instance);
     };
 
     DefaultButton.prototype = {
+        init: function (instance) {
+            this.base = instance;
+
+            this.button = this.createButton();
+            this.base.on(this.button, 'click', this.handleClick.bind(this));
+        },
         getButton: function () {
             return this.button;
         },
         getAction: function () {
             return (typeof this.options.action === 'function') ? this.options.action(this.base.options) : this.options.action;
+        },
+        getAria: function () {
+            return (typeof this.options.aria === 'function') ? this.options.aria(this.base.options) : this.options.aria;
         },
         getTagNames: function () {
             return (typeof this.options.tagNames === 'function') ? this.options.tagNames(this.base.options) : this.options.tagNames;
@@ -611,7 +601,7 @@ var DefaultButton,
             button.classList.add('medium-editor-action');
             button.classList.add('medium-editor-action-' + this.name);
             button.setAttribute('data-action', this.getAction());
-            button.setAttribute('aria-label', this.options.aria);
+            button.setAttribute('aria-label', this.getAria());
             if (this.base.options.buttonLabels) {
                 if (this.base.options.buttonLabels === 'fontawesome' && this.options.contentFA) {
                     content = this.options.contentFA;
@@ -639,6 +629,9 @@ var DefaultButton,
             if (action) {
                 this.base.execAction(action, evt);
             }
+            //if (this.options.form) {
+            //    this.base.showForm(this.form, evt);
+            //}
         },
         isActive: function () {
             return this.button.classList.contains(this.base.options.activeButtonClass);
@@ -650,6 +643,17 @@ var DefaultButton,
         activate: function () {
             this.button.classList.add(this.base.options.activeButtonClass);
             delete this.knownState;
+        },
+        queryCommandState: function () {
+            var queryState = null;
+            if (this.options.useQueryState) {
+                try {
+                    queryState = this.base.options.ownerDocument.queryCommandState(this.getAction());
+                } catch (exc) {
+                    queryState = null;
+                }
+            }
+            return queryState;
         },
         shouldActivate: function (node) {
             var isMatch = false,
@@ -663,7 +667,7 @@ var DefaultButton,
             }
 
             if (!isMatch && this.options.style) {
-                this.knownState = isMatch = (this.base.options.contentWindow.getComputedStyle(node, null).getPropertyValue(this.options.style.prop) === this.options.style.value);
+                this.knownState = isMatch = (this.base.options.contentWindow.getComputedStyle(node, null).getPropertyValue(this.options.style.prop).indexOf(this.options.style.value) !== -1);
             }
 
             return isMatch;
@@ -912,6 +916,11 @@ if (typeof module === 'object') {
 
 (function (window, document) {
     'use strict';
+
+    MediumEditor.statics = {
+        ButtonsData: ButtonsData,
+        DefaultButton: DefaultButton
+    };
 
     MediumEditor.prototype = {
         defaults: {
@@ -1558,22 +1567,15 @@ if (typeof module === 'object') {
 
         bindSelect: function () {
             var self = this,
-                i,
-                timer;
+                i;
 
             this.checkSelectionWrapper = function (e) {
-                e.stopPropagation();
-
-                clearTimeout(timer);
-
                 // Do not close the toolbar when bluring the editable area and clicking into the anchor form
                 if (!self.options.disableAnchorForm && e && self.clickingIntoArchorForm(e)) {
                     return false;
                 }
 
-                timer = setTimeout(function () {
-                    self.checkSelection();
-                }, 10);
+                self.checkSelection();
             };
 
             this.on(this.options.ownerDocument.documentElement, 'mouseup', this.checkSelectionWrapper);
