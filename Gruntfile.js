@@ -11,7 +11,14 @@ module.exports = function (grunt) {
         gruntConfig = {
             pkg: grunt.file.readJSON('package.json'),
             globalConfig: globalConfig
-        };
+        },
+        srcFiles = [
+            'src/js/util.js',
+            'src/js/selection.js',
+            'src/js/button.js',
+            'src/js/paste.js',
+            'src/js/core.js'
+        ];
 
     gruntConfig.jslint = {
         client: {
@@ -59,7 +66,7 @@ module.exports = function (grunt) {
             report: 'gzip'
         },
         build: {
-            src: 'src/js/medium-editor.js',
+            src: 'dist/js/medium-editor.js',
             dest: 'dist/js/<%= pkg.name %>.min.js'
         }
     };
@@ -160,7 +167,7 @@ module.exports = function (grunt) {
             stripBanners: true
         },
         dist: {
-            src: 'src/js/medium-editor.js',
+            src: srcFiles,
             dest: 'dist/js/<%= pkg.name %>.js'
         }
     };
@@ -168,7 +175,7 @@ module.exports = function (grunt) {
     gruntConfig.plato = {
         feed: {
             files: {
-                'reports/plato': ['src/js/medium-editor.js']
+                'reports/plato': srcFiles
             }
         }
     };
@@ -184,7 +191,7 @@ module.exports = function (grunt) {
     });
 
     grunt.registerTask('test', ['jslint', 'jasmine:suite', 'csslint']);
-    grunt.registerTask('js', ['jslint', 'jasmine:suite', 'uglify', 'concat']);
+    grunt.registerTask('js', ['jslint', 'jasmine:suite', 'concat', 'uglify']);
     grunt.registerTask('css', ['sass', 'autoprefixer', 'cssmin', 'csslint']);
     grunt.registerTask('default', ['js', 'css']);
 
