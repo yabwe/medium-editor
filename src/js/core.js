@@ -670,7 +670,8 @@ if (typeof module === 'object') {
 
         bindSelect: function () {
             var self = this,
-                i;
+                i,
+                timeoutHelper;
 
             this.checkSelectionWrapper = function (e) {
                 // Do not close the toolbar when bluring the editable area and clicking into the anchor form
@@ -681,12 +682,18 @@ if (typeof module === 'object') {
                 self.checkSelection();
             };
 
+            timeoutHelper = function (event) {
+                setTimeout(function () {
+                    this.checkSelectionWrapper(event);
+                }.bind(this), 0);
+            }.bind(this);
+
             this.on(this.options.ownerDocument.documentElement, 'mouseup', this.checkSelectionWrapper);
 
             for (i = 0; i < this.elements.length; i += 1) {
                 this.on(this.elements[i], 'keyup', this.checkSelectionWrapper);
                 this.on(this.elements[i], 'blur', this.checkSelectionWrapper);
-                this.on(this.elements[i], 'mouseup', this.checkSelectionWrapper);
+                this.on(this.elements[i], 'click', timeoutHelper);
             }
 
             return this;
@@ -794,7 +801,6 @@ if (typeof module === 'object') {
         },
 
         checkSelection: function () {
-
             var newSelection,
                 selectionElement;
 

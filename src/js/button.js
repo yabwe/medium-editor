@@ -1,3 +1,5 @@
+/*global console */
+
 var DefaultButton,
     ButtonsData;
 
@@ -10,6 +12,10 @@ var DefaultButton,
             action: 'bold',
             aria: 'bold',
             tagNames: ['b', 'strong'],
+            style: {
+                prop: 'font-weight',
+                value: '700|bold'
+            },
             useQueryState: true,
             contentDefault: '<b>B</b>',
             contentFA: '<i class="fa fa-bold"></i>'
@@ -300,7 +306,8 @@ var DefaultButton,
         },
         shouldActivate: function (node) {
             var isMatch = false,
-                tagNames = this.getTagNames();
+                tagNames = this.getTagNames(),
+                styleVals;
             if (this.knownState === false || this.knownState === true) {
                 return this.knownState;
             }
@@ -310,7 +317,13 @@ var DefaultButton,
             }
 
             if (!isMatch && this.options.style) {
-                this.knownState = isMatch = (this.base.options.contentWindow.getComputedStyle(node, null).getPropertyValue(this.options.style.prop).indexOf(this.options.style.value) !== -1);
+                styleVals = this.options.style.value.split('|');
+                styleVals.forEach(function (val) {
+                    this.knownState = isMatch = (this.base.options.contentWindow.getComputedStyle(node, null).getPropertyValue(this.options.style.prop).indexOf(val) !== -1);
+                    if (this.knownState) {
+                        return false;
+                    }
+                }.bind(this));
             }
 
             return isMatch;
