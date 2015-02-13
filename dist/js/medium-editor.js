@@ -367,6 +367,10 @@ var DefaultButton,
             action: 'bold',
             aria: 'bold',
             tagNames: ['b', 'strong'],
+            style: {
+                prop: 'font-weight',
+                value: '700|bold'
+            },
             useQueryState: true,
             contentDefault: '<b>B</b>',
             contentFA: '<i class="fa fa-bold"></i>'
@@ -657,7 +661,8 @@ var DefaultButton,
         },
         shouldActivate: function (node) {
             var isMatch = false,
-                tagNames = this.getTagNames();
+                tagNames = this.getTagNames(),
+                styleVals;
             if (this.knownState === false || this.knownState === true) {
                 return this.knownState;
             }
@@ -667,7 +672,13 @@ var DefaultButton,
             }
 
             if (!isMatch && this.options.style) {
-                this.knownState = isMatch = (this.base.options.contentWindow.getComputedStyle(node, null).getPropertyValue(this.options.style.prop).indexOf(this.options.style.value) !== -1);
+                styleVals = this.options.style.value.split('|');
+                styleVals.forEach(function (val) {
+                    this.knownState = isMatch = (this.base.options.contentWindow.getComputedStyle(node, null).getPropertyValue(this.options.style.prop).indexOf(val) !== -1);
+                    if (this.knownState) {
+                        return false;
+                    }
+                }.bind(this));
             }
 
             return isMatch;
@@ -1567,7 +1578,8 @@ if (typeof module === 'object') {
 
         bindSelect: function () {
             var self = this,
-                i;
+                i,
+                timeoutHelper;
 
             this.checkSelectionWrapper = function (e) {
                 // Do not close the toolbar when bluring the editable area and clicking into the anchor form
@@ -1578,12 +1590,18 @@ if (typeof module === 'object') {
                 self.checkSelection();
             };
 
+            timeoutHelper = function (event) {
+                setTimeout(function () {
+                    this.checkSelectionWrapper(event);
+                }.bind(this), 0);
+            }.bind(this);
+
             this.on(this.options.ownerDocument.documentElement, 'mouseup', this.checkSelectionWrapper);
 
             for (i = 0; i < this.elements.length; i += 1) {
                 this.on(this.elements[i], 'keyup', this.checkSelectionWrapper);
                 this.on(this.elements[i], 'blur', this.checkSelectionWrapper);
-                this.on(this.elements[i], 'mouseup', this.checkSelectionWrapper);
+                this.on(this.elements[i], 'click', timeoutHelper);
             }
 
             return this;
@@ -1691,7 +1709,6 @@ if (typeof module === 'object') {
         },
 
         checkSelection: function () {
-
             var newSelection,
                 selectionElement;
 
