@@ -10,32 +10,34 @@ var pasteHandler;
         block, negation is used specifically to match the end of an html
         tag, and in fact unicode characters *should* be allowed.
     */
-    var replacements = [
+    function createReplacements() {
+        return [
 
-        // replace two bogus tags that begin pastes from google docs
-        [new RegExp(/<[^>]*docs-internal-guid[^>]*>/gi), ""],
-        [new RegExp(/<\/b>(<br[^>]*>)?$/gi), ""],
+            // replace two bogus tags that begin pastes from google docs
+            [new RegExp(/<[^>]*docs-internal-guid[^>]*>/gi), ""],
+            [new RegExp(/<\/b>(<br[^>]*>)?$/gi), ""],
 
-         // un-html spaces and newlines inserted by OS X
-        [new RegExp(/<span class="Apple-converted-space">\s+<\/span>/g), ' '],
-        [new RegExp(/<br class="Apple-interchange-newline">/g), '<br>'],
+             // un-html spaces and newlines inserted by OS X
+            [new RegExp(/<span class="Apple-converted-space">\s+<\/span>/g), ' '],
+            [new RegExp(/<br class="Apple-interchange-newline">/g), '<br>'],
 
-        // replace google docs italics+bold with a span to be replaced once the html is inserted
-        [new RegExp(/<span[^>]*(font-style:italic;font-weight:bold|font-weight:bold;font-style:italic)[^>]*>/gi), '<span class="replace-with italic bold">'],
+            // replace google docs italics+bold with a span to be replaced once the html is inserted
+            [new RegExp(/<span[^>]*(font-style:italic;font-weight:bold|font-weight:bold;font-style:italic)[^>]*>/gi), '<span class="replace-with italic bold">'],
 
-        // replace google docs italics with a span to be replaced once the html is inserted
-        [new RegExp(/<span[^>]*font-style:italic[^>]*>/gi), '<span class="replace-with italic">'],
+            // replace google docs italics with a span to be replaced once the html is inserted
+            [new RegExp(/<span[^>]*font-style:italic[^>]*>/gi), '<span class="replace-with italic">'],
 
-        //[replace google docs bolds with a span to be replaced once the html is inserted
-        [new RegExp(/<span[^>]*font-weight:bold[^>]*>/gi), '<span class="replace-with bold">'],
+            //[replace google docs bolds with a span to be replaced once the html is inserted
+            [new RegExp(/<span[^>]*font-weight:bold[^>]*>/gi), '<span class="replace-with bold">'],
 
-         // replace manually entered b/i/a tags with real ones
-        [new RegExp(/&lt;(\/?)(i|b|a)&gt;/gi), '<$1$2>'],
+             // replace manually entered b/i/a tags with real ones
+            [new RegExp(/&lt;(\/?)(i|b|a)&gt;/gi), '<$1$2>'],
 
-         // replace manually a tags with real ones, converting smart-quotes from google docs
-        [new RegExp(/&lt;a\s+href=(&quot;|&rdquo;|&ldquo;|“|”)([^&]+)(&quot;|&rdquo;|&ldquo;|“|”)&gt;/gi), '<a href="$2">']
+             // replace manually a tags with real ones, converting smart-quotes from google docs
+            [new RegExp(/&lt;a\s+href=(&quot;|&rdquo;|&ldquo;|“|”)([^&]+)(&quot;|&rdquo;|&ldquo;|“|”)&gt;/gi), '<a href="$2">']
 
-    ];
+        ];
+    }
     /*jslint regexp: false*/
 
     pasteHandler = {
@@ -86,7 +88,8 @@ var pasteHandler;
         cleanPaste: function (text, options) {
             var i, elList, workEl,
                 el = meSelection.getSelectionElement(options.contentWindow),
-                multiline = /<p|<br|<div/.test(text);
+                multiline = /<p|<br|<div/.test(text),
+                replacements = createReplacements();
 
             for (i = 0; i < replacements.length; i += 1) {
                 text = text.replace(replacements[i][0], replacements[i][1]);
