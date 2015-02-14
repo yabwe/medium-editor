@@ -568,7 +568,8 @@ if (typeof module === 'object') {
 
             toolbar.appendChild(this.toolbarButtons());
             if (!this.options.disableAnchorForm) {
-                toolbar.appendChild(AnchorExtension.createForm(this.id, this.options.ownerDocument, this.options));
+                this.anchorExtension = new AnchorExtension(this);
+                toolbar.appendChild(this.anchorExtension.getForm());
             }
             this.options.elementsContainer.appendChild(toolbar);
             return toolbar;

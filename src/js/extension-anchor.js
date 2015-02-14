@@ -1,13 +1,25 @@
-/*global mediumEditorUtil, meSelection*/
-var AnchorExtension;
+/*global */
+var AnchorExtension = function (instance) {
+    'use strict';
+
+    this.base = instance;
+};
 
 (function (window, document) {
     'use strict';
 
-    AnchorExtension = {
+    AnchorExtension.prototype = {
 
-        createForm: function (id, doc, options) {
-            var anchor = doc.createElement('div'),
+        getForm: function () {
+            if (!this.anchorForm) {
+                this.anchorForm = this.createForm();
+            }
+            return this.anchorForm;
+        },
+
+        createForm: function () {
+            var doc = this.base.options.ownerDocument,
+                anchor = doc.createElement('div'),
                 input = doc.createElement('input'),
                 close = doc.createElement('a'),
                 save = doc.createElement('a'),
@@ -26,28 +38,28 @@ var AnchorExtension;
 
             input.setAttribute('type', 'text');
             input.className = 'medium-editor-toolbar-input';
-            input.setAttribute('placeholder', options.anchorInputPlaceholder);
+            input.setAttribute('placeholder', this.base.options.anchorInputPlaceholder);
 
             anchor.className = 'medium-editor-toolbar-form';
-            anchor.id = 'medium-editor-toolbar-form-anchor-' + id;
+            anchor.id = 'medium-editor-toolbar-form-anchor-' + this.base.id;
             anchor.appendChild(input);
 
             anchor.appendChild(save);
             anchor.appendChild(close);
 
-            if (options.anchorTarget) {
+            if (this.base.options.anchorTarget) {
                 target = doc.createElement('input');
                 target.setAttribute('type', 'checkbox');
                 target.className = 'medium-editor-toolbar-anchor-target';
 
                 target_label = doc.createElement('label');
-                target_label.innerHTML = options.anchorInputCheckboxLabel;
+                target_label.innerHTML = this.base.options.anchorInputCheckboxLabel;
                 target_label.insertBefore(target, target_label.firstChild);
 
                 anchor.appendChild(target_label);
             }
 
-            if (options.anchorButton) {
+            if (this.base.options.anchorButton) {
                 button = doc.createElement('input');
                 button.setAttribute('type', 'checkbox');
                 button.className = 'medium-editor-toolbar-anchor-button';
