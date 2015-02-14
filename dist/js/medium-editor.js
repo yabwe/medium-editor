@@ -2607,6 +2607,12 @@ if (typeof module === 'object') {
                 this.elements[i].removeAttribute('data-medium-element');
             }
 
+            this.commands.forEach(function (extension) {
+                if (typeof extension.deactivate === 'function') {
+                    extension.deactivate();
+                }
+            }.bind(this));
+
             this.removeAllEvents();
         },
 
