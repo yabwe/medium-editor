@@ -1,4 +1,4 @@
-# MediumEditor
+﻿# MediumEditor
 
 This is a clone of [medium.com](https://medium.com) inline editor toolbar.
 
@@ -404,6 +404,10 @@ var editor = new MediumEditor('.editable', {
 ## Markdown
 
 [Ionică Bizău](https://github.com/IonicaBizau) has created a Medium Editor extension, named [Medium Editor Markdown](https://github.com/IonicaBizau/medium-editor-markdown), to add the functionality to render the HTML into Markdown code. Check it out at [https://github.com/IonicaBizau/medium-editor-markdown](https://github.com/IonicaBizau/medium-editor-markdown).
+
+## Tables
+
+A tables support extension is available at [https://github.com/daviferreira/medium-editor-tables](https://github.com/daviferreira/medium-editor-tables).
 
 ## Inserting custom HTML
 At [**@jillix**](https://github.com/jillix/), [Ionică Bizău](https://github.com/IonicaBizau) developed [a Medium Editor extension](https://github.com/jillix/medium-editor-custom-html) that allows inserting custom HTML into the editor. Check it out here: [https://github.com/jillix/medium-editor-custom-html](https://github.com/jillix/medium-editor-custom-html).
