@@ -97,8 +97,6 @@ describe('Anchor Preview TestCase', function () {
             fireEvent(editor.elements[0], 'blur', undefined, undefined, editor.elements[0], document.querySelector('#medium-editor-toolbar-form-anchor-' + editor.id + ' input'));
             jasmine.clock().tick(1);
             expect(editor.hideToolbarActions).not.toHaveBeenCalled();
-
-
         });
 
         it('Hover empty anchor should NOT show preview', function () {
@@ -116,7 +114,6 @@ describe('Anchor Preview TestCase', function () {
             // preview shows only after delay
             jasmine.clock().tick(250);
             expect(editor.showAnchorPreview).not.toHaveBeenCalled();
-
         });
 
     });

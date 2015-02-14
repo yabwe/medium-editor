@@ -17,6 +17,7 @@ module.exports = function (grunt) {
             'src/js/selection.js',
             'src/js/button.js',
             'src/js/paste.js',
+            'src/js/extension-anchor.js',
             'src/js/core.js'
         ];
 

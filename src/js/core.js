@@ -1,6 +1,6 @@
 /*global module, console, define, FileReader,
  mediumEditorUtil, ButtonsData, DefaultButton,
- pasteHandler, meSelection*/
+ pasteHandler, meSelection, AnchorExtension*/
 
 function MediumEditor(elements, options) {
     'use strict';
@@ -568,7 +568,7 @@ if (typeof module === 'object') {
 
             toolbar.appendChild(this.toolbarButtons());
             if (!this.options.disableAnchorForm) {
-                toolbar.appendChild(this.toolbarFormAnchor());
+                toolbar.appendChild(AnchorExtension.createForm(this.id, this.options.ownerDocument, this.options));
             }
             this.options.elementsContainer.appendChild(toolbar);
             return toolbar;
@@ -614,58 +614,6 @@ if (typeof module === 'object') {
                     this.toolbar.appendChild(form);
                 }
             }.bind(this));
-        },
-
-        toolbarFormAnchor: function () {
-            var anchor = this.options.ownerDocument.createElement('div'),
-                input = this.options.ownerDocument.createElement('input'),
-                target_label = this.options.ownerDocument.createElement('label'),
-                target = this.options.ownerDocument.createElement('input'),
-                button_label = this.options.ownerDocument.createElement('label'),
-                button = this.options.ownerDocument.createElement('input'),
-                close = this.options.ownerDocument.createElement('a'),
-                save = this.options.ownerDocument.createElement('a');
-
-            close.setAttribute('href', '#');
-            close.className = 'medium-editor-toobar-close';
-            close.innerHTML = '&times;';
-
-            save.setAttribute('href', '#');
-            save.className = 'medium-editor-toobar-save';
-            save.innerHTML = '&#10003;';
-
-            input.setAttribute('type', 'text');
-            input.className = 'medium-editor-toolbar-input';
-            input.setAttribute('placeholder', this.options.anchorInputPlaceholder);
-
-
-            target.setAttribute('type', 'checkbox');
-            target.className = 'medium-editor-toolbar-anchor-target';
-            target_label.innerHTML = this.options.anchorInputCheckboxLabel;
-            target_label.insertBefore(target, target_label.firstChild);
-
-            button.setAttribute('type', 'checkbox');
-            button.className = 'medium-editor-toolbar-anchor-button';
-            button_label.innerHTML = "Button";
-            button_label.insertBefore(button, button_label.firstChild);
-
-
-            anchor.className = 'medium-editor-toolbar-form';
-            anchor.id = 'medium-editor-toolbar-form-anchor-' + this.id;
-            anchor.appendChild(input);
-
-            anchor.appendChild(save);
-            anchor.appendChild(close);
-
-            if (this.options.anchorTarget) {
-                anchor.appendChild(target_label);
-            }
-
-            if (this.options.anchorButton) {
-                anchor.appendChild(button_label);
-            }
-
-            return anchor;
         },
 
         bindSelect: function () {

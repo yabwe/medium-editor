@@ -59,7 +59,7 @@ describe('Toolbar TestCase', function () {
             expect(editor.toolbar.querySelectorAll('.medium-editor-toolbar-form-anchor').length).toBe(0);
         });
 
-        it('should not call MediumEditor\'s toolbarFormAnchor method if disableAnchorForm is set to true', function () {
+        xit('should not call MediumEditor\'s toolbarFormAnchor method if disableAnchorForm is set to true', function () {
             spyOn(MediumEditor.prototype, 'toolbarFormAnchor').and.callThrough();
             var editor = new MediumEditor('.editor', {
                 disableAnchorForm: true
