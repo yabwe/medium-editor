@@ -406,6 +406,10 @@ var DefaultButton,
             action: 'underline',
             aria: 'underline',
             tagNames: ['u'],
+            style: {
+                prop: 'text-decoration',
+                value: 'underline'
+            },
             useQueryState: true,
             contentDefault: '<b><u>U</u></b>',
             contentFA: '<i class="fa fa-underline"></i>'
@@ -415,6 +419,10 @@ var DefaultButton,
             action: 'strikethrough',
             aria: 'strike through',
             tagNames: ['strike'],
+            style: {
+                prop: 'text-decoration',
+                value: 'line-through'
+            },
             useQueryState: true,
             contentDefault: '<s>A</s>',
             contentFA: '<i class="fa fa-strikethrough"></i>'
@@ -675,7 +683,8 @@ var DefaultButton,
         shouldActivate: function (node) {
             var isMatch = false,
                 tagNames = this.getTagNames(),
-                styleVals;
+                styleVals,
+                computedStyle;
             if (this.knownState === false || this.knownState === true) {
                 return this.knownState;
             }
@@ -686,10 +695,10 @@ var DefaultButton,
 
             if (!isMatch && this.options.style) {
                 styleVals = this.options.style.value.split('|');
+                computedStyle = this.base.options.contentWindow.getComputedStyle(node, null).getPropertyValue(this.options.style.prop);
                 styleVals.forEach(function (val) {
-                    this.knownState = isMatch = (this.base.options.contentWindow.getComputedStyle(node, null).getPropertyValue(this.options.style.prop).indexOf(val) !== -1);
-                    if (this.knownState) {
-                        return false;
+                    if (!this.knownState) {
+                        this.knownState = isMatch = (computedStyle.indexOf(val) !== -1);
                     }
                 }.bind(this));
             }
@@ -926,6 +935,209 @@ var pasteHandler;
     };
 }(window, document));
 
+var AnchorExtension;
+
+(function (window, document) {
+    'use strict';
+
+    AnchorExtension = function (instance) {
+        this.base = instance;
+    };
+
+    AnchorExtension.prototype = {
+
+        getForm: function () {
+            if (!this.anchorForm) {
+                this.anchorForm = this.createForm();
+            }
+            return this.anchorForm;
+        },
+
+        getInput: function () {
+            return this.getForm().querySelector('input.medium-editor-toolbar-input');
+        },
+
+        deactivate: function () {
+            if (!this.anchorForm) {
+                return false;
+            }
+
+            if (this.anchorForm.parentNode) {
+                this.anchorForm.parentNode.removeChild(this.anchorForm);
+            }
+
+            delete this.anchorForm;
+        },
+
+        doLinkCreation: function () {
+            var button = null,
+                target,
+                targetCheckbox = this.getForm().querySelector('.medium-editor-toolbar-anchor-target'),
+                buttonCheckbox = this.getForm().querySelector('.medium-editor-toolbar-anchor-button');
+
+            if (targetCheckbox && targetCheckbox.checked) {
+                target = "_blank";
+            } else {
+                target = "_self";
+            }
+
+            if (buttonCheckbox && buttonCheckbox.checked) {
+                button = this.base.options.anchorButtonClass;
+            }
+
+            this.base.createLink(this.getInput(), target, button);
+        },
+
+        doFormCancel: function () {
+            this.base.showToolbarActions();
+            this.base.restoreSelection();
+        },
+
+        handleOutsideInteraction: function (event) {
+            if (event.target !== this.getForm() &&
+                    !mediumEditorUtil.isDescendant(this.getForm(), event.target) &&
+                    !mediumEditorUtil.isDescendant(this.base.toolbarActions, event.target)) {
+                this.base.keepToolbarAlive = false;
+                this.base.checkSelection();
+            }
+        },
+
+        createForm: function () {
+            var doc = this.base.options.ownerDocument,
+                form = doc.createElement('div'),
+                input = doc.createElement('input'),
+                close = doc.createElement('a'),
+                save = doc.createElement('a'),
+                target,
+                target_label,
+                button,
+                button_label;
+
+            // Anchor Form (div)
+            form.className = 'medium-editor-toolbar-form';
+            form.id = 'medium-editor-toolbar-form-anchor-' + this.base.id;
+
+            // Handle clicks on the form itself
+            this.base.on(form, 'click', function (event) {
+                event.stopPropagation();
+                this.base.keepToolbarAlive = true;
+            }.bind(this));
+
+            // Add url textbox
+            input.setAttribute('type', 'text');
+            input.className = 'medium-editor-toolbar-input';
+            input.setAttribute('placeholder', this.base.options.anchorInputPlaceholder);
+            form.appendChild(input);
+
+            // Handle typing in the textbox
+            this.base.on(input, 'keyup', function (event) {
+                // For ENTER -> create the anchor
+                if (event.keyCode === mediumEditorUtil.keyCode.ENTER) {
+                    event.preventDefault();
+                    this.doLinkCreation();
+                    return;
+                }
+
+                // For ESCAPE -> close the form
+                if (event.keyCode === mediumEditorUtil.keyCode.ESCAPE) {
+                    event.preventDefault();
+                    this.doFormCancel();
+                }
+            }.bind(this));
+
+            // Handle clicks into the textbox
+            this.base.on(input, 'click', function (event) {
+                // make sure not to hide form when cliking into the input
+                event.stopPropagation();
+                this.base.keepToolbarAlive = true;
+            }.bind(this));
+
+            // Add save buton
+            save.setAttribute('href', '#');
+            save.className = 'medium-editor-toobar-save';
+            save.innerHTML = '&#10003;';
+            form.appendChild(save);
+
+            // Handle save button clicks (capture)
+            this.base.on(save, 'click', function (event) {
+                // Clicking Save -> create the anchor
+                event.preventDefault();
+                this.doLinkCreation();
+            }.bind(this), true);
+
+            // Add close button
+            close.setAttribute('href', '#');
+            close.className = 'medium-editor-toobar-close';
+            close.innerHTML = '&times;';
+            form.appendChild(close);
+
+            // Handle close button clicks
+            this.base.on(close, 'click', function (event) {
+                // Click Close -> close the form
+                event.preventDefault();
+                this.doFormCancel();
+            }.bind(this));
+
+            // (Optional) Add 'open in new window' checkbox
+            if (this.base.options.anchorTarget) {
+                target = doc.createElement('input');
+                target.setAttribute('type', 'checkbox');
+                target.className = 'medium-editor-toolbar-anchor-target';
+
+                target_label = doc.createElement('label');
+                target_label.innerHTML = this.base.options.anchorInputCheckboxLabel;
+                target_label.insertBefore(target, target_label.firstChild);
+
+                form.appendChild(target_label);
+            }
+
+            // (Optional) Add 'add button class to anchor' checkbox
+            if (this.base.options.anchorButton) {
+                button = doc.createElement('input');
+                button.setAttribute('type', 'checkbox');
+                button.className = 'medium-editor-toolbar-anchor-button';
+
+                button_label = doc.createElement('label');
+                button_label.innerHTML = "Button";
+                button_label.insertBefore(button, button_label.firstChild);
+
+                form.appendChild(button_label);
+            }
+
+            // Handle click (capture) & focus (capture) outside of the form
+            this.base.on(doc.body, 'click', this.handleOutsideInteraction.bind(this), true);
+            this.base.on(doc.body, 'focus', this.handleOutsideInteraction.bind(this), true);
+
+            return form;
+        },
+
+        focus: function (value) {
+            var input = this.getInput();
+            input.focus();
+            input.value = value || '';
+        },
+
+        hideForm: function () {
+            this.getForm().style.display = 'none';
+        },
+
+        showForm: function () {
+            this.getForm().style.display = 'block';
+        },
+
+        isDisplayed: function () {
+            return this.getForm().style.display === 'block';
+        },
+
+        isClickIntoForm: function (event) {
+            return (event &&
+                event.type &&
+                event.type.toLowerCase() === 'blur' &&
+                event.relatedTarget &&
+                event.relatedTarget === this.getInput());
+        }
+    };
+}(window, document));
 function MediumEditor(elements, options) {
     'use strict';
     return this.init(elements, options);
@@ -936,7 +1148,8 @@ function MediumEditor(elements, options) {
 
     MediumEditor.statics = {
         ButtonsData: ButtonsData,
-        DefaultButton: DefaultButton
+        DefaultButton: DefaultButton,
+        AnchorExtension: AnchorExtension
     };
 
     MediumEditor.prototype = {
@@ -1102,7 +1315,6 @@ function MediumEditor(elements, options) {
             if (addToolbar) {
                 this.initToolbar()
                     .bindButtons()
-                    .bindAnchorForm()
                     .bindAnchorPreview();
             }
             return this;
@@ -1457,13 +1669,6 @@ function MediumEditor(elements, options) {
             this.toolbarActions = this.toolbar.querySelector('.medium-editor-toolbar-actions');
             this.anchorPreview = this.createAnchorPreview();
 
-            if (!this.options.disableAnchorForm) {
-                this.anchorForm = this.toolbar.querySelector('.medium-editor-toolbar-form');
-                this.anchorInput = this.anchorForm.querySelector('input.medium-editor-toolbar-input');
-                this.anchorTarget = this.anchorForm.querySelector('input.medium-editor-toolbar-anchor-target');
-                this.anchorButton = this.anchorForm.querySelector('input.medium-editor-toolbar-anchor-button');
-            }
-
             this.addExtensionForms();
 
             return this;
@@ -1482,7 +1687,8 @@ function MediumEditor(elements, options) {
 
             toolbar.appendChild(this.toolbarButtons());
             if (!this.options.disableAnchorForm) {
-                toolbar.appendChild(this.toolbarFormAnchor());
+                this.anchorExtension = new AnchorExtension(this);
+                toolbar.appendChild(this.anchorExtension.getForm());
             }
             this.options.elementsContainer.appendChild(toolbar);
             return toolbar;
@@ -1530,58 +1736,6 @@ function MediumEditor(elements, options) {
             }.bind(this));
         },
 
-        toolbarFormAnchor: function () {
-            var anchor = this.options.ownerDocument.createElement('div'),
-                input = this.options.ownerDocument.createElement('input'),
-                target_label = this.options.ownerDocument.createElement('label'),
-                target = this.options.ownerDocument.createElement('input'),
-                button_label = this.options.ownerDocument.createElement('label'),
-                button = this.options.ownerDocument.createElement('input'),
-                close = this.options.ownerDocument.createElement('a'),
-                save = this.options.ownerDocument.createElement('a');
-
-            close.setAttribute('href', '#');
-            close.className = 'medium-editor-toobar-close';
-            close.innerHTML = '&times;';
-
-            save.setAttribute('href', '#');
-            save.className = 'medium-editor-toobar-save';
-            save.innerHTML = '&#10003;';
-
-            input.setAttribute('type', 'text');
-            input.className = 'medium-editor-toolbar-input';
-            input.setAttribute('placeholder', this.options.anchorInputPlaceholder);
-
-
-            target.setAttribute('type', 'checkbox');
-            target.className = 'medium-editor-toolbar-anchor-target';
-            target_label.innerHTML = this.options.anchorInputCheckboxLabel;
-            target_label.insertBefore(target, target_label.firstChild);
-
-            button.setAttribute('type', 'checkbox');
-            button.className = 'medium-editor-toolbar-anchor-button';
-            button_label.innerHTML = "Button";
-            button_label.insertBefore(button, button_label.firstChild);
-
-
-            anchor.className = 'medium-editor-toolbar-form';
-            anchor.id = 'medium-editor-toolbar-form-anchor-' + this.id;
-            anchor.appendChild(input);
-
-            anchor.appendChild(save);
-            anchor.appendChild(close);
-
-            if (this.options.anchorTarget) {
-                anchor.appendChild(target_label);
-            }
-
-            if (this.options.anchorButton) {
-                anchor.appendChild(button_label);
-            }
-
-            return anchor;
-        },
-
         bindSelect: function () {
             var self = this,
                 i,
@@ -1589,7 +1743,7 @@ function MediumEditor(elements, options) {
 
             this.checkSelectionWrapper = function (e) {
                 // Do not close the toolbar when bluring the editable area and clicking into the anchor form
-                if (!self.options.disableAnchorForm && e && self.clickingIntoArchorForm(e)) {
+                if (e && this.anchorExtension && this.anchorExtension.isClickIntoForm(e)) {
                     return false;
                 }
 
@@ -1730,7 +1884,7 @@ function MediumEditor(elements, options) {
 
                     if (!this.options.staticToolbar) {
                         this.hideToolbarActions();
-                    } else if (this.anchorForm && this.anchorForm.style.display === 'block') {
+                    } else if (this.anchorExtension && this.anchorExtension.isDisplayed()) {
                         this.setToolbarButtonStates();
                         this.showToolbarActions();
                     }
@@ -1747,16 +1901,6 @@ function MediumEditor(elements, options) {
                 }
             }
             return this;
-        },
-
-        clickingIntoArchorForm: function (e) {
-            var self = this;
-
-            if (e.type && e.type.toLowerCase() === 'blur' && e.relatedTarget && e.relatedTarget === self.anchorInput) {
-                return true;
-            }
-
-            return false;
         },
 
         hasMultiParagraphs: function () {
@@ -2050,8 +2194,8 @@ function MediumEditor(elements, options) {
             if (selectedParentElement.tagName &&
                     selectedParentElement.tagName.toLowerCase() === 'a') {
                 this.options.ownerDocument.execCommand('unlink', false, null);
-            } else if (this.anchorForm) {
-                if (this.anchorForm.style.display === 'block') {
+            } else if (this.anchorExtension) {
+                if (this.anchorExtension.isDisplayed()) {
                     this.showToolbarActions();
                 } else {
                     this.showAnchorForm();
@@ -2120,8 +2264,8 @@ function MediumEditor(elements, options) {
 
         showToolbarActions: function () {
             var self = this;
-            if (this.anchorForm) {
-                this.anchorForm.style.display = 'none';
+            if (this.anchorExtension) {
+                this.anchorExtension.hideForm();
             }
             this.toolbarActions.style.display = 'block';
             this.keepToolbarAlive = false;
@@ -2223,100 +2367,16 @@ function MediumEditor(elements, options) {
         },
 
         showAnchorForm: function (link_value) {
-            if (!this.anchorForm) {
+            if (!this.anchorExtension) {
                 return;
             }
 
             this.toolbarActions.style.display = 'none';
             this.saveSelection();
-            this.anchorForm.style.display = 'block';
+            this.anchorExtension.showForm();
             this.setToolbarPosition();
             this.keepToolbarAlive = true;
-            this.anchorInput.focus();
-            this.anchorInput.value = link_value || '';
-        },
-
-        bindAnchorForm: function () {
-            if (!this.anchorForm) {
-                return this;
-            }
-
-            var linkCancel = this.anchorForm.querySelector('a.medium-editor-toobar-close'),
-                linkSave = this.anchorForm.querySelector('a.medium-editor-toobar-save'),
-                self = this;
-
-            this.on(this.anchorForm, 'click', function (e) {
-                e.stopPropagation();
-                self.keepToolbarAlive = true;
-            });
-
-            this.on(this.anchorInput, 'keyup', function (e) {
-                var button = null,
-                    target;
-
-                if (e.keyCode === mediumEditorUtil.keyCode.ENTER) {
-                    e.preventDefault();
-                    if (self.options.anchorTarget && self.anchorTarget.checked) {
-                        target = "_blank";
-                    } else {
-                        target = "_self";
-                    }
-
-                    if (self.options.anchorButton && self.anchorButton.checked) {
-                        button = self.options.anchorButtonClass;
-                    }
-
-                    self.createLink(this, target, button);
-                } else if (e.keyCode === mediumEditorUtil.keyCode.ESCAPE) {
-                    e.preventDefault();
-                    self.showToolbarActions();
-                    self.restoreSelection();
-                }
-            });
-
-            this.on(linkSave, 'click', function (e) {
-                var button = null,
-                    target;
-                e.preventDefault();
-                if (self.options.anchorTarget && self.anchorTarget.checked) {
-                    target = "_blank";
-                } else {
-                    target = "_self";
-                }
-
-                if (self.options.anchorButton && self.anchorButton.checked) {
-                    button = self.options.anchorButtonClass;
-                }
-
-                self.createLink(self.anchorInput, target, button);
-            }, true);
-
-            this.on(this.anchorInput, 'click', function (e) {
-                // make sure not to hide form when cliking into the input
-                e.stopPropagation();
-                self.keepToolbarAlive = true;
-            });
-
-            // Hide the anchor form when focusing outside of it.
-            this.on(this.options.ownerDocument.body, 'click', function (e) {
-                if (e.target !== self.anchorForm && !mediumEditorUtil.isDescendant(self.anchorForm, e.target) && !mediumEditorUtil.isDescendant(self.toolbarActions, e.target)) {
-                    self.keepToolbarAlive = false;
-                    self.checkSelection();
-                }
-            }, true);
-            this.on(this.options.ownerDocument.body, 'focus', function (e) {
-                if (e.target !== self.anchorForm && !mediumEditorUtil.isDescendant(self.anchorForm, e.target) && !mediumEditorUtil.isDescendant(self.toolbarActions, e.target)) {
-                    self.keepToolbarAlive = false;
-                    self.checkSelection();
-                }
-            }, true);
-
-            this.on(linkCancel, 'click', function (e) {
-                e.preventDefault();
-                self.showToolbarActions();
-                self.restoreSelection();
-            });
-            return this;
+            this.anchorExtension.focus(link_value);
         },
 
         hideAnchorPreview: function () {
@@ -2433,7 +2493,7 @@ function MediumEditor(elements, options) {
                 sel.removeAllRanges();
                 sel.addRange(range);
                 // Using setTimeout + options.delay because:
-                // We may actually be displaying the anchor preview, which should be controlled by options.delay
+                // We may actually be displaying the anchor form, which should be controlled by options.delay
                 this.delay(function () {
                     if (self.activeAnchor) {
                         self.showAnchorForm(self.activeAnchor.attributes.href.value);
@@ -2618,6 +2678,10 @@ function MediumEditor(elements, options) {
                     extension.deactivate();
                 }
             }.bind(this));
+
+            if (this.anchorExtension) {
+                this.anchorExtension.deactivate();
+            }
 
             this.removeAllEvents();
         },

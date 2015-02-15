@@ -1,4 +1,4 @@
-/*global MediumEditor, describe, it, expect, spyOn,
+/*global MediumEditor, describe, it, xit, expect, spyOn,
          afterEach, beforeEach, selectElementContents,
          jasmine, fireEvent, console, tearDown*/
 
@@ -92,13 +92,8 @@ describe('Anchor Preview TestCase', function () {
             fireEvent(editor.anchorPreview, 'click');
             jasmine.clock().tick(200);
 
-            // blur the editable area and focus onto the input for the anchor form
-            spyOn(MediumEditor.prototype, 'hideToolbarActions').and.callThrough();
-            fireEvent(editor.elements[0], 'blur', undefined, undefined, editor.elements[0], document.querySelector('#medium-editor-toolbar-form-anchor-' + editor.id + ' input'));
-            jasmine.clock().tick(1);
-            expect(editor.hideToolbarActions).not.toHaveBeenCalled();
-
-
+            expect(editor.isToolbarShown()).toBe(true);
+            expect(editor.anchorExtension.isDisplayed()).toBe(true);
         });
 
         it('Hover empty anchor should NOT show preview', function () {
@@ -116,7 +111,6 @@ describe('Anchor Preview TestCase', function () {
             // preview shows only after delay
             jasmine.clock().tick(250);
             expect(editor.showAnchorPreview).not.toHaveBeenCalled();
-
         });
 
     });
