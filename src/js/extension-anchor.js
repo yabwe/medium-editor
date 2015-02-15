@@ -12,15 +12,26 @@ var AnchorExtension;
     AnchorExtension.prototype = {
 
         getForm: function () {
-            var form = this.base.options.ownerDocument.getElementById('medium-editor-toolbar-form-anchor-' + this.base.id);
-            if (!form) {
-                form = this.createForm();
+            if (!this.anchorForm) {
+                this.anchorForm = this.createForm();
             }
-            return form;
+            return this.anchorForm;
         },
 
         getInput: function () {
             return this.getForm().querySelector('input.medium-editor-toolbar-input');
+        },
+
+        deactivate: function () {
+            if (!this.anchorForm) {
+                return false;
+            }
+
+            if (this.anchorForm.parentNode) {
+                this.anchorForm.parentNode.removeChild(this.anchorForm);
+            }
+
+            delete this.anchorForm;
         },
 
         doLinkCreation: function () {

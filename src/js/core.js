@@ -1553,6 +1553,10 @@ if (typeof module === 'object') {
                 }
             }.bind(this));
 
+            if (this.anchorExtension) {
+                this.anchorExtension.deactivate();
+            }
+
             this.removeAllEvents();
         },
 
