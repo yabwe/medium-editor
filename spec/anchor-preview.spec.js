@@ -79,7 +79,7 @@ describe('Anchor Preview TestCase', function () {
             expect(editor.anchorPreview.querySelector('i').innerHTML).toBe(document.getElementById('test-symbol-link').attributes.href.value);
         });
 
-        xit('Anchor form stays visible on click', function () {
+        it('Anchor form stays visible on click', function () {
             var editor = new MediumEditor('.editor');
 
             // show preview
@@ -92,11 +92,8 @@ describe('Anchor Preview TestCase', function () {
             fireEvent(editor.anchorPreview, 'click');
             jasmine.clock().tick(200);
 
-            // blur the editable area and focus onto the input for the anchor form
-            spyOn(MediumEditor.prototype, 'hideToolbarActions').and.callThrough();
-            fireEvent(editor.elements[0], 'blur', undefined, undefined, editor.elements[0], editor.anchorExtension.getInput());
-            jasmine.clock().tick(1);
-            expect(editor.hideToolbarActions).not.toHaveBeenCalled();
+            expect(editor.isToolbarShown()).toBe(true);
+            expect(editor.anchorExtension.isDisplayed()).toBe(true);
         });
 
         it('Hover empty anchor should NOT show preview', function () {

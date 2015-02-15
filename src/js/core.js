@@ -1367,7 +1367,7 @@ if (typeof module === 'object') {
                 sel.removeAllRanges();
                 sel.addRange(range);
                 // Using setTimeout + options.delay because:
-                // We may actually be displaying the anchor preview, which should be controlled by options.delay
+                // We may actually be displaying the anchor form, which should be controlled by options.delay
                 this.delay(function () {
                     if (self.activeAnchor) {
                         self.showAnchorForm(self.activeAnchor.attributes.href.value);
