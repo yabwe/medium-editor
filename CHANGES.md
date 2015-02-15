@@ -1,3 +1,13 @@
+2.4.0 / 2015-02-15
+==================
+* Split source code into several files for better development flow
+* Make saveSelection and restoreSelection more consistant cross browser
+* Use document.queryCommandState for some button toolbar states
+* Add selection storage
+* Call extensions deactivate when deactivating the editor
+* Turn Anchor button into an extension
+
+
 2.3.0 / 2015-02-11
 ==================
 * Fix various selection and positioning bugs
