@@ -25,14 +25,14 @@ describe('Initialization TestCase', function () {
             spyOn(MediumEditor.prototype, 'initToolbar');
             spyOn(MediumEditor.prototype, 'bindSelect');
             spyOn(MediumEditor.prototype, 'bindButtons');
-            spyOn(MediumEditor.prototype, 'bindAnchorForm');
+            spyOn(MediumEditor.statics.AnchorExtension.prototype, 'createForm');
             var editor = new MediumEditor('.test');
             expect(editor.id).toBe(undefined);
             expect(editor.initElements).not.toHaveBeenCalled();
             expect(editor.initToolbar).not.toHaveBeenCalled();
             expect(editor.bindSelect).not.toHaveBeenCalled();
             expect(editor.bindButtons).not.toHaveBeenCalled();
-            expect(editor.bindAnchorForm).not.toHaveBeenCalled();
+            expect(editor.anchorExtension.createForm).not.toHaveBeenCalled();
             expect(editor.initElements).not.toHaveBeenCalled();
         });
     });
@@ -156,14 +156,14 @@ describe('Initialization TestCase', function () {
             spyOn(MediumEditor.prototype, 'initToolbar').and.callThrough();
             spyOn(MediumEditor.prototype, 'bindSelect').and.callThrough();
             spyOn(MediumEditor.prototype, 'bindButtons').and.callThrough();
-            spyOn(MediumEditor.prototype, 'bindAnchorForm').and.callThrough();
+            spyOn(MediumEditor.statics.AnchorExtension.prototype, 'createForm').and.callThrough();
             var editor = new MediumEditor('.editor');
             expect(editor.id).toBe(1);
             expect(editor.initElements).toHaveBeenCalled();
             expect(editor.initToolbar).toHaveBeenCalled();
             expect(editor.bindSelect).toHaveBeenCalled();
             expect(editor.bindButtons).toHaveBeenCalled();
-            expect(editor.bindAnchorForm).toHaveBeenCalled();
+            expect(editor.anchorExtension.createForm).toHaveBeenCalled();
             expect(editor.initElements).toHaveBeenCalled();
         });
 
