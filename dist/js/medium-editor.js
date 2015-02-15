@@ -1,3 +1,16 @@
+(function (root, factory) {
+    'use strict';
+    if (typeof module === 'object') {
+        module.exports = factory;
+    } else if (typeof define === 'function' && define.amd) {
+        define(factory);
+    } else {
+        root.MediumEditor = factory;
+    }
+}(this, function () {
+
+    'use strict';
+
 var mediumEditorUtil;
 
 (function (window, document) {
@@ -918,17 +931,7 @@ function MediumEditor(elements, options) {
     return this.init(elements, options);
 }
 
-if (typeof module === 'object') {
-    module.exports = MediumEditor;
-// AMD support
-} else if (typeof define === 'function' && define.amd) {
-    define(function () {
-        'use strict';
-        return MediumEditor;
-    });
-}
-
-(function (window, document) {
+(function () {
     'use strict';
 
     MediumEditor.statics = {
@@ -2651,4 +2654,7 @@ if (typeof module === 'object') {
         }
     };
 
-}(window, document));
+}());
+
+    return MediumEditor;
+}()));
