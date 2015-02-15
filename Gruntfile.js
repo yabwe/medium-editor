@@ -167,7 +167,9 @@ module.exports = function (grunt) {
             stripBanners: true
         },
         dist: {
-            src: srcFiles,
+            src: ['src/wrappers/start.js']
+                    .concat(srcFiles)
+                    .concat(['src/wrappers/end.js']),
             dest: 'dist/js/<%= pkg.name %>.js'
         }
     };
