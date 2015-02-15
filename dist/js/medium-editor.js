@@ -1584,7 +1584,7 @@ function MediumEditor(elements, options) {
                     }
 
                     // Tab to indent list structures!
-                    if (tag === 'li' || self.isListItemChild(node)) {
+                    if (tag === 'li' || mediumEditorUtil.isListItemChild(node)) {
                         e.preventDefault();
 
                         // If Shift is down, outdent, otherwise indent
