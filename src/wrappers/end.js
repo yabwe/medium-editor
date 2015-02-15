@@ -1,2 +1,2 @@
-  return MediumEditor;
+    return MediumEditor;
 }()));
