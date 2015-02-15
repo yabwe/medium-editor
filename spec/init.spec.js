@@ -25,14 +25,13 @@ describe('Initialization TestCase', function () {
             spyOn(MediumEditor.prototype, 'initToolbar');
             spyOn(MediumEditor.prototype, 'bindSelect');
             spyOn(MediumEditor.prototype, 'bindButtons');
-            spyOn(MediumEditor.statics.AnchorExtension.prototype, 'createForm');
             var editor = new MediumEditor('.test');
             expect(editor.id).toBe(undefined);
             expect(editor.initElements).not.toHaveBeenCalled();
             expect(editor.initToolbar).not.toHaveBeenCalled();
             expect(editor.bindSelect).not.toHaveBeenCalled();
             expect(editor.bindButtons).not.toHaveBeenCalled();
-            expect(editor.anchorExtension.createForm).not.toHaveBeenCalled();
+            expect(editor.anchorExtension).toBeUndefined();
             expect(editor.initElements).not.toHaveBeenCalled();
         });
     });

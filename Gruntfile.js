@@ -35,7 +35,7 @@ module.exports = function (grunt) {
 
     gruntConfig.jasmine = {
         suite: {
-            src: 'src/js/**/*.js',
+            src: srcFiles,
             options: {
                 specs: 'spec/*.spec.js',
                 helpers: 'spec/helpers/*.js',
