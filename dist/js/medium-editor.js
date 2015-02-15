@@ -2307,7 +2307,7 @@ function MediumEditor(elements, options) {
         selectAllContents: function () {
             var range = this.options.ownerDocument.createRange(),
                 sel = this.options.contentWindow.getSelection(),
-                currNode = this.getSelectionElement();
+                currNode = meSelection.getSelectionElement(this.options.contentWindow);
 
             if (currNode) {
                 // Move to the lowest descendant node that still selects all of the contents
