@@ -1,3 +1,8 @@
+2.4.1 / 2015-02-15
+==================
+* Fix isListItemChild call
+
+
 2.4.0 / 2015-02-15
 ==================
 * Split source code into several files for better development flow
