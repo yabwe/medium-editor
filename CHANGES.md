@@ -1,3 +1,8 @@
+2.4.2 / 2015-02-15
+==================
+* Fix disableDoubleReturn option
+
+
 2.4.1 / 2015-02-15
 ==================
 * Fix isListItemChild call
