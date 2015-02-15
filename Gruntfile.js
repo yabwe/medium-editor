@@ -35,7 +35,7 @@ module.exports = function (grunt) {
 
     gruntConfig.jasmine = {
         suite: {
-            src: srcFiles,
+            src: 'dist/js/medium-editor.js',
             options: {
                 specs: 'spec/*.spec.js',
                 helpers: 'spec/helpers/*.js',
@@ -168,7 +168,9 @@ module.exports = function (grunt) {
             stripBanners: true
         },
         dist: {
-            src: srcFiles,
+            src: ['src/wrappers/start.js']
+                .concat(srcFiles)
+                .concat(['src/wrappers/end.js']),
             dest: 'dist/js/<%= pkg.name %>.js'
         }
     };
@@ -191,8 +193,8 @@ module.exports = function (grunt) {
         ]
     });
 
-    grunt.registerTask('test', ['jslint', 'jasmine:suite', 'csslint']);
-    grunt.registerTask('js', ['jslint', 'jasmine:suite', 'concat', 'uglify']);
+    grunt.registerTask('test', ['jslint', 'concat', 'jasmine:suite', 'csslint']);
+    grunt.registerTask('js', ['jslint', 'concat', 'jasmine:suite', 'uglify']);
     grunt.registerTask('css', ['sass', 'autoprefixer', 'cssmin', 'csslint']);
     grunt.registerTask('default', ['js', 'css']);
 
