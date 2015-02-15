@@ -38,6 +38,10 @@ var DefaultButton,
             action: 'underline',
             aria: 'underline',
             tagNames: ['u'],
+            style: {
+                prop: 'text-decoration',
+                value: 'underline'
+            },
             useQueryState: true,
             contentDefault: '<b><u>U</u></b>',
             contentFA: '<i class="fa fa-underline"></i>'
@@ -47,6 +51,10 @@ var DefaultButton,
             action: 'strikethrough',
             aria: 'strike through',
             tagNames: ['strike'],
+            style: {
+                prop: 'text-decoration',
+                value: 'line-through'
+            },
             useQueryState: true,
             contentDefault: '<s>A</s>',
             contentFA: '<i class="fa fa-strikethrough"></i>'
@@ -307,7 +315,8 @@ var DefaultButton,
         shouldActivate: function (node) {
             var isMatch = false,
                 tagNames = this.getTagNames(),
-                styleVals;
+                styleVals,
+                computedStyle;
             if (this.knownState === false || this.knownState === true) {
                 return this.knownState;
             }
@@ -318,10 +327,10 @@ var DefaultButton,
 
             if (!isMatch && this.options.style) {
                 styleVals = this.options.style.value.split('|');
+                computedStyle = this.base.options.contentWindow.getComputedStyle(node, null).getPropertyValue(this.options.style.prop);
                 styleVals.forEach(function (val) {
-                    this.knownState = isMatch = (this.base.options.contentWindow.getComputedStyle(node, null).getPropertyValue(this.options.style.prop).indexOf(val) !== -1);
-                    if (this.knownState) {
-                        return false;
+                    if (!this.knownState) {
+                        this.knownState = isMatch = (computedStyle.indexOf(val) !== -1);
                     }
                 }.bind(this));
             }
