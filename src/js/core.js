@@ -396,7 +396,7 @@ function MediumEditor(elements, options) {
                 if (e.which === mediumEditorUtil.keyCode.ENTER) {
                     node = meSelection.getSelectionStart(self.options.ownerDocument);
                     tagName = node.tagName.toLowerCase();
-                    editorElement = self.getSelectionElement(this.options.contentWindow);
+                    editorElement = meSelection.getSelectionElement(self.options.contentWindow);
 
                     if (!(self.options.disableReturn || editorElement.getAttribute('data-disable-return')) &&
                             tagName !== 'li' && !mediumEditorUtil.isListItemChild(node)) {
@@ -423,8 +423,8 @@ function MediumEditor(elements, options) {
                     if (self.options.disableReturn || this.getAttribute('data-disable-return')) {
                         e.preventDefault();
                     } else if (self.options.disableDoubleReturn || this.getAttribute('data-disable-double-return')) {
-                        var node = meSelection.getSelectionStart(self.options.ownerDocument);
-                        if (node && node.textContent === '\n') {
+                        var node = meSelection.getSelectionStart(self.options.contentWindow);
+                        if (node && node.textContent.trim() === '') {
                             e.preventDefault();
                         }
                     }
