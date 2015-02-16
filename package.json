@@ -3,7 +3,7 @@
   "version": "2.4.3",
   "author": "Davi Ferreira <hi@daviferreira.com>",
   "description": "Medium.com WYSIWYG editor clone.",
-  "main": "src/js/medium-editor.js",
+  "main": "dist/js/medium-editor.js",
   "repository": {
     "type": "git",
     "url": "https://github.com/daviferreira/medium-editor"
