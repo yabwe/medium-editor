@@ -2127,11 +2127,38 @@ function MediumEditor(elements, options) {
         },
 
         execAction: function (action, e) {
-            if (action.indexOf('append-') > -1) {
-                this.execFormatBlock(action.replace('append-', ''));
+            /*jslint regexp: true*/
+            var fullAction = /^full-(.+)$/gi,
+                appendAction = /^append-(.+)$/gi,
+                justifyAction = /^justify(left|center|right|full)$/gi,
+                match;
+            /*jslint regexp: false*/
+
+            // Actions starting with 'full-' should be applied to to the entire contents of the editable element
+            // (ie full-bold, full-append-pre, etc.)
+            match = fullAction.exec(action);
+            if (match) {
+                // Store the current selection to be restored after applying the action
+                this.saveSelection();
+                // Select all of the contents before calling the action
+                this.selectAllContents();
+                this.execAction(match[1], e);
+                // Restore the previous selection
+                this.restoreSelection();
+                return;
+            }
+
+            // Actions starting with 'append-' should attempt to format a block of text ('formatBlock') using a specific
+            // type of block element (ie append-blockquote, append-h1, append-pre, etc.)
+            match = appendAction.exec(action);
+            if (match) {
+                this.execFormatBlock(match[1]);
                 this.setToolbarPosition();
                 this.setToolbarButtonStates();
-            } else if (action === 'anchor') {
+                return;
+            }
+
+            if (action === 'anchor') {
                 if (!this.options.disableAnchorForm) {
                     this.triggerAnchorAction(e);
                 }
@@ -2140,7 +2167,8 @@ function MediumEditor(elements, options) {
             } else {
                 this.options.ownerDocument.execCommand(action, false, null);
                 this.setToolbarPosition();
-                if (action.indexOf('justify') === 0) {
+                // Manually update the toolbar for text-alignment actions
+                if (justifyAction.test(action)) {
                     this.setToolbarButtonStates();
                 }
             }
@@ -2274,6 +2302,23 @@ function MediumEditor(elements, options) {
             this.delay(function () {
                 self.showToolbar();
             });
+        },
+
+        selectAllContents: function () {
+            var range = this.options.ownerDocument.createRange(),
+                sel = this.options.contentWindow.getSelection(),
+                currNode = meSelection.getSelectionElement(this.options.contentWindow);
+
+            if (currNode) {
+                // Move to the lowest descendant node that still selects all of the contents
+                while (currNode.children.length === 1) {
+                    currNode = currNode.children[0];
+                }
+
+                range.selectNodeContents(currNode);
+                sel.removeAllRanges();
+                sel.addRange(range);
+            }
         },
 
         // http://stackoverflow.com/questions/17678843/cant-restore-selection-after-html-modify-even-if-its-the-same-html
