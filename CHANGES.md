@@ -1,3 +1,7 @@
+2.4.3 / 2015-02-16
+* Introduce full content actions
+
+
 2.4.2 / 2015-02-15
 ==================
 * Fix disableDoubleReturn option
