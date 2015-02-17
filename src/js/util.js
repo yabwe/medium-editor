@@ -77,8 +77,8 @@ var mediumEditorUtil;
         },
 
         // https://github.com/jashkenas/underscore
-        isElement: function isElement(obj) {
-            return !!(obj && obj.nodeType === 1);
+        isElement: function isObj(obj) { 
+            !!(obj && obj.nodeType === 1)
         },
 
         now: function now() {
