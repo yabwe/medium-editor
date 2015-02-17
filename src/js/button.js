@@ -18,7 +18,8 @@ var DefaultButton,
             },
             useQueryState: true,
             contentDefault: '<b>B</b>',
-            contentFA: '<i class="fa fa-bold"></i>'
+            contentFA: '<i class="fa fa-bold"></i>',
+            key: 'b'
         },
         'italic': {
             name: 'italic',
@@ -31,7 +32,8 @@ var DefaultButton,
             },
             useQueryState: true,
             contentDefault: '<b><i>I</i></b>',
-            contentFA: '<i class="fa fa-italic"></i>'
+            contentFA: '<i class="fa fa-italic"></i>',
+            key: 'i'
         },
         'underline': {
             name: 'underline',
@@ -44,7 +46,8 @@ var DefaultButton,
             },
             useQueryState: true,
             contentDefault: '<b><u>U</u></b>',
-            contentFA: '<i class="fa fa-underline"></i>'
+            contentFA: '<i class="fa fa-underline"></i>',
+            key: 'u'
         },
         'strikethrough': {
             name: 'strikethrough',
