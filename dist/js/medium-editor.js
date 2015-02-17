@@ -1349,7 +1349,7 @@ function MediumEditor(elements, options) {
                                    meSelection.getSelectedParentElement(selection.getRangeAt(0)),
                         i;
 
-                    //This control was introduced also to avoid the toolbar
+                    // This control was introduced also to avoid the toolbar
                     // to disapper when selecting from right to left and
                     // the selection ends at the beginning of the text.
                     for (i = 0; i < self.elements.length; i += 1) {
