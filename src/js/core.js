@@ -204,7 +204,7 @@ function MediumEditor(elements, options) {
             var self = this,
                 blurFunction = function (e) {
                     var isDescendantOfEditorElements = false,
-                        selection = window.getSelection(),
+                        selection = self.options.contentWindow.getSelection(),
                         selRange = selection.isCollapsed ?
                                    null :
                                    meSelection.getSelectedParentElement(selection.getRangeAt(0)),
