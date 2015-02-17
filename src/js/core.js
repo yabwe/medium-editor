@@ -204,12 +204,18 @@ function MediumEditor(elements, options) {
             var self = this,
                 blurFunction = function (e) {
                     var isDescendantOfEditorElements = false,
-                        selRange = meSelection.getSelectedParentElement(window.getSelection().getRangeAt(0)),
+                        selection = window.getSelection(),
+                        selRange = selection.isCollapsed ?
+                                   null :
+                                   meSelection.getSelectedParentElement(selection.getRangeAt(0)),
                         i;
 
-                    //This control was introduced also to avoid the toolbar to disapper when selecting from right to left and the selection ends at the beginning of the text.                                     
+                    // This control was introduced also to avoid the toolbar
+                    // to disapper when selecting from right to left and
+                    // the selection ends at the beginning of the text.
                     for (i = 0; i < self.elements.length; i += 1) {
-                        if (mediumEditorUtil.isDescendant(self.elements[i], e.target) || mediumEditorUtil.isDescendant(self.elements[i], selRange)) {
+                        if (mediumEditorUtil.isDescendant(self.elements[i], e.target)
+                                || mediumEditorUtil.isDescendant(self.elements[i], selRange)) {
                             isDescendantOfEditorElements = true;
                             break;
                         }
