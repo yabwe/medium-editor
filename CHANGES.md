@@ -1,4 +1,10 @@
+2.4.5 / 2015-02-17
+=================
+* Fix main file reference in npm package
+
+
 2.4.3 / 2015-02-16
+=================
 * Introduce full content actions
 
 
