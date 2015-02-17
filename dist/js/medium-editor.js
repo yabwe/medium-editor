@@ -389,7 +389,8 @@ var DefaultButton,
             },
             useQueryState: true,
             contentDefault: '<b>B</b>',
-            contentFA: '<i class="fa fa-bold"></i>'
+            contentFA: '<i class="fa fa-bold"></i>',
+            key: 'b'
         },
         'italic': {
             name: 'italic',
@@ -402,7 +403,8 @@ var DefaultButton,
             },
             useQueryState: true,
             contentDefault: '<b><i>I</i></b>',
-            contentFA: '<i class="fa fa-italic"></i>'
+            contentFA: '<i class="fa fa-italic"></i>',
+            key: 'i'
         },
         'underline': {
             name: 'underline',
@@ -415,7 +417,8 @@ var DefaultButton,
             },
             useQueryState: true,
             contentDefault: '<b><u>U</u></b>',
-            contentFA: '<i class="fa fa-underline"></i>'
+            contentFA: '<i class="fa fa-underline"></i>',
+            key: 'u'
         },
         'strikethrough': {
             name: 'strikethrough',
@@ -710,6 +713,7 @@ var DefaultButton,
         }
     };
 }(window, document));
+
 var pasteHandler;
 
 (function (window, document) {
@@ -1584,11 +1588,12 @@ function MediumEditor(elements, options) {
         bindKeydown: function (index) {
             var self = this;
             this.on(this.elements[index], 'keydown', function (e) {
+                var node, tag, key;
 
                 if (e.which === mediumEditorUtil.keyCode.TAB) {
                     // Override tab only for pre nodes
-                    var node = meSelection.getSelectionStart(self.options.ownerDocument),
-                        tag = node && node.tagName.toLowerCase();
+                    node = meSelection.getSelectionStart(self.options.ownerDocument);
+                    tag = node && node.tagName.toLowerCase();
 
                     if (tag === 'pre') {
                         e.preventDefault();
@@ -1611,6 +1616,13 @@ function MediumEditor(elements, options) {
                     // Bind keys which can create or destroy a block element: backspace, delete, return
                     self.onBlockModifier(e);
 
+                } else if (e.ctrlKey) {
+                    key = String.fromCharCode(e.which || e.keyCode).toLowerCase();
+                    self.commands.forEach(function (extension) {
+                        if (extension.options.key && extension.options.key === key) {
+                            extension.handleClick(e);
+                        }
+                    });
                 }
             });
             return this;

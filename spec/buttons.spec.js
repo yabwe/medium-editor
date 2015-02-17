@@ -75,6 +75,16 @@ describe('Buttons TestCase', function () {
             fireEvent(button, 'click');
             expect(editor.execAction).toHaveBeenCalled();
         });
+
+        it('should execute the button action on shortcut', function () {
+            spyOn(MediumEditor.prototype, 'execAction');
+            var editor = new MediumEditor('.editor'),
+                code = 'b'.charCodeAt(0);
+            selectElementContentsAndFire(editor.elements[0]);
+            jasmine.clock().tick(1);
+            fireEvent(editor.elements[0], 'keydown', code, true);
+            expect(editor.execAction).toHaveBeenCalled();
+        });
     });
 
     describe('AppendEl', function () {

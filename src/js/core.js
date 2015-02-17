@@ -445,11 +445,12 @@ function MediumEditor(elements, options) {
         bindKeydown: function (index) {
             var self = this;
             this.on(this.elements[index], 'keydown', function (e) {
+                var node, tag, key;
 
                 if (e.which === mediumEditorUtil.keyCode.TAB) {
                     // Override tab only for pre nodes
-                    var node = meSelection.getSelectionStart(self.options.ownerDocument),
-                        tag = node && node.tagName.toLowerCase();
+                    node = meSelection.getSelectionStart(self.options.ownerDocument);
+                    tag = node && node.tagName.toLowerCase();
 
                     if (tag === 'pre') {
                         e.preventDefault();
@@ -472,6 +473,13 @@ function MediumEditor(elements, options) {
                     // Bind keys which can create or destroy a block element: backspace, delete, return
                     self.onBlockModifier(e);
 
+                } else if (e.ctrlKey) {
+                    key = String.fromCharCode(e.which || e.keyCode).toLowerCase();
+                    self.commands.forEach(function (extension) {
+                        if (extension.options.key && extension.options.key === key) {
+                            extension.handleClick(e);
+                        }
+                    });
                 }
             });
             return this;
