@@ -207,7 +207,6 @@ function MediumEditor(elements, options) {
                         selRange = meSelection.getSelectedParentElement(window.getSelection().getRangeAt(0)),
                         i;
     
-                    //Check also if the selection is in the editor, if so, we don't have to hide the toolbar. 
                     //This control was introduced also to avoid the toolbar to disapper when selecting from right to left and the selection ends at the beginning of the text.                                     
                     for (i = 0; i < self.elements.length; i += 1) {
                         if (mediumEditorUtil.isDescendant(self.elements[i], e.target) 
