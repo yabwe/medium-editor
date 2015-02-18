@@ -2143,7 +2143,8 @@ function MediumEditor(elements, options) {
         execAction: function (action, e) {
             /*jslint regexp: true*/
             var fullAction = /^full-(.+)$/gi,
-                match;
+                match,
+                result;
             /*jslint regexp: false*/
 
             // Actions starting with 'full-' should be applied to to the entire contents of the editable element
@@ -2154,14 +2155,15 @@ function MediumEditor(elements, options) {
                 this.saveSelection();
                 // Select all of the contents before calling the action
                 this.selectAllContents();
-                this.execActionInternal(match[1]);
+                result = this.execActionInternal(match[1]);
                 // Restore the previous selection
                 this.restoreSelection();
             } else {
-                this.execActionInternal(action);
+                result = this.execActionInternal(action);
             }
 
             this.checkSelection();
+            return result;
         },
 
         execActionInternal: function (action) {
@@ -2174,19 +2176,21 @@ function MediumEditor(elements, options) {
             // type of block element (ie append-blockquote, append-h1, append-pre, etc.)
             match = appendAction.exec(action);
             if (match) {
-                this.execFormatBlock(match[1]);
-                return;
+                return this.execFormatBlock(match[1]);
             }
 
             if (action === 'anchor') {
                 if (!this.options.disableAnchorForm) {
-                    this.triggerAnchorAction();
+                    return this.triggerAnchorAction();
                 }
-            } else if (action === 'image') {
-                this.options.ownerDocument.execCommand('insertImage', false, this.options.contentWindow.getSelection());
-            } else {
-                this.options.ownerDocument.execCommand(action, false, null);
+                return false;
             }
+
+            if (action === 'image') {
+                return this.options.ownerDocument.execCommand('insertImage', false, this.options.contentWindow.getSelection());
+            }
+
+            return this.options.ownerDocument.execCommand(action, false, null);
         },
 
         // Method to show an extension's form
@@ -2239,15 +2243,17 @@ function MediumEditor(elements, options) {
             var selectedParentElement = meSelection.getSelectedParentElement(this.selectionRange);
             if (selectedParentElement.tagName &&
                     selectedParentElement.tagName.toLowerCase() === 'a') {
-                this.options.ownerDocument.execCommand('unlink', false, null);
-            } else if (this.anchorExtension) {
+                return this.options.ownerDocument.execCommand('unlink', false, null);
+            }
+
+            if (this.anchorExtension) {
                 if (this.anchorExtension.isDisplayed()) {
                     this.showToolbarActions();
                 } else {
                     this.showAnchorForm();
                 }
             }
-            return this;
+            return false;
         },
 
         execFormatBlock: function (el) {
