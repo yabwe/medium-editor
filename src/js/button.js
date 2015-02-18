@@ -275,23 +275,12 @@ var DefaultButton,
         handleClick: function (evt) {
             evt.preventDefault();
             evt.stopPropagation();
-            var action = this.getAction();
-            if (!this.base.selection) {
-                this.base.checkSelection();
-            }
 
-            if (this.isActive()) {
-                this.deactivate();
-            } else {
-                this.activate();
-            }
+            var action = this.getAction();
 
             if (action) {
-                this.base.execAction(action, evt);
+                this.base.execAction(action);
             }
-            //if (this.options.form) {
-            //    this.base.showForm(this.form, evt);
-            //}
         },
         isActive: function () {
             return this.button.classList.contains(this.base.options.activeButtonClass);
@@ -320,6 +309,7 @@ var DefaultButton,
                 tagNames = this.getTagNames(),
                 styleVals,
                 computedStyle;
+
             if (this.knownState === false || this.knownState === true) {
                 return this.knownState;
             }

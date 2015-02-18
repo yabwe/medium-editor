@@ -646,23 +646,12 @@ var DefaultButton,
         handleClick: function (evt) {
             evt.preventDefault();
             evt.stopPropagation();
-            var action = this.getAction();
-            if (!this.base.selection) {
-                this.base.checkSelection();
-            }
 
-            if (this.isActive()) {
-                this.deactivate();
-            } else {
-                this.activate();
-            }
+            var action = this.getAction();
 
             if (action) {
-                this.base.execAction(action, evt);
+                this.base.execAction(action);
             }
-            //if (this.options.form) {
-            //    this.base.showForm(this.form, evt);
-            //}
         },
         isActive: function () {
             return this.button.classList.contains(this.base.options.activeButtonClass);
@@ -691,6 +680,7 @@ var DefaultButton,
                 tagNames = this.getTagNames(),
                 styleVals,
                 computedStyle;
+
             if (this.knownState === false || this.knownState === true) {
                 return this.knownState;
             }
@@ -2153,8 +2143,6 @@ function MediumEditor(elements, options) {
         execAction: function (action, e) {
             /*jslint regexp: true*/
             var fullAction = /^full-(.+)$/gi,
-                appendAction = /^append-(.+)$/gi,
-                justifyAction = /^justify(left|center|right|full)$/gi,
                 match;
             /*jslint regexp: false*/
 
@@ -2166,35 +2154,38 @@ function MediumEditor(elements, options) {
                 this.saveSelection();
                 // Select all of the contents before calling the action
                 this.selectAllContents();
-                this.execAction(match[1], e);
+                this.execActionInternal(match[1]);
                 // Restore the previous selection
                 this.restoreSelection();
-                return;
+            } else {
+                this.execActionInternal(action);
             }
+
+            this.checkSelection();
+        },
+
+        execActionInternal: function (action) {
+            /*jslint regexp: true*/
+            var appendAction = /^append-(.+)$/gi,
+                match;
+            /*jslint regexp: false*/
 
             // Actions starting with 'append-' should attempt to format a block of text ('formatBlock') using a specific
             // type of block element (ie append-blockquote, append-h1, append-pre, etc.)
             match = appendAction.exec(action);
             if (match) {
                 this.execFormatBlock(match[1]);
-                this.setToolbarPosition();
-                this.setToolbarButtonStates();
                 return;
             }
 
             if (action === 'anchor') {
                 if (!this.options.disableAnchorForm) {
-                    this.triggerAnchorAction(e);
+                    this.triggerAnchorAction();
                 }
             } else if (action === 'image') {
                 this.options.ownerDocument.execCommand('insertImage', false, this.options.contentWindow.getSelection());
             } else {
                 this.options.ownerDocument.execCommand(action, false, null);
-                this.setToolbarPosition();
-                // Manually update the toolbar for text-alignment actions
-                if (justifyAction.test(action)) {
-                    this.setToolbarButtonStates();
-                }
             }
         },
 
@@ -2242,6 +2233,9 @@ function MediumEditor(elements, options) {
         },
 
         triggerAnchorAction: function () {
+            if (!this.selection) {
+                this.checkSelection();
+            }
             var selectedParentElement = meSelection.getSelectedParentElement(this.selectionRange);
             if (selectedParentElement.tagName &&
                     selectedParentElement.tagName.toLowerCase() === 'a') {
