@@ -1,3 +1,8 @@
+2.4.6 / 2015-02-18
+=================
+* Add basic support to keyboard shortcuts
+
+
 2.4.5 / 2015-02-17
 =================
 * Fix main file reference in npm package
