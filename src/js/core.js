@@ -1010,9 +1010,8 @@ function MediumEditor(elements, options) {
         execAction: function (action, e) {
             /*jslint regexp: true*/
             var fullAction = /^full-(.+)$/gi,
-                appendAction = /^append-(.+)$/gi,
-                justifyAction = /^justify(left|center|right|full)$/gi,
-                match;
+                match,
+                result;
             /*jslint regexp: false*/
 
             // Actions starting with 'full-' should be applied to to the entire contents of the editable element
@@ -1023,36 +1022,42 @@ function MediumEditor(elements, options) {
                 this.saveSelection();
                 // Select all of the contents before calling the action
                 this.selectAllContents();
-                this.execAction(match[1], e);
+                result = this.execActionInternal(match[1]);
                 // Restore the previous selection
                 this.restoreSelection();
-                return;
+            } else {
+                result = this.execActionInternal(action);
             }
+
+            this.checkSelection();
+            return result;
+        },
+
+        execActionInternal: function (action) {
+            /*jslint regexp: true*/
+            var appendAction = /^append-(.+)$/gi,
+                match;
+            /*jslint regexp: false*/
 
             // Actions starting with 'append-' should attempt to format a block of text ('formatBlock') using a specific
             // type of block element (ie append-blockquote, append-h1, append-pre, etc.)
             match = appendAction.exec(action);
             if (match) {
-                this.execFormatBlock(match[1]);
-                this.setToolbarPosition();
-                this.setToolbarButtonStates();
-                return;
+                return this.execFormatBlock(match[1]);
             }
 
             if (action === 'anchor') {
                 if (!this.options.disableAnchorForm) {
-                    this.triggerAnchorAction(e);
+                    return this.triggerAnchorAction();
                 }
-            } else if (action === 'image') {
-                this.options.ownerDocument.execCommand('insertImage', false, this.options.contentWindow.getSelection());
-            } else {
-                this.options.ownerDocument.execCommand(action, false, null);
-                this.setToolbarPosition();
-                // Manually update the toolbar for text-alignment actions
-                if (justifyAction.test(action)) {
-                    this.setToolbarButtonStates();
-                }
+                return false;
             }
+
+            if (action === 'image') {
+                return this.options.ownerDocument.execCommand('insertImage', false, this.options.contentWindow.getSelection());
+            }
+
+            return this.options.ownerDocument.execCommand(action, false, null);
         },
 
         // Method to show an extension's form
@@ -1099,18 +1104,23 @@ function MediumEditor(elements, options) {
         },
 
         triggerAnchorAction: function () {
+            if (!this.selection) {
+                this.checkSelection();
+            }
             var selectedParentElement = meSelection.getSelectedParentElement(this.selectionRange);
             if (selectedParentElement.tagName &&
                     selectedParentElement.tagName.toLowerCase() === 'a') {
-                this.options.ownerDocument.execCommand('unlink', false, null);
-            } else if (this.anchorExtension) {
+                return this.options.ownerDocument.execCommand('unlink', false, null);
+            }
+
+            if (this.anchorExtension) {
                 if (this.anchorExtension.isDisplayed()) {
                     this.showToolbarActions();
                 } else {
                     this.showAnchorForm();
                 }
             }
-            return this;
+            return false;
         },
 
         execFormatBlock: function (el) {
