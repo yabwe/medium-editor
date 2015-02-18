@@ -1616,7 +1616,7 @@ function MediumEditor(elements, options) {
                     // Bind keys which can create or destroy a block element: backspace, delete, return
                     self.onBlockModifier(e);
 
-                } else if (e.ctrlKey) {
+                } else if (e.ctrlKey || e.metaKey) {
                     key = String.fromCharCode(e.which || e.keyCode).toLowerCase();
                     self.commands.forEach(function (extension) {
                         if (extension.options.key && extension.options.key === key) {
