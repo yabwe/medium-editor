@@ -211,7 +211,8 @@ module.exports = function (grunt) {
                 .concat(['src/wrappers/start.js'])
                 .concat(srcFiles)
                 .concat(['src/wrappers/end.js']),
-            dest: 'dist/js/<%= pkg.name %>.js'
+            dest: 'dist/js/<%= pkg.name %>.js',
+            nonull: true
         }
     };
 
