@@ -62,6 +62,7 @@ module.exports = function (grunt) {
                 browser: true,
                 unparam: true,
                 todo: true,
+                regexp: true,
                 debug: true
             }
         }
