@@ -56,6 +56,7 @@ module.exports = function (grunt) {
 
     gruntConfig.jslint = {
         client: {
+            exclude: ['src/js/polyfills.js'],
             src: ['src/js/**/*.js', 'spec/*.spec.js', 'Gruntfile.js'],
             directives: {
                 browser: true,
@@ -201,7 +202,8 @@ module.exports = function (grunt) {
             stripBanners: true
         },
         dist: {
-            src: ['src/wrappers/start.js']
+            src: ['src/js/polyfills.js']
+                .concat(['src/wrappers/start.js'])
                 .concat(srcFiles)
                 .concat(['src/wrappers/end.js']),
             dest: 'dist/js/<%= pkg.name %>.js'
