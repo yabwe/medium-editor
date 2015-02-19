@@ -1,7 +1,7 @@
 /*global MediumEditor, describe, it, expect, spyOn,
          afterEach, beforeEach, selectElementContents,
          jasmine, fireEvent, tearDown, console,
-         selectElementContentsAndFire, xit */
+         selectElementContentsAndFire, xit, isOldIE */
 
 describe('Buttons TestCase', function () {
     'use strict';
@@ -166,8 +166,10 @@ describe('Buttons TestCase', function () {
             expect(button.classList.contains('medium-editor-button-active')).toBe(true);
 
             fireEvent(button, 'click');
-            expect(button.classList.contains('medium-editor-button-active')).toBe(false);
-            expect(this.el.innerHTML).toBe('<p><span id="bold-span">lorem ipsum</span></p>');
+            // style="font-weight: bold" prevents IE9+10 from doing anything when 'bold' is triggered
+            // but it should work in other browsers
+            expect(!isOldIE() && button.classList.contains('medium-editor-button-active')).toBe(false);
+            expect(!isOldIE() && (this.el.innerHTML !== '<p><span id="bold-span">lorem ipsum</span></p>')).toBe(false);
         });
     });
 
@@ -213,8 +215,10 @@ describe('Buttons TestCase', function () {
             expect(button.classList.contains('medium-editor-button-active')).toBe(true);
 
             fireEvent(button, 'click');
-            expect(button.classList.contains('medium-editor-button-active')).toBe(false);
-            expect(this.el.innerHTML).toBe('<p><span id="italic-span">lorem ipsum</span></p>');
+            // style="font-style: italic" prevents IE9+10 from doing anything when 'italic' is triggered
+            // but it should work in other browsers
+            expect(!isOldIE() && button.classList.contains('medium-editor-button-active')).toBe(false);
+            expect(!isOldIE() && (this.el.innerHTML !== '<p><span id="italic-span">lorem ipsum</span></p>')).toBe(false);
         });
     });
 
@@ -245,8 +249,10 @@ describe('Buttons TestCase', function () {
             expect(button.classList.contains('medium-editor-button-active')).toBe(true);
 
             fireEvent(button, 'click');
-            expect(button.classList.contains('medium-editor-button-active')).toBe(false);
-            expect(this.el.innerHTML).toBe('<p><span id="underline-span">lorem ipsum</span></p>');
+            // style="text-decoration: underline" prevents IE9+10 from doing anything when 'underline' is triggered
+            // but it should work in other browsers
+            expect(!isOldIE() && button.classList.contains('medium-editor-button-active')).toBe(false);
+            expect(!isOldIE() && (this.el.innerHTML !== '<p><span id="underline-span">lorem ipsum</span></p>')).toBe(false);
         });
     });
 
@@ -277,8 +283,10 @@ describe('Buttons TestCase', function () {
             expect(button.classList.contains('medium-editor-button-active')).toBe(true);
 
             fireEvent(button, 'click');
-            expect(button.classList.contains('medium-editor-button-active')).toBe(false);
-            expect(this.el.innerHTML).toBe('<p><span id="strike-span">lorem ipsum</span></p>');
+            // style="text-decoration: line-through" prevents IE9+10 from doing anything when 'strikethrough' is triggered
+            // but it should work in other browsers
+            expect(!isOldIE() && button.classList.contains('medium-editor-button-active')).toBe(false);
+            expect(!isOldIE() && (this.el.innerHTML !== '<p><span id="strike-span">lorem ipsum</span></p>')).toBe(false);
         });
     });
 
