@@ -167,7 +167,7 @@ var pasteHandler;
             } else if (this.isCommonBlock(el.parentNode) && (el.parentNode.firstChild === el || el.parentNode.lastChild === el)) {
                 // remove br's just inside open or close tags of a div/p
                 el.parentNode.removeChild(el);
-            } else if (el.parentNode.childElementCount === 1) {
+            } else if (el.parentNode.childElementCount === 1 && el.parentNode.textContent === '') {
                 // and br's that are the only child of a div/p
                 this.removeWithParent(el);
             }
