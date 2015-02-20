@@ -196,14 +196,6 @@ var AnchorExtension;
 
         isDisplayed: function () {
             return this.getForm().style.display === 'block';
-        },
-
-        isClickIntoForm: function (event) {
-            return (event &&
-                event.type &&
-                event.type.toLowerCase() === 'blur' &&
-                event.relatedTarget &&
-                event.relatedTarget === this.getInput());
         }
     };
 }(window, document));
