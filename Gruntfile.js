@@ -80,14 +80,19 @@ module.exports = function (grunt) {
                 helpers: 'spec/helpers/*.js',
                 styles: 'dist/css/*.css',
                 junit: {
-                    path: "reports/jasmine/",
+                    path: 'reports/jasmine/',
                     consolidate: true
                 },
                 keepRunner: true,
                 template: require('grunt-template-jasmine-istanbul'),
                 templateOptions: {
                     coverage: 'reports/jasmine/coverage.json',
-                    report: 'coverage'
+                    report: {
+                        type: 'lcov',
+                        options: {
+                            dir: 'reports/jasmine/lcov'
+                        }
+                    }
                 },
                 summary: true
             }
@@ -241,6 +246,12 @@ module.exports = function (grunt) {
         }
     };
 
+    gruntConfig['coveralls'] =  {
+        dist: {
+            src: 'reports/jasmine/lcov/lcov.info'
+        }
+    };
+
     grunt.initConfig(gruntConfig);
 
     require('time-grunt')(grunt);
@@ -252,7 +263,7 @@ module.exports = function (grunt) {
     });
 
     grunt.registerTask('test', ['jslint', 'concat', 'jasmine:suite', 'csslint']);
-    grunt.registerTask('travis', ['connect', 'jslint', 'concat', 'jasmine:suite', 'csslint', 'saucelabs-jasmine']);
+    grunt.registerTask('travis', ['connect', 'jslint', 'concat', 'jasmine:suite', 'csslint', 'saucelabs-jasmine', 'coveralls']);
     grunt.registerTask('sauce', ['connect', 'saucelabs-jasmine']);
     grunt.registerTask('js', ['jslint', 'concat', 'jasmine:suite', 'uglify']);
     grunt.registerTask('css', ['sass', 'autoprefixer', 'cssmin', 'csslint']);
