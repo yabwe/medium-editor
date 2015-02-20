@@ -285,11 +285,11 @@ var DefaultButton,
         isActive: function () {
             return this.button.classList.contains(this.base.options.activeButtonClass);
         },
-        deactivate: function () {
+        setInactive: function () {
             this.button.classList.remove(this.base.options.activeButtonClass);
             delete this.knownState;
         },
-        activate: function () {
+        setActive: function () {
             this.button.classList.add(this.base.options.activeButtonClass);
             delete this.knownState;
         },
@@ -304,7 +304,7 @@ var DefaultButton,
             }
             return queryState;
         },
-        shouldActivate: function (node) {
+        isAlreadyApplied: function (node) {
             var isMatch = false,
                 tagNames = this.getTagNames(),
                 styleVals,

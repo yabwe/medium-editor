@@ -829,11 +829,11 @@ var DefaultButton,
         isActive: function () {
             return this.button.classList.contains(this.base.options.activeButtonClass);
         },
-        deactivate: function () {
+        setInactive: function () {
             this.button.classList.remove(this.base.options.activeButtonClass);
             delete this.knownState;
         },
-        activate: function () {
+        setActive: function () {
             this.button.classList.add(this.base.options.activeButtonClass);
             delete this.knownState;
         },
@@ -848,7 +848,7 @@ var DefaultButton,
             }
             return queryState;
         },
-        shouldActivate: function (node) {
+        isAlreadyApplied: function (node) {
             var isMatch = false,
                 tagNames = this.getTagNames(),
                 styleVals,
@@ -2218,8 +2218,8 @@ function MediumEditor(elements, options) {
 
         setToolbarButtonStates: function () {
             this.commands.forEach(function (extension) {
-                if (typeof extension.deactivate === 'function') {
-                    extension.deactivate();
+                if (typeof extension.isActive === 'function') {
+                    extension.setInactive();
                 }
             }.bind(this));
             this.checkActiveButtons();
@@ -2234,9 +2234,10 @@ function MediumEditor(elements, options) {
                 checkExtension = function (extension) {
                     if (typeof extension.checkState === 'function') {
                         extension.checkState(parentNode);
-                    } else if (typeof extension.isActive === 'function') {
-                        if (!extension.isActive() && extension.shouldActivate(parentNode)) {
-                            extension.activate();
+                    } else if (typeof extension.isActive === 'function' &&
+                               typeof extension.isAlreadyApplied === 'function') {
+                        if (!extension.isActive() && extension.isAlreadyApplied(parentNode)) {
+                            extension.setActive();
                         }
                     }
                 };
@@ -2250,7 +2251,7 @@ function MediumEditor(elements, options) {
                     // and don't need to do our manual checks
                     if (queryState !== null) {
                         if (queryState) {
-                            command.activate();
+                            command.setActive();
                         }
                         return;
                     }
