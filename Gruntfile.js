@@ -246,7 +246,7 @@ module.exports = function (grunt) {
         }
     };
 
-    gruntConfig['coveralls'] =  {
+    gruntConfig.coveralls =  {
         dist: {
             src: 'reports/jasmine/lcov/lcov.info'
         }
