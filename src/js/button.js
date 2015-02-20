@@ -282,16 +282,16 @@ var DefaultButton,
                 this.base.execAction(action);
             }
         },
-        isActive: function () {
+        isActive: function (setActive) {
+            if (typeof setActive === 'boolean') {
+                delete this.knownState;
+                if (setActive) {
+                    this.button.classList.add(this.base.options.activeButtonClass);
+                } else {
+                    this.button.classList.remove(this.base.options.activeButtonClass);
+                }
+            }
             return this.button.classList.contains(this.base.options.activeButtonClass);
-        },
-        deactivate: function () {
-            this.button.classList.remove(this.base.options.activeButtonClass);
-            delete this.knownState;
-        },
-        activate: function () {
-            this.button.classList.add(this.base.options.activeButtonClass);
-            delete this.knownState;
         },
         queryCommandState: function () {
             var queryState = null;
@@ -304,7 +304,7 @@ var DefaultButton,
             }
             return queryState;
         },
-        shouldActivate: function (node) {
+        isAlreadyApplied: function (node) {
             var isMatch = false,
                 tagNames = this.getTagNames(),
                 styleVals,
