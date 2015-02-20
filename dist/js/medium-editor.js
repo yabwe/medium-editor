@@ -1568,7 +1568,9 @@ var AnchorExtension;
             // Add save buton
             save.setAttribute('href', '#');
             save.className = 'medium-editor-toobar-save';
-            save.innerHTML = '&#10003;';
+            save.innerHTML = this.base.options.buttonLabels === 'fontawesome' ?
+                             '<i class="fa fa-check"></i>' :
+                             '&#10003;';
             form.appendChild(save);
 
             // Handle save button clicks (capture)
@@ -1581,7 +1583,9 @@ var AnchorExtension;
             // Add close button
             close.setAttribute('href', '#');
             close.className = 'medium-editor-toobar-close';
-            close.innerHTML = '&times;';
+            close.innerHTML = this.base.options.buttonLabels === 'fontawesome' ?
+                              '<i class="fa fa-times"></i>' :
+                              '&times;';
             form.appendChild(close);
 
             // Handle close button clicks
@@ -1651,6 +1655,7 @@ var AnchorExtension;
         }
     };
 }(window, document));
+
 function MediumEditor(elements, options) {
     'use strict';
     return this.init(elements, options);
