@@ -285,11 +285,13 @@ var DefaultButton,
         isActive: function () {
             return this.button.classList.contains(this.base.options.activeButtonClass);
         },
-        setActive: function () {
-            this.button.classList.add(this.base.options.activeButtonClass);
-        },
         setInactive: function () {
             this.button.classList.remove(this.base.options.activeButtonClass);
+            delete this.knownState;
+        },
+        setActive: function () {
+            this.button.classList.add(this.base.options.activeButtonClass);
+            delete this.knownState;
         },
         queryCommandState: function () {
             var queryState = null;
