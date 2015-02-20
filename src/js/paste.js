@@ -100,7 +100,10 @@ var pasteHandler;
                 elList = text.split('<br><br>');
 
                 this.pasteHTML('<p>' + elList.join('</p><p>') + '</p>', options.ownerDocument);
-                options.ownerDocument.execCommand('insertText', false, "\n");
+
+                try {
+                    options.ownerDocument.execCommand('insertText', false, "\n");
+                } catch (ignore) { }
 
                 // block element cleanup
                 elList = el.querySelectorAll('a,p,div,br');
