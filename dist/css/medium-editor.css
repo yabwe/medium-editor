@@ -15,7 +15,7 @@
   20% {
     -webkit-transform: matrix(0.99, 0, 0, 1, 0, 2);
             transform: matrix(0.99, 0, 0, 1, 0, 2);
-    opacity: .7; }
+    opacity: 0.7; }
 
   40% {
     -webkit-transform: matrix(1, 0, 0, 1, 0, -1);
@@ -41,7 +41,7 @@
   20% {
     -webkit-transform: matrix(0.99, 0, 0, 1, 0, 2);
             transform: matrix(0.99, 0, 0, 1, 0, 2);
-    opacity: .7; }
+    opacity: 0.7; }
 
   40% {
     -webkit-transform: matrix(1, 0, 0, 1, 0, -1);

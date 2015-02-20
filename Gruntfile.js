@@ -1,4 +1,4 @@
-/*global module, require*/
+/*global module, require, process*/
 
 module.exports = function (grunt) {
     'use strict';
@@ -20,15 +20,54 @@ module.exports = function (grunt) {
             'src/js/paste.js',
             'src/js/extension-anchor.js',
             'src/js/core.js'
-        ];
+        ],
+        browsers = [ {
+            browserName: "internet explorer",
+            version: "9",
+            platform: "WIN7"
+        }, {
+            browserName: "internet explorer",
+            version: "10",
+            platform: "WIN8"
+        }, {
+            browserName: "internet explorer",
+            version: "11",
+            platform: "WIN8.1"
+        }, {
+            browserName: "chrome",
+            platform: "WIN8.1"
+        }, {
+            browserName: "firefox",
+            platform: "WIN8.1"
+        }, {
+            browserName: "safari",
+            platform: "OS X 10.10"
+        }, {
+            browserName: "firefox",
+            platform: "OS X 10.10"
+        }, {
+            browserName: "googlechrome",
+            platform: "OS X 10.10"
+        }];
+
+    gruntConfig.connect = {
+        server: {
+            options: {
+                base: '',
+                port: 9999
+            }
+        }
+    };
 
     gruntConfig.jslint = {
         client: {
-            src: ['src/js/**/*.js', 'spec/*.js', 'Gruntfile.js'],
+            exclude: ['src/js/polyfills.js'],
+            src: ['src/js/**/*.js', 'spec/*.spec.js', 'Gruntfile.js'],
             directives: {
                 browser: true,
                 unparam: true,
                 todo: true,
+                regexp: true,
                 debug: true
             }
         }
@@ -36,9 +75,9 @@ module.exports = function (grunt) {
 
     gruntConfig.jasmine = {
         suite: {
-            src: 'dist/js/medium-editor.js',
+            src: ['dist/js/medium-editor.js', 'spec/jasmine-jsreporter.js'],
             options: {
-                specs: 'spec/*.spec.js',
+                specs: ['spec/*.spec.js', 'spec/jasmine-jsreporter-script.js'],
                 helpers: 'spec/helpers/*.js',
                 styles: 'dist/css/*.css',
                 junit: {
@@ -169,10 +208,12 @@ module.exports = function (grunt) {
             stripBanners: true
         },
         dist: {
-            src: ['src/wrappers/start.js']
+            src: ['src/js/polyfills.js']
+                .concat(['src/wrappers/start.js'])
                 .concat(srcFiles)
                 .concat(['src/wrappers/end.js']),
-            dest: 'dist/js/<%= pkg.name %>.js'
+            dest: 'dist/js/<%= pkg.name %>.js',
+            nonull: true
         }
     };
 
@@ -180,6 +221,23 @@ module.exports = function (grunt) {
         feed: {
             files: {
                 'reports/plato': srcFiles
+            }
+        }
+    };
+
+    gruntConfig['saucelabs-jasmine'] = {
+        all: {
+            options: {
+                urls: ['http://127.0.0.1:9999/_SpecRunner.html'],
+                tunnelTimeout: 5,
+                build: process.env.TRAVIS_JOB_ID,
+                concurrency: 3,
+                browsers: browsers,
+                sauceConfig: {
+                    'public': 'public',
+                    build: process.env.TRAVIS_JOB_ID,
+                    name: 'medium-editor-tests'
+                }
             }
         }
     };
@@ -195,6 +253,8 @@ module.exports = function (grunt) {
     });
 
     grunt.registerTask('test', ['jslint', 'concat', 'jasmine:suite', 'csslint']);
+    grunt.registerTask('travis', ['connect', 'jslint', 'concat', 'jasmine:suite', 'csslint', 'saucelabs-jasmine']);
+    grunt.registerTask('sauce', ['connect', 'saucelabs-jasmine']);
     grunt.registerTask('js', ['jslint', 'concat', 'jasmine:suite', 'uglify']);
     grunt.registerTask('css', ['sass', 'autoprefixer', 'cssmin', 'csslint']);
     grunt.registerTask('default', ['js', 'css']);

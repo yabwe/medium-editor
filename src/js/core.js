@@ -179,7 +179,7 @@ function MediumEditor(elements, options) {
             // Init toolbar
             if (addToolbar) {
                 this.initToolbar()
-                    .bindButtons()
+                    .setFirstAndLastButtons()
                     .bindAnchorPreview();
             }
             return this;
@@ -552,30 +552,29 @@ function MediumEditor(elements, options) {
         },
 
         bindSelect: function () {
-            var self = this,
-                i,
-                timeoutHelper;
+            var i,
+                blurHelper = function (event) {
+                    // Do not close the toolbar when bluring the editable area and clicking into the anchor form
+                    if (event &&
+                            event.type &&
+                            event.type.toLowerCase() === 'blur' &&
+                            event.relatedTarget &&
+                            mediumEditorUtil.isDescendant(this.toolbar, event.relatedTarget)) {
+                        return false;
+                    }
+                    this.checkSelection();
+                }.bind(this),
+                timeoutHelper = function () {
+                    setTimeout(function () {
+                        this.checkSelection();
+                    }.bind(this), 0);
+                }.bind(this);
 
-            this.checkSelectionWrapper = function (e) {
-                // Do not close the toolbar when bluring the editable area and clicking into the anchor form
-                if (e && this.anchorExtension && this.anchorExtension.isClickIntoForm(e)) {
-                    return false;
-                }
-
-                self.checkSelection();
-            };
-
-            timeoutHelper = function (event) {
-                setTimeout(function () {
-                    this.checkSelectionWrapper(event);
-                }.bind(this), 0);
-            }.bind(this);
-
-            this.on(this.options.ownerDocument.documentElement, 'mouseup', this.checkSelectionWrapper);
+            this.on(this.options.ownerDocument.documentElement, 'mouseup', this.checkSelection.bind(this));
 
             for (i = 0; i < this.elements.length; i += 1) {
-                this.on(this.elements[i], 'keyup', this.checkSelectionWrapper);
-                this.on(this.elements[i], 'blur', this.checkSelectionWrapper);
+                this.on(this.elements[i], 'keyup', this.checkSelection.bind(this));
+                this.on(this.elements[i], 'blur', blurHelper);
                 this.on(this.elements[i], 'click', timeoutHelper);
             }
 
@@ -832,27 +831,6 @@ function MediumEditor(elements, options) {
             }
 
             return this.options.ownerDocument.execCommand(action, false, null);
-        },
-
-        // Method to show an extension's form
-        // TO DO: Improve this
-        showForm: function (formId, e) {
-            this.toolbarActions.style.display = 'none';
-            this.saveSelection();
-            var form = document.getElementById(formId);
-            form.style.display = 'block';
-            this.setToolbarPosition();
-            this.keepToolbarAlive = true;
-        },
-
-        // Method to show an extension's form
-        // TO DO: Improve this
-        hideForm: function (form, e) {
-            var el = document.getElementById(form.id);
-            el.style.display = 'none';
-            this.showToolbarActions();
-            this.setToolbarPosition();
-            this.restoreSelection();
         },
 
         // TODO: move these two methods to selection.js

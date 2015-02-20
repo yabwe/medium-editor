@@ -58,3 +58,10 @@ function tearDown(el) {
     document.body.removeChild(el);
     sel.removeAllRanges();
 }
+
+function isOldIE() {
+    return (
+        navigator.appName.indexOf("Internet Explorer") != -1
+        && (navigator.appVersion.indexOf("MSIE 9") != -1 || navigator.appVersion.indexOf("MSIE 10") != -1)
+    );
+}
