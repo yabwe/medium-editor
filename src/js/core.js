@@ -253,7 +253,7 @@ function MediumEditor(elements, options) {
                 }
 
                 if (self.options.staticToolbar) {
-                    self.setToolbarPosition();
+                    self.toolbar.setToolbarPosition();
                 }
             });
 
@@ -697,8 +697,8 @@ function MediumEditor(elements, options) {
                     if (!this.options.staticToolbar) {
                         this.toolbar.hideToolbarActions();
                     } else if (this.anchorExtension && this.anchorExtension.isDisplayed()) {
-                        this.setToolbarButtonStates();
-                        this.showToolbarActions();
+                        this.toolbar.setToolbarButtonStates();
+                        this.toolbar.showToolbarActions();
                     }
 
                 } else {
@@ -766,9 +766,9 @@ function MediumEditor(elements, options) {
 
             for (i = 0; i < this.elements.length; i += 1) {
                 if (this.elements[i] === selectionElement) {
-                    this.setToolbarButtonStates()
-                        .setToolbarPosition()
-                        .showToolbarActions();
+                    this.toolbar.setToolbarButtonStates()
+                        .toolbar.setToolbarPosition()
+                        .toolbar.showToolbarActions();
                     return;
                 }
             }
@@ -819,7 +819,7 @@ function MediumEditor(elements, options) {
 
             if (action === 'anchor') {
                 if (!this.options.disableAnchorForm) {
-                    return this.triggerAnchorAction();
+                    return this.toolbar.triggerAnchorAction();
                 }
                 return false;
             }

@@ -153,7 +153,7 @@ function Toolbar(editor) {
         },
 
         setToolbarButtonStates: function () {
-            this.commands.forEach(function (extension) {
+            this.base.commands.forEach(function (extension) {
                 if (typeof extension.deactivate === 'function') {
                     extension.deactivate();
                 }
@@ -166,7 +166,7 @@ function Toolbar(editor) {
             var elements = Array.prototype.slice.call(this.elements),
                 manualStateChecks = [],
                 queryState = null,
-                parentNode = meSelection.getSelectedParentElement(this.selectionRange),
+                parentNode = meSelection.getSelectedParentElement(this.base.selectionRange),
                 checkExtension = function (extension) {
                     if (typeof extension.checkState === 'function') {
                         extension.checkState(parentNode);
@@ -178,7 +178,7 @@ function Toolbar(editor) {
                 };
 
             // Loop through all commands
-            this.commands.forEach(function (command) {
+            this.base.commands.forEach(function (command) {
                 // For those commands where we can use document.queryCommandState(), do so
                 if (typeof command.queryCommandState === 'function') {
                     queryState = command.queryCommandState();
@@ -495,10 +495,10 @@ function Toolbar(editor) {
         },
 
         triggerAnchorAction: function () {
-            if (!this.selection) {
-                this.checkSelection();
+            if (!this.base.selection) {
+                this.base.checkSelection();
             }
-            var selectedParentElement = meSelection.getSelectedParentElement(this.selectionRange);
+            var selectedParentElement = meSelection.getSelectedParentElement(this.base.selectionRange);
             if (selectedParentElement.tagName &&
                     selectedParentElement.tagName.toLowerCase() === 'a') {
                 return this.options.ownerDocument.execCommand('unlink', false, null);
