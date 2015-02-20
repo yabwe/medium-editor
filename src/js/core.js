@@ -178,7 +178,7 @@ function MediumEditor(elements, options) {
             // Init toolbar
             if (addToolbar) {
                 this.initToolbar()
-                    .bindButtons()
+                    .setFirstAndLastButtons()
                     .bindAnchorPreview();
             }
             return this;
@@ -550,8 +550,6 @@ function MediumEditor(elements, options) {
             this.toolbarActions = this.toolbar.querySelector('.medium-editor-toolbar-actions');
             this.anchorPreview = this.createAnchorPreview();
 
-            this.addExtensionForms();
-
             return this;
         },
 
@@ -598,23 +596,6 @@ function MediumEditor(elements, options) {
             }.bind(this));
 
             return ul;
-        },
-
-        addExtensionForms: function () {
-            var form,
-                id;
-
-            this.commands.forEach(function (extension) {
-                if (extension.hasForm) {
-                    form = (typeof extension.getForm === 'function') ? extension.getForm() : null;
-                }
-                if (form) {
-                    id = 'medium-editor-toolbar-form-' + extension.name + '-' + this.id;
-                    form.className += ' medium-editor-toolbar-form';
-                    form.id = id;
-                    this.toolbar.appendChild(form);
-                }
-            }.bind(this));
         },
 
         bindSelect: function () {
@@ -975,7 +956,6 @@ function MediumEditor(elements, options) {
 
             // Climb up the DOM and do manual checks for whether a certain command is currently enabled for this node
             while (parentNode.tagName !== undefined && mediumEditorUtil.parentElements.indexOf(parentNode.tagName.toLowerCase) === -1) {
-                this.activateButton(parentNode.tagName.toLowerCase());
                 manualStateChecks.forEach(checkExtension.bind(this));
 
                 // we can abort the search upwards if we leave the contentEditable element
@@ -986,21 +966,9 @@ function MediumEditor(elements, options) {
             }
         },
 
-        activateButton: function (tag) {
-            var el = this.toolbar.querySelector('[data-element="' + tag + '"]');
-            if (el !== null && !el.classList.contains(this.options.activeButtonClass)) {
-                el.classList.add(this.options.activeButtonClass);
-            }
-        },
-
-        bindButtons: function () {
-            this.setFirstAndLastItems(this.toolbar.querySelectorAll('button'));
-            return this;
-        },
-
-        setFirstAndLastItems: function (buttons) {
+        setFirstAndLastButtons: function () {
+            var buttons = this.toolbar.querySelectorAll('button');
             if (buttons.length > 0) {
-
                 buttons[0].className += ' ' + this.options.firstButtonClass;
                 buttons[buttons.length - 1].className += ' ' + this.options.lastButtonClass;
             }
@@ -1058,27 +1026,6 @@ function MediumEditor(elements, options) {
             }
 
             return this.options.ownerDocument.execCommand(action, false, null);
-        },
-
-        // Method to show an extension's form
-        // TO DO: Improve this
-        showForm: function (formId, e) {
-            this.toolbarActions.style.display = 'none';
-            this.saveSelection();
-            var form = document.getElementById(formId);
-            form.style.display = 'block';
-            this.setToolbarPosition();
-            this.keepToolbarAlive = true;
-        },
-
-        // Method to show an extension's form
-        // TO DO: Improve this
-        hideForm: function (form, e) {
-            var el = document.getElementById(form.id);
-            el.style.display = 'none';
-            this.showToolbarActions();
-            this.setToolbarPosition();
-            this.restoreSelection();
         },
 
         // TODO: move these two methods to selection.js
