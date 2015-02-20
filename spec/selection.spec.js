@@ -35,13 +35,13 @@ describe('Selection TestCase', function () {
 
             // Underline entire element
             selectElementContents(editor.elements[0]);
-            button = editor.toolbar.querySelector('[data-action="underline"]');
+            button = editor.toolbar.el.querySelector('[data-action="underline"]');
             fireEvent(button, 'click');
 
             // Restore selection back to <i> tag and add a <strike> tag
             regex = new RegExp("^<u>lorem (<i><strike>|<strike><i>)ipsum(</i></strike>|</strike></i>) dolor</u>$");
             editor.restoreSelection();
-            button = editor.toolbar.querySelector('[data-action="strikethrough"]');
+            button = editor.toolbar.el.querySelector('[data-action="strikethrough"]');
             fireEvent(button, 'click');
             expect(regex.test(editor.elements[0].innerHTML)).toBe(true);
         });
@@ -78,11 +78,11 @@ describe('Selection TestCase', function () {
                 spyOn(MediumEditor.prototype, 'setToolbarButtonStates').and.callThrough();
                 spyOn(MediumEditor.prototype, 'showToolbarActions').and.callThrough();
                 var editor = new MediumEditor('.editor');
-                editor.toolbar.style.display = 'block';
-                editor.toolbar.classList.add('medium-editor-toolbar-active');
-                expect(editor.toolbar.classList.contains('medium-editor-toolbar-active')).toBe(true);
+                editor.toolbar.el.style.display = 'block';
+                editor.toolbar.el.classList.add('medium-editor-toolbar-active');
+                expect(editor.toolbar.el.classList.contains('medium-editor-toolbar-active')).toBe(true);
                 editor.checkSelection();
-                expect(editor.toolbar.classList.contains('medium-editor-toolbar-active')).toBe(false);
+                expect(editor.toolbar.el.classList.contains('medium-editor-toolbar-active')).toBe(false);
                 expect(editor.setToolbarPosition).not.toHaveBeenCalled();
                 expect(editor.setToolbarButtonStates).not.toHaveBeenCalled();
                 expect(editor.showToolbarActions).not.toHaveBeenCalled();
@@ -90,10 +90,10 @@ describe('Selection TestCase', function () {
 
             it('should show the toolbar when something is selected', function () {
                 var editor = new MediumEditor('.editor');
-                expect(editor.toolbar.classList.contains('medium-editor-toolbar-active')).toBe(false);
+                expect(editor.toolbar.el.classList.contains('medium-editor-toolbar-active')).toBe(false);
                 selectElementContentsAndFire(this.el);
                 jasmine.clock().tick(501);
-                expect(editor.toolbar.classList.contains('medium-editor-toolbar-active')).toBe(true);
+                expect(editor.toolbar.el.classList.contains('medium-editor-toolbar-active')).toBe(true);
             });
 
             it('should update toolbar position and button states when something is selected', function () {

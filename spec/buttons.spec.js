@@ -25,7 +25,7 @@ describe('Buttons TestCase', function () {
                 editor = new MediumEditor('.editor');
             selectElementContentsAndFire(editor.elements[0]);
             jasmine.clock().tick(1);
-            button = editor.toolbar.querySelector('[data-action="bold"]');
+            button = editor.toolbar.el.querySelector('[data-action="bold"]');
             fireEvent(button, 'click');
             expect(button.className).toContain('medium-editor-button-active');
         });
@@ -36,7 +36,7 @@ describe('Buttons TestCase', function () {
                 editor = new MediumEditor('.editor');
             selectElementContentsAndFire(editor.elements[0]);
             jasmine.clock().tick(1);
-            button = editor.toolbar.querySelector('[data-action="bold"]');
+            button = editor.toolbar.el.querySelector('[data-action="bold"]');
             editor.selection = undefined;
             fireEvent(button, 'click');
             expect(editor.checkSelection).toHaveBeenCalled();
@@ -48,7 +48,7 @@ describe('Buttons TestCase', function () {
                 editor = new MediumEditor('.editor');
             selectElementContentsAndFire(editor.elements[0]);
             jasmine.clock().tick(11); // checkSelection delay
-            button = editor.toolbar.querySelector('[data-action="bold"]');
+            button = editor.toolbar.el.querySelector('[data-action="bold"]');
             expect(button.className).toContain('medium-editor-button-active');
             fireEvent(button, 'click');
             expect(button.className).not.toContain('medium-editor-button-active');
@@ -60,7 +60,7 @@ describe('Buttons TestCase', function () {
                 editor = new MediumEditor('.editor');
             selectElementContentsAndFire(editor.elements[0]);
             jasmine.clock().tick(1);
-            button = editor.toolbar.querySelector('[data-action="bold"]');
+            button = editor.toolbar.el.querySelector('[data-action="bold"]');
             fireEvent(button, 'click');
             expect(editor.execAction).toHaveBeenCalled();
         });
@@ -71,7 +71,7 @@ describe('Buttons TestCase', function () {
                 editor = new MediumEditor('.editor');
             selectElementContentsAndFire(editor.elements[0]);
             jasmine.clock().tick(1);
-            button = editor.toolbar.querySelector('[data-action="bold"]');
+            button = editor.toolbar.el.querySelector('[data-action="bold"]');
             fireEvent(button, 'click');
             expect(editor.execAction).toHaveBeenCalled();
         });
@@ -94,7 +94,7 @@ describe('Buttons TestCase', function () {
                 editor = new MediumEditor('.editor');
             selectElementContentsAndFire(editor.elements[0]);
             jasmine.clock().tick(1);
-            button = editor.toolbar.querySelector('[data-action="append-h3"]');
+            button = editor.toolbar.el.querySelector('[data-action="append-h3"]');
             fireEvent(button, 'click');
             expect(editor.execFormatBlock).toHaveBeenCalled();
         });
@@ -105,7 +105,7 @@ describe('Buttons TestCase', function () {
                 editor = new MediumEditor('.editor');
             selectElementContentsAndFire(editor.elements[0]);
             jasmine.clock().tick(1);
-            button = editor.toolbar.querySelector('[data-action="append-h3"]');
+            button = editor.toolbar.el.querySelector('[data-action="append-h3"]');
             fireEvent(button, 'click');
             // depending on the styling you have,
             // IE might strip the <b> out when it applies the H3 here.
@@ -119,7 +119,7 @@ describe('Buttons TestCase', function () {
                 editor = new MediumEditor('.editor');
             selectElementContentsAndFire(editor.elements[0].firstChild);
             jasmine.clock().tick(1);
-            button = editor.toolbar.querySelector('[data-action="append-h3"]');
+            button = editor.toolbar.el.querySelector('[data-action="append-h3"]');
             fireEvent(button, 'click');
             expect(this.el.innerHTML).toBe('<p><b>lorem ipsum</b></p>');
         });
@@ -128,7 +128,7 @@ describe('Buttons TestCase', function () {
     describe('First and Last', function () {
         it('should add a special class to the first and last buttons', function () {
             var editor = new MediumEditor('.editor'),
-                buttons = editor.toolbar.querySelectorAll('button');
+                buttons = editor.toolbar.el.querySelectorAll('button');
             expect(buttons[0].className).toContain('medium-editor-button-first');
             expect(buttons[1].className).not.toContain('medium-editor-button-first');
             expect(buttons[1].className).not.toContain('medium-editor-button-last');
@@ -141,7 +141,7 @@ describe('Buttons TestCase', function () {
             var editor = new MediumEditor('.editor', {
                     buttons: ['bold']
                 }),
-                button = editor.toolbar.querySelector('[data-action="bold"]');
+                button = editor.toolbar.el.querySelector('[data-action="bold"]');
 
             this.el.innerHTML = '<b>lorem ipsum</b>';
             selectElementContentsAndFire(editor.elements[0]);
@@ -159,7 +159,7 @@ describe('Buttons TestCase', function () {
             var editor = new MediumEditor('.editor', {
                     buttons: ['bold']
                 }),
-                button = editor.toolbar.querySelector('[data-action="bold"]');
+                button = editor.toolbar.el.querySelector('[data-action="bold"]');
 
             this.el.innerHTML = '<p><span id="bold-span" style="font-weight: bold">lorem ipsum</span></p>';
             selectElementContentsAndFire(document.getElementById('bold-span'));
@@ -179,7 +179,7 @@ describe('Buttons TestCase', function () {
             var button,
                 editor = new MediumEditor('.editor');
             selectElementContentsAndFire(editor.elements[0]);
-            button = editor.toolbar.querySelector('[data-action="italic"]');
+            button = editor.toolbar.el.querySelector('[data-action="italic"]');
             fireEvent(button, 'click');
             expect(document.execCommand).toHaveBeenCalled();
             // IE won't generate an `<i>` tag here. it generates an `<em>`:
@@ -190,7 +190,7 @@ describe('Buttons TestCase', function () {
             var editor = new MediumEditor('.editor', {
                     buttons: ['italic']
                 }),
-                button = editor.toolbar.querySelector('[data-action="italic"]');
+                button = editor.toolbar.el.querySelector('[data-action="italic"]');
 
             this.el.innerHTML = '<i>lorem ipsum</i>';
             selectElementContentsAndFire(editor.elements[0]);
@@ -208,7 +208,7 @@ describe('Buttons TestCase', function () {
             var editor = new MediumEditor('.editor', {
                     buttons: ['italic']
                 }),
-                button = editor.toolbar.querySelector('[data-action="italic"]');
+                button = editor.toolbar.el.querySelector('[data-action="italic"]');
 
             this.el.innerHTML = '<p><span id="italic-span" style="font-style: italic">lorem ipsum</span></p>';
             selectElementContentsAndFire(document.getElementById('italic-span'));
@@ -227,7 +227,7 @@ describe('Buttons TestCase', function () {
             var editor = new MediumEditor('.editor', {
                     buttons: ['underline']
                 }),
-                button = editor.toolbar.querySelector('[data-action="underline"]');
+                button = editor.toolbar.el.querySelector('[data-action="underline"]');
 
             this.el.innerHTML = '<u>lorem ipsum</u>';
             selectElementContentsAndFire(editor.elements[0]);
@@ -242,7 +242,7 @@ describe('Buttons TestCase', function () {
             var editor = new MediumEditor('.editor', {
                     buttons: ['underline']
                 }),
-                button = editor.toolbar.querySelector('[data-action="underline"]');
+                button = editor.toolbar.el.querySelector('[data-action="underline"]');
 
             this.el.innerHTML = '<p><span id="underline-span" style="text-decoration: underline">lorem ipsum</span></p>';
             selectElementContentsAndFire(document.getElementById('underline-span'));
@@ -261,7 +261,7 @@ describe('Buttons TestCase', function () {
             var editor = new MediumEditor('.editor', {
                     buttons: ['strikethrough']
                 }),
-                button = editor.toolbar.querySelector('[data-action="strikethrough"]');
+                button = editor.toolbar.el.querySelector('[data-action="strikethrough"]');
 
             this.el.innerHTML = '<strike>lorem ipsum</strike>';
             selectElementContentsAndFire(editor.elements[0]);
@@ -276,7 +276,7 @@ describe('Buttons TestCase', function () {
             var editor = new MediumEditor('.editor', {
                     buttons: ['strikethrough']
                 }),
-                button = editor.toolbar.querySelector('[data-action="strikethrough"]');
+                button = editor.toolbar.el.querySelector('[data-action="strikethrough"]');
 
             this.el.innerHTML = '<p><span id="strike-span" style="text-decoration: line-through">lorem ipsum</span></p>';
             selectElementContentsAndFire(document.getElementById('strike-span'));
@@ -295,7 +295,7 @@ describe('Buttons TestCase', function () {
             var editor = new MediumEditor('.editor', {
                     buttons: ['superscript']
                 }),
-                button = editor.toolbar.querySelector('[data-action="superscript"]');
+                button = editor.toolbar.el.querySelector('[data-action="superscript"]');
 
             this.el.innerHTML = '<sup>lorem ipsum</sub>';
             selectElementContentsAndFire(editor.elements[0]);
@@ -312,7 +312,7 @@ describe('Buttons TestCase', function () {
             var editor = new MediumEditor('.editor', {
                     buttons: ['subscript']
                 }),
-                button = editor.toolbar.querySelector('[data-action="subscript"]');
+                button = editor.toolbar.el.querySelector('[data-action="subscript"]');
 
             this.el.innerHTML = '<sub>lorem ipsum</sub>';
             selectElementContentsAndFire(editor.elements[0]);
@@ -329,7 +329,7 @@ describe('Buttons TestCase', function () {
             var editor = new MediumEditor('.editor', {
                     buttons: ['anchor']
                 }),
-                button = editor.toolbar.querySelector('[data-action="anchor"]');
+                button = editor.toolbar.el.querySelector('[data-action="anchor"]');
 
             this.el.innerHTML = '<p><span id="span-lorem">lorem</span> <a href="#" id="link">ipsum</a></p>';
             selectElementContentsAndFire(document.getElementById('link'));
@@ -344,7 +344,7 @@ describe('Buttons TestCase', function () {
             var button,
                 editor = new MediumEditor('.editor');
             selectElementContentsAndFire(editor.elements[0]);
-            button = editor.toolbar.querySelector('[data-action="anchor"]');
+            button = editor.toolbar.el.querySelector('[data-action="anchor"]');
             fireEvent(button, 'click');
             expect(editor.triggerAnchorAction).toHaveBeenCalled();
         });
@@ -355,7 +355,7 @@ describe('Buttons TestCase', function () {
             var editor = new MediumEditor('.editor', {
                     buttons: ['quote']
                 }),
-                button = editor.toolbar.querySelector('[data-action="append-blockquote"]');
+                button = editor.toolbar.el.querySelector('[data-action="append-blockquote"]');
 
             this.el.innerHTML = '<span id="span-lorem">lorem ipsum</span>';
             selectElementContentsAndFire(document.getElementById('span-lorem'));
@@ -372,18 +372,18 @@ describe('Buttons TestCase', function () {
             var editor = new MediumEditor('.editor', {
                     buttons: ['orderedlist', 'unorderedlist']
                 }),
-                button = editor.toolbar.querySelector('[data-action="insertorderedlist"]');
+                button = editor.toolbar.el.querySelector('[data-action="insertorderedlist"]');
 
             this.el.innerHTML = '<ol><li id="li-lorem">lorem ipsum</li></ol>';
             selectElementContentsAndFire(document.getElementById('li-lorem'));
             expect(button.classList.contains('medium-editor-button-active')).toBe(true);
             // Unordered list should not be active
-            expect(editor.toolbar.querySelector('[data-action="insertunorderedlist"]').classList.contains('medium-editor-button-active')).toBe(false);
+            expect(editor.toolbar.el.querySelector('[data-action="insertunorderedlist"]').classList.contains('medium-editor-button-active')).toBe(false);
 
             fireEvent(button, 'click');
             expect(button.classList.contains('medium-editor-button-active')).toBe(false);
             // Unordered list should not be active
-            expect(editor.toolbar.querySelector('[data-action="insertunorderedlist"]').classList.contains('medium-editor-button-active')).toBe(false);
+            expect(editor.toolbar.el.querySelector('[data-action="insertunorderedlist"]').classList.contains('medium-editor-button-active')).toBe(false);
         });
     });
 
@@ -392,18 +392,18 @@ describe('Buttons TestCase', function () {
             var editor = new MediumEditor('.editor', {
                     buttons: ['unorderedlist', 'orderedlist']
                 }),
-                button = editor.toolbar.querySelector('[data-action="insertunorderedlist"]');
+                button = editor.toolbar.el.querySelector('[data-action="insertunorderedlist"]');
 
             this.el.innerHTML = '<ul><li id="li-lorem">lorem ipsum</li></ul>';
             selectElementContentsAndFire(document.getElementById('li-lorem'));
             expect(button.classList.contains('medium-editor-button-active')).toBe(true);
             // Ordered list button should not be active
-            expect(editor.toolbar.querySelector('[data-action="insertorderedlist"]').classList.contains('medium-editor-button-active')).toBe(false);
+            expect(editor.toolbar.el.querySelector('[data-action="insertorderedlist"]').classList.contains('medium-editor-button-active')).toBe(false);
 
             fireEvent(button, 'click');
             expect(button.classList.contains('medium-editor-button-active')).toBe(false);
             // Ordered list button should not be active
-            expect(editor.toolbar.querySelector('[data-action="insertorderedlist"]').classList.contains('medium-editor-button-active')).toBe(false);
+            expect(editor.toolbar.el.querySelector('[data-action="insertorderedlist"]').classList.contains('medium-editor-button-active')).toBe(false);
         });
     });
 
@@ -412,7 +412,7 @@ describe('Buttons TestCase', function () {
             var editor = new MediumEditor('.editor', {
                     buttons: ['pre']
                 }),
-                button = editor.toolbar.querySelector('[data-action="append-pre"]');
+                button = editor.toolbar.el.querySelector('[data-action="append-pre"]');
 
             this.el.innerHTML = '<pre><span id="span-lorem">lorem ipsum</span></pre>';
             selectElementContentsAndFire(document.getElementById('span-lorem'));
@@ -433,10 +433,10 @@ describe('Buttons TestCase', function () {
             var editor = new MediumEditor('.editor', {
                     buttons: ['justifyLeft', 'justifyCenter', 'justifyRight', 'justifyFull']
                 }),
-                leftButton = editor.toolbar.querySelector('[data-action="justifyLeft"]'),
-                rightButton = editor.toolbar.querySelector('[data-action="justifyRight"]'),
-                centerButton = editor.toolbar.querySelector('[data-action="justifyCenter"]'),
-                fullButton = editor.toolbar.querySelector('[data-action="justifyFull"]');
+                leftButton = editor.toolbar.el.querySelector('[data-action="justifyLeft"]'),
+                rightButton = editor.toolbar.el.querySelector('[data-action="justifyRight"]'),
+                centerButton = editor.toolbar.el.querySelector('[data-action="justifyCenter"]'),
+                fullButton = editor.toolbar.el.querySelector('[data-action="justifyFull"]');
 
             // First paragraph should have nothing activated (IE will select align-left)
             selectElementContentsAndFire(document.getElementById('justify-para-one'));
@@ -508,8 +508,8 @@ describe('Buttons TestCase', function () {
             var editor = new MediumEditor('.editor', {
                     buttons: ['header1', 'header2']
                 }),
-                buttonOne = editor.toolbar.querySelector('[data-action="append-h3"]'),
-                buttonTwo = editor.toolbar.querySelector('[data-action="append-h4"]');
+                buttonOne = editor.toolbar.el.querySelector('[data-action="append-h3"]'),
+                buttonTwo = editor.toolbar.el.querySelector('[data-action="append-h4"]');
 
             this.el.innerHTML = '<h2>lorem</h2><h3>ipsum</h3><h4>dolor</h4>';
             selectElementContentsAndFire(editor.elements[0].querySelector('h2'));
@@ -531,8 +531,8 @@ describe('Buttons TestCase', function () {
                     firstHeader: 'h1',
                     secondHeader: 'h5'
                 }),
-                buttonOne = editor.toolbar.querySelector('[data-action="append-h1"]'),
-                buttonTwo = editor.toolbar.querySelector('[data-action="append-h5"]');
+                buttonOne = editor.toolbar.el.querySelector('[data-action="append-h1"]'),
+                buttonTwo = editor.toolbar.el.querySelector('[data-action="append-h5"]');
 
             expect(buttonOne).toBeTruthy();
             expect(buttonTwo).toBeTruthy();
@@ -556,8 +556,8 @@ describe('Buttons TestCase', function () {
                     buttons: ['header1', 'header2'],
                     firstHeader: 'h1'
                 }),
-                buttonOne = editor.toolbar.querySelector('[data-action="append-h1"]'),
-                buttonTwo = editor.toolbar.querySelector('[data-action="append-h4"]');
+                buttonOne = editor.toolbar.el.querySelector('[data-action="append-h1"]'),
+                buttonTwo = editor.toolbar.el.querySelector('[data-action="append-h4"]');
 
             this.el.innerHTML = '<p>lorem ipsum dolor</p>';
             selectElementContentsAndFire(editor.elements[0].firstChild);

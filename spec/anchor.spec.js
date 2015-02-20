@@ -1,7 +1,7 @@
 /*global MediumEditor, describe, it, expect, spyOn,
      afterEach, beforeEach, selectElementContents,
      jasmine, fireEvent, console, tearDown,
-     selectElementContentsAndFire, xit */
+     selectElementContentsAndFire, xit, Toolbar*/
 
 describe('Anchor Button TestCase', function () {
     'use strict';
@@ -21,16 +21,16 @@ describe('Anchor Button TestCase', function () {
 
     describe('Click', function () {
         it('should display the anchor form when toolbar is visible', function () {
-            spyOn(MediumEditor.prototype, 'showAnchorForm').and.callThrough();
+            spyOn(Toolbar.prototype, 'showAnchorForm').and.callThrough();
             var button,
                 editor = new MediumEditor('.editor');
             selectElementContentsAndFire(editor.elements[0]);
             jasmine.clock().tick(1);
-            button = editor.toolbar.querySelector('[data-action="anchor"]');
+            button = editor.toolbar.el.querySelector('[data-action="anchor"]');
             fireEvent(button, 'click');
-            expect(editor.toolbarActions.style.display).toBe('none');
+            expect(editor.toolbar.toolbarActions.style.display).toBe('none');
             expect(editor.anchorExtension.isDisplayed()).toBe(true);
-            expect(editor.showAnchorForm).toHaveBeenCalled();
+            expect(editor.toolbar.showAnchorForm).toHaveBeenCalled();
         });
 
         it('should display the toolbar actions when anchor form is visible', function () {
@@ -39,10 +39,10 @@ describe('Anchor Button TestCase', function () {
                 editor = new MediumEditor('.editor');
             selectElementContentsAndFire(editor.elements[0]);
             jasmine.clock().tick(11); // checkSelection delay
-            button = editor.toolbar.querySelector('[data-action="anchor"]');
+            button = editor.toolbar.el.querySelector('[data-action="anchor"]');
             editor.anchorExtension.showForm();
             fireEvent(button, 'click');
-            expect(editor.toolbarActions.style.display).toBe('block');
+            expect(editor.toolbar.toolbarActions.style.display).toBe('block');
             expect(editor.anchorExtension.isDisplayed()).toBe(false);
             expect(editor.showToolbarActions).toHaveBeenCalled();
         });
@@ -54,7 +54,7 @@ describe('Anchor Button TestCase', function () {
                 editor = new MediumEditor('.editor');
             selectElementContentsAndFire(editor.elements[0]);
             jasmine.clock().tick(11); // checkSelection delay
-            button = editor.toolbar.querySelector('[data-action="anchor"]');
+            button = editor.toolbar.el.querySelector('[data-action="anchor"]');
             fireEvent(button, 'click');
             expect(this.el.innerHTML, 'link');
             expect(document.execCommand).toHaveBeenCalled();
@@ -70,7 +70,7 @@ describe('Anchor Button TestCase', function () {
                 input;
 
             selectElementContents(editor.elements[0]);
-            button = editor.toolbar.querySelector('[data-action="anchor"]');
+            button = editor.toolbar.el.querySelector('[data-action="anchor"]');
             fireEvent(button, 'click');
             input = editor.anchorExtension.getInput();
             input.value = 'test';
@@ -84,7 +84,7 @@ describe('Anchor Button TestCase', function () {
                 input;
 
             selectElementContents(editor.elements[0]);
-            button = editor.toolbar.querySelector('[data-action="anchor"]');
+            button = editor.toolbar.el.querySelector('[data-action="anchor"]');
             fireEvent(button, 'click');
             input = editor.anchorExtension.getInput();
             input.value = '';
@@ -98,7 +98,7 @@ describe('Anchor Button TestCase', function () {
                 link;
 
             selectElementContentsAndFire(editor.elements[0]);
-            editor.showAnchorForm('test.com');
+            editor.toolbar.showAnchorForm('test.com');
             fireEvent(editor.anchorExtension.getForm().querySelector('a.medium-editor-toobar-save'), 'click');
 
             link = editor.elements[0].querySelector('a');
@@ -113,7 +113,7 @@ describe('Anchor Button TestCase', function () {
                 link;
 
             selectElementContentsAndFire(editor.elements[0]);
-            editor.showAnchorForm(validUrl);
+            editor.toolbar.showAnchorForm(validUrl);
             fireEvent(editor.anchorExtension.getForm().querySelector('a.medium-editor-toobar-save'), 'click');
 
             link = editor.elements[0].querySelector('a');
@@ -127,7 +127,7 @@ describe('Anchor Button TestCase', function () {
                 link;
 
             selectElementContentsAndFire(editor.elements[0]);
-            editor.showAnchorForm('http://test.com');
+            editor.toolbar.showAnchorForm('http://test.com');
             fireEvent(editor.anchorExtension.getForm().querySelector('a.medium-editor-toobar-save'), 'click');
 
             link = editor.elements[0].querySelector('a');
@@ -146,7 +146,7 @@ describe('Anchor Button TestCase', function () {
                 link;
 
             selectElementContents(editor.elements[0]);
-            save = editor.toolbar.querySelector('[data-action="anchor"]');
+            save = editor.toolbar.el.querySelector('[data-action="anchor"]');
             fireEvent(save, 'click');
 
             input = editor.anchorExtension.getInput();
@@ -174,7 +174,7 @@ describe('Anchor Button TestCase', function () {
                 cancel;
 
             selectElementContents(editor.elements[0]);
-            button = editor.toolbar.querySelector('[data-action="anchor"]');
+            button = editor.toolbar.el.querySelector('[data-action="anchor"]');
             cancel = editor.anchorExtension.getForm().querySelector('a.medium-editor-toobar-close');
             fireEvent(button, 'click');
             expect(editor.anchorExtension.isDisplayed()).toBe(true);

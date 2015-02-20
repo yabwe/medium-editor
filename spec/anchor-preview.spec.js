@@ -1,6 +1,6 @@
 /*global MediumEditor, describe, it, xit, expect, spyOn,
          afterEach, beforeEach, selectElementContents,
-         jasmine, fireEvent, console, tearDown*/
+         jasmine, fireEvent, console, tearDown, Toolbar*/
 
 describe('Anchor Preview TestCase', function () {
     'use strict';
@@ -31,35 +31,35 @@ describe('Anchor Preview TestCase', function () {
                 nextRange;
 
             // show preview
-            spyOn(MediumEditor.prototype, 'showAnchorPreview').and.callThrough();
-            editor.editorAnchorObserver({
+            spyOn(Toolbar.prototype, 'showAnchorPreview').and.callThrough();
+            editor.toolbar.editorAnchorObserver({
                 target: document.getElementById('test-link')
             });
             fireEvent(editor.elements[0], 'mouseover', undefined, undefined, document.getElementById('test-link'));
 
             // preview shows only after delay
-            expect(editor.showAnchorPreview).not.toHaveBeenCalled();
+            expect(editor.toolbar.showAnchorPreview).not.toHaveBeenCalled();
             jasmine.clock().tick(250);
-            expect(editor.showAnchorPreview).toHaveBeenCalled();
+            expect(editor.toolbar.showAnchorPreview).toHaveBeenCalled();
 
             // link is set in preview
-            expect(editor.anchorPreview.querySelector('i').innerHTML).toBe(document.getElementById('test-link').attributes.href.value);
+            expect(editor.toolbar.anchorPreview.querySelector('i').innerHTML).toBe(document.getElementById('test-link').attributes.href.value);
 
             // load into editor
-            spyOn(MediumEditor.prototype, 'showAnchorForm').and.callThrough();
-            fireEvent(editor.anchorPreview, 'click');
+            spyOn(Toolbar.prototype, 'showAnchorForm').and.callThrough();
+            fireEvent(editor.toolbar.anchorPreview, 'click');
             jasmine.clock().tick(300);
-            expect(editor.showAnchorForm).toHaveBeenCalled();
+            expect(editor.toolbar.showAnchorForm).toHaveBeenCalled();
 
             // selecting other text should close the toolbar
-            spyOn(MediumEditor.prototype, 'hideToolbarActions').and.callThrough();
+            spyOn(Toolbar.prototype, 'hideToolbarActions').and.callThrough();
             nextRange = document.createRange();
             nextRange.selectNodeContents(document.getElementById('another-element'));
             sel.removeAllRanges();
             sel.addRange(nextRange);
             fireEvent(document.documentElement, 'mouseup');
             jasmine.clock().tick(200);
-            expect(editor.hideToolbarActions).toHaveBeenCalled();
+            expect(editor.toolbar.hideToolbarActions).toHaveBeenCalled();
 
         });
 
@@ -67,7 +67,7 @@ describe('Anchor Preview TestCase', function () {
             var editor = new MediumEditor('.editor');
 
             // show preview
-            editor.editorAnchorObserver({
+            editor.toolbar.editorAnchorObserver({
                 target: document.getElementById('test-symbol-link')
             });
             fireEvent(editor.elements[0], 'mouseover', undefined, undefined, document.getElementById('test-symbol-link'));
@@ -76,23 +76,23 @@ describe('Anchor Preview TestCase', function () {
             jasmine.clock().tick(200);
 
             // link is set in preview
-            expect(editor.anchorPreview.querySelector('i').innerHTML).toBe(document.getElementById('test-symbol-link').attributes.href.value);
+            expect(editor.toolbar.anchorPreview.querySelector('i').innerHTML).toBe(document.getElementById('test-symbol-link').attributes.href.value);
         });
 
         it('Anchor form stays visible on click', function () {
             var editor = new MediumEditor('.editor');
 
             // show preview
-            editor.editorAnchorObserver({
+            editor.toolbar.editorAnchorObserver({
                 target: document.getElementById('test-link')
             });
             fireEvent(editor.elements[0], 'mouseover', undefined, undefined, document.getElementById('test-link'));
 
             // load into editor
-            fireEvent(editor.anchorPreview, 'click');
+            fireEvent(editor.toolbar.anchorPreview, 'click');
             jasmine.clock().tick(200);
 
-            expect(editor.isToolbarShown()).toBe(true);
+            expect(editor.toolbar.isToolbarShown()).toBe(true);
             expect(editor.anchorExtension.isDisplayed()).toBe(true);
         });
 
@@ -102,15 +102,15 @@ describe('Anchor Preview TestCase', function () {
             });
 
             // show preview
-            spyOn(MediumEditor.prototype, 'showAnchorPreview').and.callThrough();
-            editor.editorAnchorObserver({
+            spyOn(Toolbar.prototype, 'showAnchorPreview').and.callThrough();
+            editor.toolbar.editorAnchorObserver({
                 target: document.getElementById('test-empty-link')
             });
             fireEvent(editor.elements[0], 'mouseover', undefined, undefined, document.getElementById('test-empty-link'));
 
             // preview shows only after delay
             jasmine.clock().tick(250);
-            expect(editor.showAnchorPreview).not.toHaveBeenCalled();
+            expect(editor.toolbar.showAnchorPreview).not.toHaveBeenCalled();
         });
 
     });

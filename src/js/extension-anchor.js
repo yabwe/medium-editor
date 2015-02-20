@@ -54,7 +54,7 @@ var AnchorExtension;
         },
 
         doFormCancel: function () {
-            this.base.showToolbarActions();
+            this.base.toolbar.showToolbarActions();
             this.base.restoreSelection();
         },
 
@@ -62,7 +62,7 @@ var AnchorExtension;
             if (event.target !== this.getForm() &&
                     !mediumEditorUtil.isDescendant(this.getForm(), event.target) &&
                     !mediumEditorUtil.isDescendant(this.base.toolbarActions, event.target)) {
-                this.base.keepToolbarAlive = false;
+                this.base.toolbar.keepToolbarAlive = false;
                 this.base.checkSelection();
             }
         },
@@ -85,7 +85,7 @@ var AnchorExtension;
             // Handle clicks on the form itself
             this.base.on(form, 'click', function (event) {
                 event.stopPropagation();
-                this.base.keepToolbarAlive = true;
+                this.base.toolbar.keepToolbarAlive = true;
             }.bind(this));
 
             // Add url textbox
@@ -114,7 +114,7 @@ var AnchorExtension;
             this.base.on(input, 'click', function (event) {
                 // make sure not to hide form when cliking into the input
                 event.stopPropagation();
-                this.base.keepToolbarAlive = true;
+                this.base.toolbar.keepToolbarAlive = true;
             }.bind(this));
 
             // Add save buton

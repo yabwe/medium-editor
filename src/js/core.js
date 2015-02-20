@@ -140,8 +140,8 @@ function MediumEditor(elements, options) {
             // - It will be called when the browser is resizing, which can fire many times very quickly
             // - For some event (like resize) a slight lag in UI responsiveness is OK and provides performance benefits
             this.handleResize = mediumEditorUtil.throttle(function () {
-                if (self.isActive) {
-                    self.positionToolbarIfShown();
+                if (self.isActive && self.toolbar) {
+                    self.toolbar.positionToolbarIfShown();
                 }
             });
 
@@ -151,7 +151,7 @@ function MediumEditor(elements, options) {
             //   prevent the toolbar from being hidden (via this.keepToolbarAlive).
             this.handleBlur = mediumEditorUtil.throttle(function () {
                 if (self.isActive && !self.keepToolbarAlive) {
-                    self.hideToolbarActions();
+                    self.toolbar.hideToolbarActions();
                 }
             });
 
@@ -178,9 +178,7 @@ function MediumEditor(elements, options) {
             }
             // Init toolbar
             if (addToolbar) {
-                this.initToolbar()
-                    .setFirstAndLastButtons()
-                    .bindAnchorPreview();
+                this.initToolbar();
             }
             return this;
         },
@@ -697,7 +695,7 @@ function MediumEditor(elements, options) {
                         meSelection.selectionInContentEditableFalse(this.options.contentWindow)) {
 
                     if (!this.options.staticToolbar) {
-                        this.hideToolbarActions();
+                        this.toolbar.hideToolbarActions();
                     } else if (this.anchorExtension && this.anchorExtension.isDisplayed()) {
                         this.setToolbarButtonStates();
                         this.showToolbarActions();
@@ -707,7 +705,7 @@ function MediumEditor(elements, options) {
                     selectionElement = meSelection.getSelectionElement(this.options.contentWindow);
                     if (!selectionElement || selectionElement.getAttribute('data-disable-toolbar')) {
                         if (!this.options.staticToolbar) {
-                            this.hideToolbarActions();
+                            this.toolbar.hideToolbarActions();
                         }
                     } else {
                         this.checkSelectionElement(newSelection, selectionElement);
@@ -776,7 +774,7 @@ function MediumEditor(elements, options) {
             }
 
             if (!this.options.staticToolbar) {
-                this.hideToolbarActions();
+                this.toolbar.hideToolbarActions();
             }
         },
 
@@ -1027,7 +1025,7 @@ function MediumEditor(elements, options) {
 
         createLinkInternal: function (url, target, buttonClass) {
             if (!url || url.trim().length === 0) {
-                this.hideToolbarActions();
+                this.toolbar.hideToolbarActions();
                 return;
             }
 
@@ -1055,7 +1053,7 @@ function MediumEditor(elements, options) {
             if (this.options.staticToolbar && this.options.stickyToolbar) {
                 // On scroll, re-position the toolbar
                 this.on(this.options.contentWindow, 'scroll', function () {
-                    self.positionToolbarIfShown();
+                    self.toolbar.positionToolbarIfShown();
                 }, true);
             }
 
@@ -1085,10 +1083,8 @@ function MediumEditor(elements, options) {
             this.isActive = false;
 
             if (this.toolbar !== undefined) {
-                this.options.elementsContainer.removeChild(this.anchorPreview);
-                this.options.elementsContainer.removeChild(this.toolbar);
+                this.toolbar.destroy();
                 delete this.toolbar;
-                delete this.anchorPreview;
             }
 
             for (i = 0; i < this.elements.length; i += 1) {
