@@ -283,15 +283,13 @@ var DefaultButton,
             }
         },
         isActive: function (setActive) {
-            if (typeof setActive === 'boolean') {
-                delete this.knownState;
-                if (setActive) {
-                    this.button.classList.add(this.base.options.activeButtonClass);
-                } else {
-                    this.button.classList.remove(this.base.options.activeButtonClass);
-                }
-            }
             return this.button.classList.contains(this.base.options.activeButtonClass);
+        },
+        setActive: function () {
+            this.button.classList.add(this.base.options.activeButtonClass);
+        },
+        setInactive: function () {
+            this.button.classList.remove(this.base.options.activeButtonClass);
         },
         queryCommandState: function () {
             var queryState = null;

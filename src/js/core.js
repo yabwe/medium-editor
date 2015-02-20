@@ -913,7 +913,7 @@ function MediumEditor(elements, options) {
         setToolbarButtonStates: function () {
             this.commands.forEach(function (extension) {
                 if (typeof extension.isActive === 'function') {
-                    extension.isActive(false);
+                    extension.setInactive();
                 }
             }.bind(this));
             this.checkActiveButtons();
@@ -931,7 +931,7 @@ function MediumEditor(elements, options) {
                     } else if (typeof extension.isActive === 'function' &&
                                typeof extension.isAlreadyApplied === 'function') {
                         if (!extension.isActive() && extension.isAlreadyApplied(parentNode)) {
-                            extension.isActive(true);
+                            extension.setActive();
                         }
                     }
                 };
@@ -945,7 +945,7 @@ function MediumEditor(elements, options) {
                     // and don't need to do our manual checks
                     if (queryState !== null) {
                         if (queryState) {
-                            command.isActive(true);
+                            command.setActive();
                         }
                         return;
                     }
