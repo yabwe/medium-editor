@@ -1,4 +1,4 @@
-/*global mediumEditorUtil, console */
+/*global mediumEditorUtil, console, meSelection */
 
 var AnchorExtension;
 
@@ -65,6 +65,26 @@ var AnchorExtension;
                 this.base.keepToolbarAlive = false;
                 this.base.checkSelection();
             }
+        },
+
+        executeAction: function () {
+            if (!this.base.selection) {
+                this.base.checkSelection();
+            }
+
+            var selectedParentElement = meSelection.getSelectedParentElement(this.base.selectionRange);
+            if (selectedParentElement.tagName &&
+                    selectedParentElement.tagName.toLowerCase() === 'a') {
+                return this.base.options.ownerDocument.execCommand('unlink', false, null);
+            }
+
+            if (this.isDisplayed()) {
+                this.base.showToolbarActions();
+            } else {
+                this.base.showAnchorForm();
+            }
+
+            return false;
         },
 
         createForm: function () {

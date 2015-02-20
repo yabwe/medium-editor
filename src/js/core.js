@@ -1015,8 +1015,8 @@ function MediumEditor(elements, options) {
             }
 
             if (action === 'anchor') {
-                if (!this.options.disableAnchorForm) {
-                    return this.triggerAnchorAction();
+                if (this.anchorExtension) {
+                    return this.anchorExtension.executeAction();
                 }
                 return false;
             }
@@ -1048,26 +1048,6 @@ function MediumEditor(elements, options) {
                 selectedParentElement = range.startContainer;
             }
             return selectedParentElement;
-        },
-
-        triggerAnchorAction: function () {
-            if (!this.selection) {
-                this.checkSelection();
-            }
-            var selectedParentElement = meSelection.getSelectedParentElement(this.selectionRange);
-            if (selectedParentElement.tagName &&
-                    selectedParentElement.tagName.toLowerCase() === 'a') {
-                return this.options.ownerDocument.execCommand('unlink', false, null);
-            }
-
-            if (this.anchorExtension) {
-                if (this.anchorExtension.isDisplayed()) {
-                    this.showToolbarActions();
-                } else {
-                    this.showAnchorForm();
-                }
-            }
-            return false;
         },
 
         execFormatBlock: function (el) {
