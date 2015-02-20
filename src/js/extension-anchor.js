@@ -81,7 +81,7 @@ var AnchorExtension;
             if (this.isDisplayed()) {
                 this.base.showToolbarActions();
             } else {
-                this.base.showAnchorForm();
+                this.showForm();
             }
 
             return false;
@@ -210,8 +210,13 @@ var AnchorExtension;
             this.getForm().style.display = 'none';
         },
 
-        showForm: function () {
+        showForm: function (link_value) {
+            this.base.saveSelection();
+            this.base.hideToolbarDefaultActions();
             this.getForm().style.display = 'block';
+            this.base.setToolbarPosition();
+            this.base.keepToolbarAlive = true;
+            this.focus(link_value);
         },
 
         isDisplayed: function () {

@@ -1189,7 +1189,7 @@ var AnchorExtension;
             if (this.isDisplayed()) {
                 this.base.showToolbarActions();
             } else {
-                this.base.showAnchorForm();
+                this.showForm();
             }
 
             return false;
@@ -1318,8 +1318,13 @@ var AnchorExtension;
             this.getForm().style.display = 'none';
         },
 
-        showForm: function () {
+        showForm: function (link_value) {
+            this.base.saveSelection();
+            this.base.hideToolbarDefaultActions();
             this.getForm().style.display = 'block';
+            this.base.setToolbarPosition();
+            this.base.keepToolbarAlive = true;
+            this.focus(link_value);
         },
 
         isDisplayed: function () {
@@ -2401,6 +2406,27 @@ function MediumEditor(elements, options) {
             return this.options.ownerDocument.execCommand('formatBlock', false, el);
         },
 
+        isToolbarDefaultActionsShown: function () {
+            return !!this.toolbarActions && this.toolbarActions.style.display === 'block';
+        },
+
+        hideToolbarDefaultActions: function () {
+            if (this.toolbarActions && this.isToolbarDefaultActionsShown()) {
+                this.commands.forEach(function (extension) {
+                    if (extension.onHide && typeof extension.onHide === 'function') {
+                        extension.onHide();
+                    }
+                });
+                this.toolbarActions.style.display = 'none';
+            }
+        },
+
+        showToolbarDefaultActions: function () {
+            if (this.toolbarActions && !this.isToolbarDefaultActionsShown()) {
+                this.toolbarActions.style.display = 'block';
+            }
+        },
+
         isToolbarShown: function () {
             return this.toolbar && this.toolbar.classList.contains('medium-editor-toolbar-active');
         },
@@ -2555,19 +2581,6 @@ function MediumEditor(elements, options) {
             sel.addRange(range);
         },
 
-        showAnchorForm: function (link_value) {
-            if (!this.anchorExtension) {
-                return;
-            }
-
-            this.toolbarActions.style.display = 'none';
-            this.saveSelection();
-            this.anchorExtension.showForm();
-            this.setToolbarPosition();
-            this.keepToolbarAlive = true;
-            this.anchorExtension.focus(link_value);
-        },
-
         hideAnchorPreview: function () {
             this.anchorPreview.classList.remove('medium-editor-anchor-preview-active');
         },
@@ -2672,24 +2685,22 @@ function MediumEditor(elements, options) {
         },
 
         anchorPreviewClickHandler: function (e) {
-            if (!this.options.disableAnchorForm && this.activeAnchor) {
+            if (this.anchorExtension && this.activeAnchor) {
 
-                var self = this,
-                    range = this.options.ownerDocument.createRange(),
+                var range = this.options.ownerDocument.createRange(),
                     sel = this.options.contentWindow.getSelection();
 
-                range.selectNodeContents(self.activeAnchor);
+                range.selectNodeContents(this.activeAnchor);
                 sel.removeAllRanges();
                 sel.addRange(range);
                 // Using setTimeout + options.delay because:
                 // We may actually be displaying the anchor form, which should be controlled by options.delay
                 this.delay(function () {
-                    if (self.activeAnchor) {
-                        self.showAnchorForm(self.activeAnchor.attributes.href.value);
+                    if (this.activeAnchor) {
+                        this.anchorExtension.showForm(this.activeAnchor.attributes.href.value);
                     }
-                    self.keepToolbarAlive = false;
-                });
-
+                    this.keepToolbarAlive = false;
+                }.bind(this));
             }
 
             this.hideAnchorPreview();

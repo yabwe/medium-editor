@@ -46,10 +46,10 @@ describe('Anchor Preview TestCase', function () {
             expect(editor.anchorPreview.querySelector('i').innerHTML).toBe(document.getElementById('test-link').attributes.href.value);
 
             // load into editor
-            spyOn(MediumEditor.prototype, 'showAnchorForm').and.callThrough();
+            spyOn(MediumEditor.statics.AnchorExtension.prototype, 'showForm').and.callThrough();
             fireEvent(editor.anchorPreview, 'click');
             jasmine.clock().tick(300);
-            expect(editor.showAnchorForm).toHaveBeenCalled();
+            expect(editor.anchorExtension.showForm).toHaveBeenCalled();
 
             // selecting other text should close the toolbar
             spyOn(MediumEditor.prototype, 'hideToolbarActions').and.callThrough();

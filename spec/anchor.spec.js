@@ -21,7 +21,7 @@ describe('Anchor Button TestCase', function () {
 
     describe('Click', function () {
         it('should display the anchor form when toolbar is visible', function () {
-            spyOn(MediumEditor.prototype, 'showAnchorForm').and.callThrough();
+            spyOn(MediumEditor.statics.AnchorExtension.prototype, 'showForm').and.callThrough();
             var button,
                 editor = new MediumEditor('.editor');
             selectElementContentsAndFire(editor.elements[0]);
@@ -30,7 +30,7 @@ describe('Anchor Button TestCase', function () {
             fireEvent(button, 'click');
             expect(editor.toolbarActions.style.display).toBe('none');
             expect(editor.anchorExtension.isDisplayed()).toBe(true);
-            expect(editor.showAnchorForm).toHaveBeenCalled();
+            expect(editor.anchorExtension.showForm).toHaveBeenCalled();
         });
 
         it('should display the toolbar actions when anchor form is visible', function () {
@@ -98,7 +98,7 @@ describe('Anchor Button TestCase', function () {
                 link;
 
             selectElementContentsAndFire(editor.elements[0]);
-            editor.showAnchorForm('test.com');
+            editor.anchorExtension.showForm('test.com');
             fireEvent(editor.anchorExtension.getForm().querySelector('a.medium-editor-toobar-save'), 'click');
 
             link = editor.elements[0].querySelector('a');
@@ -113,7 +113,7 @@ describe('Anchor Button TestCase', function () {
                 link;
 
             selectElementContentsAndFire(editor.elements[0]);
-            editor.showAnchorForm(validUrl);
+            editor.anchorExtension.showForm(validUrl);
             fireEvent(editor.anchorExtension.getForm().querySelector('a.medium-editor-toobar-save'), 'click');
 
             link = editor.elements[0].querySelector('a');
@@ -127,7 +127,7 @@ describe('Anchor Button TestCase', function () {
                 link;
 
             selectElementContentsAndFire(editor.elements[0]);
-            editor.showAnchorForm('http://test.com');
+            editor.anchorExtension.showForm('http://test.com');
             fireEvent(editor.anchorExtension.getForm().querySelector('a.medium-editor-toobar-save'), 'click');
 
             link = editor.elements[0].querySelector('a');
