@@ -826,7 +826,7 @@ var DefaultButton,
                 this.base.execAction(action);
             }
         },
-        isActive: function (setActive) {
+        isActive: function () {
             return this.button.classList.contains(this.base.options.activeButtonClass);
         },
         setActive: function () {
