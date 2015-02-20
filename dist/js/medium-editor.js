@@ -1304,14 +1304,6 @@ var AnchorExtension;
 
         isDisplayed: function () {
             return this.getForm().style.display === 'block';
-        },
-
-        isClickIntoForm: function (event) {
-            return (event &&
-                event.type &&
-                event.type.toLowerCase() === 'blur' &&
-                event.relatedTarget &&
-                event.relatedTarget === this.getInput());
         }
     };
 }(window, document));
@@ -1913,30 +1905,29 @@ function MediumEditor(elements, options) {
         },
 
         bindSelect: function () {
-            var self = this,
-                i,
-                timeoutHelper;
+            var i,
+                blurHelper = function (event) {
+                    // Do not close the toolbar when bluring the editable area and clicking into the anchor form
+                    if (event &&
+                            event.type &&
+                            event.type.toLowerCase() === 'blur' &&
+                            event.relatedTarget &&
+                            mediumEditorUtil.isDescendant(this.toolbar, event.relatedTarget)) {
+                        return false;
+                    }
+                    this.checkSelection();
+                }.bind(this),
+                timeoutHelper = function () {
+                    setTimeout(function () {
+                        this.checkSelection();
+                    }.bind(this), 0);
+                }.bind(this);
 
-            this.checkSelectionWrapper = function (e) {
-                // Do not close the toolbar when bluring the editable area and clicking into the anchor form
-                if (e && this.anchorExtension && this.anchorExtension.isClickIntoForm(e)) {
-                    return false;
-                }
-
-                self.checkSelection();
-            };
-
-            timeoutHelper = function (event) {
-                setTimeout(function () {
-                    this.checkSelectionWrapper(event);
-                }.bind(this), 0);
-            }.bind(this);
-
-            this.on(this.options.ownerDocument.documentElement, 'mouseup', this.checkSelectionWrapper);
+            this.on(this.options.ownerDocument.documentElement, 'mouseup', this.checkSelection.bind(this));
 
             for (i = 0; i < this.elements.length; i += 1) {
-                this.on(this.elements[i], 'keyup', this.checkSelectionWrapper);
-                this.on(this.elements[i], 'blur', this.checkSelectionWrapper);
+                this.on(this.elements[i], 'keyup', this.checkSelection.bind(this));
+                this.on(this.elements[i], 'blur', blurHelper);
                 this.on(this.elements[i], 'click', timeoutHelper);
             }
 
