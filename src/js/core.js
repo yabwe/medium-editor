@@ -57,7 +57,7 @@ function MediumEditor(elements, options) {
         init: function (elements, options) {
             var uniqueId = 1;
 
-            this.options = mediumEditorUtil.extend(options, this.defaults);
+            this.options = mediumEditorUtil.defaults(options, this.defaults);
             this.setElementSelection(elements);
             if (this.elements.length === 0) {
                 return;
@@ -338,6 +338,9 @@ function MediumEditor(elements, options) {
                 if (extensions[buttonName]) {
                     ext = this.initExtension(extensions[buttonName], buttonName);
                     this.commands.push(ext);
+                } else if (buttonName === 'anchor') {
+                    ext = this.initExtension(new AnchorExtension(), buttonName);
+                    this.commands.push(ext);
                 } else if (ButtonsData.hasOwnProperty(buttonName)) {
                     ext = new DefaultButton(ButtonsData[buttonName], this);
                     this.commands.push(ext);
@@ -351,6 +354,18 @@ function MediumEditor(elements, options) {
             }
 
             return this;
+        },
+
+        getAnchorExtension: function () {
+            var extension;
+            if (this.commands && this.commands.length) {
+                this.commands.forEach(function (ext) {
+                    if (ext.name === 'anchor') {
+                        extension = ext;
+                    }
+                });
+            }
+            return extension;
         },
 
         /**
@@ -565,10 +580,12 @@ function MediumEditor(elements, options) {
             }
 
             toolbar.appendChild(this.toolbarButtons());
-            if (!this.options.disableAnchorForm) {
-                this.anchorExtension = new AnchorExtension(this);
-                toolbar.appendChild(this.anchorExtension.getForm());
-            }
+            this.commands.forEach(function (extension) {
+                if (typeof extension.getForm === 'function') {
+                    toolbar.appendChild(extension.getForm());
+                }
+            });
+
             this.options.elementsContainer.appendChild(toolbar);
             return toolbar;
         },
@@ -731,7 +748,8 @@ function MediumEditor(elements, options) {
 
         checkSelection: function () {
             var newSelection,
-                selectionElement;
+                selectionElement,
+                anchorExtension;
 
             if (!this.preventSelectionUpdates &&
                     this.keepToolbarAlive !== true &&
@@ -745,9 +763,12 @@ function MediumEditor(elements, options) {
 
                     if (!this.options.staticToolbar) {
                         this.hideToolbarActions();
-                    } else if (this.anchorExtension && this.anchorExtension.isDisplayed()) {
-                        this.setToolbarButtonStates();
-                        this.showToolbarActions();
+                    } else {
+                        anchorExtension = this.getAnchorExtension();
+                        if (anchorExtension && anchorExtension.isDisplayed()) {
+                            this.setToolbarButtonStates();
+                            this.showToolbarActions();
+                        }
                     }
 
                 } else {
@@ -1004,7 +1025,8 @@ function MediumEditor(elements, options) {
         execActionInternal: function (action) {
             /*jslint regexp: true*/
             var appendAction = /^append-(.+)$/gi,
-                match;
+                match,
+                anchorExtension;
             /*jslint regexp: false*/
 
             // Actions starting with 'append-' should attempt to format a block of text ('formatBlock') using a specific
@@ -1015,8 +1037,9 @@ function MediumEditor(elements, options) {
             }
 
             if (action === 'anchor') {
-                if (this.anchorExtension) {
-                    return this.anchorExtension.executeAction();
+                anchorExtension = this.getAnchorExtension();
+                if (anchorExtension) {
+                    return anchorExtension.executeAction();
                 }
                 return false;
             }
@@ -1130,9 +1153,10 @@ function MediumEditor(elements, options) {
         },
 
         showToolbarActions: function () {
-            var self = this;
-            if (this.anchorExtension) {
-                this.anchorExtension.hideForm();
+            var self = this,
+                anchorExtension = this.getAnchorExtension();
+            if (anchorExtension) {
+                anchorExtension.hideForm();
             }
             this.toolbarActions.style.display = 'block';
             this.keepToolbarAlive = false;
@@ -1354,10 +1378,11 @@ function MediumEditor(elements, options) {
         },
 
         anchorPreviewClickHandler: function (e) {
-            if (this.anchorExtension && this.activeAnchor) {
+            if (this.getAnchorExtension() && this.activeAnchor) {
 
                 var range = this.options.ownerDocument.createRange(),
-                    sel = this.options.contentWindow.getSelection();
+                    sel = this.options.contentWindow.getSelection(),
+                    anchorExtension = this.getAnchorExtension();
 
                 range.selectNodeContents(this.activeAnchor);
                 sel.removeAllRanges();
@@ -1366,7 +1391,7 @@ function MediumEditor(elements, options) {
                 // We may actually be displaying the anchor form, which should be controlled by options.delay
                 this.delay(function () {
                     if (this.activeAnchor) {
-                        this.anchorExtension.showForm(this.activeAnchor.attributes.href.value);
+                        anchorExtension.showForm(this.activeAnchor.attributes.href.value);
                     }
                     this.keepToolbarAlive = false;
                 }.bind(this));
@@ -1547,10 +1572,6 @@ function MediumEditor(elements, options) {
                     extension.deactivate();
                 }
             }.bind(this));
-
-            if (this.anchorExtension) {
-                this.anchorExtension.deactivate();
-            }
 
             this.removeAllEvents();
         },

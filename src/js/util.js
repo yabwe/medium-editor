@@ -5,6 +5,17 @@ var mediumEditorUtil;
 (function (window, document) {
     'use strict';
 
+    function copyInto(dest, source, overwrite) {
+        var prop;
+        dest = dest || {};
+        for (prop in source) {
+            if (source.hasOwnProperty(prop) && (overwrite || dest.hasOwnProperty(prop) === false)) {
+                dest[prop] = source[prop];
+            }
+        }
+        return dest;
+    }
+
     mediumEditorUtil = {
 
         // http://stackoverflow.com/questions/17907445/how-to-detect-ie11#comment30165888_17907562
@@ -23,17 +34,22 @@ var mediumEditorUtil;
 
         parentElements: ['p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'blockquote', 'pre'],
 
-        extend: function extend(b, a) {
-            var prop;
-            if (b === undefined) {
-                return a;
-            }
-            for (prop in a) {
-                if (a.hasOwnProperty(prop) && b.hasOwnProperty(prop) === false) {
-                    b[prop] = a[prop];
-                }
-            }
-            return b;
+        defaults: function defaults(dest, source) {
+            return copyInto(dest, source);
+        },
+
+        extend: function extend(dest, source) {
+            return copyInto(dest, source, true);
+        },
+
+        derives: function derives(base, derived) {
+            var origPrototype = derived.prototype;
+            function Proto() { }
+            Proto.prototype = base.prototype;
+            derived.prototype = new Proto();
+            derived.prototype.constructor = base;
+            derived.prototype = copyInto(derived.prototype, origPrototype);
+            return derived;
         },
 
         // Find the next node in the DOM tree that represents any text that is being

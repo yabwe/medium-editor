@@ -84,14 +84,6 @@ var DefaultButton,
             contentDefault: '<b>x<sub>1</sub></b>',
             contentFA: '<i class="fa fa-subscript"></i>'
         },
-        'anchor': {
-            name: 'anchor',
-            action: 'anchor',
-            aria: 'link',
-            tagNames: ['a'],
-            contentDefault: '<b>#</b>',
-            contentFA: '<i class="fa fa-link"></i>'
-        },
         'image': {
             name: 'image',
             action: 'image',

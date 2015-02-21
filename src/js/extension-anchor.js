@@ -1,15 +1,25 @@
-/*global mediumEditorUtil, console, meSelection */
+/*global mediumEditorUtil, console, meSelection,
+  ButtonsData, DefaultButton */
 
 var AnchorExtension;
 
 (function (window, document) {
     'use strict';
 
-    AnchorExtension = function (instance) {
-        this.base = instance;
-    };
+    function AnchorDerived() {
+        this.parent = true;
+        this.options = {
+            name: 'anchor',
+            action: 'anchor',
+            aria: 'link',
+            tagNames: ['a'],
+            contentDefault: '<b>#</b>',
+            contentFA: '<i class="fa fa-link"></i>'
+        };
+        this.name = 'anchor';
+    }
 
-    AnchorExtension.prototype = {
+    AnchorDerived.prototype = {
 
         getForm: function () {
             if (!this.anchorForm) {
@@ -223,4 +233,6 @@ var AnchorExtension;
             return this.getForm().style.display === 'block';
         }
     };
+
+    AnchorExtension = mediumEditorUtil.derives(DefaultButton, AnchorDerived);
 }(window, document));
