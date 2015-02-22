@@ -78,10 +78,12 @@ module.exports = function (grunt) {
             options: {
                 specs: ['spec/*.spec.js'],
                 helpers: 'spec/helpers/*.js',
-                vendor: 'spec/vendor/jasmine-jsreporter.js',
+                vendor: [
+                    'spec/vendor/jasmine-jsreporter.js',
+                    'spec/vendor/jasmine-jsreporter-script.js'
+                ],
                 polyfills: [
-                    'src/js/polyfills.js',
-                    'spec/jasmine-jsreporter-script.js'
+                    'src/js/polyfills.js'
                 ],
                 styles: 'dist/css/*.css',
                 junit: {
@@ -243,7 +245,7 @@ module.exports = function (grunt) {
                 concurrency: 3,
                 browsers: browsers,
                 sauceConfig: {
-                    'public': 'public',
+                    public: 'public',
                     build: process.env.TRAVIS_JOB_ID,
                     name: 'medium-editor-tests'
                 }
@@ -268,7 +270,7 @@ module.exports = function (grunt) {
     });
 
     grunt.registerTask('test', ['jslint', 'concat', 'jasmine:suite', 'csslint']);
-    grunt.registerTask('travis', ['connect', 'jslint', 'concat', 'jasmine:suite', 'csslint', 'saucelabs-jasmine', 'coveralls']);
+    grunt.registerTask('travis', ['connect', 'jslint', 'jasmine:suite', 'csslint', 'saucelabs-jasmine', 'coveralls']);
     grunt.registerTask('sauce', ['connect', 'saucelabs-jasmine']);
     grunt.registerTask('js', ['jslint', 'concat', 'jasmine:suite', 'uglify']);
     grunt.registerTask('css', ['sass', 'autoprefixer', 'cssmin', 'csslint']);
