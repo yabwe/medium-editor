@@ -339,14 +339,14 @@ describe('Buttons TestCase', function () {
             expect(button.classList.contains('medium-editor-button-active')).toBe(false);
         });
 
-        it('button should call the anchorExtension.executeAction() method', function () {
-            spyOn(MediumEditor.statics.AnchorExtension.prototype, 'executeAction');
+        it('button should call the anchorExtension.showForm() method', function () {
+            spyOn(MediumEditor.statics.AnchorExtension.prototype, 'showForm');
             var button,
                 editor = new MediumEditor('.editor');
             selectElementContentsAndFire(editor.elements[0]);
             button = editor.toolbar.querySelector('[data-action="anchor"]');
             fireEvent(button, 'click');
-            expect(editor.getAnchorExtension().executeAction).toHaveBeenCalled();
+            expect(editor.getAnchorExtension().showForm).toHaveBeenCalled();
         });
     });
 

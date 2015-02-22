@@ -1160,27 +1160,42 @@ var AnchorExtension;
         },
 
         doLinkCreation: function () {
-            var button = null,
-                target,
-                targetCheckbox = this.getForm().querySelector('.medium-editor-toolbar-anchor-target'),
-                buttonCheckbox = this.getForm().querySelector('.medium-editor-toolbar-anchor-button');
+            var targetCheckbox = this.getForm().querySelector('.medium-editor-toolbar-anchor-target'),
+                buttonCheckbox = this.getForm().querySelector('.medium-editor-toolbar-anchor-button'),
+                opts = {
+                    url: this.getInput().value
+                };
+
+            this.base.restoreSelection();
+
+            if (this.base.options.checkLinkFormat) {
+                opts.url = this.checkLinkFormat(opts.url);
+            }
 
             if (targetCheckbox && targetCheckbox.checked) {
-                target = "_blank";
+                opts.target = "_blank";
             } else {
-                target = "_self";
+                opts.target = "_self";
             }
 
             if (buttonCheckbox && buttonCheckbox.checked) {
-                button = this.base.options.anchorButtonClass;
+                opts.buttonClass = this.base.options.anchorButtonClass;
             }
 
-            this.base.createLink(this.getInput(), target, button);
+            this.base.createLink(opts);
+
+            this.switchToDefaultToolbar();
+            this.base.checkSelection();
+        },
+
+        checkLinkFormat: function (value) {
+            var re = /^(https?|ftps?|rtmpt?):\/\/|mailto:/;
+            return (re.test(value) ? '' : 'http://') + value;
         },
 
         doFormCancel: function () {
-            this.base.showToolbarActions();
             this.base.restoreSelection();
+            this.switchToDefaultToolbar();
         },
 
         handleOutsideInteraction: function (event) {
@@ -1192,7 +1207,10 @@ var AnchorExtension;
             }
         },
 
-        executeAction: function () {
+        handleClick: function (evt) {
+            evt.preventDefault();
+            evt.stopPropagation();
+
             if (!this.base.selection) {
                 this.base.checkSelection();
             }
@@ -1200,12 +1218,10 @@ var AnchorExtension;
             var selectedParentElement = meSelection.getSelectedParentElement(this.base.selectionRange);
             if (selectedParentElement.tagName &&
                     selectedParentElement.tagName.toLowerCase() === 'a') {
-                return this.base.options.ownerDocument.execCommand('unlink', false, null);
+                return this.base.execAction('unlink');
             }
 
-            if (this.isDisplayed()) {
-                this.base.showToolbarActions();
-            } else {
+            if (!this.isDisplayed()) {
                 this.showForm();
             }
 
@@ -1327,12 +1343,19 @@ var AnchorExtension;
 
         focus: function (value) {
             var input = this.getInput();
-            input.focus();
             input.value = value || '';
+            input.focus();
+        },
+
+        switchToDefaultToolbar: function () {
+            this.hideForm();
+            this.base.hideToolbar();
+            this.base.checkSelection();
         },
 
         hideForm: function () {
             this.getForm().style.display = 'none';
+            this.getInput().value = '';
         },
 
         showForm: function (link_value) {
@@ -2346,7 +2369,7 @@ function MediumEditor(elements, options) {
             return this;
         },
 
-        execAction: function (action, e) {
+        execAction: function (action, opts) {
             /*jslint regexp: true*/
             var fullAction = /^full-(.+)$/gi,
                 match,
@@ -2361,22 +2384,21 @@ function MediumEditor(elements, options) {
                 this.saveSelection();
                 // Select all of the contents before calling the action
                 this.selectAllContents();
-                result = this.execActionInternal(match[1]);
+                result = this.execActionInternal(match[1], opts);
                 // Restore the previous selection
                 this.restoreSelection();
             } else {
-                result = this.execActionInternal(action);
+                result = this.execActionInternal(action, opts);
             }
 
             this.checkSelection();
             return result;
         },
 
-        execActionInternal: function (action) {
+        execActionInternal: function (action, opts) {
             /*jslint regexp: true*/
             var appendAction = /^append-(.+)$/gi,
-                match,
-                anchorExtension;
+                match;
             /*jslint regexp: false*/
 
             // Actions starting with 'append-' should attempt to format a block of text ('formatBlock') using a specific
@@ -2386,12 +2408,8 @@ function MediumEditor(elements, options) {
                 return this.execFormatBlock(match[1]);
             }
 
-            if (action === 'anchor') {
-                anchorExtension = this.getAnchorExtension();
-                if (anchorExtension) {
-                    return anchorExtension.executeAction();
-                }
-                return false;
+            if (action === 'createLink') {
+                return this.createLink(opts);
             }
 
             if (action === 'image') {
@@ -2467,6 +2485,13 @@ function MediumEditor(elements, options) {
             if (this.toolbarActions && !this.isToolbarDefaultActionsShown()) {
                 this.toolbarActions.style.display = 'block';
             }
+
+            this.keepToolbarAlive = false;
+            // Using setTimeout + options.delay because:
+            // We will actually be displaying the toolbar, which should be controlled by options.delay
+            this.delay(function () {
+                this.showToolbar();
+            }.bind(this));
         },
 
         isToolbarShown: function () {
@@ -2797,9 +2822,29 @@ function MediumEditor(elements, options) {
             return this;
         },
 
-        checkLinkFormat: function (value) {
-            var re = /^(https?|ftps?|rtmpt?):\/\/|mailto:/;
-            return (re.test(value) ? '' : 'http://') + value;
+        createLink: function (opts) {
+            var customEvent,
+                i;
+
+            if (opts.url && opts.url.trim().length > 0) {
+                this.options.ownerDocument.execCommand('createLink', false, opts.url);
+
+                if (this.options.targetBlank || opts.target === '_blank') {
+                    mediumEditorUtil.setTargetBlank(meSelection.getSelectionStart(this.options.ownerDocument));
+                }
+
+                if (opts.buttonClass) {
+                    this.setButtonClass(opts.buttonClass);
+                }
+            }
+
+            if (this.options.targetBlank || opts.target === "_blank" || opts.buttonClass) {
+                customEvent = this.options.ownerDocument.createEvent("HTMLEvents");
+                customEvent.initEvent("input", true, true, this.options.contentWindow);
+                for (i = 0; i < this.elements.length; i += 1) {
+                    this.elements[i].dispatchEvent(customEvent);
+                }
+            }
         },
 
         setButtonClass: function (buttonClass) {
@@ -2818,48 +2863,6 @@ function MediumEditor(elements, options) {
                         el[i].classList.add(classes[j]);
                     }
                 }
-            }
-        },
-
-        createLink: function (input, target, buttonClass) {
-
-            var i, event;
-
-            this.createLinkInternal(input.value, target, buttonClass);
-
-            if (this.options.targetBlank || target === "_blank" || buttonClass) {
-                event = this.options.ownerDocument.createEvent("HTMLEvents");
-                event.initEvent("input", true, true, this.options.contentWindow);
-                for (i = 0; i < this.elements.length; i += 1) {
-                    this.elements[i].dispatchEvent(event);
-                }
-            }
-
-            this.checkSelection();
-            this.showToolbarActions();
-            input.value = '';
-        },
-
-        createLinkInternal: function (url, target, buttonClass) {
-            if (!url || url.trim().length === 0) {
-                this.hideToolbarActions();
-                return;
-            }
-
-            this.restoreSelection();
-
-            if (this.options.checkLinkFormat) {
-                url = this.checkLinkFormat(url);
-            }
-
-            this.options.ownerDocument.execCommand('createLink', false, url);
-
-            if (this.options.targetBlank || target === "_blank") {
-                mediumEditorUtil.setTargetBlank(meSelection.getSelectionStart(this.options.ownerDocument));
-            }
-
-            if (buttonClass) {
-                this.setButtonClass(buttonClass);
             }
         },
 

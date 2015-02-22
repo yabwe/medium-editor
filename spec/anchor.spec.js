@@ -33,20 +33,6 @@ describe('Anchor Button TestCase', function () {
             expect(editor.getAnchorExtension().showForm).toHaveBeenCalled();
         });
 
-        it('should display the toolbar actions when anchor form is visible', function () {
-            spyOn(MediumEditor.prototype, 'showToolbarActions').and.callThrough();
-            var button,
-                editor = new MediumEditor('.editor');
-            selectElementContentsAndFire(editor.elements[0]);
-            jasmine.clock().tick(11); // checkSelection delay
-            button = editor.toolbar.querySelector('[data-action="anchor"]');
-            editor.getAnchorExtension().showForm();
-            fireEvent(button, 'click');
-            expect(editor.toolbarActions.style.display).toBe('block');
-            expect(editor.getAnchorExtension().isDisplayed()).toBe(false);
-            expect(editor.showToolbarActions).toHaveBeenCalled();
-        });
-
         it('should unlink when selection is a link', function () {
             spyOn(document, 'execCommand').and.callThrough();
             this.el.innerHTML = '<a href="#">link</a>';
@@ -143,7 +129,8 @@ describe('Anchor Button TestCase', function () {
                 save,
                 input,
                 button,
-                link;
+                link,
+                opts;
 
             selectElementContents(editor.elements[0]);
             save = editor.toolbar.querySelector('[data-action="anchor"]');
@@ -157,7 +144,12 @@ describe('Anchor Button TestCase', function () {
             button.checked = true;
 
             fireEvent(input, 'keyup', 13);
-            expect(editor.createLink).toHaveBeenCalledWith(input, '_self', 'btn btn-default');
+            opts = {
+                url: 'test',
+                target: '_self',
+                buttonClass: 'btn btn-default'
+            };
+            expect(editor.createLink).toHaveBeenCalledWith(opts);
 
             link = editor.elements[0].querySelector('a');
             expect(link).not.toBeNull();

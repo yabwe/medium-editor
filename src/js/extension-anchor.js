@@ -45,27 +45,42 @@ var AnchorExtension;
         },
 
         doLinkCreation: function () {
-            var button = null,
-                target,
-                targetCheckbox = this.getForm().querySelector('.medium-editor-toolbar-anchor-target'),
-                buttonCheckbox = this.getForm().querySelector('.medium-editor-toolbar-anchor-button');
+            var targetCheckbox = this.getForm().querySelector('.medium-editor-toolbar-anchor-target'),
+                buttonCheckbox = this.getForm().querySelector('.medium-editor-toolbar-anchor-button'),
+                opts = {
+                    url: this.getInput().value
+                };
+
+            this.base.restoreSelection();
+
+            if (this.base.options.checkLinkFormat) {
+                opts.url = this.checkLinkFormat(opts.url);
+            }
 
             if (targetCheckbox && targetCheckbox.checked) {
-                target = "_blank";
+                opts.target = "_blank";
             } else {
-                target = "_self";
+                opts.target = "_self";
             }
 
             if (buttonCheckbox && buttonCheckbox.checked) {
-                button = this.base.options.anchorButtonClass;
+                opts.buttonClass = this.base.options.anchorButtonClass;
             }
 
-            this.base.createLink(this.getInput(), target, button);
+            this.base.createLink(opts);
+
+            this.switchToDefaultToolbar();
+            this.base.checkSelection();
+        },
+
+        checkLinkFormat: function (value) {
+            var re = /^(https?|ftps?|rtmpt?):\/\/|mailto:/;
+            return (re.test(value) ? '' : 'http://') + value;
         },
 
         doFormCancel: function () {
-            this.base.showToolbarActions();
             this.base.restoreSelection();
+            this.switchToDefaultToolbar();
         },
 
         handleOutsideInteraction: function (event) {
@@ -77,7 +92,10 @@ var AnchorExtension;
             }
         },
 
-        executeAction: function () {
+        handleClick: function (evt) {
+            evt.preventDefault();
+            evt.stopPropagation();
+
             if (!this.base.selection) {
                 this.base.checkSelection();
             }
@@ -85,12 +103,10 @@ var AnchorExtension;
             var selectedParentElement = meSelection.getSelectedParentElement(this.base.selectionRange);
             if (selectedParentElement.tagName &&
                     selectedParentElement.tagName.toLowerCase() === 'a') {
-                return this.base.options.ownerDocument.execCommand('unlink', false, null);
+                return this.base.execAction('unlink');
             }
 
-            if (this.isDisplayed()) {
-                this.base.showToolbarActions();
-            } else {
+            if (!this.isDisplayed()) {
                 this.showForm();
             }
 
@@ -212,12 +228,19 @@ var AnchorExtension;
 
         focus: function (value) {
             var input = this.getInput();
-            input.focus();
             input.value = value || '';
+            input.focus();
+        },
+
+        switchToDefaultToolbar: function () {
+            this.hideForm();
+            this.base.hideToolbar();
+            this.base.checkSelection();
         },
 
         hideForm: function () {
             this.getForm().style.display = 'none';
+            this.getInput().value = '';
         },
 
         showForm: function (link_value) {
