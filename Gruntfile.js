@@ -74,12 +74,13 @@ module.exports = function (grunt) {
 
     gruntConfig.jasmine = {
         suite: {
-            src: ['dist/js/medium-editor.js'],
+            src: [srcFiles],
             options: {
                 specs: ['spec/*.spec.js'],
                 helpers: 'spec/helpers/*.js',
-                vendor: [
-                    'spec/vendor/jasmine-jsreporter.js',
+                vendor: 'spec/vendor/jasmine-jsreporter.js',
+                polyfills: [
+                    'src/js/polyfills.js',
                     'spec/jasmine-jsreporter-script.js'
                 ],
                 styles: 'dist/css/*.css',
