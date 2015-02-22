@@ -10,17 +10,44 @@ var AnchorExtension;
         this.parent = true;
         this.options = {
             name: 'anchor',
-            action: 'anchor',
+            action: 'createLink',
             aria: 'link',
             tagNames: ['a'],
             contentDefault: '<b>#</b>',
             contentFA: '<i class="fa fa-link"></i>'
         };
         this.name = 'anchor';
+        this.hasForm = true;
     }
 
     AnchorDerived.prototype = {
 
+        // Button and Extension handling
+
+        // Called when the button the toolbar is clicked
+        // Overrides DefaultButton.handleClick
+        handleClick: function (evt) {
+            evt.preventDefault();
+            evt.stopPropagation();
+
+            if (!this.base.selection) {
+                this.base.checkSelection();
+            }
+
+            var selectedParentElement = meSelection.getSelectedParentElement(this.base.selectionRange);
+            if (selectedParentElement.tagName &&
+                    selectedParentElement.tagName.toLowerCase() === 'a') {
+                return this.base.execAction('unlink');
+            }
+
+            if (!this.isDisplayed()) {
+                this.showForm();
+            }
+
+            return false;
+        },
+
+        // Called by medium-editor to append form to the toolbar
         getForm: function () {
             if (!this.anchorForm) {
                 this.anchorForm = this.createForm();
@@ -28,10 +55,30 @@ var AnchorExtension;
             return this.anchorForm;
         },
 
-        getInput: function () {
-            return this.getForm().querySelector('input.medium-editor-toolbar-input');
+        // Used by medium-editor when the default toolbar is to be displayed
+        isDisplayed: function () {
+            return this.getForm().style.display === 'block';
         },
 
+        hideForm: function () {
+            this.getForm().style.display = 'none';
+            this.getInput().value = '';
+        },
+
+        showForm: function (link_value) {
+            var input = this.getInput();
+
+            this.base.saveSelection();
+            this.base.hideToolbarDefaultActions();
+            this.getForm().style.display = 'block';
+            this.base.setToolbarPosition();
+            this.base.keepToolbarAlive = true;
+
+            input.value = link_value || '';
+            input.focus();
+        },
+
+        // Called by core when tearing down medium-editor (deactivate)
         deactivate: function () {
             if (!this.anchorForm) {
                 return false;
@@ -43,6 +90,8 @@ var AnchorExtension;
 
             delete this.anchorForm;
         },
+
+        // core methods
 
         doLinkCreation: function () {
             var targetCheckbox = this.getForm().querySelector('.medium-editor-toolbar-anchor-target'),
@@ -69,8 +118,7 @@ var AnchorExtension;
 
             this.base.createLink(opts);
 
-            this.switchToDefaultToolbar();
-            this.base.checkSelection();
+            this.base.hideExtensionForms();
         },
 
         checkLinkFormat: function (value) {
@@ -80,38 +128,10 @@ var AnchorExtension;
 
         doFormCancel: function () {
             this.base.restoreSelection();
-            this.switchToDefaultToolbar();
+            this.base.hideExtensionForms();
         },
 
-        handleOutsideInteraction: function (event) {
-            if (event.target !== this.getForm() &&
-                    !mediumEditorUtil.isDescendant(this.getForm(), event.target) &&
-                    !mediumEditorUtil.isDescendant(this.base.toolbarActions, event.target)) {
-                this.base.keepToolbarAlive = false;
-                this.base.checkSelection();
-            }
-        },
-
-        handleClick: function (evt) {
-            evt.preventDefault();
-            evt.stopPropagation();
-
-            if (!this.base.selection) {
-                this.base.checkSelection();
-            }
-
-            var selectedParentElement = meSelection.getSelectedParentElement(this.base.selectionRange);
-            if (selectedParentElement.tagName &&
-                    selectedParentElement.tagName.toLowerCase() === 'a') {
-                return this.base.execAction('unlink');
-            }
-
-            if (!this.isDisplayed()) {
-                this.showForm();
-            }
-
-            return false;
-        },
+        // form creation and event handling
 
         createForm: function () {
             var doc = this.base.options.ownerDocument,
@@ -129,10 +149,7 @@ var AnchorExtension;
             form.id = 'medium-editor-toolbar-form-anchor-' + this.base.id;
 
             // Handle clicks on the form itself
-            this.base.on(form, 'click', function (event) {
-                event.stopPropagation();
-                this.base.keepToolbarAlive = true;
-            }.bind(this));
+            this.base.on(form, 'click', this.handleFormClick.bind(this));
 
             // Add url textbox
             input.setAttribute('type', 'text');
@@ -141,27 +158,10 @@ var AnchorExtension;
             form.appendChild(input);
 
             // Handle typing in the textbox
-            this.base.on(input, 'keyup', function (event) {
-                // For ENTER -> create the anchor
-                if (event.keyCode === mediumEditorUtil.keyCode.ENTER) {
-                    event.preventDefault();
-                    this.doLinkCreation();
-                    return;
-                }
-
-                // For ESCAPE -> close the form
-                if (event.keyCode === mediumEditorUtil.keyCode.ESCAPE) {
-                    event.preventDefault();
-                    this.doFormCancel();
-                }
-            }.bind(this));
+            this.base.on(input, 'keyup', this.handleTextboxKeyup.bind(this));
 
             // Handle clicks into the textbox
-            this.base.on(input, 'click', function (event) {
-                // make sure not to hide form when cliking into the input
-                event.stopPropagation();
-                this.base.keepToolbarAlive = true;
-            }.bind(this));
+            this.base.on(input, 'click', this.handleFormClick.bind(this));
 
             // Add save buton
             save.setAttribute('href', '#');
@@ -172,11 +172,7 @@ var AnchorExtension;
             form.appendChild(save);
 
             // Handle save button clicks (capture)
-            this.base.on(save, 'click', function (event) {
-                // Clicking Save -> create the anchor
-                event.preventDefault();
-                this.doLinkCreation();
-            }.bind(this), true);
+            this.base.on(save, 'click', this.handleSaveClick.bind(this), true);
 
             // Add close button
             close.setAttribute('href', '#');
@@ -187,11 +183,7 @@ var AnchorExtension;
             form.appendChild(close);
 
             // Handle close button clicks
-            this.base.on(close, 'click', function (event) {
-                // Click Close -> close the form
-                event.preventDefault();
-                this.doFormCancel();
-            }.bind(this));
+            this.base.on(close, 'click', this.handleCloseClick.bind(this));
 
             // (Optional) Add 'open in new window' checkbox
             if (this.base.options.anchorTarget) {
@@ -226,34 +218,50 @@ var AnchorExtension;
             return form;
         },
 
-        focus: function (value) {
-            var input = this.getInput();
-            input.value = value || '';
-            input.focus();
+        getInput: function () {
+            return this.getForm().querySelector('input.medium-editor-toolbar-input');
         },
 
-        switchToDefaultToolbar: function () {
-            this.hideForm();
-            this.base.hideToolbar();
-            this.base.checkSelection();
+        handleOutsideInteraction: function (event) {
+            if (event.target !== this.getForm() &&
+                    !mediumEditorUtil.isDescendant(this.getForm(), event.target) &&
+                    !mediumEditorUtil.isDescendant(this.base.toolbarActions, event.target)) {
+                this.base.keepToolbarAlive = false;
+                this.base.checkSelection();
+            }
         },
 
-        hideForm: function () {
-            this.getForm().style.display = 'none';
-            this.getInput().value = '';
+        handleTextboxKeyup: function (event) {
+            // For ENTER -> create the anchor
+            if (event.keyCode === mediumEditorUtil.keyCode.ENTER) {
+                event.preventDefault();
+                this.doLinkCreation();
+                return;
+            }
+
+            // For ESCAPE -> close the form
+            if (event.keyCode === mediumEditorUtil.keyCode.ESCAPE) {
+                event.preventDefault();
+                this.doFormCancel();
+            }
         },
 
-        showForm: function (link_value) {
-            this.base.saveSelection();
-            this.base.hideToolbarDefaultActions();
-            this.getForm().style.display = 'block';
-            this.base.setToolbarPosition();
+        handleFormClick: function (event) {
+            // make sure not to hide form when clicking inside the form
+            event.stopPropagation();
             this.base.keepToolbarAlive = true;
-            this.focus(link_value);
         },
 
-        isDisplayed: function () {
-            return this.getForm().style.display === 'block';
+        handleSaveClick: function (event) {
+            // Clicking Save -> create the anchor
+            event.preventDefault();
+            this.doLinkCreation();
+        },
+
+        handleCloseClick: function (event) {
+            // Click Close -> close the form
+            event.preventDefault();
+            this.doFormCancel();
         }
     };
 

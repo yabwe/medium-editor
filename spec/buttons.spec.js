@@ -329,7 +329,7 @@ describe('Buttons TestCase', function () {
             var editor = new MediumEditor('.editor', {
                     buttons: ['anchor']
                 }),
-                button = editor.toolbar.querySelector('[data-action="anchor"]');
+                button = editor.toolbar.querySelector('[data-action="createLink"]');
 
             this.el.innerHTML = '<p><span id="span-lorem">lorem</span> <a href="#" id="link">ipsum</a></p>';
             selectElementContentsAndFire(document.getElementById('link'));
@@ -344,7 +344,7 @@ describe('Buttons TestCase', function () {
             var button,
                 editor = new MediumEditor('.editor');
             selectElementContentsAndFire(editor.elements[0]);
-            button = editor.toolbar.querySelector('[data-action="anchor"]');
+            button = editor.toolbar.querySelector('[data-action="createLink"]');
             fireEvent(button, 'click');
             expect(editor.getAnchorExtension().showForm).toHaveBeenCalled();
         });

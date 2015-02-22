@@ -579,8 +579,10 @@ function MediumEditor(elements, options) {
             }
 
             toolbar.appendChild(this.toolbarButtons());
+
+            // Add any forms that extensions may have
             this.commands.forEach(function (extension) {
-                if (typeof extension.getForm === 'function') {
+                if (extension.hasForm) {
                     toolbar.appendChild(extension.getForm());
                 }
             });
@@ -1118,6 +1120,19 @@ function MediumEditor(elements, options) {
             this.delay(function () {
                 this.showToolbar();
             }.bind(this));
+        },
+
+        hideExtensionForms: function () {
+            // Hide all extension forms
+            this.commands.forEach(function (extension) {
+                if (extension.hasForm && extension.isDisplayed()) {
+                    extension.hideForm();
+                }
+            });
+
+            // Hide the toolbar and check selection to see if toolbar should be displayed
+            this.hideToolbar();
+            this.checkSelection();
         },
 
         isToolbarShown: function () {

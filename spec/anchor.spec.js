@@ -26,7 +26,7 @@ describe('Anchor Button TestCase', function () {
                 editor = new MediumEditor('.editor');
             selectElementContentsAndFire(editor.elements[0]);
             jasmine.clock().tick(1);
-            button = editor.toolbar.querySelector('[data-action="anchor"]');
+            button = editor.toolbar.querySelector('[data-action="createLink"]');
             fireEvent(button, 'click');
             expect(editor.toolbarActions.style.display).toBe('none');
             expect(editor.getAnchorExtension().isDisplayed()).toBe(true);
@@ -40,7 +40,7 @@ describe('Anchor Button TestCase', function () {
                 editor = new MediumEditor('.editor');
             selectElementContentsAndFire(editor.elements[0]);
             jasmine.clock().tick(11); // checkSelection delay
-            button = editor.toolbar.querySelector('[data-action="anchor"]');
+            button = editor.toolbar.querySelector('[data-action="createLink"]');
             fireEvent(button, 'click');
             expect(this.el.innerHTML, 'link');
             expect(document.execCommand).toHaveBeenCalled();
@@ -56,7 +56,7 @@ describe('Anchor Button TestCase', function () {
                 input;
 
             selectElementContents(editor.elements[0]);
-            button = editor.toolbar.querySelector('[data-action="anchor"]');
+            button = editor.toolbar.querySelector('[data-action="createLink"]');
             fireEvent(button, 'click');
             input = editor.getAnchorExtension().getInput();
             input.value = 'test';
@@ -70,7 +70,7 @@ describe('Anchor Button TestCase', function () {
                 input;
 
             selectElementContents(editor.elements[0]);
-            button = editor.toolbar.querySelector('[data-action="anchor"]');
+            button = editor.toolbar.querySelector('[data-action="createLink"]');
             fireEvent(button, 'click');
             input = editor.getAnchorExtension().getInput();
             input.value = '';
@@ -133,7 +133,7 @@ describe('Anchor Button TestCase', function () {
                 opts;
 
             selectElementContents(editor.elements[0]);
-            save = editor.toolbar.querySelector('[data-action="anchor"]');
+            save = editor.toolbar.querySelector('[data-action="createLink"]');
             fireEvent(save, 'click');
 
             input = editor.getAnchorExtension().getInput();
@@ -166,7 +166,7 @@ describe('Anchor Button TestCase', function () {
                 cancel;
 
             selectElementContents(editor.elements[0]);
-            button = editor.toolbar.querySelector('[data-action="anchor"]');
+            button = editor.toolbar.querySelector('[data-action="createLink"]');
             cancel = editor.getAnchorExtension().getForm().querySelector('a.medium-editor-toobar-close');
             fireEvent(button, 'click');
             expect(editor.getAnchorExtension().isDisplayed()).toBe(true);
