@@ -33,7 +33,6 @@ function MediumEditor(elements, options) {
             disableDoubleReturn: false,
             disableToolbar: false,
             disableEditing: false,
-            disableAnchorForm: false,
             disablePlaceholders: false,
             elementsContainer: false,
             imageDragging: true,

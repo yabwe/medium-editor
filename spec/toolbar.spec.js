@@ -51,20 +51,13 @@ describe('Toolbar TestCase', function () {
             }
         });
 
-        it('should not create an anchor form element if disableAnchorForm is set to true', function () {
+        it('should not create an anchor form element or anchor extension if anchor is not passed as a button', function () {
             expect(document.querySelectorAll('.medium-editor-toolbar-form-anchor').length).toBe(0);
             var editor = new MediumEditor('.editor', {
-                disableAnchorForm: true
+                buttons: ['bold', 'italic', 'underline']
             });
             expect(editor.toolbar.querySelectorAll('.medium-editor-toolbar-form-anchor').length).toBe(0);
-        });
-
-        xit('should not call MediumEditor\'s toolbarFormAnchor method if disableAnchorForm is set to true', function () {
-            spyOn(MediumEditor.prototype, 'toolbarFormAnchor').and.callThrough();
-            var editor = new MediumEditor('.editor', {
-                disableAnchorForm: true
-            });
-            expect(editor.toolbarFormAnchor).not.toHaveBeenCalled();
+            expect(editor.getAnchorExtension()).toBeUndefined();
         });
     });
 
