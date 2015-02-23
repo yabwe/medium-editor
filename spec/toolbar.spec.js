@@ -155,7 +155,7 @@ describe('Toolbar TestCase', function () {
             });
 
             selectElementContents(this.el.querySelector('b'));
-            window.getSelection().getRangeAt(0).collapse();
+            window.getSelection().getRangeAt(0).collapse(false);
             editor.checkSelection();
             jasmine.clock().tick(1); // checkSelection delay
             expect(editor.toolbar.classList.contains('medium-editor-toolbar-active')).toBe(true);
