@@ -1,4 +1,4 @@
-/*global mediumEditorUtil, console, meSelection,
+/*global Util, console, Selection,
   ButtonsData, DefaultButton */
 
 var AnchorExtension;
@@ -34,7 +34,7 @@ var AnchorExtension;
                 this.base.checkSelection();
             }
 
-            var selectedParentElement = meSelection.getSelectedParentElement(this.base.selectionRange);
+            var selectedParentElement = Selection.getSelectedParentElement(this.base.selectionRange);
             if (selectedParentElement.tagName &&
                     selectedParentElement.tagName.toLowerCase() === 'a') {
                 return this.base.execAction('unlink');
@@ -225,8 +225,8 @@ var AnchorExtension;
 
         handleOutsideInteraction: function (event) {
             if (event.target !== this.getForm() &&
-                    !mediumEditorUtil.isDescendant(this.getForm(), event.target) &&
-                    !mediumEditorUtil.isDescendant(this.base.toolbarActions, event.target)) {
+                    !Util.isDescendant(this.getForm(), event.target) &&
+                    !Util.isDescendant(this.base.toolbarActions, event.target)) {
                 this.base.keepToolbarAlive = false;
                 this.base.checkSelection();
             }
@@ -234,14 +234,14 @@ var AnchorExtension;
 
         handleTextboxKeyup: function (event) {
             // For ENTER -> create the anchor
-            if (event.keyCode === mediumEditorUtil.keyCode.ENTER) {
+            if (event.keyCode === Util.keyCode.ENTER) {
                 event.preventDefault();
                 this.doLinkCreation();
                 return;
             }
 
             // For ESCAPE -> close the form
-            if (event.keyCode === mediumEditorUtil.keyCode.ESCAPE) {
+            if (event.keyCode === Util.keyCode.ESCAPE) {
                 event.preventDefault();
                 this.doFormCancel();
             }
@@ -266,5 +266,5 @@ var AnchorExtension;
         }
     };
 
-    AnchorExtension = mediumEditorUtil.derives(DefaultButton, AnchorDerived);
+    AnchorExtension = Util.derives(DefaultButton, AnchorDerived);
 }(window, document));

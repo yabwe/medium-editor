@@ -1,10 +1,10 @@
-/*global mediumEditorUtil */
-var meSelection;
+/*global Util */
+var Selection;
 
 (function (window, document) {
     'use strict';
 
-    meSelection = {
+    Selection = {
         // http://stackoverflow.com/questions/1197401/how-can-i-get-the-element-the-caret-is-in-with-javascript-when-using-contentedi
         // by You
         getSelectionStart: function (ownerDocument) {
@@ -23,7 +23,7 @@ var meSelection;
             range = selection.getRangeAt(0);
             current = range.commonAncestorContainer;
 
-            return mediumEditorUtil.traverseUp(current, testElementFunction);
+            return Util.traverseUp(current, testElementFunction);
         },
 
         getSelectionElement: function (contentWindow) {
@@ -119,7 +119,7 @@ var meSelection;
                 tagName = el.tagName.toLowerCase();
             }
 
-            while (el && mediumEditorUtil.parentElements.indexOf(tagName) === -1) {
+            while (el && Util.parentElements.indexOf(tagName) === -1) {
                 el = el.parentNode;
                 if (el && el.tagName) {
                     tagName = el.tagName.toLowerCase();

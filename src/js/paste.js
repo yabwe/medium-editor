@@ -1,4 +1,4 @@
-/*global mediumEditorUtil, meSelection*/
+/*global Util, Selection*/
 var pasteHandler;
 
 (function (window, document) {
@@ -74,20 +74,20 @@ var pasteHandler;
                     paragraphs = evt.clipboardData.getData(dataFormatPlain).split(/[\r\n]/g);
                     for (p = 0; p < paragraphs.length; p += 1) {
                         if (paragraphs[p] !== '') {
-                            html += '<p>' + mediumEditorUtil.htmlEntities(paragraphs[p]) + '</p>';
+                            html += '<p>' + Util.htmlEntities(paragraphs[p]) + '</p>';
                         }
                     }
-                    mediumEditorUtil.insertHTMLCommand(options.ownerDocument, html);
+                    Util.insertHTMLCommand(options.ownerDocument, html);
                 } else {
-                    html = mediumEditorUtil.htmlEntities(evt.clipboardData.getData(dataFormatPlain));
-                    mediumEditorUtil.insertHTMLCommand(options.ownerDocument, html);
+                    html = Util.htmlEntities(evt.clipboardData.getData(dataFormatPlain));
+                    Util.insertHTMLCommand(options.ownerDocument, html);
                 }
             }
         },
 
         cleanPaste: function (text, options) {
             var i, elList, workEl,
-                el = meSelection.getSelectionElement(options.contentWindow),
+                el = Selection.getSelectionElement(options.contentWindow),
                 multiline = /<p|<br|<div/.test(text),
                 replacements = createReplacements();
 
@@ -113,7 +113,7 @@ var pasteHandler;
                     switch (workEl.tagName.toLowerCase()) {
                     case 'a':
                         if (options.targetBlank) {
-                            mediumEditorUtil.setTargetBlank(workEl);
+                            Util.setTargetBlank(workEl);
                         }
                         break;
                     case 'p':
@@ -153,7 +153,7 @@ var pasteHandler;
                     workEl.parentNode.removeChild(workEl);
                 }
             }
-            mediumEditorUtil.insertHTMLCommand(ownerDocument, fragmentBody.innerHTML.replace(/&nbsp;/g, ' '));
+            Util.insertHTMLCommand(ownerDocument, fragmentBody.innerHTML.replace(/&nbsp;/g, ' '));
         },
         isCommonBlock: function (el) {
             return (el && (el.tagName.toLowerCase() === 'p' || el.tagName.toLowerCase() === 'div'));
@@ -215,7 +215,7 @@ var pasteHandler;
                 el = spans[i];
 
                 // bail if span is in contenteditable = false
-                if (mediumEditorUtil.traverseUp(el, isCEF)) {
+                if (Util.traverseUp(el, isCEF)) {
                     return false;
                 }
 

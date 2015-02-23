@@ -184,7 +184,7 @@ if (!("classList" in document.createElement("_"))) {
 
     'use strict';
 
-var mediumEditorUtil;
+var Util;
 
 (function (window, document) {
     'use strict';
@@ -200,7 +200,7 @@ var mediumEditorUtil;
         return dest;
     }
 
-    mediumEditorUtil = {
+    Util = {
 
         // http://stackoverflow.com/questions/17907445/how-to-detect-ie11#comment30165888_17907562
         // by rg89
@@ -303,7 +303,7 @@ var mediumEditorUtil;
             }
 
             later = function () {
-                previous = mediumEditorUtil.now();
+                previous = Util.now();
                 timeout = null;
                 result = func.apply(context, args);
                 if (!timeout) {
@@ -312,7 +312,7 @@ var mediumEditorUtil;
             };
 
             return function () {
-                var currNow = mediumEditorUtil.now(),
+                var currNow = Util.now(),
                     remaining = wait - (currNow - previous);
                 context = this;
                 args = arguments;
@@ -425,12 +425,12 @@ var mediumEditorUtil;
     };
 }(window, document));
 
-var meSelection;
+var Selection;
 
 (function (window, document) {
     'use strict';
 
-    meSelection = {
+    Selection = {
         // http://stackoverflow.com/questions/1197401/how-can-i-get-the-element-the-caret-is-in-with-javascript-when-using-contentedi
         // by You
         getSelectionStart: function (ownerDocument) {
@@ -449,7 +449,7 @@ var meSelection;
             range = selection.getRangeAt(0);
             current = range.commonAncestorContainer;
 
-            return mediumEditorUtil.traverseUp(current, testElementFunction);
+            return Util.traverseUp(current, testElementFunction);
         },
 
         getSelectionElement: function (contentWindow) {
@@ -545,7 +545,7 @@ var meSelection;
                 tagName = el.tagName.toLowerCase();
             }
 
-            while (el && mediumEditorUtil.parentElements.indexOf(tagName) === -1) {
+            while (el && Util.parentElements.indexOf(tagName) === -1) {
                 el = el.parentNode;
                 if (el && el.tagName) {
                     tagName = el.tagName.toLowerCase();
@@ -960,20 +960,20 @@ var pasteHandler;
                     paragraphs = evt.clipboardData.getData(dataFormatPlain).split(/[\r\n]/g);
                     for (p = 0; p < paragraphs.length; p += 1) {
                         if (paragraphs[p] !== '') {
-                            html += '<p>' + mediumEditorUtil.htmlEntities(paragraphs[p]) + '</p>';
+                            html += '<p>' + Util.htmlEntities(paragraphs[p]) + '</p>';
                         }
                     }
-                    mediumEditorUtil.insertHTMLCommand(options.ownerDocument, html);
+                    Util.insertHTMLCommand(options.ownerDocument, html);
                 } else {
-                    html = mediumEditorUtil.htmlEntities(evt.clipboardData.getData(dataFormatPlain));
-                    mediumEditorUtil.insertHTMLCommand(options.ownerDocument, html);
+                    html = Util.htmlEntities(evt.clipboardData.getData(dataFormatPlain));
+                    Util.insertHTMLCommand(options.ownerDocument, html);
                 }
             }
         },
 
         cleanPaste: function (text, options) {
             var i, elList, workEl,
-                el = meSelection.getSelectionElement(options.contentWindow),
+                el = Selection.getSelectionElement(options.contentWindow),
                 multiline = /<p|<br|<div/.test(text),
                 replacements = createReplacements();
 
@@ -999,7 +999,7 @@ var pasteHandler;
                     switch (workEl.tagName.toLowerCase()) {
                     case 'a':
                         if (options.targetBlank) {
-                            mediumEditorUtil.setTargetBlank(workEl);
+                            Util.setTargetBlank(workEl);
                         }
                         break;
                     case 'p':
@@ -1039,7 +1039,7 @@ var pasteHandler;
                     workEl.parentNode.removeChild(workEl);
                 }
             }
-            mediumEditorUtil.insertHTMLCommand(ownerDocument, fragmentBody.innerHTML.replace(/&nbsp;/g, ' '));
+            Util.insertHTMLCommand(ownerDocument, fragmentBody.innerHTML.replace(/&nbsp;/g, ' '));
         },
         isCommonBlock: function (el) {
             return (el && (el.tagName.toLowerCase() === 'p' || el.tagName.toLowerCase() === 'div'));
@@ -1101,7 +1101,7 @@ var pasteHandler;
                 el = spans[i];
 
                 // bail if span is in contenteditable = false
-                if (mediumEditorUtil.traverseUp(el, isCEF)) {
+                if (Util.traverseUp(el, isCEF)) {
                     return false;
                 }
 
@@ -1149,7 +1149,7 @@ var AnchorExtension;
                 this.base.checkSelection();
             }
 
-            var selectedParentElement = meSelection.getSelectedParentElement(this.base.selectionRange);
+            var selectedParentElement = Selection.getSelectedParentElement(this.base.selectionRange);
             if (selectedParentElement.tagName &&
                     selectedParentElement.tagName.toLowerCase() === 'a') {
                 return this.base.execAction('unlink');
@@ -1340,8 +1340,8 @@ var AnchorExtension;
 
         handleOutsideInteraction: function (event) {
             if (event.target !== this.getForm() &&
-                    !mediumEditorUtil.isDescendant(this.getForm(), event.target) &&
-                    !mediumEditorUtil.isDescendant(this.base.toolbarActions, event.target)) {
+                    !Util.isDescendant(this.getForm(), event.target) &&
+                    !Util.isDescendant(this.base.toolbarActions, event.target)) {
                 this.base.keepToolbarAlive = false;
                 this.base.checkSelection();
             }
@@ -1349,14 +1349,14 @@ var AnchorExtension;
 
         handleTextboxKeyup: function (event) {
             // For ENTER -> create the anchor
-            if (event.keyCode === mediumEditorUtil.keyCode.ENTER) {
+            if (event.keyCode === Util.keyCode.ENTER) {
                 event.preventDefault();
                 this.doLinkCreation();
                 return;
             }
 
             // For ESCAPE -> close the form
-            if (event.keyCode === mediumEditorUtil.keyCode.ESCAPE) {
+            if (event.keyCode === Util.keyCode.ESCAPE) {
                 event.preventDefault();
                 this.doFormCancel();
             }
@@ -1381,7 +1381,7 @@ var AnchorExtension;
         }
     };
 
-    AnchorExtension = mediumEditorUtil.derives(DefaultButton, AnchorDerived);
+    AnchorExtension = Util.derives(DefaultButton, AnchorDerived);
 }(window, document));
 
 function MediumEditor(elements, options) {
@@ -1438,7 +1438,7 @@ function MediumEditor(elements, options) {
         init: function (elements, options) {
             var uniqueId = 1;
 
-            this.options = mediumEditorUtil.defaults(options, this.defaults);
+            this.options = Util.defaults(options, this.defaults);
             this.setElementSelection(elements);
             if (this.elements.length === 0) {
                 return;
@@ -1519,7 +1519,7 @@ function MediumEditor(elements, options) {
             // handleResize is throttled because:
             // - It will be called when the browser is resizing, which can fire many times very quickly
             // - For some event (like resize) a slight lag in UI responsiveness is OK and provides performance benefits
-            this.handleResize = mediumEditorUtil.throttle(function () {
+            this.handleResize = Util.throttle(function () {
                 if (self.isActive) {
                     self.positionToolbarIfShown();
                 }
@@ -1529,7 +1529,7 @@ function MediumEditor(elements, options) {
             // - This method could be called many times due to the type of event handlers that are calling it
             // - We want a slight delay so that other events in the stack can run, some of which may
             //   prevent the toolbar from being hidden (via this.keepToolbarAlive).
-            this.handleBlur = mediumEditorUtil.throttle(function () {
+            this.handleBlur = Util.throttle(function () {
                 if (self.isActive && !self.keepToolbarAlive) {
                     self.hideToolbarActions();
                 }
@@ -1574,7 +1574,7 @@ function MediumEditor(elements, options) {
                 selector = this.options.ownerDocument.querySelectorAll(selector);
             }
             // If element, put into array
-            if (mediumEditorUtil.isElement(selector)) {
+            if (Util.isElement(selector)) {
                 selector = [selector];
             }
             // Convert NodeList (or other array like object) into an array
@@ -1588,15 +1588,15 @@ function MediumEditor(elements, options) {
                         selection = self.options.contentWindow.getSelection(),
                         selRange = selection.isCollapsed ?
                                    null :
-                                   meSelection.getSelectedParentElement(selection.getRangeAt(0)),
+                                   Selection.getSelectedParentElement(selection.getRangeAt(0)),
                         i;
 
                     // This control was introduced also to avoid the toolbar
                     // to disapper when selecting from right to left and
                     // the selection ends at the beginning of the text.
                     for (i = 0; i < self.elements.length; i += 1) {
-                        if (mediumEditorUtil.isDescendant(self.elements[i], e.target)
-                                || mediumEditorUtil.isDescendant(self.elements[i], selRange)) {
+                        if (Util.isDescendant(self.elements[i], e.target)
+                                || Util.isDescendant(self.elements[i], selRange)) {
                             isDescendantOfEditorElements = true;
                             break;
                         }
@@ -1605,8 +1605,8 @@ function MediumEditor(elements, options) {
                     if (e.target !== self.toolbar
                             && self.elements.indexOf(e.target) === -1
                             && !isDescendantOfEditorElements
-                            && !mediumEditorUtil.isDescendant(self.toolbar, e.target)
-                            && !mediumEditorUtil.isDescendant(self.anchorPreview, e.target)) {
+                            && !Util.isDescendant(self.toolbar, e.target)
+                            && !Util.isDescendant(self.anchorPreview, e.target)) {
 
                         // Activate the placeholder
                         if (!self.options.disablePlaceholders) {
@@ -1781,8 +1781,8 @@ function MediumEditor(elements, options) {
             this.on(this.elements[index], 'keypress', function (e) {
                 var node,
                     tagName;
-                if (e.which === mediumEditorUtil.keyCode.SPACE) {
-                    node = meSelection.getSelectionStart(self.options.ownerDocument);
+                if (e.which === Util.keyCode.SPACE) {
+                    node = Selection.getSelectionStart(self.options.ownerDocument);
                     tagName = node.tagName.toLowerCase();
                     if (tagName === 'a') {
                         self.options.ownerDocument.execCommand('unlink', false, null);
@@ -1791,20 +1791,20 @@ function MediumEditor(elements, options) {
             });
 
             this.on(this.elements[index], 'keyup', function (e) {
-                var node = meSelection.getSelectionStart(self.options.ownerDocument),
+                var node = Selection.getSelectionStart(self.options.ownerDocument),
                     tagName,
                     editorElement;
 
                 if (node && node.getAttribute('data-medium-element') && node.children.length === 0 && !(self.options.disableReturn || node.getAttribute('data-disable-return'))) {
                     self.options.ownerDocument.execCommand('formatBlock', false, 'p');
                 }
-                if (e.which === mediumEditorUtil.keyCode.ENTER) {
-                    node = meSelection.getSelectionStart(self.options.ownerDocument);
+                if (e.which === Util.keyCode.ENTER) {
+                    node = Selection.getSelectionStart(self.options.ownerDocument);
                     tagName = node.tagName.toLowerCase();
-                    editorElement = meSelection.getSelectionElement(self.options.contentWindow);
+                    editorElement = Selection.getSelectionElement(self.options.contentWindow);
 
                     if (!(self.options.disableReturn || editorElement.getAttribute('data-disable-return')) &&
-                            tagName !== 'li' && !mediumEditorUtil.isListItemChild(node)) {
+                            tagName !== 'li' && !Util.isListItemChild(node)) {
                         if (!e.shiftKey) {
 
                             // paragraph creation should not be forced within a header tag
@@ -1824,11 +1824,11 @@ function MediumEditor(elements, options) {
         bindReturn: function (index) {
             var self = this;
             this.on(this.elements[index], 'keypress', function (e) {
-                if (e.which === mediumEditorUtil.keyCode.ENTER) {
+                if (e.which === Util.keyCode.ENTER) {
                     if (self.options.disableReturn || this.getAttribute('data-disable-return')) {
                         e.preventDefault();
                     } else if (self.options.disableDoubleReturn || this.getAttribute('data-disable-double-return')) {
-                        var node = meSelection.getSelectionStart(self.options.contentWindow);
+                        var node = Selection.getSelectionStart(self.options.contentWindow);
                         if (node && node.textContent.trim() === '') {
                             e.preventDefault();
                         }
@@ -1843,9 +1843,9 @@ function MediumEditor(elements, options) {
             this.on(this.elements[index], 'keydown', function (e) {
                 var node, tag, key;
 
-                if (e.which === mediumEditorUtil.keyCode.TAB) {
+                if (e.which === Util.keyCode.TAB) {
                     // Override tab only for pre nodes
-                    node = meSelection.getSelectionStart(self.options.ownerDocument);
+                    node = Selection.getSelectionStart(self.options.ownerDocument);
                     tag = node && node.tagName.toLowerCase();
 
                     if (tag === 'pre') {
@@ -1854,7 +1854,7 @@ function MediumEditor(elements, options) {
                     }
 
                     // Tab to indent list structures!
-                    if (tag === 'li' || mediumEditorUtil.isListItemChild(node)) {
+                    if (tag === 'li' || Util.isListItemChild(node)) {
                         e.preventDefault();
 
                         // If Shift is down, outdent, otherwise indent
@@ -1864,7 +1864,7 @@ function MediumEditor(elements, options) {
                             self.options.ownerDocument.execCommand('indent', e);
                         }
                     }
-                } else if (e.which === mediumEditorUtil.keyCode.BACKSPACE || e.which === mediumEditorUtil.keyCode.DELETE || e.which === mediumEditorUtil.keyCode.ENTER) {
+                } else if (e.which === Util.keyCode.BACKSPACE || e.which === Util.keyCode.DELETE || e.which === Util.keyCode.ENTER) {
 
                     // Bind keys which can create or destroy a block element: backspace, delete, return
                     self.onBlockModifier(e);
@@ -1882,24 +1882,24 @@ function MediumEditor(elements, options) {
         },
 
         onBlockModifier: function (e) {
-            var range, sel, p, node = meSelection.getSelectionStart(this.options.ownerDocument),
+            var range, sel, p, node = Selection.getSelectionStart(this.options.ownerDocument),
                 tagName = node.tagName.toLowerCase(),
                 isEmpty = /^(\s+|<br\/?>)?$/i,
                 isHeader = /h\d/i;
 
-            if ((e.which === mediumEditorUtil.keyCode.BACKSPACE || e.which === mediumEditorUtil.keyCode.ENTER)
+            if ((e.which === Util.keyCode.BACKSPACE || e.which === Util.keyCode.ENTER)
                     && node.previousElementSibling
                     // in a header
                     && isHeader.test(tagName)
                     // at the very end of the block
-                    && meSelection.getCaretOffsets(node).left === 0) {
-                if (e.which === mediumEditorUtil.keyCode.BACKSPACE && isEmpty.test(node.previousElementSibling.innerHTML)) {
+                    && Selection.getCaretOffsets(node).left === 0) {
+                if (e.which === Util.keyCode.BACKSPACE && isEmpty.test(node.previousElementSibling.innerHTML)) {
                     // backspacing the begining of a header into an empty previous element will
                     // change the tagName of the current node to prevent one
                     // instead delete previous node and cancel the event.
                     node.previousElementSibling.parentNode.removeChild(node.previousElementSibling);
                     e.preventDefault();
-                } else if (e.which === mediumEditorUtil.keyCode.ENTER) {
+                } else if (e.which === Util.keyCode.ENTER) {
                     // hitting return in the begining of a header will create empty header elements before the current one
                     // instead, make "<p><br></p>" element, which are what happens if you hit return in an empty paragraph
                     p = this.options.ownerDocument.createElement('p');
@@ -1907,7 +1907,7 @@ function MediumEditor(elements, options) {
                     node.previousElementSibling.parentNode.insertBefore(p, node);
                     e.preventDefault();
                 }
-            } else if (e.which === mediumEditorUtil.keyCode.DELETE
+            } else if (e.which === Util.keyCode.DELETE
                         && node.nextElementSibling
                         && node.previousElementSibling
                         // not in a header
@@ -1986,7 +1986,7 @@ function MediumEditor(elements, options) {
                 if (typeof extension.getButton === 'function') {
                     btn = extension.getButton(this);
                     li = this.options.ownerDocument.createElement('li');
-                    if (mediumEditorUtil.isElement(btn)) {
+                    if (Util.isElement(btn)) {
                         li.appendChild(btn);
                     } else {
                         li.innerHTML = btn;
@@ -2006,7 +2006,7 @@ function MediumEditor(elements, options) {
                             event.type &&
                             event.type.toLowerCase() === 'blur' &&
                             event.relatedTarget &&
-                            mediumEditorUtil.isDescendant(this.toolbar, event.relatedTarget)) {
+                            Util.isDescendant(this.toolbar, event.relatedTarget)) {
                         return false;
                     }
                     this.checkSelection();
@@ -2060,7 +2060,7 @@ function MediumEditor(elements, options) {
                         fileReader.readAsDataURL(file);
 
                         id = 'medium-img-' + (+new Date());
-                        mediumEditorUtil.insertHTMLCommand(self.options.ownerDocument, '<img class="medium-image-loading" id="' + id + '" />');
+                        Util.insertHTMLCommand(self.options.ownerDocument, '<img class="medium-image-loading" id="' + id + '" />');
 
                         fileReader.onload = function () {
                             var img = document.getElementById(id);
@@ -2105,7 +2105,7 @@ function MediumEditor(elements, options) {
                 newSelection = this.options.contentWindow.getSelection();
                 if ((!this.options.updateOnEmptySelection && newSelection.toString().trim() === '') ||
                         (this.options.allowMultiParagraphSelection === false && this.multipleBlockElementsSelected()) ||
-                        meSelection.selectionInContentEditableFalse(this.options.contentWindow)) {
+                        Selection.selectionInContentEditableFalse(this.options.contentWindow)) {
                     if (!this.options.staticToolbar) {
                         this.hideToolbarActions();
                     } else {
@@ -2113,7 +2113,7 @@ function MediumEditor(elements, options) {
                     }
 
                 } else {
-                    selectionElement = meSelection.getSelectionElement(this.options.contentWindow);
+                    selectionElement = Selection.getSelectionElement(this.options.contentWindow);
                     if (!selectionElement || selectionElement.getAttribute('data-disable-toolbar')) {
                         if (!this.options.staticToolbar) {
                             this.hideToolbarActions();
@@ -2129,7 +2129,7 @@ function MediumEditor(elements, options) {
         // Checks for existance of multiple block elements in the current selection
         multipleBlockElementsSelected: function () {
             /*jslint regexp: true*/
-            var selectionHtml = meSelection.getSelectionHtml.call(this).replace(/<[\S]+><\/[\S]+>/gim, ''),
+            var selectionHtml = Selection.getSelectionHtml.call(this).replace(/<[\S]+><\/[\S]+>/gim, ''),
                 hasMultiParagraphs = selectionHtml.match(/<(p|h[1-6]|blockquote)[^>]*>/g);
             /*jslint regexp: false*/
 
@@ -2163,7 +2163,7 @@ function MediumEditor(elements, options) {
             if (this.options.standardizeSelectionStart &&
                     this.selectionRange.startContainer.nodeValue &&
                     (this.selectionRange.startOffset === this.selectionRange.startContainer.nodeValue.length)) {
-                adjacentNode = mediumEditorUtil.findAdjacentTextNodeWithContent(meSelection.getSelectionElement(this.options.contentWindow), this.selectionRange.startContainer, this.options.ownerDocument);
+                adjacentNode = Util.findAdjacentTextNodeWithContent(Selection.getSelectionElement(this.options.contentWindow), this.selectionRange.startContainer, this.options.ownerDocument);
                 if (adjacentNode) {
                     offset = 0;
                     while (adjacentNode.nodeValue.substr(offset, 1).trim().length === 0) {
@@ -2307,7 +2307,7 @@ function MediumEditor(elements, options) {
             if (!this.selectionRange) {
                 return;
             }
-            parentNode = meSelection.getSelectedParentElement(this.selectionRange);
+            parentNode = Selection.getSelectedParentElement(this.selectionRange);
 
             // Loop through all commands
             this.commands.forEach(function (command) {
@@ -2328,7 +2328,7 @@ function MediumEditor(elements, options) {
             });
 
             // Climb up the DOM and do manual checks for whether a certain command is currently enabled for this node
-            while (parentNode.tagName !== undefined && mediumEditorUtil.parentElements.indexOf(parentNode.tagName.toLowerCase) === -1) {
+            while (parentNode.tagName !== undefined && Util.parentElements.indexOf(parentNode.tagName.toLowerCase) === -1) {
                 manualStateChecks.forEach(checkExtension.bind(this));
 
                 // we can abort the search upwards if we leave the contentEditable element
@@ -2421,7 +2421,7 @@ function MediumEditor(elements, options) {
         },
 
         execFormatBlock: function (el) {
-            var selectionData = meSelection.getSelectionData(this.selection.anchorNode);
+            var selectionData = Selection.getSelectionData(this.selection.anchorNode);
             // FF handles blockquote differently on formatBlock
             // allowing nesting, we need to use outdent
             // https://developer.mozilla.org/en-US/docs/Rich-Text_Editing_in_Mozilla
@@ -2436,7 +2436,7 @@ function MediumEditor(elements, options) {
             //  blockquote needs to be called as indent
             // http://stackoverflow.com/questions/10741831/execcommand-formatblock-headings-in-ie
             // http://stackoverflow.com/questions/1816223/rich-text-editor-with-blockquote-function/1821777#1821777
-            if (mediumEditorUtil.isIE) {
+            if (Util.isIE) {
                 if (el === 'blockquote') {
                     return this.options.ownerDocument.execCommand('indent', false, el);
                 }
@@ -2521,7 +2521,7 @@ function MediumEditor(elements, options) {
         selectAllContents: function () {
             var range = this.options.ownerDocument.createRange(),
                 sel = this.options.contentWindow.getSelection(),
-                currNode = meSelection.getSelectionElement(this.options.contentWindow);
+                currNode = Selection.getSelectionElement(this.options.contentWindow);
 
             if (currNode) {
                 // Move to the lowest descendant node that still selects all of the contents
@@ -2553,7 +2553,7 @@ function MediumEditor(elements, options) {
 
                 // Find element current selection is inside
                 this.elements.forEach(function (el, index) {
-                    if (el === range.startContainer || mediumEditorUtil.isDescendant(el, range.startContainer)) {
+                    if (el === range.startContainer || Util.isDescendant(el, range.startContainer)) {
                         editableElementIndex = index;
                         return false;
                     }
@@ -2808,7 +2808,7 @@ function MediumEditor(elements, options) {
                 this.options.ownerDocument.execCommand('createLink', false, opts.url);
 
                 if (this.options.targetBlank || opts.target === '_blank') {
-                    mediumEditorUtil.setTargetBlank(meSelection.getSelectionStart(this.options.ownerDocument));
+                    Util.setTargetBlank(Selection.getSelectionStart(this.options.ownerDocument));
                 }
 
                 if (opts.buttonClass) {
@@ -2826,7 +2826,7 @@ function MediumEditor(elements, options) {
         },
 
         setButtonClass: function (buttonClass) {
-            var el = meSelection.getSelectionStart(this.options.ownerDocument),
+            var el = Selection.getSelectionStart(this.options.ownerDocument),
                 classes = buttonClass.split(' '),
                 i,
                 j;

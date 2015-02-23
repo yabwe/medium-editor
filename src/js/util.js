@@ -1,6 +1,6 @@
 /*global NodeFilter*/
 
-var mediumEditorUtil;
+var Util;
 
 (function (window, document) {
     'use strict';
@@ -16,7 +16,7 @@ var mediumEditorUtil;
         return dest;
     }
 
-    mediumEditorUtil = {
+    Util = {
 
         // http://stackoverflow.com/questions/17907445/how-to-detect-ie11#comment30165888_17907562
         // by rg89
@@ -119,7 +119,7 @@ var mediumEditorUtil;
             }
 
             later = function () {
-                previous = mediumEditorUtil.now();
+                previous = Util.now();
                 timeout = null;
                 result = func.apply(context, args);
                 if (!timeout) {
@@ -128,7 +128,7 @@ var mediumEditorUtil;
             };
 
             return function () {
-                var currNow = mediumEditorUtil.now(),
+                var currNow = Util.now(),
                     remaining = wait - (currNow - previous);
                 context = this;
                 args = arguments;
