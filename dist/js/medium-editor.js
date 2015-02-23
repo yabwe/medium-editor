@@ -2138,11 +2138,9 @@ function MediumEditor(elements, options) {
                     !this.options.disableToolbar) {
 
                 newSelection = this.options.contentWindow.getSelection();
-
                 if ((!this.options.updateOnEmptySelection && newSelection.toString().trim() === '') ||
                         (this.options.allowMultiParagraphSelection === false && this.hasMultiParagraphs()) ||
                         meSelection.selectionInContentEditableFalse(this.options.contentWindow)) {
-
                     if (!this.options.staticToolbar) {
                         this.hideToolbarActions();
                     } else {
@@ -2523,8 +2521,8 @@ function MediumEditor(elements, options) {
         showToolbar: function () {
             if (this.toolbar && !this.isToolbarShown()) {
                 this.toolbar.classList.add('medium-editor-toolbar-active');
-                if (this.onShowToolbar) {
-                    this.onShowToolbar();
+                if (typeof this.options.onShowToolbar === 'function') {
+                    this.options.onShowToolbar();
                 }
             }
         },
@@ -2532,9 +2530,8 @@ function MediumEditor(elements, options) {
         hideToolbar: function () {
             if (this.isToolbarShown()) {
                 this.toolbar.classList.remove('medium-editor-toolbar-active');
-                // TODO: this should be an option?
-                if (this.onHideToolbar) {
-                    this.onHideToolbar();
+                if (typeof this.options.onHideToolbar === 'function') {
+                    this.options.onHideToolbar();
                 }
             }
         },
