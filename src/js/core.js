@@ -722,7 +722,7 @@ function MediumEditor(elements, options) {
 
                 newSelection = this.options.contentWindow.getSelection();
                 if ((!this.options.updateOnEmptySelection && newSelection.toString().trim() === '') ||
-                        (this.options.allowMultiParagraphSelection === false && this.hasMultiParagraphs()) ||
+                        (this.options.allowMultiParagraphSelection === false && this.multipleBlockElementsSelected()) ||
                         meSelection.selectionInContentEditableFalse(this.options.contentWindow)) {
                     if (!this.options.staticToolbar) {
                         this.hideToolbarActions();
@@ -744,11 +744,14 @@ function MediumEditor(elements, options) {
             return this;
         },
 
-        hasMultiParagraphs: function () {
+        // Checks for existance of multiple block elements in the current selection
+        multipleBlockElementsSelected: function () {
+            /*jslint regexp: true*/
             var selectionHtml = meSelection.getSelectionHtml.call(this).replace(/<[\S]+><\/[\S]+>/gim, ''),
-                hasMultiParagraphs = selectionHtml.match(/<(p|h[0-6]|blockquote)>([\s\S]*?)<\/(p|h[0-6]|blockquote)>/g);
+                hasMultiParagraphs = selectionHtml.match(/<(p|h[1-6]|blockquote)[^>]*>/g);
+            /*jslint regexp: false*/
 
-            return (hasMultiParagraphs ? hasMultiParagraphs.length : 0);
+            return !!hasMultiParagraphs && hasMultiParagraphs.length > 1;
         },
 
         checkSelectionElement: function (newSelection, selectionElement) {
