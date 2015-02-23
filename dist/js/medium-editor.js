@@ -2211,13 +2211,8 @@ function MediumEditor(elements, options) {
                 halfOffsetWidth = this.toolbar.offsetWidth / 2,
                 containerCenter = (containerRect.left + (containerRect.width / 2));
 
-            if (selection.focusNode === null) {
-                return this;
-            }
-
-            this.showToolbar();
-
             if (this.options.staticToolbar) {
+                this.showToolbar();
 
                 if (this.options.stickyToolbar) {
 
@@ -2251,7 +2246,11 @@ function MediumEditor(elements, options) {
                     this.toolbar.style.left = (containerCenter - halfOffsetWidth) + "px";
                 }
 
-            } else if (!selection.isCollapsed) {
+                this.hideAnchorPreview();
+
+            } else if (selection.focusNode !== null && !selection.isCollapsed) {
+                this.showToolbar();
+
                 range = selection.getRangeAt(0);
                 boundary = range.getBoundingClientRect();
                 middleBoundary = (boundary.left + boundary.right) / 2;
@@ -2272,9 +2271,9 @@ function MediumEditor(elements, options) {
                 } else {
                     this.toolbar.style.left = defaultLeft + middleBoundary + 'px';
                 }
-            }
 
-            this.hideAnchorPreview();
+                this.hideAnchorPreview();
+            }
 
             return this;
         },
@@ -2293,7 +2292,7 @@ function MediumEditor(elements, options) {
             var elements = Array.prototype.slice.call(this.elements),
                 manualStateChecks = [],
                 queryState = null,
-                parentNode = meSelection.getSelectedParentElement(this.selectionRange),
+                parentNode,
                 checkExtension = function (extension) {
                     if (typeof extension.checkState === 'function') {
                         extension.checkState(parentNode);
@@ -2304,6 +2303,11 @@ function MediumEditor(elements, options) {
                         }
                     }
                 };
+
+            if (!this.selectionRange) {
+                return;
+            }
+            parentNode = meSelection.getSelectedParentElement(this.selectionRange);
 
             // Loop through all commands
             this.commands.forEach(function (command) {
