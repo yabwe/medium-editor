@@ -749,8 +749,7 @@ function MediumEditor(elements, options) {
 
         checkSelection: function () {
             var newSelection,
-                selectionElement,
-                anchorExtension;
+                selectionElement;
 
             if (!this.preventSelectionUpdates &&
                     this.keepToolbarAlive !== true &&
@@ -765,11 +764,7 @@ function MediumEditor(elements, options) {
                     if (!this.options.staticToolbar) {
                         this.hideToolbarActions();
                     } else {
-                        anchorExtension = this.getAnchorExtension();
-                        if (anchorExtension && anchorExtension.isDisplayed()) {
-                            this.setToolbarButtonStates();
-                            this.showToolbarActions();
-                        }
+                        this.showAndUpdateToolbar();
                     }
 
                 } else {
@@ -837,9 +832,7 @@ function MediumEditor(elements, options) {
 
             for (i = 0; i < this.elements.length; i += 1) {
                 if (this.elements[i] === selectionElement) {
-                    this.setToolbarButtonStates()
-                        .setToolbarPosition()
-                        .showToolbarActions();
+                    this.showAndUpdateToolbar();
                     return;
                 }
             }
@@ -847,6 +840,12 @@ function MediumEditor(elements, options) {
             if (!this.options.staticToolbar) {
                 this.hideToolbarActions();
             }
+        },
+
+        showAndUpdateToolbar: function () {
+            this.setToolbarButtonStates()
+                .setToolbarPosition()
+                .showToolbarDefaultActions();
         },
 
         setToolbarPosition: function () {
@@ -1110,6 +1109,8 @@ function MediumEditor(elements, options) {
         },
 
         showToolbarDefaultActions: function () {
+            this.hideExtensionForms();
+
             if (this.toolbarActions && !this.isToolbarDefaultActionsShown()) {
                 this.toolbarActions.style.display = 'block';
             }
@@ -1120,6 +1121,8 @@ function MediumEditor(elements, options) {
             this.delay(function () {
                 this.showToolbar();
             }.bind(this));
+
+            return this;
         },
 
         hideExtensionForms: function () {
@@ -1129,10 +1132,6 @@ function MediumEditor(elements, options) {
                     extension.hideForm();
                 }
             });
-
-            // Hide the toolbar and check selection to see if toolbar should be displayed
-            this.hideToolbar();
-            this.checkSelection();
         },
 
         isToolbarShown: function () {
@@ -1166,21 +1165,6 @@ function MediumEditor(elements, options) {
             });
             this.keepToolbarAlive = false;
             this.hideToolbar();
-        },
-
-        showToolbarActions: function () {
-            var self = this,
-                anchorExtension = this.getAnchorExtension();
-            if (anchorExtension) {
-                anchorExtension.hideForm();
-            }
-            this.toolbarActions.style.display = 'block';
-            this.keepToolbarAlive = false;
-            // Using setTimeout + options.delay because:
-            // We will actually be displaying the toolbar, which should be controlled by options.delay
-            this.delay(function () {
-                self.showToolbar();
-            });
         },
 
         selectAllContents: function () {

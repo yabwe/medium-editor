@@ -117,8 +117,8 @@ var AnchorExtension;
             }
 
             this.base.createLink(opts);
-
-            this.base.hideExtensionForms();
+            this.base.keepToolbarAlive = false;
+            this.base.checkSelection();
         },
 
         checkLinkFormat: function (value) {
@@ -128,7 +128,8 @@ var AnchorExtension;
 
         doFormCancel: function () {
             this.base.restoreSelection();
-            this.base.hideExtensionForms();
+            this.base.keepToolbarAlive = false;
+            this.base.checkSelection();
         },
 
         // form creation and event handling

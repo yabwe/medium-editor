@@ -160,7 +160,7 @@ describe('Anchor Button TestCase', function () {
 
     describe('Cancel', function () {
         it('should close the link form when user clicks on cancel', function () {
-            spyOn(MediumEditor.prototype, 'showToolbarActions').and.callThrough();
+            spyOn(MediumEditor.prototype, 'showAndUpdateToolbar').and.callThrough();
             var editor = new MediumEditor('.editor'),
                 button,
                 cancel;
@@ -171,7 +171,7 @@ describe('Anchor Button TestCase', function () {
             fireEvent(button, 'click');
             expect(editor.getAnchorExtension().isDisplayed()).toBe(true);
             fireEvent(cancel, 'click');
-            expect(editor.showToolbarActions).toHaveBeenCalled();
+            expect(editor.showAndUpdateToolbar).toHaveBeenCalled();
             expect(editor.getAnchorExtension().isDisplayed()).toBe(false);
         });
     });
