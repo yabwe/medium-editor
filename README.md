@@ -17,6 +17,7 @@ Latest ✔ | Latest ✔ | IE 9+ ✔ | Latest ✔ |
 [![Travis build status](https://travis-ci.org/daviferreira/medium-editor.png?branch=master)](https://travis-ci.org/daviferreira/medium-editor)
 [![dependencies](https://david-dm.org/daviferreira/medium-editor.png)](https://david-dm.org/daviferreira/medium-editor)
 [![devDependency Status](https://david-dm.org/daviferreira/medium-editor/dev-status.png)](https://david-dm.org/daviferreira/medium-editor#info=devDependencies)
+[![Coverage Status](https://coveralls.io/repos/daviferreira/medium-editor/badge.svg)](https://coveralls.io/r/daviferreira/medium-editor)
 
 # Basic usage
 

@@ -2028,41 +2028,6 @@ function MediumEditor(elements, options) {
             return this;
         },
 
-        // http://stackoverflow.com/questions/6690752/insert-html-at-caret-in-a-contenteditable-div
-        insertHTML: function insertHTML(html) {
-            var selection, range, el, fragment, node, lastNode;
-
-            if (this.options.ownerDocument.queryCommandSupported('insertHTML')) {
-                try {
-                    return this.options.ownerDocument.execCommand('insertHTML', false, html);
-                } catch (ignore) {}
-            }
-
-            selection = window.getSelection();
-            if (selection.getRangeAt && selection.rangeCount) {
-                range = selection.getRangeAt(0);
-                range.deleteContents();
-
-                el = this.options.ownerDocument.createElement("div");
-                el.innerHTML = html;
-                fragment = this.options.ownerDocument.createDocumentFragment();
-                while (el.firstChild) {
-                    node = el.firstChild;
-                    lastNode = fragment.appendChild(node);
-                }
-                range.insertNode(fragment);
-
-                // Preserve the selection:
-                if (lastNode) {
-                    range = range.cloneRange();
-                    range.setStartAfter(lastNode);
-                    range.collapse(true);
-                    selection.removeAllRanges();
-                    selection.addRange(range);
-                }
-            }
-        },
-
         bindDragDrop: function () {
             var self = this, i, className, onDrag, onDrop, element;
 
