@@ -1,7 +1,7 @@
 /*global MediumEditor, describe, it, expect, spyOn,
          afterEach, beforeEach, selectElementContents, runs,
          fireEvent, waitsFor, tearDown, xit, jasmine,
-         selectElementContentsAndFire */
+         selectElementContentsAndFire, console */
 
 describe('Toolbar TestCase', function () {
     'use strict';
@@ -33,22 +33,6 @@ describe('Toolbar TestCase', function () {
             var editor = new MediumEditor('.editor');
             expect(editor.toolbar.className).toMatch(/medium-editor-toolbar/);
             expect(document.querySelectorAll('.medium-editor-toolbar').length).toBe(1);
-        });
-
-        it('should call the onShowToolbar callback if set', function () {
-            this.el.innerHTML = 'specOnShowToolbarTest';
-            var editor = new MediumEditor('.editor');
-            editor.onShowToolbar = function () {};
-            spyOn(editor, 'onShowToolbar').and.callThrough();
-            jasmine.clock().install();
-            try {
-                selectElementContentsAndFire(this.el);
-                jasmine.clock().tick(51);
-                expect(editor.toolbar.classList.contains('medium-editor-toolbar-active')).toBe(true);
-                expect(editor.onShowToolbar).toHaveBeenCalled();
-            } finally {
-                jasmine.clock().uninstall();
-            }
         });
 
         it('should not create an anchor form element or anchor extension if anchor is not passed as a button', function () {
@@ -105,17 +89,36 @@ describe('Toolbar TestCase', function () {
             expect(editor.toolbar.querySelector('button[data-action="bold"]').classList.contains('medium-editor-button-active')).toBe(true);
         });
 
-        it('should call onHideToolbar when toolbar is hidden', function () {
-            var editor = new MediumEditor('.editor');
-            editor.toolbar.classList.add('medium-editor-toolbar-active');
-            editor.onHideToolbar = function () {};
+        it('should call onShowToolbar when toolbar is shwon and onHideToolbar when toolbar is hidden', function () {
+            var editor,
+                temp = {
+                    onShow: function () {},
+                    onHide: function () {}
+                };
 
-            spyOn(editor, 'onHideToolbar').and.callThrough();
+            spyOn(temp, 'onShow').and.callThrough();
+            spyOn(temp, 'onHide').and.callThrough();
 
-            fireEvent(editor.elements[0], 'focus');
-            fireEvent(editor.elements[0], 'blur');
+            this.el.innerHTML = 'specOnShowToolbarTest';
 
-            expect(editor.onHideToolbar).toHaveBeenCalled();
+            editor = new MediumEditor('.editor', {
+                onShowToolbar: temp.onShow,
+                onHideToolbar: temp.onHide
+            });
+
+            selectElementContentsAndFire(this.el);
+
+            expect(editor.toolbar.classList.contains('medium-editor-toolbar-active')).toBe(true);
+            expect(temp.onShow).toHaveBeenCalled();
+            expect(temp.onHide).not.toHaveBeenCalled();
+
+            // Remove selection and call check selection, which should make the toolbar be hidden
+            jasmine.clock().tick(1);
+            window.getSelection().removeAllRanges();
+            editor.checkSelection();
+
+            expect(editor.toolbar.classList.contains('medium-editor-toolbar-active')).toBe(false);
+            expect(temp.onHide).toHaveBeenCalled();
         });
 
         it('should hide the toolbar for one medium-editor instance when another medium-editor instance shows its toolbar', function () {
