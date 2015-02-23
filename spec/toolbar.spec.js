@@ -146,6 +146,15 @@ describe('Toolbar TestCase', function () {
             expect(editor.toolbar.querySelector('[data-action="bold"]').classList.contains('medium-editor-button-active')).toBe(false);
         });
 
+        it('should update toolbar position when user clicks on medium editor element', function () {
+            var editor = new MediumEditor('.editor', {
+                staticToolbar: true
+            });
+            spyOn(MediumEditor.prototype, 'setToolbarPosition').and.callThrough();
+            fireEvent(editor.elements[0], 'click');
+            expect(editor.setToolbarPosition).toHaveBeenCalled();
+        });
+
         it('should show and update toolbar buttons when staticToolbar and updateOnEmptySelection options are set to true', function () {
             this.el.innerHTML = '<b>lorem ipsum</b>';
             var editor = new MediumEditor('.editor', {
