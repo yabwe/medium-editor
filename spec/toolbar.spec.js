@@ -120,8 +120,49 @@ describe('Toolbar TestCase', function () {
             expect(editor.toolbar.classList.contains('medium-editor-toolbar-active')).toBe(false);
             expect(temp.onHide).toHaveBeenCalled();
         });
+    });
 
-        it('should hide the toolbar for one medium-editor instance when another medium-editor instance shows its toolbar', function () {
+    describe('Static Toolbars', function () {
+        beforeEach(function () {
+            jasmine.clock().install();
+        });
+
+        afterEach(function () {
+            jasmine.clock().uninstall();
+        });
+
+        it('should not throw an error when check selection is called when there is an empty selection', function () {
+            this.el.innerHTML = '<b>lorem ipsum</b>';
+            var editor = new MediumEditor('.editor', {
+                staticToolbar: true,
+                stickyToolbar: true
+            });
+
+            selectElementContents(this.el.querySelector('b'));
+            window.getSelection().removeAllRanges();
+            editor.checkSelection();
+            jasmine.clock().tick(1); // checkSelection delay
+            expect(editor.toolbar.classList.contains('medium-editor-toolbar-active')).toBe(true);
+            expect(editor.toolbar.querySelector('[data-action="bold"]').classList.contains('medium-editor-button-active')).toBe(false);
+        });
+
+        it('should show and update toolbar buttons when staticToolbar and updateOnEmptySelection options are set to true', function () {
+            this.el.innerHTML = '<b>lorem ipsum</b>';
+            var editor = new MediumEditor('.editor', {
+                staticToolbar: true,
+                stickyToolbar: true,
+                updateOnEmptySelection: true
+            });
+
+            selectElementContents(this.el.querySelector('b'));
+            window.getSelection().getRangeAt(0).collapse();
+            editor.checkSelection();
+            jasmine.clock().tick(1); // checkSelection delay
+            expect(editor.toolbar.classList.contains('medium-editor-toolbar-active')).toBe(true);
+            expect(editor.toolbar.querySelector('[data-action="bold"]').classList.contains('medium-editor-button-active')).toBe(true);
+        });
+
+        it('should be hidden for one medium-editor instance when another medium-editor instance shows its toolbar', function () {
             var editorOne,
                 editorTwo,
                 elTwo = document.createElement('div');
@@ -137,7 +178,7 @@ describe('Toolbar TestCase', function () {
 
             selectElementContentsAndFire(document.getElementById('editor-span-1'));
 
-            jasmine.clock().tick(11); // checkSelection delay
+            jasmine.clock().tick(1); // checkSelection delay
 
             expect(editorOne.toolbar.classList.contains('medium-editor-toolbar-active')).toBe(true);
             expect(editorTwo.toolbar.classList.contains('medium-editor-toolbar-active')).toBe(false);
@@ -145,7 +186,7 @@ describe('Toolbar TestCase', function () {
             selectElementContentsAndFire(document.getElementById('editor-span-2'));
             fireEvent(editorTwo.elements[0], 'focus');
 
-            jasmine.clock().tick(11); // checkSelection delay
+            jasmine.clock().tick(1); // checkSelection delay
 
             expect(editorOne.toolbar.classList.contains('medium-editor-toolbar-active')).toBe(false);
             expect(editorTwo.toolbar.classList.contains('medium-editor-toolbar-active')).toBe(true);
