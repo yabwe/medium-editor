@@ -31,7 +31,7 @@ describe('Initialization TestCase', function () {
             expect(editor.initToolbar).not.toHaveBeenCalled();
             expect(editor.bindSelect).not.toHaveBeenCalled();
             expect(editor.setFirstAndLastButtons).not.toHaveBeenCalled();
-            expect(editor.getAnchorExtension()).toBeUndefined();
+            expect(editor.getExtensionByName('anchor')).toBeUndefined();
             expect(editor.initElements).not.toHaveBeenCalled();
         });
     });
@@ -161,7 +161,7 @@ describe('Initialization TestCase', function () {
             expect(editor.initToolbar).toHaveBeenCalled();
             expect(editor.bindSelect).toHaveBeenCalled();
             expect(editor.setFirstAndLastButtons).toHaveBeenCalled();
-            expect(editor.getAnchorExtension().createForm).toHaveBeenCalled();
+            expect(editor.getExtensionByName('anchor').createForm).toHaveBeenCalled();
             expect(editor.initElements).toHaveBeenCalled();
         });
 

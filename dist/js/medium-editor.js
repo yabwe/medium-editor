@@ -1737,11 +1737,11 @@ function MediumEditor(elements, options) {
             return this;
         },
 
-        getAnchorExtension: function () {
+        getExtensionByName: function (name) {
             var extension;
             if (this.commands && this.commands.length) {
                 this.commands.forEach(function (ext) {
-                    if (ext.name === 'anchor') {
+                    if (ext.name === name) {
                         extension = ext;
                     }
                 });
@@ -2759,14 +2759,16 @@ function MediumEditor(elements, options) {
                 '</div>';
         },
 
-        anchorPreviewClickHandler: function (e) {
-            if (this.getAnchorExtension() && this.activeAnchor) {
+        anchorPreviewClickHandler: function (event) {
+            var range,
+                sel,
+                anchorExtension = this.getExtensionByName('anchor');
 
-                var range = this.options.ownerDocument.createRange(),
-                    sel = this.options.contentWindow.getSelection(),
-                    anchorExtension = this.getAnchorExtension();
-
+            if (anchorExtension && this.activeAnchor) {
+                range = this.options.ownerDocument.createRange();
                 range.selectNodeContents(this.activeAnchor);
+
+                sel = this.options.contentWindow.getSelection();
                 sel.removeAllRanges();
                 sel.addRange(range);
                 // Using setTimeout + options.delay because:

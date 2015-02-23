@@ -346,7 +346,7 @@ describe('Buttons TestCase', function () {
             selectElementContentsAndFire(editor.elements[0]);
             button = editor.toolbar.querySelector('[data-action="createLink"]');
             fireEvent(button, 'click');
-            expect(editor.getAnchorExtension().showForm).toHaveBeenCalled();
+            expect(editor.getExtensionByName('anchor').showForm).toHaveBeenCalled();
         });
     });
 

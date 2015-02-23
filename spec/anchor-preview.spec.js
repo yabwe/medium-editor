@@ -49,7 +49,7 @@ describe('Anchor Preview TestCase', function () {
             spyOn(MediumEditor.statics.AnchorExtension.prototype, 'showForm').and.callThrough();
             fireEvent(editor.anchorPreview, 'click');
             jasmine.clock().tick(300);
-            expect(editor.getAnchorExtension().showForm).toHaveBeenCalled();
+            expect(editor.getExtensionByName('anchor').showForm).toHaveBeenCalled();
 
             // selecting other text should close the toolbar
             spyOn(MediumEditor.prototype, 'hideToolbarActions').and.callThrough();
@@ -93,7 +93,7 @@ describe('Anchor Preview TestCase', function () {
             jasmine.clock().tick(200);
 
             expect(editor.isToolbarShown()).toBe(true);
-            expect(editor.getAnchorExtension().isDisplayed()).toBe(true);
+            expect(editor.getExtensionByName('anchor').isDisplayed()).toBe(true);
         });
 
         it('Hover empty anchor should NOT show preview', function () {

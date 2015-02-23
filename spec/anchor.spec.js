@@ -23,14 +23,15 @@ describe('Anchor Button TestCase', function () {
         it('should display the anchor form when toolbar is visible', function () {
             spyOn(MediumEditor.statics.AnchorExtension.prototype, 'showForm').and.callThrough();
             var button,
-                editor = new MediumEditor('.editor');
+                editor = new MediumEditor('.editor'),
+                anchorExtension = editor.getExtensionByName('anchor');
             selectElementContentsAndFire(editor.elements[0]);
             jasmine.clock().tick(1);
             button = editor.toolbar.querySelector('[data-action="createLink"]');
             fireEvent(button, 'click');
             expect(editor.toolbarActions.style.display).toBe('none');
-            expect(editor.getAnchorExtension().isDisplayed()).toBe(true);
-            expect(editor.getAnchorExtension().showForm).toHaveBeenCalled();
+            expect(anchorExtension.isDisplayed()).toBe(true);
+            expect(anchorExtension.showForm).toHaveBeenCalled();
         });
 
         it('should unlink when selection is a link', function () {
@@ -58,7 +59,7 @@ describe('Anchor Button TestCase', function () {
             selectElementContents(editor.elements[0]);
             button = editor.toolbar.querySelector('[data-action="createLink"]');
             fireEvent(button, 'click');
-            input = editor.getAnchorExtension().getInput();
+            input = editor.getExtensionByName('anchor').getInput();
             input.value = 'test';
             fireEvent(input, 'keyup', 13);
             expect(editor.createLink).toHaveBeenCalled();
@@ -72,7 +73,7 @@ describe('Anchor Button TestCase', function () {
             selectElementContents(editor.elements[0]);
             button = editor.toolbar.querySelector('[data-action="createLink"]');
             fireEvent(button, 'click');
-            input = editor.getAnchorExtension().getInput();
+            input = editor.getExtensionByName('anchor').getInput();
             input.value = '';
             fireEvent(input, 'keyup', 13);
             expect(editor.elements[0].querySelector('a')).toBeNull();
@@ -81,11 +82,12 @@ describe('Anchor Button TestCase', function () {
             var editor = new MediumEditor('.editor', {
                 checkLinkFormat: true
             }),
-                link;
+                link,
+                anchorExtension = editor.getExtensionByName('anchor');
 
             selectElementContentsAndFire(editor.elements[0]);
-            editor.getAnchorExtension().showForm('test.com');
-            fireEvent(editor.getAnchorExtension().getForm().querySelector('a.medium-editor-toobar-save'), 'click');
+            anchorExtension.showForm('test.com');
+            fireEvent(anchorExtension.getForm().querySelector('a.medium-editor-toobar-save'), 'click');
 
             link = editor.elements[0].querySelector('a');
             expect(link).not.toBeNull();
@@ -96,11 +98,12 @@ describe('Anchor Button TestCase', function () {
                 checkLinkFormat: true
             }),
                 validUrl = 'mailto:test.com',
-                link;
+                link,
+                anchorExtension = editor.getExtensionByName('anchor');
 
             selectElementContentsAndFire(editor.elements[0]);
-            editor.getAnchorExtension().showForm(validUrl);
-            fireEvent(editor.getAnchorExtension().getForm().querySelector('a.medium-editor-toobar-save'), 'click');
+            anchorExtension.showForm(validUrl);
+            fireEvent(anchorExtension.getForm().querySelector('a.medium-editor-toobar-save'), 'click');
 
             link = editor.elements[0].querySelector('a');
             expect(link).not.toBeNull();
@@ -110,11 +113,12 @@ describe('Anchor Button TestCase', function () {
             var editor = new MediumEditor('.editor', {
                 targetBlank: true
             }),
-                link;
+                link,
+                anchorExtension = editor.getExtensionByName('anchor');
 
             selectElementContentsAndFire(editor.elements[0]);
-            editor.getAnchorExtension().showForm('http://test.com');
-            fireEvent(editor.getAnchorExtension().getForm().querySelector('a.medium-editor-toobar-save'), 'click');
+            anchorExtension.showForm('http://test.com');
+            fireEvent(anchorExtension.getForm().querySelector('a.medium-editor-toobar-save'), 'click');
 
             link = editor.elements[0].querySelector('a');
             expect(link).not.toBeNull();
@@ -130,16 +134,17 @@ describe('Anchor Button TestCase', function () {
                 input,
                 button,
                 link,
-                opts;
+                opts,
+                anchorExtension = editor.getExtensionByName('anchor');
 
             selectElementContents(editor.elements[0]);
             save = editor.toolbar.querySelector('[data-action="createLink"]');
             fireEvent(save, 'click');
 
-            input = editor.getAnchorExtension().getInput();
+            input = anchorExtension.getInput();
             input.value = 'test';
 
-            button = editor.getAnchorExtension().getForm().querySelector('input.medium-editor-toolbar-anchor-button');
+            button = anchorExtension.getForm().querySelector('input.medium-editor-toolbar-anchor-button');
             button.setAttribute('type', 'checkbox');
             button.checked = true;
 
@@ -163,16 +168,17 @@ describe('Anchor Button TestCase', function () {
             spyOn(MediumEditor.prototype, 'showAndUpdateToolbar').and.callThrough();
             var editor = new MediumEditor('.editor'),
                 button,
-                cancel;
+                cancel,
+                anchorExtension = editor.getExtensionByName('anchor');
 
             selectElementContents(editor.elements[0]);
             button = editor.toolbar.querySelector('[data-action="createLink"]');
-            cancel = editor.getAnchorExtension().getForm().querySelector('a.medium-editor-toobar-close');
+            cancel = anchorExtension.getForm().querySelector('a.medium-editor-toobar-close');
             fireEvent(button, 'click');
-            expect(editor.getAnchorExtension().isDisplayed()).toBe(true);
+            expect(anchorExtension.isDisplayed()).toBe(true);
             fireEvent(cancel, 'click');
             expect(editor.showAndUpdateToolbar).toHaveBeenCalled();
-            expect(editor.getAnchorExtension().isDisplayed()).toBe(false);
+            expect(anchorExtension.isDisplayed()).toBe(false);
         });
     });
 

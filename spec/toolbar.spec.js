@@ -57,7 +57,7 @@ describe('Toolbar TestCase', function () {
                 buttons: ['bold', 'italic', 'underline']
             });
             expect(editor.toolbar.querySelectorAll('.medium-editor-toolbar-form-anchor').length).toBe(0);
-            expect(editor.getAnchorExtension()).toBeUndefined();
+            expect(editor.getExtensionByName('anchor')).toBeUndefined();
         });
     });
 
