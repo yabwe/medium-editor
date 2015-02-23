@@ -1,3 +1,14 @@
+3.0.0 / 2015-02-23
+=================
+* Extract anchor form code from core code and convert into an extension
+* Expose onShowToolbar and onHideToolbar as options
+* Change button method names (now `setActive` and `setInactive`) to differentiate from core's `activate` and `deactivate`
+* Simplify blur check selection
+* Add Sauce Labs configuration to automate cross-browser testing
+* Add IE9 polyfill to repo
+* Let 'meta' key trigger shortcuts
+
+
 2.4.6 / 2015-02-18
 =================
 * Add basic support to keyboard shortcuts
