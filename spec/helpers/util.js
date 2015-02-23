@@ -5,6 +5,7 @@ function fireEvent (element, event, keyCode, ctrlKey, target, relatedTarget) {
        evt.initEvent(event, true, true ); // event type,bubbling,cancelable
        if (keyCode) {
         evt.keyCode = keyCode;
+        evt.which = keyCode;
        }
        if (ctrlKey) {
         evt.ctrlKey = true;
