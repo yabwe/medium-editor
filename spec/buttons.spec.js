@@ -329,7 +329,7 @@ describe('Buttons TestCase', function () {
             var editor = new MediumEditor('.editor', {
                     buttons: ['anchor']
                 }),
-                button = editor.toolbar.querySelector('[data-action="anchor"]');
+                button = editor.toolbar.querySelector('[data-action="createLink"]');
 
             this.el.innerHTML = '<p><span id="span-lorem">lorem</span> <a href="#" id="link">ipsum</a></p>';
             selectElementContentsAndFire(document.getElementById('link'));
@@ -339,14 +339,14 @@ describe('Buttons TestCase', function () {
             expect(button.classList.contains('medium-editor-button-active')).toBe(false);
         });
 
-        it('button should call the triggerAnchorAction method', function () {
-            spyOn(MediumEditor.prototype, 'triggerAnchorAction');
+        it('button should call the anchorExtension.showForm() method', function () {
+            spyOn(MediumEditor.statics.AnchorExtension.prototype, 'showForm');
             var button,
                 editor = new MediumEditor('.editor');
             selectElementContentsAndFire(editor.elements[0]);
-            button = editor.toolbar.querySelector('[data-action="anchor"]');
+            button = editor.toolbar.querySelector('[data-action="createLink"]');
             fireEvent(button, 'click');
-            expect(editor.triggerAnchorAction).toHaveBeenCalled();
+            expect(editor.getExtensionByName('anchor').showForm).toHaveBeenCalled();
         });
     });
 

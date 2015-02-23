@@ -33,7 +33,6 @@ function MediumEditor(elements, options) {
             disableDoubleReturn: false,
             disableToolbar: false,
             disableEditing: false,
-            disableAnchorForm: false,
             disablePlaceholders: false,
             elementsContainer: false,
             imageDragging: true,
@@ -57,7 +56,7 @@ function MediumEditor(elements, options) {
         init: function (elements, options) {
             var uniqueId = 1;
 
-            this.options = mediumEditorUtil.extend(options, this.defaults);
+            this.options = mediumEditorUtil.defaults(options, this.defaults);
             this.setElementSelection(elements);
             if (this.elements.length === 0) {
                 return;
@@ -338,6 +337,9 @@ function MediumEditor(elements, options) {
                 if (extensions[buttonName]) {
                     ext = this.initExtension(extensions[buttonName], buttonName);
                     this.commands.push(ext);
+                } else if (buttonName === 'anchor') {
+                    ext = this.initExtension(new AnchorExtension(), buttonName);
+                    this.commands.push(ext);
                 } else if (ButtonsData.hasOwnProperty(buttonName)) {
                     ext = new DefaultButton(ButtonsData[buttonName], this);
                     this.commands.push(ext);
@@ -351,6 +353,18 @@ function MediumEditor(elements, options) {
             }
 
             return this;
+        },
+
+        getExtensionByName: function (name) {
+            var extension;
+            if (this.commands && this.commands.length) {
+                this.commands.forEach(function (ext) {
+                    if (ext.name === name) {
+                        extension = ext;
+                    }
+                });
+            }
+            return extension;
         },
 
         /**
@@ -565,10 +579,14 @@ function MediumEditor(elements, options) {
             }
 
             toolbar.appendChild(this.toolbarButtons());
-            if (!this.options.disableAnchorForm) {
-                this.anchorExtension = new AnchorExtension(this);
-                toolbar.appendChild(this.anchorExtension.getForm());
-            }
+
+            // Add any forms that extensions may have
+            this.commands.forEach(function (extension) {
+                if (extension.hasForm) {
+                    toolbar.appendChild(extension.getForm());
+                }
+            });
+
             this.options.elementsContainer.appendChild(toolbar);
             return toolbar;
         },
@@ -745,9 +763,8 @@ function MediumEditor(elements, options) {
 
                     if (!this.options.staticToolbar) {
                         this.hideToolbarActions();
-                    } else if (this.anchorExtension && this.anchorExtension.isDisplayed()) {
-                        this.setToolbarButtonStates();
-                        this.showToolbarActions();
+                    } else {
+                        this.showAndUpdateToolbar();
                     }
 
                 } else {
@@ -815,9 +832,7 @@ function MediumEditor(elements, options) {
 
             for (i = 0; i < this.elements.length; i += 1) {
                 if (this.elements[i] === selectionElement) {
-                    this.setToolbarButtonStates()
-                        .setToolbarPosition()
-                        .showToolbarActions();
+                    this.showAndUpdateToolbar();
                     return;
                 }
             }
@@ -825,6 +840,12 @@ function MediumEditor(elements, options) {
             if (!this.options.staticToolbar) {
                 this.hideToolbarActions();
             }
+        },
+
+        showAndUpdateToolbar: function () {
+            this.setToolbarButtonStates()
+                .setToolbarPosition()
+                .showToolbarDefaultActions();
         },
 
         setToolbarPosition: function () {
@@ -975,7 +996,7 @@ function MediumEditor(elements, options) {
             return this;
         },
 
-        execAction: function (action, e) {
+        execAction: function (action, opts) {
             /*jslint regexp: true*/
             var fullAction = /^full-(.+)$/gi,
                 match,
@@ -990,18 +1011,18 @@ function MediumEditor(elements, options) {
                 this.saveSelection();
                 // Select all of the contents before calling the action
                 this.selectAllContents();
-                result = this.execActionInternal(match[1]);
+                result = this.execActionInternal(match[1], opts);
                 // Restore the previous selection
                 this.restoreSelection();
             } else {
-                result = this.execActionInternal(action);
+                result = this.execActionInternal(action, opts);
             }
 
             this.checkSelection();
             return result;
         },
 
-        execActionInternal: function (action) {
+        execActionInternal: function (action, opts) {
             /*jslint regexp: true*/
             var appendAction = /^append-(.+)$/gi,
                 match;
@@ -1014,11 +1035,8 @@ function MediumEditor(elements, options) {
                 return this.execFormatBlock(match[1]);
             }
 
-            if (action === 'anchor') {
-                if (!this.options.disableAnchorForm) {
-                    return this.triggerAnchorAction();
-                }
-                return false;
+            if (action === 'createLink') {
+                return this.createLink(opts);
             }
 
             if (action === 'image') {
@@ -1050,26 +1068,6 @@ function MediumEditor(elements, options) {
             return selectedParentElement;
         },
 
-        triggerAnchorAction: function () {
-            if (!this.selection) {
-                this.checkSelection();
-            }
-            var selectedParentElement = meSelection.getSelectedParentElement(this.selectionRange);
-            if (selectedParentElement.tagName &&
-                    selectedParentElement.tagName.toLowerCase() === 'a') {
-                return this.options.ownerDocument.execCommand('unlink', false, null);
-            }
-
-            if (this.anchorExtension) {
-                if (this.anchorExtension.isDisplayed()) {
-                    this.showToolbarActions();
-                } else {
-                    this.showAnchorForm();
-                }
-            }
-            return false;
-        },
-
         execFormatBlock: function (el) {
             var selectionData = meSelection.getSelectionData(this.selection.anchorNode);
             // FF handles blockquote differently on formatBlock
@@ -1093,6 +1091,47 @@ function MediumEditor(elements, options) {
                 el = '<' + el + '>';
             }
             return this.options.ownerDocument.execCommand('formatBlock', false, el);
+        },
+
+        isToolbarDefaultActionsShown: function () {
+            return !!this.toolbarActions && this.toolbarActions.style.display === 'block';
+        },
+
+        hideToolbarDefaultActions: function () {
+            if (this.toolbarActions && this.isToolbarDefaultActionsShown()) {
+                this.commands.forEach(function (extension) {
+                    if (extension.onHide && typeof extension.onHide === 'function') {
+                        extension.onHide();
+                    }
+                });
+                this.toolbarActions.style.display = 'none';
+            }
+        },
+
+        showToolbarDefaultActions: function () {
+            this.hideExtensionForms();
+
+            if (this.toolbarActions && !this.isToolbarDefaultActionsShown()) {
+                this.toolbarActions.style.display = 'block';
+            }
+
+            this.keepToolbarAlive = false;
+            // Using setTimeout + options.delay because:
+            // We will actually be displaying the toolbar, which should be controlled by options.delay
+            this.delay(function () {
+                this.showToolbar();
+            }.bind(this));
+
+            return this;
+        },
+
+        hideExtensionForms: function () {
+            // Hide all extension forms
+            this.commands.forEach(function (extension) {
+                if (extension.hasForm && extension.isDisplayed()) {
+                    extension.hideForm();
+                }
+            });
         },
 
         isToolbarShown: function () {
@@ -1126,20 +1165,6 @@ function MediumEditor(elements, options) {
             });
             this.keepToolbarAlive = false;
             this.hideToolbar();
-        },
-
-        showToolbarActions: function () {
-            var self = this;
-            if (this.anchorExtension) {
-                this.anchorExtension.hideForm();
-            }
-            this.toolbarActions.style.display = 'block';
-            this.keepToolbarAlive = false;
-            // Using setTimeout + options.delay because:
-            // We will actually be displaying the toolbar, which should be controlled by options.delay
-            this.delay(function () {
-                self.showToolbar();
-            });
         },
 
         selectAllContents: function () {
@@ -1249,19 +1274,6 @@ function MediumEditor(elements, options) {
             sel.addRange(range);
         },
 
-        showAnchorForm: function (link_value) {
-            if (!this.anchorExtension) {
-                return;
-            }
-
-            this.toolbarActions.style.display = 'none';
-            this.saveSelection();
-            this.anchorExtension.showForm();
-            this.setToolbarPosition();
-            this.keepToolbarAlive = true;
-            this.anchorExtension.focus(link_value);
-        },
-
         hideAnchorPreview: function () {
             this.anchorPreview.classList.remove('medium-editor-anchor-preview-active');
         },
@@ -1365,25 +1377,26 @@ function MediumEditor(elements, options) {
                 '</div>';
         },
 
-        anchorPreviewClickHandler: function (e) {
-            if (!this.options.disableAnchorForm && this.activeAnchor) {
+        anchorPreviewClickHandler: function (event) {
+            var range,
+                sel,
+                anchorExtension = this.getExtensionByName('anchor');
 
-                var self = this,
-                    range = this.options.ownerDocument.createRange(),
-                    sel = this.options.contentWindow.getSelection();
+            if (anchorExtension && this.activeAnchor) {
+                range = this.options.ownerDocument.createRange();
+                range.selectNodeContents(this.activeAnchor);
 
-                range.selectNodeContents(self.activeAnchor);
+                sel = this.options.contentWindow.getSelection();
                 sel.removeAllRanges();
                 sel.addRange(range);
                 // Using setTimeout + options.delay because:
                 // We may actually be displaying the anchor form, which should be controlled by options.delay
                 this.delay(function () {
-                    if (self.activeAnchor) {
-                        self.showAnchorForm(self.activeAnchor.attributes.href.value);
+                    if (this.activeAnchor) {
+                        anchorExtension.showForm(this.activeAnchor.attributes.href.value);
                     }
-                    self.keepToolbarAlive = false;
-                });
-
+                    this.keepToolbarAlive = false;
+                }.bind(this));
             }
 
             this.hideAnchorPreview();
@@ -1436,9 +1449,29 @@ function MediumEditor(elements, options) {
             return this;
         },
 
-        checkLinkFormat: function (value) {
-            var re = /^(https?|ftps?|rtmpt?):\/\/|mailto:/;
-            return (re.test(value) ? '' : 'http://') + value;
+        createLink: function (opts) {
+            var customEvent,
+                i;
+
+            if (opts.url && opts.url.trim().length > 0) {
+                this.options.ownerDocument.execCommand('createLink', false, opts.url);
+
+                if (this.options.targetBlank || opts.target === '_blank') {
+                    mediumEditorUtil.setTargetBlank(meSelection.getSelectionStart(this.options.ownerDocument));
+                }
+
+                if (opts.buttonClass) {
+                    this.setButtonClass(opts.buttonClass);
+                }
+            }
+
+            if (this.options.targetBlank || opts.target === "_blank" || opts.buttonClass) {
+                customEvent = this.options.ownerDocument.createEvent("HTMLEvents");
+                customEvent.initEvent("input", true, true, this.options.contentWindow);
+                for (i = 0; i < this.elements.length; i += 1) {
+                    this.elements[i].dispatchEvent(customEvent);
+                }
+            }
         },
 
         setButtonClass: function (buttonClass) {
@@ -1457,48 +1490,6 @@ function MediumEditor(elements, options) {
                         el[i].classList.add(classes[j]);
                     }
                 }
-            }
-        },
-
-        createLink: function (input, target, buttonClass) {
-
-            var i, event;
-
-            this.createLinkInternal(input.value, target, buttonClass);
-
-            if (this.options.targetBlank || target === "_blank" || buttonClass) {
-                event = this.options.ownerDocument.createEvent("HTMLEvents");
-                event.initEvent("input", true, true, this.options.contentWindow);
-                for (i = 0; i < this.elements.length; i += 1) {
-                    this.elements[i].dispatchEvent(event);
-                }
-            }
-
-            this.checkSelection();
-            this.showToolbarActions();
-            input.value = '';
-        },
-
-        createLinkInternal: function (url, target, buttonClass) {
-            if (!url || url.trim().length === 0) {
-                this.hideToolbarActions();
-                return;
-            }
-
-            this.restoreSelection();
-
-            if (this.options.checkLinkFormat) {
-                url = this.checkLinkFormat(url);
-            }
-
-            this.options.ownerDocument.execCommand('createLink', false, url);
-
-            if (this.options.targetBlank || target === "_blank") {
-                mediumEditorUtil.setTargetBlank(meSelection.getSelectionStart(this.options.ownerDocument));
-            }
-
-            if (buttonClass) {
-                this.setButtonClass(buttonClass);
             }
         },
 
@@ -1561,10 +1552,6 @@ function MediumEditor(elements, options) {
                     extension.deactivate();
                 }
             }.bind(this));
-
-            if (this.anchorExtension) {
-                this.anchorExtension.deactivate();
-            }
 
             this.removeAllEvents();
         },

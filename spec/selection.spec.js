@@ -76,7 +76,7 @@ describe('Selection TestCase', function () {
             it('should hide the toolbar if selection is empty', function () {
                 spyOn(MediumEditor.prototype, 'setToolbarPosition').and.callThrough();
                 spyOn(MediumEditor.prototype, 'setToolbarButtonStates').and.callThrough();
-                spyOn(MediumEditor.prototype, 'showToolbarActions').and.callThrough();
+                spyOn(MediumEditor.prototype, 'showAndUpdateToolbar').and.callThrough();
                 var editor = new MediumEditor('.editor');
                 editor.toolbar.style.display = 'block';
                 editor.toolbar.classList.add('medium-editor-toolbar-active');
@@ -85,7 +85,7 @@ describe('Selection TestCase', function () {
                 expect(editor.toolbar.classList.contains('medium-editor-toolbar-active')).toBe(false);
                 expect(editor.setToolbarPosition).not.toHaveBeenCalled();
                 expect(editor.setToolbarButtonStates).not.toHaveBeenCalled();
-                expect(editor.showToolbarActions).not.toHaveBeenCalled();
+                expect(editor.showAndUpdateToolbar).not.toHaveBeenCalled();
             });
 
             it('should show the toolbar when something is selected', function () {
@@ -99,13 +99,13 @@ describe('Selection TestCase', function () {
             it('should update toolbar position and button states when something is selected', function () {
                 spyOn(MediumEditor.prototype, 'setToolbarPosition').and.callThrough();
                 spyOn(MediumEditor.prototype, 'setToolbarButtonStates').and.callThrough();
-                spyOn(MediumEditor.prototype, 'showToolbarActions').and.callThrough();
+                spyOn(MediumEditor.prototype, 'showAndUpdateToolbar').and.callThrough();
                 var editor = new MediumEditor('.editor');
                 selectElementContentsAndFire(this.el);
                 jasmine.clock().tick(51);
                 expect(editor.setToolbarPosition).toHaveBeenCalled();
                 expect(editor.setToolbarButtonStates).toHaveBeenCalled();
-                expect(editor.showToolbarActions).toHaveBeenCalled();
+                expect(editor.showAndUpdateToolbar).toHaveBeenCalled();
             });
 
             it('should update button states when updateOnEmptySelection is true and the selection is empty', function () {
