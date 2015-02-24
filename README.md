@@ -166,7 +166,10 @@ This is handy when you need to capture modifications other thats outside of `key
 
 ## MediumButton
 
-Patrick Stillhart developed a new and improved way to add buttons to our toolbar. Check it out at:
+Patrick Stillhart developed a new and improved way to add buttons to our toolbar. 
+With it you can add HTML or javascript buttons.
+Check it out at:
+
 [https://github.com/arcs-/MediumButton](https://github.com/arcs-/MediumButton)
 
 ## Extensions
