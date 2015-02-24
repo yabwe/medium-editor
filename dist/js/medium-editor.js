@@ -2242,21 +2242,20 @@ function MediumEditor(elements, options) {
                 this.showToolbar();
 
                 if (this.options.stickyToolbar) {
-
                     // If it's beyond the height of the editor, position it at the bottom of the editor
-                    if (scrollTop > (containerTop + this.elements[0].offsetHeight - toolbarHeight)) {
-                        this.toolbar.style.top = (containerTop + this.elements[0].offsetHeight) + 'px';
+                    if (scrollTop > (containerTop + container.offsetHeight - toolbarHeight)) {
+                        this.toolbar.style.top = (containerTop + container.offsetHeight) + 'px';
 
                     // Stick the toolbar to the top of the window
                     } else if (scrollTop > (containerTop - toolbarHeight)) {
                         this.toolbar.classList.add('sticky-toolbar');
                         this.toolbar.style.top = "0px";
+
                     // Normal static toolbar position
                     } else {
                         this.toolbar.classList.remove('sticky-toolbar');
                         this.toolbar.style.top = containerTop - toolbarHeight + "px";
                     }
-
                 } else {
                     this.toolbar.style.top = containerTop - toolbarHeight + "px";
                 }
@@ -2276,8 +2275,6 @@ function MediumEditor(elements, options) {
                 }
 
                 this.toolbar.style.left = targetLeft + 'px';
-
-                this.hideAnchorPreview();
 
             } else if (!selection.isCollapsed) {
                 this.showToolbar();
