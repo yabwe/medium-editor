@@ -2244,7 +2244,8 @@ function MediumEditor(elements, options) {
                 if (this.options.stickyToolbar) {
                     // If it's beyond the height of the editor, position it at the bottom of the editor
                     if (scrollTop > (containerTop + container.offsetHeight - toolbarHeight)) {
-                        this.toolbar.style.top = (containerTop + container.offsetHeight) + 'px';
+                        this.toolbar.style.top = (containerTop + container.offsetHeight - toolbarHeight) + 'px';
+                        this.toolbar.classList.remove('sticky-toolbar');
 
                     // Stick the toolbar to the top of the window
                     } else if (scrollTop > (containerTop - toolbarHeight)) {
