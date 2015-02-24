@@ -8,11 +8,6 @@ body {
     line-height: 30px;
 }
 
-#container {
-    width: 960px;
-    margin: 30px auto;
-}
-
 h1 {
     font-size: 60px;
     font-weight: bold;
@@ -35,21 +30,6 @@ a:hover {
     color:green;
 }
 
-blockquote {
-    display: block;
-    padding-left: 20px;
-    border-left: 6px solid #df0d32;
-}
-
-.editable,
-.secondEditable
- {
-    outline: none;
-    margin: 0 0 20px 0;
-    padding: 0 0 20px 0;
-    border-bottom: 1px solid #dbdbdb;
-}
-
 pre {
     font-family: 'Menlo', monospace;
     font-size: 15px;
@@ -59,12 +39,6 @@ pre {
     border-radius: 5px;
     color: #666;
 }
-
-#container {
-    width: 960px;
-    margin: 30px auto;
-}
-
 
 h3 {
     font-size: 32px;
@@ -78,10 +52,42 @@ h4 {
 
 
 blockquote {
+    display: block;
+    padding-left: 20px;
     border-left: 5px solid #555;
     margin-left: -15px;
     padding-left: 15px;
     font-style: italic;
     color: #555;
+}
+
+#container {
+    width: 960px;
+    margin: 30px auto;
+}
+
+.editable,
+.secondEditable
+ {
+    outline: none;
+    margin: 0 0 20px 0;
+    padding: 0 0 20px 0;
+    border-bottom: 1px solid #dbdbdb;
+}
+
+#columns {
+    width: 90%;
+    margin: 30px auto;
+}
+
+.column-container {
+
+}
+
+.column {
+    vertical-align: top;
+    display: inline-block;
+    width: 30%;
+    margin: 10px 1%;
 }
 

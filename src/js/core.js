@@ -34,6 +34,7 @@ function MediumEditor(elements, options) {
             disableToolbar: false,
             disableEditing: false,
             disablePlaceholders: false,
+            toolbarAlign: 'center',
             elementsContainer: false,
             imageDragging: true,
             standardizeSelectionStart: false,
@@ -817,56 +818,84 @@ function MediumEditor(elements, options) {
         setToolbarPosition: function () {
             // document.documentElement for IE 9
             var scrollTop = (this.options.ownerDocument.documentElement && this.options.ownerDocument.documentElement.scrollTop) || this.options.ownerDocument.body.scrollTop,
-                container = this.elements[0],
-                containerRect = container.getBoundingClientRect(),
-                containerTop = containerRect.top + scrollTop,
-                buttonHeight = 50,
                 selection = this.options.contentWindow.getSelection(),
+                windowWidth = this.options.contentWindow.innerWidth,
+                container = Selection.getSelectionElement(this.options.contentWindow),
+                buttonHeight = 50,
+                toolbarWidth,
+                toolbarHeight,
+                halfOffsetWidth,
+                defaultLeft,
+                containerRect,
+                containerTop,
+                containerCenter,
                 range,
                 boundary,
                 middleBoundary,
-                defaultLeft = (this.options.diffLeft) - (this.toolbar.offsetWidth / 2),
-                halfOffsetWidth = this.toolbar.offsetWidth / 2,
-                containerCenter = (containerRect.left + (containerRect.width / 2));
+                targetLeft;
+
+            // If there isn't a valid selection, bail
+            if (!container || !this.options.contentWindow.getSelection().focusNode) {
+                return this;
+            }
+
+            // If the container isn't part of this medium-editor instance, bail
+            if (this.elements.indexOf(container) === -1) {
+                return this;
+            }
+
+            // Calculate container dimensions
+            containerRect = container.getBoundingClientRect();
+            containerTop = containerRect.top + scrollTop;
+            containerCenter = (containerRect.left + (containerRect.width / 2));
+
+            // position the toolbar at left 0, so we can get the real width of the toolbar
+            this.toolbar.style.left = '0';
+            toolbarWidth = this.toolbar.offsetWidth;
+            toolbarHeight = this.toolbar.offsetHeight;
+            halfOffsetWidth = toolbarWidth / 2;
+            defaultLeft = this.options.diffLeft - halfOffsetWidth;
 
             if (this.options.staticToolbar) {
                 this.showToolbar();
 
                 if (this.options.stickyToolbar) {
-
                     // If it's beyond the height of the editor, position it at the bottom of the editor
-                    if (scrollTop > (containerTop + this.elements[0].offsetHeight - this.toolbar.offsetHeight)) {
-                        this.toolbar.style.top = (containerTop + this.elements[0].offsetHeight) + 'px';
+                    if (scrollTop > (containerTop + container.offsetHeight - toolbarHeight)) {
+                        this.toolbar.style.top = (containerTop + container.offsetHeight - toolbarHeight) + 'px';
+                        this.toolbar.classList.remove('sticky-toolbar');
 
                     // Stick the toolbar to the top of the window
-                    } else if (scrollTop > (containerTop - this.toolbar.offsetHeight)) {
+                    } else if (scrollTop > (containerTop - toolbarHeight)) {
                         this.toolbar.classList.add('sticky-toolbar');
                         this.toolbar.style.top = "0px";
+
                     // Normal static toolbar position
                     } else {
                         this.toolbar.classList.remove('sticky-toolbar');
-                        this.toolbar.style.top = containerTop - this.toolbar.offsetHeight + "px";
-                    }
-
-                } else {
-                    this.toolbar.style.top = containerTop - this.toolbar.offsetHeight + "px";
-                }
-
-                if (this.options.toolbarAlign) {
-                    if (this.options.toolbarAlign === 'left') {
-                        this.toolbar.style.left = containerRect.left + "px";
-                    } else if (this.options.toolbarAlign === 'center') {
-                        this.toolbar.style.left = (containerCenter - halfOffsetWidth) + "px";
-                    } else {
-                        this.toolbar.style.left = (containerRect.right - this.toolbar.offsetWidth) + "px";
+                        this.toolbar.style.top = containerTop - toolbarHeight + "px";
                     }
                 } else {
-                    this.toolbar.style.left = (containerCenter - halfOffsetWidth) + "px";
+                    this.toolbar.style.top = containerTop - toolbarHeight + "px";
                 }
 
-                this.hideAnchorPreview();
+                if (this.options.toolbarAlign === 'left') {
+                    targetLeft = containerRect.left;
+                } else if (this.options.toolbarAlign === 'center') {
+                    targetLeft = containerCenter - halfOffsetWidth;
+                } else if (this.options.toolbarAlign === 'right') {
+                    targetLeft = containerRect.right - toolbarWidth;
+                }
 
-            } else if (selection.focusNode !== null && !selection.isCollapsed) {
+                if (targetLeft < 0) {
+                    targetLeft = 0;
+                } else if ((targetLeft + toolbarWidth) > windowWidth) {
+                    targetLeft = windowWidth - toolbarWidth;
+                }
+
+                this.toolbar.style.left = targetLeft + 'px';
+
+            } else if (!selection.isCollapsed) {
                 this.showToolbar();
 
                 range = selection.getRangeAt(0);
@@ -876,22 +905,22 @@ function MediumEditor(elements, options) {
                 if (boundary.top < buttonHeight) {
                     this.toolbar.classList.add('medium-toolbar-arrow-over');
                     this.toolbar.classList.remove('medium-toolbar-arrow-under');
-                    this.toolbar.style.top = buttonHeight + boundary.bottom - this.options.diffTop + this.options.contentWindow.pageYOffset - this.toolbar.offsetHeight + 'px';
+                    this.toolbar.style.top = buttonHeight + boundary.bottom - this.options.diffTop + this.options.contentWindow.pageYOffset - toolbarHeight + 'px';
                 } else {
                     this.toolbar.classList.add('medium-toolbar-arrow-under');
                     this.toolbar.classList.remove('medium-toolbar-arrow-over');
-                    this.toolbar.style.top = boundary.top + this.options.diffTop + this.options.contentWindow.pageYOffset - this.toolbar.offsetHeight + 'px';
+                    this.toolbar.style.top = boundary.top + this.options.diffTop + this.options.contentWindow.pageYOffset - toolbarHeight + 'px';
                 }
                 if (middleBoundary < halfOffsetWidth) {
                     this.toolbar.style.left = defaultLeft + halfOffsetWidth + 'px';
-                } else if ((this.options.contentWindow.innerWidth - middleBoundary) < halfOffsetWidth) {
-                    this.toolbar.style.left = this.options.contentWindow.innerWidth + defaultLeft - halfOffsetWidth + 'px';
+                } else if ((windowWidth - middleBoundary) < halfOffsetWidth) {
+                    this.toolbar.style.left = windowWidth + defaultLeft - halfOffsetWidth + 'px';
                 } else {
                     this.toolbar.style.left = defaultLeft + middleBoundary + 'px';
                 }
-
-                this.hideAnchorPreview();
             }
+
+            this.hideAnchorPreview();
 
             return this;
         },

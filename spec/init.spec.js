@@ -107,6 +107,7 @@ describe('Initialization TestCase', function () {
                 disableEditing: false,
                 disableToolbar: false,
                 disablePlaceholders: false,
+                toolbarAlign: 'center',
                 elementsContainer: document.body,
                 imageDragging: true,
                 standardizeSelectionStart: false,
