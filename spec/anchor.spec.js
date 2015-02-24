@@ -109,6 +109,27 @@ describe('Anchor Button TestCase', function () {
             expect(link).not.toBeNull();
             expect(link.href).toBe(validUrl);
         });
+        it('should add target="_blank" when "open in a new window" checkbox is checked', function () {
+            var editor = new MediumEditor('.editor', {
+                anchorTarget: true
+            }),
+                anchorExtension = editor.getExtensionByName('anchor'),
+                targetCheckbox,
+                link;
+
+            selectElementContentsAndFire(editor.elements[0]);
+            anchorExtension.showForm('http://test.com');
+            expect(anchorExtension.isDisplayed()).toBe(true);
+            targetCheckbox = anchorExtension.getForm().querySelector('input.medium-editor-toolbar-anchor-target');
+            expect().not.toBeNull(targetCheckbox);
+            targetCheckbox.checked = true;
+            fireEvent(anchorExtension.getForm().querySelector('a.medium-editor-toobar-save'), 'click');
+            expect(anchorExtension.isDisplayed()).toBe(false);
+
+            link = editor.elements[0].querySelector('a');
+            expect(link).not.toBeNull();
+            expect(link.target).toBe('_blank');
+        });
         it('should add target="_blank" when respective option is set to true', function () {
             var editor = new MediumEditor('.editor', {
                 targetBlank: true
@@ -178,6 +199,16 @@ describe('Anchor Button TestCase', function () {
             expect(anchorExtension.isDisplayed()).toBe(true);
             fireEvent(cancel, 'click');
             expect(editor.showAndUpdateToolbar).toHaveBeenCalled();
+            expect(anchorExtension.isDisplayed()).toBe(false);
+        });
+        it('should close the link form when user presses escape', function () {
+            var editor = new MediumEditor('.editor'),
+                anchorExtension = editor.getExtensionByName('anchor');
+
+            selectElementContents(editor.elements[0]);
+            fireEvent(editor.toolbar.querySelector('[data-action="createLink"]'), 'click');
+            expect(anchorExtension.isDisplayed()).toBe(true);
+            fireEvent(anchorExtension.getInput(), 'keyup', 27);
             expect(anchorExtension.isDisplayed()).toBe(false);
         });
     });
