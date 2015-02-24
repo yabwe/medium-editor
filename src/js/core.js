@@ -816,30 +816,45 @@ function MediumEditor(elements, options) {
         },
 
         setToolbarPosition: function () {
-            if (!this.options.contentWindow.getSelection().focusNode) {
-                return this;
-            }
-
-            // First position the toolbar at left 0, so we can get the real width of the toolbar
-            this.toolbar.style.left = '0';
-
             // document.documentElement for IE 9
             var scrollTop = (this.options.ownerDocument.documentElement && this.options.ownerDocument.documentElement.scrollTop) || this.options.ownerDocument.body.scrollTop,
-                container = this.elements[0],
-                containerRect = container.getBoundingClientRect(),
-                containerTop = containerRect.top + scrollTop,
-                buttonHeight = 50,
                 selection = this.options.contentWindow.getSelection(),
-                containerCenter = (containerRect.left + (containerRect.width / 2)),
                 windowWidth = this.options.contentWindow.innerWidth,
-                toolbarWidth = this.toolbar.offsetWidth,
-                toolbarHeight = this.toolbar.offsetHeight,
-                halfOffsetWidth = toolbarWidth / 2,
-                defaultLeft = this.options.diffLeft - halfOffsetWidth,
+                container = Selection.getSelectionElement(this.options.contentWindow),
+                buttonHeight = 50,
+                toolbarWidth,
+                toolbarHeight,
+                halfOffsetWidth,
+                defaultLeft,
+                containerRect,
+                containerTop,
+                containerCenter,
                 range,
                 boundary,
                 middleBoundary,
                 targetLeft;
+
+            // If there isn't a valid selection, bail
+            if (!container || !this.options.contentWindow.getSelection().focusNode) {
+                return this;
+            }
+
+            // If the container isn't part of this medium-editor instance, bail
+            if (this.elements.indexOf(container) === -1) {
+                return this;
+            }
+
+            // Calculate container dimensions
+            containerRect = container.getBoundingClientRect();
+            containerTop = containerRect.top + scrollTop;
+            containerCenter = (containerRect.left + (containerRect.width / 2));
+
+            // position the toolbar at left 0, so we can get the real width of the toolbar
+            this.toolbar.style.left = '0';
+            toolbarWidth = this.toolbar.offsetWidth;
+            toolbarHeight = this.toolbar.offsetHeight;
+            halfOffsetWidth = toolbarWidth / 2;
+            defaultLeft = this.options.diffLeft - halfOffsetWidth;
 
             if (this.options.staticToolbar) {
                 this.showToolbar();
@@ -884,6 +899,7 @@ function MediumEditor(elements, options) {
 
             } else if (!selection.isCollapsed) {
                 this.showToolbar();
+
                 range = selection.getRangeAt(0);
                 boundary = range.getBoundingClientRect();
                 middleBoundary = (boundary.left + boundary.right) / 2;
