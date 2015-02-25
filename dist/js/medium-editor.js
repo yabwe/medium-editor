@@ -848,7 +848,7 @@ var DefaultButton,
         queryCommandState: function () {
             var queryState = null;
             if (this.options.useQueryState) {
-                this.base.queryCommandState(this.getAction());
+                queryState = this.base.queryCommandState(this.getAction());
             }
             return queryState;
         },
@@ -2387,7 +2387,7 @@ function MediumEditor(elements, options) {
             }
 
             try {
-                queryState = this.base.options.ownerDocument.queryCommandState(action);
+                queryState = this.options.ownerDocument.queryCommandState(action);
             } catch (exc) {
                 queryState = null;
             }

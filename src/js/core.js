@@ -1009,7 +1009,7 @@ function MediumEditor(elements, options) {
             }
 
             try {
-                queryState = this.base.options.ownerDocument.queryCommandState(action);
+                queryState = this.options.ownerDocument.queryCommandState(action);
             } catch (exc) {
                 queryState = null;
             }
