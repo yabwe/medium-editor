@@ -288,11 +288,7 @@ var DefaultButton,
         queryCommandState: function () {
             var queryState = null;
             if (this.options.useQueryState) {
-                try {
-                    queryState = this.base.options.ownerDocument.queryCommandState(this.getAction());
-                } catch (exc) {
-                    queryState = null;
-                }
+                this.base.queryCommandState(this.getAction());
             }
             return queryState;
         },

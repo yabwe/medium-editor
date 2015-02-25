@@ -995,6 +995,28 @@ function MediumEditor(elements, options) {
             return this;
         },
 
+        // Wrapper around document.queryCommandState for checking whether an action has already
+        // been applied to the current selection
+        queryCommandState: function (action) {
+            var fullAction = /^full-(.+)$/gi,
+                match,
+                queryState = null;
+
+            // Actions starting with 'full-' need to be modified since this is a medium-editor concept
+            match = fullAction.exec(action);
+            if (match) {
+                action = match[1];
+            }
+
+            try {
+                queryState = this.base.options.ownerDocument.queryCommandState(action);
+            } catch (exc) {
+                queryState = null;
+            }
+
+            return queryState;
+        },
+
         execAction: function (action, opts) {
             /*jslint regexp: true*/
             var fullAction = /^full-(.+)$/gi,
