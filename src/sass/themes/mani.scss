@@ -15,7 +15,7 @@ $medium_editor_border_radius: 2px;
     border: 1px solid $medium_editor_border_color;
     background-color: $medium_editor_bgcolor;
     background-color: rgba($medium_editor_bgcolor, .95);
-    background: linear-gradient(bottom, $medium_editor_bgcolor, rgba(#fff, 1));
+    background: linear-gradient(to bottom, $medium_editor_bgcolor, rgba(#fff, 1));
     border-radius: $medium_editor_border_radius;
     box-shadow: 0 2px 6px rgba(#000, .45);
 
@@ -49,7 +49,7 @@ $medium_editor_border_radius: 2px;
             background-color: $medium_editor_bgcolor_alt;
             background-color: rgba($medium_editor_bgcolor_alt, .45);
             color: #000;
-            background: linear-gradient(bottom, $medium_editor_bgcolor, rgba(#000, .1));
+            background: linear-gradient(to bottom, $medium_editor_bgcolor, rgba(#000, .1));
         }
     }
 }
