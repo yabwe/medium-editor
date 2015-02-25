@@ -6,7 +6,7 @@
   background-color: #dee7f0;
   background-color: rgba(222, 231, 240, 0.95);
   background: -webkit-linear-gradient(bottom, #dee7f0, #ffffff);
-  background: linear-gradient(bottom, #dee7f0, #ffffff);
+  background: linear-gradient(to bottom, #dee7f0, #ffffff);
   border-radius: 2px;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.45); }
   .medium-editor-toolbar li button {
@@ -33,7 +33,7 @@
     background-color: rgba(92, 144, 199, 0.45);
     color: #000;
     background: -webkit-linear-gradient(bottom, #dee7f0, rgba(0, 0, 0, 0.1));
-    background: linear-gradient(bottom, #dee7f0, rgba(0, 0, 0, 0.1)); }
+    background: linear-gradient(to bottom, #dee7f0, rgba(0, 0, 0, 0.1)); }
 
 .medium-editor-toolbar-form {
   background: #dee7f0;
