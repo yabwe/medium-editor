@@ -454,7 +454,7 @@ The source files are located inside the __src__ directory.
 ## Contributors
 
 ```
- project  : medium-editor
+project  : medium-editor
 repo age : 1 year, 8 months
 active   : 239 days
 commits  : 863
