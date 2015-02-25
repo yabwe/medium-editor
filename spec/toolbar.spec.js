@@ -275,45 +275,27 @@ describe('Toolbar TestCase', function () {
             expect(editor.toolbar.classList.contains('medium-editor-toolbar-active')).toBe(false);
         });
 
-        // jasmine 2.0 changed async tests, runs no longer exists
-        xit('should show the toolbar if it\'s text are selected even though one or more elements that has a data attr of disable-toolbar', function () {
-            var value,
-                flag,
-                element = document.createElement('div'),
-                editor = null;
+        it('should show the toolbar if it\'s text are selected even though one or more elements that has a data attr of disable-toolbar', function () {
+            var editor,
+                element = document.createElement('div');
 
-            runs(function () {
-                flag = false;
-                element.className = 'editor';
-                element.setAttribute('data-disable-toolbar', 'true');
-                this.el.innerHTML = 'lorem ipsum';
-                document.body.appendChild(element);
-                editor = new MediumEditor(document.querySelectorAll('.editor'));
-                expect(editor.elements.length).toEqual(2);
-                expect(editor.toolbar.style.display).toBe('');
-                selectElementContents(this.el);
-                editor.checkSelection();
-                setTimeout(function () {
-                    flag = true;
-                }, 500);
-            });
+            element.className = 'editor';
+            element.setAttribute('data-disable-toolbar', 'true');
+            this.el.innerHTML = 'lorem ipsum';
+            document.body.appendChild(element);
+            editor = new MediumEditor(document.querySelectorAll('.editor'));
+            expect(editor.elements.length).toEqual(3);
+            expect(editor.toolbar.style.display).toBe('');
+            selectElementContents(this.el);
+            editor.checkSelection();
 
-            // Because the toolbar appear after 100ms, waits 150ms...
-            waitsFor(function () {
-                value = value + 1; // value += 1 is not accepted by jslint (unused)
-                return flag;
-            }, 'The i value should be incremented', 500);
-
-            runs(function () {
-                expect(editor.toolbar.classList.contains('medium-editor-toolbar-active')).toBe(true);
-                // Remove the new element from the DOM
-                document.body.removeChild(element);
-            });
+            expect(editor.toolbar.classList.contains('medium-editor-toolbar-active')).toBe(true);
+            // Remove the new element from the DOM
+            document.body.removeChild(element);
 
         });
 
-        // jasmine 2.0 changed async tests, runs no longer exists
-        xit('should not try to toggle toolbar when option disabletoolbar is set to true', function () {
+        it('should not try to toggle toolbar when option disabletoolbar is set to true', function () {
             var element = document.createElement('div'),
                 editor = null;
 

@@ -31,9 +31,7 @@ describe('Resize TestCase', function () {
         editor.deactivate();
     });
 
-    // I believe some other test is breaking this one, it passes when runs alone
-    // it is calling setToolbar even with no text selected
-    xit('should not call setToolbarPosition when toolbar is not visible', function () {
+    it('should not call setToolbarPosition when toolbar is not visible', function () {
         var editor = new MediumEditor('.editor');
         spyOn(editor, 'setToolbarPosition');
         fireEvent(window, 'resize');
