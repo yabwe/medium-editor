@@ -25,7 +25,7 @@ $medium_editor_border_radius: 5px;
             background-color: transparent;
             color: $medium_editor_link_color;
             box-shadow: inset 0 0 3px #f8f8e6;
-            background: linear-gradient(top, $medium_editor_bgcolor, rgba(#000, .1));
+            background: linear-gradient(to top, $medium_editor_bgcolor, rgba(#000, .1));
             text-shadow: 1px 4px 6px #def, 0 0 0 #000, 1px 4px 6px #def;
             transition: background-color .2s ease-in;
             &:hover {
@@ -49,7 +49,7 @@ $medium_editor_border_radius: 5px;
             background-color: #ccc;
             color: #000;
             color: rgba(#000, .8);
-            background: linear-gradient(bottom, $medium_editor_bgcolor, rgba(#000, .2));
+            background: linear-gradient(to bottom, $medium_editor_bgcolor, rgba(#000, .2));
         }
     }
 }
