@@ -10,6 +10,7 @@
            "dist/css/medium-editor.css",
            "dist/css/themes/default.css"],
   "keywords": [
+    "contenteditable",
     "wysiwyg",
     "medium",
     "rich-text",
