@@ -848,11 +848,7 @@ var DefaultButton,
         queryCommandState: function () {
             var queryState = null;
             if (this.options.useQueryState) {
-                try {
-                    queryState = this.base.options.ownerDocument.queryCommandState(this.getAction());
-                } catch (exc) {
-                    queryState = null;
-                }
+                queryState = this.base.queryCommandState(this.getAction());
             }
             return queryState;
         },
@@ -2375,6 +2371,28 @@ function MediumEditor(elements, options) {
                 buttons[buttons.length - 1].className += ' ' + this.options.lastButtonClass;
             }
             return this;
+        },
+
+        // Wrapper around document.queryCommandState for checking whether an action has already
+        // been applied to the current selection
+        queryCommandState: function (action) {
+            var fullAction = /^full-(.+)$/gi,
+                match,
+                queryState = null;
+
+            // Actions starting with 'full-' need to be modified since this is a medium-editor concept
+            match = fullAction.exec(action);
+            if (match) {
+                action = match[1];
+            }
+
+            try {
+                queryState = this.options.ownerDocument.queryCommandState(action);
+            } catch (exc) {
+                queryState = null;
+            }
+
+            return queryState;
         },
 
         execAction: function (action, opts) {
