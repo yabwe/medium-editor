@@ -16,7 +16,7 @@
     "rich-text",
     "editor"
   ],
-  "license": "THE BEER-WARE LICENSE",
+  "license": "MIT",
   "ignore": [
     "**/.*",
     "node_modules",
