@@ -166,7 +166,7 @@ This is handy when you need to capture modifications other thats outside of `key
 
 ## MediumButton
 
-Patrick Stillhart developed a new and improved way to add buttons to our toolbar. 
+Patrick Stillhart developed a new and improved way to add buttons to our toolbar.
 With it you can add HTML or javascript buttons.
 Check it out at:
 
@@ -457,7 +457,7 @@ The source files are located inside the __src__ directory.
 ## Contributors
 
 ```
- project  : medium-editor
+project  : medium-editor
 repo age : 1 year, 8 months
 active   : 239 days
 commits  : 863
