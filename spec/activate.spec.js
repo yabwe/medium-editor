@@ -88,7 +88,7 @@ describe('Activate/Deactivate TestCase', function () {
         });
 
         // regression test for https://github.com/daviferreira/medium-editor/issues/390
-        xit('should work with multiple elements of the same class', function () {
+        it('should work with multiple elements of the same class', function () {
             var editor,
                 el,
                 elements = [],
