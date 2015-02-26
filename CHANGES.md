@@ -1,5 +1,16 @@
+3.0.7 / 2015-02-26
+==================
+* Ensure static toolbar won't render outside window + minimize when toolbar overflows
+* Fix flashing static-toolbar bug
+* Fix bug with sticky-toolbar when scrolling past bottom of contenteditable
+* Fix css declaration of linear-gradient
+* Fix AMD "Uncaught TypeError: undefined is not a function" issue
+* Account for 'full' actions when doing queryCommandState
+* Fix bugs in modified queryCommandState calls
+
+
 3.0.0 / 2015-02-23
-=================
+==================
 * Extract anchor form code from core code and convert into an extension
 * Expose onShowToolbar and onHideToolbar as options
 * Change button method names (now `setActive` and `setInactive`) to differentiate from core's `activate` and `deactivate`
@@ -10,17 +21,17 @@
 
 
 2.4.6 / 2015-02-18
-=================
+==================
 * Add basic support to keyboard shortcuts
 
 
 2.4.5 / 2015-02-17
-=================
+==================
 * Fix main file reference in npm package
 
 
 2.4.3 / 2015-02-16
-=================
+==================
 * Introduce full content actions
 
 
