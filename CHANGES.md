@@ -1,3 +1,10 @@
+3.0.8 / 2015-02-27
+==================
+* MIT License
+* Use code from selection.js which is duplicated in core.js
+* Fix bug in paste handling + increase paste coverage
+
+
 3.0.7 / 2015-02-26
 ==================
 * Ensure static toolbar won't render outside window + minimize when toolbar overflows
