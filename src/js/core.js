@@ -1067,26 +1067,8 @@ function MediumEditor(elements, options) {
             return this.options.ownerDocument.execCommand(action, false, null);
         },
 
-        // TODO: move these two methods to selection.js
-        // http://stackoverflow.com/questions/15867542/range-object-get-selection-parent-node-chrome-vs-firefox
-        rangeSelectsSingleNode: function (range) {
-            var startNode = range.startContainer;
-            return startNode === range.endContainer &&
-                startNode.hasChildNodes() &&
-                range.endOffset === range.startOffset + 1;
-        },
-
         getSelectedParentElement: function () {
-            var selectedParentElement = null,
-                range = this.selectionRange;
-            if (this.rangeSelectsSingleNode(range) && range.startContainer.childNodes[range.startOffset].nodeType !== 3) {
-                selectedParentElement = range.startContainer.childNodes[range.startOffset];
-            } else if (range.startContainer.nodeType === 3) {
-                selectedParentElement = range.startContainer.parentNode;
-            } else {
-                selectedParentElement = range.startContainer;
-            }
-            return selectedParentElement;
+            return Selection.getSelectedParentElement();
         },
 
         execFormatBlock: function (el) {
