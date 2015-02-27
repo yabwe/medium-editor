@@ -2,6 +2,13 @@
   "name": "medium-editor",
   "version": "3.0.7",
   "author": "Davi Ferreira <hi@daviferreira.com>",
+  "contributors": [{
+    "name": "Nate Mielnik",
+    "email": "nathan@outlook.com"
+  }, {
+    "name": "Noah Chase",
+    "email": "nchase@gmail.com"
+  }],
   "description": "Medium.com WYSIWYG editor clone.",
   "main": "dist/js/medium-editor.js",
   "repository": {
