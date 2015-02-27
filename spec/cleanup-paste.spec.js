@@ -48,6 +48,11 @@ describe('Clean pasted HTML', function () {
                     source: 'Paragraphs with internal linebreaks',
                     paste: '<meta charset=\'utf-8\'><p>One<br>Two</p><p>Three<br>Four</p>',
                     output: '<p>One<br>Two</p><p>Three<br>Four</p>'
+                },
+                {
+                    source: 'Non <p> or <div> with only <br> elements',
+                    paste: '<p>One</p><div><h1><br /></h1></div><p>Two</p><span><span><br /></span></span><p>Three</p>',
+                    output: '<p>One</p><p>Two</p><p>Three</p>'
                 }
             ];
 

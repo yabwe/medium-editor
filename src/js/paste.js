@@ -1,4 +1,4 @@
-/*global Util, Selection*/
+/*global Util, Selection, console*/
 var pasteHandler;
 
 (function (window, document) {
@@ -166,15 +166,14 @@ var pasteHandler;
         filterLineBreak: function (el) {
             if (this.isCommonBlock(el.previousElementSibling)) {
                 // remove stray br's following common block elements
-                el.parentNode.removeChild(el);
+                this.removeWithParent(el);
             } else if (this.isCommonBlock(el.parentNode) && (el.parentNode.firstChild === el || el.parentNode.lastChild === el)) {
                 // remove br's just inside open or close tags of a div/p
-                el.parentNode.removeChild(el);
+                this.removeWithParent(el);
             } else if (el.parentNode.childElementCount === 1 && el.parentNode.textContent === '') {
-                // and br's that are the only child of a div/p
+                // and br's that are the only child of elements other than div/p
                 this.removeWithParent(el);
             }
-
         },
 
         // remove an element, including its parent, if it is the only element within its parent
@@ -183,7 +182,7 @@ var pasteHandler;
                 if (el.parentNode.parentNode && el.parentNode.childElementCount === 1) {
                     el.parentNode.parentNode.removeChild(el.parentNode);
                 } else {
-                    el.parentNode.removeChild(el.parentNode);
+                    el.parentNode.removeChild(el);
                 }
             }
         },
