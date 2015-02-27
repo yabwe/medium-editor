@@ -1,5 +1,7 @@
 ﻿# MediumEditor
 
+[![Join the chat at https://gitter.im/daviferreira/medium-editor](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/daviferreira/medium-editor?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 This is a clone of [medium.com](https://medium.com) inline editor toolbar.
 
 MediumEditor has been written using vanilla JavaScript, no additional frameworks required.
