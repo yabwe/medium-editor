@@ -264,6 +264,16 @@ module.exports = function (grunt) {
         }
     };
 
+    gruntConfig.bump = {
+        options: {
+            files: ['bower.json', 'package.json'],
+            updateConfigs: [],
+            commit: false,
+            createTag: false,
+            push: false
+        }
+    }
+
     grunt.initConfig(gruntConfig);
 
     require('time-grunt')(grunt);
