@@ -168,9 +168,9 @@ This is handy when you need to capture modifications other thats outside of `key
 
 ## Extensions & Plugins
 
-Check the [documentation](https://github.com/daviferreira/medium-editor/wiki/Creating-Extensions) to learn how to develop extensions for MediumEditor.
+Check the [documentation](https://github.com/daviferreira/medium-editor/wiki/Creating-Extensions) in order to learn how to develop extensions for MediumEditor.
 
-A list of existing extensions and plugins can be found [here](https://github.com/daviferreira/medium-editor/wiki/Extensions-Plugins).
+A list of existing extensions and plugins, such as [Images and Media embeds](http://orthes.github.io/medium-editor-insert-plugin/), [Tables](https://github.com/daviferreira/medium-editor-tables) and [Markdown](https://github.com/IonicaBizau/medium-editor-markdown) can be found [here](https://github.com/daviferreira/medium-editor/wiki/Extensions-Plugins).
 
 ## Development
 
