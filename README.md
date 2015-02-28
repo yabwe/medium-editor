@@ -166,14 +166,6 @@ This is handy when you need to capture modifications other thats outside of `key
 
 `input` is supported by Chrome, Firefox, IE9 and other modern browsers. If you want to read more or support older browsers, check [Listening to events of a contenteditable HTML element](http://stackoverflow.com/questions/7802784/listening-to-events-of-a-contenteditable-html-element/7804973#7804973) and [Detect changes in the DOM](http://stackoverflow.com/questions/3219758/detect-changes-in-the-dom)
 
-## MediumButton
-
-Patrick Stillhart developed a new and improved way to add buttons to our toolbar.
-With it you can add HTML or javascript buttons.
-Check it out at:
-
-[https://github.com/arcs-/MediumButton](https://github.com/arcs-/MediumButton)
-
 ## Extensions & Plugins
 
 Check the [documentation](https://github.com/daviferreira/medium-editor/wiki/Creating-Extensions) to learn how to develop extensions for MediumEditor.
