@@ -272,7 +272,7 @@ module.exports = function (grunt) {
             createTag: false,
             push: false
         }
-    }
+    };
 
     grunt.initConfig(gruntConfig);
 
