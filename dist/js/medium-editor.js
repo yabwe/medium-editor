@@ -1161,10 +1161,10 @@ var AnchorExtension;
 
         // Called by medium-editor to append form to the toolbar
         getForm: function () {
-            if (!this.anchorForm) {
-                this.anchorForm = this.createForm();
+            if (!this.form) {
+                this.form = this.createForm();
             }
-            return this.anchorForm;
+            return this.form;
         },
 
         // Used by medium-editor when the default toolbar is to be displayed
@@ -1192,20 +1192,20 @@ var AnchorExtension;
 
         // Called by core when tearing down medium-editor (deactivate)
         deactivate: function () {
-            if (!this.anchorForm) {
+            if (!this.form) {
                 return false;
             }
 
-            if (this.anchorForm.parentNode) {
-                this.anchorForm.parentNode.removeChild(this.anchorForm);
+            if (this.form.parentNode) {
+                this.form.parentNode.removeChild(this.form);
             }
 
-            delete this.anchorForm;
+            delete this.form;
         },
 
         // core methods
 
-        doLinkCreation: function () {
+        doFormSave: function () {
             var targetCheckbox = this.getForm().querySelector('.medium-editor-toolbar-anchor-target'),
                 buttonCheckbox = this.getForm().querySelector('.medium-editor-toolbar-anchor-button'),
                 opts = {
@@ -1336,9 +1336,10 @@ var AnchorExtension;
         },
 
         handleOutsideInteraction: function (event) {
-            if (event.target !== this.getForm() &&
-                    !Util.isDescendant(this.getForm(), event.target) &&
-                    !Util.isDescendant(this.base.toolbarActions, event.target)) {
+            var form = this.getForm();
+            if (event.target !== form &&
+                    !Util.isDescendant(form, event.target) &&
+                    !Util.isDescendant(form.parentNode, event.target)) {
                 this.base.keepToolbarAlive = false;
                 this.base.checkSelection();
             }
@@ -1348,7 +1349,7 @@ var AnchorExtension;
             // For ENTER -> create the anchor
             if (event.keyCode === Util.keyCode.ENTER) {
                 event.preventDefault();
-                this.doLinkCreation();
+                this.doFormSave();
                 return;
             }
 
@@ -1368,7 +1369,7 @@ var AnchorExtension;
         handleSaveClick: function (event) {
             // Clicking Save -> create the anchor
             event.preventDefault();
-            this.doLinkCreation();
+            this.doFormSave();
         },
 
         handleCloseClick: function (event) {
