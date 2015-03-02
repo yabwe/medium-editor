@@ -1184,7 +1184,6 @@ var AnchorExtension;
             this.base.hideToolbarDefaultActions();
             this.getForm().style.display = 'block';
             this.base.setToolbarPosition();
-            this.base.keepToolbarAlive = true;
 
             input.value = link_value || '';
             input.focus();
@@ -1229,7 +1228,6 @@ var AnchorExtension;
             }
 
             this.base.createLink(opts);
-            this.base.keepToolbarAlive = false;
             this.base.checkSelection();
         },
 
@@ -1240,7 +1238,6 @@ var AnchorExtension;
 
         doFormCancel: function () {
             this.base.restoreSelection();
-            this.base.keepToolbarAlive = false;
             this.base.checkSelection();
         },
 
@@ -1324,10 +1321,6 @@ var AnchorExtension;
                 form.appendChild(button_label);
             }
 
-            // Handle click (capture) & focus (capture) outside of the form
-            this.base.on(doc.body, 'click', this.handleOutsideInteraction.bind(this), true);
-            this.base.on(doc.body, 'focus', this.handleOutsideInteraction.bind(this), true);
-
             return form;
         },
 
@@ -1340,7 +1333,6 @@ var AnchorExtension;
             if (event.target !== form &&
                     !Util.isDescendant(form, event.target) &&
                     !Util.isDescendant(form.parentNode, event.target)) {
-                this.base.keepToolbarAlive = false;
                 this.base.checkSelection();
             }
         },
@@ -1363,7 +1355,6 @@ var AnchorExtension;
         handleFormClick: function (event) {
             // make sure not to hide form when clicking inside the form
             event.stopPropagation();
-            this.base.keepToolbarAlive = true;
         },
 
         handleSaveClick: function (event) {
@@ -1513,26 +1504,24 @@ function MediumEditor(elements, options) {
         },
 
         initThrottledMethods: function () {
-            var self = this;
-
             // handleResize is throttled because:
             // - It will be called when the browser is resizing, which can fire many times very quickly
             // - For some event (like resize) a slight lag in UI responsiveness is OK and provides performance benefits
             this.handleResize = Util.throttle(function () {
-                if (self.isActive) {
-                    self.positionToolbarIfShown();
+                if (this.isActive) {
+                    this.positionToolbarIfShown();
                 }
-            });
+            }.bind(this));
 
             // handleBlur is throttled because:
             // - This method could be called many times due to the type of event handlers that are calling it
             // - We want a slight delay so that other events in the stack can run, some of which may
-            //   prevent the toolbar from being hidden (via this.keepToolbarAlive).
+            //   prevent the toolbar from being hidden
             this.handleBlur = Util.throttle(function () {
-                if (self.isActive && !self.keepToolbarAlive) {
-                    self.hideToolbarActions();
+                if (this.isActive) {
+                    this.hideToolbarActions();
                 }
-            });
+            }.bind(this));
 
             return this;
         },
@@ -1594,17 +1583,18 @@ function MediumEditor(elements, options) {
                     // to disapper when selecting from right to left and
                     // the selection ends at the beginning of the text.
                     for (i = 0; i < self.elements.length; i += 1) {
-                        if (Util.isDescendant(self.elements[i], e.target)
+                        if (self.elements[i] === e.target
+                                || Util.isDescendant(self.elements[i], e.target)
                                 || Util.isDescendant(self.elements[i], selRange)) {
                             isDescendantOfEditorElements = true;
                             break;
                         }
                     }
-                    // If it's not part of the editor, or the toolbar
-                    if (e.target !== self.toolbar
-                            && self.elements.indexOf(e.target) === -1
-                            && !isDescendantOfEditorElements
+                    // If it's not part of the editor, toolbar, or anchor preview
+                    if (!isDescendantOfEditorElements
+                            && self.toolbar !== e.target
                             && !Util.isDescendant(self.toolbar, e.target)
+                            && self.anchorPreview !== e.target
                             && !Util.isDescendant(self.anchorPreview, e.target)) {
 
                         // Activate the placeholder
@@ -1941,7 +1931,6 @@ function MediumEditor(elements, options) {
                 return this;
             }
             this.toolbar = this.createToolbar();
-            this.keepToolbarAlive = false;
             this.toolbarActions = this.toolbar.querySelector('.medium-editor-toolbar-actions');
             this.anchorPreview = this.createAnchorPreview();
 
@@ -2077,7 +2066,6 @@ function MediumEditor(elements, options) {
             for (i = 0; i < this.elements.length; i += 1) {
                 element = this.elements[i];
 
-
                 this.on(element, 'dragover', onDrag);
                 this.on(element, 'dragleave', onDrag);
                 this.on(element, 'drop', onDrop);
@@ -2097,9 +2085,7 @@ function MediumEditor(elements, options) {
             var newSelection,
                 selectionElement;
 
-            if (!this.preventSelectionUpdates &&
-                    this.keepToolbarAlive !== true &&
-                    !this.options.disableToolbar) {
+            if (!this.preventSelectionUpdates && !this.options.disableToolbar) {
 
                 newSelection = this.options.contentWindow.getSelection();
                 if ((!this.options.updateOnEmptySelection && newSelection.toString().trim() === '') ||
@@ -2498,7 +2484,6 @@ function MediumEditor(elements, options) {
                 this.toolbarActions.style.display = 'block';
             }
 
-            this.keepToolbarAlive = false;
             // Using setTimeout + options.delay because:
             // We will actually be displaying the toolbar, which should be controlled by options.delay
             this.delay(function () {
@@ -2545,7 +2530,6 @@ function MediumEditor(elements, options) {
                     extension.onHide();
                 }
             });
-            this.keepToolbarAlive = false;
             this.hideToolbar();
         },
 
@@ -2777,7 +2761,6 @@ function MediumEditor(elements, options) {
                     if (this.activeAnchor) {
                         anchorExtension.showForm(this.activeAnchor.attributes.href.value);
                     }
-                    this.keepToolbarAlive = false;
                 }.bind(this));
             }
 

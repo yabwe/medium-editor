@@ -23,11 +23,6 @@ describe('Toolbar TestCase', function () {
             expect(editor.createToolbar).toHaveBeenCalled();
         });
 
-        it('should set keepToolbarAlive to false', function () {
-            var editor = new MediumEditor('.editor');
-            expect(editor.keepToolbarAlive).toBe(false);
-        });
-
         it('should create a new element for the editor toolbar', function () {
             expect(document.querySelectorAll('.medium-editor-toolbar').length).toBe(0);
             var editor = new MediumEditor('.editor');

@@ -52,7 +52,6 @@ TableDerived.prototype = {
         this.base.pasteHTML(table.innerHTML);
 
         // Update toolbar -> hide this form
-        this.base.keepToolbarAlive = false;
         this.base.checkSelection();
     },
 
@@ -121,7 +120,6 @@ TableDerived.prototype = {
         this.base.hideToolbarDefaultActions();
         this.getForm().style.display = 'block';
         this.base.setToolbarPosition();
-        this.base.keepToolbarAlive = true;
 
         colsInput.focus();
     },
