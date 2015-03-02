@@ -52,7 +52,6 @@ TableDerived.prototype = {
         this.base.pasteHTML(table.innerHTML);
 
         // Update toolbar -> hide this form
-        this.base.keepToolbarAlive = false;
         this.base.checkSelection();
     },
 
@@ -121,7 +120,6 @@ TableDerived.prototype = {
         this.base.hideToolbarDefaultActions();
         this.getForm().style.display = 'block';
         this.base.setToolbarPosition();
-        this.base.keepToolbarAlive = true;
 
         colsInput.focus();
     },
@@ -155,10 +153,6 @@ TableDerived.prototype = {
         // Handle typing in the textboxes
         this.base.on(columnInput, 'keyup', this.handleTextboxKeyup.bind(this));
         this.base.on(rowInput, 'keyup', this.handleTextboxKeyup.bind(this));
-
-        // Handle clicks into the textbox
-        this.base.on(columnInput, 'click', this.handleFormClick.bind(this));
-        this.base.on(rowInput, 'click', this.handleFormClick.bind(this));
 
         // Add save buton
         save.setAttribute('href', '#');

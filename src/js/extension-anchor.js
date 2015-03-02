@@ -72,7 +72,6 @@ var AnchorExtension;
             this.base.hideToolbarDefaultActions();
             this.getForm().style.display = 'block';
             this.base.setToolbarPosition();
-            this.base.keepToolbarAlive = true;
 
             input.value = link_value || '';
             input.focus();
@@ -117,7 +116,6 @@ var AnchorExtension;
             }
 
             this.base.createLink(opts);
-            this.base.keepToolbarAlive = false;
             this.base.checkSelection();
         },
 
@@ -128,7 +126,6 @@ var AnchorExtension;
 
         doFormCancel: function () {
             this.base.restoreSelection();
-            this.base.keepToolbarAlive = false;
             this.base.checkSelection();
         },
 
@@ -160,9 +157,6 @@ var AnchorExtension;
 
             // Handle typing in the textbox
             this.base.on(input, 'keyup', this.handleTextboxKeyup.bind(this));
-
-            // Handle clicks into the textbox
-            this.base.on(input, 'click', this.handleFormClick.bind(this));
 
             // Add save buton
             save.setAttribute('href', '#');
@@ -212,25 +206,11 @@ var AnchorExtension;
                 form.appendChild(button_label);
             }
 
-            // Handle click (capture) & focus (capture) outside of the form
-            this.base.on(doc.body, 'click', this.handleOutsideInteraction.bind(this), true);
-            this.base.on(doc.body, 'focus', this.handleOutsideInteraction.bind(this), true);
-
             return form;
         },
 
         getInput: function () {
             return this.getForm().querySelector('input.medium-editor-toolbar-input');
-        },
-
-        handleOutsideInteraction: function (event) {
-            var form = this.getForm();
-            if (event.target !== form &&
-                    !Util.isDescendant(form, event.target) &&
-                    !Util.isDescendant(form.parentNode, event.target)) {
-                this.base.keepToolbarAlive = false;
-                this.base.checkSelection();
-            }
         },
 
         handleTextboxKeyup: function (event) {
@@ -251,7 +231,6 @@ var AnchorExtension;
         handleFormClick: function (event) {
             // make sure not to hide form when clicking inside the form
             event.stopPropagation();
-            this.base.keepToolbarAlive = true;
         },
 
         handleSaveClick: function (event) {

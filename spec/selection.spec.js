@@ -64,14 +64,6 @@ describe('Selection TestCase', function () {
             expect(editor.checkSelection).toHaveBeenCalled();
         });
 
-        it('should do nothing when keepToolbarAlive is true', function () {
-            spyOn(window, 'getSelection').and.callThrough();
-            var editor = new MediumEditor('.editor');
-            editor.keepToolbarAlive = true;
-            editor.checkSelection();
-            expect(window.getSelection).not.toHaveBeenCalled();
-        });
-
         describe('When keepToolbarAlive is false', function () {
             it('should hide the toolbar if selection is empty', function () {
                 spyOn(MediumEditor.prototype, 'setToolbarPosition').and.callThrough();
