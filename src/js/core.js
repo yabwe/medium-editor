@@ -598,6 +598,7 @@ function MediumEditor(elements, options) {
 
             ul.id = 'medium-editor-toolbar-actions' + this.id;
             ul.className = 'medium-editor-toolbar-actions clearfix';
+            ul.style.display = 'block';
 
             this.commands.forEach(function (extension) {
                 if (typeof extension.getButton === 'function') {
@@ -806,8 +807,8 @@ function MediumEditor(elements, options) {
 
         showAndUpdateToolbar: function () {
             this.setToolbarButtonStates()
-                .setToolbarPosition()
-                .showToolbarDefaultActions();
+                .showToolbarDefaultActions()
+                .setToolbarPosition();
         },
 
         setToolbarPosition: function () {
@@ -1097,11 +1098,6 @@ function MediumEditor(elements, options) {
 
         hideToolbarDefaultActions: function () {
             if (this.toolbarActions && this.isToolbarDefaultActionsShown()) {
-                this.commands.forEach(function (extension) {
-                    if (extension.onHide && typeof extension.onHide === 'function') {
-                        extension.onHide();
-                    }
-                });
                 this.toolbarActions.style.display = 'none';
             }
         },
