@@ -154,10 +154,6 @@ TableDerived.prototype = {
         this.base.on(columnInput, 'keyup', this.handleTextboxKeyup.bind(this));
         this.base.on(rowInput, 'keyup', this.handleTextboxKeyup.bind(this));
 
-        // Handle clicks into the textbox
-        this.base.on(columnInput, 'click', this.handleFormClick.bind(this));
-        this.base.on(rowInput, 'click', this.handleFormClick.bind(this));
-
         // Add save buton
         save.setAttribute('href', '#');
         save.className = 'medium-editor-toobar-save';

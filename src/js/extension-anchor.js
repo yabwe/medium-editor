@@ -158,9 +158,6 @@ var AnchorExtension;
             // Handle typing in the textbox
             this.base.on(input, 'keyup', this.handleTextboxKeyup.bind(this));
 
-            // Handle clicks into the textbox
-            this.base.on(input, 'click', this.handleFormClick.bind(this));
-
             // Add save buton
             save.setAttribute('href', '#');
             save.className = 'medium-editor-toobar-save';
@@ -214,15 +211,6 @@ var AnchorExtension;
 
         getInput: function () {
             return this.getForm().querySelector('input.medium-editor-toolbar-input');
-        },
-
-        handleOutsideInteraction: function (event) {
-            var form = this.getForm();
-            if (event.target !== form &&
-                    !Util.isDescendant(form, event.target) &&
-                    !Util.isDescendant(form.parentNode, event.target)) {
-                this.base.checkSelection();
-            }
         },
 
         handleTextboxKeyup: function (event) {
