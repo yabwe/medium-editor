@@ -1,6 +1,7 @@
 /*global module, console, define, FileReader,
  Util, ButtonsData, DefaultButton,
- pasteHandler, Selection, AnchorExtension */
+ pasteHandler, Selection, AnchorExtension,
+ Toolbar */
 
 function MediumEditor(elements, options) {
     'use strict';
@@ -559,6 +560,7 @@ function MediumEditor(elements, options) {
             if (this.toolbar) {
                 return this;
             }
+            this.toolbarObj = new Toolbar();
             this.toolbar = this.createToolbar();
             this.toolbarActions = this.toolbar.querySelector('.medium-editor-toolbar-actions');
             this.anchorPreview = this.createAnchorPreview();

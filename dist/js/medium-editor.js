@@ -1361,6 +1361,19 @@ var AnchorExtension;
     AnchorExtension = Util.derives(DefaultButton, AnchorDerived);
 }(window, document));
 
+var Toolbar;
+
+(function (window, document) {
+    'use strict';
+
+    Toolbar = function Toolbar(instance) {
+        this.base = instance;
+    };
+
+    Toolbar.prototype = {
+
+    };
+}(window, document));
 function MediumEditor(elements, options) {
     'use strict';
     return this.init(elements, options);
@@ -1918,6 +1931,7 @@ function MediumEditor(elements, options) {
             if (this.toolbar) {
                 return this;
             }
+            this.toolbarObj = new Toolbar();
             this.toolbar = this.createToolbar();
             this.toolbarActions = this.toolbar.querySelector('.medium-editor-toolbar-actions');
             this.anchorPreview = this.createAnchorPreview();
