@@ -18,9 +18,10 @@ describe('Toolbar TestCase', function () {
 
     describe('Initialization', function () {
         it('should call the createToolbar method', function () {
-            spyOn(MediumEditor.prototype, 'createToolbar').and.callThrough();
+            spyOn(MediumEditor.statics.Toolbar.prototype, 'createToolbar').and.callThrough();
             var editor = new MediumEditor('.editor');
-            expect(editor.createToolbar).toHaveBeenCalled();
+            expect(editor.toolbarObj).not.toBeUndefined();
+            expect(editor.toolbarObj.createToolbar).toHaveBeenCalled();
         });
 
         it('should create a new element for the editor toolbar', function () {

@@ -14,7 +14,8 @@ function MediumEditor(elements, options) {
     MediumEditor.statics = {
         ButtonsData: ButtonsData,
         DefaultButton: DefaultButton,
-        AnchorExtension: AnchorExtension
+        AnchorExtension: AnchorExtension,
+        Toolbar: Toolbar
     };
 
     MediumEditor.prototype = {
@@ -177,7 +178,6 @@ function MediumEditor(elements, options) {
             // Init toolbar
             if (addToolbar) {
                 this.initToolbar()
-                    .setFirstAndLastButtons()
                     .bindAnchorPreview();
             }
             return this;
@@ -557,65 +557,16 @@ function MediumEditor(elements, options) {
         },
 
         initToolbar: function () {
-            if (this.toolbar) {
+            if (this.toolbarObj) {
                 return this;
             }
-            this.toolbarObj = new Toolbar();
-            this.toolbar = this.createToolbar();
-            this.toolbarActions = this.toolbar.querySelector('.medium-editor-toolbar-actions');
+            this.toolbarObj = new Toolbar(this, this.options);
+            this.toolbar = this.toolbarObj.getToolbarElement();
+            this.options.elementsContainer.appendChild(this.toolbar);
+            this.toolbarActions = this.toolbarObj.getToolbarActionsElement();
             this.anchorPreview = this.createAnchorPreview();
 
             return this;
-        },
-
-        createToolbar: function () {
-            var toolbar = this.options.ownerDocument.createElement('div');
-            toolbar.id = 'medium-editor-toolbar-' + this.id;
-            toolbar.className = 'medium-editor-toolbar';
-
-            if (this.options.staticToolbar) {
-                toolbar.className += " static-toolbar";
-            } else {
-                toolbar.className += " stalker-toolbar";
-            }
-
-            toolbar.appendChild(this.toolbarButtons());
-
-            // Add any forms that extensions may have
-            this.commands.forEach(function (extension) {
-                if (extension.hasForm) {
-                    toolbar.appendChild(extension.getForm());
-                }
-            });
-
-            this.options.elementsContainer.appendChild(toolbar);
-            return toolbar;
-        },
-
-        //TODO: actionTemplate
-        toolbarButtons: function () {
-            var ul = this.options.ownerDocument.createElement('ul'),
-                li,
-                btn;
-
-            ul.id = 'medium-editor-toolbar-actions' + this.id;
-            ul.className = 'medium-editor-toolbar-actions clearfix';
-            ul.style.display = 'block';
-
-            this.commands.forEach(function (extension) {
-                if (typeof extension.getButton === 'function') {
-                    btn = extension.getButton(this);
-                    li = this.options.ownerDocument.createElement('li');
-                    if (Util.isElement(btn)) {
-                        li.appendChild(btn);
-                    } else {
-                        li.innerHTML = btn;
-                    }
-                    ul.appendChild(li);
-                }
-            }.bind(this));
-
-            return ul;
         },
 
         bindSelect: function () {
@@ -989,15 +940,6 @@ function MediumEditor(elements, options) {
                 }
                 parentNode = parentNode.parentNode;
             }
-        },
-
-        setFirstAndLastButtons: function () {
-            var buttons = this.toolbar.querySelectorAll('button');
-            if (buttons.length > 0) {
-                buttons[0].className += ' ' + this.options.firstButtonClass;
-                buttons[buttons.length - 1].className += ' ' + this.options.lastButtonClass;
-            }
-            return this;
         },
 
         // Wrapper around document.queryCommandState for checking whether an action has already
@@ -1537,10 +1479,11 @@ function MediumEditor(elements, options) {
             }
             this.isActive = false;
 
-            if (this.toolbar !== undefined) {
+            if (this.toolbarObj !== undefined) {
+                this.toolbarObj.deactivate();
+                delete this.toolbarObj;
+
                 this.options.elementsContainer.removeChild(this.anchorPreview);
-                this.options.elementsContainer.removeChild(this.toolbar);
-                delete this.toolbar;
                 delete this.anchorPreview;
             }
 
