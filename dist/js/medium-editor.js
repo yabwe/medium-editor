@@ -2931,6 +2931,8 @@ function MediumEditor(elements, options) {
             if (this.toolbarObj !== undefined) {
                 this.toolbarObj.deactivate();
                 delete this.toolbarObj;
+                delete this.toolbar;
+                delete this.toolbarActions;
 
                 this.options.elementsContainer.removeChild(this.anchorPreview);
                 delete this.anchorPreview;
