@@ -80,11 +80,11 @@ describe('Activate/Deactivate TestCase', function () {
             triggerEvents();
 
             spyOn(editor, 'positionToolbarIfShown').and.callThrough(); // via: handleResize
-            spyOn(editor, 'hideToolbarActions').and.callThrough(); // via: handleBlur
+            spyOn(editor, 'checkSelection').and.callThrough(); // via: handleBlur
             editor.deactivate();
             jasmine.clock().tick(1000); // arbitrary – must be longer than THROTTLE_INTERVAL
             expect(editor.positionToolbarIfShown).not.toHaveBeenCalled();
-            expect(editor.hideToolbarActions).not.toHaveBeenCalled();
+            expect(editor.checkSelection).not.toHaveBeenCalled();
         });
 
         // regression test for https://github.com/daviferreira/medium-editor/issues/390
@@ -107,20 +107,20 @@ describe('Activate/Deactivate TestCase', function () {
 
             editor = new MediumEditor('.editor');
 
-            spyOn(editor, 'hideToolbarActions').and.callThrough(); // via: handleBlur
+            spyOn(editor.toolbarObj, 'hideToolbarActions').and.callThrough(); // via: handleBlur
 
             selectElementContentsAndFire(editor.elements[0], { eventToFire: 'click' });
             jasmine.clock().tick(51);
-            expect(editor.hideToolbarActions).not.toHaveBeenCalled();
+            expect(editor.toolbarObj.hideToolbarActions).not.toHaveBeenCalled();
 
             selectElementContentsAndFire(editor.elements[1], { eventToFire: 'click' });
             jasmine.clock().tick(51);
-            expect(editor.hideToolbarActions).not.toHaveBeenCalled();
+            expect(editor.toolbarObj.hideToolbarActions).not.toHaveBeenCalled();
 
             selectElementContents(editor.elements[2]);
             selectElementContentsAndFire(editor.elements[2], { eventToFire: 'click' });
             jasmine.clock().tick(51);
-            expect(editor.hideToolbarActions).not.toHaveBeenCalled();
+            expect(editor.toolbarObj.hideToolbarActions).not.toHaveBeenCalled();
 
             elements.forEach(function (el) {
                 document.body.removeChild(el);

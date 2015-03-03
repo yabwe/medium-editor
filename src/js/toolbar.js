@@ -12,6 +12,8 @@ var Toolbar;
 
     Toolbar.prototype = {
 
+        // Toolbar creation/deletion
+
         createToolbar: function () {
             var toolbar = this.base.options.ownerDocument.createElement('div');
 
@@ -36,7 +38,6 @@ var Toolbar;
             return toolbar;
         },
 
-        //TODO: actionTemplate
         createToolbarButtons: function () {
             var ul = this.base.options.ownerDocument.createElement('ul'),
                 li,
@@ -69,6 +70,17 @@ var Toolbar;
             return ul;
         },
 
+        deactivate: function () {
+            if (this.toolbar) {
+                if (this.toolbar.parentNode) {
+                    this.toolbar.parentNode.removeChild(this.toolbar);
+                }
+                delete this.toolbar;
+            }
+        },
+
+        // Toolbar accessors
+
         getToolbarElement: function () {
             if (!this.toolbar) {
                 this.toolbar = this.createToolbar();
@@ -81,13 +93,70 @@ var Toolbar;
             return this.getToolbarElement().querySelector('.medium-editor-toolbar-actions');
         },
 
-        deactivate: function () {
-            if (this.toolbar) {
-                if (this.toolbar.parentNode) {
-                    this.toolbar.parentNode.removeChild(this.toolbar);
+        // Hiding/showing toolbar
+
+        isDisplayed: function () {
+            return this.getToolbarElement().classList.contains('medium-editor-toolbar-active');
+        },
+
+        showToolbar: function () {
+            if (!this.isDisplayed()) {
+                this.toolbar.classList.add('medium-editor-toolbar-active');
+                if (typeof this.options.onShowToolbar === 'function') {
+                    this.options.onShowToolbar();
                 }
-                delete this.toolbar;
             }
+        },
+
+        hideToolbar: function () {
+            if (this.isDisplayed()) {
+                this.toolbar.classList.remove('medium-editor-toolbar-active');
+                if (typeof this.options.onHideToolbar === 'function') {
+                    this.options.onHideToolbar();
+                }
+            }
+        },
+
+        hideToolbarActions: function () {
+            this.base.commands.forEach(function (extension) {
+                if (extension.onHide && typeof extension.onHide === 'function') {
+                    extension.onHide();
+                }
+            });
+            this.hideToolbar();
+        },
+
+        isToolbarDefaultActionsDisplayed: function () {
+            return this.getToolbarActionsElement().style.display === 'block';
+        },
+
+        hideToolbarDefaultActions: function () {
+            if (this.isToolbarDefaultActionsDisplayed()) {
+                this.getToolbarActionsElement().style.display = 'none';
+            }
+        },
+
+        showToolbarDefaultActions: function () {
+            this.hideExtensionForms();
+
+            if (!this.isToolbarDefaultActionsDisplayed()) {
+                this.getToolbarActionsElement().style.display = 'block';
+            }
+
+            // Using setTimeout + options.delay because:
+            // We will actually be displaying the toolbar, which should be controlled by options.delay
+            this.base.delay(function () {
+                this.showToolbar();
+            }.bind(this));
+        },
+
+        hideExtensionForms: function () {
+            // Hide all extension forms
+            this.base.commands.forEach(function (extension) {
+                if (extension.hasForm && extension.isDisplayed()) {
+                    extension.hideForm();
+                }
+            });
         }
     };
 }(window, document));
