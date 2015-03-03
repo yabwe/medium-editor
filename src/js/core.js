@@ -1070,8 +1070,11 @@ function MediumEditor(elements, options) {
             return this.options.ownerDocument.execCommand(action, false, null);
         },
 
-        getSelectedParentElement: function () {
-            return Selection.getSelectedParentElement();
+        getSelectedParentElement: function (range) {
+            if (range === undefined) {
+                range = window.getSelection().getRangeAt(0);
+            }
+            return Selection.getSelectedParentElement(range);
         },
 
         execFormatBlock: function (el) {
