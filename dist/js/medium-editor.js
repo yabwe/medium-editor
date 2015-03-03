@@ -1900,7 +1900,7 @@ function MediumEditor(elements, options) {
 
                 // remove node and move cursor to start of header
                 range = document.createRange();
-                sel = window.getSelection();
+                sel = this.options.contentWindow.getSelection();
 
                 range.setStart(node.nextElementSibling, 0);
                 range.collapse(true);
@@ -2429,8 +2429,11 @@ function MediumEditor(elements, options) {
             return this.options.ownerDocument.execCommand(action, false, null);
         },
 
-        getSelectedParentElement: function () {
-            return Selection.getSelectedParentElement();
+        getSelectedParentElement: function (range) {
+            if (range === undefined) {
+                range = this.options.contentWindow.getSelection().getRangeAt(0);
+            }
+            return Selection.getSelectedParentElement(range);
         },
 
         execFormatBlock: function (el) {
