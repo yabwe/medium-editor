@@ -1071,7 +1071,7 @@ function MediumEditor(elements, options) {
         },
 
         getSelectedParentElement: function (range) {
-            if (typeof range !== 'undefined') {
+            if (typeof range === 'undefined') {
                 range = window.getSelection().getRangeAt(0);
             }
             return Selection.getSelectedParentElement(range);
