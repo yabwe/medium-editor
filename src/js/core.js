@@ -672,97 +672,10 @@ function MediumEditor(elements, options) {
         },
 
         checkSelection: function () {
-            var newSelection,
-                selectionElement;
-
             if (!this.preventSelectionUpdates && this.toolbarObj) {
-
-                newSelection = this.options.contentWindow.getSelection();
-                if ((!this.options.updateOnEmptySelection && newSelection.toString().trim() === '') ||
-                        (this.options.allowMultiParagraphSelection === false && this.multipleBlockElementsSelected()) ||
-                        Selection.selectionInContentEditableFalse(this.options.contentWindow)) {
-                    if (!this.options.staticToolbar) {
-                        this.toolbarObj.hideToolbarActions();
-                    } else {
-                        this.showAndUpdateToolbar();
-                    }
-
-                } else {
-                    selectionElement = Selection.getSelectionElement(this.options.contentWindow);
-                    if (!selectionElement || selectionElement.getAttribute('data-disable-toolbar')) {
-                        if (!this.options.staticToolbar) {
-                            this.toolbarObj.hideToolbarActions();
-                        }
-                    } else {
-                        this.checkSelectionElement(newSelection, selectionElement);
-                    }
-                }
+                this.toolbarObj.checkState();
             }
             return this;
-        },
-
-        // Checks for existance of multiple block elements in the current selection
-        multipleBlockElementsSelected: function () {
-            /*jslint regexp: true*/
-            var selectionHtml = Selection.getSelectionHtml.call(this).replace(/<[\S]+><\/[\S]+>/gim, ''),
-                hasMultiParagraphs = selectionHtml.match(/<(p|h[1-6]|blockquote)[^>]*>/g);
-            /*jslint regexp: false*/
-
-            return !!hasMultiParagraphs && hasMultiParagraphs.length > 1;
-        },
-
-        checkSelectionElement: function (newSelection, selectionElement) {
-            var i,
-                adjacentNode,
-                offset = 0,
-                newRange;
-            this.selection = newSelection;
-            this.selectionRange = this.selection.getRangeAt(0);
-
-            /*
-            * In firefox, there are cases (ie doubleclick of a word) where the selectionRange start
-            * will be at the very end of an element.  In other browsers, the selectionRange start
-            * would instead be at the very beginning of an element that actually has content.
-            * example:
-            *   <span>foo</span><span>bar</span>
-            *
-            * If the text 'bar' is selected, most browsers will have the selectionRange start at the beginning
-            * of the 'bar' span.  However, there are cases where firefox will have the selectionRange start
-            * at the end of the 'foo' span.  The contenteditable behavior will be ok, but if there are any
-            * properties on the 'bar' span, they won't be reflected accurately in the toolbar
-            * (ie 'Bold' button wouldn't be active)
-            *
-            * So, for cases where the selectionRange start is at the end of an element/node, find the next
-            * adjacent text node that actually has content in it, and move the selectionRange start there.
-            */
-            if (this.options.standardizeSelectionStart &&
-                    this.selectionRange.startContainer.nodeValue &&
-                    (this.selectionRange.startOffset === this.selectionRange.startContainer.nodeValue.length)) {
-                adjacentNode = Util.findAdjacentTextNodeWithContent(Selection.getSelectionElement(this.options.contentWindow), this.selectionRange.startContainer, this.options.ownerDocument);
-                if (adjacentNode) {
-                    offset = 0;
-                    while (adjacentNode.nodeValue.substr(offset, 1).trim().length === 0) {
-                        offset = offset + 1;
-                    }
-                    newRange = this.options.ownerDocument.createRange();
-                    newRange.setStart(adjacentNode, offset);
-                    newRange.setEnd(this.selectionRange.endContainer, this.selectionRange.endOffset);
-                    this.selection.removeAllRanges();
-                    this.selection.addRange(newRange);
-                    this.selectionRange = newRange;
-                }
-            }
-
-            for (i = 0; i < this.elements.length; i += 1) {
-                if (this.elements[i] === selectionElement) {
-                    this.showAndUpdateToolbar();
-                    return;
-                }
-            }
-
-            if (!this.options.staticToolbar) {
-                this.toolbarObj.hideToolbarActions();
-            }
         },
 
         showAndUpdateToolbar: function () {
