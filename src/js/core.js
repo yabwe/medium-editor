@@ -619,12 +619,19 @@ function MediumEditor(elements, options) {
         bindSelect: function () {
             var i,
                 blurHelper = function (event) {
-                    // Do not close the toolbar when bluring the editable area and clicking into the anchor form
+                    // Do not trigger checkSelection when bluring the editable area and clicking into the toolbar
                     if (event &&
-                            event.type &&
-                            event.type.toLowerCase() === 'blur' &&
                             event.relatedTarget &&
                             Util.isDescendant(this.toolbar, event.relatedTarget)) {
+                        return false;
+                    }
+                    this.checkSelection();
+                }.bind(this),
+                mouseupHelper = function (event) {
+                    // Do not trigger checkSelection when mouseup fires over the toolbar
+                    if (event &&
+                            event.target &&
+                            Util.isDescendant(this.toolbar, event.target)) {
                         return false;
                     }
                     this.checkSelection();
@@ -635,7 +642,7 @@ function MediumEditor(elements, options) {
                     }.bind(this), 0);
                 }.bind(this);
 
-            this.on(this.options.ownerDocument.documentElement, 'mouseup', this.checkSelection.bind(this));
+            this.on(this.options.ownerDocument.documentElement, 'mouseup', mouseupHelper);
 
             for (i = 0; i < this.elements.length; i += 1) {
                 this.on(this.elements[i], 'keyup', this.checkSelection.bind(this));
