@@ -1366,9 +1366,9 @@ var Toolbar;
 (function (window, document) {
     'use strict';
 
-    Toolbar = function Toolbar(instance, options) {
+    Toolbar = function Toolbar(instance) {
         this.base = instance;
-        this.options = options;
+        this.options = instance.options;
     };
 
     Toolbar.prototype = {
@@ -1521,6 +1521,7 @@ var Toolbar;
         }
     };
 }(window, document));
+
 function MediumEditor(elements, options) {
     'use strict';
     return this.init(elements, options);
@@ -2078,7 +2079,7 @@ function MediumEditor(elements, options) {
             if (this.toolbarObj) {
                 return this;
             }
-            this.toolbarObj = new Toolbar(this, this.options);
+            this.toolbarObj = new Toolbar(this);
             this.toolbar = this.toolbarObj.getToolbarElement();
             this.options.elementsContainer.appendChild(this.toolbar);
             this.toolbarActions = this.toolbarObj.getToolbarActionsElement();

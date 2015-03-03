@@ -5,9 +5,9 @@ var Toolbar;
 (function (window, document) {
     'use strict';
 
-    Toolbar = function Toolbar(instance, options) {
+    Toolbar = function Toolbar(instance) {
         this.base = instance;
-        this.options = options;
+        this.options = instance.options;
     };
 
     Toolbar.prototype = {

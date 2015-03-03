@@ -560,7 +560,7 @@ function MediumEditor(elements, options) {
             if (this.toolbarObj) {
                 return this;
             }
-            this.toolbarObj = new Toolbar(this, this.options);
+            this.toolbarObj = new Toolbar(this);
             this.toolbar = this.toolbarObj.getToolbarElement();
             this.options.elementsContainer.appendChild(this.toolbar);
             this.toolbarActions = this.toolbarObj.getToolbarActionsElement();
