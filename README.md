@@ -74,7 +74,7 @@ var elements = document.querySelectorAll('.editable'),
 * __disableEditing__: enables/disables adding the contenteditable behavior. Useful for using the toolbar with customized buttons/actions. You can also set specific element behavior by using setting a data-disable-editing attribute. Default: false
 * __disablePlaceholders__: enables/disables support for __placeholder__, including DOM element creation and attaching event handlers.  When disabled, medium-editor will ignore the __placholder__ option and not show placeholder text. Default: false
 * __elementsContainer__: specifies a DOM node to contain MediumEditor's toolbar and anchor preview elements. Default: document.body
-* __extensions__: extension to use (see [Extensions](https://github.com/daviferreira/medium-editor/wiki/Creating-Extensions)) for more. Default: {}
+* __extensions__: extension to use (see [Custom Buttons and Extensions](https://github.com/daviferreira/medium-editor/wiki/Custom-Buttons-and-Extensions)) for more. Default: {}
 * __firstHeader__: HTML tag to be used as first header. Default: h3
 * __forcePlainText__: Forces pasting as plain text. Default: true
 * __imageDragging__: Allows image drag and drop into the editor. Default: true
@@ -168,7 +168,7 @@ This is handy when you need to capture modifications other thats outside of `key
 
 ## Extensions & Plugins
 
-Check the [documentation](https://github.com/daviferreira/medium-editor/wiki/Creating-Extensions) in order to learn how to develop extensions for MediumEditor.
+Check the [documentation](https://github.com/daviferreira/medium-editor/wiki/Custom-Buttons-and-Extensions) in order to learn how to develop extensions for MediumEditor.
 
 A list of existing extensions and plugins, such as [Images and Media embeds](http://orthes.github.io/medium-editor-insert-plugin/), [Tables](https://github.com/daviferreira/medium-editor-tables) and [Markdown](https://github.com/IonicaBizau/medium-editor-markdown) can be found [here](https://github.com/daviferreira/medium-editor/wiki/Extensions-Plugins).
 
