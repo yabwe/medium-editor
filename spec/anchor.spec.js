@@ -29,7 +29,7 @@ describe('Anchor Button TestCase', function () {
             jasmine.clock().tick(1);
             button = editor.toolbar.querySelector('[data-action="createLink"]');
             fireEvent(button, 'click');
-            expect(editor.toolbarActions.style.display).toBe('none');
+            expect(editor.toolbarObj.getToolbarActionsElement().style.display).toBe('none');
             expect(anchorExtension.isDisplayed()).toBe(true);
             expect(anchorExtension.showForm).toHaveBeenCalled();
         });
