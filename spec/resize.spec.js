@@ -24,20 +24,20 @@ describe('Resize TestCase', function () {
         selectElementContentsAndFire(editor.elements[0]);
         jasmine.clock().tick(101);
         expect(editor.toolbar.className.indexOf('active') > -1).toBe(true);
-        spyOn(editor, 'setToolbarPosition');
+        spyOn(MediumEditor.statics.Toolbar.prototype, 'setToolbarPosition');
         fireEvent(window, 'resize');
         jasmine.clock().tick(101);
-        expect(editor.setToolbarPosition).toHaveBeenCalled();
+        expect(editor.toolbarObj.setToolbarPosition).toHaveBeenCalled();
         editor.deactivate();
     });
 
     it('should not call setToolbarPosition when toolbar is not visible', function () {
         var editor = new MediumEditor('.editor');
-        spyOn(editor, 'setToolbarPosition');
+        spyOn(MediumEditor.statics.Toolbar.prototype, 'setToolbarPosition');
         fireEvent(window, 'resize');
         jasmine.clock().tick(101);
         expect(editor.toolbar.className.indexOf('active')).toBe(-1);
-        expect(editor.setToolbarPosition).not.toHaveBeenCalled();
+        expect(editor.toolbarObj.setToolbarPosition).not.toHaveBeenCalled();
     });
 
 });

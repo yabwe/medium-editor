@@ -611,183 +611,6 @@ function MediumEditor(elements, options) {
             return this;
         },
 
-        showAndUpdateToolbar: function () {
-            this.setToolbarButtonStates()
-                .showToolbarDefaultActions()
-                .setToolbarPosition();
-        },
-
-        setToolbarPosition: function () {
-            // document.documentElement for IE 9
-            var scrollTop = (this.options.ownerDocument.documentElement && this.options.ownerDocument.documentElement.scrollTop) || this.options.ownerDocument.body.scrollTop,
-                selection = this.options.contentWindow.getSelection(),
-                windowWidth = this.options.contentWindow.innerWidth,
-                container = Selection.getSelectionElement(this.options.contentWindow),
-                buttonHeight = 50,
-                toolbarWidth,
-                toolbarHeight,
-                halfOffsetWidth,
-                defaultLeft,
-                containerRect,
-                containerTop,
-                containerCenter,
-                range,
-                boundary,
-                middleBoundary,
-                targetLeft;
-
-            // If there isn't a valid selection, bail
-            if (!container || !this.options.contentWindow.getSelection().focusNode) {
-                return this;
-            }
-
-            // If the container isn't part of this medium-editor instance, bail
-            if (this.elements.indexOf(container) === -1) {
-                return this;
-            }
-
-            // Calculate container dimensions
-            containerRect = container.getBoundingClientRect();
-            containerTop = containerRect.top + scrollTop;
-            containerCenter = (containerRect.left + (containerRect.width / 2));
-
-            // position the toolbar at left 0, so we can get the real width of the toolbar
-            this.toolbar.style.left = '0';
-            toolbarWidth = this.toolbar.offsetWidth;
-            toolbarHeight = this.toolbar.offsetHeight;
-            halfOffsetWidth = toolbarWidth / 2;
-            defaultLeft = this.options.diffLeft - halfOffsetWidth;
-
-            if (this.options.staticToolbar) {
-                this.toolbarObj.showToolbar();
-
-                if (this.options.stickyToolbar) {
-                    // If it's beyond the height of the editor, position it at the bottom of the editor
-                    if (scrollTop > (containerTop + container.offsetHeight - toolbarHeight)) {
-                        this.toolbar.style.top = (containerTop + container.offsetHeight - toolbarHeight) + 'px';
-                        this.toolbar.classList.remove('sticky-toolbar');
-
-                    // Stick the toolbar to the top of the window
-                    } else if (scrollTop > (containerTop - toolbarHeight)) {
-                        this.toolbar.classList.add('sticky-toolbar');
-                        this.toolbar.style.top = "0px";
-
-                    // Normal static toolbar position
-                    } else {
-                        this.toolbar.classList.remove('sticky-toolbar');
-                        this.toolbar.style.top = containerTop - toolbarHeight + "px";
-                    }
-                } else {
-                    this.toolbar.style.top = containerTop - toolbarHeight + "px";
-                }
-
-                if (this.options.toolbarAlign === 'left') {
-                    targetLeft = containerRect.left;
-                } else if (this.options.toolbarAlign === 'center') {
-                    targetLeft = containerCenter - halfOffsetWidth;
-                } else if (this.options.toolbarAlign === 'right') {
-                    targetLeft = containerRect.right - toolbarWidth;
-                }
-
-                if (targetLeft < 0) {
-                    targetLeft = 0;
-                } else if ((targetLeft + toolbarWidth) > windowWidth) {
-                    targetLeft = windowWidth - toolbarWidth;
-                }
-
-                this.toolbar.style.left = targetLeft + 'px';
-
-            } else if (!selection.isCollapsed) {
-                this.toolbarObj.showToolbar();
-
-                range = selection.getRangeAt(0);
-                boundary = range.getBoundingClientRect();
-                middleBoundary = (boundary.left + boundary.right) / 2;
-
-                if (boundary.top < buttonHeight) {
-                    this.toolbar.classList.add('medium-toolbar-arrow-over');
-                    this.toolbar.classList.remove('medium-toolbar-arrow-under');
-                    this.toolbar.style.top = buttonHeight + boundary.bottom - this.options.diffTop + this.options.contentWindow.pageYOffset - toolbarHeight + 'px';
-                } else {
-                    this.toolbar.classList.add('medium-toolbar-arrow-under');
-                    this.toolbar.classList.remove('medium-toolbar-arrow-over');
-                    this.toolbar.style.top = boundary.top + this.options.diffTop + this.options.contentWindow.pageYOffset - toolbarHeight + 'px';
-                }
-                if (middleBoundary < halfOffsetWidth) {
-                    this.toolbar.style.left = defaultLeft + halfOffsetWidth + 'px';
-                } else if ((windowWidth - middleBoundary) < halfOffsetWidth) {
-                    this.toolbar.style.left = windowWidth + defaultLeft - halfOffsetWidth + 'px';
-                } else {
-                    this.toolbar.style.left = defaultLeft + middleBoundary + 'px';
-                }
-            }
-
-            this.hideAnchorPreview();
-
-            return this;
-        },
-
-        setToolbarButtonStates: function () {
-            this.commands.forEach(function (extension) {
-                if (typeof extension.isActive === 'function') {
-                    extension.setInactive();
-                }
-            }.bind(this));
-            this.checkActiveButtons();
-            return this;
-        },
-
-        checkActiveButtons: function () {
-            var elements = Array.prototype.slice.call(this.elements),
-                manualStateChecks = [],
-                queryState = null,
-                parentNode,
-                checkExtension = function (extension) {
-                    if (typeof extension.checkState === 'function') {
-                        extension.checkState(parentNode);
-                    } else if (typeof extension.isActive === 'function' &&
-                               typeof extension.isAlreadyApplied === 'function') {
-                        if (!extension.isActive() && extension.isAlreadyApplied(parentNode)) {
-                            extension.setActive();
-                        }
-                    }
-                };
-
-            if (!this.selectionRange) {
-                return;
-            }
-            parentNode = Selection.getSelectedParentElement(this.selectionRange);
-
-            // Loop through all commands
-            this.commands.forEach(function (command) {
-                // For those commands where we can use document.queryCommandState(), do so
-                if (typeof command.queryCommandState === 'function') {
-                    queryState = command.queryCommandState();
-                    // If queryCommandState returns a valid value, we can trust the browser
-                    // and don't need to do our manual checks
-                    if (queryState !== null) {
-                        if (queryState) {
-                            command.setActive();
-                        }
-                        return;
-                    }
-                }
-                // We can't use queryCommandState for this command, so add to manualStateChecks
-                manualStateChecks.push(command);
-            });
-
-            // Climb up the DOM and do manual checks for whether a certain command is currently enabled for this node
-            while (parentNode.tagName !== undefined && Util.parentElements.indexOf(parentNode.tagName.toLowerCase) === -1) {
-                manualStateChecks.forEach(checkExtension.bind(this));
-
-                // we can abort the search upwards if we leave the contentEditable element
-                if (elements.indexOf(parentNode) !== -1) {
-                    break;
-                }
-                parentNode = parentNode.parentNode;
-            }
-        },
-
         // Wrapper around document.queryCommandState for checking whether an action has already
         // been applied to the current selection
         queryCommandState: function (action) {
@@ -903,7 +726,12 @@ function MediumEditor(elements, options) {
             if (this.toolbarObj) {
                 this.toolbarObj.showToolbarDefaultActions();
             }
-            return this;
+        },
+
+        setToolbarPosition: function () {
+            if (this.toolbarObj) {
+                this.toolbarObj.setToolbarPosition();
+            }
         },
 
         selectAllContents: function () {
@@ -1228,12 +1056,6 @@ function MediumEditor(elements, options) {
                         el[i].classList.add(classes[j]);
                     }
                 }
-            }
-        },
-
-        positionToolbarIfShown: function () {
-            if (this.toolbarObj && this.toolbarObj.isDisplayed()) {
-                this.setToolbarPosition();
             }
         },
 

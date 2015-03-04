@@ -186,7 +186,7 @@ describe('Anchor Button TestCase', function () {
 
     describe('Cancel', function () {
         it('should close the link form when user clicks on cancel', function () {
-            spyOn(MediumEditor.prototype, 'showAndUpdateToolbar').and.callThrough();
+            spyOn(MediumEditor.statics.Toolbar.prototype, 'showAndUpdateToolbar').and.callThrough();
             var editor = new MediumEditor('.editor'),
                 button,
                 cancel,
@@ -198,7 +198,7 @@ describe('Anchor Button TestCase', function () {
             fireEvent(button, 'click');
             expect(anchorExtension.isDisplayed()).toBe(true);
             fireEvent(cancel, 'click');
-            expect(editor.showAndUpdateToolbar).toHaveBeenCalled();
+            expect(editor.toolbarObj.showAndUpdateToolbar).toHaveBeenCalled();
             expect(anchorExtension.isDisplayed()).toBe(false);
         });
         it('should close the link form when user presses escape', function () {

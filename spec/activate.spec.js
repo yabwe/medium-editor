@@ -63,7 +63,7 @@ describe('Activate/Deactivate TestCase', function () {
         });
 
         it('should abort any pending throttled event handlers', function () {
-            var editor, triggerEvents;
+            var editor, triggerEvents, toolbar;
 
             editor = new MediumEditor('.editor', {delay: 5});
             triggerEvents = function () {
@@ -71,6 +71,8 @@ describe('Activate/Deactivate TestCase', function () {
                 fireEvent(document.body, 'click', null, false, document.body);
                 fireEvent(document.body, 'blur', null, false);
             };
+            // Store toolbar, since deactivate will remove the reference from the editor
+            toolbar = editor.toolbarObj;
 
             // fire event (handler executed immediately)
             triggerEvents();
@@ -79,11 +81,11 @@ describe('Activate/Deactivate TestCase', function () {
             // fire event again (handler delayed because of throttle)
             triggerEvents();
 
-            spyOn(editor, 'positionToolbarIfShown').and.callThrough(); // via: handleResize
+            spyOn(toolbar, 'positionToolbarIfShown').and.callThrough(); // via: handleResize
             spyOn(editor, 'checkSelection').and.callThrough(); // via: handleBlur
             editor.deactivate();
             jasmine.clock().tick(1000); // arbitrary – must be longer than THROTTLE_INTERVAL
-            expect(editor.positionToolbarIfShown).not.toHaveBeenCalled();
+            expect(toolbar.positionToolbarIfShown).not.toHaveBeenCalled();
             expect(editor.checkSelection).not.toHaveBeenCalled();
         });
 

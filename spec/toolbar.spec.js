@@ -146,10 +146,10 @@ describe('Toolbar TestCase', function () {
             var editor = new MediumEditor('.editor', {
                 staticToolbar: true
             });
-            spyOn(MediumEditor.prototype, 'setToolbarPosition').and.callThrough();
+            spyOn(MediumEditor.statics.Toolbar.prototype, 'setToolbarPosition').and.callThrough();
             fireEvent(editor.elements[0], 'click');
             jasmine.clock().tick(1); // checkSelection delay
-            expect(editor.setToolbarPosition).toHaveBeenCalled();
+            expect(editor.toolbarObj.setToolbarPosition).toHaveBeenCalled();
         });
 
         it('should show and update toolbar buttons when staticToolbar and updateOnEmptySelection options are set to true', function () {
