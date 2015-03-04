@@ -49,19 +49,17 @@ describe('Selection TestCase', function () {
 
     describe('CheckSelection', function () {
         it('should check for selection on mouseup event', function () {
-            spyOn(MediumEditor.prototype, 'checkSelection');
+            spyOn(MediumEditor.statics.Toolbar.prototype, 'checkState');
             var editor = new MediumEditor('.editor');
             fireEvent(editor.elements[0], 'mouseup');
-            jasmine.clock().tick(11); // checkSelection delay
-            expect(editor.checkSelection).toHaveBeenCalled();
+            expect(editor.toolbarObj.checkState).toHaveBeenCalled();
         });
 
         it('should check for selection on keyup', function () {
-            spyOn(MediumEditor.prototype, 'checkSelection');
+            spyOn(MediumEditor.statics.Toolbar.prototype, 'checkState');
             var editor = new MediumEditor('.editor');
             fireEvent(editor.elements[0], 'keyup');
-            jasmine.clock().tick(11); // checkSelection delay
-            expect(editor.checkSelection).toHaveBeenCalled();
+            expect(editor.toolbarObj.checkState).toHaveBeenCalled();
         });
 
         describe('When keepToolbarAlive is false', function () {

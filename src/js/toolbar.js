@@ -1,4 +1,4 @@
-/*global Util, Selection*/
+/*global Util, Selection, console*/
 
 var Toolbar;
 
@@ -8,6 +8,7 @@ var Toolbar;
     Toolbar = function Toolbar(instance) {
         this.base = instance;
         this.options = instance.options;
+        this.initThrottledMethods();
     };
 
     Toolbar.prototype = {
@@ -34,6 +35,8 @@ var Toolbar;
                     toolbar.appendChild(extension.getForm());
                 }
             });
+
+            this.attachEventHandlers();
 
             return toolbar;
         },
@@ -91,6 +94,100 @@ var Toolbar;
 
         getToolbarActionsElement: function () {
             return this.getToolbarElement().querySelector('.medium-editor-toolbar-actions');
+        },
+
+        // Toolbar event handlers
+
+        initThrottledMethods: function () {
+            // throttledPositionToolbar is throttled because:
+            // - It will be called when the browser is resizing, which can fire many times very quickly
+            // - For some event (like resize) a slight lag in UI responsiveness is OK and provides performance benefits
+            this.throttledPositionToolbar = Util.throttle(function (event) {
+                if (this.base.isActive) {
+                    this.base.positionToolbarIfShown();
+                }
+            }.bind(this));
+
+            // throttledHideToolbarActions is throttled because:
+            // - This method could be called many times due to the type of event handlers that are calling it
+            // - We want a slight delay so that other events in the stack can run, some of which may
+            //   prevent the toolbar from being hidden
+            this.throttledHideToolbarActions = Util.throttle(function (event) {
+                if (this.base.isActive) {
+                    this.hideToolbarActions();
+                }
+            }.bind(this));
+        },
+
+        attachEventHandlers: function () {
+            // Handle mouseup on document for updating the selection in the toolbar
+            this.base.on(this.options.ownerDocument.documentElement, 'mouseup', this.handleDocumentMouseup.bind(this));
+
+            // Add a scroll event for sticky toolbar
+            if (this.options.staticToolbar && this.options.stickyToolbar) {
+                // On scroll (capture), re-position the toolbar
+                this.base.on(this.options.contentWindow, 'scroll', this.handleWindowScroll.bind(this), true);
+            }
+
+            // On resize, re-position the toolbar
+            this.base.on(this.options.contentWindow, 'resize', this.handleWindowResize.bind(this));
+
+            // Handlers for each contentedtiable element
+            this.base.elements.forEach(function (element) {
+                // Attach click handler to each contenteditable element
+                this.base.on(element, 'click', this.handleEditableClick.bind(this));
+
+                // Attach keyup handler to each contenteditable element
+                this.base.on(element, 'keyup', this.handleEditableKeyup.bind(this));
+
+                // Attach blur handler to each contenteditable element
+                this.base.on(element, 'blur', this.handleEditableBlur.bind(this));
+            }.bind(this));
+        },
+
+        handleWindowScroll: function (event) {
+            this.base.positionToolbarIfShown();
+        },
+
+        handleWindowResize: function (event) {
+            this.throttledPositionToolbar();
+        },
+
+        handleDocumentMouseup: function (event) {
+            // Do not trigger checkState when mouseup fires over the toolbar
+            if (event &&
+                    event.target &&
+                    Util.isDescendant(this.getToolbarElement(), event.target)) {
+                return false;
+            }
+            this.checkState();
+        },
+
+        handleEditableClick: function (event) {
+            // Delay the call to checkState to handle bug where selection is empty
+            // immediately after clicking inside a pre-existing selection
+            setTimeout(function () {
+                this.checkState();
+            }.bind(this), 0);
+        },
+
+        handleEditableKeyup: function (event) {
+            this.checkState();
+        },
+
+        handleEditableBlur: function (event) {
+            // Do not trigger checkState when bluring the editable area and clicking into the toolbar
+            if (event &&
+                    event.relatedTarget &&
+                    Util.isDescendant(this.getToolbarElement(), event.relatedTarget)) {
+                return false;
+            }
+            this.checkState();
+        },
+
+        handleBlur: function (event) {
+            // Hide the toolbar after a small delay so we can prevent this on toolbar click
+            this.throttledHideToolbarActions();
         },
 
         // Hiding/showing toolbar
@@ -229,24 +326,26 @@ var Toolbar;
             var newSelection,
                 selectionElement;
 
-            newSelection = this.options.contentWindow.getSelection();
-            if ((!this.options.updateOnEmptySelection && newSelection.toString().trim() === '') ||
-                    (this.options.allowMultiParagraphSelection === false && this.multipleBlockElementsSelected()) ||
-                    Selection.selectionInContentEditableFalse(this.options.contentWindow)) {
-                if (!this.options.staticToolbar) {
-                    this.hideToolbarActions();
-                } else {
-                    this.base.showAndUpdateToolbar();
-                }
-
-            } else {
-                selectionElement = Selection.getSelectionElement(this.options.contentWindow);
-                if (!selectionElement || selectionElement.getAttribute('data-disable-toolbar')) {
+            if (!this.base.preventSelectionUpdates) {
+                newSelection = this.options.contentWindow.getSelection();
+                if ((!this.options.updateOnEmptySelection && newSelection.toString().trim() === '') ||
+                        (this.options.allowMultiParagraphSelection === false && this.multipleBlockElementsSelected()) ||
+                        Selection.selectionInContentEditableFalse(this.options.contentWindow)) {
                     if (!this.options.staticToolbar) {
                         this.hideToolbarActions();
+                    } else {
+                        this.base.showAndUpdateToolbar();
                     }
+
                 } else {
-                    this.checkSelectionElement(newSelection, selectionElement);
+                    selectionElement = Selection.getSelectionElement(this.options.contentWindow);
+                    if (!selectionElement || selectionElement.getAttribute('data-disable-toolbar')) {
+                        if (!this.options.staticToolbar) {
+                            this.hideToolbarActions();
+                        }
+                    } else {
+                        this.checkSelectionElement(newSelection, selectionElement);
+                    }
                 }
             }
         }

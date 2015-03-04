@@ -148,6 +148,7 @@ describe('Toolbar TestCase', function () {
             });
             spyOn(MediumEditor.prototype, 'setToolbarPosition').and.callThrough();
             fireEvent(editor.elements[0], 'click');
+            jasmine.clock().tick(1); // checkSelection delay
             expect(editor.setToolbarPosition).toHaveBeenCalled();
         });
 
@@ -189,7 +190,7 @@ describe('Toolbar TestCase', function () {
             expect(editorTwo.toolbar.classList.contains('medium-editor-toolbar-active')).toBe(false);
 
             selectElementContentsAndFire(document.getElementById('editor-span-2'));
-            fireEvent(editorTwo.elements[0], 'focus');
+            fireEvent(elTwo, 'focus', null, null, elTwo, this.el);
 
             jasmine.clock().tick(1); // checkSelection delay
 
