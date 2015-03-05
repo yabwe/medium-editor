@@ -2,20 +2,75 @@
     outline: none;
 }
 
+@font-face {
+    font-family: 'ProximaNovaBlack';
+    src: url('http://dfimg.com/fonts/proximanova-black-webfont.eot');
+    src: url('http://dfimg.com/fonts/proximanova-black-webfont.eot?#iefix') format('embedded-opentype'),
+         url('http://dfimg.com/fonts/proximanova-black-webfont.woff') format('woff'),
+         url('http://dfimg.com/fonts/proximanova-black-webfont.ttf') format('truetype'),
+         url('http://dfimg.com/fonts/proximanova-black-webfont.svg#ProximaNovaBlack') format('svg');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'ProximaNovaRegular';
+    src: url('http://dfimg.com/fonts/proximanova-regular-webfont.eot');
+    src: url('http://dfimg.com/fonts/proximanova-regular-webfont.eot?#iefix') format('embedded-opentype'),
+         url('http://dfimg.com/fonts/proximanova-regular-webfont.woff') format('woff'),
+         url('http://dfimg.com/fonts/proximanova-regular-webfont.ttf') format('truetype'),
+         url('http://dfimg.com/fonts/proximanova-regular-webfont.svg#ProximaNovaRegular') format('svg');
+    font-weight: normal;
+    font-style: normal;
+}
+
 body {
-    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-family: ProximaNovaRegular, Helvetica, Arial, sans-serif;
     font-size: 22px;
     line-height: 30px;
 }
 
-h1 {
-    font-size: 60px;
+.top-bar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: auto;
+    z-index: 10;
+    padding: 10px;
+    background-color: #000;
+    background-color: rgba(0, 0, 0, .8);
+    box-shadow: 0 0 4px #000;
+    box-sizing: border-box;
+    color: #ccc;
+    font-size: 12px;
     font-weight: bold;
+    text-align: center;
+    text-transform: uppercase;
+}
+
+h1 {
+    font-family: ProximaNovaBlack, Helvetica, Arial, sans-serif;
+    font-size: 60px;
+    font-weight: normal;
     text-align: center;
     margin-bottom: 40px;
     padding-bottom: 40px;
     letter-spacing: -2px;
     border-bottom: 1px solid #dbdbdb;
+}
+
+h3 {
+    font-size: 32px;
+    line-height: 42px;
+}
+
+h4 {
+    font-size: 26px;
+    line-height: 32px;
+}
+
+b {
+    font-family: ProximaNovaBlack, Helvetica, Arial, sans-serif;
 }
 
 p {
@@ -40,21 +95,11 @@ pre {
     color: #666;
 }
 
-h3 {
-    font-size: 32px;
-    line-height: 42px;
-}
-
-h4 {
-    font-size: 26px;
-    line-height: 32px;
-}
-
 
 blockquote {
     display: block;
     padding-left: 20px;
-    border-left: 5px solid #555;
+    border-left: 6px solid #df0d32;
     margin-left: -15px;
     padding-left: 15px;
     font-style: italic;
