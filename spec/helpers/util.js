@@ -19,6 +19,14 @@ function fireEvent (element, event, keyCode, ctrlKey, target, relatedTarget, shi
        if (shiftKey) {
         evt.shiftKey = true;
        }
+       if (event.indexOf('drag') !== -1 || event === 'drop') {
+           evt.dataTransfer = {
+               dropEffect: '',
+               files: [{
+                   type: 'image'
+               }]
+           };
+       }
        return !element.dispatchEvent(evt);
    } else {
        // dispatch for IE
