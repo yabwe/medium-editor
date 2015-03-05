@@ -43,22 +43,15 @@ var Selection;
         getSelectionHtml: function getSelectionHtml() {
             var i,
                 html = '',
-                sel,
+                sel = this.options.contentWindow.getSelection(),
                 len,
                 container;
-            if (this.options.contentWindow.getSelection !== undefined) {
-                sel = this.options.contentWindow.getSelection();
-                if (sel.rangeCount) {
-                    container = this.options.ownerDocument.createElement('div');
-                    for (i = 0, len = sel.rangeCount; i < len; i += 1) {
-                        container.appendChild(sel.getRangeAt(i).cloneContents());
-                    }
-                    html = container.innerHTML;
+            if (sel.rangeCount) {
+                container = this.options.ownerDocument.createElement('div');
+                for (i = 0, len = sel.rangeCount; i < len; i += 1) {
+                    container.appendChild(sel.getRangeAt(i).cloneContents());
                 }
-            } else if (this.options.ownerDocument.selection !== undefined) {
-                if (this.options.ownerDocument.selection.type === 'Text') {
-                    html = this.options.ownerDocument.selection.createRange().htmlText;
-                }
+                html = container.innerHTML;
             }
             return html;
         },
