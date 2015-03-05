@@ -1,4 +1,4 @@
-function fireEvent (element, event, keyCode, ctrlKey, target, relatedTarget) {
+function fireEvent (element, event, keyCode, ctrlKey, target, relatedTarget, shiftKey) {
    if (document.createEvent) {
        // dispatch for firefox + others
        var evt = document.createEvent("HTMLEvents");
@@ -16,11 +16,16 @@ function fireEvent (element, event, keyCode, ctrlKey, target, relatedTarget) {
        if (relatedTarget) {
         evt.relatedTarget = relatedTarget;
        }
-       return !element.dispatchEvent(evt);
+       if (shiftKey) {
+        evt.shiftKey = true;
+       }
+       element.dispatchEvent(evt);
+       return evt;
    } else {
        // dispatch for IE
        var evt = document.createEventObject();
-       return element.fireEvent('on'+event,evt)
+       element.fireEvent('on'+event,evt);
+       return evt;
    }
 }
 

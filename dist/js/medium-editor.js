@@ -2310,7 +2310,6 @@ function MediumEditor(elements, options) {
                     if (!(self.options.disableReturn || editorElement.getAttribute('data-disable-return')) &&
                             tagName !== 'li' && !Util.isListItemChild(node)) {
                         if (!e.shiftKey) {
-
                             // paragraph creation should not be forced within a header tag
                             if (!/h\d/.test(tagName)) {
                                 self.options.ownerDocument.execCommand('formatBlock', false, 'p');
@@ -2354,7 +2353,7 @@ function MediumEditor(elements, options) {
 
                     if (tag === 'pre') {
                         e.preventDefault();
-                        self.options.ownerDocument.execCommand('insertHtml', null, '    ');
+                        Util.insertHTMLCommand(self.options.ownerDocument, '    ');
                     }
 
                     // Tab to indent list structures!
