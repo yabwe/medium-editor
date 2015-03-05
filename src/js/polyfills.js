@@ -388,6 +388,42 @@ if (!("classList" in document.createElement("_"))) {
       window.Int32Array = TypedArray;
     })();
 
+
+    (function() {
+      if ("response" in XMLHttpRequest.prototype ||
+          "mozResponseArrayBuffer" in XMLHttpRequest.prototype ||
+          "mozResponse" in XMLHttpRequest.prototype ||
+          "responseArrayBuffer" in XMLHttpRequest.prototype)
+        return;
+      Object.defineProperty(XMLHttpRequest.prototype, "response", {
+        get: function() {
+          return new Uint8Array( new VBArray(this.responseBody).toArray() );
+        }
+      });
+    })();
+
+    (function() {
+      if ("btoa" in window)
+        return;
+
+      var digits = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=";
+
+      window.btoa = function(chars) {
+        var buffer = "";
+        var i, n;
+        for (i = 0, n = chars.length; i < n; i += 3) {
+          var b1 = chars.charCodeAt(i) & 0xFF;
+          var b2 = chars.charCodeAt(i + 1) & 0xFF;
+          var b3 = chars.charCodeAt(i + 2) & 0xFF;
+          var d1 = b1 >> 2, d2 = ((b1 & 3) << 4) | (b2 >> 4);
+          var d3 = i + 1 < n ? ((b2 & 0xF) << 2) | (b3 >> 6) : 64;
+          var d4 = i + 2 < n ? (b3 & 0x3F) : 64;
+          buffer += digits.charAt(d1) + digits.charAt(d2) + digits.charAt(d3) + digits.charAt(d4);
+        }
+        return buffer;
+      };
+    })();
+
 	view.URL = view.URL || view.webkitURL;
 
 	if (view.Blob && view.URL) {
