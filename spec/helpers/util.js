@@ -1,4 +1,4 @@
-function fireEvent (element, event, keyCode, ctrlKey, target, relatedTarget) {
+function fireEvent (element, event, keyCode, ctrlKey, target, relatedTarget, shiftKey) {
    if (document.createEvent) {
        // dispatch for firefox + others
        var evt = document.createEvent("HTMLEvents");
@@ -16,12 +16,23 @@ function fireEvent (element, event, keyCode, ctrlKey, target, relatedTarget) {
        if (relatedTarget) {
         evt.relatedTarget = relatedTarget;
        }
+       if (shiftKey) {
+        evt.shiftKey = true;
+       }
        return !element.dispatchEvent(evt);
    } else {
        // dispatch for IE
        var evt = document.createEventObject();
        return element.fireEvent('on'+event,evt)
    }
+}
+
+function placeCursorInsideElement(el, index) {
+    var selection = window.getSelection(),
+        newRange = document.createRange();
+    selection.removeAllRanges();
+    newRange.setStart(el, index);
+    selection.addRange(newRange);
 }
 
 function selectElementContentsAndFire(el, options) {
@@ -65,4 +76,8 @@ function isOldIE() {
         navigator.appName.indexOf("Internet Explorer") != -1
         && (navigator.appVersion.indexOf("MSIE 9") != -1 || navigator.appVersion.indexOf("MSIE 10") != -1)
     );
+}
+
+function isFirefox() {
+    return navigator.userAgent.toLowerCase().indexOf("firefox") != -1;
 }

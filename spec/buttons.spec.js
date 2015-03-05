@@ -62,18 +62,7 @@ describe('Buttons TestCase', function () {
             jasmine.clock().tick(1);
             button = editor.toolbar.getToolbarElement().querySelector('[data-action="bold"]');
             fireEvent(button, 'click');
-            expect(editor.execAction).toHaveBeenCalled();
-        });
-
-        it('should execute the button action', function () {
-            spyOn(MediumEditor.prototype, 'execAction');
-            var button,
-                editor = new MediumEditor('.editor');
-            selectElementContentsAndFire(editor.elements[0]);
-            jasmine.clock().tick(1);
-            button = editor.toolbar.getToolbarElement().querySelector('[data-action="bold"]');
-            fireEvent(button, 'click');
-            expect(editor.execAction).toHaveBeenCalled();
+            expect(editor.execAction).toHaveBeenCalledWith('bold');
         });
 
         it('should execute the button action on shortcut', function () {
@@ -84,6 +73,100 @@ describe('Buttons TestCase', function () {
             jasmine.clock().tick(1);
             fireEvent(editor.elements[0], 'keydown', code, true);
             expect(editor.execAction).toHaveBeenCalled();
+        });
+    });
+
+    describe('Buttons with various labels', function () {
+        var defaultLabels = {},
+            fontAwesomeLabels = {},
+            customLabels = {},
+            allButtons = [],
+            buttonsData = MediumEditor.statics.ButtonsData,
+            currButton,
+            tempEl;
+
+        Object.keys(buttonsData).forEach(function (buttonName) {
+            if (buttonName !== 'header1' && buttonName !== 'header2') {
+                allButtons.push(buttonName);
+                currButton = buttonsData[buttonName];
+                // If the labels contain HTML entities, we need to escape them
+                tempEl = document.createElement('div');
+
+                // Default Labels
+                tempEl.innerHTML = currButton.contentDefault;
+                defaultLabels[buttonName] = {
+                    action: currButton.action,
+                    label: tempEl.innerHTML
+                };
+
+                // fontawesome labels
+                tempEl.innerHTML = currButton.contentFA;
+                fontAwesomeLabels[buttonName] = tempEl.innerHTML;
+
+                // custom labels (using aria label as a test)
+                customLabels[buttonName] = currButton.aria;
+            }
+        });
+
+        it('should contain default content if no custom labels are provided', function () {
+            spyOn(MediumEditor.prototype, 'execAction');
+            var button,
+                editor = new MediumEditor('.editor', {
+                    buttons: allButtons
+                });
+            expect(editor.toolbar.getToolbarElement().querySelectorAll('button').length).toBe(allButtons.length);
+            selectElementContentsAndFire(editor.elements[0]);
+            jasmine.clock().tick(1);
+
+            Object.keys(defaultLabels).forEach(function (buttonName) {
+                button = editor.toolbar.getToolbarElement().querySelector('.medium-editor-action-' + buttonName);
+                expect(button).not.toBeUndefined();
+                expect(button.innerHTML).toBe(defaultLabels[buttonName].label);
+            });
+        });
+
+        it('should contain fontawesome labels and execute the button action when clicked', function () {
+            spyOn(MediumEditor.prototype, 'execAction');
+            var action,
+                button,
+                editor = new MediumEditor('.editor', {
+                    buttons: allButtons,
+                    buttonLabels: 'fontawesome'
+                });
+            expect(editor.toolbar.getToolbarElement().querySelectorAll('button').length).toBe(allButtons.length);
+            selectElementContentsAndFire(editor.elements[0]);
+            jasmine.clock().tick(1);
+
+            Object.keys(fontAwesomeLabels).forEach(function (buttonName) {
+                action = defaultLabels[buttonName].action;
+                button = editor.toolbar.getToolbarElement().querySelector('.medium-editor-action-' + buttonName);
+                expect(button).not.toBeUndefined();
+                fireEvent(button, 'click');
+                expect(editor.execAction).toHaveBeenCalledWith(action);
+                expect(button.innerHTML).toBe(fontAwesomeLabels[buttonName]);
+            });
+        });
+
+        it('should contain custom labels and execute the button action when clicked', function () {
+            spyOn(MediumEditor.prototype, 'execAction');
+            var action,
+                button,
+                editor = new MediumEditor('.editor', {
+                    buttons: allButtons,
+                    buttonLabels: customLabels
+                });
+            expect(editor.toolbar.getToolbarElement().querySelectorAll('button').length).toBe(allButtons.length);
+            selectElementContentsAndFire(editor.elements[0]);
+            jasmine.clock().tick(1);
+
+            Object.keys(customLabels).forEach(function (buttonName) {
+                action = defaultLabels[buttonName].action;
+                button = editor.toolbar.getToolbarElement().querySelector('.medium-editor-action-' + buttonName);
+                expect(button).not.toBeUndefined();
+                fireEvent(button, 'click');
+                expect(editor.execAction).toHaveBeenCalledWith(action);
+                expect(button.innerHTML).toBe(customLabels[buttonName]);
+            });
         });
     });
 
@@ -155,6 +238,22 @@ describe('Buttons TestCase', function () {
             expect(button.classList.contains('medium-editor-button-active')).toBe(true);
         });
 
+        it('button should be active if the selection is bold and queryCommandState fails', function () {
+            var editor = new MediumEditor('.editor', {
+                    buttons: ['bold']
+                }),
+                button = editor.toolbar.getToolbarElement().querySelector('[data-action="bold"]');
+
+            spyOn(document, "queryCommandState").and.throwError("DOM ERROR");
+
+            this.el.innerHTML = '<b><i><u>lorem ipsum</u></i></b>';
+            selectElementContentsAndFire(editor.elements[0].querySelector('u'));
+            expect(button.classList.contains('medium-editor-button-active')).toBe(true);
+
+            fireEvent(button, 'click');
+            expect(button.classList.contains('medium-editor-button-active')).toBe(false);
+        });
+
         it('button should be active for other cases when text is bold', function () {
             var editor = new MediumEditor('.editor', {
                     buttons: ['bold']
@@ -204,6 +303,22 @@ describe('Buttons TestCase', function () {
             expect(button.classList.contains('medium-editor-button-active')).toBe(true);
         });
 
+        it('button should be active if the selection is italic and queryCommandState fails', function () {
+            var editor = new MediumEditor('.editor', {
+                    buttons: ['italic']
+                }),
+                button = editor.toolbar.getToolbarElement().querySelector('[data-action="italic"]');
+
+            spyOn(document, "queryCommandState").and.throwError("DOM ERROR");
+
+            this.el.innerHTML = '<i><b><u>lorem ipsum</u></b></i>';
+            selectElementContentsAndFire(editor.elements[0].querySelector('u'));
+            expect(button.classList.contains('medium-editor-button-active')).toBe(true);
+
+            fireEvent(button, 'click');
+            expect(button.classList.contains('medium-editor-button-active')).toBe(false);
+        });
+
         it('button should be active for other cases when text is italic', function () {
             var editor = new MediumEditor('.editor', {
                     buttons: ['italic']
@@ -238,6 +353,22 @@ describe('Buttons TestCase', function () {
             expect(this.el.innerHTML).toBe('lorem ipsum');
         });
 
+        it('button should be active if the selection is underlined and queryCommandState fails', function () {
+            var editor = new MediumEditor('.editor', {
+                    buttons: ['underline']
+                }),
+                button = editor.toolbar.getToolbarElement().querySelector('[data-action="underline"]');
+
+            spyOn(document, "queryCommandState").and.throwError("DOM ERROR");
+
+            this.el.innerHTML = '<u><b><i>lorem ipsum</i></b></u>';
+            selectElementContentsAndFire(editor.elements[0].querySelector('i'));
+            expect(button.classList.contains('medium-editor-button-active')).toBe(true);
+
+            fireEvent(button, 'click');
+            expect(button.classList.contains('medium-editor-button-active')).toBe(false);
+        });
+
         it('button should be active for other cases when text is underlined', function () {
             var editor = new MediumEditor('.editor', {
                     buttons: ['underline']
@@ -270,6 +401,22 @@ describe('Buttons TestCase', function () {
             fireEvent(button, 'click');
             expect(button.classList.contains('medium-editor-button-active')).toBe(false);
             expect(this.el.innerHTML).toBe('lorem ipsum');
+        });
+
+        it('button should be active if the selection is strikethrough and queryCommandState fails', function () {
+            var editor = new MediumEditor('.editor', {
+                    buttons: ['strikethrough']
+                }),
+                button = editor.toolbar.getToolbarElement().querySelector('[data-action="strikethrough"]');
+
+            spyOn(document, "queryCommandState").and.throwError("DOM ERROR");
+
+            this.el.innerHTML = '<strike><b><i>lorem ipsum</i></b></strike>';
+            selectElementContentsAndFire(editor.elements[0].querySelector('i'));
+            expect(button.classList.contains('medium-editor-button-active')).toBe(true);
+
+            fireEvent(button, 'click');
+            expect(button.classList.contains('medium-editor-button-active')).toBe(false);
         });
 
         it('button should be active for other cases when text is strikethrough', function () {

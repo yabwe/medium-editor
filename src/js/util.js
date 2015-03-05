@@ -1,4 +1,4 @@
-/*global NodeFilter*/
+/*global NodeFilter, console*/
 
 var Util;
 
@@ -36,10 +36,6 @@ var Util;
 
         defaults: function defaults(dest, source) {
             return copyInto(dest, source);
-        },
-
-        extend: function extend(dest, source) {
-            return copyInto(dest, source, true);
         },
 
         derives: function derives(base, derived) {
@@ -175,7 +171,7 @@ var Util;
 
         // http://stackoverflow.com/questions/6690752/insert-html-at-caret-in-a-contenteditable-div
         insertHTMLCommand: function (doc, html) {
-            var selection, range, el, fragment, node, lastNode;
+            var selection, range, el, fragment, node, lastNode, toReplace;
 
             if (doc.queryCommandSupported('insertHTML')) {
                 try {
@@ -183,9 +179,21 @@ var Util;
                 } catch (ignore) {}
             }
 
-            selection = window.getSelection();
+            selection = doc.defaultView.getSelection();
             if (selection.getRangeAt && selection.rangeCount) {
                 range = selection.getRangeAt(0);
+                toReplace = range.commonAncestorContainer;
+                // Ensure range covers maximum amount of nodes as possible
+                // By moving up the DOM and selecting ancestors whose only child is the range
+                if ((toReplace.nodeType === 3 && toReplace.nodeValue === range.toString()) ||
+                        (toReplace.nodeType !== 3 && toReplace.innerHTML === range.toString())) {
+                    while (toReplace.parentNode &&
+                            toReplace.parentNode.childNodes.length === 1 &&
+                            !toReplace.parentNode.getAttribute('data-medium-element')) {
+                        toReplace = toReplace.parentNode;
+                    }
+                    range.selectNode(toReplace);
+                }
                 range.deleteContents();
 
                 el = doc.createElement("div");

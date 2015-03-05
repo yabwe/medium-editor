@@ -311,7 +311,13 @@ var DefaultButton,
                 computedStyle = this.base.options.contentWindow.getComputedStyle(node, null).getPropertyValue(this.options.style.prop);
                 styleVals.forEach(function (val) {
                     if (!this.knownState) {
-                        this.knownState = isMatch = (computedStyle.indexOf(val) !== -1);
+                        isMatch = (computedStyle.indexOf(val) !== -1);
+                        // text-decoration is not inherited by default
+                        // so if the computed style for text-decoration doesn't match
+                        // don't write to knownState so we can fallback to other checks
+                        if (isMatch || this.options.style.prop !== 'text-decoration') {
+                            this.knownState = isMatch;
+                        }
                     }
                 }.bind(this));
             }

@@ -385,7 +385,10 @@ function MediumEditor(elements, options) {
                     tagName,
                     editorElement;
 
-                if (node && node.getAttribute('data-medium-element') && node.children.length === 0 && !(self.options.disableReturn || node.getAttribute('data-disable-return'))) {
+                if (node
+                        && node.getAttribute('data-medium-element')
+                        && node.children.length === 0
+                        && !(self.options.disableReturn || node.getAttribute('data-disable-return'))) {
                     self.options.ownerDocument.execCommand('formatBlock', false, 'p');
                 }
                 if (e.which === Util.keyCode.ENTER) {
@@ -395,15 +398,14 @@ function MediumEditor(elements, options) {
 
                     if (!(self.options.disableReturn || editorElement.getAttribute('data-disable-return')) &&
                             tagName !== 'li' && !Util.isListItemChild(node)) {
-                        if (!e.shiftKey) {
-
-                            // paragraph creation should not be forced within a header tag
+                        // For anchor tags, unlink
+                        if (tagName === 'a') {
+                            self.options.ownerDocument.execCommand('unlink', false, null);
+                        } else if (!e.shiftKey) {
+                            // only format block if this is not a header tag
                             if (!/h\d/.test(tagName)) {
                                 self.options.ownerDocument.execCommand('formatBlock', false, 'p');
                             }
-                        }
-                        if (tagName === 'a') {
-                            self.options.ownerDocument.execCommand('unlink', false, null);
                         }
                     }
                 }
@@ -440,7 +442,7 @@ function MediumEditor(elements, options) {
 
                     if (tag === 'pre') {
                         e.preventDefault();
-                        self.options.ownerDocument.execCommand('insertHtml', null, '    ');
+                        Util.insertHTMLCommand(self.options.ownerDocument, '    ');
                     }
 
                     // Tab to indent list structures!
@@ -449,9 +451,9 @@ function MediumEditor(elements, options) {
 
                         // If Shift is down, outdent, otherwise indent
                         if (e.shiftKey) {
-                            self.options.ownerDocument.execCommand('outdent', e);
+                            self.options.ownerDocument.execCommand('outdent', false, null);
                         } else {
-                            self.options.ownerDocument.execCommand('indent', e);
+                            self.options.ownerDocument.execCommand('indent', false, null);
                         }
                     }
                 } else if (e.which === Util.keyCode.BACKSPACE || e.which === Util.keyCode.DELETE || e.which === Util.keyCode.ENTER) {
@@ -719,12 +721,6 @@ function MediumEditor(elements, options) {
                 this.toolbar.hideToolbarDefaultActions();
             }
             return this;
-        },
-
-        showToolbarDefaultActions: function () {
-            if (this.toolbar) {
-                this.toolbar.showToolbarDefaultActions();
-            }
         },
 
         setToolbarPosition: function () {

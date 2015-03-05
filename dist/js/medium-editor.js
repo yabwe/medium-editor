@@ -224,10 +224,6 @@ var Util;
             return copyInto(dest, source);
         },
 
-        extend: function extend(dest, source) {
-            return copyInto(dest, source, true);
-        },
-
         derives: function derives(base, derived) {
             var origPrototype = derived.prototype;
             function Proto() { }
@@ -361,7 +357,7 @@ var Util;
 
         // http://stackoverflow.com/questions/6690752/insert-html-at-caret-in-a-contenteditable-div
         insertHTMLCommand: function (doc, html) {
-            var selection, range, el, fragment, node, lastNode;
+            var selection, range, el, fragment, node, lastNode, toReplace;
 
             if (doc.queryCommandSupported('insertHTML')) {
                 try {
@@ -369,9 +365,21 @@ var Util;
                 } catch (ignore) {}
             }
 
-            selection = window.getSelection();
+            selection = doc.defaultView.getSelection();
             if (selection.getRangeAt && selection.rangeCount) {
                 range = selection.getRangeAt(0);
+                toReplace = range.commonAncestorContainer;
+                // Ensure range covers maximum amount of nodes as possible
+                // By moving up the DOM and selecting ancestors whose only child is the range
+                if ((toReplace.nodeType === 3 && toReplace.nodeValue === range.toString()) ||
+                        (toReplace.nodeType !== 3 && toReplace.innerHTML === range.toString())) {
+                    while (toReplace.parentNode &&
+                            toReplace.parentNode.childNodes.length === 1 &&
+                            !toReplace.parentNode.getAttribute('data-medium-element')) {
+                        toReplace = toReplace.parentNode;
+                    }
+                    range.selectNode(toReplace);
+                }
                 range.deleteContents();
 
                 el = doc.createElement("div");
@@ -873,7 +881,13 @@ var DefaultButton,
                 computedStyle = this.base.options.contentWindow.getComputedStyle(node, null).getPropertyValue(this.options.style.prop);
                 styleVals.forEach(function (val) {
                     if (!this.knownState) {
-                        this.knownState = isMatch = (computedStyle.indexOf(val) !== -1);
+                        isMatch = (computedStyle.indexOf(val) !== -1);
+                        // text-decoration is not inherited by default
+                        // so if the computed style for text-decoration doesn't match
+                        // don't write to knownState so we can fallback to other checks
+                        if (isMatch || this.options.style.prop !== 'text-decoration') {
+                            this.knownState = isMatch;
+                        }
                     }
                 }.bind(this));
             }
@@ -2285,7 +2299,10 @@ function MediumEditor(elements, options) {
                     tagName,
                     editorElement;
 
-                if (node && node.getAttribute('data-medium-element') && node.children.length === 0 && !(self.options.disableReturn || node.getAttribute('data-disable-return'))) {
+                if (node
+                        && node.getAttribute('data-medium-element')
+                        && node.children.length === 0
+                        && !(self.options.disableReturn || node.getAttribute('data-disable-return'))) {
                     self.options.ownerDocument.execCommand('formatBlock', false, 'p');
                 }
                 if (e.which === Util.keyCode.ENTER) {
@@ -2295,15 +2312,14 @@ function MediumEditor(elements, options) {
 
                     if (!(self.options.disableReturn || editorElement.getAttribute('data-disable-return')) &&
                             tagName !== 'li' && !Util.isListItemChild(node)) {
-                        if (!e.shiftKey) {
-
-                            // paragraph creation should not be forced within a header tag
+                        // For anchor tags, unlink
+                        if (tagName === 'a') {
+                            self.options.ownerDocument.execCommand('unlink', false, null);
+                        } else if (!e.shiftKey) {
+                            // only format block if this is not a header tag
                             if (!/h\d/.test(tagName)) {
                                 self.options.ownerDocument.execCommand('formatBlock', false, 'p');
                             }
-                        }
-                        if (tagName === 'a') {
-                            self.options.ownerDocument.execCommand('unlink', false, null);
                         }
                     }
                 }
@@ -2340,7 +2356,7 @@ function MediumEditor(elements, options) {
 
                     if (tag === 'pre') {
                         e.preventDefault();
-                        self.options.ownerDocument.execCommand('insertHtml', null, '    ');
+                        Util.insertHTMLCommand(self.options.ownerDocument, '    ');
                     }
 
                     // Tab to indent list structures!
@@ -2349,9 +2365,9 @@ function MediumEditor(elements, options) {
 
                         // If Shift is down, outdent, otherwise indent
                         if (e.shiftKey) {
-                            self.options.ownerDocument.execCommand('outdent', e);
+                            self.options.ownerDocument.execCommand('outdent', false, null);
                         } else {
-                            self.options.ownerDocument.execCommand('indent', e);
+                            self.options.ownerDocument.execCommand('indent', false, null);
                         }
                     }
                 } else if (e.which === Util.keyCode.BACKSPACE || e.which === Util.keyCode.DELETE || e.which === Util.keyCode.ENTER) {
@@ -2619,12 +2635,6 @@ function MediumEditor(elements, options) {
                 this.toolbar.hideToolbarDefaultActions();
             }
             return this;
-        },
-
-        showToolbarDefaultActions: function () {
-            if (this.toolbar) {
-                this.toolbar.showToolbarDefaultActions();
-            }
         },
 
         setToolbarPosition: function () {
