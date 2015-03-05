@@ -1816,6 +1816,9 @@ var Toolbar;
         },
 
         positionStaticToolbar: function (container) {
+            // position the toolbar at left 0, so we can get the real width of the toolbar
+            this.getToolbarElement().style.left = '0';
+
             // document.documentElement for IE 9
             var scrollTop = (this.options.ownerDocument.documentElement && this.options.ownerDocument.documentElement.scrollTop) || this.options.ownerDocument.body.scrollTop,
                 windowWidth = this.options.contentWindow.innerWidth,
@@ -1866,6 +1869,9 @@ var Toolbar;
         },
 
         positionToolbar: function (selection) {
+            // position the toolbar at left 0, so we can get the real width of the toolbar
+            this.getToolbarElement().style.left = '0';
+
             var windowWidth = this.options.contentWindow.innerWidth,
                 range = selection.getRangeAt(0),
                 boundary = range.getBoundingClientRect(),
