@@ -385,7 +385,10 @@ function MediumEditor(elements, options) {
                     tagName,
                     editorElement;
 
-                if (node && node.getAttribute('data-medium-element') && node.children.length === 0 && !(self.options.disableReturn || node.getAttribute('data-disable-return'))) {
+                if (node
+                        && node.getAttribute('data-medium-element')
+                        && node.children.length === 0
+                        && !(self.options.disableReturn || node.getAttribute('data-disable-return'))) {
                     self.options.ownerDocument.execCommand('formatBlock', false, 'p');
                 }
                 if (e.which === Util.keyCode.ENTER) {
@@ -397,7 +400,7 @@ function MediumEditor(elements, options) {
                             tagName !== 'li' && !Util.isListItemChild(node)) {
                         if (!e.shiftKey) {
                             // paragraph creation should not be forced within a header tag
-                            if (!/h\d/.test(tagName)) {
+                            if (/h\d/.test(tagName)) {
                                 self.options.ownerDocument.execCommand('formatBlock', false, 'p');
                             }
                         }
@@ -448,9 +451,9 @@ function MediumEditor(elements, options) {
 
                         // If Shift is down, outdent, otherwise indent
                         if (e.shiftKey) {
-                            self.options.ownerDocument.execCommand('outdent', e);
+                            self.options.ownerDocument.execCommand('outdent', false, null);
                         } else {
-                            self.options.ownerDocument.execCommand('indent', e);
+                            self.options.ownerDocument.execCommand('indent', false, null);
                         }
                     }
                 } else if (e.which === Util.keyCode.BACKSPACE || e.which === Util.keyCode.DELETE || e.which === Util.keyCode.ENTER) {

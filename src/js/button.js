@@ -40,11 +40,10 @@ var DefaultButton,
             action: 'underline',
             aria: 'underline',
             tagNames: ['u'],
-            /* text-decoration is not inherited by default, so we CAN'T rely on this when inspecting descendants
             style: {
                 prop: 'text-decoration',
                 value: 'underline'
-            },*/
+            },
             useQueryState: true,
             contentDefault: '<b><u>U</u></b>',
             contentFA: '<i class="fa fa-underline"></i>',
@@ -55,11 +54,10 @@ var DefaultButton,
             action: 'strikethrough',
             aria: 'strike through',
             tagNames: ['strike'],
-            /* text-decoration is not inherited by default, so we CAN'T rely on this when inspecting descendants
             style: {
                 prop: 'text-decoration',
                 value: 'line-through'
-            },*/
+            },
             useQueryState: true,
             contentDefault: '<s>A</s>',
             contentFA: '<i class="fa fa-strikethrough"></i>'
@@ -313,7 +311,13 @@ var DefaultButton,
                 computedStyle = this.base.options.contentWindow.getComputedStyle(node, null).getPropertyValue(this.options.style.prop);
                 styleVals.forEach(function (val) {
                     if (!this.knownState) {
-                        this.knownState = isMatch = (computedStyle.indexOf(val) !== -1);
+                        isMatch = (computedStyle.indexOf(val) !== -1);
+                        // text-decoration is not inherited by default
+                        // so if the computed style for text-decoration doesn't match
+                        // don't write to knownState so we can fallback to other checks
+                        if (isMatch || this.options.style.prop !== 'text-decoration') {
+                            this.knownState = isMatch;
+                        }
                     }
                 }.bind(this));
             }

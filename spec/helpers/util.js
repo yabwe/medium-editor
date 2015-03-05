@@ -19,14 +19,20 @@ function fireEvent (element, event, keyCode, ctrlKey, target, relatedTarget, shi
        if (shiftKey) {
         evt.shiftKey = true;
        }
-       element.dispatchEvent(evt);
-       return evt;
+       return !element.dispatchEvent(evt);
    } else {
        // dispatch for IE
        var evt = document.createEventObject();
-       element.fireEvent('on'+event,evt);
-       return evt;
+       return element.fireEvent('on'+event,evt)
    }
+}
+
+function placeCursorInsideElement(el, index) {
+    var selection = window.getSelection(),
+        newRange = document.createRange();
+    selection.removeAllRanges();
+    newRange.setStart(el, index);
+    selection.addRange(newRange);
 }
 
 function selectElementContentsAndFire(el, options) {
@@ -70,4 +76,8 @@ function isOldIE() {
         navigator.appName.indexOf("Internet Explorer") != -1
         && (navigator.appVersion.indexOf("MSIE 9") != -1 || navigator.appVersion.indexOf("MSIE 10") != -1)
     );
+}
+
+function isFirefox() {
+    return navigator.userAgent.toLowerCase().indexOf("firefox") != -1;
 }

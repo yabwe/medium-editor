@@ -610,11 +610,10 @@ var DefaultButton,
             action: 'underline',
             aria: 'underline',
             tagNames: ['u'],
-            /* text-decoration is not inherited by default, so we CAN'T rely on this when inspecting descendants
             style: {
                 prop: 'text-decoration',
                 value: 'underline'
-            },*/
+            },
             useQueryState: true,
             contentDefault: '<b><u>U</u></b>',
             contentFA: '<i class="fa fa-underline"></i>',
@@ -625,11 +624,10 @@ var DefaultButton,
             action: 'strikethrough',
             aria: 'strike through',
             tagNames: ['strike'],
-            /* text-decoration is not inherited by default, so we CAN'T rely on this when inspecting descendants
             style: {
                 prop: 'text-decoration',
                 value: 'line-through'
-            },*/
+            },
             useQueryState: true,
             contentDefault: '<s>A</s>',
             contentFA: '<i class="fa fa-strikethrough"></i>'
@@ -883,7 +881,13 @@ var DefaultButton,
                 computedStyle = this.base.options.contentWindow.getComputedStyle(node, null).getPropertyValue(this.options.style.prop);
                 styleVals.forEach(function (val) {
                     if (!this.knownState) {
-                        this.knownState = isMatch = (computedStyle.indexOf(val) !== -1);
+                        isMatch = (computedStyle.indexOf(val) !== -1);
+                        // text-decoration is not inherited by default
+                        // so if the computed style for text-decoration doesn't match
+                        // don't write to knownState so we can fallback to other checks
+                        if (isMatch || this.options.style.prop !== 'text-decoration') {
+                            this.knownState = isMatch;
+                        }
                     }
                 }.bind(this));
             }
@@ -2295,7 +2299,10 @@ function MediumEditor(elements, options) {
                     tagName,
                     editorElement;
 
-                if (node && node.getAttribute('data-medium-element') && node.children.length === 0 && !(self.options.disableReturn || node.getAttribute('data-disable-return'))) {
+                if (node
+                        && node.getAttribute('data-medium-element')
+                        && node.children.length === 0
+                        && !(self.options.disableReturn || node.getAttribute('data-disable-return'))) {
                     self.options.ownerDocument.execCommand('formatBlock', false, 'p');
                 }
                 if (e.which === Util.keyCode.ENTER) {
@@ -2307,7 +2314,7 @@ function MediumEditor(elements, options) {
                             tagName !== 'li' && !Util.isListItemChild(node)) {
                         if (!e.shiftKey) {
                             // paragraph creation should not be forced within a header tag
-                            if (!/h\d/.test(tagName)) {
+                            if (/h\d/.test(tagName)) {
                                 self.options.ownerDocument.execCommand('formatBlock', false, 'p');
                             }
                         }
@@ -2358,9 +2365,9 @@ function MediumEditor(elements, options) {
 
                         // If Shift is down, outdent, otherwise indent
                         if (e.shiftKey) {
-                            self.options.ownerDocument.execCommand('outdent', e);
+                            self.options.ownerDocument.execCommand('outdent', false, null);
                         } else {
-                            self.options.ownerDocument.execCommand('indent', e);
+                            self.options.ownerDocument.execCommand('indent', false, null);
                         }
                     }
                 } else if (e.which === Util.keyCode.BACKSPACE || e.which === Util.keyCode.DELETE || e.which === Util.keyCode.ENTER) {
