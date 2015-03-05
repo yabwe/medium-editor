@@ -112,6 +112,17 @@ describe('Content TestCase', function () {
             fireEvent(targetNode, 'keydown', 46);
             expect(this.el.innerHTML).toBe('<h2>lorem</h2><h3>ipsum</h3>');
         });
+
+        it('should not create a <p> tag when hitting enter', function () {
+            this.el.innerHTML = '<h2>lorem ipsum</h2>';
+            var editor = new MediumEditor('.editor'),
+                targetNode = editor.elements[0].querySelector('h2');
+            spyOn(document, 'execCommand').and.callThrough();
+            placeCursorInsideElement(targetNode, 0);
+            fireEvent(targetNode, 'keyup', 13);
+            expect(document.execCommand).not.toHaveBeenCalledWith('formatBlock', false, 'p');
+            expect(this.el.innerHTML).toBe('<h2>lorem ipsum</h2>');
+        });
     });
 
     it('should insert a space when hitting tab key within a pre node', function () {
