@@ -27,9 +27,9 @@ describe('Anchor Button TestCase', function () {
                 anchorExtension = editor.getExtensionByName('anchor');
             selectElementContentsAndFire(editor.elements[0]);
             jasmine.clock().tick(1);
-            button = editor.toolbar.querySelector('[data-action="createLink"]');
+            button = editor.toolbar.getToolbarElement().querySelector('[data-action="createLink"]');
             fireEvent(button, 'click');
-            expect(editor.toolbarActions.style.display).toBe('none');
+            expect(editor.toolbar.getToolbarActionsElement().style.display).toBe('none');
             expect(anchorExtension.isDisplayed()).toBe(true);
             expect(anchorExtension.showForm).toHaveBeenCalled();
         });
@@ -41,7 +41,7 @@ describe('Anchor Button TestCase', function () {
                 editor = new MediumEditor('.editor');
             selectElementContentsAndFire(editor.elements[0]);
             jasmine.clock().tick(11); // checkSelection delay
-            button = editor.toolbar.querySelector('[data-action="createLink"]');
+            button = editor.toolbar.getToolbarElement().querySelector('[data-action="createLink"]');
             fireEvent(button, 'click');
             expect(this.el.innerHTML, 'link');
             expect(document.execCommand).toHaveBeenCalled();
@@ -57,7 +57,7 @@ describe('Anchor Button TestCase', function () {
                 input;
 
             selectElementContents(editor.elements[0]);
-            button = editor.toolbar.querySelector('[data-action="createLink"]');
+            button = editor.toolbar.getToolbarElement().querySelector('[data-action="createLink"]');
             fireEvent(button, 'click');
             input = editor.getExtensionByName('anchor').getInput();
             input.value = 'test';
@@ -71,7 +71,7 @@ describe('Anchor Button TestCase', function () {
                 input;
 
             selectElementContents(editor.elements[0]);
-            button = editor.toolbar.querySelector('[data-action="createLink"]');
+            button = editor.toolbar.getToolbarElement().querySelector('[data-action="createLink"]');
             fireEvent(button, 'click');
             input = editor.getExtensionByName('anchor').getInput();
             input.value = '';
@@ -159,7 +159,7 @@ describe('Anchor Button TestCase', function () {
                 anchorExtension = editor.getExtensionByName('anchor');
 
             selectElementContents(editor.elements[0]);
-            save = editor.toolbar.querySelector('[data-action="createLink"]');
+            save = editor.toolbar.getToolbarElement().querySelector('[data-action="createLink"]');
             fireEvent(save, 'click');
 
             input = anchorExtension.getInput();
@@ -186,19 +186,19 @@ describe('Anchor Button TestCase', function () {
 
     describe('Cancel', function () {
         it('should close the link form when user clicks on cancel', function () {
-            spyOn(MediumEditor.prototype, 'showAndUpdateToolbar').and.callThrough();
+            spyOn(MediumEditor.statics.Toolbar.prototype, 'showAndUpdateToolbar').and.callThrough();
             var editor = new MediumEditor('.editor'),
                 button,
                 cancel,
                 anchorExtension = editor.getExtensionByName('anchor');
 
             selectElementContents(editor.elements[0]);
-            button = editor.toolbar.querySelector('[data-action="createLink"]');
+            button = editor.toolbar.getToolbarElement().querySelector('[data-action="createLink"]');
             cancel = anchorExtension.getForm().querySelector('a.medium-editor-toobar-close');
             fireEvent(button, 'click');
             expect(anchorExtension.isDisplayed()).toBe(true);
             fireEvent(cancel, 'click');
-            expect(editor.showAndUpdateToolbar).toHaveBeenCalled();
+            expect(editor.toolbar.showAndUpdateToolbar).toHaveBeenCalled();
             expect(anchorExtension.isDisplayed()).toBe(false);
         });
         it('should close the link form when user presses escape', function () {
@@ -206,7 +206,7 @@ describe('Anchor Button TestCase', function () {
                 anchorExtension = editor.getExtensionByName('anchor');
 
             selectElementContents(editor.elements[0]);
-            fireEvent(editor.toolbar.querySelector('[data-action="createLink"]'), 'click');
+            fireEvent(editor.toolbar.getToolbarElement().querySelector('[data-action="createLink"]'), 'click');
             expect(anchorExtension.isDisplayed()).toBe(true);
             fireEvent(anchorExtension.getInput(), 'keyup', 27);
             expect(anchorExtension.isDisplayed()).toBe(false);

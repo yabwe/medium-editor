@@ -18,15 +18,17 @@ describe('Toolbar TestCase', function () {
 
     describe('Initialization', function () {
         it('should call the createToolbar method', function () {
-            spyOn(MediumEditor.prototype, 'createToolbar').and.callThrough();
+            spyOn(MediumEditor.statics.Toolbar.prototype, 'createToolbar').and.callThrough();
             var editor = new MediumEditor('.editor');
-            expect(editor.createToolbar).toHaveBeenCalled();
+            expect(editor.toolbar).not.toBeUndefined();
+            expect(editor.toolbar.createToolbar).toHaveBeenCalled();
         });
 
         it('should create a new element for the editor toolbar', function () {
             expect(document.querySelectorAll('.medium-editor-toolbar').length).toBe(0);
-            var editor = new MediumEditor('.editor');
-            expect(editor.toolbar.className).toMatch(/medium-editor-toolbar/);
+            var editor = new MediumEditor('.editor'),
+                toolbar = editor.toolbar.getToolbarElement();
+            expect(toolbar.className).toMatch(/medium-editor-toolbar/);
             expect(document.querySelectorAll('.medium-editor-toolbar').length).toBe(1);
         });
 
@@ -35,7 +37,7 @@ describe('Toolbar TestCase', function () {
             var editor = new MediumEditor('.editor', {
                 buttons: ['bold', 'italic', 'underline']
             });
-            expect(editor.toolbar.querySelectorAll('.medium-editor-toolbar-form-anchor').length).toBe(0);
+            expect(editor.toolbar.getToolbarElement().querySelectorAll('.medium-editor-toolbar-form-anchor').length).toBe(0);
             expect(editor.getExtensionByName('anchor')).toBeUndefined();
         });
     });
@@ -61,7 +63,7 @@ describe('Toolbar TestCase', function () {
             selectElementContentsAndFire(document.getElementById('bold_dolorOne'));
 
             jasmine.clock().tick(51);
-            expect(editor.toolbar.querySelector('button[data-action="bold"]').classList.contains('medium-editor-button-active')).toBe(true);
+            expect(editor.toolbar.getToolbarElement().querySelector('button[data-action="bold"]').classList.contains('medium-editor-button-active')).toBe(true);
         });
 
         it('should not activate buttons in toolbar when stopSelectionUpdates has been called, but should activate buttons after startSelectionUpdates is called', function () {
@@ -75,13 +77,13 @@ describe('Toolbar TestCase', function () {
             selectElementContentsAndFire(document.getElementById('bold_dolorTwo'));
 
             jasmine.clock().tick(51);
-            expect(editor.toolbar.querySelector('button[data-action="bold"]').classList.contains('medium-editor-button-active')).toBe(false);
+            expect(editor.toolbar.getToolbarElement().querySelector('button[data-action="bold"]').classList.contains('medium-editor-button-active')).toBe(false);
 
             editor.startSelectionUpdates();
             selectElementContentsAndFire(document.getElementById('bold_dolorTwo'));
 
             jasmine.clock().tick(51);
-            expect(editor.toolbar.querySelector('button[data-action="bold"]').classList.contains('medium-editor-button-active')).toBe(true);
+            expect(editor.toolbar.getToolbarElement().querySelector('button[data-action="bold"]').classList.contains('medium-editor-button-active')).toBe(true);
         });
 
         it('should call onShowToolbar when toolbar is shwon and onHideToolbar when toolbar is hidden', function () {
@@ -103,7 +105,7 @@ describe('Toolbar TestCase', function () {
 
             selectElementContentsAndFire(this.el);
 
-            expect(editor.toolbar.classList.contains('medium-editor-toolbar-active')).toBe(true);
+            expect(editor.toolbar.getToolbarElement().classList.contains('medium-editor-toolbar-active')).toBe(true);
             expect(temp.onShow).toHaveBeenCalled();
             expect(temp.onHide).not.toHaveBeenCalled();
 
@@ -112,7 +114,7 @@ describe('Toolbar TestCase', function () {
             window.getSelection().removeAllRanges();
             editor.checkSelection();
 
-            expect(editor.toolbar.classList.contains('medium-editor-toolbar-active')).toBe(false);
+            expect(editor.toolbar.getToolbarElement().classList.contains('medium-editor-toolbar-active')).toBe(false);
             expect(temp.onHide).toHaveBeenCalled();
         });
     });
@@ -137,17 +139,18 @@ describe('Toolbar TestCase', function () {
             window.getSelection().removeAllRanges();
             editor.checkSelection();
             jasmine.clock().tick(1); // checkSelection delay
-            expect(editor.toolbar.classList.contains('medium-editor-toolbar-active')).toBe(true);
-            expect(editor.toolbar.querySelector('[data-action="bold"]').classList.contains('medium-editor-button-active')).toBe(false);
+            expect(editor.toolbar.getToolbarElement().classList.contains('medium-editor-toolbar-active')).toBe(true);
+            expect(editor.toolbar.getToolbarElement().querySelector('[data-action="bold"]').classList.contains('medium-editor-button-active')).toBe(false);
         });
 
         it('should update toolbar position when user clicks on medium editor element', function () {
             var editor = new MediumEditor('.editor', {
                 staticToolbar: true
             });
-            spyOn(MediumEditor.prototype, 'setToolbarPosition').and.callThrough();
+            spyOn(MediumEditor.statics.Toolbar.prototype, 'setToolbarPosition').and.callThrough();
             fireEvent(editor.elements[0], 'click');
-            expect(editor.setToolbarPosition).toHaveBeenCalled();
+            jasmine.clock().tick(1); // checkSelection delay
+            expect(editor.toolbar.setToolbarPosition).toHaveBeenCalled();
         });
 
         it('should show and update toolbar buttons when staticToolbar and updateOnEmptySelection options are set to true', function () {
@@ -162,8 +165,8 @@ describe('Toolbar TestCase', function () {
             window.getSelection().getRangeAt(0).collapse(false);
             editor.checkSelection();
             jasmine.clock().tick(1); // checkSelection delay
-            expect(editor.toolbar.classList.contains('medium-editor-toolbar-active')).toBe(true);
-            expect(editor.toolbar.querySelector('[data-action="bold"]').classList.contains('medium-editor-button-active')).toBe(true);
+            expect(editor.toolbar.getToolbarElement().classList.contains('medium-editor-toolbar-active')).toBe(true);
+            expect(editor.toolbar.getToolbarElement().querySelector('[data-action="bold"]').classList.contains('medium-editor-button-active')).toBe(true);
         });
 
         it('should be hidden for one medium-editor instance when another medium-editor instance shows its toolbar', function () {
@@ -184,16 +187,16 @@ describe('Toolbar TestCase', function () {
 
             jasmine.clock().tick(1); // checkSelection delay
 
-            expect(editorOne.toolbar.classList.contains('medium-editor-toolbar-active')).toBe(true);
-            expect(editorTwo.toolbar.classList.contains('medium-editor-toolbar-active')).toBe(false);
+            expect(editorOne.toolbar.getToolbarElement().classList.contains('medium-editor-toolbar-active')).toBe(true);
+            expect(editorTwo.toolbar.getToolbarElement().classList.contains('medium-editor-toolbar-active')).toBe(false);
 
             selectElementContentsAndFire(document.getElementById('editor-span-2'));
-            fireEvent(editorTwo.elements[0], 'focus');
+            fireEvent(elTwo, 'focus', null, null, elTwo, this.el);
 
             jasmine.clock().tick(1); // checkSelection delay
 
-            expect(editorOne.toolbar.classList.contains('medium-editor-toolbar-active')).toBe(false);
-            expect(editorTwo.toolbar.classList.contains('medium-editor-toolbar-active')).toBe(true);
+            expect(editorOne.toolbar.getToolbarElement().classList.contains('medium-editor-toolbar-active')).toBe(false);
+            expect(editorTwo.toolbar.getToolbarElement().classList.contains('medium-editor-toolbar-active')).toBe(true);
         });
     });
 
@@ -245,11 +248,11 @@ describe('Toolbar TestCase', function () {
             editor = new MediumEditor(document.querySelectorAll('.editor'));
 
             expect(editor.elements.length).toEqual(2);
-            expect(editor.toolbar.style.display).toBe('');
+            expect(editor.toolbar.getToolbarElement().style.display).toBe('');
             selectElementContentsAndFire(element);
             jasmine.clock().tick(51);
 
-            expect(editor.toolbar.style.display).toBe('');
+            expect(editor.toolbar.getToolbarElement().style.display).toBe('');
             // Remove the new element from the DOM
             document.body.removeChild(element);
         });
@@ -267,7 +270,7 @@ describe('Toolbar TestCase', function () {
             selectElementContentsAndFire(document.getElementById('cef_el'));
 
             jasmine.clock().tick(51);
-            expect(editor.toolbar.classList.contains('medium-editor-toolbar-active')).toBe(false);
+            expect(editor.toolbar.getToolbarElement().classList.contains('medium-editor-toolbar-active')).toBe(false);
         });
 
         it('should show the toolbar if it\'s text are selected even though one or more elements that has a data attr of disable-toolbar', function () {
@@ -280,11 +283,11 @@ describe('Toolbar TestCase', function () {
             document.body.appendChild(element);
             editor = new MediumEditor(document.querySelectorAll('.editor'));
             expect(editor.elements.length).toEqual(3);
-            expect(editor.toolbar.style.display).toBe('');
+            expect(editor.toolbar.getToolbarElement().style.display).toBe('');
             selectElementContents(this.el);
             editor.checkSelection();
 
-            expect(editor.toolbar.classList.contains('medium-editor-toolbar-active')).toBe(true);
+            expect(editor.toolbar.getToolbarElement().classList.contains('medium-editor-toolbar-active')).toBe(true);
             // Remove the new element from the DOM
             document.body.removeChild(element);
 
@@ -302,7 +305,7 @@ describe('Toolbar TestCase', function () {
                 disableToolbar: true
             });
 
-            expect(editor.toolbar).toBe(undefined);
+            expect(editor.toolbar).toBeUndefined();
 
             selectElementContents(this.el);
             editor.checkSelection();

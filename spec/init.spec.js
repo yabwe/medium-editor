@@ -23,14 +23,11 @@ describe('Initialization TestCase', function () {
         it('should do nothing when selector does not return any elements', function () {
             spyOn(MediumEditor.prototype, 'initElements');
             spyOn(MediumEditor.prototype, 'initToolbar');
-            spyOn(MediumEditor.prototype, 'bindSelect');
-            spyOn(MediumEditor.prototype, 'setFirstAndLastButtons');
             var editor = new MediumEditor('.test');
             expect(editor.id).toBe(undefined);
             expect(editor.initElements).not.toHaveBeenCalled();
             expect(editor.initToolbar).not.toHaveBeenCalled();
-            expect(editor.bindSelect).not.toHaveBeenCalled();
-            expect(editor.setFirstAndLastButtons).not.toHaveBeenCalled();
+            expect(editor.toolbar).toBeUndefined();
             expect(editor.getExtensionByName('anchor')).toBeUndefined();
             expect(editor.initElements).not.toHaveBeenCalled();
         });
@@ -153,15 +150,14 @@ describe('Initialization TestCase', function () {
         it('should call the default initialization methods', function () {
             spyOn(MediumEditor.prototype, 'initElements').and.callThrough();
             spyOn(MediumEditor.prototype, 'initToolbar').and.callThrough();
-            spyOn(MediumEditor.prototype, 'bindSelect').and.callThrough();
-            spyOn(MediumEditor.prototype, 'setFirstAndLastButtons').and.callThrough();
+            spyOn(MediumEditor.statics.Toolbar.prototype, 'createToolbar').and.callThrough();
             spyOn(MediumEditor.statics.AnchorExtension.prototype, 'createForm').and.callThrough();
             var editor = new MediumEditor('.editor');
             expect(editor.id).toBe(1);
             expect(editor.initElements).toHaveBeenCalled();
             expect(editor.initToolbar).toHaveBeenCalled();
-            expect(editor.bindSelect).toHaveBeenCalled();
-            expect(editor.setFirstAndLastButtons).toHaveBeenCalled();
+            expect(editor.toolbar).not.toBeUndefined();
+            expect(editor.toolbar.createToolbar).toHaveBeenCalled();
             expect(editor.getExtensionByName('anchor').createForm).toHaveBeenCalled();
             expect(editor.initElements).toHaveBeenCalled();
         });

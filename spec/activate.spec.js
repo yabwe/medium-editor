@@ -63,7 +63,7 @@ describe('Activate/Deactivate TestCase', function () {
         });
 
         it('should abort any pending throttled event handlers', function () {
-            var editor, triggerEvents;
+            var editor, triggerEvents, toolbar;
 
             editor = new MediumEditor('.editor', {delay: 5});
             triggerEvents = function () {
@@ -71,6 +71,8 @@ describe('Activate/Deactivate TestCase', function () {
                 fireEvent(document.body, 'click', null, false, document.body);
                 fireEvent(document.body, 'blur', null, false);
             };
+            // Store toolbar, since deactivate will remove the reference from the editor
+            toolbar = editor.toolbar;
 
             // fire event (handler executed immediately)
             triggerEvents();
@@ -79,12 +81,12 @@ describe('Activate/Deactivate TestCase', function () {
             // fire event again (handler delayed because of throttle)
             triggerEvents();
 
-            spyOn(editor, 'positionToolbarIfShown').and.callThrough(); // via: handleResize
-            spyOn(editor, 'hideToolbarActions').and.callThrough(); // via: handleBlur
+            spyOn(toolbar, 'positionToolbarIfShown').and.callThrough(); // via: handleResize
+            spyOn(editor, 'checkSelection').and.callThrough(); // via: handleBlur
             editor.deactivate();
             jasmine.clock().tick(1000); // arbitrary – must be longer than THROTTLE_INTERVAL
-            expect(editor.positionToolbarIfShown).not.toHaveBeenCalled();
-            expect(editor.hideToolbarActions).not.toHaveBeenCalled();
+            expect(toolbar.positionToolbarIfShown).not.toHaveBeenCalled();
+            expect(editor.checkSelection).not.toHaveBeenCalled();
         });
 
         // regression test for https://github.com/daviferreira/medium-editor/issues/390
@@ -107,20 +109,20 @@ describe('Activate/Deactivate TestCase', function () {
 
             editor = new MediumEditor('.editor');
 
-            spyOn(editor, 'hideToolbarActions').and.callThrough(); // via: handleBlur
+            spyOn(editor.toolbar, 'hideToolbarActions').and.callThrough(); // via: handleBlur
 
             selectElementContentsAndFire(editor.elements[0], { eventToFire: 'click' });
             jasmine.clock().tick(51);
-            expect(editor.hideToolbarActions).not.toHaveBeenCalled();
+            expect(editor.toolbar.hideToolbarActions).not.toHaveBeenCalled();
 
             selectElementContentsAndFire(editor.elements[1], { eventToFire: 'click' });
             jasmine.clock().tick(51);
-            expect(editor.hideToolbarActions).not.toHaveBeenCalled();
+            expect(editor.toolbar.hideToolbarActions).not.toHaveBeenCalled();
 
             selectElementContents(editor.elements[2]);
             selectElementContentsAndFire(editor.elements[2], { eventToFire: 'click' });
             jasmine.clock().tick(51);
-            expect(editor.hideToolbarActions).not.toHaveBeenCalled();
+            expect(editor.toolbar.hideToolbarActions).not.toHaveBeenCalled();
 
             elements.forEach(function (el) {
                 document.body.removeChild(el);
