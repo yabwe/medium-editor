@@ -224,10 +224,6 @@ var Util;
             return copyInto(dest, source);
         },
 
-        extend: function extend(dest, source) {
-            return copyInto(dest, source, true);
-        },
-
         derives: function derives(base, derived) {
             var origPrototype = derived.prototype;
             function Proto() { }
