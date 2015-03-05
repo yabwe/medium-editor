@@ -62,18 +62,7 @@ describe('Buttons TestCase', function () {
             jasmine.clock().tick(1);
             button = editor.toolbar.getToolbarElement().querySelector('[data-action="bold"]');
             fireEvent(button, 'click');
-            expect(editor.execAction).toHaveBeenCalled();
-        });
-
-        it('should execute the button action', function () {
-            spyOn(MediumEditor.prototype, 'execAction');
-            var button,
-                editor = new MediumEditor('.editor');
-            selectElementContentsAndFire(editor.elements[0]);
-            jasmine.clock().tick(1);
-            button = editor.toolbar.getToolbarElement().querySelector('[data-action="bold"]');
-            fireEvent(button, 'click');
-            expect(editor.execAction).toHaveBeenCalled();
+            expect(editor.execAction).toHaveBeenCalledWith('bold');
         });
 
         it('should execute the button action on shortcut', function () {
@@ -84,6 +73,100 @@ describe('Buttons TestCase', function () {
             jasmine.clock().tick(1);
             fireEvent(editor.elements[0], 'keydown', code, true);
             expect(editor.execAction).toHaveBeenCalled();
+        });
+    });
+
+    describe('Buttons with various labels', function () {
+        var defaultLabels = {},
+            fontAwesomeLabels = {},
+            customLabels = {},
+            allButtons = [],
+            buttonsData = MediumEditor.statics.ButtonsData,
+            currButton,
+            tempEl;
+
+        Object.keys(buttonsData).forEach(function (buttonName) {
+            if (buttonName !== 'header1' && buttonName !== 'header2') {
+                allButtons.push(buttonName);
+                currButton = buttonsData[buttonName];
+                // If the labels contain HTML entities, we need to escape them
+                tempEl = document.createElement('div');
+
+                // Default Labels
+                tempEl.innerHTML = currButton.contentDefault;
+                defaultLabels[buttonName] = {
+                    action: currButton.action,
+                    label: tempEl.innerHTML
+                };
+
+                // fontawesome labels
+                tempEl.innerHTML = currButton.contentFA;
+                fontAwesomeLabels[buttonName] = tempEl.innerHTML;
+
+                // custom labels (using aria label as a test)
+                customLabels[buttonName] = currButton.aria;
+            }
+        });
+
+        it('should contain default content if no custom labels are provided', function () {
+            spyOn(MediumEditor.prototype, 'execAction');
+            var button,
+                editor = new MediumEditor('.editor', {
+                    buttons: allButtons
+                });
+            expect(editor.toolbar.getToolbarElement().querySelectorAll('button').length).toBe(allButtons.length);
+            selectElementContentsAndFire(editor.elements[0]);
+            jasmine.clock().tick(1);
+
+            Object.keys(defaultLabels).forEach(function (buttonName) {
+                button = editor.toolbar.getToolbarElement().querySelector('.medium-editor-action-' + buttonName);
+                expect(button).not.toBeUndefined();
+                expect(button.innerHTML).toBe(defaultLabels[buttonName].label);
+            });
+        });
+
+        it('should contain fontawesome labels and execute the button action when clicked', function () {
+            spyOn(MediumEditor.prototype, 'execAction');
+            var action,
+                button,
+                editor = new MediumEditor('.editor', {
+                    buttons: allButtons,
+                    buttonLabels: 'fontawesome'
+                });
+            expect(editor.toolbar.getToolbarElement().querySelectorAll('button').length).toBe(allButtons.length);
+            selectElementContentsAndFire(editor.elements[0]);
+            jasmine.clock().tick(1);
+
+            Object.keys(fontAwesomeLabels).forEach(function (buttonName) {
+                action = defaultLabels[buttonName].action;
+                button = editor.toolbar.getToolbarElement().querySelector('.medium-editor-action-' + buttonName);
+                expect(button).not.toBeUndefined();
+                fireEvent(button, 'click');
+                expect(editor.execAction).toHaveBeenCalledWith(action);
+                expect(button.innerHTML).toBe(fontAwesomeLabels[buttonName]);
+            });
+        });
+
+        it('should contain custom labels and execute the button action when clicked', function () {
+            spyOn(MediumEditor.prototype, 'execAction');
+            var action,
+                button,
+                editor = new MediumEditor('.editor', {
+                    buttons: allButtons,
+                    buttonLabels: customLabels
+                });
+            expect(editor.toolbar.getToolbarElement().querySelectorAll('button').length).toBe(allButtons.length);
+            selectElementContentsAndFire(editor.elements[0]);
+            jasmine.clock().tick(1);
+
+            Object.keys(customLabels).forEach(function (buttonName) {
+                action = defaultLabels[buttonName].action;
+                button = editor.toolbar.getToolbarElement().querySelector('.medium-editor-action-' + buttonName);
+                expect(button).not.toBeUndefined();
+                fireEvent(button, 'click');
+                expect(editor.execAction).toHaveBeenCalledWith(action);
+                expect(button.innerHTML).toBe(customLabels[buttonName]);
+            });
         });
     });
 
