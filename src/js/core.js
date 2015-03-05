@@ -179,7 +179,7 @@ function MediumEditor(elements, options) {
                 blurFunction = function (e) {
                     var isDescendantOfEditorElements = false,
                         selection = self.options.contentWindow.getSelection(),
-                        toolbarEl = (self.toolbarObj) ? self.toolbarObj.getToolbarElement() : null,
+                        toolbarEl = (self.toolbar) ? self.toolbar.getToolbarElement() : null,
                         selRange = selection.isCollapsed ?
                                    null :
                                    Selection.getSelectedParentElement(selection.getRangeAt(0)),
@@ -208,8 +208,8 @@ function MediumEditor(elements, options) {
                         }
 
                         // Let the toolbar know that we've detected a blur
-                        if (self.toolbarObj) {
-                            self.toolbarObj.handleBlur(e);
+                        if (self.toolbar) {
+                            self.toolbar.handleBlur(e);
                         }
                     }
                 };
@@ -528,11 +528,11 @@ function MediumEditor(elements, options) {
         },
 
         initToolbar: function () {
-            if (this.toolbarObj) {
+            if (this.toolbar) {
                 return this;
             }
-            this.toolbarObj = new Toolbar(this);
-            this.options.elementsContainer.appendChild(this.toolbarObj.getToolbarElement());
+            this.toolbar = new Toolbar(this);
+            this.options.elementsContainer.appendChild(this.toolbar.getToolbarElement());
             this.anchorPreview = this.createAnchorPreview();
 
             return this;
@@ -604,8 +604,8 @@ function MediumEditor(elements, options) {
         },
 
         checkSelection: function () {
-            if (this.toolbarObj) {
-                this.toolbarObj.checkState();
+            if (this.toolbar) {
+                this.toolbar.checkState();
             }
             return this;
         },
@@ -715,21 +715,21 @@ function MediumEditor(elements, options) {
         },
 
         hideToolbarDefaultActions: function () {
-            if (this.toolbarObj) {
-                this.toolbarObj.hideToolbarDefaultActions();
+            if (this.toolbar) {
+                this.toolbar.hideToolbarDefaultActions();
             }
             return this;
         },
 
         showToolbarDefaultActions: function () {
-            if (this.toolbarObj) {
-                this.toolbarObj.showToolbarDefaultActions();
+            if (this.toolbar) {
+                this.toolbar.showToolbarDefaultActions();
             }
         },
 
         setToolbarPosition: function () {
-            if (this.toolbarObj) {
-                this.toolbarObj.setToolbarPosition();
+            if (this.toolbar) {
+                this.toolbar.setToolbarPosition();
             }
         },
 
@@ -986,7 +986,7 @@ function MediumEditor(elements, options) {
                 }
 
                 // only show when hovering on anchors
-                if (this.toolbarObj.isDisplayed()) {
+                if (this.toolbar && this.toolbar.isDisplayed()) {
                     // only show when toolbar is not present
                     return true;
                 }
@@ -1074,9 +1074,9 @@ function MediumEditor(elements, options) {
             }
             this.isActive = false;
 
-            if (this.toolbarObj !== undefined) {
-                this.toolbarObj.deactivate();
-                delete this.toolbarObj;
+            if (this.toolbar !== undefined) {
+                this.toolbar.deactivate();
+                delete this.toolbar;
 
                 this.options.elementsContainer.removeChild(this.anchorPreview);
                 delete this.anchorPreview;

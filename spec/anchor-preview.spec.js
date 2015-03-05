@@ -59,7 +59,7 @@ describe('Anchor Preview TestCase', function () {
             sel.addRange(nextRange);
             fireEvent(document.documentElement, 'mouseup');
             jasmine.clock().tick(200);
-            expect(editor.toolbarObj.hideToolbarActions).toHaveBeenCalled();
+            expect(editor.toolbar.hideToolbarActions).toHaveBeenCalled();
 
         });
 
@@ -92,7 +92,7 @@ describe('Anchor Preview TestCase', function () {
             fireEvent(editor.anchorPreview, 'click');
             jasmine.clock().tick(200);
 
-            expect(editor.toolbarObj.isDisplayed()).toBe(true);
+            expect(editor.toolbar.isDisplayed()).toBe(true);
             expect(editor.getExtensionByName('anchor').isDisplayed()).toBe(true);
         });
 

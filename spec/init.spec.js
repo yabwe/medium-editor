@@ -27,7 +27,7 @@ describe('Initialization TestCase', function () {
             expect(editor.id).toBe(undefined);
             expect(editor.initElements).not.toHaveBeenCalled();
             expect(editor.initToolbar).not.toHaveBeenCalled();
-            expect(editor.toolbarObj).toBeUndefined();
+            expect(editor.toolbar).toBeUndefined();
             expect(editor.getExtensionByName('anchor')).toBeUndefined();
             expect(editor.initElements).not.toHaveBeenCalled();
         });
@@ -156,8 +156,8 @@ describe('Initialization TestCase', function () {
             expect(editor.id).toBe(1);
             expect(editor.initElements).toHaveBeenCalled();
             expect(editor.initToolbar).toHaveBeenCalled();
-            expect(editor.toolbarObj).not.toBeUndefined();
-            expect(editor.toolbarObj.createToolbar).toHaveBeenCalled();
+            expect(editor.toolbar).not.toBeUndefined();
+            expect(editor.toolbar.createToolbar).toHaveBeenCalled();
             expect(editor.getExtensionByName('anchor').createForm).toHaveBeenCalled();
             expect(editor.initElements).toHaveBeenCalled();
         });
