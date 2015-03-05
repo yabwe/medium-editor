@@ -1,7 +1,7 @@
 /*global MediumEditor, describe, it, expect, spyOn,
      afterEach, beforeEach, tearDown, fireEvent, Util*/
 
-describe('Anchor Button TestCase', function () {
+describe('Drag and Drop TestCase', function () {
     'use strict';
 
     beforeEach(function () {
