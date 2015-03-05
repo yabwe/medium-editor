@@ -238,6 +238,22 @@ describe('Buttons TestCase', function () {
             expect(button.classList.contains('medium-editor-button-active')).toBe(true);
         });
 
+        it('button should be active if the selection is bold and queryCommandState fails', function () {
+            var editor = new MediumEditor('.editor', {
+                    buttons: ['bold']
+                }),
+                button = editor.toolbar.getToolbarElement().querySelector('[data-action="bold"]');
+
+            spyOn(document, "queryCommandState").and.throwError("DOM ERROR");
+
+            this.el.innerHTML = '<b><i><u>lorem ipsum</u></i></b>';
+            selectElementContentsAndFire(editor.elements[0].querySelector('u'));
+            expect(button.classList.contains('medium-editor-button-active')).toBe(true);
+
+            fireEvent(button, 'click');
+            expect(button.classList.contains('medium-editor-button-active')).toBe(false);
+        });
+
         it('button should be active for other cases when text is bold', function () {
             var editor = new MediumEditor('.editor', {
                     buttons: ['bold']
@@ -287,6 +303,22 @@ describe('Buttons TestCase', function () {
             expect(button.classList.contains('medium-editor-button-active')).toBe(true);
         });
 
+        it('button should be active if the selection is italic and queryCommandState fails', function () {
+            var editor = new MediumEditor('.editor', {
+                    buttons: ['italic']
+                }),
+                button = editor.toolbar.getToolbarElement().querySelector('[data-action="italic"]');
+
+            spyOn(document, "queryCommandState").and.throwError("DOM ERROR");
+
+            this.el.innerHTML = '<i><b><u>lorem ipsum</u></b></i>';
+            selectElementContentsAndFire(editor.elements[0].querySelector('u'));
+            expect(button.classList.contains('medium-editor-button-active')).toBe(true);
+
+            fireEvent(button, 'click');
+            expect(button.classList.contains('medium-editor-button-active')).toBe(false);
+        });
+
         it('button should be active for other cases when text is italic', function () {
             var editor = new MediumEditor('.editor', {
                     buttons: ['italic']
@@ -321,6 +353,22 @@ describe('Buttons TestCase', function () {
             expect(this.el.innerHTML).toBe('lorem ipsum');
         });
 
+        it('button should be active if the selection is underlined and queryCommandState fails', function () {
+            var editor = new MediumEditor('.editor', {
+                    buttons: ['underline']
+                }),
+                button = editor.toolbar.getToolbarElement().querySelector('[data-action="underline"]');
+
+            spyOn(document, "queryCommandState").and.throwError("DOM ERROR");
+
+            this.el.innerHTML = '<u><b><i>lorem ipsum</i></b></u>';
+            selectElementContentsAndFire(editor.elements[0].querySelector('i'));
+            expect(button.classList.contains('medium-editor-button-active')).toBe(true);
+
+            fireEvent(button, 'click');
+            expect(button.classList.contains('medium-editor-button-active')).toBe(false);
+        });
+
         it('button should be active for other cases when text is underlined', function () {
             var editor = new MediumEditor('.editor', {
                     buttons: ['underline']
@@ -353,6 +401,22 @@ describe('Buttons TestCase', function () {
             fireEvent(button, 'click');
             expect(button.classList.contains('medium-editor-button-active')).toBe(false);
             expect(this.el.innerHTML).toBe('lorem ipsum');
+        });
+
+        it('button should be active if the selection is strikethrough and queryCommandState fails', function () {
+            var editor = new MediumEditor('.editor', {
+                    buttons: ['strikethrough']
+                }),
+                button = editor.toolbar.getToolbarElement().querySelector('[data-action="strikethrough"]');
+
+            spyOn(document, "queryCommandState").and.throwError("DOM ERROR");
+
+            this.el.innerHTML = '<strike><b><i>lorem ipsum</i></b></strike>';
+            selectElementContentsAndFire(editor.elements[0].querySelector('i'));
+            expect(button.classList.contains('medium-editor-button-active')).toBe(true);
+
+            fireEvent(button, 'click');
+            expect(button.classList.contains('medium-editor-button-active')).toBe(false);
         });
 
         it('button should be active for other cases when text is strikethrough', function () {

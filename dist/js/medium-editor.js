@@ -614,10 +614,11 @@ var DefaultButton,
             action: 'underline',
             aria: 'underline',
             tagNames: ['u'],
+            /* text-decoration is not inherited by default, so we CAN'T rely on this when inspecting descendants
             style: {
                 prop: 'text-decoration',
                 value: 'underline'
-            },
+            },*/
             useQueryState: true,
             contentDefault: '<b><u>U</u></b>',
             contentFA: '<i class="fa fa-underline"></i>',
@@ -628,10 +629,11 @@ var DefaultButton,
             action: 'strikethrough',
             aria: 'strike through',
             tagNames: ['strike'],
+            /* text-decoration is not inherited by default, so we CAN'T rely on this when inspecting descendants
             style: {
                 prop: 'text-decoration',
                 value: 'line-through'
-            },
+            },*/
             useQueryState: true,
             contentDefault: '<s>A</s>',
             contentFA: '<i class="fa fa-strikethrough"></i>'
