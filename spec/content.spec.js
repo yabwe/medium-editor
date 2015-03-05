@@ -65,4 +65,54 @@ describe('Content TestCase', function () {
         expect(this.el.innerHTML).toBe('<ol><li>lorem</li><li>ipsum<br></li></ol>');
         expect(document.execCommand).toHaveBeenCalledWith('outdent', evt);
     });
+
+    it('should prevent new lines from being inserted when disableReturn options is true', function () {
+        this.el.innerHTML = 'lorem ipsum';
+        var editor = new MediumEditor('.editor', {
+            disableReturn: true
+        });
+        selectElementContents(editor.elements[0]);
+        fireEvent(editor.elements[0], 'keypress', 13);
+        expect(this.el.innerHTML).toBe('lorem ipsum');
+    });
+
+    it('should prevent consecutive new lines from being inserted when disableDoubleReturn is true', function () {
+        this.el.innerHTML = '<br> ';
+        var editor = new MediumEditor('.editor', {
+            disableDoubleReturn: true
+        });
+        selectElementContents(editor.elements[0]);
+        fireEvent(editor.elements[0], 'keypress', 13);
+        expect(this.el.innerHTML).toBe('<br> ');
+    });
+
+    it('should call formatBlock when a keyup results in an empty element', function () {
+        this.el.innerHTML = '';
+        var editor = new MediumEditor('.editor');
+        selectElementContents(editor.elements[0]);
+        fireEvent(editor.elements[0], 'keyup', 8);
+        expect(this.el.innerHTML).toBe('<p><br></p>');
+    });
+
+    it('should insert a breaking paragraph before header when hitting entery key while cursor is as the front of a header tag', function () {
+        this.el.innerHTML = '<h2>lorem</h2><h3>ipsum</h3>';
+        var editor = new MediumEditor('.editor'),
+            targetNode = editor.elements[0].querySelector('h3'),
+            selection = window.getSelection(),
+            newRange = document.createRange();
+        selection.removeAllRanges();
+        newRange.setStart(targetNode, 0);
+        selection.addRange(newRange);
+        fireEvent(targetNode, 'keydown', 13);
+        expect(this.el.innerHTML).toBe('<h2>lorem</h2><p><br></p><h3>ipsum</h3>');
+    });
+
+    it('should remove empty element if hitting delete key inside empty element before a header tag', function () {
+        this.el.innerHTML = '<h2>lorem</h2><p><br></p><h3>ipsum</h3>';
+        var editor = new MediumEditor('.editor'),
+            targetNode = editor.elements[0].querySelector('p');
+        selectElementContents(targetNode);
+        fireEvent(targetNode, 'keydown', 46);
+        expect(this.el.innerHTML).toBe('<h2>lorem</h2><h3>ipsum</h3>');
+    });
 });
