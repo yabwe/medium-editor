@@ -71,6 +71,17 @@ describe('Content TestCase', function () {
             fireEvent(editor.elements[0], 'keypress', 13);
             expect(this.el.innerHTML).toBe('<br> ');
         });
+
+        it('should call formatBlock when inside a non-header and non-anchor', function () {
+            this.el.innerHTML = '<p>lorem ipsum</p>';
+            var editor = new MediumEditor('.editor'),
+                targetNode = editor.elements[0].querySelector('p');
+            spyOn(document, 'execCommand').and.callThrough();
+            placeCursorInsideElement(targetNode, 0);
+            fireEvent(targetNode, 'keyup', 13);
+            expect(document.execCommand).toHaveBeenCalledWith('formatBlock', false, 'p');
+            expect(this.el.innerHTML).toBe('<p>lorem ipsum</p>');
+        });
     });
 
     describe('should unlink anchors', function () {
