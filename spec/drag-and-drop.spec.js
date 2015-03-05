@@ -45,7 +45,7 @@ describe('Drag and Drop TestCase', function () {
         });
 
         it('should add the image to the editor content', function () {
-            spyOn(Util, 'insertHTMLCommand');
+            spyOn(Util, 'insertHTMLCommand').and.callThrough();
             var editor = new MediumEditor(this.el);
             fireEvent(editor.elements[0], 'drop');
             expect(Util.insertHTMLCommand).toHaveBeenCalled();
