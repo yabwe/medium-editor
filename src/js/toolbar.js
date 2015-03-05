@@ -198,7 +198,7 @@ var Toolbar;
 
         showToolbar: function () {
             if (!this.isDisplayed()) {
-                this.toolbar.classList.add('medium-editor-toolbar-active');
+                this.getToolbarElement().classList.add('medium-editor-toolbar-active');
                 if (typeof this.options.onShowToolbar === 'function') {
                     this.options.onShowToolbar();
                 }
@@ -207,7 +207,7 @@ var Toolbar;
 
         hideToolbar: function () {
             if (this.isDisplayed()) {
-                this.toolbar.classList.remove('medium-editor-toolbar-active');
+                this.getToolbarElement().classList.remove('medium-editor-toolbar-active');
                 if (typeof this.options.onHideToolbar === 'function') {
                     this.options.onHideToolbar();
                 }

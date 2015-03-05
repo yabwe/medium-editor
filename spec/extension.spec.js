@@ -112,7 +112,7 @@ describe('Extensions TestCase', function () {
                     'dummy': ExtensionWithElement
                 }
             });
-            expect(editor.toolbar.querySelectorAll('.extension-button').length).toBe(1);
+            expect(editor.toolbarObj.getToolbarElement().querySelectorAll('.extension-button').length).toBe(1);
         });
 
         it('should include extensions button by string into the toolbar', function () {
@@ -122,7 +122,7 @@ describe('Extensions TestCase', function () {
                     'dummy': ExtensionWithString
                 }
             });
-            expect(editor.toolbar.querySelectorAll('.extension-button').length).toBe(1);
+            expect(editor.toolbarObj.getToolbarElement().querySelectorAll('.extension-button').length).toBe(1);
         });
 
         it('should not include extensions button into toolbar that are not in "buttons"', function () {
@@ -132,7 +132,7 @@ describe('Extensions TestCase', function () {
                     'dummy': ExtensionWithElement
                 }
             });
-            expect(editor.toolbar.querySelectorAll('.extension-button').length).toBe(0);
+            expect(editor.toolbarObj.getToolbarElement().querySelectorAll('.extension-button').length).toBe(0);
         });
 
         it('should not include buttons into the toolbar when an overriding extension is present', function () {
@@ -147,8 +147,8 @@ describe('Extensions TestCase', function () {
                 }
             });
 
-            expect(editor.toolbar.querySelectorAll('button[data-action="italic"]').length).toBe(1);
-            expect(editor.toolbar.querySelectorAll('button[data-action="bold"]').length).toBe(0);
+            expect(editor.toolbarObj.getToolbarElement().querySelectorAll('button[data-action="italic"]').length).toBe(1);
+            expect(editor.toolbarObj.getToolbarElement().querySelectorAll('button[data-action="bold"]').length).toBe(0);
             expect(ext.init).toHaveBeenCalled();
             expect(editor.commands.length).toBe(2);
         });

@@ -1559,7 +1559,7 @@ var Toolbar;
 
         showToolbar: function () {
             if (!this.isDisplayed()) {
-                this.toolbar.classList.add('medium-editor-toolbar-active');
+                this.getToolbarElement().classList.add('medium-editor-toolbar-active');
                 if (typeof this.options.onShowToolbar === 'function') {
                     this.options.onShowToolbar();
                 }
@@ -1568,7 +1568,7 @@ var Toolbar;
 
         hideToolbar: function () {
             if (this.isDisplayed()) {
-                this.toolbar.classList.remove('medium-editor-toolbar-active');
+                this.getToolbarElement().classList.remove('medium-editor-toolbar-active');
                 if (typeof this.options.onHideToolbar === 'function') {
                     this.options.onHideToolbar();
                 }
@@ -2073,6 +2073,7 @@ function MediumEditor(elements, options) {
                 blurFunction = function (e) {
                     var isDescendantOfEditorElements = false,
                         selection = self.options.contentWindow.getSelection(),
+                        toolbarEl = (self.toolbarObj) ? self.toolbarObj.getToolbarElement() : null,
                         selRange = selection.isCollapsed ?
                                    null :
                                    Selection.getSelectedParentElement(selection.getRangeAt(0)),
@@ -2091,8 +2092,7 @@ function MediumEditor(elements, options) {
                     }
                     // If it's not part of the editor, toolbar, or anchor preview
                     if (!isDescendantOfEditorElements
-                            && self.toolbar !== e.target
-                            && !Util.isDescendant(self.toolbar, e.target)
+                            && (!toolbarEl || (toolbarEl !== e.target && !Util.isDescendant(toolbarEl, e.target)))
                             && self.anchorPreview !== e.target
                             && !Util.isDescendant(self.anchorPreview, e.target)) {
 
@@ -2426,8 +2426,7 @@ function MediumEditor(elements, options) {
                 return this;
             }
             this.toolbarObj = new Toolbar(this);
-            this.toolbar = this.toolbarObj.getToolbarElement();
-            this.options.elementsContainer.appendChild(this.toolbar);
+            this.options.elementsContainer.appendChild(this.toolbarObj.getToolbarElement());
             this.anchorPreview = this.createAnchorPreview();
 
             return this;
@@ -2972,7 +2971,6 @@ function MediumEditor(elements, options) {
             if (this.toolbarObj !== undefined) {
                 this.toolbarObj.deactivate();
                 delete this.toolbarObj;
-                delete this.toolbar;
 
                 this.options.elementsContainer.removeChild(this.anchorPreview);
                 delete this.anchorPreview;

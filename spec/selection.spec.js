@@ -35,13 +35,13 @@ describe('Selection TestCase', function () {
 
             // Underline entire element
             selectElementContents(editor.elements[0]);
-            button = editor.toolbar.querySelector('[data-action="underline"]');
+            button = editor.toolbarObj.getToolbarElement().querySelector('[data-action="underline"]');
             fireEvent(button, 'click');
 
             // Restore selection back to <i> tag and add a <strike> tag
             regex = new RegExp("^<u>lorem (<i><strike>|<strike><i>)ipsum(</i></strike>|</strike></i>) dolor</u>$");
             editor.restoreSelection();
-            button = editor.toolbar.querySelector('[data-action="strikethrough"]');
+            button = editor.toolbarObj.getToolbarElement().querySelector('[data-action="strikethrough"]');
             fireEvent(button, 'click');
             expect(regex.test(editor.elements[0].innerHTML)).toBe(true);
         });
@@ -67,11 +67,11 @@ describe('Selection TestCase', function () {
             spyOn(MediumEditor.statics.Toolbar.prototype, 'setToolbarButtonStates').and.callThrough();
             spyOn(MediumEditor.statics.Toolbar.prototype, 'showAndUpdateToolbar').and.callThrough();
             var editor = new MediumEditor('.editor');
-            editor.toolbar.style.display = 'block';
-            editor.toolbar.classList.add('medium-editor-toolbar-active');
-            expect(editor.toolbar.classList.contains('medium-editor-toolbar-active')).toBe(true);
+            editor.toolbarObj.getToolbarElement().style.display = 'block';
+            editor.toolbarObj.getToolbarElement().classList.add('medium-editor-toolbar-active');
+            expect(editor.toolbarObj.getToolbarElement().classList.contains('medium-editor-toolbar-active')).toBe(true);
             editor.checkSelection();
-            expect(editor.toolbar.classList.contains('medium-editor-toolbar-active')).toBe(false);
+            expect(editor.toolbarObj.getToolbarElement().classList.contains('medium-editor-toolbar-active')).toBe(false);
             expect(editor.toolbarObj.setToolbarPosition).not.toHaveBeenCalled();
             expect(editor.toolbarObj.setToolbarButtonStates).not.toHaveBeenCalled();
             expect(editor.toolbarObj.showAndUpdateToolbar).not.toHaveBeenCalled();
@@ -83,17 +83,17 @@ describe('Selection TestCase', function () {
                 allowMultiParagraphSelection: false
             });
             selectElementContentsAndFire(document.getElementById('p-one'));
-            expect(editor.toolbar.classList.contains('medium-editor-toolbar-active')).toBe(true);
+            expect(editor.toolbarObj.getToolbarElement().classList.contains('medium-editor-toolbar-active')).toBe(true);
             selectElementContentsAndFire(this.el);
-            expect(editor.toolbar.classList.contains('medium-editor-toolbar-active')).toBe(false);
+            expect(editor.toolbarObj.getToolbarElement().classList.contains('medium-editor-toolbar-active')).toBe(false);
         });
 
         it('should show the toolbar when something is selected', function () {
             var editor = new MediumEditor('.editor');
-            expect(editor.toolbar.classList.contains('medium-editor-toolbar-active')).toBe(false);
+            expect(editor.toolbarObj.getToolbarElement().classList.contains('medium-editor-toolbar-active')).toBe(false);
             selectElementContentsAndFire(this.el);
             jasmine.clock().tick(501);
-            expect(editor.toolbar.classList.contains('medium-editor-toolbar-active')).toBe(true);
+            expect(editor.toolbarObj.getToolbarElement().classList.contains('medium-editor-toolbar-active')).toBe(true);
         });
 
         it('should update toolbar position and button states when something is selected', function () {

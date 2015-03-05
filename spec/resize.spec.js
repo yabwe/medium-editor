@@ -23,7 +23,7 @@ describe('Resize TestCase', function () {
         var editor = new MediumEditor('.editor');
         selectElementContentsAndFire(editor.elements[0]);
         jasmine.clock().tick(101);
-        expect(editor.toolbar.className.indexOf('active') > -1).toBe(true);
+        expect(editor.toolbarObj.getToolbarElement().className.indexOf('active') > -1).toBe(true);
         spyOn(MediumEditor.statics.Toolbar.prototype, 'setToolbarPosition');
         fireEvent(window, 'resize');
         jasmine.clock().tick(101);
@@ -36,7 +36,7 @@ describe('Resize TestCase', function () {
         spyOn(MediumEditor.statics.Toolbar.prototype, 'setToolbarPosition');
         fireEvent(window, 'resize');
         jasmine.clock().tick(101);
-        expect(editor.toolbar.className.indexOf('active')).toBe(-1);
+        expect(editor.toolbarObj.getToolbarElement().className.indexOf('active')).toBe(-1);
         expect(editor.toolbarObj.setToolbarPosition).not.toHaveBeenCalled();
     });
 
