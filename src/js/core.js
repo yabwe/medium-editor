@@ -398,14 +398,14 @@ function MediumEditor(elements, options) {
 
                     if (!(self.options.disableReturn || editorElement.getAttribute('data-disable-return')) &&
                             tagName !== 'li' && !Util.isListItemChild(node)) {
-                        if (!e.shiftKey) {
-                            // paragraph creation should not be forced within a header tag
-                            if (/h\d/.test(tagName)) {
-                                self.options.ownerDocument.execCommand('formatBlock', false, 'p');
-                            }
-                        }
+                        // For anchor tags, unlink
                         if (tagName === 'a') {
                             self.options.ownerDocument.execCommand('unlink', false, null);
+                        } else if (!e.shiftKey) {
+                            // only format block if this is not a header tag
+                            if (!/h\d/.test(tagName)) {
+                                self.options.ownerDocument.execCommand('formatBlock', false, 'p');
+                            }
                         }
                     }
                 }
@@ -721,12 +721,6 @@ function MediumEditor(elements, options) {
                 this.toolbar.hideToolbarDefaultActions();
             }
             return this;
-        },
-
-        showToolbarDefaultActions: function () {
-            if (this.toolbar) {
-                this.toolbar.showToolbarDefaultActions();
-            }
         },
 
         setToolbarPosition: function () {
