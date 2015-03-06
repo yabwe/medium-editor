@@ -21,7 +21,9 @@ describe('Content TestCase', function () {
         var editor = new MediumEditor('.editor');
         spyOn(document, 'execCommand');
         selectElementContents(editor.elements[0].querySelector('a'));
-        fireEvent(editor.elements[0], 'keypress', 32);
+        fireEvent(editor.elements[0], 'keypress', {
+            keyCode: 32
+        });
         expect(document.execCommand).toHaveBeenCalledWith('unlink', false, null);
     });
 });

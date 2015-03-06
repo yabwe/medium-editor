@@ -61,7 +61,9 @@ describe('Anchor Button TestCase', function () {
             fireEvent(button, 'click');
             input = editor.getExtensionByName('anchor').getInput();
             input.value = 'test';
-            fireEvent(input, 'keyup', 13);
+            fireEvent(input, 'keyup', {
+                keyCode: 13
+            });
             expect(editor.createLink).toHaveBeenCalled();
         });
         it('shouldn\'t create a link when user presses enter without value', function () {
@@ -75,7 +77,9 @@ describe('Anchor Button TestCase', function () {
             fireEvent(button, 'click');
             input = editor.getExtensionByName('anchor').getInput();
             input.value = '';
-            fireEvent(input, 'keyup', 13);
+            fireEvent(input, 'keyup', {
+                keyCode: 13
+            });
             expect(editor.elements[0].querySelector('a')).toBeNull();
         });
         it('should add http:// if need be and checkLinkFormat option is set to true', function () {
@@ -169,7 +173,9 @@ describe('Anchor Button TestCase', function () {
             button.setAttribute('type', 'checkbox');
             button.checked = true;
 
-            fireEvent(input, 'keyup', 13);
+            fireEvent(input, 'keyup', {
+                keyCode: 13
+            });
             opts = {
                 url: 'test',
                 target: '_self',
@@ -208,7 +214,9 @@ describe('Anchor Button TestCase', function () {
             selectElementContents(editor.elements[0]);
             fireEvent(editor.toolbar.querySelector('[data-action="createLink"]'), 'click');
             expect(anchorExtension.isDisplayed()).toBe(true);
-            fireEvent(anchorExtension.getInput(), 'keyup', 27);
+            fireEvent(anchorExtension.getInput(), 'keyup', {
+                keyCode: 27
+            });
             expect(anchorExtension.isDisplayed()).toBe(false);
         });
     });

@@ -1,28 +1,30 @@
-function fireEvent(element, event, keyCode, ctrlKey, target, relatedTarget) {
+function fireEvent(element, event, options) {
     'use strict';
 
     var evt;
+
+    options = options || {};
 
     if (document.createEvent) {
         // dispatch for firefox + others
         evt = document.createEvent("HTMLEvents");
         evt.initEvent(event, true, true); // event type,bubbling,cancelable
 
-        if (keyCode) {
-            evt.keyCode = keyCode;
-            evt.which = keyCode;
+        if (options.keyCode) {
+            evt.keyCode = options.keyCode;
+            evt.which = options.keyCode;
         }
 
-        if (ctrlKey) {
+        if (options.ctrlKey) {
             evt.ctrlKey = true;
         }
 
-        if (target) {
-            evt.target = target;
+        if (options.target) {
+            evt.target = options.target;
         }
 
-        if (relatedTarget) {
-            evt.relatedTarget = relatedTarget;
+        if (options.relatedTarget) {
+            evt.relatedTarget = options.relatedTarget;
         }
 
         return !element.dispatchEvent(evt);
