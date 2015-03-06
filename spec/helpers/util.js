@@ -1,31 +1,22 @@
 /*global atob, unescape, Uint8Array, Blob*/
 
 function isIE9() {
-    'use strict';
-
     return navigator.appName.indexOf("Internet Explorer") !== -1 && navigator.appVersion.indexOf("MSIE 9") !== -1;
 }
 
 function isIE10() {
-    'use strict';
-
     return navigator.appName.indexOf("Internet Explorer") !== -1 && navigator.appVersion.indexOf("MSIE 10") !== -1;
 }
 
 function isOldIE() {
-    'use strict';
-
     return isIE9() || isIE10();
 }
 
 function isFirefox() {
-    'use strict';
-
     return navigator.userAgent.toLowerCase().indexOf("firefox") !== -1;
 }
 
 function dataURItoBlob(dataURI) {
-    'use strict';
     // convert base64/URLEncoded data component to raw binary data held in a string
     var byteString,
         mimeString,
@@ -52,8 +43,6 @@ function dataURItoBlob(dataURI) {
 
 // keyCode, ctrlKey, target, relatedTarget, shiftKey
 function fireEvent(element, event, options) {
-    'use strict';
-
     var evt;
 
     options = options || {};
@@ -101,8 +90,6 @@ function fireEvent(element, event, options) {
 }
 
 function placeCursorInsideElement(el, index) {
-    'use strict';
-
     var selection = window.getSelection(),
         newRange = document.createRange();
     selection.removeAllRanges();
@@ -111,8 +98,6 @@ function placeCursorInsideElement(el, index) {
 }
 
 function selectElementContents(el, options) {
-    'use strict';
-
     options = options || {};
 
     var range = document.createRange(),
@@ -128,16 +113,12 @@ function selectElementContents(el, options) {
 }
 
 function selectElementContentsAndFire(el, options) {
-    'use strict';
-
     options = options || {};
     selectElementContents(el, options);
     fireEvent(el, options.eventToFire || 'mouseup');
 }
 
 function tearDown(el) {
-    'use strict';
-
     var elements = document.querySelectorAll('.medium-editor-toolbar'),
         i,
         sel = window.getSelection();

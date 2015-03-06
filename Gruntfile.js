@@ -65,7 +65,6 @@ module.exports = function (grunt) {
             src: [
                 'src/js/**/*.js',
                 'spec/*.spec.js',
-                'spec/helpers/util.js',
                 'Gruntfile.js'
             ],
             directives: {
