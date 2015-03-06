@@ -1,3 +1,21 @@
+/*global atob, unescape, Uint8Array, Blob*/
+
+function isIE9() {
+    return navigator.appName.indexOf("Internet Explorer") !== -1 && navigator.appVersion.indexOf("MSIE 9") !== -1;
+}
+
+function isIE10() {
+    return navigator.appName.indexOf("Internet Explorer") !== -1 && navigator.appVersion.indexOf("MSIE 10") !== -1;
+}
+
+function isOldIE() {
+    return isIE9() || isIE10();
+}
+
+function isFirefox() {
+    return navigator.userAgent.toLowerCase().indexOf("firefox") !== -1;
+}
+
 function dataURItoBlob(dataURI) {
     // convert base64/URLEncoded data component to raw binary data held in a string
     var byteString,
@@ -20,30 +38,41 @@ function dataURItoBlob(dataURI) {
         ia[i] = byteString.charCodeAt(i);
     }
 
-    return new Blob([ia], {type:mimeString});
+    return new Blob([ia], {type: mimeString});
 }
 
-function fireEvent (element, event, keyCode, ctrlKey, target, relatedTarget, shiftKey) {
+// keyCode, ctrlKey, target, relatedTarget, shiftKey
+function fireEvent(element, event, options) {
+    var evt;
+
+    options = options || {};
+
     if (document.createEvent) {
         // dispatch for firefox + others
-        var evt = document.createEvent("HTMLEvents");
-        evt.initEvent(event, true, true ); // event type,bubbling,cancelable
-        if (keyCode) {
-            evt.keyCode = keyCode;
-            evt.which = keyCode;
+        evt = document.createEvent("HTMLEvents");
+        evt.initEvent(event, true, true); // event type,bubbling,cancelable
+
+        if (options.keyCode) {
+            evt.keyCode = options.keyCode;
+            evt.which = options.keyCode;
         }
-        if (ctrlKey) {
+
+        if (options.ctrlKey) {
             evt.ctrlKey = true;
         }
-        if (target) {
-            evt.target = target;
+
+        if (options.target) {
+            evt.target = options.target;
         }
-        if (relatedTarget) {
-            evt.relatedTarget = relatedTarget;
+
+        if (options.relatedTarget) {
+            evt.relatedTarget = options.relatedTarget;
         }
-        if (shiftKey) {
+
+        if (options.shiftKey) {
             evt.shiftKey = true;
         }
+
         if (event.indexOf('drag') !== -1 || event === 'drop') {
             evt.dataTransfer = {
                 dropEffect: ''
@@ -53,11 +82,11 @@ function fireEvent (element, event, keyCode, ctrlKey, target, relatedTarget, shi
             }
         }
         return !element.dispatchEvent(evt);
-    } else {
-        // dispatch for IE
-        var evt = document.createEventObject();
-        return element.fireEvent('on'+event,evt)
     }
+
+    // dispatch for IE
+    evt = document.createEventObject();
+    return element.fireEvent('on' + event, evt);
 }
 
 function placeCursorInsideElement(el, index) {
@@ -68,12 +97,6 @@ function placeCursorInsideElement(el, index) {
     selection.addRange(newRange);
 }
 
-function selectElementContentsAndFire(el, options) {
-    options = options || {};
-    selectElementContents(el, options);
-    fireEvent(el, options.eventToFire || 'mouseup');
-}
-
 function selectElementContents(el, options) {
     options = options || {};
 
@@ -82,11 +105,17 @@ function selectElementContents(el, options) {
     range.selectNodeContents(el);
 
     if (options.collapse) {
-      range.collapse(options.collapse === true);
+        range.collapse(options.collapse === true);
     }
 
     sel.removeAllRanges();
     sel.addRange(range);
+}
+
+function selectElementContentsAndFire(el, options) {
+    options = options || {};
+    selectElementContents(el, options);
+    fireEvent(el, options.eventToFire || 'mouseup');
 }
 
 function tearDown(el) {
@@ -102,20 +131,4 @@ function tearDown(el) {
     }
     document.body.removeChild(el);
     sel.removeAllRanges();
-}
-
-function isIE9() {
-    return navigator.appName.indexOf("Internet Explorer") != -1 && navigator.appVersion.indexOf("MSIE 9") != -1;
-}
-
-function isIE10() {
-    return navigator.appName.indexOf("Internet Explorer") != -1 && navigator.appVersion.indexOf("MSIE 10") != -1;
-}
-
-function isOldIE() {
-    return isIE9() || isIE10();
-}
-
-function isFirefox() {
-    return navigator.userAgent.toLowerCase().indexOf("firefox") != -1;
 }

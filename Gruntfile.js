@@ -62,7 +62,11 @@ module.exports = function (grunt) {
     gruntConfig.jslint = {
         client: {
             exclude: ['src/js/polyfills.js'],
-            src: ['src/js/**/*.js', 'spec/*.spec.js', 'Gruntfile.js'],
+            src: [
+                'src/js/**/*.js',
+                'spec/*.spec.js',
+                'Gruntfile.js'
+            ],
             directives: {
                 browser: true,
                 unparam: true,
@@ -205,7 +209,7 @@ module.exports = function (grunt) {
 
     gruntConfig.watch = {
         scripts: {
-            files: ['src/js/**/*.js', 'spec/*.js', 'Gruntfile.js'],
+            files: ['src/js/**/*.js', 'spec/**/*.js', 'Gruntfile.js'],
             tasks: ['js'],
             options: {
                 debounceDelay: 250

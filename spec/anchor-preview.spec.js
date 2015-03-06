@@ -35,7 +35,9 @@ describe('Anchor Preview TestCase', function () {
             editor.editorAnchorObserver({
                 target: document.getElementById('test-link')
             });
-            fireEvent(editor.elements[0], 'mouseover', undefined, undefined, document.getElementById('test-link'));
+            fireEvent(editor.elements[0], 'mouseover', {
+                target: document.getElementById('test-link')
+            });
 
             // preview shows only after delay
             expect(editor.showAnchorPreview).not.toHaveBeenCalled();
@@ -70,7 +72,9 @@ describe('Anchor Preview TestCase', function () {
             editor.editorAnchorObserver({
                 target: document.getElementById('test-symbol-link')
             });
-            fireEvent(editor.elements[0], 'mouseover', undefined, undefined, document.getElementById('test-symbol-link'));
+            fireEvent(editor.elements[0], 'mouseover', {
+                target: document.getElementById('test-symbol-link')
+            });
 
             // preview shows only after delay
             jasmine.clock().tick(200);
@@ -86,7 +90,9 @@ describe('Anchor Preview TestCase', function () {
             editor.editorAnchorObserver({
                 target: document.getElementById('test-link')
             });
-            fireEvent(editor.elements[0], 'mouseover', undefined, undefined, document.getElementById('test-link'));
+            fireEvent(editor.elements[0], 'mouseover', {
+                target: document.getElementById('test-link')
+            });
 
             // load into editor
             fireEvent(editor.anchorPreview, 'click');
@@ -106,7 +112,9 @@ describe('Anchor Preview TestCase', function () {
             editor.editorAnchorObserver({
                 target: document.getElementById('test-empty-link')
             });
-            fireEvent(editor.elements[0], 'mouseover', undefined, undefined, document.getElementById('test-empty-link'));
+            fireEvent(editor.elements[0], 'mouseover', {
+                target: document.getElementById('test-empty-link')
+            });
 
             // preview shows only after delay
             jasmine.clock().tick(250);

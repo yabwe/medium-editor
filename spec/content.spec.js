@@ -23,7 +23,9 @@ describe('Content TestCase', function () {
                 target = editor.elements[0].querySelector('ol').lastChild;
             spyOn(document, 'execCommand').and.callThrough();
             selectElementContents(target);
-            fireEvent(target, 'keydown', 9);
+            fireEvent(target, 'keydown', {
+                keyCode: 9
+            });
             expect(document.execCommand).toHaveBeenCalledWith('indent', false, null);
             // Firefox (annoyingly) throws a NS_ERROR_FAILURE when attempting to mimic this through a test case
             // I was unable to find a workaround, and this works fine in a browser
@@ -39,7 +41,10 @@ describe('Content TestCase', function () {
                 target = editor.elements[0].querySelector('ol').lastChild.firstChild.firstChild;
             spyOn(document, 'execCommand').and.callThrough();
             selectElementContents(target);
-            fireEvent(target, 'keydown', 9, null, null, null, true);
+            fireEvent(target, 'keydown', {
+                keyCode: 9,
+                shiftKey: true
+            });
             expect(document.execCommand).toHaveBeenCalledWith('outdent', false, null);
             // Firefox (annoyingly) throws a NS_ERROR_FAILURE when attempting to mimic this through a test case
             // I was unable to find a workaround, and this works fine in a browser
@@ -58,7 +63,9 @@ describe('Content TestCase', function () {
                 disableReturn: true
             });
             selectElementContents(editor.elements[0]);
-            fireEvent(editor.elements[0], 'keypress', 13);
+            fireEvent(editor.elements[0], 'keypress', {
+                keyCode: 13
+            });
             expect(this.el.innerHTML).toBe('lorem ipsum');
         });
 
@@ -68,7 +75,9 @@ describe('Content TestCase', function () {
                 disableDoubleReturn: true
             });
             selectElementContents(editor.elements[0]);
-            fireEvent(editor.elements[0], 'keypress', 13);
+            fireEvent(editor.elements[0], 'keypress', {
+                keyCode: 13
+            });
             expect(this.el.innerHTML).toBe('<br> ');
         });
 
@@ -78,7 +87,9 @@ describe('Content TestCase', function () {
                 targetNode = editor.elements[0].querySelector('p');
             spyOn(document, 'execCommand').and.callThrough();
             placeCursorInsideElement(targetNode, 0);
-            fireEvent(targetNode, 'keyup', 13);
+            fireEvent(targetNode, 'keyup', {
+                keyCode: 13
+            });
             expect(document.execCommand).toHaveBeenCalledWith('formatBlock', false, 'p');
             expect(this.el.innerHTML).toBe('<p>lorem ipsum</p>');
         });
@@ -90,7 +101,9 @@ describe('Content TestCase', function () {
             var editor = new MediumEditor('.editor');
             spyOn(document, 'execCommand').and.callThrough();
             selectElementContents(editor.elements[0].querySelector('a'));
-            fireEvent(editor.elements[0], 'keypress', 32);
+            fireEvent(editor.elements[0], 'keypress', {
+                keyCode: 32
+            });
             expect(document.execCommand).toHaveBeenCalledWith('unlink', false, null);
         });
 
@@ -100,7 +113,9 @@ describe('Content TestCase', function () {
                 target = editor.elements[0].querySelector('a');
             spyOn(document, 'execCommand').and.callThrough();
             placeCursorInsideElement(target, 1);
-            fireEvent(target, 'keyup', 13);
+            fireEvent(target, 'keyup', {
+                keyCode: 13
+            });
             expect(document.execCommand).toHaveBeenCalledWith('unlink', false, null);
         });
     });
@@ -111,7 +126,9 @@ describe('Content TestCase', function () {
             var editor = new MediumEditor('.editor'),
                 targetNode = editor.elements[0].querySelector('h3');
             placeCursorInsideElement(targetNode, 0);
-            fireEvent(targetNode, 'keydown', 13);
+            fireEvent(targetNode, 'keydown', {
+                keyCode: 13
+            });
             expect(this.el.innerHTML).toBe('<h2>lorem</h2><p><br></p><h3>ipsum</h3>');
         });
 
@@ -120,7 +137,9 @@ describe('Content TestCase', function () {
             var editor = new MediumEditor('.editor'),
                 targetNode = editor.elements[0].querySelector('p');
             selectElementContents(targetNode);
-            fireEvent(targetNode, 'keydown', 46);
+            fireEvent(targetNode, 'keydown', {
+                keyCode: 46
+            });
             expect(this.el.innerHTML).toBe('<h2>lorem</h2><h3>ipsum</h3>');
         });
 
@@ -130,7 +149,9 @@ describe('Content TestCase', function () {
                 targetNode = editor.elements[0].querySelector('h2');
             spyOn(document, 'execCommand').and.callThrough();
             placeCursorInsideElement(targetNode, 0);
-            fireEvent(targetNode, 'keyup', 13);
+            fireEvent(targetNode, 'keyup', {
+                keyCode: 13
+            });
             expect(document.execCommand).not.toHaveBeenCalledWith('formatBlock', false, 'p');
             expect(this.el.innerHTML).toBe('<h2>lorem ipsum</h2>');
         });
@@ -141,7 +162,9 @@ describe('Content TestCase', function () {
         var editor = new MediumEditor('.editor'),
             targetNode = editor.elements[0].querySelector('pre');
         placeCursorInsideElement(targetNode, 0);
-        fireEvent(targetNode, 'keydown', 9);
+        fireEvent(targetNode, 'keydown', {
+            keyCode: 9
+        });
         expect(this.el.innerHTML).toBe('<pre>    lorem ipsum</pre>');
     });
 
@@ -152,7 +175,9 @@ describe('Content TestCase', function () {
         spyOn(document, 'execCommand').and.callThrough();
         selectElementContents(target);
         target.parentNode.removeChild(target);
-        fireEvent(editor.elements[0], 'keyup', 8);
+        fireEvent(editor.elements[0], 'keyup', {
+            keyCode: 8
+        });
         expect(document.execCommand).toHaveBeenCalledWith('formatBlock', false, 'p');
         // Webkit inserts a <p> tag, firefox & ie do not
         expect(this.el.innerHTML).toMatch(/(<p><br><\/p>)?/);

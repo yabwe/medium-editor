@@ -71,7 +71,10 @@ describe('Buttons TestCase', function () {
                 code = 'b'.charCodeAt(0);
             selectElementContentsAndFire(editor.elements[0]);
             jasmine.clock().tick(1);
-            fireEvent(editor.elements[0], 'keydown', code, true);
+            fireEvent(editor.elements[0], 'keydown', {
+                keyCode: code,
+                ctrlKey: true
+            });
             expect(editor.execAction).toHaveBeenCalled();
         });
     });
