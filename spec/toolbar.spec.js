@@ -191,7 +191,10 @@ describe('Toolbar TestCase', function () {
             expect(editorTwo.toolbar.getToolbarElement().classList.contains('medium-editor-toolbar-active')).toBe(false);
 
             selectElementContentsAndFire(document.getElementById('editor-span-2'));
-            fireEvent(elTwo, 'focus', null, null, elTwo, this.el);
+            fireEvent(elTwo, 'focus', {
+                target: elTwo,
+                relatedTarget: this.el
+            });
 
             jasmine.clock().tick(1); // checkSelection delay
 
