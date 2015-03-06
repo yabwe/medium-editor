@@ -1,7 +1,7 @@
 /*global MediumEditor, describe, it, expect, spyOn,
          afterEach, beforeEach, selectElementContents, runs,
          fireEvent, waitsFor, tearDown, xit, jasmine,
-         selectElementContentsAndFire, console */
+         selectElementContentsAndFire, console, Toolbar*/
 
 describe('Toolbar TestCase', function () {
     'use strict';
@@ -313,6 +313,14 @@ describe('Toolbar TestCase', function () {
             // Remove the new element from the DOM
             document.body.removeChild(element);
         });
+    });
 
+    describe('Scroll', function () {
+        it('should position toolbar if shown', function () {
+            var editor = new MediumEditor('.editor');
+            spyOn(Toolbar.prototype, 'positionToolbarIfShown');
+            fireEvent(window, 'scroll');
+            expect(editor.toolbar.positionToolbarIfShown).toHaveBeenCalled();
+        });
     });
 });
