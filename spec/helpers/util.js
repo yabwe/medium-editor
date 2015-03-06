@@ -1,36 +1,41 @@
-function fireEvent (element, event, keyCode, ctrlKey, target, relatedTarget) {
-   if (document.createEvent) {
-       // dispatch for firefox + others
-       var evt = document.createEvent("HTMLEvents");
-       evt.initEvent(event, true, true ); // event type,bubbling,cancelable
-       if (keyCode) {
-        evt.keyCode = keyCode;
-        evt.which = keyCode;
-       }
-       if (ctrlKey) {
-        evt.ctrlKey = true;
-       }
-       if (target) {
-        evt.target = target;
-       }
-       if (relatedTarget) {
-        evt.relatedTarget = relatedTarget;
-       }
-       return !element.dispatchEvent(evt);
-   } else {
-       // dispatch for IE
-       var evt = document.createEventObject();
-       return element.fireEvent('on'+event,evt)
-   }
-}
+function fireEvent(element, event, keyCode, ctrlKey, target, relatedTarget) {
+    'use strict';
 
-function selectElementContentsAndFire(el, options) {
-    options = options || {};
-    selectElementContents(el, options);
-    fireEvent(el, options.eventToFire || 'mouseup');
+    var evt;
+
+    if (document.createEvent) {
+        // dispatch for firefox + others
+        evt = document.createEvent("HTMLEvents");
+        evt.initEvent(event, true, true); // event type,bubbling,cancelable
+
+        if (keyCode) {
+            evt.keyCode = keyCode;
+            evt.which = keyCode;
+        }
+
+        if (ctrlKey) {
+            evt.ctrlKey = true;
+        }
+
+        if (target) {
+            evt.target = target;
+        }
+
+        if (relatedTarget) {
+            evt.relatedTarget = relatedTarget;
+        }
+
+        return !element.dispatchEvent(evt);
+    }
+
+    // dispatch for IE
+    evt = document.createEventObject();
+    return element.fireEvent('on' + event, evt);
 }
 
 function selectElementContents(el, options) {
+    'use strict';
+
     options = options || {};
 
     var range = document.createRange(),
@@ -38,14 +43,24 @@ function selectElementContents(el, options) {
     range.selectNodeContents(el);
 
     if (options.collapse) {
-      range.collapse(options.collapse === true);
+        range.collapse(options.collapse === true);
     }
 
     sel.removeAllRanges();
     sel.addRange(range);
 }
 
+function selectElementContentsAndFire(el, options) {
+    'use strict';
+
+    options = options || {};
+    selectElementContents(el, options);
+    fireEvent(el, options.eventToFire || 'mouseup');
+}
+
 function tearDown(el) {
+    'use strict';
+
     var elements = document.querySelectorAll('.medium-editor-toolbar'),
         i,
         sel = window.getSelection();
@@ -61,8 +76,11 @@ function tearDown(el) {
 }
 
 function isOldIE() {
+    'use strict';
+
     return (
-        navigator.appName.indexOf("Internet Explorer") != -1
-        && (navigator.appVersion.indexOf("MSIE 9") != -1 || navigator.appVersion.indexOf("MSIE 10") != -1)
+        navigator.appName.indexOf("Internet Explorer") !== -1 &&
+        (navigator.appVersion.indexOf("MSIE 9") !== -1 ||
+                navigator.appVersion.indexOf("MSIE 10") !== -1)
     );
 }
