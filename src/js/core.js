@@ -564,26 +564,30 @@ function MediumEditor(elements, options) {
                 var files;
                 e.preventDefault();
                 e.stopPropagation();
-                files = Array.prototype.slice.call(e.dataTransfer.files, 0);
-                files.some(function (file) {
-                    if (file.type.match("image")) {
-                        var fileReader, id;
-                        fileReader = new FileReader();
-                        fileReader.readAsDataURL(file);
+                // IE9 does not support the File API, so prevent file from opening in a new window
+                // but also don't try to actually get the file
+                if (e.dataTransfer.files) {
+                    files = Array.prototype.slice.call(e.dataTransfer.files, 0);
+                    files.some(function (file) {
+                        if (file.type.match("image")) {
+                            var fileReader, id;
+                            fileReader = new FileReader();
+                            fileReader.readAsDataURL(file);
 
-                        id = 'medium-img-' + (+new Date());
-                        Util.insertHTMLCommand(self.options.ownerDocument, '<img class="medium-image-loading" id="' + id + '" />');
+                            id = 'medium-img-' + (+new Date());
+                            Util.insertHTMLCommand(self.options.ownerDocument, '<img class="medium-image-loading" id="' + id + '" />');
 
-                        fileReader.onload = function () {
-                            var img = document.getElementById(id);
-                            if (img) {
-                                img.removeAttribute('id');
-                                img.removeAttribute('class');
-                                img.src = fileReader.result;
-                            }
-                        };
-                    }
-                });
+                            fileReader.onload = function () {
+                                var img = document.getElementById(id);
+                                if (img) {
+                                    img.removeAttribute('id');
+                                    img.removeAttribute('class');
+                                    img.src = fileReader.result;
+                                }
+                            };
+                        }
+                    });
+                }
                 this.classList.remove(className);
             };
 
