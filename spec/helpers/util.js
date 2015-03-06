@@ -24,40 +24,40 @@ function dataURItoBlob(dataURI) {
 }
 
 function fireEvent (element, event, keyCode, ctrlKey, target, relatedTarget, shiftKey) {
-   if (document.createEvent) {
-       // dispatch for firefox + others
-       var evt = document.createEvent("HTMLEvents");
-       evt.initEvent(event, true, true ); // event type,bubbling,cancelable
-       if (keyCode) {
-        evt.keyCode = keyCode;
-        evt.which = keyCode;
-       }
-       if (ctrlKey) {
-        evt.ctrlKey = true;
-       }
-       if (target) {
-        evt.target = target;
-       }
-       if (relatedTarget) {
-        evt.relatedTarget = relatedTarget;
-       }
-       if (shiftKey) {
-        evt.shiftKey = true;
-       }
-       if (event.indexOf('drag') !== -1 || event === 'drop') {
-           evt.dataTransfer = {
-               dropEffect: '',
-               files: [
-                   dataURItoBlob('data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7')
-               ]
-           };
-       }
-       return !element.dispatchEvent(evt);
-   } else {
-       // dispatch for IE
-       var evt = document.createEventObject();
-       return element.fireEvent('on'+event,evt)
-   }
+    if (document.createEvent) {
+        // dispatch for firefox + others
+        var evt = document.createEvent("HTMLEvents");
+        evt.initEvent(event, true, true ); // event type,bubbling,cancelable
+        if (keyCode) {
+            evt.keyCode = keyCode;
+            evt.which = keyCode;
+        }
+        if (ctrlKey) {
+            evt.ctrlKey = true;
+        }
+        if (target) {
+            evt.target = target;
+        }
+        if (relatedTarget) {
+            evt.relatedTarget = relatedTarget;
+        }
+        if (shiftKey) {
+            evt.shiftKey = true;
+        }
+        if (event.indexOf('drag') !== -1 || event === 'drop') {
+            evt.dataTransfer = {
+                dropEffect: ''
+            };
+            if (!isIE9()) {
+                evt.dataTransfer.files = [dataURItoBlob('data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7')];
+            }
+        }
+        return !element.dispatchEvent(evt);
+    } else {
+        // dispatch for IE
+        var evt = document.createEventObject();
+        return element.fireEvent('on'+event,evt)
+    }
 }
 
 function placeCursorInsideElement(el, index) {
@@ -104,11 +104,16 @@ function tearDown(el) {
     sel.removeAllRanges();
 }
 
+function isIE9() {
+    return navigator.appName.indexOf("Internet Explorer") != -1 && navigator.appVersion.indexOf("MSIE 9") != -1;
+}
+
+function isIE10() {
+    return navigator.appName.indexOf("Internet Explorer") != -1 && navigator.appVersion.indexOf("MSIE 10") != -1;
+}
+
 function isOldIE() {
-    return (
-        navigator.appName.indexOf("Internet Explorer") != -1
-        && (navigator.appVersion.indexOf("MSIE 9") != -1 || navigator.appVersion.indexOf("MSIE 10") != -1)
-    );
+    return isIE9() || isIE10();
 }
 
 function isFirefox() {
