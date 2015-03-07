@@ -15,7 +15,8 @@ function MediumEditor(elements, options) {
         ButtonsData: ButtonsData,
         DefaultButton: DefaultButton,
         AnchorExtension: AnchorExtension,
-        Toolbar: Toolbar
+        Toolbar: Toolbar,
+        AnchorPreview: AnchorPreview
     };
 
     MediumEditor.prototype = {
@@ -842,48 +843,6 @@ function MediumEditor(elements, options) {
             sel.addRange(range);
         },
 
-        hideAnchorPreview: function () {
-            this.anchorPreview.classList.remove('medium-editor-anchor-preview-active');
-        },
-
-        // TODO: break method
-        showAnchorPreview: function (anchorEl) {
-            if (this.anchorPreview.classList.contains('medium-editor-anchor-preview-active')
-                    || anchorEl.getAttribute('data-disable-preview')) {
-                return true;
-            }
-
-            var self = this,
-                buttonHeight = 40,
-                boundary = anchorEl.getBoundingClientRect(),
-                middleBoundary = (boundary.left + boundary.right) / 2,
-                halfOffsetWidth,
-                defaultLeft;
-
-            self.anchorPreview.querySelector('i').textContent = anchorEl.attributes.href.value;
-            halfOffsetWidth = self.anchorPreview.offsetWidth / 2;
-            defaultLeft = self.options.diffLeft - halfOffsetWidth;
-
-            self.observeAnchorPreview(anchorEl);
-
-            self.anchorPreview.classList.add('medium-toolbar-arrow-over');
-            self.anchorPreview.classList.remove('medium-toolbar-arrow-under');
-            self.anchorPreview.style.top = Math.round(buttonHeight + boundary.bottom - self.options.diffTop + this.options.contentWindow.pageYOffset - self.anchorPreview.offsetHeight) + 'px';
-            if (middleBoundary < halfOffsetWidth) {
-                self.anchorPreview.style.left = defaultLeft + halfOffsetWidth + 'px';
-            } else if ((this.options.contentWindow.innerWidth - middleBoundary) < halfOffsetWidth) {
-                self.anchorPreview.style.left = this.options.contentWindow.innerWidth + defaultLeft - halfOffsetWidth + 'px';
-            } else {
-                self.anchorPreview.style.left = defaultLeft + middleBoundary + 'px';
-            }
-
-            if (this.anchorPreview && !this.anchorPreview.classList.contains('medium-editor-anchor-preview-active')) {
-                this.anchorPreview.classList.add('medium-editor-anchor-preview-active');
-            }
-
-            return this;
-        },
-
         // TODO: break method
         observeAnchorPreview: function (anchorEl) {
             var self = this,
@@ -905,7 +864,7 @@ function MediumEditor(elements, options) {
                     var durr = (new Date()).getTime() - lastOver;
                     if (durr > self.options.anchorPreviewHideDelay) {
                         // hide the preview 1/2 second after mouse leaves the link
-                        self.hideAnchorPreview();
+                        self.anchorPreviewObj.hideAnchorPreview();
 
                         // cleanup
                         clearInterval(interval_timer);
@@ -953,7 +912,7 @@ function MediumEditor(elements, options) {
                 //   if the mouse has not left the anchor tag in that time
                 this.delay(function () {
                     if (overAnchor) {
-                        self.showAnchorPreview(e.target);
+                        self.anchorPreviewObj.showAnchorPreview(e.target);
                     }
                 });
             }

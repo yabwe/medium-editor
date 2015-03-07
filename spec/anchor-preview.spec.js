@@ -31,7 +31,7 @@ describe('Anchor Preview TestCase', function () {
                 nextRange;
 
             // show preview
-            spyOn(MediumEditor.prototype, 'showAnchorPreview').and.callThrough();
+            spyOn(MediumEditor.statics.AnchorPreview.prototype, 'showAnchorPreview').and.callThrough();
             editor.editorAnchorObserver({
                 target: document.getElementById('test-link')
             });
@@ -40,9 +40,9 @@ describe('Anchor Preview TestCase', function () {
             });
 
             // preview shows only after delay
-            expect(editor.showAnchorPreview).not.toHaveBeenCalled();
+            expect(editor.anchorPreviewObj.showAnchorPreview).not.toHaveBeenCalled();
             jasmine.clock().tick(250);
-            expect(editor.showAnchorPreview).toHaveBeenCalled();
+            expect(editor.anchorPreviewObj.showAnchorPreview).toHaveBeenCalled();
 
             // link is set in preview
             expect(editor.anchorPreview.querySelector('i').innerHTML).toBe(document.getElementById('test-link').attributes.href.value);
@@ -108,7 +108,7 @@ describe('Anchor Preview TestCase', function () {
             });
 
             // show preview
-            spyOn(MediumEditor.prototype, 'showAnchorPreview').and.callThrough();
+            spyOn(MediumEditor.statics.AnchorPreview.prototype, 'showAnchorPreview').and.callThrough();
             editor.editorAnchorObserver({
                 target: document.getElementById('test-empty-link')
             });
@@ -118,7 +118,7 @@ describe('Anchor Preview TestCase', function () {
 
             // preview shows only after delay
             jasmine.clock().tick(250);
-            expect(editor.showAnchorPreview).not.toHaveBeenCalled();
+            expect(editor.anchorPreviewObj.showAnchorPreview).not.toHaveBeenCalled();
         });
 
     });
