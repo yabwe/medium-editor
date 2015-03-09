@@ -17,6 +17,10 @@ var AnchorPreview;
             this.attachToEditables();
         },
 
+        getAnchorPreviewElement: function () {
+            return this.anchorPreview;
+        },
+
         createAnchorPreview: function () {
             var el = this.base.options.ownerDocument.createElement('div');
 

@@ -1597,6 +1597,10 @@ var AnchorPreview;
             this.attachToEditables();
         },
 
+        getAnchorPreviewElement: function () {
+            return this.anchorPreview;
+        },
+
         createAnchorPreview: function () {
             var el = this.base.options.ownerDocument.createElement('div');
 
@@ -2495,6 +2499,7 @@ function MediumEditor(elements, options) {
                     var isDescendantOfEditorElements = false,
                         selection = self.options.contentWindow.getSelection(),
                         toolbarEl = (self.toolbar) ? self.toolbar.getToolbarElement() : null,
+                        previewEl = (self.anchorPreviewObj) ? self.anchorPreviewObj.getAnchorPreviewElement() : null,
                         selRange = selection.isCollapsed ?
                                    null :
                                    Selection.getSelectedParentElement(selection.getRangeAt(0)),
@@ -2514,8 +2519,7 @@ function MediumEditor(elements, options) {
                     // If it's not part of the editor, toolbar, or anchor preview
                     if (!isDescendantOfEditorElements
                             && (!toolbarEl || (toolbarEl !== e.target && !Util.isDescendant(toolbarEl, e.target)))
-                            && self.anchorPreview !== e.target
-                            && !Util.isDescendant(self.anchorPreview, e.target)) {
+                            && (!previewEl || (previewEl !== e.target && !Util.isDescendant(previewEl, e.target)))) {
 
                         // Activate the placeholder
                         if (!self.options.disablePlaceholders) {
@@ -3232,7 +3236,6 @@ function MediumEditor(elements, options) {
             }
             if (this.anchorPreviewObj) {
                 this.anchorPreviewObj.deactivate();
-                delete this.anchorPreview;
                 delete this.anchorPreviewObj;
             }
 
