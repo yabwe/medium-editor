@@ -32,7 +32,7 @@ describe('Anchor Preview TestCase', function () {
 
             // show preview
             spyOn(MediumEditor.statics.AnchorPreview.prototype, 'showAnchorPreview').and.callThrough();
-            editor.editorAnchorObserver({
+            editor.anchorPreviewObj.handleEditableMouseover({
                 target: document.getElementById('test-link')
             });
             fireEvent(editor.elements[0], 'mouseover', {
@@ -69,7 +69,7 @@ describe('Anchor Preview TestCase', function () {
             var editor = new MediumEditor('.editor');
 
             // show preview
-            editor.editorAnchorObserver({
+            editor.anchorPreviewObj.handleEditableMouseover({
                 target: document.getElementById('test-symbol-link')
             });
             fireEvent(editor.elements[0], 'mouseover', {
@@ -87,7 +87,7 @@ describe('Anchor Preview TestCase', function () {
             var editor = new MediumEditor('.editor');
 
             // show preview
-            editor.editorAnchorObserver({
+            editor.anchorPreviewObj.handleEditableMouseover({
                 target: document.getElementById('test-link')
             });
             fireEvent(editor.elements[0], 'mouseover', {
@@ -109,7 +109,7 @@ describe('Anchor Preview TestCase', function () {
 
             // show preview
             spyOn(MediumEditor.statics.AnchorPreview.prototype, 'showAnchorPreview').and.callThrough();
-            editor.editorAnchorObserver({
+            editor.anchorPreviewObj.handleEditableMouseover({
                 target: document.getElementById('test-empty-link')
             });
             fireEvent(editor.elements[0], 'mouseover', {

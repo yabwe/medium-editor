@@ -154,7 +154,7 @@ function MediumEditor(elements, options) {
             // Init toolbar
             if (addToolbar) {
                 this.initToolbar()
-                    .bindAnchorPreview();
+                    .initAnchorPreview();
             }
             return this;
         },
@@ -536,6 +536,15 @@ function MediumEditor(elements, options) {
             }
             this.toolbar = new Toolbar(this);
             this.options.elementsContainer.appendChild(this.toolbar.getToolbarElement());
+
+            return this;
+        },
+
+        initAnchorPreview: function () {
+            if (this.anchorPreviewObj) {
+                return this;
+            }
+
             this.anchorPreviewObj = new AnchorPreview();
             this.anchorPreviewObj.init(this);
             this.anchorPreview = this.anchorPreviewObj.anchorPreview;
@@ -841,92 +850,6 @@ function MediumEditor(elements, options) {
             sel = this.options.contentWindow.getSelection();
             sel.removeAllRanges();
             sel.addRange(range);
-        },
-
-        // TODO: break method
-        observeAnchorPreview: function (anchorEl) {
-            var self = this,
-                lastOver = (new Date()).getTime(),
-                over = true,
-                stamp = function () {
-                    lastOver = (new Date()).getTime();
-                    over = true;
-                },
-                unstamp = function (e) {
-                    if (!e.relatedTarget || !/anchor-preview/.test(e.relatedTarget.className)) {
-                        over = false;
-                    }
-                },
-                interval_timer = setInterval(function () {
-                    if (over) {
-                        return true;
-                    }
-                    var durr = (new Date()).getTime() - lastOver;
-                    if (durr > self.options.anchorPreviewHideDelay) {
-                        // hide the preview 1/2 second after mouse leaves the link
-                        self.anchorPreviewObj.hideAnchorPreview();
-
-                        // cleanup
-                        clearInterval(interval_timer);
-                        self.off(self.anchorPreview, 'mouseover', stamp);
-                        self.off(self.anchorPreview, 'mouseout', unstamp);
-                        self.off(anchorEl, 'mouseover', stamp);
-                        self.off(anchorEl, 'mouseout', unstamp);
-
-                    }
-                }, 200);
-
-            this.on(self.anchorPreview, 'mouseover', stamp);
-            this.on(self.anchorPreview, 'mouseout', unstamp);
-            this.on(anchorEl, 'mouseover', stamp);
-            this.on(anchorEl, 'mouseout', unstamp);
-        },
-
-        editorAnchorObserver: function (e) {
-            var self = this,
-                overAnchor = true,
-                leaveAnchor = function () {
-                    // mark the anchor as no longer hovered, and stop listening
-                    overAnchor = false;
-                    self.off(self.activeAnchor, 'mouseout', leaveAnchor);
-                };
-
-            if (e.target && e.target.tagName.toLowerCase() === 'a') {
-
-                // Detect empty href attributes
-                // The browser will make href="" or href="#top"
-                // into absolute urls when accessed as e.targed.href, so check the html
-                if (!/href=["']\S+["']/.test(e.target.outerHTML) || /href=["']#\S+["']/.test(e.target.outerHTML)) {
-                    return true;
-                }
-
-                // only show when hovering on anchors
-                if (this.toolbar && this.toolbar.isDisplayed()) {
-                    // only show when toolbar is not present
-                    return true;
-                }
-                this.activeAnchor = e.target;
-                this.on(this.activeAnchor, 'mouseout', leaveAnchor);
-                // Using setTimeout + options.delay because:
-                // - We're going to show the anchor preview according to the configured delay
-                //   if the mouse has not left the anchor tag in that time
-                this.delay(function () {
-                    if (overAnchor) {
-                        self.anchorPreviewObj.showAnchorPreview(e.target);
-                    }
-                });
-            }
-        },
-
-        bindAnchorPreview: function (index) {
-            var i, self = this;
-            this.editorAnchorObserverWrapper = function (e) {
-                self.editorAnchorObserver(e);
-            };
-            for (i = 0; i < this.elements.length; i += 1) {
-                this.on(this.elements[i], 'mouseover', this.editorAnchorObserverWrapper);
-            }
-            return this;
         },
 
         createLink: function (opts) {
