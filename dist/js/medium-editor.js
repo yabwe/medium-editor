@@ -1591,17 +1591,17 @@ var AnchorPreview;
 
         init: function (instance) {
             this.base = instance;
-            this.anchorPreview = this.createAnchorPreview();
+            this.anchorPreview = this.createPreview();
             this.base.options.elementsContainer.appendChild(this.anchorPreview);
 
             this.attachToEditables();
         },
 
-        getAnchorPreviewElement: function () {
+        getPreviewElement: function () {
             return this.anchorPreview;
         },
 
-        createAnchorPreview: function () {
+        createPreview: function () {
             var el = this.base.options.ownerDocument.createElement('div');
 
             el.id = 'medium-editor-anchor-preview-' + this.base.id;
@@ -1628,11 +1628,11 @@ var AnchorPreview;
             }
         },
 
-        hideAnchorPreview: function () {
+        hidePreview: function () {
             this.anchorPreview.classList.remove('medium-editor-anchor-preview-active');
         },
 
-        showAnchorPreview: function (anchorEl) {
+        showPreview: function (anchorEl) {
             if (this.anchorPreview.classList.contains('medium-editor-anchor-preview-active')
                     || anchorEl.getAttribute('data-disable-preview')) {
                 return true;
@@ -1647,13 +1647,13 @@ var AnchorPreview;
                 this.anchorPreview.classList.add('medium-editor-anchor-preview-active');
             }
 
-            this.positionAnchorPreview(anchorEl);
-            this.observeAnchorPreview(anchorEl);
+            this.positionPreview(anchorEl);
+            this.attachPreviewHandlers(anchorEl);
 
             return this;
         },
 
-        positionAnchorPreview: function (anchorEl) {
+        positionPreview: function (anchorEl) {
             var buttonHeight = 40,
                 boundary = anchorEl.getBoundingClientRect(),
                 middleBoundary = (boundary.left + boundary.right) / 2,
@@ -1708,7 +1708,7 @@ var AnchorPreview;
                 //   if the mouse has not left the anchor tag in that time
                 this.base.delay(function () {
                     if (overAnchor) {
-                        this.showAnchorPreview(this.activeAnchor);
+                        this.showPreview(this.activeAnchor);
                     }
                 }.bind(this));
             }
@@ -1735,11 +1735,11 @@ var AnchorPreview;
                 }.bind(this));
             }
 
-            this.hideAnchorPreview();
+            this.hidePreview();
         },
 
-        // TODO: break method
-        observeAnchorPreview: function (anchorEl) {
+        // TODO: break up method and extract out handlers
+        attachPreviewHandlers: function (anchorEl) {
             var self = this,
                 lastOver = (new Date()).getTime(),
                 over = true,
@@ -1759,7 +1759,7 @@ var AnchorPreview;
                     var durr = (new Date()).getTime() - lastOver;
                     if (durr > self.base.options.anchorPreviewHideDelay) {
                         // hide the preview 1/2 second after mouse leaves the link
-                        self.hideAnchorPreview();
+                        self.hidePreview();
 
                         // cleanup
                         clearInterval(interval_timer);
@@ -2230,7 +2230,9 @@ var Toolbar;
                 this.positionToolbar(selection);
             }
 
-            this.base.anchorPreviewObj.hideAnchorPreview();
+            if (this.base.anchorPreview) {
+                this.base.anchorPreview.hidePreview();
+            }
         },
 
         positionStaticToolbar: function (container) {
@@ -2499,7 +2501,7 @@ function MediumEditor(elements, options) {
                     var isDescendantOfEditorElements = false,
                         selection = self.options.contentWindow.getSelection(),
                         toolbarEl = (self.toolbar) ? self.toolbar.getToolbarElement() : null,
-                        previewEl = (self.anchorPreviewObj) ? self.anchorPreviewObj.getAnchorPreviewElement() : null,
+                        previewEl = (self.anchorPreview) ? self.anchorPreview.getPreviewElement() : null,
                         selRange = selection.isCollapsed ?
                                    null :
                                    Selection.getSelectedParentElement(selection.getRangeAt(0)),
@@ -2859,13 +2861,12 @@ function MediumEditor(elements, options) {
         },
 
         initAnchorPreview: function () {
-            if (this.anchorPreviewObj) {
+            if (this.anchorPreview) {
                 return this;
             }
 
-            this.anchorPreviewObj = new AnchorPreview();
-            this.anchorPreviewObj.init(this);
-            this.anchorPreview = this.anchorPreviewObj.anchorPreview;
+            this.anchorPreview = new AnchorPreview();
+            this.anchorPreview.init(this);
 
             return this;
         },
@@ -3234,9 +3235,9 @@ function MediumEditor(elements, options) {
                 this.toolbar.deactivate();
                 delete this.toolbar;
             }
-            if (this.anchorPreviewObj) {
-                this.anchorPreviewObj.deactivate();
-                delete this.anchorPreviewObj;
+            if (this.anchorPreview) {
+                this.anchorPreview.deactivate();
+                delete this.anchorPreview;
             }
 
             for (i = 0; i < this.elements.length; i += 1) {

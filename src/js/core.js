@@ -181,7 +181,7 @@ function MediumEditor(elements, options) {
                     var isDescendantOfEditorElements = false,
                         selection = self.options.contentWindow.getSelection(),
                         toolbarEl = (self.toolbar) ? self.toolbar.getToolbarElement() : null,
-                        previewEl = (self.anchorPreviewObj) ? self.anchorPreviewObj.getAnchorPreviewElement() : null,
+                        previewEl = (self.anchorPreview) ? self.anchorPreview.getPreviewElement() : null,
                         selRange = selection.isCollapsed ?
                                    null :
                                    Selection.getSelectedParentElement(selection.getRangeAt(0)),
@@ -541,13 +541,12 @@ function MediumEditor(elements, options) {
         },
 
         initAnchorPreview: function () {
-            if (this.anchorPreviewObj) {
+            if (this.anchorPreview) {
                 return this;
             }
 
-            this.anchorPreviewObj = new AnchorPreview();
-            this.anchorPreviewObj.init(this);
-            this.anchorPreview = this.anchorPreviewObj.anchorPreview;
+            this.anchorPreview = new AnchorPreview();
+            this.anchorPreview.init(this);
 
             return this;
         },
@@ -916,9 +915,9 @@ function MediumEditor(elements, options) {
                 this.toolbar.deactivate();
                 delete this.toolbar;
             }
-            if (this.anchorPreviewObj) {
-                this.anchorPreviewObj.deactivate();
-                delete this.anchorPreviewObj;
+            if (this.anchorPreview) {
+                this.anchorPreview.deactivate();
+                delete this.anchorPreview;
             }
 
             for (i = 0; i < this.elements.length; i += 1) {

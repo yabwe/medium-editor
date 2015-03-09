@@ -31,8 +31,8 @@ describe('Anchor Preview TestCase', function () {
                 nextRange;
 
             // show preview
-            spyOn(MediumEditor.statics.AnchorPreview.prototype, 'showAnchorPreview').and.callThrough();
-            editor.anchorPreviewObj.handleEditableMouseover({
+            spyOn(MediumEditor.statics.AnchorPreview.prototype, 'showPreview').and.callThrough();
+            editor.anchorPreview.handleEditableMouseover({
                 target: document.getElementById('test-link')
             });
             fireEvent(editor.elements[0], 'mouseover', {
@@ -40,16 +40,16 @@ describe('Anchor Preview TestCase', function () {
             });
 
             // preview shows only after delay
-            expect(editor.anchorPreviewObj.showAnchorPreview).not.toHaveBeenCalled();
+            expect(editor.anchorPreview.showPreview).not.toHaveBeenCalled();
             jasmine.clock().tick(250);
-            expect(editor.anchorPreviewObj.showAnchorPreview).toHaveBeenCalled();
+            expect(editor.anchorPreview.showPreview).toHaveBeenCalled();
 
             // link is set in preview
-            expect(editor.anchorPreview.querySelector('i').innerHTML).toBe(document.getElementById('test-link').attributes.href.value);
+            expect(editor.anchorPreview.getPreviewElement().querySelector('i').innerHTML).toBe(document.getElementById('test-link').attributes.href.value);
 
             // load into editor
             spyOn(MediumEditor.statics.AnchorExtension.prototype, 'showForm').and.callThrough();
-            fireEvent(editor.anchorPreview, 'click');
+            fireEvent(editor.anchorPreview.getPreviewElement(), 'click');
             jasmine.clock().tick(300);
             expect(editor.getExtensionByName('anchor').showForm).toHaveBeenCalled();
 
@@ -69,7 +69,7 @@ describe('Anchor Preview TestCase', function () {
             var editor = new MediumEditor('.editor');
 
             // show preview
-            editor.anchorPreviewObj.handleEditableMouseover({
+            editor.anchorPreview.handleEditableMouseover({
                 target: document.getElementById('test-symbol-link')
             });
             fireEvent(editor.elements[0], 'mouseover', {
@@ -80,14 +80,14 @@ describe('Anchor Preview TestCase', function () {
             jasmine.clock().tick(200);
 
             // link is set in preview
-            expect(editor.anchorPreview.querySelector('i').innerHTML).toBe(document.getElementById('test-symbol-link').attributes.href.value);
+            expect(editor.anchorPreview.getPreviewElement().querySelector('i').innerHTML).toBe(document.getElementById('test-symbol-link').attributes.href.value);
         });
 
         it('Anchor form stays visible on click', function () {
             var editor = new MediumEditor('.editor');
 
             // show preview
-            editor.anchorPreviewObj.handleEditableMouseover({
+            editor.anchorPreview.handleEditableMouseover({
                 target: document.getElementById('test-link')
             });
             fireEvent(editor.elements[0], 'mouseover', {
@@ -95,7 +95,7 @@ describe('Anchor Preview TestCase', function () {
             });
 
             // load into editor
-            fireEvent(editor.anchorPreview, 'click');
+            fireEvent(editor.anchorPreview.getPreviewElement(), 'click');
             jasmine.clock().tick(200);
 
             expect(editor.toolbar.isDisplayed()).toBe(true);
@@ -108,8 +108,8 @@ describe('Anchor Preview TestCase', function () {
             });
 
             // show preview
-            spyOn(MediumEditor.statics.AnchorPreview.prototype, 'showAnchorPreview').and.callThrough();
-            editor.anchorPreviewObj.handleEditableMouseover({
+            spyOn(MediumEditor.statics.AnchorPreview.prototype, 'showPreview').and.callThrough();
+            editor.anchorPreview.handleEditableMouseover({
                 target: document.getElementById('test-empty-link')
             });
             fireEvent(editor.elements[0], 'mouseover', {
@@ -118,7 +118,7 @@ describe('Anchor Preview TestCase', function () {
 
             // preview shows only after delay
             jasmine.clock().tick(250);
-            expect(editor.anchorPreviewObj.showAnchorPreview).not.toHaveBeenCalled();
+            expect(editor.anchorPreview.showPreview).not.toHaveBeenCalled();
         });
 
     });

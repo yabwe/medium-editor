@@ -451,7 +451,9 @@ var Toolbar;
                 this.positionToolbar(selection);
             }
 
-            this.base.anchorPreviewObj.hideAnchorPreview();
+            if (this.base.anchorPreview) {
+                this.base.anchorPreview.hidePreview();
+            }
         },
 
         positionStaticToolbar: function (container) {
