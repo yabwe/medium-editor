@@ -147,10 +147,10 @@ describe('Extensions TestCase', function () {
                 }
             });
 
+            expect(editor.toolbar.getToolbarElement().querySelectorAll('button').length).toBe(1);
             expect(editor.toolbar.getToolbarElement().querySelectorAll('button[data-action="italic"]').length).toBe(1);
             expect(editor.toolbar.getToolbarElement().querySelectorAll('button[data-action="bold"]').length).toBe(0);
             expect(ext.init).toHaveBeenCalled();
-            expect(editor.commands.length).toBe(2);
         });
     });
 

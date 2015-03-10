@@ -69,6 +69,7 @@ var elements = document.querySelectorAll('.editable'),
 * __allowMultiParagraphSelection__: enables the toolbar when selecting multiple paragraphs/block elements. Default: true
 * __cleanPastedHTML__: cleans pasted content from different sources, like google docs etc. Default: false
 * __delay__: time in milliseconds to show the toolbar or anchor tag preview. Default: 0
+* __disableAnchorPreview__: enables/disables the anchor preview element, which appears when hovering links and allows the user to edit the link when clicking. If toolbar is diabled (via __disableToolbar__ or `data-disable-toolbar attribute`) the anchor preview is always disabled so this option will be ignored. Default: false
 * __disableReturn__:  enables/disables the use of the return-key. You can also set specific element behavior by using setting a data-disable-return attribute. Default: false
 * __disableDoubleReturn__:  allows/disallows two (or more) empty new lines. You can also set specific element behavior by using setting a data-disable-double-return attribute. Default: false
 * __disableEditing__: enables/disables adding the contenteditable behavior. Useful for using the toolbar with customized buttons/actions. You can also set specific element behavior by using setting a data-disable-editing attribute. Default: false
@@ -88,7 +89,7 @@ var elements = document.querySelectorAll('.editable'),
 * __buttonLabels__: type of labels on the buttons. Values: 'fontawesome', `{'bold': '<b>b</b>', 'italic': '<i>i</i>'}`. Default: false
 * __diffLeft__: value in pixels to be added to the X axis positioning of the toolbar. Default: 0
 * __diffTop__: value in pixels to be added to the Y axis positioning of the toolbar. Default: -10
-* __disableToolbar__: enables/disables the toolbar, adding only the contenteditable behavior. You can also set specific element behavior by using setting a data-disable-toolbar attribute. Default: false
+* __disableToolbar__: enables/disables the toolbar, adding only the contenteditable behavior. You can also set specific element behavior by using setting a `data-disable-toolbar` attribute. Default: false
 * __firstButtonClass__: CSS class added to the first button in the toolbar. Default: 'medium-editor-button-first'
 * __lastButtonClass__: CSS class added to the last button in the toolbar. Default: 'medium-editor-button-last'
 * __onShowToolbar__: optional callback that will be called each time the toolbar is actually shown for this instance of medium-editor.

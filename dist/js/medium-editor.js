@@ -1580,6 +1580,244 @@ var AnchorExtension;
     AnchorExtension = Util.derives(DefaultButton, AnchorDerived);
 }(window, document));
 
+var AnchorPreview;
+
+(function (window, document) {
+    'use strict';
+
+    AnchorPreview = function () {
+        this.parent = true;
+        this.name = 'anchor-preview';
+    };
+
+    AnchorPreview.prototype = {
+
+        init: function (instance) {
+            this.base = instance;
+            this.anchorPreview = this.createPreview();
+            this.base.options.elementsContainer.appendChild(this.anchorPreview);
+
+            this.attachToEditables();
+        },
+
+        getPreviewElement: function () {
+            return this.anchorPreview;
+        },
+
+        createPreview: function () {
+            var el = this.base.options.ownerDocument.createElement('div');
+
+            el.id = 'medium-editor-anchor-preview-' + this.base.id;
+            el.className = 'medium-editor-anchor-preview';
+            el.innerHTML = this.getTemplate();
+
+            this.base.on(el, 'click', this.handleClick.bind(this));
+
+            return el;
+        },
+
+        getTemplate: function () {
+            return '<div class="medium-editor-toolbar-anchor-preview" id="medium-editor-toolbar-anchor-preview">' +
+                '    <i class="medium-editor-toolbar-anchor-preview-inner"></i>' +
+                '</div>';
+        },
+
+        deactivate: function () {
+            if (this.anchorPreview) {
+                if (this.anchorPreview.parentNode) {
+                    this.anchorPreview.parentNode.removeChild(this.anchorPreview);
+                }
+                delete this.anchorPreview;
+            }
+        },
+
+        hidePreview: function () {
+            this.anchorPreview.classList.remove('medium-editor-anchor-preview-active');
+            this.activeAnchor = null;
+        },
+
+        showPreview: function (anchorEl) {
+            if (this.anchorPreview.classList.contains('medium-editor-anchor-preview-active')
+                    || anchorEl.getAttribute('data-disable-preview')) {
+                return true;
+            }
+
+            this.anchorPreview.querySelector('i').textContent = anchorEl.attributes.href.value;
+
+            this.anchorPreview.classList.add('medium-toolbar-arrow-over');
+            this.anchorPreview.classList.remove('medium-toolbar-arrow-under');
+
+            if (!this.anchorPreview.classList.contains('medium-editor-anchor-preview-active')) {
+                this.anchorPreview.classList.add('medium-editor-anchor-preview-active');
+            }
+
+            this.activeAnchor = anchorEl;
+
+            this.positionPreview();
+            this.attachPreviewHandlers();
+
+            return this;
+        },
+
+        positionPreview: function () {
+            var buttonHeight = 40,
+                boundary = this.activeAnchor.getBoundingClientRect(),
+                middleBoundary = (boundary.left + boundary.right) / 2,
+                halfOffsetWidth,
+                defaultLeft;
+
+            halfOffsetWidth = this.anchorPreview.offsetWidth / 2;
+            defaultLeft = this.base.options.diffLeft - halfOffsetWidth;
+
+            this.anchorPreview.style.top = Math.round(buttonHeight + boundary.bottom - this.base.options.diffTop + this.base.options.contentWindow.pageYOffset - this.anchorPreview.offsetHeight) + 'px';
+            if (middleBoundary < halfOffsetWidth) {
+                this.anchorPreview.style.left = defaultLeft + halfOffsetWidth + 'px';
+            } else if ((this.base.options.contentWindow.innerWidth - middleBoundary) < halfOffsetWidth) {
+                this.anchorPreview.style.left = this.base.options.contentWindow.innerWidth + defaultLeft - halfOffsetWidth + 'px';
+            } else {
+                this.anchorPreview.style.left = defaultLeft + middleBoundary + 'px';
+            }
+        },
+
+        attachToEditables: function () {
+            this.base.elements.forEach(function (element) {
+                this.base.on(element, 'mouseover', this.handleEditableMouseover.bind(this));
+            }.bind(this));
+        },
+
+        handleClick: function (event) {
+            var range,
+                sel,
+                anchorExtension = this.base.getExtensionByName('anchor'),
+                activeAnchor = this.activeAnchor;
+
+            if (anchorExtension && activeAnchor) {
+                range = this.base.options.ownerDocument.createRange();
+                range.selectNodeContents(this.activeAnchor);
+
+                sel = this.base.options.contentWindow.getSelection();
+                sel.removeAllRanges();
+                sel.addRange(range);
+                // Using setTimeout + options.delay because:
+                // We may actually be displaying the anchor form, which should be controlled by options.delay
+                this.base.delay(function () {
+                    if (activeAnchor) {
+                        anchorExtension.showForm(activeAnchor.attributes.href.value);
+                        activeAnchor = null;
+                    }
+                }.bind(this));
+            }
+
+            this.hidePreview();
+        },
+
+        handleAnchorMouseout: function (event) {
+            this.anchorToPreview = null;
+            this.base.off(this.activeAnchor, 'mouseout', this.instance_handleAnchorMouseout);
+            this.instance_handleAnchorMouseout = null;
+        },
+
+        handleEditableMouseover: function (event) {
+            /*var overAnchor = true,
+                leaveAnchor = function () {
+                    // mark the anchor as no longer hovered, and stop listening
+                    overAnchor = false;
+                    this.base.off(this.activeAnchor, 'mouseout', leaveAnchor);
+                }.bind(this);*/
+
+            if (event.target && event.target.tagName.toLowerCase() === 'a') {
+
+                // Detect empty href attributes
+                // The browser will make href="" or href="#top"
+                // into absolute urls when accessed as event.targed.href, so check the html
+                if (!/href=["']\S+["']/.test(event.target.outerHTML) || /href=["']#\S+["']/.test(event.target.outerHTML)) {
+                    return true;
+                }
+
+                // only show when hovering on anchors
+                if (this.base.toolbar && this.base.toolbar.isDisplayed()) {
+                    // only show when toolbar is not present
+                    return true;
+                }
+
+                // detach handler for other anchor in case we hovered multiple anchors quickly
+                if (this.activeAnchor && this.activeAnchor !== event.target) {
+                    this.detachPreviewHandlers();
+                }
+
+                this.anchorToPreview = event.target;
+
+                this.instance_handleAnchorMouseout = this.handleAnchorMouseout.bind(this);
+                this.base.on(this.anchorToPreview, 'mouseout', this.instance_handleAnchorMouseout);
+                // Using setTimeout + options.delay because:
+                // - We're going to show the anchor preview according to the configured delay
+                //   if the mouse has not left the anchor tag in that time
+                this.base.delay(function () {
+                    if (this.anchorToPreview) {
+                        //this.activeAnchor = this.anchorToPreview;
+                        this.showPreview(this.anchorToPreview);
+                    }
+                }.bind(this));
+            }
+        },
+
+        handlePreviewMouseover: function (event) {
+            this.lastOver = (new Date()).getTime();
+            this.hovering = true;
+        },
+
+        handlePreviewMouseout: function (event) {
+            if (!event.relatedTarget || !/anchor-preview/.test(event.relatedTarget.className)) {
+                this.hovering = false;
+            }
+        },
+
+        updatePreview: function () {
+            if (this.hovering) {
+                return true;
+            }
+            var durr = (new Date()).getTime() - this.lastOver;
+            if (durr > this.base.options.anchorPreviewHideDelay) {
+                // hide the preview 1/2 second after mouse leaves the link
+                this.detachPreviewHandlers();
+            }
+        },
+
+        detachPreviewHandlers: function () {
+            // cleanup
+            clearInterval(this.interval_timer);
+            if (this.instance_handlePreviewMouseover) {
+                this.base.off(this.anchorPreview, 'mouseover', this.instance_handlePreviewMouseover);
+                this.base.off(this.anchorPreview, 'mouseout', this.instance_handlePreviewMouseout);
+                if (this.activeAnchor) {
+                    this.base.off(this.activeAnchor, 'mouseover', this.instance_handlePreviewMouseover);
+                    this.base.off(this.activeAnchor, 'mouseout', this.instance_handlePreviewMouseout);
+                }
+            }
+
+            this.hidePreview();
+
+            this.hovering = this.instance_handlePreviewMouseover = this.instance_handlePreviewMouseout = null;
+        },
+
+        // TODO: break up method and extract out handlers
+        attachPreviewHandlers: function () {
+            this.lastOver = (new Date()).getTime();
+            this.hovering = true;
+
+            this.instance_handlePreviewMouseover = this.handlePreviewMouseover.bind(this);
+            this.instance_handlePreviewMouseout = this.handlePreviewMouseout.bind(this);
+
+            this.interval_timer = setInterval(this.updatePreview.bind(this), 200);
+
+            this.base.on(this.anchorPreview, 'mouseover', this.instance_handlePreviewMouseover);
+            this.base.on(this.anchorPreview, 'mouseout', this.instance_handlePreviewMouseout);
+            this.base.on(this.activeAnchor, 'mouseover', this.instance_handlePreviewMouseover);
+            this.base.on(this.activeAnchor, 'mouseout', this.instance_handlePreviewMouseout);
+        }
+    };
+}(window, document));
+
 var Toolbar;
 
 (function (window, document) {
@@ -2010,7 +2248,8 @@ var Toolbar;
 
         setToolbarPosition: function () {
             var container = Selection.getSelectionElement(this.options.contentWindow),
-                selection = this.options.contentWindow.getSelection();
+                selection = this.options.contentWindow.getSelection(),
+                anchorPreview;
 
             // If there isn't a valid selection, bail
             if (!container || !this.options.contentWindow.getSelection().focusNode) {
@@ -2031,7 +2270,11 @@ var Toolbar;
                 this.positionToolbar(selection);
             }
 
-            this.base.hideAnchorPreview();
+            anchorPreview = this.base.getExtensionByName('anchor-preview');
+
+            if (anchorPreview && typeof anchorPreview.hidePreview === 'function') {
+                anchorPreview.hidePreview();
+            }
         },
 
         positionStaticToolbar: function (container) {
@@ -2134,7 +2377,8 @@ function MediumEditor(elements, options) {
         ButtonsData: ButtonsData,
         DefaultButton: DefaultButton,
         AnchorExtension: AnchorExtension,
-        Toolbar: Toolbar
+        Toolbar: Toolbar,
+        AnchorPreview: AnchorPreview
     };
 
     MediumEditor.prototype = {
@@ -2153,6 +2397,7 @@ function MediumEditor(elements, options) {
             disableReturn: false,
             disableDoubleReturn: false,
             disableToolbar: false,
+            disableAnchorPreview: false,
             disableEditing: false,
             disablePlaceholders: false,
             toolbarAlign: 'center',
@@ -2271,8 +2516,7 @@ function MediumEditor(elements, options) {
             }
             // Init toolbar
             if (addToolbar) {
-                this.initToolbar()
-                    .bindAnchorPreview();
+                this.initToolbar();
             }
             return this;
         },
@@ -2299,6 +2543,8 @@ function MediumEditor(elements, options) {
                     var isDescendantOfEditorElements = false,
                         selection = self.options.contentWindow.getSelection(),
                         toolbarEl = (self.toolbar) ? self.toolbar.getToolbarElement() : null,
+                        anchorPreview = self.getExtensionByName('anchor-preview'),
+                        previewEl = (anchorPreview && anchorPreview.getPreviewElement) ? anchorPreview.getPreviewElement() : null,
                         selRange = selection.isCollapsed ?
                                    null :
                                    Selection.getSelectedParentElement(selection.getRangeAt(0)),
@@ -2318,8 +2564,7 @@ function MediumEditor(elements, options) {
                     // If it's not part of the editor, toolbar, or anchor preview
                     if (!isDescendantOfEditorElements
                             && (!toolbarEl || (toolbarEl !== e.target && !Util.isDescendant(toolbarEl, e.target)))
-                            && self.anchorPreview !== e.target
-                            && !Util.isDescendant(self.anchorPreview, e.target)) {
+                            && (!previewEl || (previewEl !== e.target && !Util.isDescendant(previewEl, e.target)))) {
 
                         // Activate the placeholder
                         if (!self.options.disablePlaceholders) {
@@ -2417,6 +2662,32 @@ function MediumEditor(elements, options) {
             return extension;
         },
 
+        shouldAddDefaultAnchorPreview: function () {
+            var i,
+                shouldAdd = false;
+
+            // If anchor-preview is disabled, don't add
+            if (this.options.disableAnchorPreview) {
+                return false;
+            }
+            // If anchor-preview extension has been overriden, don't add
+            if (this.options.extensions['anchor-preview']) {
+                return false;
+            }
+            // If toolbar is disabled, don't add
+            if (this.options.disableToolbar) {
+                return false;
+            }
+            // If all elements have 'data-disable-toolbar' attribute, don't add
+            for (i = 0; i < this.elements.length; i += 1) {
+                if (!this.elements[i].getAttribute('data-disable-toolbar')) {
+                    shouldAdd = true;
+                }
+            }
+
+            return shouldAdd;
+        },
+
         initCommands: function () {
             var buttons = this.options.buttons,
                 extensions = this.options.extensions,
@@ -2441,6 +2712,11 @@ function MediumEditor(elements, options) {
                 if (extensions.hasOwnProperty(name) && buttons.indexOf(name) === -1) {
                     ext = this.initExtension(extensions[name], name);
                 }
+            }
+
+            // Add AnchorPreview as extension if needed
+            if (this.shouldAddDefaultAnchorPreview()) {
+                this.commands.push(this.initExtension(new AnchorPreview(), 'anchor-preview'));
             }
 
             return this;
@@ -2583,7 +2859,7 @@ function MediumEditor(elements, options) {
                 } else if (e.ctrlKey || e.metaKey) {
                     key = String.fromCharCode(e.which || e.keyCode).toLowerCase();
                     self.commands.forEach(function (extension) {
-                        if (extension.options.key && extension.options.key === key) {
+                        if (extension.options && extension.options.key && extension.options.key === key) {
                             extension.handleClick(e);
                         }
                     });
@@ -2654,7 +2930,6 @@ function MediumEditor(elements, options) {
             }
             this.toolbar = new Toolbar(this);
             this.options.elementsContainer.appendChild(this.toolbar.getToolbarElement());
-            this.anchorPreview = this.createAnchorPreview();
 
             return this;
         },
@@ -2959,180 +3234,6 @@ function MediumEditor(elements, options) {
             sel.addRange(range);
         },
 
-        hideAnchorPreview: function () {
-            this.anchorPreview.classList.remove('medium-editor-anchor-preview-active');
-        },
-
-        // TODO: break method
-        showAnchorPreview: function (anchorEl) {
-            if (this.anchorPreview.classList.contains('medium-editor-anchor-preview-active')
-                    || anchorEl.getAttribute('data-disable-preview')) {
-                return true;
-            }
-
-            var self = this,
-                buttonHeight = 40,
-                boundary = anchorEl.getBoundingClientRect(),
-                middleBoundary = (boundary.left + boundary.right) / 2,
-                halfOffsetWidth,
-                defaultLeft;
-
-            self.anchorPreview.querySelector('i').textContent = anchorEl.attributes.href.value;
-            halfOffsetWidth = self.anchorPreview.offsetWidth / 2;
-            defaultLeft = self.options.diffLeft - halfOffsetWidth;
-
-            self.observeAnchorPreview(anchorEl);
-
-            self.anchorPreview.classList.add('medium-toolbar-arrow-over');
-            self.anchorPreview.classList.remove('medium-toolbar-arrow-under');
-            self.anchorPreview.style.top = Math.round(buttonHeight + boundary.bottom - self.options.diffTop + this.options.contentWindow.pageYOffset - self.anchorPreview.offsetHeight) + 'px';
-            if (middleBoundary < halfOffsetWidth) {
-                self.anchorPreview.style.left = defaultLeft + halfOffsetWidth + 'px';
-            } else if ((this.options.contentWindow.innerWidth - middleBoundary) < halfOffsetWidth) {
-                self.anchorPreview.style.left = this.options.contentWindow.innerWidth + defaultLeft - halfOffsetWidth + 'px';
-            } else {
-                self.anchorPreview.style.left = defaultLeft + middleBoundary + 'px';
-            }
-
-            if (this.anchorPreview && !this.anchorPreview.classList.contains('medium-editor-anchor-preview-active')) {
-                this.anchorPreview.classList.add('medium-editor-anchor-preview-active');
-            }
-
-            return this;
-        },
-
-        // TODO: break method
-        observeAnchorPreview: function (anchorEl) {
-            var self = this,
-                lastOver = (new Date()).getTime(),
-                over = true,
-                stamp = function () {
-                    lastOver = (new Date()).getTime();
-                    over = true;
-                },
-                unstamp = function (e) {
-                    if (!e.relatedTarget || !/anchor-preview/.test(e.relatedTarget.className)) {
-                        over = false;
-                    }
-                },
-                interval_timer = setInterval(function () {
-                    if (over) {
-                        return true;
-                    }
-                    var durr = (new Date()).getTime() - lastOver;
-                    if (durr > self.options.anchorPreviewHideDelay) {
-                        // hide the preview 1/2 second after mouse leaves the link
-                        self.hideAnchorPreview();
-
-                        // cleanup
-                        clearInterval(interval_timer);
-                        self.off(self.anchorPreview, 'mouseover', stamp);
-                        self.off(self.anchorPreview, 'mouseout', unstamp);
-                        self.off(anchorEl, 'mouseover', stamp);
-                        self.off(anchorEl, 'mouseout', unstamp);
-
-                    }
-                }, 200);
-
-            this.on(self.anchorPreview, 'mouseover', stamp);
-            this.on(self.anchorPreview, 'mouseout', unstamp);
-            this.on(anchorEl, 'mouseover', stamp);
-            this.on(anchorEl, 'mouseout', unstamp);
-        },
-
-        createAnchorPreview: function () {
-            var self = this,
-                anchorPreview = this.options.ownerDocument.createElement('div');
-
-            anchorPreview.id = 'medium-editor-anchor-preview-' + this.id;
-            anchorPreview.className = 'medium-editor-anchor-preview';
-            anchorPreview.innerHTML = this.anchorPreviewTemplate();
-            this.options.elementsContainer.appendChild(anchorPreview);
-
-            this.on(anchorPreview, 'click', function () {
-                self.anchorPreviewClickHandler();
-            });
-
-            return anchorPreview;
-        },
-
-        anchorPreviewTemplate: function () {
-            return '<div class="medium-editor-toolbar-anchor-preview" id="medium-editor-toolbar-anchor-preview">' +
-                '    <i class="medium-editor-toolbar-anchor-preview-inner"></i>' +
-                '</div>';
-        },
-
-        anchorPreviewClickHandler: function (event) {
-            var range,
-                sel,
-                anchorExtension = this.getExtensionByName('anchor');
-
-            if (anchorExtension && this.activeAnchor) {
-                range = this.options.ownerDocument.createRange();
-                range.selectNodeContents(this.activeAnchor);
-
-                sel = this.options.contentWindow.getSelection();
-                sel.removeAllRanges();
-                sel.addRange(range);
-                // Using setTimeout + options.delay because:
-                // We may actually be displaying the anchor form, which should be controlled by options.delay
-                this.delay(function () {
-                    if (this.activeAnchor) {
-                        anchorExtension.showForm(this.activeAnchor.attributes.href.value);
-                    }
-                }.bind(this));
-            }
-
-            this.hideAnchorPreview();
-        },
-
-        editorAnchorObserver: function (e) {
-            var self = this,
-                overAnchor = true,
-                leaveAnchor = function () {
-                    // mark the anchor as no longer hovered, and stop listening
-                    overAnchor = false;
-                    self.off(self.activeAnchor, 'mouseout', leaveAnchor);
-                };
-
-            if (e.target && e.target.tagName.toLowerCase() === 'a') {
-
-                // Detect empty href attributes
-                // The browser will make href="" or href="#top"
-                // into absolute urls when accessed as e.targed.href, so check the html
-                if (!/href=["']\S+["']/.test(e.target.outerHTML) || /href=["']#\S+["']/.test(e.target.outerHTML)) {
-                    return true;
-                }
-
-                // only show when hovering on anchors
-                if (this.toolbar && this.toolbar.isDisplayed()) {
-                    // only show when toolbar is not present
-                    return true;
-                }
-                this.activeAnchor = e.target;
-                this.on(this.activeAnchor, 'mouseout', leaveAnchor);
-                // Using setTimeout + options.delay because:
-                // - We're going to show the anchor preview according to the configured delay
-                //   if the mouse has not left the anchor tag in that time
-                this.delay(function () {
-                    if (overAnchor) {
-                        self.showAnchorPreview(e.target);
-                    }
-                });
-            }
-        },
-
-        bindAnchorPreview: function (index) {
-            var i, self = this;
-            this.editorAnchorObserverWrapper = function (e) {
-                self.editorAnchorObserver(e);
-            };
-            for (i = 0; i < this.elements.length; i += 1) {
-                this.on(this.elements[i], 'mouseover', this.editorAnchorObserverWrapper);
-            }
-            return this;
-        },
-
         createLink: function (opts) {
             var customEvent,
                 i;
@@ -3196,9 +3297,6 @@ function MediumEditor(elements, options) {
             if (this.toolbar !== undefined) {
                 this.toolbar.deactivate();
                 delete this.toolbar;
-
-                this.options.elementsContainer.removeChild(this.anchorPreview);
-                delete this.anchorPreview;
             }
 
             for (i = 0; i < this.elements.length; i += 1) {

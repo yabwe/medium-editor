@@ -49,10 +49,8 @@ describe('Activate/Deactivate TestCase', function () {
         it('should remove mediumEditor elements from DOM', function () {
             var editor = new MediumEditor('.editor');
             expect(document.querySelector('.medium-editor-toolbar')).toBeTruthy();
-            expect(document.querySelector('.medium-editor-anchor-preview')).toBeTruthy();
             editor.deactivate();
             expect(document.querySelector('.medium-editor-toolbar')).toBeFalsy();
-            expect(document.querySelector('.medium-editor-anchor-preview')).toBeFalsy();
         });
 
         it('should remove all the added events', function () {
