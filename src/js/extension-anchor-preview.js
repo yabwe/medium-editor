@@ -53,6 +53,7 @@ var AnchorPreview;
 
         hidePreview: function () {
             this.anchorPreview.classList.remove('medium-editor-anchor-preview-active');
+            this.activeAnchor = null;
         },
 
         showPreview: function (anchorEl) {
@@ -70,15 +71,17 @@ var AnchorPreview;
                 this.anchorPreview.classList.add('medium-editor-anchor-preview-active');
             }
 
-            this.positionPreview(anchorEl);
-            this.attachPreviewHandlers(anchorEl);
+            this.activeAnchor = anchorEl;
+
+            this.positionPreview();
+            this.attachPreviewHandlers();
 
             return this;
         },
 
-        positionPreview: function (anchorEl) {
+        positionPreview: function () {
             var buttonHeight = 40,
-                boundary = anchorEl.getBoundingClientRect(),
+                boundary = this.activeAnchor.getBoundingClientRect(),
                 middleBoundary = (boundary.left + boundary.right) / 2,
                 halfOffsetWidth,
                 defaultLeft;
@@ -102,13 +105,45 @@ var AnchorPreview;
             }.bind(this));
         },
 
+        handleClick: function (event) {
+            var range,
+                sel,
+                anchorExtension = this.base.getExtensionByName('anchor'),
+                activeAnchor = this.activeAnchor;
+
+            if (anchorExtension && activeAnchor) {
+                range = this.base.options.ownerDocument.createRange();
+                range.selectNodeContents(this.activeAnchor);
+
+                sel = this.base.options.contentWindow.getSelection();
+                sel.removeAllRanges();
+                sel.addRange(range);
+                // Using setTimeout + options.delay because:
+                // We may actually be displaying the anchor form, which should be controlled by options.delay
+                this.base.delay(function () {
+                    if (activeAnchor) {
+                        anchorExtension.showForm(activeAnchor.attributes.href.value);
+                        activeAnchor = null;
+                    }
+                }.bind(this));
+            }
+
+            this.hidePreview();
+        },
+
+        handleAnchorMouseout: function (event) {
+            this.anchorToPreview = null;
+            this.base.off(this.activeAnchor, 'mouseout', this.instance_handleAnchorMouseout);
+            this.instance_handleAnchorMouseout = null;
+        },
+
         handleEditableMouseover: function (event) {
-            var overAnchor = true,
+            /*var overAnchor = true,
                 leaveAnchor = function () {
                     // mark the anchor as no longer hovered, and stop listening
                     overAnchor = false;
                     this.base.off(this.activeAnchor, 'mouseout', leaveAnchor);
-                }.bind(this);
+                }.bind(this);*/
 
             if (event.target && event.target.tagName.toLowerCase() === 'a') {
 
@@ -124,80 +159,81 @@ var AnchorPreview;
                     // only show when toolbar is not present
                     return true;
                 }
-                this.activeAnchor = event.target;
-                this.base.on(this.activeAnchor, 'mouseout', leaveAnchor);
+
+                // detach handler for other anchor in case we hovered multiple anchors quickly
+                if (this.activeAnchor && this.activeAnchor !== event.target) {
+                    this.detachPreviewHandlers();
+                }
+
+                this.anchorToPreview = event.target;
+
+                this.instance_handleAnchorMouseout = this.handleAnchorMouseout.bind(this);
+                this.base.on(this.anchorToPreview, 'mouseout', this.instance_handleAnchorMouseout);
                 // Using setTimeout + options.delay because:
                 // - We're going to show the anchor preview according to the configured delay
                 //   if the mouse has not left the anchor tag in that time
                 this.base.delay(function () {
-                    if (overAnchor) {
-                        this.showPreview(this.activeAnchor);
+                    if (this.anchorToPreview) {
+                        //this.activeAnchor = this.anchorToPreview;
+                        this.showPreview(this.anchorToPreview);
                     }
                 }.bind(this));
             }
         },
 
-        handleClick: function (event) {
-            var range,
-                sel,
-                anchorExtension = this.base.getExtensionByName('anchor');
+        handlePreviewMouseover: function (event) {
+            this.lastOver = (new Date()).getTime();
+            this.hovering = true;
+        },
 
-            if (anchorExtension && this.activeAnchor) {
-                range = this.base.options.ownerDocument.createRange();
-                range.selectNodeContents(this.activeAnchor);
+        handlePreviewMouseout: function (event) {
+            if (!event.relatedTarget || !/anchor-preview/.test(event.relatedTarget.className)) {
+                this.hovering = false;
+            }
+        },
 
-                sel = this.base.options.contentWindow.getSelection();
-                sel.removeAllRanges();
-                sel.addRange(range);
-                // Using setTimeout + options.delay because:
-                // We may actually be displaying the anchor form, which should be controlled by options.delay
-                this.base.delay(function () {
-                    if (this.activeAnchor) {
-                        anchorExtension.showForm(this.activeAnchor.attributes.href.value);
-                    }
-                }.bind(this));
+        updatePreview: function () {
+            if (this.hovering) {
+                return true;
+            }
+            var durr = (new Date()).getTime() - this.lastOver;
+            if (durr > this.base.options.anchorPreviewHideDelay) {
+                // hide the preview 1/2 second after mouse leaves the link
+                this.detachPreviewHandlers();
+            }
+        },
+
+        detachPreviewHandlers: function () {
+            // cleanup
+            clearInterval(this.interval_timer);
+            if (this.instance_handlePreviewMouseover) {
+                this.base.off(this.anchorPreview, 'mouseover', this.instance_handlePreviewMouseover);
+                this.base.off(this.anchorPreview, 'mouseout', this.instance_handlePreviewMouseout);
+                if (this.activeAnchor) {
+                    this.base.off(this.activeAnchor, 'mouseover', this.instance_handlePreviewMouseover);
+                    this.base.off(this.activeAnchor, 'mouseout', this.instance_handlePreviewMouseout);
+                }
             }
 
             this.hidePreview();
+
+            this.hovering = this.instance_handlePreviewMouseover = this.instance_handlePreviewMouseout = null;
         },
 
         // TODO: break up method and extract out handlers
-        attachPreviewHandlers: function (anchorEl) {
-            var self = this,
-                lastOver = (new Date()).getTime(),
-                over = true,
-                stamp = function () {
-                    lastOver = (new Date()).getTime();
-                    over = true;
-                },
-                unstamp = function (e) {
-                    if (!e.relatedTarget || !/anchor-preview/.test(e.relatedTarget.className)) {
-                        over = false;
-                    }
-                },
-                interval_timer = setInterval(function () {
-                    if (over) {
-                        return true;
-                    }
-                    var durr = (new Date()).getTime() - lastOver;
-                    if (durr > self.base.options.anchorPreviewHideDelay) {
-                        // hide the preview 1/2 second after mouse leaves the link
-                        self.hidePreview();
+        attachPreviewHandlers: function () {
+            this.lastOver = (new Date()).getTime();
+            this.hovering = true;
 
-                        // cleanup
-                        clearInterval(interval_timer);
-                        self.base.off(self.anchorPreview, 'mouseover', stamp);
-                        self.base.off(self.anchorPreview, 'mouseout', unstamp);
-                        self.base.off(anchorEl, 'mouseover', stamp);
-                        self.base.off(anchorEl, 'mouseout', unstamp);
+            this.instance_handlePreviewMouseover = this.handlePreviewMouseover.bind(this);
+            this.instance_handlePreviewMouseout = this.handlePreviewMouseout.bind(this);
 
-                    }
-                }, 200);
+            this.interval_timer = setInterval(this.updatePreview.bind(this), 200);
 
-            this.base.on(self.anchorPreview, 'mouseover', stamp);
-            this.base.on(self.anchorPreview, 'mouseout', unstamp);
-            this.base.on(anchorEl, 'mouseover', stamp);
-            this.base.on(anchorEl, 'mouseout', unstamp);
+            this.base.on(this.anchorPreview, 'mouseover', this.instance_handlePreviewMouseover);
+            this.base.on(this.anchorPreview, 'mouseout', this.instance_handlePreviewMouseout);
+            this.base.on(this.activeAnchor, 'mouseover', this.instance_handlePreviewMouseover);
+            this.base.on(this.activeAnchor, 'mouseout', this.instance_handlePreviewMouseout);
         }
     };
 }(window, document));

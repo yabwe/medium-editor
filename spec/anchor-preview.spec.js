@@ -33,12 +33,7 @@ describe('Anchor Preview TestCase', function () {
 
             // show preview
             spyOn(MediumEditor.statics.AnchorPreview.prototype, 'showPreview').and.callThrough();
-            anchorPreview.handleEditableMouseover({
-                target: document.getElementById('test-link')
-            });
-            fireEvent(editor.elements[0], 'mouseover', {
-                target: document.getElementById('test-link')
-            });
+            fireEvent(document.getElementById('test-link'), 'mouseover');
 
             // preview shows only after delay
             expect(anchorPreview.showPreview).not.toHaveBeenCalled();
@@ -71,12 +66,7 @@ describe('Anchor Preview TestCase', function () {
                 anchorPreview = editor.getExtensionByName('anchor-preview');
 
             // show preview
-            anchorPreview.handleEditableMouseover({
-                target: document.getElementById('test-symbol-link')
-            });
-            fireEvent(editor.elements[0], 'mouseover', {
-                target: document.getElementById('test-symbol-link')
-            });
+            fireEvent(document.getElementById('test-symbol-link'), 'mouseover');
 
             // preview shows only after delay
             jasmine.clock().tick(200);
@@ -85,19 +75,37 @@ describe('Anchor Preview TestCase', function () {
             expect(anchorPreview.getPreviewElement().querySelector('i').innerHTML).toBe(document.getElementById('test-symbol-link').attributes.href.value);
         });
 
+        it('should display different urls when hovering over different links consecutively', function () {
+            var editor = new MediumEditor('.editor', {
+                delay: 300
+            }),
+                anchorPreview = editor.getExtensionByName('anchor-preview');
+
+            // show preview for first link
+            fireEvent(document.getElementById('test-link'), 'mouseover');
+
+            // preview shows only after delay
+            jasmine.clock().tick(300);
+            expect(anchorPreview.getPreviewElement().querySelector('i').innerHTML).toBe(document.getElementById('test-link').attributes.href.value);
+
+            // show preview for second link
+            fireEvent(document.getElementById('test-symbol-link'), 'mouseover');
+            expect(anchorPreview.getPreviewElement().classList.contains('medium-editor-anchor-preview-active')).toBe(false);
+
+            // wait for delay
+            jasmine.clock().tick(300);
+            expect(anchorPreview.getPreviewElement().querySelector('i').innerHTML).toBe(document.getElementById('test-symbol-link').attributes.href.value);
+        });
+
         it('should display the anchor form in the toolbar when clicked', function () {
             var editor = new MediumEditor('.editor'),
                 anchorPreview = editor.getExtensionByName('anchor-preview');
 
             // show preview
-            anchorPreview.handleEditableMouseover({
-                target: document.getElementById('test-link')
-            });
-            fireEvent(editor.elements[0], 'mouseover', {
-                target: document.getElementById('test-link')
-            });
+            fireEvent(document.getElementById('test-link'), 'mouseover');
 
             // load into editor
+            jasmine.clock().tick(1);
             fireEvent(anchorPreview.getPreviewElement(), 'click');
             jasmine.clock().tick(200);
 
@@ -113,12 +121,7 @@ describe('Anchor Preview TestCase', function () {
 
             // show preview
             spyOn(MediumEditor.statics.AnchorPreview.prototype, 'showPreview').and.callThrough();
-            anchorPreview.handleEditableMouseover({
-                target: document.getElementById('test-empty-link')
-            });
-            fireEvent(editor.elements[0], 'mouseover', {
-                target: document.getElementById('test-empty-link')
-            });
+            fireEvent(document.getElementById('test-empty-link'), 'mouseover');
 
             // preview shows only after delay
             jasmine.clock().tick(250);
@@ -154,9 +157,7 @@ describe('Anchor Preview TestCase', function () {
             expect(document.querySelector('.medium-editor-anchor-preview-active')).toBeNull();
 
             // show preview
-            anchorPreview.handleEditableMouseover({
-                target: document.getElementById('test-link')
-            });
+            fireEvent(document.getElementById('test-link'), 'mouseover');
 
             jasmine.clock().tick(1);
             expect(document.querySelector('.medium-editor-anchor-preview-active')).not.toBeNull();
