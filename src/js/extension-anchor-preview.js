@@ -66,7 +66,7 @@ var AnchorPreview;
             this.anchorPreview.classList.add('medium-toolbar-arrow-over');
             this.anchorPreview.classList.remove('medium-toolbar-arrow-under');
 
-            if (this.anchorPreview && !this.anchorPreview.classList.contains('medium-editor-anchor-preview-active')) {
+            if (!this.anchorPreview.classList.contains('medium-editor-anchor-preview-active')) {
                 this.anchorPreview.classList.add('medium-editor-anchor-preview-active');
             }
 

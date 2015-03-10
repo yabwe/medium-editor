@@ -22,8 +22,8 @@ describe('Anchor Preview TestCase', function () {
         jasmine.clock().uninstall();
     });
 
-    describe('Link Creation', function () {
-        it('Hover anchor should show preview', function () {
+    describe('anchor preview element', function () {
+        it('should be displayed on hover of a link element', function () {
             var editor = new MediumEditor('.editor', {
                 delay: 200
             }),
@@ -66,7 +66,7 @@ describe('Anchor Preview TestCase', function () {
 
         });
 
-        it('Should show the unencoded link within the preview', function () {
+        it('should show the unencoded link', function () {
             var editor = new MediumEditor('.editor'),
                 anchorPreview = editor.getExtensionByName('anchor-preview');
 
@@ -85,7 +85,7 @@ describe('Anchor Preview TestCase', function () {
             expect(anchorPreview.getPreviewElement().querySelector('i').innerHTML).toBe(document.getElementById('test-symbol-link').attributes.href.value);
         });
 
-        it('Anchor form stays visible on click', function () {
+        it('should display the anchor form in the toolbar when clicked', function () {
             var editor = new MediumEditor('.editor'),
                 anchorPreview = editor.getExtensionByName('anchor-preview');
 
@@ -105,7 +105,7 @@ describe('Anchor Preview TestCase', function () {
             expect(editor.getExtensionByName('anchor').isDisplayed()).toBe(true);
         });
 
-        it('Hover empty anchor should NOT show preview', function () {
+        it('should NOT be displayed when the hovered link is empty', function () {
             var editor = new MediumEditor('.editor', {
                 delay: 200
             }),
@@ -125,6 +125,48 @@ describe('Anchor Preview TestCase', function () {
             expect(anchorPreview.showPreview).not.toHaveBeenCalled();
         });
 
+        it('should not be present when disableAnchorPreview option is passed', function () {
+            var editor = new MediumEditor('.editor', {
+                disableAnchorPreview: true
+            }),
+                anchorPreview = editor.getExtensionByName('anchor-preview');
+
+            expect(anchorPreview).toBeUndefined();
+            expect(document.querySelector('.medium-editor-anchor-preview')).toBeNull();
+        });
+
+        it('should not be present when disableToolbar option is passed', function () {
+            var editor = new MediumEditor('.editor', {
+                disableToolbar: true
+            }),
+                anchorPreview = editor.getExtensionByName('anchor-preview');
+
+            expect(anchorPreview).toBeUndefined();
+            expect(document.querySelector('.medium-editor-anchor-preview')).toBeNull();
+        });
+
+        it('should be removed from the document when editor deactivates', function () {
+            var editor = new MediumEditor('.editor'),
+                anchorPreview = editor.getExtensionByName('anchor-preview');
+
+            spyOn(MediumEditor.statics.AnchorPreview.prototype, 'deactivate').and.callThrough();
+            expect(document.querySelector('.medium-editor-anchor-preview')).not.toBeNull();
+            expect(document.querySelector('.medium-editor-anchor-preview-active')).toBeNull();
+
+            // show preview
+            anchorPreview.handleEditableMouseover({
+                target: document.getElementById('test-link')
+            });
+
+            jasmine.clock().tick(1);
+            expect(document.querySelector('.medium-editor-anchor-preview-active')).not.toBeNull();
+
+            // deactivate
+            editor.deactivate();
+            expect(anchorPreview.deactivate).toHaveBeenCalled();
+            expect(document.querySelector('.medium-editor-anchor-preview-active')).toBeNull();
+            expect(document.querySelector('.medium-editor-anchor-preview')).toBeNull();
+        });
     });
 
 });

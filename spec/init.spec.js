@@ -103,6 +103,7 @@ describe('Initialization TestCase', function () {
                 disableDoubleReturn: false,
                 disableEditing: false,
                 disableToolbar: false,
+                disableAnchorPreview: false,
                 disablePlaceholders: false,
                 toolbarAlign: 'center',
                 elementsContainer: document.body,

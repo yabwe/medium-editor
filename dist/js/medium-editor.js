@@ -1646,7 +1646,7 @@ var AnchorPreview;
             this.anchorPreview.classList.add('medium-toolbar-arrow-over');
             this.anchorPreview.classList.remove('medium-toolbar-arrow-under');
 
-            if (this.anchorPreview && !this.anchorPreview.classList.contains('medium-editor-anchor-preview-active')) {
+            if (!this.anchorPreview.classList.contains('medium-editor-anchor-preview-active')) {
                 this.anchorPreview.classList.add('medium-editor-anchor-preview-active');
             }
 
@@ -2361,6 +2361,7 @@ function MediumEditor(elements, options) {
             disableReturn: false,
             disableDoubleReturn: false,
             disableToolbar: false,
+            disableAnchorPreview: false,
             disableEditing: false,
             disablePlaceholders: false,
             toolbarAlign: 'center',
@@ -2629,6 +2630,10 @@ function MediumEditor(elements, options) {
             var i,
                 shouldAdd = false;
 
+            // If anchor-preview is disabled, don't add
+            if (this.options.disableAnchorPreview) {
+                return false;
+            }
             // If anchor-preview extension has been overriden, don't add
             if (this.options.extensions['anchor-preview']) {
                 return false;
