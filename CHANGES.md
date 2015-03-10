@@ -1,3 +1,9 @@
+3.0.9 / 2015-03-10
+==================
+* Extract toolbar
+* Extract anchor preview
+
+
 3.0.8 / 2015-02-27
 ==================
 * MIT License
