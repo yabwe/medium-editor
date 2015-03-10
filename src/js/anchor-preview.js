@@ -5,7 +5,10 @@ var AnchorPreview;
 (function (window, document) {
     'use strict';
 
-    AnchorPreview = function () {};
+    AnchorPreview = function () {
+        this.parent = true;
+        this.name = 'anchor-preview';
+    };
 
     AnchorPreview.prototype = {
 

@@ -430,7 +430,8 @@ var Toolbar;
 
         setToolbarPosition: function () {
             var container = Selection.getSelectionElement(this.options.contentWindow),
-                selection = this.options.contentWindow.getSelection();
+                selection = this.options.contentWindow.getSelection(),
+                anchorPreview;
 
             // If there isn't a valid selection, bail
             if (!container || !this.options.contentWindow.getSelection().focusNode) {
@@ -451,8 +452,10 @@ var Toolbar;
                 this.positionToolbar(selection);
             }
 
-            if (this.base.anchorPreview) {
-                this.base.anchorPreview.hidePreview();
+            anchorPreview = this.base.getExtensionByName('anchor-preview');
+
+            if (anchorPreview && typeof anchorPreview.hidePreview === 'function') {
+                anchorPreview.hidePreview();
             }
         },
 

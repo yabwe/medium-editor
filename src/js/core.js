@@ -153,8 +153,7 @@ function MediumEditor(elements, options) {
             }
             // Init toolbar
             if (addToolbar) {
-                this.initToolbar()
-                    .initAnchorPreview();
+                this.initToolbar();
             }
             return this;
         },
@@ -181,7 +180,8 @@ function MediumEditor(elements, options) {
                     var isDescendantOfEditorElements = false,
                         selection = self.options.contentWindow.getSelection(),
                         toolbarEl = (self.toolbar) ? self.toolbar.getToolbarElement() : null,
-                        previewEl = (self.anchorPreview) ? self.anchorPreview.getPreviewElement() : null,
+                        anchorPreview = self.getExtensionByName('anchor-preview'),
+                        previewEl = (anchorPreview && anchorPreview.getPreviewElement) ? anchorPreview.getPreviewElement() : null,
                         selRange = selection.isCollapsed ?
                                    null :
                                    Selection.getSelectedParentElement(selection.getRangeAt(0)),
@@ -299,6 +299,28 @@ function MediumEditor(elements, options) {
             return extension;
         },
 
+        shouldAddDefaultAnchorPreview: function () {
+            var i,
+                shouldAdd = false;
+
+            // If anchor-preview extension has been overriden, don't add
+            if (this.options.extensions['anchor-preview']) {
+                return false;
+            }
+            // If toolbar is disabled, don't add
+            if (this.options.disableToolbar) {
+                return false;
+            }
+            // If all elements have 'data-disable-toolbar' attribute, don't add
+            for (i = 0; i < this.elements.length; i += 1) {
+                if (!this.elements[i].getAttribute('data-disable-toolbar')) {
+                    shouldAdd = true;
+                }
+            }
+
+            return shouldAdd;
+        },
+
         initCommands: function () {
             var buttons = this.options.buttons,
                 extensions = this.options.extensions,
@@ -323,6 +345,11 @@ function MediumEditor(elements, options) {
                 if (extensions.hasOwnProperty(name) && buttons.indexOf(name) === -1) {
                     ext = this.initExtension(extensions[name], name);
                 }
+            }
+
+            // Add AnchorPreview as extension if needed
+            if (this.shouldAddDefaultAnchorPreview()) {
+                this.commands.push(this.initExtension(new AnchorPreview(), 'anchor-preview'));
             }
 
             return this;
@@ -465,7 +492,7 @@ function MediumEditor(elements, options) {
                 } else if (e.ctrlKey || e.metaKey) {
                     key = String.fromCharCode(e.which || e.keyCode).toLowerCase();
                     self.commands.forEach(function (extension) {
-                        if (extension.options.key && extension.options.key === key) {
+                        if (extension.options && extension.options.key && extension.options.key === key) {
                             extension.handleClick(e);
                         }
                     });
@@ -536,17 +563,6 @@ function MediumEditor(elements, options) {
             }
             this.toolbar = new Toolbar(this);
             this.options.elementsContainer.appendChild(this.toolbar.getToolbarElement());
-
-            return this;
-        },
-
-        initAnchorPreview: function () {
-            if (this.anchorPreview) {
-                return this;
-            }
-
-            this.anchorPreview = new AnchorPreview();
-            this.anchorPreview.init(this);
 
             return this;
         },
@@ -914,10 +930,6 @@ function MediumEditor(elements, options) {
             if (this.toolbar !== undefined) {
                 this.toolbar.deactivate();
                 delete this.toolbar;
-            }
-            if (this.anchorPreview) {
-                this.anchorPreview.deactivate();
-                delete this.anchorPreview;
             }
 
             for (i = 0; i < this.elements.length; i += 1) {
