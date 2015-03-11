@@ -2003,6 +2003,7 @@ var Toolbar;
             });
 
             this.attachEventHandlers();
+            this.base.subscribe('blur', this.handleBlur.bind(this));
 
             return toolbar;
         },
@@ -2669,11 +2670,6 @@ function MediumEditor(elements, options) {
             // Activate the placeholder
             if (!this.options.disablePlaceholders) {
                 this.placeholderWrapper(event, this.elements[0]);
-            }
-
-            // Let the toolbar know that we've detected a blur
-            if (this.toolbar) {
-                this.toolbar.handleBlur(event);
             }
         },
 

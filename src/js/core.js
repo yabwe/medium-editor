@@ -160,11 +160,6 @@ function MediumEditor(elements, options) {
             if (!this.options.disablePlaceholders) {
                 this.placeholderWrapper(event, this.elements[0]);
             }
-
-            // Let the toolbar know that we've detected a blur
-            if (this.toolbar) {
-                this.toolbar.handleBlur(event);
-            }
         },
 
         handleClick: function (event) {

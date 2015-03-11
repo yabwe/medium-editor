@@ -37,6 +37,7 @@ var Toolbar;
             });
 
             this.attachEventHandlers();
+            this.base.subscribe('blur', this.handleBlur.bind(this));
 
             return toolbar;
         },
