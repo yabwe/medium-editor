@@ -163,15 +163,9 @@ function MediumEditor(elements, options) {
             }
         },
 
-        bindClick: function (i) {
-            if (!this.options.disablePlaceholders) {
-                this.on(this.elements[i], 'click', function () {
-                    // Remove placeholder
-                    this.classList.remove('medium-editor-placeholder');
-                });
-            }
-
-            return this;
+        handleClick: function (event) {
+            // Remove placeholder
+            event.currentTarget.classList.remove('medium-editor-placeholder');
         },
 
         /**
@@ -180,6 +174,10 @@ function MediumEditor(elements, options) {
          */
         bindElementActions: function () {
             var i;
+
+            if (!this.options.disablePlaceholders) {
+                this.events.bind('click', this.handleClick);
+            }
 
             for (i = 0; i < this.elements.length; i += 1) {
 
@@ -190,8 +188,7 @@ function MediumEditor(elements, options) {
 
                 // Bind the return and tab keypress events
                 this.bindReturn(i)
-                    .bindKeydown(i)
-                    .bindClick(i);
+                    .bindKeydown(i);
             }
 
             return this;
@@ -836,8 +833,6 @@ function MediumEditor(elements, options) {
                 }
             }
         },
-
-
 
         activate: function () {
             if (this.isActive) {

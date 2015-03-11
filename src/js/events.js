@@ -11,8 +11,7 @@ var Events;
         this.options = this.base.options;
         this.events = [];
         this.bindings = {};
-
-        this.setupListeners();
+        this.listeners = {};
     };
 
     Events.prototype = {
@@ -54,10 +53,14 @@ var Events;
 
         // Bindings (custom events)
         bind: function (event, handler) {
-            if (!this.bindings[event]) {
-                this.bindings[event] = [];
+            this.setupListener(event);
+            // If we don't suppot this binding, don't do anything
+            if (this.listeners[event]) {
+                if (!this.bindings[event]) {
+                    this.bindings[event] = [];
+                }
+                this.bindings[event].push(handler);
             }
-            this.bindings[event].push(handler);
         },
 
         triggerBinding: function (name, data) {
@@ -70,10 +73,26 @@ var Events;
 
         // Listening to browser events to emit events medium-editor cares about
 
-        setupListeners: function () {
-            // Detecting when focus is lost
-            this.attach(this.options.ownerDocument.body, 'click', this.checkForBlur.bind(this), true);
-            this.attach(this.options.ownerDocument.body, 'focus', this.checkForBlur.bind(this), true);
+        setupListener: function (name) {
+            if (this.listeners[name]) {
+                return;
+            }
+
+            switch (name) {
+            case 'blur':
+                // Detecting when focus is lost
+                this.attach(this.options.ownerDocument.body, 'click', this.checkForBlur.bind(this), true);
+                this.attach(this.options.ownerDocument.body, 'focus', this.checkForBlur.bind(this), true);
+                this.listeners.blur = true;
+                break;
+            case 'click':
+                // Detecting click in the contenteditables
+                this.base.elements.forEach(function (element) {
+                    this.attach(element, 'click', this.handleClick.bind(this));
+                }.bind(this));
+                this.listeners.click = true;
+                break;
+            }
         },
 
         checkForBlur: function (event) {
@@ -104,6 +123,10 @@ var Events;
                     && (!previewEl || (previewEl !== event.target && !Util.isDescendant(previewEl, event.target)))) {
                 this.triggerBinding('blur', event);
             }
+        },
+
+        handleClick: function (event) {
+            this.triggerBinding('click', event);
         }
     };
 

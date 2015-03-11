@@ -51,6 +51,11 @@ describe('Placeholder TestCase', function () {
         expect(editor.elements[0].className).toContain('medium-editor-placeholder');
         fireEvent(editor.elements[0], 'click');
         expect(editor.elements[0].className).not.toContain('medium-editor-placeholder');
+        fireEvent(editor.elements[0], 'blur');
+        expect(editor.elements[0].className).toContain('medium-editor-placeholder');
+        this.el.innerHTML = '<p>lorem</p><p id="target">ipsum</p><p>dolor</p>';
+        fireEvent(document.getElementById('target'), 'click');
+        expect(editor.elements[0].className).not.toContain('medium-editor-placeholder');
     });
 
     it('should add a placeholder to empty elements on blur', function () {
