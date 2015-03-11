@@ -824,7 +824,7 @@ function MediumEditor(elements, options) {
                 }
 
                 if (opts.buttonClass) {
-                    this.setButtonClass(opts.buttonClass);
+                    Util.addClassToAnchors(Selection.getSelectionStart(this.options.ownerDocument), opts.buttonClass);
                 }
             }
 
@@ -837,24 +837,7 @@ function MediumEditor(elements, options) {
             }
         },
 
-        setButtonClass: function (buttonClass) {
-            var el = Selection.getSelectionStart(this.options.ownerDocument),
-                classes = buttonClass.split(' '),
-                i,
-                j;
-            if (el.tagName.toLowerCase() === 'a') {
-                for (j = 0; j < classes.length; j += 1) {
-                    el.classList.add(classes[j]);
-                }
-            } else {
-                el = el.getElementsByTagName('a');
-                for (i = 0; i < el.length; i += 1) {
-                    for (j = 0; j < classes.length; j += 1) {
-                        el[i].classList.add(classes[j]);
-                    }
-                }
-            }
-        },
+
 
         activate: function () {
             if (this.isActive) {
