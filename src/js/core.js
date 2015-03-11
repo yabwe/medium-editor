@@ -90,15 +90,19 @@ function MediumEditor(elements, options) {
                 .setPlaceholders()
                 .bindElementActions();
 
-            this.events.bind('blur', this.handleBlur.bind(this));
+            this.subscribe('blur', this.handleBlur.bind(this));
         },
 
         on: function (target, event, listener, useCapture) {
-            this.events.attach(target, event, listener, useCapture);
+            this.events.attachDOMEvent(target, event, listener, useCapture);
         },
 
         off: function (target, event, listener, useCapture) {
-            this.events.detach(target, event, listener, useCapture);
+            this.events.detachDOMEvent(target, event, listener, useCapture);
+        },
+
+        subscribe: function (event, listener) {
+            this.events.attachCustomEvent(event, listener);
         },
 
         delay: function (fn) {
@@ -176,7 +180,7 @@ function MediumEditor(elements, options) {
             var i;
 
             if (!this.options.disablePlaceholders) {
-                this.events.bind('click', this.handleClick);
+                this.subscribe('click', this.handleClick);
             }
 
             for (i = 0; i < this.elements.length; i += 1) {
@@ -866,7 +870,7 @@ function MediumEditor(elements, options) {
                 }
             }.bind(this));
 
-            this.events.detachAll();
+            this.events.detachAllDOMEvents();
         },
 
         bindPaste: function () {

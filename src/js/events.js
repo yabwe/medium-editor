@@ -10,7 +10,7 @@ var Events;
         this.base = instance;
         this.options = this.base.options;
         this.events = [];
-        this.bindings = {};
+        this.customEvents = {};
         this.listeners = {};
     };
 
@@ -18,12 +18,12 @@ var Events;
 
         // Helpers for event handling
 
-        attach: function (target, event, listener, useCapture) {
+        attachDOMEvent: function (target, event, listener, useCapture) {
             target.addEventListener(event, listener, useCapture);
             this.events.push([target, event, listener, useCapture]);
         },
 
-        detach: function (target, event, listener, useCapture) {
+        detachDOMEvent: function (target, event, listener, useCapture) {
             var index = this.indexOfListener(target, event, listener, useCapture),
                 e;
             if (index !== -1) {
@@ -43,7 +43,7 @@ var Events;
             return -1;
         },
 
-        detachAll: function () {
+        detachAllDOMEvents: function () {
             var e = this.events.pop();
             while (e) {
                 e[0].removeEventListener(e[1], e[2], e[3]);
@@ -51,22 +51,22 @@ var Events;
             }
         },
 
-        // Bindings (custom events)
-        bind: function (event, handler) {
+        // custom events
+        attachCustomEvent: function (event, handler) {
             this.setupListener(event);
-            // If we don't suppot this binding, don't do anything
+            // If we don't suppot this custom event, don't do anything
             if (this.listeners[event]) {
-                if (!this.bindings[event]) {
-                    this.bindings[event] = [];
+                if (!this.customEvents[event]) {
+                    this.customEvents[event] = [];
                 }
-                this.bindings[event].push(handler);
+                this.customEvents[event].push(handler);
             }
         },
 
-        triggerBinding: function (name, data) {
-            if (this.bindings[name]) {
-                this.bindings[name].forEach(function (binding) {
-                    binding(data);
+        triggerCustomEvent: function (name, data) {
+            if (this.customEvents[name]) {
+                this.customEvents[name].forEach(function (handler) {
+                    handler(data);
                 });
             }
         },
@@ -81,14 +81,14 @@ var Events;
             switch (name) {
             case 'blur':
                 // Detecting when focus is lost
-                this.attach(this.options.ownerDocument.body, 'click', this.checkForBlur.bind(this), true);
-                this.attach(this.options.ownerDocument.body, 'focus', this.checkForBlur.bind(this), true);
+                this.attachDOMEvent(this.options.ownerDocument.body, 'click', this.checkForBlur.bind(this), true);
+                this.attachDOMEvent(this.options.ownerDocument.body, 'focus', this.checkForBlur.bind(this), true);
                 this.listeners.blur = true;
                 break;
             case 'click':
                 // Detecting click in the contenteditables
                 this.base.elements.forEach(function (element) {
-                    this.attach(element, 'click', this.handleClick.bind(this));
+                    this.attachDOMEvent(element, 'click', this.handleClick.bind(this));
                 }.bind(this));
                 this.listeners.click = true;
                 break;
@@ -121,12 +121,12 @@ var Events;
             if (!isDescendantOfEditorElements
                     && (!toolbarEl || (toolbarEl !== event.target && !Util.isDescendant(toolbarEl, event.target)))
                     && (!previewEl || (previewEl !== event.target && !Util.isDescendant(previewEl, event.target)))) {
-                this.triggerBinding('blur', event);
+                this.triggerCustomEvent('blur', event);
             }
         },
 
         handleClick: function (event) {
-            this.triggerBinding('click', event);
+            this.triggerCustomEvent('click', event);
         }
     };
 
