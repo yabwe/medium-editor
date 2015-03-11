@@ -81,15 +81,16 @@ function MediumEditor(elements, options) {
         },
 
         setup: function () {
-            this.events = new Events(this.options);
+            this.events = new Events(this);
             this.isActive = true;
             this.initCommands()
                 .initElements()
                 .bindDragDrop()
                 .bindPaste()
                 .setPlaceholders()
-                .bindElementActions()
-                .bindBlur();
+                .bindElementActions();
+
+            this.events.bind('blur', this.handleBlur.bind(this));
         },
 
         on: function (target, event, listener, useCapture) {
@@ -150,52 +151,16 @@ function MediumEditor(elements, options) {
             this.elements = Array.prototype.slice.apply(selector);
         },
 
-        bindBlur: function () {
-            var self = this,
-                blurFunction = function (e) {
-                    var isDescendantOfEditorElements = false,
-                        selection = self.options.contentWindow.getSelection(),
-                        toolbarEl = (self.toolbar) ? self.toolbar.getToolbarElement() : null,
-                        anchorPreview = self.getExtensionByName('anchor-preview'),
-                        previewEl = (anchorPreview && anchorPreview.getPreviewElement) ? anchorPreview.getPreviewElement() : null,
-                        selRange = selection.isCollapsed ?
-                                   null :
-                                   Selection.getSelectedParentElement(selection.getRangeAt(0)),
-                        i;
+        handleBlur: function (event) {
+            // Activate the placeholder
+            if (!this.options.disablePlaceholders) {
+                this.placeholderWrapper(event, this.elements[0]);
+            }
 
-                    // This control was introduced also to avoid the toolbar
-                    // to disapper when selecting from right to left and
-                    // the selection ends at the beginning of the text.
-                    for (i = 0; i < self.elements.length; i += 1) {
-                        if (self.elements[i] === e.target
-                                || Util.isDescendant(self.elements[i], e.target)
-                                || Util.isDescendant(self.elements[i], selRange)) {
-                            isDescendantOfEditorElements = true;
-                            break;
-                        }
-                    }
-                    // If it's not part of the editor, toolbar, or anchor preview
-                    if (!isDescendantOfEditorElements
-                            && (!toolbarEl || (toolbarEl !== e.target && !Util.isDescendant(toolbarEl, e.target)))
-                            && (!previewEl || (previewEl !== e.target && !Util.isDescendant(previewEl, e.target)))) {
-
-                        // Activate the placeholder
-                        if (!self.options.disablePlaceholders) {
-                            self.placeholderWrapper(e, self.elements[0]);
-                        }
-
-                        // Let the toolbar know that we've detected a blur
-                        if (self.toolbar) {
-                            self.toolbar.handleBlur(e);
-                        }
-                    }
-                };
-
-            // Hide the toolbar when focusing outside of the editor.
-            this.on(this.options.ownerDocument.body, 'click', blurFunction, true);
-            this.on(this.options.ownerDocument.body, 'focus', blurFunction, true);
-
-            return this;
+            // Let the toolbar know that we've detected a blur
+            if (this.toolbar) {
+                this.toolbar.handleBlur(event);
+            }
         },
 
         bindClick: function (i) {
