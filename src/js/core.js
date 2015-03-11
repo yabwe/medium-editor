@@ -337,17 +337,6 @@ function MediumEditor(elements, options) {
 
         bindParagraphCreation: function (index) {
             var self = this;
-            this.on(this.elements[index], 'keypress', function (e) {
-                var node,
-                    tagName;
-                if (e.which === Util.keyCode.SPACE) {
-                    node = Selection.getSelectionStart(self.options.ownerDocument);
-                    tagName = node.tagName.toLowerCase();
-                    if (tagName === 'a') {
-                        self.options.ownerDocument.execCommand('unlink', false, null);
-                    }
-                }
-            });
 
             this.on(this.elements[index], 'keyup', function (e) {
                 var node = Selection.getSelectionStart(self.options.ownerDocument),

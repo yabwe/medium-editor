@@ -96,17 +96,6 @@ describe('Content TestCase', function () {
     });
 
     describe('should unlink anchors', function () {
-        it('when the user presses space inside an anchor', function () {
-            this.el.innerHTML = '<a href="#">test</a>';
-            var editor = new MediumEditor('.editor');
-            spyOn(document, 'execCommand').and.callThrough();
-            selectElementContents(editor.elements[0].querySelector('a'));
-            fireEvent(editor.elements[0], 'keypress', {
-                keyCode: 32
-            });
-            expect(document.execCommand).toHaveBeenCalledWith('unlink', false, null);
-        });
-
         it('when the user presses enter inside an anchor', function () {
             this.el.innerHTML = '<a href="#">test</a>';
             var editor = new MediumEditor('.editor'),
