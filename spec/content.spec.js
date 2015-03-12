@@ -63,7 +63,7 @@ describe('Content TestCase', function () {
                 disableReturn: true
             });
             selectElementContents(editor.elements[0]);
-            fireEvent(editor.elements[0], 'keypress', {
+            fireEvent(editor.elements[0], 'keydown', {
                 keyCode: 13
             });
             expect(this.el.innerHTML).toBe('lorem ipsum');
@@ -75,7 +75,7 @@ describe('Content TestCase', function () {
                 disableDoubleReturn: true
             });
             selectElementContents(editor.elements[0]);
-            fireEvent(editor.elements[0], 'keypress', {
+            fireEvent(editor.elements[0], 'keydown', {
                 keyCode: 13
             });
             expect(this.el.innerHTML).toBe('<br> ');

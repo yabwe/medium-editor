@@ -19,6 +19,19 @@ function MediumEditor(elements, options) {
         AnchorPreview: AnchorPreview
     };
 
+    // Event handlers that shouldn't be exposed externally
+
+    function handleDisabledEnterKeydown(event, element) {
+        if (this.options.disableReturn || element.getAttribute('data-disable-return')) {
+            event.preventDefault();
+        } else if (this.options.disableDoubleReturn || this.getAttribute('data-disable-double-return')) {
+            var node = Selection.getSelectionStart(this.options.contentWindow);
+            if (node && node.textContent.trim() === '') {
+                event.preventDefault();
+            }
+        }
+    }
+
     MediumEditor.prototype = {
         defaults: {
             allowMultiParagraphSelection: true,
@@ -85,6 +98,7 @@ function MediumEditor(elements, options) {
             this.isActive = true;
             this.initCommands()
                 .initElements()
+                .attachHandlers()
                 .bindDragDrop()
                 .bindPaste()
                 .bindElementActions();
@@ -140,6 +154,24 @@ function MediumEditor(elements, options) {
             return this;
         },
 
+        attachHandlers: function () {
+            var i;
+
+            // disabling return or double return
+            if (this.options.disableReturn || this.options.disableDoubleReturn) {
+                this.subscribe('editableKeydownEnter', handleDisabledEnterKeydown.bind(this));
+            } else {
+                for (i = 0; i < this.elements.length; i += 1) {
+                    if (this.elements[i].getAttribute('data-disable-return') || this.elements[i].getAttribute('data-disable-double-return')) {
+                        this.subscribe('editableKeydownEnter', handleDisabledEnterKeydown.bind(this));
+                        break;
+                    }
+                }
+            }
+
+            return this;
+        },
+
         setElementSelection: function (selector) {
             if (!selector) {
                 selector = [];
@@ -165,8 +197,7 @@ function MediumEditor(elements, options) {
 
             for (i = 0; i < this.elements.length; i += 1) {
                 // Bind the return and tab keypress events
-                this.bindReturn(i)
-                    .bindKeydown(i);
+                this.bindKeydown(i);
             }
 
             return this;
@@ -326,23 +357,6 @@ function MediumEditor(elements, options) {
                             if (!/h\d/.test(tagName)) {
                                 self.options.ownerDocument.execCommand('formatBlock', false, 'p');
                             }
-                        }
-                    }
-                }
-            });
-            return this;
-        },
-
-        bindReturn: function (index) {
-            var self = this;
-            this.on(this.elements[index], 'keypress', function (e) {
-                if (e.which === Util.keyCode.ENTER) {
-                    if (self.options.disableReturn || this.getAttribute('data-disable-return')) {
-                        e.preventDefault();
-                    } else if (self.options.disableDoubleReturn || this.getAttribute('data-disable-double-return')) {
-                        var node = Selection.getSelectionStart(self.options.contentWindow);
-                        if (node && node.textContent.trim() === '') {
-                            e.preventDefault();
                         }
                     }
                 }

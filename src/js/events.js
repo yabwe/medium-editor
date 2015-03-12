@@ -106,6 +106,18 @@ var Events;
                 }.bind(this));
                 this.listeners[name] = true;
                 break;
+            case 'editableKeydown':
+                // Detecting keydown on the contenteditables
+                this.base.elements.forEach(function (element) {
+                    this.attachDOMEvent(element, 'keydown', this.handleKeydown.bind(this));
+                }.bind(this));
+                this.listeners[name] = true;
+                break;
+            case 'editableKeydownEnter':
+                // Detecting keydown for ENTER on the contentediables
+                this.setupListener('editableKeydown');
+                this.listeners[name] = true;
+                break;
             case 'editableMouseover':
                 // Detecting mouseover on the contenteditables
                 this.base.elements.forEach(function (element) {
@@ -160,6 +172,14 @@ var Events;
 
         handleMouseover: function (event) {
             this.triggerCustomEvent('editableMouseover', event, event.currentTarget);
+        },
+
+        handleKeydown: function (event) {
+            this.triggerCustomEvent('editableKeydown', event, event.currentTarget);
+
+            if (event.which === Util.keyCode.ENTER) {
+                this.triggerCustomEvent('editableKeydownEnter', event, event.currentTarget);
+            }
         }
     };
 
