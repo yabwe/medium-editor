@@ -1139,7 +1139,7 @@ var pasteHandler;
              // replace manually a tags with real ones, converting smart-quotes from google docs
             [new RegExp(/&lt;a\s+href=(&quot;|&rdquo;|&ldquo;|“|”)([^&]+)(&quot;|&rdquo;|&ldquo;|“|”)&gt;/gi), '<a href="$2">'],
 
-            // New between paragraphs in html have no syntactic value,
+            // Newlines between paragraphs in html have no syntactic value,
             // but then have a tendency to accidentally become additional paragraphs down the line
             [new RegExp(/<\/p>\n+/gi), '</p>'],
             [new RegExp(/\n+<p/gi), '<p'],
