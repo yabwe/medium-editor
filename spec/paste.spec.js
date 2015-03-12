@@ -31,6 +31,16 @@ describe('Pasting content', function () {
                 source: 'Non <p> or <div> with only <br> elements',
                 paste: '<p>One</p><div><h1><br /></h1></div><p>Two</p><span><span><br /></span></span><p>Three</p>',
                 output: '<p>One</p><p>Two</p><p>Three</p>'
+            },
+            {
+                source: 'Microsoft Word - line breaks',
+                paste: "<p>One\nTwo\n</p>\n\n<p>Three Four</p>",
+                output: '<p>One Two </p><p>Three Four</p>'
+            },
+            {
+                source: 'Microsoft Word - Proprietary elements',
+                paste: "<p>One<o:p></o:p></p><p>Two<o:p></o:p></p>",
+                output: '<p>One</p><p>Two</p>'
             }
         ],
         inlineTests = [
