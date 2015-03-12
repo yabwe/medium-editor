@@ -1210,6 +1210,9 @@ var DefaultButton,
 
             this.button = this.createButton();
             this.base.on(this.button, 'click', this.handleClick.bind(this));
+            if (this.options.key) {
+                this.base.subscribe('editableKeydown', this.handleKeydown.bind(this));
+            }
         },
         getButton: function () {
             return this.button;
@@ -1239,6 +1242,22 @@ var DefaultButton,
             }
             button.innerHTML = content;
             return button;
+        },
+        handleKeydown: function (evt) {
+            var key, action;
+
+            if (evt.ctrlKey || evt.metaKey) {
+                key = String.fromCharCode(evt.which || evt.keyCode).toLowerCase();
+                if (this.options.key === key) {
+                    evt.preventDefault();
+                    evt.stopPropagation();
+
+                    action = this.getAction();
+                    if (action) {
+                        this.base.execAction(action);
+                    }
+                }
+            }
         },
         handleClick: function (evt) {
             evt.preventDefault();
@@ -2996,7 +3015,7 @@ function MediumEditor(elements, options) {
         bindKeydown: function (index) {
             var self = this;
             this.on(this.elements[index], 'keydown', function (e) {
-                var node, tag, key;
+                var node, tag;
 
                 if (e.which === Util.keyCode.TAB) {
                     // Override tab only for pre nodes
@@ -3024,13 +3043,6 @@ function MediumEditor(elements, options) {
                     // Bind keys which can create or destroy a block element: backspace, delete, return
                     self.onBlockModifier(e);
 
-                } else if (e.ctrlKey || e.metaKey) {
-                    key = String.fromCharCode(e.which || e.keyCode).toLowerCase();
-                    self.commands.forEach(function (extension) {
-                        if (extension.options && extension.options.key && extension.options.key === key) {
-                            extension.handleClick(e);
-                        }
-                    });
                 }
             });
             return this;

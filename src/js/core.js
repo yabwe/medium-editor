@@ -367,7 +367,7 @@ function MediumEditor(elements, options) {
         bindKeydown: function (index) {
             var self = this;
             this.on(this.elements[index], 'keydown', function (e) {
-                var node, tag, key;
+                var node, tag;
 
                 if (e.which === Util.keyCode.TAB) {
                     // Override tab only for pre nodes
@@ -395,13 +395,6 @@ function MediumEditor(elements, options) {
                     // Bind keys which can create or destroy a block element: backspace, delete, return
                     self.onBlockModifier(e);
 
-                } else if (e.ctrlKey || e.metaKey) {
-                    key = String.fromCharCode(e.which || e.keyCode).toLowerCase();
-                    self.commands.forEach(function (extension) {
-                        if (extension.options && extension.options.key && extension.options.key === key) {
-                            extension.handleClick(e);
-                        }
-                    });
                 }
             });
             return this;
