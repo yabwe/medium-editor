@@ -1,7 +1,7 @@
 /*global module, console, define, FileReader,
  Util, ButtonsData, DefaultButton,
  pasteHandler, Selection, AnchorExtension,
- Toolbar, AnchorPreview, Events */
+ Toolbar, AnchorPreview, Events, Placeholders */
 
 function MediumEditor(elements, options) {
     'use strict';
@@ -90,7 +90,9 @@ function MediumEditor(elements, options) {
                 .setPlaceholders()
                 .bindElementActions();
 
-            this.subscribe('blur', this.handleBlur.bind(this));
+            if (!this.options.disablePlaceholders) {
+                this.placeholders = new Placeholders(this);
+            }
         },
 
         on: function (target, event, listener, useCapture) {
@@ -155,28 +157,12 @@ function MediumEditor(elements, options) {
             this.elements = Array.prototype.slice.apply(selector);
         },
 
-        handleBlur: function (event) {
-            // Activate the placeholder
-            if (!this.options.disablePlaceholders) {
-                this.placeholderWrapper(event, this.elements[0]);
-            }
-        },
-
-        handleClick: function (event) {
-            // Remove placeholder
-            event.currentTarget.classList.remove('medium-editor-placeholder');
-        },
-
         /**
          * This handles blur and keypress events on elements
          * Including Placeholders, and tooldbar hiding on blur
          */
         bindElementActions: function () {
             var i;
-
-            if (!this.options.disablePlaceholders) {
-                this.subscribe('click', this.handleClick);
-            }
 
             for (i = 0; i < this.elements.length; i += 1) {
 
@@ -198,7 +184,6 @@ function MediumEditor(elements, options) {
             if (!(el.querySelector('img')) &&
                     !(el.querySelector('blockquote')) &&
                     el.textContent.replace(/^\s+|\s+$/g, '') === '') {
-
                 el.classList.add('medium-editor-placeholder');
             }
         },

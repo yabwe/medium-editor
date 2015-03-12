@@ -21,6 +21,7 @@ module.exports = function (grunt) {
             'src/js/extension-anchor.js',
             'src/js/extension-anchor-preview.js',
             'src/js/toolbar.js',
+            'src/js/placeholders.js',
             'src/js/core.js'
         ],
         browsers = [ {
