@@ -855,10 +855,10 @@ var Events;
             }
         },
 
-        triggerCustomEvent: function (name, data) {
+        triggerCustomEvent: function (name, data, editable) {
             if (this.customEvents[name]) {
                 this.customEvents[name].forEach(function (handler) {
-                    handler(data);
+                    handler(data, editable);
                 });
             }
         },
@@ -883,6 +883,20 @@ var Events;
                     this.attachDOMEvent(element, 'click', this.handleClick.bind(this));
                 }.bind(this));
                 this.listeners.click = true;
+                break;
+            case 'blur':
+                // Detecting blur in the contenteditables
+                this.base.elements.forEach(function (element) {
+                    this.attachDOMEvent(element, 'blur', this.handleBlur.bind(this));
+                }.bind(this));
+                this.listeners.blur = true;
+                break;
+            case 'keypress':
+                // Detecting keypress in the contenteditables
+                this.base.elements.forEach(function (element) {
+                    this.attachDOMEvent(element, 'keypress', this.handleKeypress.bind(this));
+                }.bind(this));
+                this.listeners.keypress = true;
                 break;
             }
         },
@@ -918,7 +932,15 @@ var Events;
         },
 
         handleClick: function (event) {
-            this.triggerCustomEvent('click', event);
+            this.triggerCustomEvent('click', event, event.currentTarget);
+        },
+
+        handleBlur: function (event) {
+            this.triggerCustomEvent('blur', event, event.currentTarget);
+        },
+
+        handleKeypress: function (event) {
+            this.triggerCustomEvent('keypress', event, event.currentTarget);
         }
     };
 
@@ -2522,50 +2544,68 @@ var Placeholders;
     Placeholders = function (instance) {
         this.base = instance;
 
+        this.initPlaceholders();
         this.attachEventHandlers();
-        this.setPlaceholders();
     };
 
     Placeholders.prototype = {
 
-        setPlaceholders: function () {
+        initPlaceholders: function () {
             this.base.elements.forEach(function (el) {
-                this.activatePlaceholder(el);
-                this.base.on(el, 'blur', this.placeholderWrapper.bind(this));
-                this.base.on(el, 'keypress', this.placeholderWrapper.bind(this));
+                this.updatePlaceholder(el);
             }.bind(this));
         },
 
-        // Two functions to handle placeholders
-        activatePlaceholder:  function (el) {
-            if (!(el.querySelector('img')) &&
-                    !(el.querySelector('blockquote')) &&
-                    el.textContent.replace(/^\s+|\s+$/g, '') === '') {
+        showPlaceholder: function (el) {
+            if (el) {
                 el.classList.add('medium-editor-placeholder');
             }
         },
 
-        placeholderWrapper: function (evt, el) {
-            el = el || evt.target;
-            el.classList.remove('medium-editor-placeholder');
-            if (evt.type !== 'keypress') {
-                this.activatePlaceholder(el);
+        hidePlaceholder: function (el) {
+            if (el) {
+                el.classList.remove('medium-editor-placeholder');
+            }
+        },
+
+        updatePlaceholder: function (el) {
+            if (!(el.querySelector('img')) &&
+                    !(el.querySelector('blockquote')) &&
+                    el.textContent.replace(/^\s+|\s+$/g, '') === '') {
+                this.showPlaceholder(el);
+            } else {
+                this.hidePlaceholder(el);
             }
         },
 
         attachEventHandlers: function () {
-            this.base.subscribe('externalInteraction', this.handleBlur.bind(this));
+            // Custom events
+            this.base.subscribe('externalInteraction', this.handleExternalInteraction.bind(this));
+
+            // Events for all editable elements in this instance
             this.base.subscribe('click', this.handleClick.bind(this));
+            this.base.subscribe('blur', this.handleBlur.bind(this));
+            this.base.subscribe('keypress', this.handleKeypress.bind(this));
         },
 
-        handleBlur: function (event) {
-            // Activate the placeholder
-            this.placeholderWrapper(event, this.base.elements[0]);
+        handleKeypress: function (event, element) {
+            // Always hide placeholder on keypress
+            this.hidePlaceholder(element);
         },
 
-        handleClick: function (event) {
+        handleBlur: function (event, element) {
+            // Update placeholder for element that lost focus
+            this.updatePlaceholder(element);
+        },
+
+        handleExternalInteraction: function (event) {
+            // Update all placeholders
+            this.initPlaceholders();
+        },
+
+        handleClick: function (event, element) {
             // Remove placeholder
-            event.currentTarget.classList.remove('medium-editor-placeholder');
+            this.hidePlaceholder(element);
         }
     };
 

@@ -63,10 +63,10 @@ var Events;
             }
         },
 
-        triggerCustomEvent: function (name, data) {
+        triggerCustomEvent: function (name, data, editable) {
             if (this.customEvents[name]) {
                 this.customEvents[name].forEach(function (handler) {
-                    handler(data);
+                    handler(data, editable);
                 });
             }
         },
@@ -91,6 +91,20 @@ var Events;
                     this.attachDOMEvent(element, 'click', this.handleClick.bind(this));
                 }.bind(this));
                 this.listeners.click = true;
+                break;
+            case 'blur':
+                // Detecting blur in the contenteditables
+                this.base.elements.forEach(function (element) {
+                    this.attachDOMEvent(element, 'blur', this.handleBlur.bind(this));
+                }.bind(this));
+                this.listeners.blur = true;
+                break;
+            case 'keypress':
+                // Detecting keypress in the contenteditables
+                this.base.elements.forEach(function (element) {
+                    this.attachDOMEvent(element, 'keypress', this.handleKeypress.bind(this));
+                }.bind(this));
+                this.listeners.keypress = true;
                 break;
             }
         },
@@ -126,7 +140,15 @@ var Events;
         },
 
         handleClick: function (event) {
-            this.triggerCustomEvent('click', event);
+            this.triggerCustomEvent('click', event, event.currentTarget);
+        },
+
+        handleBlur: function (event) {
+            this.triggerCustomEvent('blur', event, event.currentTarget);
+        },
+
+        handleKeypress: function (event) {
+            this.triggerCustomEvent('keypress', event, event.currentTarget);
         }
     };
 
