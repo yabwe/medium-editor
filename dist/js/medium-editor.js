@@ -871,11 +871,11 @@ var Events;
             }
 
             switch (name) {
-            case 'blur':
+            case 'externalInteraction':
                 // Detecting when focus is lost
-                this.attachDOMEvent(this.options.ownerDocument.body, 'click', this.checkForBlur.bind(this), true);
-                this.attachDOMEvent(this.options.ownerDocument.body, 'focus', this.checkForBlur.bind(this), true);
-                this.listeners.blur = true;
+                this.attachDOMEvent(this.options.ownerDocument.body, 'click', this.handleInteraction.bind(this), true);
+                this.attachDOMEvent(this.options.ownerDocument.body, 'focus', this.handleInteraction.bind(this), true);
+                this.listeners.externalInteraction = true;
                 break;
             case 'click':
                 // Detecting click in the contenteditables
@@ -887,7 +887,7 @@ var Events;
             }
         },
 
-        checkForBlur: function (event) {
+        handleInteraction: function (event) {
             var isDescendantOfEditorElements = false,
                 selection = this.options.contentWindow.getSelection(),
                 toolbarEl = (this.base.toolbar) ? this.base.toolbar.getToolbarElement() : null,
@@ -913,7 +913,7 @@ var Events;
             if (!isDescendantOfEditorElements
                     && (!toolbarEl || (toolbarEl !== event.target && !Util.isDescendant(toolbarEl, event.target)))
                     && (!previewEl || (previewEl !== event.target && !Util.isDescendant(previewEl, event.target)))) {
-                this.triggerCustomEvent('blur', event);
+                this.triggerCustomEvent('externalInteraction', event);
             }
         },
 
@@ -2003,7 +2003,7 @@ var Toolbar;
             });
 
             this.attachEventHandlers();
-            this.base.subscribe('blur', this.handleBlur.bind(this));
+            this.base.subscribe('externalInteraction', this.handleBlur.bind(this));
 
             return toolbar;
         },
@@ -2523,18 +2523,44 @@ var Placeholders;
         this.base = instance;
 
         this.attachEventHandlers();
+        this.setPlaceholders();
     };
 
     Placeholders.prototype = {
 
+        setPlaceholders: function () {
+            this.base.elements.forEach(function (el) {
+                this.activatePlaceholder(el);
+                this.base.on(el, 'blur', this.placeholderWrapper.bind(this));
+                this.base.on(el, 'keypress', this.placeholderWrapper.bind(this));
+            }.bind(this));
+        },
+
+        // Two functions to handle placeholders
+        activatePlaceholder:  function (el) {
+            if (!(el.querySelector('img')) &&
+                    !(el.querySelector('blockquote')) &&
+                    el.textContent.replace(/^\s+|\s+$/g, '') === '') {
+                el.classList.add('medium-editor-placeholder');
+            }
+        },
+
+        placeholderWrapper: function (evt, el) {
+            el = el || evt.target;
+            el.classList.remove('medium-editor-placeholder');
+            if (evt.type !== 'keypress') {
+                this.activatePlaceholder(el);
+            }
+        },
+
         attachEventHandlers: function () {
-            this.base.subscribe('blur', this.handleBlur.bind(this));
+            this.base.subscribe('externalInteraction', this.handleBlur.bind(this));
             this.base.subscribe('click', this.handleClick.bind(this));
         },
 
         handleBlur: function (event) {
             // Activate the placeholder
-            this.base.placeholderWrapper(event, this.base.elements[0]);
+            this.placeholderWrapper(event, this.base.elements[0]);
         },
 
         handleClick: function (event) {
@@ -2628,7 +2654,6 @@ function MediumEditor(elements, options) {
                 .initElements()
                 .bindDragDrop()
                 .bindPaste()
-                .setPlaceholders()
                 .bindElementActions();
 
             if (!this.options.disablePlaceholders) {
@@ -2706,34 +2731,12 @@ function MediumEditor(elements, options) {
             var i;
 
             for (i = 0; i < this.elements.length; i += 1) {
-
-                if (!this.options.disablePlaceholders) {
-                    // Active all of the placeholders
-                    this.activatePlaceholder(this.elements[i]);
-                }
-
                 // Bind the return and tab keypress events
                 this.bindReturn(i)
                     .bindKeydown(i);
             }
 
             return this;
-        },
-
-        // Two functions to handle placeholders
-        activatePlaceholder:  function (el) {
-            if (!(el.querySelector('img')) &&
-                    !(el.querySelector('blockquote')) &&
-                    el.textContent.replace(/^\s+|\s+$/g, '') === '') {
-                el.classList.add('medium-editor-placeholder');
-            }
-        },
-        placeholderWrapper: function (evt, el) {
-            el = el || evt.target;
-            el.classList.remove('medium-editor-placeholder');
-            if (evt.type !== 'keypress') {
-                this.activatePlaceholder(el);
-            }
         },
 
         serialize: function () {
@@ -3391,18 +3394,6 @@ function MediumEditor(elements, options) {
             for (i = 0; i < this.elements.length; i += 1) {
                 this.on(this.elements[i], 'paste', this.pasteWrapper);
             }
-            return this;
-        },
-
-        setPlaceholders: function () {
-            if (!this.options.disablePlaceholders && this.elements && this.elements.length) {
-                this.elements.forEach(function (el) {
-                    this.activatePlaceholder(el);
-                    this.on(el, 'blur', this.placeholderWrapper.bind(this));
-                    this.on(el, 'keypress', this.placeholderWrapper.bind(this));
-                }.bind(this));
-            }
-
             return this;
         },
 

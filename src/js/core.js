@@ -87,7 +87,6 @@ function MediumEditor(elements, options) {
                 .initElements()
                 .bindDragDrop()
                 .bindPaste()
-                .setPlaceholders()
                 .bindElementActions();
 
             if (!this.options.disablePlaceholders) {
@@ -165,34 +164,12 @@ function MediumEditor(elements, options) {
             var i;
 
             for (i = 0; i < this.elements.length; i += 1) {
-
-                if (!this.options.disablePlaceholders) {
-                    // Active all of the placeholders
-                    this.activatePlaceholder(this.elements[i]);
-                }
-
                 // Bind the return and tab keypress events
                 this.bindReturn(i)
                     .bindKeydown(i);
             }
 
             return this;
-        },
-
-        // Two functions to handle placeholders
-        activatePlaceholder:  function (el) {
-            if (!(el.querySelector('img')) &&
-                    !(el.querySelector('blockquote')) &&
-                    el.textContent.replace(/^\s+|\s+$/g, '') === '') {
-                el.classList.add('medium-editor-placeholder');
-            }
-        },
-        placeholderWrapper: function (evt, el) {
-            el = el || evt.target;
-            el.classList.remove('medium-editor-placeholder');
-            if (evt.type !== 'keypress') {
-                this.activatePlaceholder(el);
-            }
         },
 
         serialize: function () {
@@ -850,18 +827,6 @@ function MediumEditor(elements, options) {
             for (i = 0; i < this.elements.length; i += 1) {
                 this.on(this.elements[i], 'paste', this.pasteWrapper);
             }
-            return this;
-        },
-
-        setPlaceholders: function () {
-            if (!this.options.disablePlaceholders && this.elements && this.elements.length) {
-                this.elements.forEach(function (el) {
-                    this.activatePlaceholder(el);
-                    this.on(el, 'blur', this.placeholderWrapper.bind(this));
-                    this.on(el, 'keypress', this.placeholderWrapper.bind(this));
-                }.bind(this));
-            }
-
             return this;
         },
 

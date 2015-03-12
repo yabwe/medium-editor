@@ -79,11 +79,11 @@ var Events;
             }
 
             switch (name) {
-            case 'blur':
+            case 'externalInteraction':
                 // Detecting when focus is lost
-                this.attachDOMEvent(this.options.ownerDocument.body, 'click', this.checkForBlur.bind(this), true);
-                this.attachDOMEvent(this.options.ownerDocument.body, 'focus', this.checkForBlur.bind(this), true);
-                this.listeners.blur = true;
+                this.attachDOMEvent(this.options.ownerDocument.body, 'click', this.handleInteraction.bind(this), true);
+                this.attachDOMEvent(this.options.ownerDocument.body, 'focus', this.handleInteraction.bind(this), true);
+                this.listeners.externalInteraction = true;
                 break;
             case 'click':
                 // Detecting click in the contenteditables
@@ -95,7 +95,7 @@ var Events;
             }
         },
 
-        checkForBlur: function (event) {
+        handleInteraction: function (event) {
             var isDescendantOfEditorElements = false,
                 selection = this.options.contentWindow.getSelection(),
                 toolbarEl = (this.base.toolbar) ? this.base.toolbar.getToolbarElement() : null,
@@ -121,7 +121,7 @@ var Events;
             if (!isDescendantOfEditorElements
                     && (!toolbarEl || (toolbarEl !== event.target && !Util.isDescendant(toolbarEl, event.target)))
                     && (!previewEl || (previewEl !== event.target && !Util.isDescendant(previewEl, event.target)))) {
-                this.triggerCustomEvent('blur', event);
+                this.triggerCustomEvent('externalInteraction', event);
             }
         },
 
