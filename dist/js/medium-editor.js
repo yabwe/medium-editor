@@ -875,28 +875,28 @@ var Events;
                 // Detecting when focus is lost
                 this.attachDOMEvent(this.options.ownerDocument.body, 'click', this.handleInteraction.bind(this), true);
                 this.attachDOMEvent(this.options.ownerDocument.body, 'focus', this.handleInteraction.bind(this), true);
-                this.listeners.externalInteraction = true;
+                this.listeners[name] = true;
                 break;
-            case 'click':
+            case 'editableClick':
                 // Detecting click in the contenteditables
                 this.base.elements.forEach(function (element) {
                     this.attachDOMEvent(element, 'click', this.handleClick.bind(this));
                 }.bind(this));
-                this.listeners.click = true;
+                this.listeners[name] = true;
                 break;
-            case 'blur':
+            case 'editableBlur':
                 // Detecting blur in the contenteditables
                 this.base.elements.forEach(function (element) {
                     this.attachDOMEvent(element, 'blur', this.handleBlur.bind(this));
                 }.bind(this));
-                this.listeners.blur = true;
+                this.listeners[name] = true;
                 break;
-            case 'keypress':
+            case 'editableKeypress':
                 // Detecting keypress in the contenteditables
                 this.base.elements.forEach(function (element) {
                     this.attachDOMEvent(element, 'keypress', this.handleKeypress.bind(this));
                 }.bind(this));
-                this.listeners.keypress = true;
+                this.listeners[name] = true;
                 break;
             }
         },
@@ -932,15 +932,15 @@ var Events;
         },
 
         handleClick: function (event) {
-            this.triggerCustomEvent('click', event, event.currentTarget);
+            this.triggerCustomEvent('editableClick', event, event.currentTarget);
         },
 
         handleBlur: function (event) {
-            this.triggerCustomEvent('blur', event, event.currentTarget);
+            this.triggerCustomEvent('editableBlur', event, event.currentTarget);
         },
 
         handleKeypress: function (event) {
-            this.triggerCustomEvent('keypress', event, event.currentTarget);
+            this.triggerCustomEvent('editableKeypress', event, event.currentTarget);
         }
     };
 
@@ -2583,9 +2583,9 @@ var Placeholders;
             this.base.subscribe('externalInteraction', this.handleExternalInteraction.bind(this));
 
             // Events for all editable elements in this instance
-            this.base.subscribe('click', this.handleClick.bind(this));
-            this.base.subscribe('blur', this.handleBlur.bind(this));
-            this.base.subscribe('keypress', this.handleKeypress.bind(this));
+            this.base.subscribe('editableClick', this.handleClick.bind(this));
+            this.base.subscribe('editableBlur', this.handleBlur.bind(this));
+            this.base.subscribe('editableKeypress', this.handleKeypress.bind(this));
         },
 
         handleKeypress: function (event, element) {

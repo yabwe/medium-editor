@@ -48,9 +48,9 @@ var Placeholders;
             this.base.subscribe('externalInteraction', this.handleExternalInteraction.bind(this));
 
             // Events for all editable elements in this instance
-            this.base.subscribe('click', this.handleClick.bind(this));
-            this.base.subscribe('blur', this.handleBlur.bind(this));
-            this.base.subscribe('keypress', this.handleKeypress.bind(this));
+            this.base.subscribe('editableClick', this.handleClick.bind(this));
+            this.base.subscribe('editableBlur', this.handleBlur.bind(this));
+            this.base.subscribe('editableKeypress', this.handleKeypress.bind(this));
         },
 
         handleKeypress: function (event, element) {
