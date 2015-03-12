@@ -106,6 +106,13 @@ var Events;
                 }.bind(this));
                 this.listeners[name] = true;
                 break;
+            case 'editableMouseover':
+                // Detecting mouseover on the contenteditables
+                this.base.elements.forEach(function (element) {
+                    this.attachDOMEvent(element, 'mouseover', this.handleMouseover.bind(this));
+                }.bind(this));
+                this.listeners[name] = true;
+                break;
             }
         },
 
@@ -149,6 +156,10 @@ var Events;
 
         handleKeypress: function (event) {
             this.triggerCustomEvent('editableKeypress', event, event.currentTarget);
+        },
+
+        handleMouseover: function (event) {
+            this.triggerCustomEvent('editableMouseover', event, event.currentTarget);
         }
     };
 

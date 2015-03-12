@@ -898,6 +898,13 @@ var Events;
                 }.bind(this));
                 this.listeners[name] = true;
                 break;
+            case 'editableMouseover':
+                // Detecting mouseover on the contenteditables
+                this.base.elements.forEach(function (element) {
+                    this.attachDOMEvent(element, 'mouseover', this.handleMouseover.bind(this));
+                }.bind(this));
+                this.listeners[name] = true;
+                break;
             }
         },
 
@@ -941,6 +948,10 @@ var Events;
 
         handleKeypress: function (event) {
             this.triggerCustomEvent('editableKeypress', event, event.currentTarget);
+        },
+
+        handleMouseover: function (event) {
+            this.triggerCustomEvent('editableMouseover', event, event.currentTarget);
         }
     };
 
@@ -1850,9 +1861,7 @@ var AnchorPreview;
         },
 
         attachToEditables: function () {
-            this.base.elements.forEach(function (element) {
-                this.base.on(element, 'mouseover', this.handleEditableMouseover.bind(this));
-            }.bind(this));
+            this.base.subscribe('editableMouseover', this.handleEditableMouseover.bind(this));
         },
 
         handleClick: function (event) {
@@ -1888,13 +1897,6 @@ var AnchorPreview;
         },
 
         handleEditableMouseover: function (event) {
-            /*var overAnchor = true,
-                leaveAnchor = function () {
-                    // mark the anchor as no longer hovered, and stop listening
-                    overAnchor = false;
-                    this.base.off(this.activeAnchor, 'mouseout', leaveAnchor);
-                }.bind(this);*/
-
             if (event.target && event.target.tagName.toLowerCase() === 'a') {
 
                 // Detect empty href attributes

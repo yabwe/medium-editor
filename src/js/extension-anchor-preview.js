@@ -100,9 +100,7 @@ var AnchorPreview;
         },
 
         attachToEditables: function () {
-            this.base.elements.forEach(function (element) {
-                this.base.on(element, 'mouseover', this.handleEditableMouseover.bind(this));
-            }.bind(this));
+            this.base.subscribe('editableMouseover', this.handleEditableMouseover.bind(this));
         },
 
         handleClick: function (event) {
@@ -138,13 +136,6 @@ var AnchorPreview;
         },
 
         handleEditableMouseover: function (event) {
-            /*var overAnchor = true,
-                leaveAnchor = function () {
-                    // mark the anchor as no longer hovered, and stop listening
-                    overAnchor = false;
-                    this.base.off(this.activeAnchor, 'mouseout', leaveAnchor);
-                }.bind(this);*/
-
             if (event.target && event.target.tagName.toLowerCase() === 'a') {
 
                 // Detect empty href attributes
