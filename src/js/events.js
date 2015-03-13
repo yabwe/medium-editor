@@ -123,6 +123,11 @@ var Events;
                 this.setupListener('editableKeydown');
                 this.listeners[name] = true;
                 break;
+            case 'editableKeydownDelete':
+                // Detecting keydown for DELETE/BACKSPACE on the contenteditables
+                this.setupListener('editableKeydown');
+                this.listeners[name] = true;
+                break;
             case 'editableMouseover':
                 // Detecting mouseover on the contenteditables
                 this.base.elements.forEach(function (element) {
@@ -188,6 +193,10 @@ var Events;
                 break;
             case Util.keyCode.TAB:
                 this.triggerCustomEvent('editableKeydownTab', event, event.currentTarget);
+                break;
+            case Util.keyCode.DELETE:
+            case Util.keyCode.BACKSPACE:
+                this.triggerCustomEvent('editableKeydownDelete', event, event.currentTarget);
                 break;
             }
         }

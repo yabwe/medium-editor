@@ -915,6 +915,11 @@ var Events;
                 this.setupListener('editableKeydown');
                 this.listeners[name] = true;
                 break;
+            case 'editableKeydownDelete':
+                // Detecting keydown for DELETE/BACKSPACE on the contenteditables
+                this.setupListener('editableKeydown');
+                this.listeners[name] = true;
+                break;
             case 'editableMouseover':
                 // Detecting mouseover on the contenteditables
                 this.base.elements.forEach(function (element) {
@@ -980,6 +985,10 @@ var Events;
                 break;
             case Util.keyCode.TAB:
                 this.triggerCustomEvent('editableKeydownTab', event, event.currentTarget);
+                break;
+            case Util.keyCode.DELETE:
+            case Util.keyCode.BACKSPACE:
+                this.triggerCustomEvent('editableKeydownDelete', event, event.currentTarget);
                 break;
             }
         }
@@ -2718,6 +2727,62 @@ function MediumEditor(elements, options) {
         }
     }
 
+    function handleBlockDeleteKeydowns(e) {
+        var range, sel, p, node = Selection.getSelectionStart(this.options.ownerDocument),
+            tagName = node.tagName.toLowerCase(),
+            isEmpty = /^(\s+|<br\/?>)?$/i,
+            isHeader = /h\d/i;
+
+        if ((e.which === Util.keyCode.BACKSPACE || e.which === Util.keyCode.ENTER)
+                && node.previousElementSibling
+                // in a header
+                && isHeader.test(tagName)
+                // at the very end of the block
+                && Selection.getCaretOffsets(node).left === 0) {
+            if (e.which === Util.keyCode.BACKSPACE && isEmpty.test(node.previousElementSibling.innerHTML)) {
+                // backspacing the begining of a header into an empty previous element will
+                // change the tagName of the current node to prevent one
+                // instead delete previous node and cancel the event.
+                node.previousElementSibling.parentNode.removeChild(node.previousElementSibling);
+                e.preventDefault();
+            } else if (e.which === Util.keyCode.ENTER) {
+                // hitting return in the begining of a header will create empty header elements before the current one
+                // instead, make "<p><br></p>" element, which are what happens if you hit return in an empty paragraph
+                p = this.options.ownerDocument.createElement('p');
+                p.innerHTML = '<br>';
+                node.previousElementSibling.parentNode.insertBefore(p, node);
+                e.preventDefault();
+            }
+        } else if (e.which === Util.keyCode.DELETE
+                    && node.nextElementSibling
+                    && node.previousElementSibling
+                    // not in a header
+                    && !isHeader.test(tagName)
+                    // in an empty tag
+                    && isEmpty.test(node.innerHTML)
+                    // when the next tag *is* a header
+                    && isHeader.test(node.nextElementSibling.tagName)) {
+            // hitting delete in an empty element preceding a header, ex:
+            //  <p>[CURSOR]</p><h1>Header</h1>
+            // Will cause the h1 to become a paragraph.
+            // Instead, delete the paragraph node and move the cursor to the begining of the h1
+
+            // remove node and move cursor to start of header
+            range = document.createRange();
+            sel = this.options.contentWindow.getSelection();
+
+            range.setStart(node.nextElementSibling, 0);
+            range.collapse(true);
+
+            sel.removeAllRanges();
+            sel.addRange(range);
+
+            node.previousElementSibling.parentNode.removeChild(node);
+
+            e.preventDefault();
+        }
+    }
+
     MediumEditor.statics = {
         ButtonsData: ButtonsData,
         DefaultButton: DefaultButton,
@@ -2794,8 +2859,7 @@ function MediumEditor(elements, options) {
                 .initElements()
                 .attachHandlers()
                 .bindDragDrop()
-                .bindPaste()
-                .bindElementActions();
+                .bindPaste();
 
             if (!this.options.disablePlaceholders) {
                 this.placeholders = new Placeholders(this);
@@ -2854,6 +2918,10 @@ function MediumEditor(elements, options) {
             // attach to tabs
             this.subscribe('editableKeydownTab', handleTabKeydown.bind(this));
 
+            // Bind keys which can create or destroy a block element: backspace, delete, return
+            this.subscribe('editableKeydownDelete', handleBlockDeleteKeydowns.bind(this));
+            this.subscribe('editableKeydownEnter', handleBlockDeleteKeydowns.bind(this));
+
             // disabling return or double return
             if (this.options.disableReturn || this.options.disableDoubleReturn) {
                 this.subscribe('editableKeydownEnter', handleDisabledEnterKeydown.bind(this));
@@ -2883,21 +2951,6 @@ function MediumEditor(elements, options) {
             }
             // Convert NodeList (or other array like object) into an array
             this.elements = Array.prototype.slice.apply(selector);
-        },
-
-        /**
-         * This handles blur and keypress events on elements
-         * Including Placeholders, and tooldbar hiding on blur
-         */
-        bindElementActions: function () {
-            var i;
-
-            for (i = 0; i < this.elements.length; i += 1) {
-                // Bind the return and tab keypress events
-                this.bindKeydown(i);
-            }
-
-            return this;
         },
 
         serialize: function () {
@@ -3059,75 +3112,6 @@ function MediumEditor(elements, options) {
                 }
             });
             return this;
-        },
-
-        bindKeydown: function (index) {
-            var self = this;
-            this.on(this.elements[index], 'keydown', function (e) {
-                if (e.which === Util.keyCode.BACKSPACE || e.which === Util.keyCode.DELETE || e.which === Util.keyCode.ENTER) {
-
-                    // Bind keys which can create or destroy a block element: backspace, delete, return
-                    self.onBlockModifier(e);
-
-                }
-            });
-            return this;
-        },
-
-        onBlockModifier: function (e) {
-            var range, sel, p, node = Selection.getSelectionStart(this.options.ownerDocument),
-                tagName = node.tagName.toLowerCase(),
-                isEmpty = /^(\s+|<br\/?>)?$/i,
-                isHeader = /h\d/i;
-
-            if ((e.which === Util.keyCode.BACKSPACE || e.which === Util.keyCode.ENTER)
-                    && node.previousElementSibling
-                    // in a header
-                    && isHeader.test(tagName)
-                    // at the very end of the block
-                    && Selection.getCaretOffsets(node).left === 0) {
-                if (e.which === Util.keyCode.BACKSPACE && isEmpty.test(node.previousElementSibling.innerHTML)) {
-                    // backspacing the begining of a header into an empty previous element will
-                    // change the tagName of the current node to prevent one
-                    // instead delete previous node and cancel the event.
-                    node.previousElementSibling.parentNode.removeChild(node.previousElementSibling);
-                    e.preventDefault();
-                } else if (e.which === Util.keyCode.ENTER) {
-                    // hitting return in the begining of a header will create empty header elements before the current one
-                    // instead, make "<p><br></p>" element, which are what happens if you hit return in an empty paragraph
-                    p = this.options.ownerDocument.createElement('p');
-                    p.innerHTML = '<br>';
-                    node.previousElementSibling.parentNode.insertBefore(p, node);
-                    e.preventDefault();
-                }
-            } else if (e.which === Util.keyCode.DELETE
-                        && node.nextElementSibling
-                        && node.previousElementSibling
-                        // not in a header
-                        && !isHeader.test(tagName)
-                        // in an empty tag
-                        && isEmpty.test(node.innerHTML)
-                        // when the next tag *is* a header
-                        && isHeader.test(node.nextElementSibling.tagName)) {
-                // hitting delete in an empty element preceding a header, ex:
-                //  <p>[CURSOR]</p><h1>Header</h1>
-                // Will cause the h1 to become a paragraph.
-                // Instead, delete the paragraph node and move the cursor to the begining of the h1
-
-                // remove node and move cursor to start of header
-                range = document.createRange();
-                sel = this.options.contentWindow.getSelection();
-
-                range.setStart(node.nextElementSibling, 0);
-                range.collapse(true);
-
-                sel.removeAllRanges();
-                sel.addRange(range);
-
-                node.previousElementSibling.parentNode.removeChild(node);
-
-                e.preventDefault();
-            }
         },
 
         initToolbar: function () {

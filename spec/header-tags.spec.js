@@ -79,7 +79,7 @@ describe('Protect Header Tags TestCase', function () {
             sel.addRange(range);
 
             // hit backspace
-            editor.onBlockModifier({ which: 8, preventDefault: function () { } });
+            fireEvent(editor.elements[0].querySelector(el.tagName.toLowerCase()), 'keydown', { keyCode: 8 });
 
             el = document.getElementById("header");
             expect(el).toBeDefined();
