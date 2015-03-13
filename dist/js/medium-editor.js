@@ -2900,6 +2900,88 @@ function MediumEditor(elements, options) {
         }
     }
 
+    // Internal helper methods
+
+    function createElementsArray(selector) {
+        if (!selector) {
+            selector = [];
+        }
+        // If string, use as query selector
+        if (typeof selector === 'string') {
+            selector = this.options.ownerDocument.querySelectorAll(selector);
+        }
+        // If element, put into array
+        if (Util.isElement(selector)) {
+            selector = [selector];
+        }
+        // Convert NodeList (or other array like object) into an array
+        this.elements = Array.prototype.slice.apply(selector);
+    }
+
+    function initExtension(extension, name, instance) {
+        if (extension.parent) {
+            extension.base = instance;
+        }
+        if (typeof extension.init === 'function') {
+            extension.init(instance);
+        }
+        if (!extension.name) {
+            extension.name = name;
+        }
+        return extension;
+    }
+
+    function shouldAddDefaultAnchorPreview() {
+        var i,
+            shouldAdd = false;
+
+        // If anchor-preview is disabled, don't add
+        if (this.options.disableAnchorPreview) {
+            return false;
+        }
+        // If anchor-preview extension has been overriden, don't add
+        if (this.options.extensions['anchor-preview']) {
+            return false;
+        }
+        // If toolbar is disabled, don't add
+        if (this.options.disableToolbar) {
+            return false;
+        }
+        // If all elements have 'data-disable-toolbar' attribute, don't add
+        for (i = 0; i < this.elements.length; i += 1) {
+            if (!this.elements[i].getAttribute('data-disable-toolbar')) {
+                shouldAdd = true;
+                break;
+            }
+        }
+
+        return shouldAdd;
+    }
+
+    function execActionInternal(action, opts) {
+        /*jslint regexp: true*/
+        var appendAction = /^append-(.+)$/gi,
+            match;
+        /*jslint regexp: false*/
+
+        // Actions starting with 'append-' should attempt to format a block of text ('formatBlock') using a specific
+        // type of block element (ie append-blockquote, append-h1, append-pre, etc.)
+        match = appendAction.exec(action);
+        if (match) {
+            return this.execFormatBlock(match[1]);
+        }
+
+        if (action === 'createLink') {
+            return this.createLink(opts);
+        }
+
+        if (action === 'image') {
+            return this.options.ownerDocument.execCommand('insertImage', false, this.options.contentWindow.getSelection());
+        }
+
+        return this.options.ownerDocument.execCommand(action, false, null);
+    }
+
     MediumEditor.statics = {
         ButtonsData: ButtonsData,
         DefaultButton: DefaultButton,
@@ -2951,7 +3033,7 @@ function MediumEditor(elements, options) {
             var uniqueId = 1;
 
             this.options = Util.defaults(options, this.defaults);
-            this.setElementSelection(elements);
+            createElementsArray.call(this, elements);
             if (this.elements.length === 0) {
                 return;
             }
@@ -3069,22 +3151,6 @@ function MediumEditor(elements, options) {
             return this;
         },
 
-        setElementSelection: function (selector) {
-            if (!selector) {
-                selector = [];
-            }
-            // If string, use as query selector
-            if (typeof selector === 'string') {
-                selector = this.options.ownerDocument.querySelectorAll(selector);
-            }
-            // If element, put into array
-            if (Util.isElement(selector)) {
-                selector = [selector];
-            }
-            // Convert NodeList (or other array like object) into an array
-            this.elements = Array.prototype.slice.apply(selector);
-        },
-
         serialize: function () {
             var i,
                 elementid,
@@ -3098,45 +3164,6 @@ function MediumEditor(elements, options) {
             return content;
         },
 
-        initExtension: function (extension, name) {
-            if (extension.parent) {
-                extension.base = this;
-            }
-            if (typeof extension.init === 'function') {
-                extension.init(this);
-            }
-            if (!extension.name) {
-                extension.name = name;
-            }
-            return extension;
-        },
-
-        shouldAddDefaultAnchorPreview: function () {
-            var i,
-                shouldAdd = false;
-
-            // If anchor-preview is disabled, don't add
-            if (this.options.disableAnchorPreview) {
-                return false;
-            }
-            // If anchor-preview extension has been overriden, don't add
-            if (this.options.extensions['anchor-preview']) {
-                return false;
-            }
-            // If toolbar is disabled, don't add
-            if (this.options.disableToolbar) {
-                return false;
-            }
-            // If all elements have 'data-disable-toolbar' attribute, don't add
-            for (i = 0; i < this.elements.length; i += 1) {
-                if (!this.elements[i].getAttribute('data-disable-toolbar')) {
-                    shouldAdd = true;
-                }
-            }
-
-            return shouldAdd;
-        },
-
         initCommands: function () {
             var buttons = this.options.buttons,
                 extensions = this.options.extensions,
@@ -3146,10 +3173,10 @@ function MediumEditor(elements, options) {
 
             buttons.forEach(function (buttonName) {
                 if (extensions[buttonName]) {
-                    ext = this.initExtension(extensions[buttonName], buttonName);
+                    ext = initExtension(extensions[buttonName], buttonName, this);
                     this.commands.push(ext);
                 } else if (buttonName === 'anchor') {
-                    ext = this.initExtension(new AnchorExtension(), buttonName);
+                    ext = initExtension(new AnchorExtension(), buttonName, this);
                     this.commands.push(ext);
                 } else if (ButtonsData.hasOwnProperty(buttonName)) {
                     ext = new DefaultButton(ButtonsData[buttonName], this);
@@ -3159,13 +3186,13 @@ function MediumEditor(elements, options) {
 
             for (name in extensions) {
                 if (extensions.hasOwnProperty(name) && buttons.indexOf(name) === -1) {
-                    ext = this.initExtension(extensions[name], name);
+                    ext = initExtension(extensions[name], name, this);
                 }
             }
 
             // Add AnchorPreview as extension if needed
-            if (this.shouldAddDefaultAnchorPreview()) {
-                this.commands.push(this.initExtension(new AnchorPreview(), 'anchor-preview'));
+            if (shouldAddDefaultAnchorPreview.call(this)) {
+                this.commands.push(initExtension(new AnchorPreview(), 'anchor-preview', this));
             }
 
             return this;
@@ -3272,39 +3299,15 @@ function MediumEditor(elements, options) {
                 this.saveSelection();
                 // Select all of the contents before calling the action
                 this.selectAllContents();
-                result = this.execActionInternal(match[1], opts);
+                result = execActionInternal.call(this, match[1], opts);
                 // Restore the previous selection
                 this.restoreSelection();
             } else {
-                result = this.execActionInternal(action, opts);
+                result = execActionInternal.call(this, action, opts);
             }
 
             this.checkSelection();
             return result;
-        },
-
-        execActionInternal: function (action, opts) {
-            /*jslint regexp: true*/
-            var appendAction = /^append-(.+)$/gi,
-                match;
-            /*jslint regexp: false*/
-
-            // Actions starting with 'append-' should attempt to format a block of text ('formatBlock') using a specific
-            // type of block element (ie append-blockquote, append-h1, append-pre, etc.)
-            match = appendAction.exec(action);
-            if (match) {
-                return this.execFormatBlock(match[1]);
-            }
-
-            if (action === 'createLink') {
-                return this.createLink(opts);
-            }
-
-            if (action === 'image') {
-                return this.options.ownerDocument.execCommand('insertImage', false, this.options.contentWindow.getSelection());
-            }
-
-            return this.options.ownerDocument.execCommand(action, false, null);
         },
 
         getSelectedParentElement: function (range) {
