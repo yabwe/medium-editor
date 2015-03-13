@@ -114,7 +114,12 @@ var Events;
                 this.listeners[name] = true;
                 break;
             case 'editableKeydownEnter':
-                // Detecting keydown for ENTER on the contentediables
+                // Detecting keydown for ENTER on the contenteditables
+                this.setupListener('editableKeydown');
+                this.listeners[name] = true;
+                break;
+            case 'editableKeydownTab':
+                // Detecting keydown for TAB on the contenteditable
                 this.setupListener('editableKeydown');
                 this.listeners[name] = true;
                 break;
@@ -177,8 +182,13 @@ var Events;
         handleKeydown: function (event) {
             this.triggerCustomEvent('editableKeydown', event, event.currentTarget);
 
-            if (event.which === Util.keyCode.ENTER) {
+            switch (event.which) {
+            case Util.keyCode.ENTER:
                 this.triggerCustomEvent('editableKeydownEnter', event, event.currentTarget);
+                break;
+            case Util.keyCode.TAB:
+                this.triggerCustomEvent('editableKeydownTab', event, event.currentTarget);
+                break;
             }
         }
     };

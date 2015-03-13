@@ -906,7 +906,12 @@ var Events;
                 this.listeners[name] = true;
                 break;
             case 'editableKeydownEnter':
-                // Detecting keydown for ENTER on the contentediables
+                // Detecting keydown for ENTER on the contenteditables
+                this.setupListener('editableKeydown');
+                this.listeners[name] = true;
+                break;
+            case 'editableKeydownTab':
+                // Detecting keydown for TAB on the contenteditable
                 this.setupListener('editableKeydown');
                 this.listeners[name] = true;
                 break;
@@ -969,8 +974,13 @@ var Events;
         handleKeydown: function (event) {
             this.triggerCustomEvent('editableKeydown', event, event.currentTarget);
 
-            if (event.which === Util.keyCode.ENTER) {
+            switch (event.which) {
+            case Util.keyCode.ENTER:
                 this.triggerCustomEvent('editableKeydownEnter', event, event.currentTarget);
+                break;
+            case Util.keyCode.TAB:
+                this.triggerCustomEvent('editableKeydownTab', event, event.currentTarget);
+                break;
             }
         }
     };
@@ -2672,14 +2682,6 @@ function MediumEditor(elements, options) {
 (function () {
     'use strict';
 
-    MediumEditor.statics = {
-        ButtonsData: ButtonsData,
-        DefaultButton: DefaultButton,
-        AnchorExtension: AnchorExtension,
-        Toolbar: Toolbar,
-        AnchorPreview: AnchorPreview
-    };
-
     // Event handlers that shouldn't be exposed externally
 
     function handleDisabledEnterKeydown(event, element) {
@@ -2692,6 +2694,37 @@ function MediumEditor(elements, options) {
             }
         }
     }
+
+    function handleTabKeydown(event, element) {
+        // Override tab only for pre nodes
+        var node = Selection.getSelectionStart(this.options.ownerDocument),
+            tag = node && node.tagName.toLowerCase();
+
+        if (tag === 'pre') {
+            event.preventDefault();
+            Util.insertHTMLCommand(this.options.ownerDocument, '    ');
+        }
+
+        // Tab to indent list structures!
+        if (tag === 'li' || Util.isListItemChild(node)) {
+            event.preventDefault();
+
+            // If Shift is down, outdent, otherwise indent
+            if (event.shiftKey) {
+                this.options.ownerDocument.execCommand('outdent', false, null);
+            } else {
+                this.options.ownerDocument.execCommand('indent', false, null);
+            }
+        }
+    }
+
+    MediumEditor.statics = {
+        ButtonsData: ButtonsData,
+        DefaultButton: DefaultButton,
+        AnchorExtension: AnchorExtension,
+        Toolbar: Toolbar,
+        AnchorPreview: AnchorPreview
+    };
 
     MediumEditor.prototype = {
         defaults: {
@@ -2817,6 +2850,9 @@ function MediumEditor(elements, options) {
 
         attachHandlers: function () {
             var i;
+
+            // attach to tabs
+            this.subscribe('editableKeydownTab', handleTabKeydown.bind(this));
 
             // disabling return or double return
             if (this.options.disableReturn || this.options.disableDoubleReturn) {
@@ -3028,30 +3064,7 @@ function MediumEditor(elements, options) {
         bindKeydown: function (index) {
             var self = this;
             this.on(this.elements[index], 'keydown', function (e) {
-                var node, tag;
-
-                if (e.which === Util.keyCode.TAB) {
-                    // Override tab only for pre nodes
-                    node = Selection.getSelectionStart(self.options.ownerDocument);
-                    tag = node && node.tagName.toLowerCase();
-
-                    if (tag === 'pre') {
-                        e.preventDefault();
-                        Util.insertHTMLCommand(self.options.ownerDocument, '    ');
-                    }
-
-                    // Tab to indent list structures!
-                    if (tag === 'li' || Util.isListItemChild(node)) {
-                        e.preventDefault();
-
-                        // If Shift is down, outdent, otherwise indent
-                        if (e.shiftKey) {
-                            self.options.ownerDocument.execCommand('outdent', false, null);
-                        } else {
-                            self.options.ownerDocument.execCommand('indent', false, null);
-                        }
-                    }
-                } else if (e.which === Util.keyCode.BACKSPACE || e.which === Util.keyCode.DELETE || e.which === Util.keyCode.ENTER) {
+                if (e.which === Util.keyCode.BACKSPACE || e.which === Util.keyCode.DELETE || e.which === Util.keyCode.ENTER) {
 
                     // Bind keys which can create or destroy a block element: backspace, delete, return
                     self.onBlockModifier(e);
@@ -3506,7 +3519,6 @@ function MediumEditor(elements, options) {
             pasteHandler.pasteHTML(html, this.options.ownerDocument);
         }
     };
-
 }());
 
     return MediumEditor;
