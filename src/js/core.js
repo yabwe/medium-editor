@@ -1,6 +1,6 @@
 /*global module, console, define, FileReader,
  Util, ButtonsData, DefaultButton,
- pasteHandler, Selection, AnchorExtension,
+ PasteHandler, Selection, AnchorExtension,
  Toolbar, AnchorPreview, Events, Placeholders */
 
 function MediumEditor(elements, options) {
@@ -222,8 +222,9 @@ function MediumEditor(elements, options) {
             this.isActive = true;
             this.initCommands()
                 .initElements()
-                .attachHandlers()
-                .bindPaste();
+                .attachHandlers();
+
+            this.pasteHandler = new PasteHandler(this);
 
             if (!this.options.disablePlaceholders) {
                 this.placeholders = new Placeholders(this);
@@ -766,7 +767,6 @@ function MediumEditor(elements, options) {
             this.setup();
         },
 
-        // TODO: break method
         deactivate: function () {
             var i;
             if (!this.isActive) {
@@ -793,23 +793,12 @@ function MediumEditor(elements, options) {
             this.events.detachAllDOMEvents();
         },
 
-        bindPaste: function () {
-            var i, self = this;
-            this.pasteWrapper = function (e) {
-                pasteHandler.handlePaste(this, e, self.options);
-            };
-            for (i = 0; i < this.elements.length; i += 1) {
-                this.on(this.elements[i], 'paste', this.pasteWrapper);
-            }
-            return this;
-        },
-
         cleanPaste: function (text) {
-            pasteHandler.cleanPaste(text, this.options);
+            this.pasteHandler.cleanPaste(text);
         },
 
         pasteHTML: function (html) {
-            pasteHandler.pasteHTML(html, this.options.ownerDocument);
+            this.pasteHandler.pasteHTML(html);
         }
     };
 }());

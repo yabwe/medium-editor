@@ -47,14 +47,17 @@ var Placeholders;
             // Custom events
             this.base.subscribe('externalInteraction', this.handleExternalInteraction.bind(this));
 
-            // Events for all editable elements in this instance
-            this.base.subscribe('editableClick', this.handleClick.bind(this));
+            // Check placeholder on blur
             this.base.subscribe('editableBlur', this.handleBlur.bind(this));
-            this.base.subscribe('editableKeypress', this.handleKeypress.bind(this));
+
+            // Events where we always hide the placeholder
+            this.base.subscribe('editableClick', this.handleHidePlaceholderEvent.bind(this));
+            this.base.subscribe('editableKeypress', this.handleHidePlaceholderEvent.bind(this));
+            this.base.subscribe('editablePaste', this.handleHidePlaceholderEvent.bind(this));
         },
 
-        handleKeypress: function (event, element) {
-            // Always hide placeholder on keypress
+        handleHidePlaceholderEvent: function (event, element) {
+            // Events where we hide the placeholder
             this.hidePlaceholder(element);
         },
 
@@ -66,11 +69,6 @@ var Placeholders;
         handleExternalInteraction: function (event) {
             // Update all placeholders
             this.initPlaceholders();
-        },
-
-        handleClick: function (event, element) {
-            // Remove placeholder
-            this.hidePlaceholder(element);
         }
     };
 

@@ -1,5 +1,5 @@
 /*global Util, Selection, console*/
-var pasteHandler;
+var PasteHandler;
 
 (function (window, document) {
     'use strict';
@@ -47,22 +47,26 @@ var pasteHandler;
     }
     /*jslint regexp: false*/
 
-    pasteHandler = {
-        handlePaste: function (element, evt, options) {
+    PasteHandler = function (instance) {
+        this.base = instance;
+        this.options = this.base.options;
+
+        if (this.options.forcePlainText || this.options.cleanPastedHTML) {
+            this.base.subscribe('editablePaste', this.handlePaste.bind(this));
+        }
+    };
+
+    PasteHandler.prototype = {
+        handlePaste: function (event, element) {
             var paragraphs,
                 html = '',
                 p,
                 dataFormatHTML = 'text/html',
                 dataFormatPlain = 'text/plain';
 
-            element.classList.remove('medium-editor-placeholder');
-            if (!options.forcePlainText && !options.cleanPastedHTML) {
-                return element;
-            }
-
-            if (options.contentWindow.clipboardData && evt.clipboardData === undefined) {
-                evt.clipboardData = options.contentWindow.clipboardData;
-                // If window.clipboardData exists, but e.clipboardData doesn't exist,
+            if (this.options.contentWindow.clipboardData && event.clipboardData === undefined) {
+                event.clipboardData = this.options.contentWindow.clipboardData;
+                // If window.clipboardData exists, but event.clipboardData doesn't exist,
                 // we're probably in IE. IE only has two possibilities for clipboard
                 // data format: 'Text' and 'URL'.
                 //
@@ -71,30 +75,33 @@ var pasteHandler;
                 dataFormatPlain = 'Text';
             }
 
-            if (evt.clipboardData && evt.clipboardData.getData && !evt.defaultPrevented) {
-                evt.preventDefault();
+            if (event.clipboardData
+                    && event.clipboardData.getData
+                    && !event.defaultPrevented) {
+                event.preventDefault();
 
-                if (options.cleanPastedHTML && evt.clipboardData.getData(dataFormatHTML)) {
-                    return this.cleanPaste(evt.clipboardData.getData(dataFormatHTML), options);
+                if (this.options.cleanPastedHTML && event.clipboardData.getData(dataFormatHTML)) {
+                    return this.cleanPaste(event.clipboardData.getData(dataFormatHTML));
                 }
-                if (!(options.disableReturn || element.getAttribute('data-disable-return'))) {
-                    paragraphs = evt.clipboardData.getData(dataFormatPlain).split(/[\r\n]/g);
+
+                if (!(this.options.disableReturn || element.getAttribute('data-disable-return'))) {
+                    paragraphs = event.clipboardData.getData(dataFormatPlain).split(/[\r\n]/g);
                     for (p = 0; p < paragraphs.length; p += 1) {
                         if (paragraphs[p] !== '') {
                             html += '<p>' + Util.htmlEntities(paragraphs[p]) + '</p>';
                         }
                     }
-                    Util.insertHTMLCommand(options.ownerDocument, html);
+                    Util.insertHTMLCommand(this.options.ownerDocument, html);
                 } else {
-                    html = Util.htmlEntities(evt.clipboardData.getData(dataFormatPlain));
-                    Util.insertHTMLCommand(options.ownerDocument, html);
+                    html = Util.htmlEntities(event.clipboardData.getData(dataFormatPlain));
+                    Util.insertHTMLCommand(this.options.ownerDocument, html);
                 }
             }
         },
 
-        cleanPaste: function (text, options) {
+        cleanPaste: function (text) {
             var i, elList, workEl,
-                el = Selection.getSelectionElement(options.contentWindow),
+                el = Selection.getSelectionElement(this.options.contentWindow),
                 multiline = /<p|<br|<div/.test(text),
                 replacements = createReplacements();
 
@@ -106,10 +113,10 @@ var pasteHandler;
                 // double br's aren't converted to p tags, but we want paragraphs.
                 elList = text.split('<br><br>');
 
-                this.pasteHTML('<p>' + elList.join('</p><p>') + '</p>', options.ownerDocument);
+                this.pasteHTML('<p>' + elList.join('</p><p>') + '</p>');
 
                 try {
-                    options.ownerDocument.execCommand('insertText', false, "\n");
+                    this.options.ownerDocument.execCommand('insertText', false, "\n");
                 } catch (ignore) { }
 
                 // block element cleanup
@@ -124,7 +131,7 @@ var pasteHandler;
 
                     switch (workEl.tagName.toLowerCase()) {
                     case 'a':
-                        if (options.targetBlank) {
+                        if (this.options.targetBlank) {
                             Util.setTargetBlank(workEl);
                         }
                         break;
@@ -138,19 +145,19 @@ var pasteHandler;
                     }
                 }
             } else {
-                this.pasteHTML(text, options.ownerDocument);
+                this.pasteHTML(text);
             }
         },
 
-        pasteHTML: function (html, ownerDocument) {
-            var elList, workEl, i, fragmentBody, pasteBlock = ownerDocument.createDocumentFragment();
+        pasteHTML: function (html) {
+            var elList, workEl, i, fragmentBody, pasteBlock = this.options.ownerDocument.createDocumentFragment();
 
-            pasteBlock.appendChild(ownerDocument.createElement('body'));
+            pasteBlock.appendChild(this.options.ownerDocument.createElement('body'));
 
             fragmentBody = pasteBlock.querySelector('body');
             fragmentBody.innerHTML = html;
 
-            this.cleanupSpans(fragmentBody, ownerDocument);
+            this.cleanupSpans(fragmentBody);
 
             elList = fragmentBody.querySelectorAll('*');
             for (i = 0; i < elList.length; i += 1) {
@@ -165,7 +172,7 @@ var pasteHandler;
                     workEl.parentNode.removeChild(workEl);
                 }
             }
-            Util.insertHTMLCommand(ownerDocument, fragmentBody.innerHTML.replace(/&nbsp;/g, ' '));
+            Util.insertHTMLCommand(this.options.ownerDocument, fragmentBody.innerHTML.replace(/&nbsp;/g, ' '));
         },
         isCommonBlock: function (el) {
             return (el && (el.tagName.toLowerCase() === 'p' || el.tagName.toLowerCase() === 'div'));
@@ -200,7 +207,7 @@ var pasteHandler;
             }
         },
 
-        cleanupSpans: function (container_el, ownerDocument) {
+        cleanupSpans: function (container_el) {
             var i,
                 el,
                 new_el,
@@ -211,7 +218,7 @@ var pasteHandler;
 
             for (i = 0; i < spans.length; i += 1) {
                 el = spans[i];
-                new_el = ownerDocument.createElement(el.classList.contains('bold') ? 'b' : 'i');
+                new_el = this.options.ownerDocument.createElement(el.classList.contains('bold') ? 'b' : 'i');
 
                 if (el.classList.contains('bold') && el.classList.contains('italic')) {
                     // add an i tag as well if this has both italics and bold
@@ -235,7 +242,7 @@ var pasteHandler;
                 if (/^\s*$/.test()) {
                     el.parentNode.removeChild(el);
                 } else {
-                    el.parentNode.replaceChild(ownerDocument.createTextNode(el.textContent), el);
+                    el.parentNode.replaceChild(this.options.ownerDocument.createTextNode(el.textContent), el);
                 }
             }
         }

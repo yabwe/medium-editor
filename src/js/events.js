@@ -150,6 +150,13 @@ var Events;
                 }.bind(this));
                 this.listeners[name] = true;
                 break;
+            case 'editablePaste':
+                // Detecting paste on the contenteditables
+                this.base.elements.forEach(function (element) {
+                    this.attachDOMEvent(element, 'paste', this.handlePaste.bind(this));
+                }.bind(this));
+                this.listeners[name] = true;
+                break;
             }
         },
 
@@ -205,6 +212,10 @@ var Events;
 
         handleDrop: function (event) {
             this.triggerCustomEvent('editableDrop', event, event.currentTarget);
+        },
+
+        handlePaste: function (event) {
+            this.triggerCustomEvent('editablePaste', event, event.currentTarget);
         },
 
         handleKeydown: function (event) {
