@@ -646,7 +646,14 @@ var Util;
             }
         },
 
-        isListItemChild: function (node) {
+        isListItem: function (node) {
+            if (!node) {
+                return false;
+            }
+            if (node.tagName.toLowerCase() === 'li') {
+                return true;
+            }
+
             var parentNode = node.parentNode,
                 tagName = parentNode.tagName.toLowerCase();
             while (this.parentElements.indexOf(tagName) === -1 && tagName !== 'div') {
@@ -2754,7 +2761,7 @@ function MediumEditor(elements, options) {
         }
 
         // Tab to indent list structures!
-        if (tag === 'li' || Util.isListItemChild(node)) {
+        if (Util.isListItem(node)) {
             event.preventDefault();
 
             // If Shift is down, outdent, otherwise indent
@@ -2865,6 +2872,32 @@ function MediumEditor(elements, options) {
             }.bind(this));
         }
         event.target.classList.remove(className);
+    }
+
+    function handleKeyup(event) {
+        var node = Selection.getSelectionStart(this.options.ownerDocument),
+            tagName;
+
+        if (!node) {
+            return;
+        }
+
+        if (node.getAttribute('data-medium-element') && node.children.length === 0) {
+            this.options.ownerDocument.execCommand('formatBlock', false, 'p');
+        }
+
+        if (event.which === Util.keyCode.ENTER && !Util.isListItem(node)) {
+            tagName = node.tagName.toLowerCase();
+            // For anchor tags, unlink
+            if (tagName === 'a') {
+                this.options.ownerDocument.execCommand('unlink', false, null);
+            } else if (!event.shiftKey) {
+                // only format block if this is not a header tag
+                if (!/h\d/.test(tagName)) {
+                    this.options.ownerDocument.execCommand('formatBlock', false, 'p');
+                }
+            }
+        }
     }
 
     MediumEditor.statics = {
@@ -2984,7 +3017,6 @@ function MediumEditor(elements, options) {
                 this.elements[i].setAttribute('data-medium-element', true);
                 this.elements[i].setAttribute('role', 'textbox');
                 this.elements[i].setAttribute('aria-multiline', true);
-                this.bindParagraphCreation(i);
                 if (!this.options.disableToolbar && !this.elements[i].getAttribute('data-disable-toolbar')) {
                     addToolbar = true;
                 }
@@ -3016,6 +3048,16 @@ function MediumEditor(elements, options) {
                         break;
                     }
                 }
+            }
+
+            // if we're not disabling return, add a handler to help handle cleanup
+            // for certain cases when enter is pressed
+            if (!this.options.disableReturn) {
+                this.elements.forEach(function (element) {
+                    if (!element.getAttribute('data-disable-return')) {
+                        this.on(element, 'keyup', handleKeyup.bind(this));
+                    }
+                }.bind(this));
             }
 
             // drag and drop of images
@@ -3165,42 +3207,6 @@ function MediumEditor(elements, options) {
                     }
                 }
             }
-            return this;
-        },
-
-        bindParagraphCreation: function (index) {
-            var self = this;
-
-            this.on(this.elements[index], 'keyup', function (e) {
-                var node = Selection.getSelectionStart(self.options.ownerDocument),
-                    tagName,
-                    editorElement;
-
-                if (node
-                        && node.getAttribute('data-medium-element')
-                        && node.children.length === 0
-                        && !(self.options.disableReturn || node.getAttribute('data-disable-return'))) {
-                    self.options.ownerDocument.execCommand('formatBlock', false, 'p');
-                }
-                if (e.which === Util.keyCode.ENTER) {
-                    node = Selection.getSelectionStart(self.options.ownerDocument);
-                    tagName = node.tagName.toLowerCase();
-                    editorElement = Selection.getSelectionElement(self.options.contentWindow);
-
-                    if (!(self.options.disableReturn || editorElement.getAttribute('data-disable-return')) &&
-                            tagName !== 'li' && !Util.isListItemChild(node)) {
-                        // For anchor tags, unlink
-                        if (tagName === 'a') {
-                            self.options.ownerDocument.execCommand('unlink', false, null);
-                        } else if (!e.shiftKey) {
-                            // only format block if this is not a header tag
-                            if (!/h\d/.test(tagName)) {
-                                self.options.ownerDocument.execCommand('formatBlock', false, 'p');
-                            }
-                        }
-                    }
-                }
-            });
             return this;
         },
 

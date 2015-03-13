@@ -248,7 +248,14 @@ var Util;
             }
         },
 
-        isListItemChild: function (node) {
+        isListItem: function (node) {
+            if (!node) {
+                return false;
+            }
+            if (node.tagName.toLowerCase() === 'li') {
+                return true;
+            }
+
             var parentNode = node.parentNode,
                 tagName = parentNode.tagName.toLowerCase();
             while (this.parentElements.indexOf(tagName) === -1 && tagName !== 'div') {
