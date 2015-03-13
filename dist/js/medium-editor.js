@@ -927,6 +927,21 @@ var Events;
                 }.bind(this));
                 this.listeners[name] = true;
                 break;
+            case 'editableDrag':
+                // Detecting dragover and dragleave on the contenteditables
+                this.base.elements.forEach(function (element) {
+                    this.attachDOMEvent(element, 'dragover', this.handleDragging.bind(this));
+                    this.attachDOMEvent(element, 'dragleave', this.handleDragging.bind(this));
+                }.bind(this));
+                this.listeners[name] = true;
+                break;
+            case 'editableDrop':
+                // Detecting drop on the contenteditables
+                this.base.elements.forEach(function (element) {
+                    this.attachDOMEvent(element, 'drop', this.handleDrop.bind(this));
+                }.bind(this));
+                this.listeners[name] = true;
+                break;
             }
         },
 
@@ -974,6 +989,14 @@ var Events;
 
         handleMouseover: function (event) {
             this.triggerCustomEvent('editableMouseover', event, event.currentTarget);
+        },
+
+        handleDragging: function (event) {
+            this.triggerCustomEvent('editableDrag', event, event.currentTarget);
+        },
+
+        handleDrop: function (event) {
+            this.triggerCustomEvent('editableDrop', event, event.currentTarget);
         },
 
         handleKeydown: function (event) {
@@ -2727,33 +2750,33 @@ function MediumEditor(elements, options) {
         }
     }
 
-    function handleBlockDeleteKeydowns(e) {
+    function handleBlockDeleteKeydowns(event, element) {
         var range, sel, p, node = Selection.getSelectionStart(this.options.ownerDocument),
             tagName = node.tagName.toLowerCase(),
             isEmpty = /^(\s+|<br\/?>)?$/i,
             isHeader = /h\d/i;
 
-        if ((e.which === Util.keyCode.BACKSPACE || e.which === Util.keyCode.ENTER)
+        if ((event.which === Util.keyCode.BACKSPACE || event.which === Util.keyCode.ENTER)
                 && node.previousElementSibling
                 // in a header
                 && isHeader.test(tagName)
                 // at the very end of the block
                 && Selection.getCaretOffsets(node).left === 0) {
-            if (e.which === Util.keyCode.BACKSPACE && isEmpty.test(node.previousElementSibling.innerHTML)) {
+            if (event.which === Util.keyCode.BACKSPACE && isEmpty.test(node.previousElementSibling.innerHTML)) {
                 // backspacing the begining of a header into an empty previous element will
                 // change the tagName of the current node to prevent one
                 // instead delete previous node and cancel the event.
                 node.previousElementSibling.parentNode.removeChild(node.previousElementSibling);
-                e.preventDefault();
-            } else if (e.which === Util.keyCode.ENTER) {
+                event.preventDefault();
+            } else if (event.which === Util.keyCode.ENTER) {
                 // hitting return in the begining of a header will create empty header elements before the current one
                 // instead, make "<p><br></p>" element, which are what happens if you hit return in an empty paragraph
                 p = this.options.ownerDocument.createElement('p');
                 p.innerHTML = '<br>';
                 node.previousElementSibling.parentNode.insertBefore(p, node);
-                e.preventDefault();
+                event.preventDefault();
             }
-        } else if (e.which === Util.keyCode.DELETE
+        } else if (event.which === Util.keyCode.DELETE
                     && node.nextElementSibling
                     && node.previousElementSibling
                     // not in a header
@@ -2779,8 +2802,53 @@ function MediumEditor(elements, options) {
 
             node.previousElementSibling.parentNode.removeChild(node);
 
-            e.preventDefault();
+            event.preventDefault();
         }
+    }
+
+    function handleDrag(event, element) {
+        var className = 'medium-editor-dragover';
+        event.preventDefault();
+        event.dataTransfer.dropEffect = 'copy';
+
+        if (event.type === 'dragover') {
+            event.target.classList.add(className);
+        } else if (event.type === 'dragleave') {
+            event.target.classList.remove(className);
+        }
+    }
+
+    function handleDrop(event, element) {
+        var className = 'medium-editor-dragover',
+            files;
+        event.preventDefault();
+        event.stopPropagation();
+
+        // IE9 does not support the File API, so prevent file from opening in a new window
+        // but also don't try to actually get the file
+        if (event.dataTransfer.files) {
+            files = Array.prototype.slice.call(event.dataTransfer.files, 0);
+            files.some(function (file) {
+                if (file.type.match("image")) {
+                    var fileReader, id;
+                    fileReader = new FileReader();
+                    fileReader.readAsDataURL(file);
+
+                    id = 'medium-img-' + (+new Date());
+                    Util.insertHTMLCommand(this.options.ownerDocument, '<img class="medium-image-loading" id="' + id + '" />');
+
+                    fileReader.onload = function () {
+                        var img = document.getElementById(id);
+                        if (img) {
+                            img.removeAttribute('id');
+                            img.removeAttribute('class');
+                            img.src = fileReader.result;
+                        }
+                    };
+                }
+            }.bind(this));
+        }
+        event.target.classList.remove(className);
     }
 
     MediumEditor.statics = {
@@ -2858,7 +2926,6 @@ function MediumEditor(elements, options) {
             this.initCommands()
                 .initElements()
                 .attachHandlers()
-                .bindDragDrop()
                 .bindPaste();
 
             if (!this.options.disablePlaceholders) {
@@ -2932,6 +2999,12 @@ function MediumEditor(elements, options) {
                         break;
                     }
                 }
+            }
+
+            // drag and drop of images
+            if (this.options.imageDragging) {
+                this.subscribe('editableDrag', handleDrag.bind(this));
+                this.subscribe('editableDrop', handleDrop.bind(this));
             }
 
             return this;
@@ -3121,67 +3194,6 @@ function MediumEditor(elements, options) {
             this.toolbar = new Toolbar(this);
             this.options.elementsContainer.appendChild(this.toolbar.getToolbarElement());
 
-            return this;
-        },
-
-        bindDragDrop: function () {
-            var self = this, i, className, onDrag, onDrop, element;
-
-            if (!self.options.imageDragging) {
-                return this;
-            }
-
-            className = 'medium-editor-dragover';
-
-            onDrag = function (e) {
-                e.preventDefault();
-                e.dataTransfer.dropEffect = "copy";
-
-                if (e.type === "dragover") {
-                    this.classList.add(className);
-                } else {
-                    this.classList.remove(className);
-                }
-            };
-
-            onDrop = function (e) {
-                var files;
-                e.preventDefault();
-                e.stopPropagation();
-                // IE9 does not support the File API, so prevent file from opening in a new window
-                // but also don't try to actually get the file
-                if (e.dataTransfer.files) {
-                    files = Array.prototype.slice.call(e.dataTransfer.files, 0);
-                    files.some(function (file) {
-                        if (file.type.match("image")) {
-                            var fileReader, id;
-                            fileReader = new FileReader();
-                            fileReader.readAsDataURL(file);
-
-                            id = 'medium-img-' + (+new Date());
-                            Util.insertHTMLCommand(self.options.ownerDocument, '<img class="medium-image-loading" id="' + id + '" />');
-
-                            fileReader.onload = function () {
-                                var img = document.getElementById(id);
-                                if (img) {
-                                    img.removeAttribute('id');
-                                    img.removeAttribute('class');
-                                    img.src = fileReader.result;
-                                }
-                            };
-                        }
-                    });
-                }
-                this.classList.remove(className);
-            };
-
-            for (i = 0; i < this.elements.length; i += 1) {
-                element = this.elements[i];
-
-                this.on(element, 'dragover', onDrag);
-                this.on(element, 'dragleave', onDrag);
-                this.on(element, 'drop', onDrop);
-            }
             return this;
         },
 

@@ -135,6 +135,21 @@ var Events;
                 }.bind(this));
                 this.listeners[name] = true;
                 break;
+            case 'editableDrag':
+                // Detecting dragover and dragleave on the contenteditables
+                this.base.elements.forEach(function (element) {
+                    this.attachDOMEvent(element, 'dragover', this.handleDragging.bind(this));
+                    this.attachDOMEvent(element, 'dragleave', this.handleDragging.bind(this));
+                }.bind(this));
+                this.listeners[name] = true;
+                break;
+            case 'editableDrop':
+                // Detecting drop on the contenteditables
+                this.base.elements.forEach(function (element) {
+                    this.attachDOMEvent(element, 'drop', this.handleDrop.bind(this));
+                }.bind(this));
+                this.listeners[name] = true;
+                break;
             }
         },
 
@@ -182,6 +197,14 @@ var Events;
 
         handleMouseover: function (event) {
             this.triggerCustomEvent('editableMouseover', event, event.currentTarget);
+        },
+
+        handleDragging: function (event) {
+            this.triggerCustomEvent('editableDrag', event, event.currentTarget);
+        },
+
+        handleDrop: function (event) {
+            this.triggerCustomEvent('editableDrop', event, event.currentTarget);
         },
 
         handleKeydown: function (event) {
