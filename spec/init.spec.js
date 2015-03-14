@@ -21,15 +21,13 @@ describe('Initialization TestCase', function () {
         });
 
         it('should do nothing when selector does not return any elements', function () {
-            spyOn(MediumEditor.prototype, 'initElements');
-            spyOn(MediumEditor.prototype, 'initToolbar');
+            spyOn(MediumEditor.prototype, 'setup');
             var editor = new MediumEditor('.test');
             expect(editor.id).toBe(undefined);
-            expect(editor.initElements).not.toHaveBeenCalled();
-            expect(editor.initToolbar).not.toHaveBeenCalled();
+            expect(editor.setup).not.toHaveBeenCalled();
             expect(editor.toolbar).toBeUndefined();
             expect(editor.getExtensionByName('anchor')).toBeUndefined();
-            expect(editor.initElements).not.toHaveBeenCalled();
+            expect(editor.getExtensionByName('anchor-preview')).toBeUndefined();
         });
     });
 
@@ -149,18 +147,21 @@ describe('Initialization TestCase', function () {
         });
 
         it('should call the default initialization methods', function () {
-            spyOn(MediumEditor.prototype, 'initElements').and.callThrough();
-            spyOn(MediumEditor.prototype, 'initToolbar').and.callThrough();
+            spyOn(MediumEditor.prototype, 'setup').and.callThrough();
             spyOn(MediumEditor.statics.Toolbar.prototype, 'createToolbar').and.callThrough();
             spyOn(MediumEditor.statics.AnchorExtension.prototype, 'createForm').and.callThrough();
-            var editor = new MediumEditor('.editor');
+            spyOn(MediumEditor.statics.AnchorPreview.prototype, 'createPreview').and.callThrough();
+            var editor = new MediumEditor('.editor'),
+                anchorExtension = editor.getExtensionByName('anchor'),
+                anchorPreview = editor.getExtensionByName('anchor-preview');
             expect(editor.id).toBe(1);
-            expect(editor.initElements).toHaveBeenCalled();
-            expect(editor.initToolbar).toHaveBeenCalled();
+            expect(editor.setup).toHaveBeenCalled();
             expect(editor.toolbar).not.toBeUndefined();
             expect(editor.toolbar.createToolbar).toHaveBeenCalled();
-            expect(editor.getExtensionByName('anchor').createForm).toHaveBeenCalled();
-            expect(editor.initElements).toHaveBeenCalled();
+            expect(anchorExtension).not.toBeUndefined();
+            expect(anchorExtension.createForm).toHaveBeenCalled();
+            expect(anchorPreview).not.toBeUndefined();
+            expect(anchorPreview.createPreview).toHaveBeenCalled();
         });
 
         it('should set the ID according to the numbers of editors instantiated', function () {

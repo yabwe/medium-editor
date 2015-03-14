@@ -378,8 +378,9 @@ function MediumEditor(elements, options) {
                 }
             }
             // Init toolbar
-            if (addToolbar) {
-                this.initToolbar();
+            if (!this.toolbar && addToolbar) {
+                this.toolbar = new Toolbar(this);
+                this.options.elementsContainer.appendChild(this.toolbar.getToolbarElement());
             }
             return this;
         },
@@ -508,16 +509,6 @@ function MediumEditor(elements, options) {
                     }
                 }
             }
-            return this;
-        },
-
-        initToolbar: function () {
-            if (this.toolbar) {
-                return this;
-            }
-            this.toolbar = new Toolbar(this);
-            this.options.elementsContainer.appendChild(this.toolbar.getToolbarElement());
-
             return this;
         },
 
