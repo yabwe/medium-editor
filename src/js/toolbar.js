@@ -275,9 +275,8 @@ var Toolbar;
             var i,
                 adjacentNode,
                 offset = 0,
-                newRange;
-            this.base.selection = newSelection;
-            this.base.selectionRange = this.base.selection.getRangeAt(0);
+                newRange,
+                selectionRange = newSelection.getRangeAt(0);
 
             /*
             * In firefox, there are cases (ie doubleclick of a word) where the selectionRange start
@@ -296,9 +295,9 @@ var Toolbar;
             * adjacent text node that actually has content in it, and move the selectionRange start there.
             */
             if (this.options.standardizeSelectionStart &&
-                    this.base.selectionRange.startContainer.nodeValue &&
-                    (this.base.selectionRange.startOffset === this.base.selectionRange.startContainer.nodeValue.length)) {
-                adjacentNode = Util.findAdjacentTextNodeWithContent(Selection.getSelectionElement(this.options.contentWindow), this.base.selectionRange.startContainer, this.options.ownerDocument);
+                    selectionRange.startContainer.nodeValue &&
+                    (selectionRange.startOffset === selectionRange.startContainer.nodeValue.length)) {
+                adjacentNode = Util.findAdjacentTextNodeWithContent(Selection.getSelectionElement(this.options.contentWindow), selectionRange.startContainer, this.options.ownerDocument);
                 if (adjacentNode) {
                     offset = 0;
                     while (adjacentNode.nodeValue.substr(offset, 1).trim().length === 0) {
@@ -306,10 +305,10 @@ var Toolbar;
                     }
                     newRange = this.options.ownerDocument.createRange();
                     newRange.setStart(adjacentNode, offset);
-                    newRange.setEnd(this.base.selectionRange.endContainer, this.base.selectionRange.endOffset);
-                    this.base.selection.removeAllRanges();
-                    this.base.selection.addRange(newRange);
-                    this.base.selectionRange = newRange;
+                    newRange.setEnd(selectionRange.endContainer, selectionRange.endOffset);
+                    newSelection.removeAllRanges();
+                    newSelection.addRange(newRange);
+                    selectionRange = newRange;
                 }
             }
 
@@ -373,6 +372,7 @@ var Toolbar;
         checkActiveButtons: function () {
             var manualStateChecks = [],
                 queryState = null,
+                selectionRange = Util.getSelectionRange(this.options.ownerDocument),
                 parentNode,
                 updateExtensionState = function (extension) {
                     if (typeof extension.checkState === 'function') {
@@ -385,11 +385,11 @@ var Toolbar;
                     }
                 };
 
-            if (!this.base.selectionRange) {
+            if (!selectionRange) {
                 return;
             }
 
-            parentNode = Selection.getSelectedParentElement(this.base.selectionRange);
+            parentNode = Selection.getSelectedParentElement(selectionRange);
 
             // Loop through all commands
             this.base.commands.forEach(function (command) {

@@ -17,7 +17,7 @@ function MediumEditor(elements, options) {
         if (this.options.disableReturn || element.getAttribute('data-disable-return')) {
             event.preventDefault();
         } else if (this.options.disableDoubleReturn || this.getAttribute('data-disable-double-return')) {
-            var node = Selection.getSelectionStart(this.options.contentWindow);
+            var node = Util.getSelectionStart(this.options.ownerDocument);
             if (node && node.textContent.trim() === '') {
                 event.preventDefault();
             }
@@ -26,7 +26,7 @@ function MediumEditor(elements, options) {
 
     function handleTabKeydown(event, element) {
         // Override tab only for pre nodes
-        var node = Selection.getSelectionStart(this.options.ownerDocument),
+        var node = Util.getSelectionStart(this.options.ownerDocument),
             tag = node && node.tagName.toLowerCase();
 
         if (tag === 'pre') {
@@ -48,7 +48,7 @@ function MediumEditor(elements, options) {
     }
 
     function handleBlockDeleteKeydowns(event, element) {
-        var range, sel, p, node = Selection.getSelectionStart(this.options.ownerDocument),
+        var range, sel, p, node = Util.getSelectionStart(this.options.ownerDocument),
             tagName = node.tagName.toLowerCase(),
             isEmpty = /^(\s+|<br\/?>)?$/i,
             isHeader = /h\d/i;
@@ -149,7 +149,7 @@ function MediumEditor(elements, options) {
     }
 
     function handleKeyup(event) {
-        var node = Selection.getSelectionStart(this.options.ownerDocument),
+        var node = Util.getSelectionStart(this.options.ownerDocument),
             tagName;
 
         if (!node) {
@@ -242,7 +242,7 @@ function MediumEditor(elements, options) {
         // type of block element (ie append-blockquote, append-h1, append-pre, etc.)
         match = appendAction.exec(action);
         if (match) {
-            return this.execFormatBlock(match[1]);
+            return Util.execFormatBlock(this.options.ownerDocument, match[1]);
         }
 
         if (action === 'createLink') {
@@ -591,31 +591,6 @@ function MediumEditor(elements, options) {
             return Selection.getSelectedParentElement(range);
         },
 
-        execFormatBlock: function (el) {
-            var selectionData = Selection.getSelectionData(this.selection.anchorNode);
-            // FF handles blockquote differently on formatBlock
-            // allowing nesting, we need to use outdent
-            // https://developer.mozilla.org/en-US/docs/Rich-Text_Editing_in_Mozilla
-            if (el === 'blockquote' && selectionData.el &&
-                    selectionData.el.parentNode.tagName.toLowerCase() === 'blockquote') {
-                return this.options.ownerDocument.execCommand('outdent', false, null);
-            }
-            if (selectionData.tagName === el) {
-                el = 'p';
-            }
-            // When IE we need to add <> to heading elements and
-            //  blockquote needs to be called as indent
-            // http://stackoverflow.com/questions/10741831/execcommand-formatblock-headings-in-ie
-            // http://stackoverflow.com/questions/1816223/rich-text-editor-with-blockquote-function/1821777#1821777
-            if (Util.isIE) {
-                if (el === 'blockquote') {
-                    return this.options.ownerDocument.execCommand('indent', false, el);
-                }
-                el = '<' + el + '>';
-            }
-            return this.options.ownerDocument.execCommand('formatBlock', false, el);
-        },
-
         hideToolbarDefaultActions: function () {
             if (this.toolbar) {
                 this.toolbar.hideToolbarDefaultActions();
@@ -744,11 +719,11 @@ function MediumEditor(elements, options) {
                 this.options.ownerDocument.execCommand('createLink', false, opts.url);
 
                 if (this.options.targetBlank || opts.target === '_blank') {
-                    Util.setTargetBlank(Selection.getSelectionStart(this.options.ownerDocument));
+                    Util.setTargetBlank(Util.getSelectionStart(this.options.ownerDocument));
                 }
 
                 if (opts.buttonClass) {
-                    Util.addClassToAnchors(Selection.getSelectionStart(this.options.ownerDocument), opts.buttonClass);
+                    Util.addClassToAnchors(Util.getSelectionStart(this.options.ownerDocument), opts.buttonClass);
                 }
             }
 

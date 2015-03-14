@@ -614,6 +614,67 @@ var Util;
             }
         },
 
+        getSelectionRange: function (ownerDocument) {
+            var selection = ownerDocument.getSelection();
+            if (selection.rangeCount === 0) {
+                return null;
+            }
+            return selection.getRangeAt(0);
+        },
+
+        // http://stackoverflow.com/questions/1197401/how-can-i-get-the-element-the-caret-is-in-with-javascript-when-using-contentedi
+        // by You
+        getSelectionStart: function (ownerDocument) {
+            var node = ownerDocument.getSelection().anchorNode,
+                startNode = (node && node.nodeType === 3 ? node.parentNode : node);
+            return startNode;
+        },
+
+        getSelectionData: function (el) {
+            var tagName;
+
+            if (el && el.tagName) {
+                tagName = el.tagName.toLowerCase();
+            }
+
+            while (el && this.parentElements.indexOf(tagName) === -1) {
+                el = el.parentNode;
+                if (el && el.tagName) {
+                    tagName = el.tagName.toLowerCase();
+                }
+            }
+
+            return {
+                el: el,
+                tagName: tagName
+            };
+        },
+
+        execFormatBlock: function (doc, tagName) {
+            var selectionData = this.getSelectionData(this.getSelectionStart(doc));
+            // FF handles blockquote differently on formatBlock
+            // allowing nesting, we need to use outdent
+            // https://developer.mozilla.org/en-US/docs/Rich-Text_Editing_in_Mozilla
+            if (tagName === 'blockquote' && selectionData.el &&
+                    selectionData.el.parentNode.tagName.toLowerCase() === 'blockquote') {
+                return doc.execCommand('outdent', false, null);
+            }
+            if (selectionData.tagName === tagName) {
+                tagName = 'p';
+            }
+            // When IE we need to add <> to heading elements and
+            //  blockquote needs to be called as indent
+            // http://stackoverflow.com/questions/10741831/execcommand-formatblock-headings-in-ie
+            // http://stackoverflow.com/questions/1816223/rich-text-editor-with-blockquote-function/1821777#1821777
+            if (this.isIE) {
+                if (tagName === 'blockquote') {
+                    return doc.execCommand('indent', false, tagName);
+                }
+                tagName = '<' + tagName + '>';
+            }
+            return doc.execCommand('formatBlock', false, tagName);
+        },
+
         // TODO: not sure if this should be here
         setTargetBlank: function (el) {
             var i;
@@ -678,14 +739,6 @@ var Selection;
     'use strict';
 
     Selection = {
-        // http://stackoverflow.com/questions/1197401/how-can-i-get-the-element-the-caret-is-in-with-javascript-when-using-contentedi
-        // by You
-        getSelectionStart: function (ownerDocument) {
-            var node = ownerDocument.getSelection().anchorNode,
-                startNode = (node && node.nodeType === 3 ? node.parentNode : node);
-            return startNode;
-        },
-
         findMatchingSelectionParent: function (testElementFunction, contentWindow) {
             var selection = contentWindow.getSelection(), range, current;
 
@@ -776,26 +829,6 @@ var Selection;
                 selectedParentElement = range.startContainer;
             }
             return selectedParentElement;
-        },
-
-        getSelectionData: function (el) {
-            var tagName;
-
-            if (el && el.tagName) {
-                tagName = el.tagName.toLowerCase();
-            }
-
-            while (el && Util.parentElements.indexOf(tagName) === -1) {
-                el = el.parentNode;
-                if (el && el.tagName) {
-                    tagName = el.tagName.toLowerCase();
-                }
-            }
-
-            return {
-                el: el,
-                tagName: tagName
-            };
         }
     };
 }(document, window));
@@ -1661,11 +1694,7 @@ var AnchorExtension;
             evt.preventDefault();
             evt.stopPropagation();
 
-            if (!this.base.selection) {
-                this.base.checkSelection();
-            }
-
-            var selectedParentElement = Selection.getSelectedParentElement(this.base.selectionRange);
+            var selectedParentElement = Selection.getSelectedParentElement(Util.getSelectionRange(this.base.options.ownerDocument));
             if (selectedParentElement.tagName &&
                     selectedParentElement.tagName.toLowerCase() === 'a') {
                 return this.base.execAction('unlink');
@@ -2384,9 +2413,8 @@ var Toolbar;
             var i,
                 adjacentNode,
                 offset = 0,
-                newRange;
-            this.base.selection = newSelection;
-            this.base.selectionRange = this.base.selection.getRangeAt(0);
+                newRange,
+                selectionRange = newSelection.getRangeAt(0);
 
             /*
             * In firefox, there are cases (ie doubleclick of a word) where the selectionRange start
@@ -2405,9 +2433,9 @@ var Toolbar;
             * adjacent text node that actually has content in it, and move the selectionRange start there.
             */
             if (this.options.standardizeSelectionStart &&
-                    this.base.selectionRange.startContainer.nodeValue &&
-                    (this.base.selectionRange.startOffset === this.base.selectionRange.startContainer.nodeValue.length)) {
-                adjacentNode = Util.findAdjacentTextNodeWithContent(Selection.getSelectionElement(this.options.contentWindow), this.base.selectionRange.startContainer, this.options.ownerDocument);
+                    selectionRange.startContainer.nodeValue &&
+                    (selectionRange.startOffset === selectionRange.startContainer.nodeValue.length)) {
+                adjacentNode = Util.findAdjacentTextNodeWithContent(Selection.getSelectionElement(this.options.contentWindow), selectionRange.startContainer, this.options.ownerDocument);
                 if (adjacentNode) {
                     offset = 0;
                     while (adjacentNode.nodeValue.substr(offset, 1).trim().length === 0) {
@@ -2415,10 +2443,10 @@ var Toolbar;
                     }
                     newRange = this.options.ownerDocument.createRange();
                     newRange.setStart(adjacentNode, offset);
-                    newRange.setEnd(this.base.selectionRange.endContainer, this.base.selectionRange.endOffset);
-                    this.base.selection.removeAllRanges();
-                    this.base.selection.addRange(newRange);
-                    this.base.selectionRange = newRange;
+                    newRange.setEnd(selectionRange.endContainer, selectionRange.endOffset);
+                    newSelection.removeAllRanges();
+                    newSelection.addRange(newRange);
+                    selectionRange = newRange;
                 }
             }
 
@@ -2482,6 +2510,7 @@ var Toolbar;
         checkActiveButtons: function () {
             var manualStateChecks = [],
                 queryState = null,
+                selectionRange = Util.getSelectionRange(this.options.ownerDocument),
                 parentNode,
                 updateExtensionState = function (extension) {
                     if (typeof extension.checkState === 'function') {
@@ -2494,11 +2523,11 @@ var Toolbar;
                     }
                 };
 
-            if (!this.base.selectionRange) {
+            if (!selectionRange) {
                 return;
             }
 
-            parentNode = Selection.getSelectedParentElement(this.base.selectionRange);
+            parentNode = Selection.getSelectedParentElement(selectionRange);
 
             // Loop through all commands
             this.base.commands.forEach(function (command) {
@@ -2743,7 +2772,7 @@ function MediumEditor(elements, options) {
         if (this.options.disableReturn || element.getAttribute('data-disable-return')) {
             event.preventDefault();
         } else if (this.options.disableDoubleReturn || this.getAttribute('data-disable-double-return')) {
-            var node = Selection.getSelectionStart(this.options.contentWindow);
+            var node = Util.getSelectionStart(this.options.ownerDocument);
             if (node && node.textContent.trim() === '') {
                 event.preventDefault();
             }
@@ -2752,7 +2781,7 @@ function MediumEditor(elements, options) {
 
     function handleTabKeydown(event, element) {
         // Override tab only for pre nodes
-        var node = Selection.getSelectionStart(this.options.ownerDocument),
+        var node = Util.getSelectionStart(this.options.ownerDocument),
             tag = node && node.tagName.toLowerCase();
 
         if (tag === 'pre') {
@@ -2774,7 +2803,7 @@ function MediumEditor(elements, options) {
     }
 
     function handleBlockDeleteKeydowns(event, element) {
-        var range, sel, p, node = Selection.getSelectionStart(this.options.ownerDocument),
+        var range, sel, p, node = Util.getSelectionStart(this.options.ownerDocument),
             tagName = node.tagName.toLowerCase(),
             isEmpty = /^(\s+|<br\/?>)?$/i,
             isHeader = /h\d/i;
@@ -2875,7 +2904,7 @@ function MediumEditor(elements, options) {
     }
 
     function handleKeyup(event) {
-        var node = Selection.getSelectionStart(this.options.ownerDocument),
+        var node = Util.getSelectionStart(this.options.ownerDocument),
             tagName;
 
         if (!node) {
@@ -2968,7 +2997,7 @@ function MediumEditor(elements, options) {
         // type of block element (ie append-blockquote, append-h1, append-pre, etc.)
         match = appendAction.exec(action);
         if (match) {
-            return this.execFormatBlock(match[1]);
+            return Util.execFormatBlock(this.options.ownerDocument, match[1]);
         }
 
         if (action === 'createLink') {
@@ -3317,31 +3346,6 @@ function MediumEditor(elements, options) {
             return Selection.getSelectedParentElement(range);
         },
 
-        execFormatBlock: function (el) {
-            var selectionData = Selection.getSelectionData(this.selection.anchorNode);
-            // FF handles blockquote differently on formatBlock
-            // allowing nesting, we need to use outdent
-            // https://developer.mozilla.org/en-US/docs/Rich-Text_Editing_in_Mozilla
-            if (el === 'blockquote' && selectionData.el &&
-                    selectionData.el.parentNode.tagName.toLowerCase() === 'blockquote') {
-                return this.options.ownerDocument.execCommand('outdent', false, null);
-            }
-            if (selectionData.tagName === el) {
-                el = 'p';
-            }
-            // When IE we need to add <> to heading elements and
-            //  blockquote needs to be called as indent
-            // http://stackoverflow.com/questions/10741831/execcommand-formatblock-headings-in-ie
-            // http://stackoverflow.com/questions/1816223/rich-text-editor-with-blockquote-function/1821777#1821777
-            if (Util.isIE) {
-                if (el === 'blockquote') {
-                    return this.options.ownerDocument.execCommand('indent', false, el);
-                }
-                el = '<' + el + '>';
-            }
-            return this.options.ownerDocument.execCommand('formatBlock', false, el);
-        },
-
         hideToolbarDefaultActions: function () {
             if (this.toolbar) {
                 this.toolbar.hideToolbarDefaultActions();
@@ -3470,11 +3474,11 @@ function MediumEditor(elements, options) {
                 this.options.ownerDocument.execCommand('createLink', false, opts.url);
 
                 if (this.options.targetBlank || opts.target === '_blank') {
-                    Util.setTargetBlank(Selection.getSelectionStart(this.options.ownerDocument));
+                    Util.setTargetBlank(Util.getSelectionStart(this.options.ownerDocument));
                 }
 
                 if (opts.buttonClass) {
-                    Util.addClassToAnchors(Selection.getSelectionStart(this.options.ownerDocument), opts.buttonClass);
+                    Util.addClassToAnchors(Util.getSelectionStart(this.options.ownerDocument), opts.buttonClass);
                 }
             }
 

@@ -37,7 +37,6 @@ describe('Buttons TestCase', function () {
             selectElementContentsAndFire(editor.elements[0]);
             jasmine.clock().tick(1);
             button = editor.toolbar.getToolbarElement().querySelector('[data-action="bold"]');
-            editor.selection = undefined;
             fireEvent(button, 'click');
             expect(editor.checkSelection).toHaveBeenCalled();
         });
@@ -174,15 +173,15 @@ describe('Buttons TestCase', function () {
     });
 
     describe('AppendEl', function () {
-        it('should call the execFormatBlock method when button action is append', function () {
-            spyOn(MediumEditor.prototype, 'execFormatBlock');
+        it('should call the document.execCommand method when button action is append', function () {
+            spyOn(document, 'execCommand');
             var button,
                 editor = new MediumEditor('.editor');
             selectElementContentsAndFire(editor.elements[0]);
             jasmine.clock().tick(1);
             button = editor.toolbar.getToolbarElement().querySelector('[data-action="append-h3"]');
             fireEvent(button, 'click');
-            expect(editor.execFormatBlock).toHaveBeenCalled();
+            expect(document.execCommand).toHaveBeenCalledWith('formatBlock', false, 'h3');
         });
 
         it('should create an h3 element when header1 is clicked', function () {
