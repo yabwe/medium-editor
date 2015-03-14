@@ -232,6 +232,101 @@ function MediumEditor(elements, options) {
         return shouldAdd;
     }
 
+    function initElements() {
+        var i,
+            addToolbar = false;
+        for (i = 0; i < this.elements.length; i += 1) {
+            if (!this.options.disableEditing && !this.elements[i].getAttribute('data-disable-editing')) {
+                this.elements[i].setAttribute('contentEditable', true);
+            }
+            if (!this.elements[i].getAttribute('data-placeholder')) {
+                this.elements[i].setAttribute('data-placeholder', this.options.placeholder);
+            }
+            this.elements[i].setAttribute('data-medium-element', true);
+            this.elements[i].setAttribute('role', 'textbox');
+            this.elements[i].setAttribute('aria-multiline', true);
+            if (!this.options.disableToolbar && !this.elements[i].getAttribute('data-disable-toolbar')) {
+                addToolbar = true;
+            }
+        }
+        // Init toolbar
+        if (!this.toolbar && addToolbar) {
+            this.toolbar = new Toolbar(this);
+            this.options.elementsContainer.appendChild(this.toolbar.getToolbarElement());
+        }
+    }
+
+    function attachHandlers() {
+        var i;
+
+        // attach to tabs
+        this.subscribe('editableKeydownTab', handleTabKeydown.bind(this));
+
+        // Bind keys which can create or destroy a block element: backspace, delete, return
+        this.subscribe('editableKeydownDelete', handleBlockDeleteKeydowns.bind(this));
+        this.subscribe('editableKeydownEnter', handleBlockDeleteKeydowns.bind(this));
+
+        // disabling return or double return
+        if (this.options.disableReturn || this.options.disableDoubleReturn) {
+            this.subscribe('editableKeydownEnter', handleDisabledEnterKeydown.bind(this));
+        } else {
+            for (i = 0; i < this.elements.length; i += 1) {
+                if (this.elements[i].getAttribute('data-disable-return') || this.elements[i].getAttribute('data-disable-double-return')) {
+                    this.subscribe('editableKeydownEnter', handleDisabledEnterKeydown.bind(this));
+                    break;
+                }
+            }
+        }
+
+        // if we're not disabling return, add a handler to help handle cleanup
+        // for certain cases when enter is pressed
+        if (!this.options.disableReturn) {
+            this.elements.forEach(function (element) {
+                if (!element.getAttribute('data-disable-return')) {
+                    this.on(element, 'keyup', handleKeyup.bind(this));
+                }
+            }.bind(this));
+        }
+
+        // drag and drop of images
+        if (this.options.imageDragging) {
+            this.subscribe('editableDrag', handleDrag.bind(this));
+            this.subscribe('editableDrop', handleDrop.bind(this));
+        }
+    }
+
+    function initCommands() {
+        var buttons = this.options.buttons,
+            extensions = this.options.extensions,
+            ext,
+            name;
+        this.commands = [];
+
+        buttons.forEach(function (buttonName) {
+            if (extensions[buttonName]) {
+                ext = initExtension(extensions[buttonName], buttonName, this);
+                this.commands.push(ext);
+            } else if (buttonName === 'anchor') {
+                ext = initExtension(new AnchorExtension(), buttonName, this);
+                this.commands.push(ext);
+            } else if (ButtonsData.hasOwnProperty(buttonName)) {
+                ext = new DefaultButton(ButtonsData[buttonName], this);
+                this.commands.push(ext);
+            }
+        }.bind(this));
+
+        for (name in extensions) {
+            if (extensions.hasOwnProperty(name) && buttons.indexOf(name) === -1) {
+                ext = initExtension(extensions[name], name, this);
+            }
+        }
+
+        // Add AnchorPreview as extension if needed
+        if (shouldAddDefaultAnchorPreview.call(this)) {
+            this.commands.push(initExtension(new AnchorPreview(), 'anchor-preview', this));
+        }
+    }
+
     function execActionInternal(action, opts) {
         /*jslint regexp: true*/
         var appendAction = /^append-(.+)$/gi,
@@ -328,9 +423,11 @@ function MediumEditor(elements, options) {
         setup: function () {
             this.events = new Events(this);
             this.isActive = true;
-            this.initCommands()
-                .initElements()
-                .attachHandlers();
+
+            // Call initialization helpers
+            initCommands.call(this);
+            initElements.call(this);
+            attachHandlers.call(this);
 
             this.pasteHandler = new PasteHandler(this);
 
@@ -360,72 +457,6 @@ function MediumEditor(elements, options) {
             }, this.options.delay);
         },
 
-        initElements: function () {
-            var i,
-                addToolbar = false;
-            for (i = 0; i < this.elements.length; i += 1) {
-                if (!this.options.disableEditing && !this.elements[i].getAttribute('data-disable-editing')) {
-                    this.elements[i].setAttribute('contentEditable', true);
-                }
-                if (!this.elements[i].getAttribute('data-placeholder')) {
-                    this.elements[i].setAttribute('data-placeholder', this.options.placeholder);
-                }
-                this.elements[i].setAttribute('data-medium-element', true);
-                this.elements[i].setAttribute('role', 'textbox');
-                this.elements[i].setAttribute('aria-multiline', true);
-                if (!this.options.disableToolbar && !this.elements[i].getAttribute('data-disable-toolbar')) {
-                    addToolbar = true;
-                }
-            }
-            // Init toolbar
-            if (!this.toolbar && addToolbar) {
-                this.toolbar = new Toolbar(this);
-                this.options.elementsContainer.appendChild(this.toolbar.getToolbarElement());
-            }
-            return this;
-        },
-
-        attachHandlers: function () {
-            var i;
-
-            // attach to tabs
-            this.subscribe('editableKeydownTab', handleTabKeydown.bind(this));
-
-            // Bind keys which can create or destroy a block element: backspace, delete, return
-            this.subscribe('editableKeydownDelete', handleBlockDeleteKeydowns.bind(this));
-            this.subscribe('editableKeydownEnter', handleBlockDeleteKeydowns.bind(this));
-
-            // disabling return or double return
-            if (this.options.disableReturn || this.options.disableDoubleReturn) {
-                this.subscribe('editableKeydownEnter', handleDisabledEnterKeydown.bind(this));
-            } else {
-                for (i = 0; i < this.elements.length; i += 1) {
-                    if (this.elements[i].getAttribute('data-disable-return') || this.elements[i].getAttribute('data-disable-double-return')) {
-                        this.subscribe('editableKeydownEnter', handleDisabledEnterKeydown.bind(this));
-                        break;
-                    }
-                }
-            }
-
-            // if we're not disabling return, add a handler to help handle cleanup
-            // for certain cases when enter is pressed
-            if (!this.options.disableReturn) {
-                this.elements.forEach(function (element) {
-                    if (!element.getAttribute('data-disable-return')) {
-                        this.on(element, 'keyup', handleKeyup.bind(this));
-                    }
-                }.bind(this));
-            }
-
-            // drag and drop of images
-            if (this.options.imageDragging) {
-                this.subscribe('editableDrag', handleDrag.bind(this));
-                this.subscribe('editableDrop', handleDrop.bind(this));
-            }
-
-            return this;
-        },
-
         serialize: function () {
             var i,
                 elementid,
@@ -437,40 +468,6 @@ function MediumEditor(elements, options) {
                 };
             }
             return content;
-        },
-
-        initCommands: function () {
-            var buttons = this.options.buttons,
-                extensions = this.options.extensions,
-                ext,
-                name;
-            this.commands = [];
-
-            buttons.forEach(function (buttonName) {
-                if (extensions[buttonName]) {
-                    ext = initExtension(extensions[buttonName], buttonName, this);
-                    this.commands.push(ext);
-                } else if (buttonName === 'anchor') {
-                    ext = initExtension(new AnchorExtension(), buttonName, this);
-                    this.commands.push(ext);
-                } else if (ButtonsData.hasOwnProperty(buttonName)) {
-                    ext = new DefaultButton(ButtonsData[buttonName], this);
-                    this.commands.push(ext);
-                }
-            }.bind(this));
-
-            for (name in extensions) {
-                if (extensions.hasOwnProperty(name) && buttons.indexOf(name) === -1) {
-                    ext = initExtension(extensions[name], name, this);
-                }
-            }
-
-            // Add AnchorPreview as extension if needed
-            if (shouldAddDefaultAnchorPreview.call(this)) {
-                this.commands.push(initExtension(new AnchorPreview(), 'anchor-preview', this));
-            }
-
-            return this;
         },
 
         getExtensionByName: function (name) {
