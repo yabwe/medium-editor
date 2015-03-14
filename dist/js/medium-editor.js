@@ -2929,7 +2929,7 @@ function MediumEditor(elements, options) {
         }
     }
 
-    // Internal helper methods
+    // Internal helper methods which shouldn't be exposed externally
 
     function createElementsArray(selector) {
         if (!selector) {
@@ -3153,6 +3153,7 @@ function MediumEditor(elements, options) {
             lastButtonClass: 'medium-editor-button-last'
         },
 
+        // NOT DOCUMENTED - exposed for backwards compatability
         init: function (elements, options) {
             var uniqueId = 1;
 
@@ -3175,6 +3176,7 @@ function MediumEditor(elements, options) {
             return this.setup();
         },
 
+        // NOT DOCUMENTED - internal helper method exposed for backwards compatability
         setup: function () {
             this.events = new Events(this);
             this.isActive = true;
@@ -3238,6 +3240,7 @@ function MediumEditor(elements, options) {
         },
 
         /**
+         * NOT DOCUMENTED - exposed for backwards compatability
          * Helper function to call a method with a number of parameters on all registered extensions.
          * The function assures that the function exists before calling.
          *
@@ -3272,6 +3275,7 @@ function MediumEditor(elements, options) {
             this.preventSelectionUpdates = false;
         },
 
+        // NOT DOCUMENTED - exposed as extension helper and for backwards compatability
         checkSelection: function () {
             if (this.toolbar) {
                 this.toolbar.checkState();
@@ -3334,6 +3338,7 @@ function MediumEditor(elements, options) {
             return Selection.getSelectedParentElement(range);
         },
 
+        // NOT DOCUMENTED - exposed as extension helper
         hideToolbarDefaultActions: function () {
             if (this.toolbar) {
                 this.toolbar.hideToolbarDefaultActions();
@@ -3341,6 +3346,7 @@ function MediumEditor(elements, options) {
             return this;
         },
 
+        // NOT DOCUMENTED - exposed as extension helper and for backwards compatability
         setToolbarPosition: function () {
             if (this.toolbar) {
                 this.toolbar.setToolbarPosition();

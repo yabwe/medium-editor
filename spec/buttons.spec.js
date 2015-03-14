@@ -1,7 +1,7 @@
 /*global MediumEditor, describe, it, expect, spyOn,
          afterEach, beforeEach, selectElementContents,
          jasmine, fireEvent, tearDown, console,
-         selectElementContentsAndFire, xit, isOldIE */
+         selectElementContentsAndFire, xit, isOldIE, isIE */
 
 describe('Buttons TestCase', function () {
     'use strict';
@@ -181,7 +181,11 @@ describe('Buttons TestCase', function () {
             jasmine.clock().tick(1);
             button = editor.toolbar.getToolbarElement().querySelector('[data-action="append-h3"]');
             fireEvent(button, 'click');
-            expect(document.execCommand).toHaveBeenCalledWith('formatBlock', false, 'h3');
+            if (isIE()) {
+                expect(document.execCommand).toHaveBeenCalledWith('formatBlock', false, '<h3>');
+            } else {
+                expect(document.execCommand).toHaveBeenCalledWith('formatBlock', false, 'h3');
+            }
         });
 
         it('should create an h3 element when header1 is clicked', function () {
