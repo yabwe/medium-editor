@@ -148,10 +148,27 @@ Check out the Wiki page for a list of available themes: [https://github.com/davi
 
 ## API
 
+### Core Methods
 * __.deactivate()__: disables the editor
 * __.activate()__: re-activates the editor
 * __.serialize()__: returns a JSON object with elements contents
+* __.execAction(action, opts)__:
+* __.createLink(opts)__:
+* __.subscribe(event, listener)__:
+* __.saveSelection()__:
+* __.restoreSelection()__:
+* __.selectAllContents()__:
+* __.stopSelectionUpdates()__:
+* __.startSelectionUpdates()__:
+* __.cleanPaste(text)__:
+* __.pasteHTML(html)__:
 
+### Helper Methods
+* __.on(target, event, listener, useCapture)__:
+* __.off(target, event, listener, useCapture)__:
+* __.delay(fn)__:
+* __.getSelectionParentElement(range)__:
+* __.getExtensionByName(name)__:
 
 ## Capturing DOM changes
 
@@ -163,7 +180,7 @@ $('.editable').on('input', function() {
 });
 ```
 
-This is handy when you need to capture modifications other thats outside of `key up`'s scope like clicking on toolbar buttons.
+This is handy when you need to capture modifications to the contenteditable element that occur outside of `key up`'s scope (like clicking on toolbar buttons).
 
 `input` is supported by Chrome, Firefox, IE9 and other modern browsers. If you want to read more or support older browsers, check [Listening to events of a contenteditable HTML element](http://stackoverflow.com/questions/7802784/listening-to-events-of-a-contenteditable-html-element/7804973#7804973) and [Detect changes in the DOM](http://stackoverflow.com/questions/3219758/detect-changes-in-the-dom)
 
