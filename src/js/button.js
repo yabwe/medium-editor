@@ -234,6 +234,9 @@ var DefaultButton,
 
             this.button = this.createButton();
             this.base.on(this.button, 'click', this.handleClick.bind(this));
+            if (this.options.key) {
+                this.base.subscribe('editableKeydown', this.handleKeydown.bind(this));
+            }
         },
         getButton: function () {
             return this.button;
@@ -263,6 +266,22 @@ var DefaultButton,
             }
             button.innerHTML = content;
             return button;
+        },
+        handleKeydown: function (evt) {
+            var key, action;
+
+            if (evt.ctrlKey || evt.metaKey) {
+                key = String.fromCharCode(evt.which || evt.keyCode).toLowerCase();
+                if (this.options.key === key) {
+                    evt.preventDefault();
+                    evt.stopPropagation();
+
+                    action = this.getAction();
+                    if (action) {
+                        this.base.execAction(action);
+                    }
+                }
+            }
         },
         handleClick: function (evt) {
             evt.preventDefault();

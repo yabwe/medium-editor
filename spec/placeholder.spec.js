@@ -1,6 +1,6 @@
 /*global MediumEditor, describe, it, expect, spyOn,
          afterEach, beforeEach, selectElementContents,
-         jasmine, fireEvent, tearDown*/
+         jasmine, fireEvent, tearDown, console */
 
 describe('Placeholder TestCase', function () {
     'use strict';
@@ -50,6 +50,11 @@ describe('Placeholder TestCase', function () {
         var editor = new MediumEditor('.editor');
         expect(editor.elements[0].className).toContain('medium-editor-placeholder');
         fireEvent(editor.elements[0], 'click');
+        expect(editor.elements[0].className).not.toContain('medium-editor-placeholder');
+        fireEvent(editor.elements[0], 'blur');
+        expect(editor.elements[0].className).toContain('medium-editor-placeholder');
+        this.el.innerHTML = '<p>lorem</p><p id="target">ipsum</p><p>dolor</p>';
+        fireEvent(document.getElementById('target'), 'click');
         expect(editor.elements[0].className).not.toContain('medium-editor-placeholder');
     });
 

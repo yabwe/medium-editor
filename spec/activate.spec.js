@@ -55,9 +55,9 @@ describe('Activate/Deactivate TestCase', function () {
 
         it('should remove all the added events', function () {
             var editor = new MediumEditor('.editor');
-            expect(editor.events.length).toBeGreaterThan(0);
+            expect(editor.events.events.length).toBeGreaterThan(0);
             editor.deactivate();
-            expect(editor.events.length).toBe(0);
+            expect(editor.events.events.length).toBe(0);
         });
 
         it('should abort any pending throttled event handlers', function () {

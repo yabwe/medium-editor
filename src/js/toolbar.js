@@ -37,6 +37,7 @@ var Toolbar;
             });
 
             this.attachEventHandlers();
+            this.base.subscribe('externalInteraction', this.handleBlur.bind(this));
 
             return toolbar;
         },
