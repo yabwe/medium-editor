@@ -2247,16 +2247,6 @@ var Toolbar;
                     this.positionToolbarIfShown();
                 }
             }.bind(this));
-
-            // throttledHideToolbarActions is throttled because:
-            // - This method could be called many times due to the type of event handlers that are calling it
-            // - We want a slight delay so that other events in the stack can run, some of which may
-            //   prevent the toolbar from being hidden
-            this.throttledHideToolbarActions = Util.throttle(function (event) {
-                if (this.base.isActive) {
-                    this.hideToolbarActions();
-                }
-            }.bind(this));
         },
 
         attachEventHandlers: function () {
@@ -2326,8 +2316,10 @@ var Toolbar;
         },
 
         handleBlur: function (event) {
-            // Hide the toolbar after a small delay so we can prevent this on toolbar click
-            this.throttledHideToolbarActions();
+            // Delay the call to hideToolbar to handle bug with multiple editors on the page at once
+            setTimeout(function () {
+                this.hideToolbar();
+            }.bind(this), 0);
         },
 
         // Hiding/showing toolbar
@@ -2347,20 +2339,17 @@ var Toolbar;
 
         hideToolbar: function () {
             if (this.isDisplayed()) {
+                this.base.commands.forEach(function (extension) {
+                    if (typeof extension.onHide === 'function') {
+                        extension.onHide();
+                    }
+                });
+
                 this.getToolbarElement().classList.remove('medium-editor-toolbar-active');
                 if (typeof this.options.onHideToolbar === 'function') {
                     this.options.onHideToolbar();
                 }
             }
-        },
-
-        hideToolbarActions: function () {
-            this.base.commands.forEach(function (extension) {
-                if (extension.onHide && typeof extension.onHide === 'function') {
-                    extension.onHide();
-                }
-            });
-            this.hideToolbar();
         },
 
         isToolbarDefaultActionsDisplayed: function () {
@@ -2459,7 +2448,7 @@ var Toolbar;
             }
 
             if (!this.options.staticToolbar) {
-                this.hideToolbarActions();
+                this.hideToolbar();
             }
         },
 
@@ -2473,7 +2462,7 @@ var Toolbar;
                         (this.options.allowMultiParagraphSelection === false && this.multipleBlockElementsSelected()) ||
                         Selection.selectionInContentEditableFalse(this.options.contentWindow)) {
                     if (!this.options.staticToolbar) {
-                        this.hideToolbarActions();
+                        this.hideToolbar();
                     } else {
                         this.showAndUpdateToolbar();
                     }
@@ -2482,7 +2471,7 @@ var Toolbar;
                     selectionElement = Selection.getSelectionElement(this.options.contentWindow);
                     if (!selectionElement || selectionElement.getAttribute('data-disable-toolbar')) {
                         if (!this.options.staticToolbar) {
-                            this.hideToolbarActions();
+                            this.hideToolbar();
                         }
                     } else {
                         this.checkSelectionElement(newSelection, selectionElement);

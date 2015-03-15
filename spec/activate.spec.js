@@ -109,20 +109,20 @@ describe('Activate/Deactivate TestCase', function () {
 
             editor = new MediumEditor('.editor');
 
-            spyOn(editor.toolbar, 'hideToolbarActions').and.callThrough(); // via: handleBlur
+            spyOn(editor.toolbar, 'hideToolbar').and.callThrough(); // via: handleBlur
 
             selectElementContentsAndFire(editor.elements[0], { eventToFire: 'click' });
             jasmine.clock().tick(51);
-            expect(editor.toolbar.hideToolbarActions).not.toHaveBeenCalled();
+            expect(editor.toolbar.hideToolbar).not.toHaveBeenCalled();
 
             selectElementContentsAndFire(editor.elements[1], { eventToFire: 'click' });
             jasmine.clock().tick(51);
-            expect(editor.toolbar.hideToolbarActions).not.toHaveBeenCalled();
+            expect(editor.toolbar.hideToolbar).not.toHaveBeenCalled();
 
             selectElementContents(editor.elements[2]);
             selectElementContentsAndFire(editor.elements[2], { eventToFire: 'click' });
             jasmine.clock().tick(51);
-            expect(editor.toolbar.hideToolbarActions).not.toHaveBeenCalled();
+            expect(editor.toolbar.hideToolbar).not.toHaveBeenCalled();
 
             elements.forEach(function (el) {
                 document.body.removeChild(el);
