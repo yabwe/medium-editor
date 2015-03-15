@@ -495,41 +495,42 @@ var Util;
         },
 
         now: function now() {
-            return Date.now || new Date().getTime();
+            return Date.now() || new Date().getTime();
         },
 
         // https://github.com/jashkenas/underscore
-        throttle: function throttle(func, wait) {
+        throttle: function (func, wait) {
             var THROTTLE_INTERVAL = 50,
                 context,
                 args,
                 result,
                 timeout = null,
                 previous = 0,
-                later;
+                later = function () {
+                    previous = Util.now();
+                    timeout = null;
+                    result = func.apply(context, args);
+                    if (!timeout) {
+                        context = args = null;
+                    }
+                };
 
             if (!wait && wait !== 0) {
                 wait = THROTTLE_INTERVAL;
             }
 
-            later = function () {
-                previous = Util.now();
-                timeout = null;
-                result = func.apply(context, args);
-                if (!timeout) {
-                    context = args = null;
-                }
-            };
-
             return function () {
-                var currNow = Util.now(),
-                    remaining = wait - (currNow - previous);
+                var now = Util.now(),
+                    remaining = wait - (now - previous);
+
                 context = this;
                 args = arguments;
                 if (remaining <= 0 || remaining > wait) {
-                    clearTimeout(timeout);
-                    timeout = null;
-                    previous = currNow;
+                    if (timeout) {
+                        clearTimeout(timeout);
+                        timeout = null;
+                    }
+                    previous = now;
                     result = func.apply(context, args);
                     if (!timeout) {
                         context = args = null;
