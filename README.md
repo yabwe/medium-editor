@@ -149,26 +149,26 @@ Check out the Wiki page for a list of available themes: [https://github.com/davi
 ## API
 
 ### Core Methods
-* __.deactivate()__: disables the editor
-* __.activate()__: re-activates the editor
+* __.deactivate()__: disables the editor, removing all DOM elements and event handlers
+* __.activate()__: re-activates the editor if deactivated
 * __.serialize()__: returns a JSON object with elements contents
-* __.execAction(action, opts)__:
-* __.createLink(opts)__:
-* __.subscribe(event, listener)__:
-* __.saveSelection()__:
-* __.restoreSelection()__:
-* __.selectAllContents()__:
-* __.stopSelectionUpdates()__:
-* __.startSelectionUpdates()__:
-* __.cleanPaste(text)__:
-* __.pasteHTML(html)__:
+* __.execAction(action, opts)__: executes an built-in action via `document.execCommand`
+* __.createLink(opts)__: creates a link via the native `document.execCommand('createLink')` command
+* __.subscribe(event, listener)__: attaches a listener to a custom medium-editor event
+* __.saveSelection()__: internally store the set of selected text
+* __.restoreSelection()__: restore the selection to what was selected when `saveSelection()` was called
+* __.selectAllContents()__: expands the selection to contain all text within the focused contenteditable
+* __.stopSelectionUpdates()__: stop the toolbar from updating to reflect the state of the selected text
+* __.startSelectionUpdates()__: put the toolbar back into its normal updating state
+* __.cleanPaste(text)__: convert text to plaintext and replace current selection with result
+* __.pasteHTML(html)__: replace the current selection with html
 
 ### Helper Methods
-* __.on(target, event, listener, useCapture)__:
-* __.off(target, event, listener, useCapture)__:
-* __.delay(fn)__:
-* __.getSelectionParentElement(range)__:
-* __.getExtensionByName(name)__:
+* __.on(target, event, listener, useCapture)__: attach a listener to a DOM event which will be detached when MediumEditor is deactivated
+* __.off(target, event, listener, useCapture)__: detach a listener to a DOM even that was attached via `on()`
+* __.delay(fn)__: delay any function from being executed by the amount of time passed as the `delay` option
+* __.getSelectionParentElement(range)__: get the parent contenteditable element that contains the current selection
+* __.getExtensionByName(name)__: get a reference to an extension with the specified name
 
 ## Capturing DOM changes
 
