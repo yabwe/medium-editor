@@ -50,14 +50,14 @@ describe('Anchor Preview TestCase', function () {
             expect(editor.getExtensionByName('anchor').showForm).toHaveBeenCalled();
 
             // selecting other text should close the toolbar
-            spyOn(MediumEditor.statics.Toolbar.prototype, 'hideToolbarActions').and.callThrough();
+            spyOn(MediumEditor.statics.Toolbar.prototype, 'hideToolbar').and.callThrough();
             nextRange = document.createRange();
             nextRange.selectNodeContents(document.getElementById('another-element'));
             sel.removeAllRanges();
             sel.addRange(nextRange);
             fireEvent(document.documentElement, 'mouseup');
             jasmine.clock().tick(200);
-            expect(editor.toolbar.hideToolbarActions).toHaveBeenCalled();
+            expect(editor.toolbar.hideToolbar).toHaveBeenCalled();
 
         });
 

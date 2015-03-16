@@ -495,41 +495,42 @@ var Util;
         },
 
         now: function now() {
-            return Date.now || new Date().getTime();
+            return Date.now() || new Date().getTime();
         },
 
         // https://github.com/jashkenas/underscore
-        throttle: function throttle(func, wait) {
+        throttle: function (func, wait) {
             var THROTTLE_INTERVAL = 50,
                 context,
                 args,
                 result,
                 timeout = null,
                 previous = 0,
-                later;
+                later = function () {
+                    previous = Util.now();
+                    timeout = null;
+                    result = func.apply(context, args);
+                    if (!timeout) {
+                        context = args = null;
+                    }
+                };
 
             if (!wait && wait !== 0) {
                 wait = THROTTLE_INTERVAL;
             }
 
-            later = function () {
-                previous = Util.now();
-                timeout = null;
-                result = func.apply(context, args);
-                if (!timeout) {
-                    context = args = null;
-                }
-            };
-
             return function () {
-                var currNow = Util.now(),
-                    remaining = wait - (currNow - previous);
+                var now = Util.now(),
+                    remaining = wait - (now - previous);
+
                 context = this;
                 args = arguments;
                 if (remaining <= 0 || remaining > wait) {
-                    clearTimeout(timeout);
-                    timeout = null;
-                    previous = currNow;
+                    if (timeout) {
+                        clearTimeout(timeout);
+                        timeout = null;
+                    }
+                    previous = now;
                     result = func.apply(context, args);
                     if (!timeout) {
                         context = args = null;
@@ -614,6 +615,67 @@ var Util;
             }
         },
 
+        getSelectionRange: function (ownerDocument) {
+            var selection = ownerDocument.getSelection();
+            if (selection.rangeCount === 0) {
+                return null;
+            }
+            return selection.getRangeAt(0);
+        },
+
+        // http://stackoverflow.com/questions/1197401/how-can-i-get-the-element-the-caret-is-in-with-javascript-when-using-contentedi
+        // by You
+        getSelectionStart: function (ownerDocument) {
+            var node = ownerDocument.getSelection().anchorNode,
+                startNode = (node && node.nodeType === 3 ? node.parentNode : node);
+            return startNode;
+        },
+
+        getSelectionData: function (el) {
+            var tagName;
+
+            if (el && el.tagName) {
+                tagName = el.tagName.toLowerCase();
+            }
+
+            while (el && this.parentElements.indexOf(tagName) === -1) {
+                el = el.parentNode;
+                if (el && el.tagName) {
+                    tagName = el.tagName.toLowerCase();
+                }
+            }
+
+            return {
+                el: el,
+                tagName: tagName
+            };
+        },
+
+        execFormatBlock: function (doc, tagName) {
+            var selectionData = this.getSelectionData(this.getSelectionStart(doc));
+            // FF handles blockquote differently on formatBlock
+            // allowing nesting, we need to use outdent
+            // https://developer.mozilla.org/en-US/docs/Rich-Text_Editing_in_Mozilla
+            if (tagName === 'blockquote' && selectionData.el &&
+                    selectionData.el.parentNode.tagName.toLowerCase() === 'blockquote') {
+                return doc.execCommand('outdent', false, null);
+            }
+            if (selectionData.tagName === tagName) {
+                tagName = 'p';
+            }
+            // When IE we need to add <> to heading elements and
+            //  blockquote needs to be called as indent
+            // http://stackoverflow.com/questions/10741831/execcommand-formatblock-headings-in-ie
+            // http://stackoverflow.com/questions/1816223/rich-text-editor-with-blockquote-function/1821777#1821777
+            if (this.isIE) {
+                if (tagName === 'blockquote') {
+                    return doc.execCommand('indent', false, tagName);
+                }
+                tagName = '<' + tagName + '>';
+            }
+            return doc.execCommand('formatBlock', false, tagName);
+        },
+
         // TODO: not sure if this should be here
         setTargetBlank: function (el) {
             var i;
@@ -678,14 +740,6 @@ var Selection;
     'use strict';
 
     Selection = {
-        // http://stackoverflow.com/questions/1197401/how-can-i-get-the-element-the-caret-is-in-with-javascript-when-using-contentedi
-        // by You
-        getSelectionStart: function (ownerDocument) {
-            var node = ownerDocument.getSelection().anchorNode,
-                startNode = (node && node.nodeType === 3 ? node.parentNode : node);
-            return startNode;
-        },
-
         findMatchingSelectionParent: function (testElementFunction, contentWindow) {
             var selection = contentWindow.getSelection(), range, current;
 
@@ -776,26 +830,6 @@ var Selection;
                 selectedParentElement = range.startContainer;
             }
             return selectedParentElement;
-        },
-
-        getSelectionData: function (el) {
-            var tagName;
-
-            if (el && el.tagName) {
-                tagName = el.tagName.toLowerCase();
-            }
-
-            while (el && Util.parentElements.indexOf(tagName) === -1) {
-                el = el.parentNode;
-                if (el && el.tagName) {
-                    tagName = el.tagName.toLowerCase();
-                }
-            }
-
-            return {
-                el: el,
-                tagName: tagName
-            };
         }
     };
 }(document, window));
@@ -1661,11 +1695,7 @@ var AnchorExtension;
             evt.preventDefault();
             evt.stopPropagation();
 
-            if (!this.base.selection) {
-                this.base.checkSelection();
-            }
-
-            var selectedParentElement = Selection.getSelectedParentElement(this.base.selectionRange);
+            var selectedParentElement = Selection.getSelectedParentElement(Util.getSelectionRange(this.base.options.ownerDocument));
             if (selectedParentElement.tagName &&
                     selectedParentElement.tagName.toLowerCase() === 'a') {
                 return this.base.execAction('unlink');
@@ -2217,16 +2247,6 @@ var Toolbar;
                     this.positionToolbarIfShown();
                 }
             }.bind(this));
-
-            // throttledHideToolbarActions is throttled because:
-            // - This method could be called many times due to the type of event handlers that are calling it
-            // - We want a slight delay so that other events in the stack can run, some of which may
-            //   prevent the toolbar from being hidden
-            this.throttledHideToolbarActions = Util.throttle(function (event) {
-                if (this.base.isActive) {
-                    this.hideToolbarActions();
-                }
-            }.bind(this));
         },
 
         attachEventHandlers: function () {
@@ -2296,8 +2316,10 @@ var Toolbar;
         },
 
         handleBlur: function (event) {
-            // Hide the toolbar after a small delay so we can prevent this on toolbar click
-            this.throttledHideToolbarActions();
+            // Delay the call to hideToolbar to handle bug with multiple editors on the page at once
+            setTimeout(function () {
+                this.hideToolbar();
+            }.bind(this), 0);
         },
 
         // Hiding/showing toolbar
@@ -2317,20 +2339,17 @@ var Toolbar;
 
         hideToolbar: function () {
             if (this.isDisplayed()) {
+                this.base.commands.forEach(function (extension) {
+                    if (typeof extension.onHide === 'function') {
+                        extension.onHide();
+                    }
+                });
+
                 this.getToolbarElement().classList.remove('medium-editor-toolbar-active');
                 if (typeof this.options.onHideToolbar === 'function') {
                     this.options.onHideToolbar();
                 }
             }
-        },
-
-        hideToolbarActions: function () {
-            this.base.commands.forEach(function (extension) {
-                if (extension.onHide && typeof extension.onHide === 'function') {
-                    extension.onHide();
-                }
-            });
-            this.hideToolbar();
         },
 
         isToolbarDefaultActionsDisplayed: function () {
@@ -2384,9 +2403,8 @@ var Toolbar;
             var i,
                 adjacentNode,
                 offset = 0,
-                newRange;
-            this.base.selection = newSelection;
-            this.base.selectionRange = this.base.selection.getRangeAt(0);
+                newRange,
+                selectionRange = newSelection.getRangeAt(0);
 
             /*
             * In firefox, there are cases (ie doubleclick of a word) where the selectionRange start
@@ -2405,9 +2423,9 @@ var Toolbar;
             * adjacent text node that actually has content in it, and move the selectionRange start there.
             */
             if (this.options.standardizeSelectionStart &&
-                    this.base.selectionRange.startContainer.nodeValue &&
-                    (this.base.selectionRange.startOffset === this.base.selectionRange.startContainer.nodeValue.length)) {
-                adjacentNode = Util.findAdjacentTextNodeWithContent(Selection.getSelectionElement(this.options.contentWindow), this.base.selectionRange.startContainer, this.options.ownerDocument);
+                    selectionRange.startContainer.nodeValue &&
+                    (selectionRange.startOffset === selectionRange.startContainer.nodeValue.length)) {
+                adjacentNode = Util.findAdjacentTextNodeWithContent(Selection.getSelectionElement(this.options.contentWindow), selectionRange.startContainer, this.options.ownerDocument);
                 if (adjacentNode) {
                     offset = 0;
                     while (adjacentNode.nodeValue.substr(offset, 1).trim().length === 0) {
@@ -2415,10 +2433,10 @@ var Toolbar;
                     }
                     newRange = this.options.ownerDocument.createRange();
                     newRange.setStart(adjacentNode, offset);
-                    newRange.setEnd(this.base.selectionRange.endContainer, this.base.selectionRange.endOffset);
-                    this.base.selection.removeAllRanges();
-                    this.base.selection.addRange(newRange);
-                    this.base.selectionRange = newRange;
+                    newRange.setEnd(selectionRange.endContainer, selectionRange.endOffset);
+                    newSelection.removeAllRanges();
+                    newSelection.addRange(newRange);
+                    selectionRange = newRange;
                 }
             }
 
@@ -2430,7 +2448,7 @@ var Toolbar;
             }
 
             if (!this.options.staticToolbar) {
-                this.hideToolbarActions();
+                this.hideToolbar();
             }
         },
 
@@ -2444,7 +2462,7 @@ var Toolbar;
                         (this.options.allowMultiParagraphSelection === false && this.multipleBlockElementsSelected()) ||
                         Selection.selectionInContentEditableFalse(this.options.contentWindow)) {
                     if (!this.options.staticToolbar) {
-                        this.hideToolbarActions();
+                        this.hideToolbar();
                     } else {
                         this.showAndUpdateToolbar();
                     }
@@ -2453,7 +2471,7 @@ var Toolbar;
                     selectionElement = Selection.getSelectionElement(this.options.contentWindow);
                     if (!selectionElement || selectionElement.getAttribute('data-disable-toolbar')) {
                         if (!this.options.staticToolbar) {
-                            this.hideToolbarActions();
+                            this.hideToolbar();
                         }
                     } else {
                         this.checkSelectionElement(newSelection, selectionElement);
@@ -2482,6 +2500,7 @@ var Toolbar;
         checkActiveButtons: function () {
             var manualStateChecks = [],
                 queryState = null,
+                selectionRange = Util.getSelectionRange(this.options.ownerDocument),
                 parentNode,
                 updateExtensionState = function (extension) {
                     if (typeof extension.checkState === 'function') {
@@ -2494,11 +2513,11 @@ var Toolbar;
                     }
                 };
 
-            if (!this.base.selectionRange) {
+            if (!selectionRange) {
                 return;
             }
 
-            parentNode = Selection.getSelectedParentElement(this.base.selectionRange);
+            parentNode = Selection.getSelectedParentElement(selectionRange);
 
             // Loop through all commands
             this.base.commands.forEach(function (command) {
@@ -2743,7 +2762,7 @@ function MediumEditor(elements, options) {
         if (this.options.disableReturn || element.getAttribute('data-disable-return')) {
             event.preventDefault();
         } else if (this.options.disableDoubleReturn || this.getAttribute('data-disable-double-return')) {
-            var node = Selection.getSelectionStart(this.options.contentWindow);
+            var node = Util.getSelectionStart(this.options.ownerDocument);
             if (node && node.textContent.trim() === '') {
                 event.preventDefault();
             }
@@ -2752,7 +2771,7 @@ function MediumEditor(elements, options) {
 
     function handleTabKeydown(event, element) {
         // Override tab only for pre nodes
-        var node = Selection.getSelectionStart(this.options.ownerDocument),
+        var node = Util.getSelectionStart(this.options.ownerDocument),
             tag = node && node.tagName.toLowerCase();
 
         if (tag === 'pre') {
@@ -2774,7 +2793,7 @@ function MediumEditor(elements, options) {
     }
 
     function handleBlockDeleteKeydowns(event, element) {
-        var range, sel, p, node = Selection.getSelectionStart(this.options.ownerDocument),
+        var range, sel, p, node = Util.getSelectionStart(this.options.ownerDocument),
             tagName = node.tagName.toLowerCase(),
             isEmpty = /^(\s+|<br\/?>)?$/i,
             isHeader = /h\d/i;
@@ -2875,7 +2894,7 @@ function MediumEditor(elements, options) {
     }
 
     function handleKeyup(event) {
-        var node = Selection.getSelectionStart(this.options.ownerDocument),
+        var node = Util.getSelectionStart(this.options.ownerDocument),
             tagName;
 
         if (!node) {
@@ -2900,7 +2919,7 @@ function MediumEditor(elements, options) {
         }
     }
 
-    // Internal helper methods
+    // Internal helper methods which shouldn't be exposed externally
 
     function createElementsArray(selector) {
         if (!selector) {
@@ -2958,6 +2977,101 @@ function MediumEditor(elements, options) {
         return shouldAdd;
     }
 
+    function initElements() {
+        var i,
+            addToolbar = false;
+        for (i = 0; i < this.elements.length; i += 1) {
+            if (!this.options.disableEditing && !this.elements[i].getAttribute('data-disable-editing')) {
+                this.elements[i].setAttribute('contentEditable', true);
+            }
+            if (!this.elements[i].getAttribute('data-placeholder')) {
+                this.elements[i].setAttribute('data-placeholder', this.options.placeholder);
+            }
+            this.elements[i].setAttribute('data-medium-element', true);
+            this.elements[i].setAttribute('role', 'textbox');
+            this.elements[i].setAttribute('aria-multiline', true);
+            if (!this.options.disableToolbar && !this.elements[i].getAttribute('data-disable-toolbar')) {
+                addToolbar = true;
+            }
+        }
+        // Init toolbar
+        if (!this.toolbar && addToolbar) {
+            this.toolbar = new Toolbar(this);
+            this.options.elementsContainer.appendChild(this.toolbar.getToolbarElement());
+        }
+    }
+
+    function attachHandlers() {
+        var i;
+
+        // attach to tabs
+        this.subscribe('editableKeydownTab', handleTabKeydown.bind(this));
+
+        // Bind keys which can create or destroy a block element: backspace, delete, return
+        this.subscribe('editableKeydownDelete', handleBlockDeleteKeydowns.bind(this));
+        this.subscribe('editableKeydownEnter', handleBlockDeleteKeydowns.bind(this));
+
+        // disabling return or double return
+        if (this.options.disableReturn || this.options.disableDoubleReturn) {
+            this.subscribe('editableKeydownEnter', handleDisabledEnterKeydown.bind(this));
+        } else {
+            for (i = 0; i < this.elements.length; i += 1) {
+                if (this.elements[i].getAttribute('data-disable-return') || this.elements[i].getAttribute('data-disable-double-return')) {
+                    this.subscribe('editableKeydownEnter', handleDisabledEnterKeydown.bind(this));
+                    break;
+                }
+            }
+        }
+
+        // if we're not disabling return, add a handler to help handle cleanup
+        // for certain cases when enter is pressed
+        if (!this.options.disableReturn) {
+            this.elements.forEach(function (element) {
+                if (!element.getAttribute('data-disable-return')) {
+                    this.on(element, 'keyup', handleKeyup.bind(this));
+                }
+            }.bind(this));
+        }
+
+        // drag and drop of images
+        if (this.options.imageDragging) {
+            this.subscribe('editableDrag', handleDrag.bind(this));
+            this.subscribe('editableDrop', handleDrop.bind(this));
+        }
+    }
+
+    function initCommands() {
+        var buttons = this.options.buttons,
+            extensions = this.options.extensions,
+            ext,
+            name;
+        this.commands = [];
+
+        buttons.forEach(function (buttonName) {
+            if (extensions[buttonName]) {
+                ext = initExtension(extensions[buttonName], buttonName, this);
+                this.commands.push(ext);
+            } else if (buttonName === 'anchor') {
+                ext = initExtension(new AnchorExtension(), buttonName, this);
+                this.commands.push(ext);
+            } else if (ButtonsData.hasOwnProperty(buttonName)) {
+                ext = new DefaultButton(ButtonsData[buttonName], this);
+                this.commands.push(ext);
+            }
+        }.bind(this));
+
+        for (name in extensions) {
+            if (extensions.hasOwnProperty(name) && buttons.indexOf(name) === -1) {
+                ext = initExtension(extensions[name], name, this);
+            }
+        }
+
+        // Add AnchorPreview as extension if needed
+        if (shouldAddDefaultAnchorPreview.call(this)) {
+            this.commands.push(initExtension(new AnchorPreview(), 'anchor-preview', this));
+        }
+    }
+
     function execActionInternal(action, opts) {
         /*jslint regexp: true*/
         var appendAction = /^append-(.+)$/gi,
@@ -2968,7 +3082,7 @@ function MediumEditor(elements, options) {
         // type of block element (ie append-blockquote, append-h1, append-pre, etc.)
         match = appendAction.exec(action);
         if (match) {
-            return this.execFormatBlock(match[1]);
+            return Util.execFormatBlock(this.options.ownerDocument, match[1]);
         }
 
         if (action === 'createLink') {
@@ -3029,6 +3143,7 @@ function MediumEditor(elements, options) {
             lastButtonClass: 'medium-editor-button-last'
         },
 
+        // NOT DOCUMENTED - exposed for backwards compatability
         init: function (elements, options) {
             var uniqueId = 1;
 
@@ -3051,12 +3166,15 @@ function MediumEditor(elements, options) {
             return this.setup();
         },
 
+        // NOT DOCUMENTED - internal helper method exposed for backwards compatability
         setup: function () {
             this.events = new Events(this);
             this.isActive = true;
-            this.initCommands()
-                .initElements()
-                .attachHandlers();
+
+            // Call initialization helpers
+            initCommands.call(this);
+            initElements.call(this);
+            attachHandlers.call(this);
 
             this.pasteHandler = new PasteHandler(this);
 
@@ -3086,71 +3204,6 @@ function MediumEditor(elements, options) {
             }, this.options.delay);
         },
 
-        initElements: function () {
-            var i,
-                addToolbar = false;
-            for (i = 0; i < this.elements.length; i += 1) {
-                if (!this.options.disableEditing && !this.elements[i].getAttribute('data-disable-editing')) {
-                    this.elements[i].setAttribute('contentEditable', true);
-                }
-                if (!this.elements[i].getAttribute('data-placeholder')) {
-                    this.elements[i].setAttribute('data-placeholder', this.options.placeholder);
-                }
-                this.elements[i].setAttribute('data-medium-element', true);
-                this.elements[i].setAttribute('role', 'textbox');
-                this.elements[i].setAttribute('aria-multiline', true);
-                if (!this.options.disableToolbar && !this.elements[i].getAttribute('data-disable-toolbar')) {
-                    addToolbar = true;
-                }
-            }
-            // Init toolbar
-            if (addToolbar) {
-                this.initToolbar();
-            }
-            return this;
-        },
-
-        attachHandlers: function () {
-            var i;
-
-            // attach to tabs
-            this.subscribe('editableKeydownTab', handleTabKeydown.bind(this));
-
-            // Bind keys which can create or destroy a block element: backspace, delete, return
-            this.subscribe('editableKeydownDelete', handleBlockDeleteKeydowns.bind(this));
-            this.subscribe('editableKeydownEnter', handleBlockDeleteKeydowns.bind(this));
-
-            // disabling return or double return
-            if (this.options.disableReturn || this.options.disableDoubleReturn) {
-                this.subscribe('editableKeydownEnter', handleDisabledEnterKeydown.bind(this));
-            } else {
-                for (i = 0; i < this.elements.length; i += 1) {
-                    if (this.elements[i].getAttribute('data-disable-return') || this.elements[i].getAttribute('data-disable-double-return')) {
-                        this.subscribe('editableKeydownEnter', handleDisabledEnterKeydown.bind(this));
-                        break;
-                    }
-                }
-            }
-
-            // if we're not disabling return, add a handler to help handle cleanup
-            // for certain cases when enter is pressed
-            if (!this.options.disableReturn) {
-                this.elements.forEach(function (element) {
-                    if (!element.getAttribute('data-disable-return')) {
-                        this.on(element, 'keyup', handleKeyup.bind(this));
-                    }
-                }.bind(this));
-            }
-
-            // drag and drop of images
-            if (this.options.imageDragging) {
-                this.subscribe('editableDrag', handleDrag.bind(this));
-                this.subscribe('editableDrop', handleDrop.bind(this));
-            }
-
-            return this;
-        },
-
         serialize: function () {
             var i,
                 elementid,
@@ -3162,40 +3215,6 @@ function MediumEditor(elements, options) {
                 };
             }
             return content;
-        },
-
-        initCommands: function () {
-            var buttons = this.options.buttons,
-                extensions = this.options.extensions,
-                ext,
-                name;
-            this.commands = [];
-
-            buttons.forEach(function (buttonName) {
-                if (extensions[buttonName]) {
-                    ext = initExtension(extensions[buttonName], buttonName, this);
-                    this.commands.push(ext);
-                } else if (buttonName === 'anchor') {
-                    ext = initExtension(new AnchorExtension(), buttonName, this);
-                    this.commands.push(ext);
-                } else if (ButtonsData.hasOwnProperty(buttonName)) {
-                    ext = new DefaultButton(ButtonsData[buttonName], this);
-                    this.commands.push(ext);
-                }
-            }.bind(this));
-
-            for (name in extensions) {
-                if (extensions.hasOwnProperty(name) && buttons.indexOf(name) === -1) {
-                    ext = initExtension(extensions[name], name, this);
-                }
-            }
-
-            // Add AnchorPreview as extension if needed
-            if (shouldAddDefaultAnchorPreview.call(this)) {
-                this.commands.push(initExtension(new AnchorPreview(), 'anchor-preview', this));
-            }
-
-            return this;
         },
 
         getExtensionByName: function (name) {
@@ -3211,6 +3230,7 @@ function MediumEditor(elements, options) {
         },
 
         /**
+         * NOT DOCUMENTED - exposed for backwards compatability
          * Helper function to call a method with a number of parameters on all registered extensions.
          * The function assures that the function exists before calling.
          *
@@ -3237,16 +3257,6 @@ function MediumEditor(elements, options) {
             return this;
         },
 
-        initToolbar: function () {
-            if (this.toolbar) {
-                return this;
-            }
-            this.toolbar = new Toolbar(this);
-            this.options.elementsContainer.appendChild(this.toolbar.getToolbarElement());
-
-            return this;
-        },
-
         stopSelectionUpdates: function () {
             this.preventSelectionUpdates = true;
         },
@@ -3255,6 +3265,7 @@ function MediumEditor(elements, options) {
             this.preventSelectionUpdates = false;
         },
 
+        // NOT DOCUMENTED - exposed as extension helper and for backwards compatability
         checkSelection: function () {
             if (this.toolbar) {
                 this.toolbar.checkState();
@@ -3317,31 +3328,7 @@ function MediumEditor(elements, options) {
             return Selection.getSelectedParentElement(range);
         },
 
-        execFormatBlock: function (el) {
-            var selectionData = Selection.getSelectionData(this.selection.anchorNode);
-            // FF handles blockquote differently on formatBlock
-            // allowing nesting, we need to use outdent
-            // https://developer.mozilla.org/en-US/docs/Rich-Text_Editing_in_Mozilla
-            if (el === 'blockquote' && selectionData.el &&
-                    selectionData.el.parentNode.tagName.toLowerCase() === 'blockquote') {
-                return this.options.ownerDocument.execCommand('outdent', false, null);
-            }
-            if (selectionData.tagName === el) {
-                el = 'p';
-            }
-            // When IE we need to add <> to heading elements and
-            //  blockquote needs to be called as indent
-            // http://stackoverflow.com/questions/10741831/execcommand-formatblock-headings-in-ie
-            // http://stackoverflow.com/questions/1816223/rich-text-editor-with-blockquote-function/1821777#1821777
-            if (Util.isIE) {
-                if (el === 'blockquote') {
-                    return this.options.ownerDocument.execCommand('indent', false, el);
-                }
-                el = '<' + el + '>';
-            }
-            return this.options.ownerDocument.execCommand('formatBlock', false, el);
-        },
-
+        // NOT DOCUMENTED - exposed as extension helper
         hideToolbarDefaultActions: function () {
             if (this.toolbar) {
                 this.toolbar.hideToolbarDefaultActions();
@@ -3349,6 +3336,7 @@ function MediumEditor(elements, options) {
             return this;
         },
 
+        // NOT DOCUMENTED - exposed as extension helper and for backwards compatability
         setToolbarPosition: function () {
             if (this.toolbar) {
                 this.toolbar.setToolbarPosition();
@@ -3470,11 +3458,11 @@ function MediumEditor(elements, options) {
                 this.options.ownerDocument.execCommand('createLink', false, opts.url);
 
                 if (this.options.targetBlank || opts.target === '_blank') {
-                    Util.setTargetBlank(Selection.getSelectionStart(this.options.ownerDocument));
+                    Util.setTargetBlank(Util.getSelectionStart(this.options.ownerDocument));
                 }
 
                 if (opts.buttonClass) {
-                    Util.addClassToAnchors(Selection.getSelectionStart(this.options.ownerDocument), opts.buttonClass);
+                    Util.addClassToAnchors(Util.getSelectionStart(this.options.ownerDocument), opts.buttonClass);
                 }
             }
 

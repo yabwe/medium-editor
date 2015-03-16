@@ -1,6 +1,7 @@
 /*global MediumEditor, describe, it, expect, spyOn,
          afterEach, beforeEach, selectElementContents,
-         jasmine, fireEvent, tearDown*/
+         jasmine, fireEvent, tearDown, console,
+         selectElementContentsAndFire */
 
 describe('Extensions TestCase', function () {
     'use strict';
@@ -94,7 +95,8 @@ describe('Extensions TestCase', function () {
                 button.className = 'extension-button';
                 button.innerText = 'XXX';
                 return button;
-            }
+            },
+            checkState: function () {}
         },
             ExtensionWithString = {
                 getButton: function () {
@@ -113,6 +115,22 @@ describe('Extensions TestCase', function () {
                 }
             });
             expect(editor.toolbar.getToolbarElement().querySelectorAll('.extension-button').length).toBe(1);
+        });
+
+        it('should call checkState on extensions when toolbar selection updates', function () {
+            jasmine.clock().install();
+            var editor = new MediumEditor('.editor', {
+                    buttons: ['dummy'],
+                    extensions: {
+                        'dummy': ExtensionWithElement
+                    }
+                });
+            selectElementContentsAndFire(editor.elements[0].firstChild);
+            spyOn(ExtensionWithElement, 'checkState').and.callThrough();
+            editor.checkSelection();
+            jasmine.clock().tick(51);
+            expect(ExtensionWithElement.checkState.calls.count()).toEqual(1);
+            jasmine.clock().uninstall();
         });
 
         it('should include extensions button by string into the toolbar', function () {

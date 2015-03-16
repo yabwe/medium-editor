@@ -95,10 +95,6 @@ TableDerived.prototype = {
         evt.preventDefault();
         evt.stopPropagation();
 
-        if (!this.base.selection) {
-            this.base.checkSelection();
-        }
-
         if (!this.isDisplayed()) {
             this.showForm();
         }

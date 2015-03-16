@@ -108,16 +108,6 @@ var Toolbar;
                     this.positionToolbarIfShown();
                 }
             }.bind(this));
-
-            // throttledHideToolbarActions is throttled because:
-            // - This method could be called many times due to the type of event handlers that are calling it
-            // - We want a slight delay so that other events in the stack can run, some of which may
-            //   prevent the toolbar from being hidden
-            this.throttledHideToolbarActions = Util.throttle(function (event) {
-                if (this.base.isActive) {
-                    this.hideToolbarActions();
-                }
-            }.bind(this));
         },
 
         attachEventHandlers: function () {
@@ -187,8 +177,10 @@ var Toolbar;
         },
 
         handleBlur: function (event) {
-            // Hide the toolbar after a small delay so we can prevent this on toolbar click
-            this.throttledHideToolbarActions();
+            // Delay the call to hideToolbar to handle bug with multiple editors on the page at once
+            setTimeout(function () {
+                this.hideToolbar();
+            }.bind(this), 0);
         },
 
         // Hiding/showing toolbar
@@ -208,20 +200,17 @@ var Toolbar;
 
         hideToolbar: function () {
             if (this.isDisplayed()) {
+                this.base.commands.forEach(function (extension) {
+                    if (typeof extension.onHide === 'function') {
+                        extension.onHide();
+                    }
+                });
+
                 this.getToolbarElement().classList.remove('medium-editor-toolbar-active');
                 if (typeof this.options.onHideToolbar === 'function') {
                     this.options.onHideToolbar();
                 }
             }
-        },
-
-        hideToolbarActions: function () {
-            this.base.commands.forEach(function (extension) {
-                if (extension.onHide && typeof extension.onHide === 'function') {
-                    extension.onHide();
-                }
-            });
-            this.hideToolbar();
         },
 
         isToolbarDefaultActionsDisplayed: function () {
@@ -275,9 +264,8 @@ var Toolbar;
             var i,
                 adjacentNode,
                 offset = 0,
-                newRange;
-            this.base.selection = newSelection;
-            this.base.selectionRange = this.base.selection.getRangeAt(0);
+                newRange,
+                selectionRange = newSelection.getRangeAt(0);
 
             /*
             * In firefox, there are cases (ie doubleclick of a word) where the selectionRange start
@@ -296,9 +284,9 @@ var Toolbar;
             * adjacent text node that actually has content in it, and move the selectionRange start there.
             */
             if (this.options.standardizeSelectionStart &&
-                    this.base.selectionRange.startContainer.nodeValue &&
-                    (this.base.selectionRange.startOffset === this.base.selectionRange.startContainer.nodeValue.length)) {
-                adjacentNode = Util.findAdjacentTextNodeWithContent(Selection.getSelectionElement(this.options.contentWindow), this.base.selectionRange.startContainer, this.options.ownerDocument);
+                    selectionRange.startContainer.nodeValue &&
+                    (selectionRange.startOffset === selectionRange.startContainer.nodeValue.length)) {
+                adjacentNode = Util.findAdjacentTextNodeWithContent(Selection.getSelectionElement(this.options.contentWindow), selectionRange.startContainer, this.options.ownerDocument);
                 if (adjacentNode) {
                     offset = 0;
                     while (adjacentNode.nodeValue.substr(offset, 1).trim().length === 0) {
@@ -306,10 +294,10 @@ var Toolbar;
                     }
                     newRange = this.options.ownerDocument.createRange();
                     newRange.setStart(adjacentNode, offset);
-                    newRange.setEnd(this.base.selectionRange.endContainer, this.base.selectionRange.endOffset);
-                    this.base.selection.removeAllRanges();
-                    this.base.selection.addRange(newRange);
-                    this.base.selectionRange = newRange;
+                    newRange.setEnd(selectionRange.endContainer, selectionRange.endOffset);
+                    newSelection.removeAllRanges();
+                    newSelection.addRange(newRange);
+                    selectionRange = newRange;
                 }
             }
 
@@ -321,7 +309,7 @@ var Toolbar;
             }
 
             if (!this.options.staticToolbar) {
-                this.hideToolbarActions();
+                this.hideToolbar();
             }
         },
 
@@ -335,7 +323,7 @@ var Toolbar;
                         (this.options.allowMultiParagraphSelection === false && this.multipleBlockElementsSelected()) ||
                         Selection.selectionInContentEditableFalse(this.options.contentWindow)) {
                     if (!this.options.staticToolbar) {
-                        this.hideToolbarActions();
+                        this.hideToolbar();
                     } else {
                         this.showAndUpdateToolbar();
                     }
@@ -344,7 +332,7 @@ var Toolbar;
                     selectionElement = Selection.getSelectionElement(this.options.contentWindow);
                     if (!selectionElement || selectionElement.getAttribute('data-disable-toolbar')) {
                         if (!this.options.staticToolbar) {
-                            this.hideToolbarActions();
+                            this.hideToolbar();
                         }
                     } else {
                         this.checkSelectionElement(newSelection, selectionElement);
@@ -373,6 +361,7 @@ var Toolbar;
         checkActiveButtons: function () {
             var manualStateChecks = [],
                 queryState = null,
+                selectionRange = Util.getSelectionRange(this.options.ownerDocument),
                 parentNode,
                 updateExtensionState = function (extension) {
                     if (typeof extension.checkState === 'function') {
@@ -385,11 +374,11 @@ var Toolbar;
                     }
                 };
 
-            if (!this.base.selectionRange) {
+            if (!selectionRange) {
                 return;
             }
 
-            parentNode = Selection.getSelectedParentElement(this.base.selectionRange);
+            parentNode = Selection.getSelectedParentElement(selectionRange);
 
             // Loop through all commands
             this.base.commands.forEach(function (command) {
