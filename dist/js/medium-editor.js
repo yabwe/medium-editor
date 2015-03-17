@@ -3523,11 +3523,11 @@ function MediumEditor(elements, options) {
         },
 
         cleanListDOM: function () {
-            var ul, element = this.getSelectedParentElement();
+            var list, element = this.getSelectedParentElement();
             if (element.tagName.toLowerCase() === 'li') {
-                ul = element.parentElement;
-                if (ul.parentElement.tagName.toLowerCase() === 'p') { // yes we need to clean up
-                    this.unwrapElement(ul.parentElement);
+                list = element.parentElement;
+                if (list.parentElement.tagName.toLowerCase() === 'p') { // yes we need to clean up
+                    this.unwrapElement(list.parentElement);
                 }
             }
         },
