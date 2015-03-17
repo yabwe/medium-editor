@@ -3317,6 +3317,11 @@ function MediumEditor(elements, options) {
                 result = execActionInternal.call(this, action, opts);
             }
 
+            // do some DOM clean-up for known browser issues after the action
+            if (action === 'insertunorderedlist' || action === 'insertorderedlist') {
+                this.cleanListDOM();
+            }
+
             this.checkSelection();
             return result;
         },
@@ -3515,6 +3520,28 @@ function MediumEditor(elements, options) {
 
         pasteHTML: function (html) {
             this.pasteHandler.pasteHTML(html);
+        },
+
+        cleanListDOM: function () {
+            var ul, element = this.getSelectedParentElement();
+            if (element.tagName.toLowerCase() === 'li') {
+                ul = element.parentElement;
+                if (ul.parentElement.tagName.toLowerCase() === 'p') { // yes we need to clean up
+                    this.unwrapElement(ul.parentElement);
+                }
+            }
+        },
+
+        unwrapElement: function (element) {
+            var parent = element.parentNode,
+                current = element.firstChild,
+                next;
+            do {
+                next = current.nextSibling;
+                parent.insertBefore(current, element);
+                current = next;
+            } while (current);
+            parent.removeChild(element);
         }
     };
 }());
