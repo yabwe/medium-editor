@@ -2845,7 +2845,7 @@ function MediumEditor(elements, options) {
             node.previousElementSibling.parentNode.removeChild(node);
 
             event.preventDefault();
-        } else if (event.which === Util.keyCode.BACKSPACE && tagName === 'li' && node.textContent === '' && !node.parentElement.previousElementSibling && node.nextElementSibling.tagName.toLowerCase() === 'li') {
+        } else if (event.which === Util.keyCode.BACKSPACE && tagName === 'li' && node.textContent === '' && !node.previousElementSibling && !node.parentElement.previousElementSibling && node.nextElementSibling.tagName.toLowerCase() === 'li') {
             // backspacing in an empty first list element in the first list (with more elements) should remove the list element, create a paragraph before the list and move the cursor into the paragraph
 
             // create a paragraph before the list
