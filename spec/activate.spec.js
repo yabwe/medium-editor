@@ -2,7 +2,7 @@
          afterEach, beforeEach, selectElementContents, runs, waitsFor,
          tearDown, xit, selectElementContentsAndFire */
 
-describe('Activate/Deactivate TestCase', function () {
+describe('Setup/Destroy TestCase', function () {
     'use strict';
 
     beforeEach(function () {
@@ -18,25 +18,42 @@ describe('Activate/Deactivate TestCase', function () {
 
     it('should toggle the isActive property', function () {
         var editor = new MediumEditor('.editor');
-        editor.deactivate();
+        editor.destroy();
         expect(editor.isActive).toBe(false);
-        editor.activate();
+        editor.setup();
         expect(editor.isActive).toBe(true);
-        editor.deactivate();
+        editor.destroy();
         expect(editor.isActive).toBe(false);
     });
 
-    describe('Activate', function () {
-        it('should init the toolbar and editor elements', function () {
+    describe('activate() and deactivate()', function () {
+        it('should be aliases for setup() and destory() for backwards compatability', function () {
             var editor = new MediumEditor('.editor');
+            expect(editor.isActive).toBe(true);
+
+            spyOn(MediumEditor.prototype, 'destroy').and.callThrough();
             editor.deactivate();
+            expect(editor.isActive).toBe(false);
+            expect(editor.destroy).toHaveBeenCalled();
+
             spyOn(MediumEditor.prototype, 'setup').and.callThrough();
             editor.activate();
+            expect(editor.isActive).toBe(true);
             expect(editor.setup).toHaveBeenCalled();
         });
     });
 
-    describe('Deactivate', function () {
+    describe('Setup', function () {
+        it('should init the toolbar and editor elements', function () {
+            var editor = new MediumEditor('.editor');
+            editor.destroy();
+            spyOn(MediumEditor.prototype, 'setup').and.callThrough();
+            editor.setup();
+            expect(editor.setup).toHaveBeenCalled();
+        });
+    });
+
+    describe('Destroy', function () {
 
         beforeEach(function () {
             jasmine.clock().install();
@@ -49,14 +66,14 @@ describe('Activate/Deactivate TestCase', function () {
         it('should remove mediumEditor elements from DOM', function () {
             var editor = new MediumEditor('.editor');
             expect(document.querySelector('.medium-editor-toolbar')).toBeTruthy();
-            editor.deactivate();
+            editor.destroy();
             expect(document.querySelector('.medium-editor-toolbar')).toBeFalsy();
         });
 
         it('should remove all the added events', function () {
             var editor = new MediumEditor('.editor');
             expect(editor.events.events.length).toBeGreaterThan(0);
-            editor.deactivate();
+            editor.destroy();
             expect(editor.events.events.length).toBe(0);
         });
 
@@ -71,7 +88,7 @@ describe('Activate/Deactivate TestCase', function () {
                 });
                 fireEvent(document.body, 'blur');
             };
-            // Store toolbar, since deactivate will remove the reference from the editor
+            // Store toolbar, since destroy will remove the reference from the editor
             toolbar = editor.toolbar;
 
             // fire event (handler executed immediately)
@@ -83,7 +100,7 @@ describe('Activate/Deactivate TestCase', function () {
 
             spyOn(toolbar, 'positionToolbarIfShown').and.callThrough(); // via: handleResize
             spyOn(editor, 'checkSelection').and.callThrough(); // via: handleBlur
-            editor.deactivate();
+            editor.destroy();
             jasmine.clock().tick(1000); // arbitrary – must be longer than THROTTLE_INTERVAL
             expect(toolbar.positionToolbarIfShown).not.toHaveBeenCalled();
             expect(editor.checkSelection).not.toHaveBeenCalled();
@@ -132,15 +149,15 @@ describe('Activate/Deactivate TestCase', function () {
         });
 
         // regression test for https://github.com/daviferreira/medium-editor/issues/197
-        it('should not crash when deactivated immediately after a mouse click', function () {
+        it('should not crash when destroy immediately after a mouse click', function () {
             var editor = new MediumEditor('.editor');
             // selected some content and let the toolbar appear
             selectElementContents(editor.elements[0]);
             jasmine.clock().tick(501);
 
-            // fire a mouse up somewhere else (i.e. a button which click handler could have called deactivate() )
+            // fire a mouse up somewhere else (i.e. a button which click handler could have called destroy() )
             fireEvent(document.documentElement, 'mouseup');
-            editor.deactivate();
+            editor.destroy();
 
             jasmine.clock().tick(501);
             expect(true).toBe(true);
