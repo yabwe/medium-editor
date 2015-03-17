@@ -1,6 +1,16 @@
 @import "clearfix";
 @import "pop-upwards";
 
+.data-medium-element {
+    sup {
+        vertical-align: super;
+    }
+
+    sub {
+        vertical-align: sub;
+    }
+}
+
 %medium-toolbar-arrow {
     position: absolute;
     left: 50%;

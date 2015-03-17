@@ -58,6 +58,11 @@
             transform: matrix(1, 0, 0, 1, 0, 0);
     opacity: 1; } }
 
+.data-medium-element sup {
+  vertical-align: super; }
+.data-medium-element sub {
+  vertical-align: sub; }
+
 .medium-toolbar-arrow-under:after, .medium-toolbar-arrow-over:before {
   position: absolute;
   left: 50%;
