@@ -2845,6 +2845,26 @@ function MediumEditor(elements, options) {
             node.previousElementSibling.parentNode.removeChild(node);
 
             event.preventDefault();
+        } else if (event.which === Util.keyCode.BACKSPACE && tagName === 'li' && node.textContent === '' && !node.parentElement.previousElementSibling && node.nextElementSibling.tagName.toLowerCase() === 'li') {
+            // backspacing in an empty first list element in the first list (with more elements) should remove the list element, create a paragraph before the list and move the cursor into the paragraph
+
+            // create a paragraph before the list
+            p = this.options.ownerDocument.createElement('p');
+            p.innerHTML = '<br>';
+            node.parentElement.parentElement.insertBefore(p, node.parentElement);
+
+            // move the cursor into the new paragraph
+            range = document.createRange();
+            sel = this.options.contentWindow.getSelection();
+            range.setStart(p, 0);
+            range.collapse(true);
+            sel.removeAllRanges();
+            sel.addRange(range);
+
+            // remove the list element
+            node.parentElement.removeChild(node);
+
+            event.preventDefault();
         }
     }
 
