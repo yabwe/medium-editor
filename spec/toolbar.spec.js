@@ -209,7 +209,7 @@ describe('Toolbar TestCase', function () {
             var editor = new MediumEditor('.editor');
             expect(this.el.addEventListener).toHaveBeenCalled();
             spyOn(this.el, 'removeEventListener');
-            editor.deactivate();
+            editor.destroy();
             expect(this.el.removeEventListener).toHaveBeenCalled();
         });
     });

@@ -61,21 +61,21 @@ describe('Initialization TestCase', function () {
             expect(editor.elements.length).toEqual(nodeList.length);
             expect(typeof nodeList.forEach).toBe('undefined');
             expect(typeof editor.elements.forEach).toBe('function');
-            editor.deactivate();
+            editor.destroy();
 
             editor = new MediumEditor('span');
             expect(editor.elements.length).toEqual(nodeList.length);
-            editor.deactivate();
+            editor.destroy();
 
             editor = new MediumEditor(node);
             expect(editor.elements.length).toEqual(1);
             expect(editor.elements[0]).toBe(node);
-            editor.deactivate();
+            editor.destroy();
 
             editor = new MediumEditor();
             expect(editor.elements).not.toBe(null);
             expect(editor.elements.length).toBe(0);
-            editor.deactivate();
+            editor.destroy();
         });
     });
 
@@ -173,7 +173,7 @@ describe('Initialization TestCase', function () {
             expect(editor3.id).toBe(3);
         });
 
-        it('should not reset ID when deactivated and then re-initialized', function () {
+        it('should not reset ID when destroy and then re-initialized', function () {
             var secondEditor = document.createElement('div'),
                 editor1 = new MediumEditor('.editor'),
                 editor2;
@@ -182,7 +182,7 @@ describe('Initialization TestCase', function () {
             document.body.appendChild(secondEditor);
 
             editor2 = new MediumEditor('.editor-two');
-            editor1.deactivate();
+            editor1.destroy();
             editor1.init('.editor');
 
             expect(editor1.id).not.toEqual(editor2.id);

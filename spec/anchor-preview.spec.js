@@ -148,7 +148,7 @@ describe('Anchor Preview TestCase', function () {
             expect(document.querySelector('.medium-editor-anchor-preview')).toBeNull();
         });
 
-        it('should be removed from the document when editor deactivates', function () {
+        it('should be removed from the document when editor is destroyed', function () {
             var editor = new MediumEditor('.editor'),
                 anchorPreview = editor.getExtensionByName('anchor-preview');
 
@@ -162,8 +162,8 @@ describe('Anchor Preview TestCase', function () {
             jasmine.clock().tick(1);
             expect(document.querySelector('.medium-editor-anchor-preview-active')).not.toBeNull();
 
-            // deactivate
-            editor.deactivate();
+            // destroy
+            editor.destroy();
             expect(anchorPreview.deactivate).toHaveBeenCalled();
             expect(document.querySelector('.medium-editor-anchor-preview-active')).toBeNull();
             expect(document.querySelector('.medium-editor-anchor-preview')).toBeNull();
