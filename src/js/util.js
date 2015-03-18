@@ -332,6 +332,14 @@ var Util;
                 }
             }
             return false;
+        },
+
+        deprecatedMethod: function (method, newMethod, callback) {
+            console.warn(method +
+                ' is deprecated and will be removed, please use ' +
+                newMethod +
+                ' instead');
+            callback();
         }
     };
 }(window, document));

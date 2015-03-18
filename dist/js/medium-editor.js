@@ -730,6 +730,14 @@ var Util;
                 }
             }
             return false;
+        },
+
+        deprecatedMethod: function (method, newMethod, callback) {
+            console.warn(method +
+                ' is deprecated and will be removed, please use ' +
+                newMethod +
+                ' instead');
+            callback();
         }
     };
 }(window, document));
@@ -3508,12 +3516,20 @@ function MediumEditor(elements, options) {
 
         // alias for setup - keeping for backwards compatability
         activate: function () {
-            this.setup();
+            Util.deprecatedMethod(
+                'activate',
+                'setup',
+                this.setup.bind(this)
+            );
         },
 
         // alias for destory - keeping for backwards compatability
         deactivate: function () {
-            this.destroy();
+            Util.deprecatedMethod(
+                'deactivate',
+                'destroy',
+                this.destroy.bind(this)
+            );
         },
 
         cleanPaste: function (text) {
