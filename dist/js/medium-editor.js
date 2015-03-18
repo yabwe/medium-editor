@@ -730,6 +730,19 @@ var Util;
                 }
             }
             return false;
+        },
+
+        deprecatedMethod: function (oldName, newName, args) {
+            // Thanks IE9, you're the best
+            if (window.console !== undefined) {
+                console.warn(oldName +
+                    ' is deprecated and will be removed, please use ' +
+                    newName +
+                    ' instead');
+            }
+            if (typeof this[newName] === 'function') {
+                this[newName].apply(this, args);
+            }
         }
     };
 }(window, document));
@@ -3166,8 +3179,11 @@ function MediumEditor(elements, options) {
             return this.setup();
         },
 
-        // NOT DOCUMENTED - internal helper method exposed for backwards compatability
         setup: function () {
+            if (this.isActive) {
+                return;
+            }
+
             this.events = new Events(this);
             this.isActive = true;
 
@@ -3181,6 +3197,34 @@ function MediumEditor(elements, options) {
             if (!this.options.disablePlaceholders) {
                 this.placeholders = new Placeholders(this);
             }
+        },
+
+        destroy: function () {
+            if (!this.isActive) {
+                return;
+            }
+
+            var i;
+
+            this.isActive = false;
+
+            if (this.toolbar !== undefined) {
+                this.toolbar.deactivate();
+                delete this.toolbar;
+            }
+
+            for (i = 0; i < this.elements.length; i += 1) {
+                this.elements[i].removeAttribute('contentEditable');
+                this.elements[i].removeAttribute('data-medium-element');
+            }
+
+            this.commands.forEach(function (extension) {
+                if (typeof extension.deactivate === 'function') {
+                    extension.deactivate();
+                }
+            }.bind(this));
+
+            this.events.detachAllDOMEvents();
         },
 
         on: function (target, event, listener, useCapture) {
@@ -3475,38 +3519,14 @@ function MediumEditor(elements, options) {
             }
         },
 
+        // alias for setup - keeping for backwards compatability
         activate: function () {
-            if (this.isActive) {
-                return;
-            }
-
-            this.setup();
+            Util.deprecatedMethod.call(this, 'activate', 'setup', arguments);
         },
 
+        // alias for destory - keeping for backwards compatability
         deactivate: function () {
-            var i;
-            if (!this.isActive) {
-                return;
-            }
-            this.isActive = false;
-
-            if (this.toolbar !== undefined) {
-                this.toolbar.deactivate();
-                delete this.toolbar;
-            }
-
-            for (i = 0; i < this.elements.length; i += 1) {
-                this.elements[i].removeAttribute('contentEditable');
-                this.elements[i].removeAttribute('data-medium-element');
-            }
-
-            this.commands.forEach(function (extension) {
-                if (typeof extension.deactivate === 'function') {
-                    extension.deactivate();
-                }
-            }.bind(this));
-
-            this.events.detachAllDOMEvents();
+            Util.deprecatedMethod.call(this, 'deactivate', 'destroy', arguments);
         },
 
         cleanPaste: function (text) {

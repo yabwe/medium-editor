@@ -35,7 +35,7 @@ describe('Delay TestCase', function () {
         editor = new MediumEditor('.editor', {delay: 1});
         spy = jasmine.createSpy('spy');
 
-        editor.deactivate();
+        editor.destroy();
         editor.delay(spy);
         jasmine.clock().tick(100);
         expect(spy).not.toHaveBeenCalled();
