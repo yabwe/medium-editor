@@ -734,7 +734,7 @@ var Util;
 
         deprecatedMethod: function (oldName, newName, args) {
             // Thanks IE9, you're the best
-            if (console) {
+            if (window.console !== undefined) {
                 console.warn(oldName +
                     ' is deprecated and will be removed, please use ' +
                     newName +

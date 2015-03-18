@@ -5,6 +5,14 @@ describe('Util', function () {
 
     describe('Deprecated', function () {
         it('should warn when a method is deprecated', function () {
+            // IE9 mock for SauceLabs
+            if (window.console === undefined) {
+                window.console = {
+                    warn: function (msg) {
+                        return msg;
+                    }
+                };
+            }
             var testObj = {
                 newMethod: function () {}
             };
