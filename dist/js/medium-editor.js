@@ -733,10 +733,13 @@ var Util;
         },
 
         deprecatedMethod: function (oldName, newName, args) {
-            console.warn(oldName +
-                ' is deprecated and will be removed, please use ' +
-                newName +
-                ' instead');
+            // Thanks IE9, you're the best
+            if (console) {
+                console.warn(oldName +
+                    ' is deprecated and will be removed, please use ' +
+                    newName +
+                    ' instead');
+            }
             if (typeof this[newName] === 'function') {
                 this[newName].apply(this, args);
             }
