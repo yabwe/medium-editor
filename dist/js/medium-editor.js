@@ -732,12 +732,14 @@ var Util;
             return false;
         },
 
-        deprecatedMethod: function (method, newMethod, callback) {
-            console.warn(method +
+        deprecatedMethod: function (oldName, newName, args) {
+            console.warn(oldName +
                 ' is deprecated and will be removed, please use ' +
-                newMethod +
+                newName +
                 ' instead');
-            callback();
+            if (typeof this[newName] === 'function') {
+                this[newName].apply(this, args);
+            }
         }
     };
 }(window, document));
@@ -3516,20 +3518,12 @@ function MediumEditor(elements, options) {
 
         // alias for setup - keeping for backwards compatability
         activate: function () {
-            Util.deprecatedMethod(
-                'activate',
-                'setup',
-                this.setup.bind(this)
-            );
+            Util.deprecatedMethod.call(this, 'activate', 'setup', arguments);
         },
 
         // alias for destory - keeping for backwards compatability
         deactivate: function () {
-            Util.deprecatedMethod(
-                'deactivate',
-                'destroy',
-                this.destroy.bind(this)
-            );
+            Util.deprecatedMethod.call(this, 'deactivate', 'destroy', arguments);
         },
 
         cleanPaste: function (text) {

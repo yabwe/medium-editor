@@ -763,20 +763,12 @@ function MediumEditor(elements, options) {
 
         // alias for setup - keeping for backwards compatability
         activate: function () {
-            Util.deprecatedMethod(
-                'activate',
-                'setup',
-                this.setup.bind(this)
-            );
+            Util.deprecatedMethod.call(this, 'activate', 'setup', arguments);
         },
 
         // alias for destory - keeping for backwards compatability
         deactivate: function () {
-            Util.deprecatedMethod(
-                'deactivate',
-                'destroy',
-                this.destroy.bind(this)
-            );
+            Util.deprecatedMethod.call(this, 'deactivate', 'destroy', arguments);
         },
 
         cleanPaste: function (text) {

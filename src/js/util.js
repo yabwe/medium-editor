@@ -334,12 +334,14 @@ var Util;
             return false;
         },
 
-        deprecatedMethod: function (method, newMethod, callback) {
-            console.warn(method +
+        deprecatedMethod: function (oldName, newName, args) {
+            console.warn(oldName +
                 ' is deprecated and will be removed, please use ' +
-                newMethod +
+                newName +
                 ' instead');
-            callback();
+            if (typeof this[newName] === 'function') {
+                this[newName].apply(this, args);
+            }
         }
     };
 }(window, document));
