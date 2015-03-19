@@ -408,7 +408,7 @@ function MediumEditor(elements, options) {
                     editorElement = meSelection.getSelectionElement(self.options.contentWindow);
 
                     if (!(self.options.disableReturn || editorElement.getAttribute('data-disable-return')) &&
-                            tagName !== 'li' && !mediumEditorUtil.isListItemChild(node)) {
+                            tagName !== 'li' && tagName !== 'figcaption' && !mediumEditorUtil.isListItemChild(node)) {
                         if (!e.shiftKey) {
 
                             // paragraph creation should not be forced within a header tag
