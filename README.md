@@ -88,7 +88,7 @@ the textarea value to the div HTML content.
 
 ### Toolbar options
 * __activeButtonClass__: CSS class added to active buttons in the toolbar. Default: 'medium-editor-button-active'
-* __buttons__: the set of buttons to display on the toolbar. Default: ['bold', 'italic', 'underline', 'anchor', 'header1', 'header2', 'quote']
+* __buttons__: the set of buttons to display on the toolbar. Default: `['bold', 'italic', 'underline', 'anchor', 'header1', 'header2', 'quote']`
 * __buttonLabels__: type of labels on the buttons. Values: 'fontawesome', `{'bold': '<b>b</b>', 'italic': '<i>i</i>'}`. Default: false
 * __diffLeft__: value in pixels to be added to the X axis positioning of the toolbar. Default: 0
 * __diffTop__: value in pixels to be added to the Y axis positioning of the toolbar. Default: -10
@@ -156,11 +156,12 @@ var editor = new MediumEditor('.editable', {
 
 ## Extra buttons
 
-Medium Editor, by default, will show only the buttons listed above to avoid a huge toolbar. There are a couple of extra buttons you can use:
+Medium Editor, by default, will show only the buttons listed above to avoid a huge toolbar. There are a few extra buttons you can use:
 
 * __superscript__
 * __subscript__
 * __strikethrough__
+* __fontsize__
 * __unorderedlist__
 * __orderedlist__
 * __pre__
