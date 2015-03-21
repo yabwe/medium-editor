@@ -57,7 +57,7 @@
   },
   "scripts": {
     "test": "grunt test --verbose",
-    "test:ci": "grunt travis",
+    "test:ci": "grunt travis --verbose",
     "start": "open ./demo/index.html"
   }
 }
