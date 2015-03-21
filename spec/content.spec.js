@@ -171,4 +171,31 @@ describe('Content TestCase', function () {
         // Webkit inserts a <p> tag, firefox & ie do not
         expect(this.el.innerHTML).toMatch(/(<p><br><\/p>)?/);
     });
+
+    describe('when deleting and empty first list item via backspace', function () {
+        it('should insert a paragraph before the list if it is the first element in the editor', function () {
+            this.el.innerHTML = '<ul><li></li><li>lorem ipsum</li></ul>';
+            var editor = new MediumEditor('.editor'),
+                target = editor.elements[0].querySelector('li'),
+                range;
+            placeCursorInsideElement(target, 0);
+            fireEvent(target, 'keydown', {
+                keyCode: Util.keyCode.BACKSPACE
+            });
+            expect(this.el.innerHTML).toBe('<p><br></p><ul><li>lorem ipsum</li></ul>');
+            range = document.getSelection().getRangeAt(0);
+            expect(range.commonAncestorContainer.tagName.toLowerCase()).toBe('p');
+        });
+
+        it('should not insert a paragraph before the list if it is NOT the first element in the editor', function () {
+            this.el.innerHTML = '<p>lorem ipsum</p><ul><li></li><li>lorem ipsum</li></ul>';
+            var editor = new MediumEditor('.editor'),
+                target = editor.elements[0].querySelector('li');
+            placeCursorInsideElement(target, 0);
+            fireEvent(target, 'keydown', {
+                keyCode: Util.keyCode.BACKSPACE
+            });
+            expect(this.el.innerHTML).toBe('<p>lorem ipsum</p><ul><li></li><li>lorem ipsum</li></ul>');
+        });
+    });
 });
