@@ -1,6 +1,6 @@
 /*global MediumEditor, describe, it, expect, spyOn, jasmine, fireEvent,
          afterEach, beforeEach, selectElementContents, runs, waitsFor,
-         tearDown, placeCursorInsideElement, isFirefox, console */
+         tearDown, placeCursorInsideElement, isFirefox, console, Util */
 
 describe('Content TestCase', function () {
     'use strict';
@@ -24,7 +24,7 @@ describe('Content TestCase', function () {
             spyOn(document, 'execCommand').and.callThrough();
             selectElementContents(target);
             fireEvent(target, 'keydown', {
-                keyCode: 9
+                keyCode: Util.keyCode.TAB
             });
             expect(document.execCommand).toHaveBeenCalledWith('indent', false, null);
             // Firefox (annoyingly) throws a NS_ERROR_FAILURE when attempting to mimic this through a test case
@@ -42,7 +42,7 @@ describe('Content TestCase', function () {
             spyOn(document, 'execCommand').and.callThrough();
             selectElementContents(target);
             fireEvent(target, 'keydown', {
-                keyCode: 9,
+                keyCode: Util.keyCode.TAB,
                 shiftKey: true
             });
             expect(document.execCommand).toHaveBeenCalledWith('outdent', false, null);
@@ -64,7 +64,7 @@ describe('Content TestCase', function () {
             });
             selectElementContents(editor.elements[0]);
             fireEvent(editor.elements[0], 'keydown', {
-                keyCode: 13
+                keyCode: Util.keyCode.ENTER
             });
             expect(this.el.innerHTML).toBe('lorem ipsum');
         });
@@ -76,7 +76,7 @@ describe('Content TestCase', function () {
             });
             selectElementContents(editor.elements[0]);
             fireEvent(editor.elements[0], 'keydown', {
-                keyCode: 13
+                keyCode: Util.keyCode.ENTER
             });
             expect(this.el.innerHTML).toBe('<br> ');
         });
@@ -88,7 +88,7 @@ describe('Content TestCase', function () {
             spyOn(document, 'execCommand').and.callThrough();
             placeCursorInsideElement(targetNode, 0);
             fireEvent(targetNode, 'keyup', {
-                keyCode: 13
+                keyCode: Util.keyCode.ENTER
             });
             expect(document.execCommand).toHaveBeenCalledWith('formatBlock', false, 'p');
             expect(this.el.innerHTML).toBe('<p>lorem ipsum</p>');
@@ -103,7 +103,7 @@ describe('Content TestCase', function () {
             spyOn(document, 'execCommand').and.callThrough();
             placeCursorInsideElement(target, 1);
             fireEvent(target, 'keyup', {
-                keyCode: 13
+                keyCode: Util.keyCode.ENTER
             });
             expect(document.execCommand).toHaveBeenCalledWith('unlink', false, null);
         });
@@ -116,7 +116,7 @@ describe('Content TestCase', function () {
                 targetNode = editor.elements[0].querySelector('h3');
             placeCursorInsideElement(targetNode, 0);
             fireEvent(targetNode, 'keydown', {
-                keyCode: 13
+                keyCode: Util.keyCode.ENTER
             });
             expect(this.el.innerHTML).toBe('<h2>lorem</h2><p><br></p><h3>ipsum</h3>');
         });
@@ -127,7 +127,7 @@ describe('Content TestCase', function () {
                 targetNode = editor.elements[0].querySelector('p');
             selectElementContents(targetNode);
             fireEvent(targetNode, 'keydown', {
-                keyCode: 46
+                keyCode: Util.keyCode.DELETE
             });
             expect(this.el.innerHTML).toBe('<h2>lorem</h2><h3>ipsum</h3>');
         });
@@ -139,7 +139,7 @@ describe('Content TestCase', function () {
             spyOn(document, 'execCommand').and.callThrough();
             placeCursorInsideElement(targetNode, 0);
             fireEvent(targetNode, 'keyup', {
-                keyCode: 13
+                keyCode: Util.keyCode.ENTER
             });
             expect(document.execCommand).not.toHaveBeenCalledWith('formatBlock', false, 'p');
             expect(this.el.innerHTML).toBe('<h2>lorem ipsum</h2>');
@@ -152,7 +152,7 @@ describe('Content TestCase', function () {
             targetNode = editor.elements[0].querySelector('pre');
         placeCursorInsideElement(targetNode, 0);
         fireEvent(targetNode, 'keydown', {
-            keyCode: 9
+            keyCode: Util.keyCode.TAB
         });
         expect(this.el.innerHTML).toBe('<pre>    lorem ipsum</pre>');
     });
@@ -165,10 +165,46 @@ describe('Content TestCase', function () {
         selectElementContents(target);
         target.parentNode.removeChild(target);
         fireEvent(editor.elements[0], 'keyup', {
-            keyCode: 8
+            keyCode: Util.keyCode.BACKSPACE
         });
         expect(document.execCommand).toHaveBeenCalledWith('formatBlock', false, 'p');
         // Webkit inserts a <p> tag, firefox & ie do not
         expect(this.el.innerHTML).toMatch(/(<p><br><\/p>)?/);
+    });
+
+    describe('when deleting and empty first list item via backspace', function () {
+        it('should insert a paragraph before the list if it is the first element in the editor', function () {
+            this.el.innerHTML = '<ul><li></li><li>lorem ipsum</li></ul>';
+            var editor = new MediumEditor('.editor'),
+                target = editor.elements[0].querySelector('li'),
+                range;
+            placeCursorInsideElement(target, 0);
+            fireEvent(target, 'keydown', {
+                keyCode: Util.keyCode.BACKSPACE
+            });
+            expect(this.el.innerHTML).toBe('<p><br></p><ul><li>lorem ipsum</li></ul>');
+            range = document.getSelection().getRangeAt(0);
+            expect(range.commonAncestorContainer.tagName.toLowerCase()).toBe('p');
+        });
+
+        it('should not insert a paragraph before the list if it is NOT the first element in the editor', function () {
+            this.el.innerHTML = '<p>lorem ipsum</p><ul><li></li><li>lorem ipsum</li></ul>';
+            var editor = new MediumEditor('.editor'),
+                target = editor.elements[0].querySelector('li');
+            placeCursorInsideElement(target, 0);
+            fireEvent(target, 'keydown', {
+                keyCode: Util.keyCode.BACKSPACE
+            });
+            expect(this.el.innerHTML).toBe('<p>lorem ipsum</p><ul><li></li><li>lorem ipsum</li></ul>');
+        });
+    });
+
+    it('should removing paragraphs when a list is inserted inside of it', function () {
+        this.el.innerHTML = '<p>lorem ipsum<ul><li>dolor</li></ul></p>';
+        var editor = new MediumEditor('.editor'),
+            target = editor.elements[0].querySelector('p');
+        selectElementContents(target);
+        editor.execAction('insertorderedlist');
+        expect(this.el.innerHTML).toMatch(/^<ol><li>lorem ipsum(<br>)?<\/li><\/ol><ul><li>dolor<\/li><\/ul>?/);
     });
 });

@@ -334,6 +334,27 @@ var Util;
             return false;
         },
 
+        cleanListDOM: function (element) {
+            if (element.tagName.toLowerCase() === 'li') {
+                var list = element.parentElement;
+                if (list.parentElement.tagName.toLowerCase() === 'p') { // yes we need to clean up
+                    this.unwrapElement(list.parentElement);
+                }
+            }
+        },
+
+        unwrapElement: function (element) {
+            var parent = element.parentNode,
+                current = element.firstChild,
+                next;
+            do {
+                next = current.nextSibling;
+                parent.insertBefore(current, element);
+                current = next;
+            } while (current);
+            parent.removeChild(element);
+        },
+
         deprecatedMethod: function (oldName, newName, args) {
             // Thanks IE9, you're the best
             if (window.console !== undefined) {

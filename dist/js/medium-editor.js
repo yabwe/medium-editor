@@ -732,6 +732,27 @@ var Util;
             return false;
         },
 
+        cleanListDOM: function (element) {
+            if (element.tagName.toLowerCase() === 'li') {
+                var list = element.parentElement;
+                if (list.parentElement.tagName.toLowerCase() === 'p') { // yes we need to clean up
+                    this.unwrapElement(list.parentElement);
+                }
+            }
+        },
+
+        unwrapElement: function (element) {
+            var parent = element.parentNode,
+                current = element.firstChild,
+                next;
+            do {
+                next = current.nextSibling;
+                parent.insertBefore(current, element);
+                current = next;
+            } while (current);
+            parent.removeChild(element);
+        },
+
         deprecatedMethod: function (oldName, newName, args) {
             // Thanks IE9, you're the best
             if (window.console !== undefined) {
@@ -2812,6 +2833,7 @@ function MediumEditor(elements, options) {
             isHeader = /h\d/i;
 
         if ((event.which === Util.keyCode.BACKSPACE || event.which === Util.keyCode.ENTER)
+                // has a preceeding sibling
                 && node.previousElementSibling
                 // in a header
                 && isHeader.test(tagName)
@@ -2832,6 +2854,7 @@ function MediumEditor(elements, options) {
                 event.preventDefault();
             }
         } else if (event.which === Util.keyCode.DELETE
+                    // between two sibling elements
                     && node.nextElementSibling
                     && node.previousElementSibling
                     // not in a header
@@ -2846,8 +2869,8 @@ function MediumEditor(elements, options) {
             // Instead, delete the paragraph node and move the cursor to the begining of the h1
 
             // remove node and move cursor to start of header
-            range = document.createRange();
-            sel = this.options.contentWindow.getSelection();
+            range = this.options.ownerDocument.createRange();
+            sel = this.options.ownerDocument.getSelection();
 
             range.setStart(node.nextElementSibling, 0);
             range.collapse(true);
@@ -2856,6 +2879,41 @@ function MediumEditor(elements, options) {
             sel.addRange(range);
 
             node.previousElementSibling.parentNode.removeChild(node);
+
+            event.preventDefault();
+        } else if (event.which === Util.keyCode.BACKSPACE
+                && tagName === 'li'
+                // hitting backspace inside an empty li
+                && isEmpty.test(node.innerHTML)
+                // is first element (no preceeding siblings)
+                && !node.previousElementSibling
+                // parent also does not have a sibling
+                && !node.parentElement.previousElementSibling
+                // is not the only li in a list
+                && node.nextElementSibling.tagName.toLowerCase() === 'li') {
+            // backspacing in an empty first list element in the first list (with more elements) ex:
+            //  <ul><li>[CURSOR]</li><li>List Item 2</li></ul>
+            // will remove the first <li> but add some extra element before (varies based on browser)
+            // Instead, this will:
+            // 1) remove the list element
+            // 2) create a paragraph before the list
+            // 3) move the cursor into the paragraph
+
+            // create a paragraph before the list
+            p = this.options.ownerDocument.createElement('p');
+            p.innerHTML = '<br>';
+            node.parentElement.parentElement.insertBefore(p, node.parentElement);
+
+            // move the cursor into the new paragraph
+            range = this.options.ownerDocument.createRange();
+            sel = this.options.ownerDocument.getSelection();
+            range.setStart(p, 0);
+            range.collapse(true);
+            sel.removeAllRanges();
+            sel.addRange(range);
+
+            // remove the list element
+            node.parentElement.removeChild(node);
 
             event.preventDefault();
         }
@@ -2893,13 +2951,13 @@ function MediumEditor(elements, options) {
                     Util.insertHTMLCommand(this.options.ownerDocument, '<img class="medium-image-loading" id="' + id + '" />');
 
                     fileReader.onload = function () {
-                        var img = document.getElementById(id);
+                        var img = this.options.ownerDocument.getElementById(id);
                         if (img) {
                             img.removeAttribute('id');
                             img.removeAttribute('class');
                             img.src = fileReader.result;
                         }
-                    };
+                    }.bind(this);
                 }
             }.bind(this));
         }
@@ -3359,6 +3417,11 @@ function MediumEditor(elements, options) {
                 this.restoreSelection();
             } else {
                 result = execActionInternal.call(this, action, opts);
+            }
+
+            // do some DOM clean-up for known browser issues after the action
+            if (action === 'insertunorderedlist' || action === 'insertorderedlist') {
+                Util.cleanListDOM(this.getSelectedParentElement());
             }
 
             this.checkSelection();
