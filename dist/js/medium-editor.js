@@ -732,6 +732,27 @@ var Util;
             return false;
         },
 
+        cleanListDOM: function (element) {
+            if (element.tagName.toLowerCase() === 'li') {
+                var list = element.parentElement;
+                if (list.parentElement.tagName.toLowerCase() === 'p') { // yes we need to clean up
+                    this.unwrapElement(list.parentElement);
+                }
+            }
+        },
+
+        unwrapElement: function (element) {
+            var parent = element.parentNode,
+                current = element.firstChild,
+                next;
+            do {
+                next = current.nextSibling;
+                parent.insertBefore(current, element);
+                current = next;
+            } while (current);
+            parent.removeChild(element);
+        },
+
         deprecatedMethod: function (oldName, newName, args) {
             // Thanks IE9, you're the best
             if (window.console !== undefined) {
@@ -3400,7 +3421,7 @@ function MediumEditor(elements, options) {
 
             // do some DOM clean-up for known browser issues after the action
             if (action === 'insertunorderedlist' || action === 'insertorderedlist') {
-                this.cleanListDOM();
+                Util.cleanListDOM(this.getSelectedParentElement());
             }
 
             this.checkSelection();
@@ -3577,28 +3598,6 @@ function MediumEditor(elements, options) {
 
         pasteHTML: function (html) {
             this.pasteHandler.pasteHTML(html);
-        },
-
-        cleanListDOM: function () {
-            var list, element = this.getSelectedParentElement();
-            if (element.tagName.toLowerCase() === 'li') {
-                list = element.parentElement;
-                if (list.parentElement.tagName.toLowerCase() === 'p') { // yes we need to clean up
-                    this.unwrapElement(list.parentElement);
-                }
-            }
-        },
-
-        unwrapElement: function (element) {
-            var parent = element.parentNode,
-                current = element.firstChild,
-                next;
-            do {
-                next = current.nextSibling;
-                parent.insertBefore(current, element);
-                current = next;
-            } while (current);
-            parent.removeChild(element);
         }
     };
 }());
