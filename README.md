@@ -149,8 +149,8 @@ Check out the Wiki page for a list of available themes: [https://github.com/davi
 ## API
 
 ### Core Methods
-* __.deactivate()__: disables the editor, removing all DOM elements and event handlers
-* __.activate()__: re-activates the editor if deactivated
+* __.destroy()__: tears down the editor if already setup, removing all DOM elements and event handlers
+* __.setup()__: rebuilds the editor if it has already been destroyed, recreating DOM elements and attaching event handlers
 * __.serialize()__: returns a JSON object with elements contents
 * __.execAction(action, opts)__: executes an built-in action via `document.execCommand`
 * __.createLink(opts)__: creates a link via the native `document.execCommand('createLink')` command

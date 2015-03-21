@@ -28,7 +28,7 @@ describe('Resize TestCase', function () {
         fireEvent(window, 'resize');
         jasmine.clock().tick(1);
         expect(editor.toolbar.setToolbarPosition).toHaveBeenCalled();
-        editor.deactivate();
+        editor.destroy();
     });
 
     it('should not call setToolbarPosition when toolbar is not visible', function () {

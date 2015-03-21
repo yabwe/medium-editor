@@ -83,7 +83,7 @@ describe('Extensions TestCase', function () {
 
             expect(ext1.me instanceof MediumEditor).toBeTruthy();
             expect(ext2.me instanceof MediumEditor).toBeTruthy();
-            editor.deactivate();
+            editor.destroy();
         });
     });
 
@@ -216,7 +216,7 @@ describe('Extensions TestCase', function () {
 
             expect(extOne.name).toBe('one');
             expect(extTwo.name).toBe('two');
-            editor.deactivate();
+            editor.destroy();
         });
     });
 });
