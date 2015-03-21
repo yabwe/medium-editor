@@ -292,8 +292,13 @@ module.exports = function (grunt) {
         ]
     });
 
+    if (process.env.TRAVIS_BRANCH === 'master') {
+        grunt.registerTask('travis', ['connect', 'jslint', 'jasmine:suite', 'csslint', 'saucelabs-jasmine', 'coveralls']);
+    } else {
+        grunt.registerTask('travis', ['jslint', 'jasmine:suite', 'csslint', 'coveralls']);
+    }
+
     grunt.registerTask('test', ['jslint', 'concat', 'jasmine:suite', 'csslint']);
-    grunt.registerTask('travis', ['connect', 'jslint', 'jasmine:suite', 'csslint', 'saucelabs-jasmine', 'coveralls']);
     grunt.registerTask('sauce', ['connect', 'saucelabs-jasmine']);
     grunt.registerTask('js', ['jslint', 'concat', 'jasmine:suite', 'uglify']);
     grunt.registerTask('css', ['sass', 'autoprefixer', 'cssmin', 'csslint']);
