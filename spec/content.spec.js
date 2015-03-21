@@ -198,4 +198,13 @@ describe('Content TestCase', function () {
             expect(this.el.innerHTML).toBe('<p>lorem ipsum</p><ul><li></li><li>lorem ipsum</li></ul>');
         });
     });
+
+    it('should removing paragraphs when a list is inserted inside of it', function () {
+        this.el.innerHTML = '<p>lorem ipsum<ul><li>dolor</li></ul></p>';
+        var editor = new MediumEditor('.editor'),
+            target = editor.elements[0].querySelector('p');
+        selectElementContents(target);
+        editor.execAction('insertorderedlist');
+        expect(this.el.innerHTML).toMatch(/^<ol><li>lorem ipsum(<br>)?<\/li><\/ol><ul><li>dolor<\/li><\/ul>?/);
+    });
 });
