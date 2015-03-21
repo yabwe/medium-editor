@@ -292,10 +292,10 @@ module.exports = function (grunt) {
         ]
     });
 
-    if (process.env.TRAVIS_BRANCH === 'master') {
-        grunt.registerTask('travis', ['connect', 'jslint', 'jasmine:suite', 'csslint', 'saucelabs-jasmine', 'coveralls']);
-    } else {
+    if (parseInt(process.env.TRAVIS_PULL_REQUEST, 10) > 0) {
         grunt.registerTask('travis', ['jslint', 'jasmine:suite', 'csslint', 'coveralls']);
+    } else {
+        grunt.registerTask('travis', ['connect', 'jslint', 'jasmine:suite', 'csslint', 'saucelabs-jasmine', 'coveralls']);
     }
 
     grunt.registerTask('test', ['jslint', 'concat', 'jasmine:suite', 'csslint']);
