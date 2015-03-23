@@ -1,3 +1,17 @@
+4.0.0 / 2015-03-23
+==================
+* Introduced custom events (consumable externally)
+* Reduce API surface area
+  * Deprecated activate & deactivated. Exposed setup and destroy as replacements
+  * Updated documentation to reflect API changes
+* HTML standardization around list items
+* Fixed throttling
+* Added superscript & subscript css
+* Added better paste cleaning for Microsoft Word
+* Convert anchor preview into overrideable extension
+* Added disableAnchorPreview option
+
+
 3.0.9 / 2015-03-10
 ==================
 * Extract toolbar
