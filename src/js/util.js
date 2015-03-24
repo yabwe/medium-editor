@@ -96,8 +96,8 @@ var Util;
             return !!(obj && obj.nodeType === 1);
         },
 
-        now: function now() {
-            return Date.now() || new Date().getTime();
+        now: Date.now || function now() {
+            return +new Date();
         },
 
         // https://github.com/jashkenas/underscore
