@@ -62,6 +62,8 @@
   vertical-align: super; }
 .data-medium-element sub {
   vertical-align: sub; }
+.data-medium-element img {
+  max-width: 100%; }
 
 .medium-toolbar-arrow-under:after, .medium-toolbar-arrow-over:before {
   position: absolute;
