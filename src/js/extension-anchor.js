@@ -24,6 +24,10 @@ var AnchorExtension;
 
         // Button and Extension handling
 
+        // labels for the anchor-edit form buttons
+        formSaveLabel: '&#10003;',
+        formCloseLabel: '&times;',
+
         // Called when the button the toolbar is clicked
         // Overrides DefaultButton.handleClick
         handleClick: function (evt) {
@@ -159,7 +163,7 @@ var AnchorExtension;
             save.className = 'medium-editor-toolbar-save';
             save.innerHTML = this.base.options.buttonLabels === 'fontawesome' ?
                              '<i class="fa fa-check"></i>' :
-                             '&#10003;';
+                             this.formSaveLabel;
             form.appendChild(save);
 
             // Handle save button clicks (capture)
@@ -170,7 +174,7 @@ var AnchorExtension;
             close.className = 'medium-editor-toolbar-close';
             close.innerHTML = this.base.options.buttonLabels === 'fontawesome' ?
                               '<i class="fa fa-times"></i>' :
-                              '&times;';
+                              this.formCloseLabel;
             form.appendChild(close);
 
             // Handle close button clicks
