@@ -1,3 +1,7 @@
+4.0.1 / 2015-03-24
+* Fix issue with dragged in image sizes
+* Fix isues with focus/blur when using standardizeSelectionStart option
+
 4.0.0 / 2015-03-23
 ==================
 * Introduced custom events (consumable externally)
