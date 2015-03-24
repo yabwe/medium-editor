@@ -16,8 +16,8 @@
     border-right: 1px solid #cdd6e0;
     background-color: transparent;
     color: #40648a;
-    -webkit-transition: background-color 0.2s ease-in, color 0.2s ease-in;
-            transition: background-color 0.2s ease-in, color 0.2s ease-in; }
+    -webkit-transition: background-color .2s ease-in, color .2s ease-in;
+            transition: background-color .2s ease-in, color .2s ease-in; }
     .medium-editor-toolbar li button:hover {
       background-color: #5c90c7;
       background-color: rgba(92, 144, 199, 0.45);
