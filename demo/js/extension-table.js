@@ -152,7 +152,7 @@ TableDerived.prototype = {
 
         // Add save buton
         save.setAttribute('href', '#');
-        save.className = 'medium-editor-toobar-save';
+        save.className = 'medium-editor-toolbar-save';
         save.innerHTML = this.base.options.buttonLabels === 'fontawesome' ?
                          '<i class="fa fa-check"></i>' :
                          '&#10003;';
@@ -163,7 +163,7 @@ TableDerived.prototype = {
 
         // Add close button
         close.setAttribute('href', '#');
-        close.className = 'medium-editor-toobar-close';
+        close.className = 'medium-editor-toolbar-close';
         close.innerHTML = this.base.options.buttonLabels === 'fontawesome' ?
                           '<i class="fa fa-times"></i>' :
                           '&times;';

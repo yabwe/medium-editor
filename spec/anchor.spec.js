@@ -91,7 +91,7 @@ describe('Anchor Button TestCase', function () {
 
             selectElementContentsAndFire(editor.elements[0]);
             anchorExtension.showForm('test.com');
-            fireEvent(anchorExtension.getForm().querySelector('a.medium-editor-toobar-save'), 'click');
+            fireEvent(anchorExtension.getForm().querySelector('a.medium-editor-toolbar-save'), 'click');
 
             link = editor.elements[0].querySelector('a');
             expect(link).not.toBeNull();
@@ -107,7 +107,7 @@ describe('Anchor Button TestCase', function () {
 
             selectElementContentsAndFire(editor.elements[0]);
             anchorExtension.showForm(validUrl);
-            fireEvent(anchorExtension.getForm().querySelector('a.medium-editor-toobar-save'), 'click');
+            fireEvent(anchorExtension.getForm().querySelector('a.medium-editor-toolbar-save'), 'click');
 
             link = editor.elements[0].querySelector('a');
             expect(link).not.toBeNull();
@@ -127,7 +127,7 @@ describe('Anchor Button TestCase', function () {
             targetCheckbox = anchorExtension.getForm().querySelector('input.medium-editor-toolbar-anchor-target');
             expect().not.toBeNull(targetCheckbox);
             targetCheckbox.checked = true;
-            fireEvent(anchorExtension.getForm().querySelector('a.medium-editor-toobar-save'), 'click');
+            fireEvent(anchorExtension.getForm().querySelector('a.medium-editor-toolbar-save'), 'click');
             expect(anchorExtension.isDisplayed()).toBe(false);
 
             link = editor.elements[0].querySelector('a');
@@ -143,7 +143,7 @@ describe('Anchor Button TestCase', function () {
 
             selectElementContentsAndFire(editor.elements[0]);
             anchorExtension.showForm('http://test.com');
-            fireEvent(anchorExtension.getForm().querySelector('a.medium-editor-toobar-save'), 'click');
+            fireEvent(anchorExtension.getForm().querySelector('a.medium-editor-toolbar-save'), 'click');
 
             link = editor.elements[0].querySelector('a');
             expect(link).not.toBeNull();
@@ -200,7 +200,7 @@ describe('Anchor Button TestCase', function () {
 
             selectElementContents(editor.elements[0]);
             button = editor.toolbar.getToolbarElement().querySelector('[data-action="createLink"]');
-            cancel = anchorExtension.getForm().querySelector('a.medium-editor-toobar-close');
+            cancel = anchorExtension.getForm().querySelector('a.medium-editor-toolbar-close');
             fireEvent(button, 'click');
             expect(anchorExtension.isDisplayed()).toBe(true);
             fireEvent(cancel, 'click');
