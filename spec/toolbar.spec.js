@@ -138,7 +138,9 @@ describe('Toolbar TestCase', function () {
             });
 
             placeCursorInsideElement(this.el.firstChild, 'This is my text'.length);
-            fireEvent(this.el, 'blur');
+            fireEvent(this.el, 'blur', {
+                relatedTarget: document.createElement('div')
+            });
             expect(editor.toolbar.getToolbarElement().classList.contains('medium-editor-toolbar-active')).toBe(false);
             expect(window.getSelection().anchorNode).toBe(null);
         });
