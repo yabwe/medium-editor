@@ -1,7 +1,8 @@
 /*global MediumEditor, describe, it, expect, spyOn,
          afterEach, beforeEach, selectElementContents, runs,
          fireEvent, waitsFor, tearDown, xit, jasmine,
-         selectElementContentsAndFire, console, Toolbar*/
+         selectElementContentsAndFire, placeCursorInsideElement,
+         console, Toolbar*/
 
 describe('Toolbar TestCase', function () {
     'use strict';
@@ -126,6 +127,20 @@ describe('Toolbar TestCase', function () {
 
         afterEach(function () {
             jasmine.clock().uninstall();
+        });
+
+        it('should let the user click outside of the selected area to leave', function () {
+            this.el.innerHTML = 'This is my text<span>and this is some other text</span>';
+            var editor = new MediumEditor('.editor', {
+                staticToolbar: true,
+                standardizeSelectionStart: true,
+                updateOnEmptySelection: true
+            });
+
+            placeCursorInsideElement(this.el.firstChild, 'This is my text'.length);
+            fireEvent(this.el, 'blur');
+            expect(editor.toolbar.getToolbarElement().classList.contains('medium-editor-toolbar-active')).toBe(false);
+            expect(window.getSelection().anchorNode).toBe(null);
         });
 
         it('should not throw an error when check selection is called when there is an empty selection', function () {
