@@ -2353,7 +2353,7 @@ var Toolbar;
             }
             // Remove all selections before checking state. This is necessary to avoid issues with
             // standardizeSelectionStart 'canceling' the blur event by moving the selection.
-            window.getSelection().removeAllRanges();
+            this.options.contentWindow.getSelection().removeAllRanges();
             this.checkState();
         },
 
