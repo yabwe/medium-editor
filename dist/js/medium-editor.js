@@ -2340,11 +2340,28 @@ var Toolbar;
         },
 
         handleEditableBlur: function (event) {
+            var getBlurRelatedTarget = function (e) {
+                return e.relatedTarget || // standard HTML5 DOM
+                    e.explicitOriginalTarget || // Firefox only
+                    document.activeElement; // IE9-11
+            },
+                isRelatedTargetOwnedByThisEditor = false;
             // Do not trigger checkState when bluring the editable area and clicking into the toolbar
             if (event &&
-                    event.relatedTarget &&
-                    Util.isDescendant(this.getToolbarElement(), event.relatedTarget)) {
+                    getBlurRelatedTarget(event) &&
+                    Util.isDescendant(this.getToolbarElement(), getBlurRelatedTarget(event))) {
                 return false;
+            }
+            // Remove all selections before checking state. This is necessary to avoid issues with
+            // standardizeSelectionStart 'canceling' the blur event by moving the selection.
+            this.base.elements.forEach(function (el) {
+                isRelatedTargetOwnedByThisEditor = isRelatedTargetOwnedByThisEditor || Util.isDescendant(el, getBlurRelatedTarget(event)) ||
+                    getBlurRelatedTarget(event) === el;
+            });
+            // We only remove all the ranges if the user clicked outside the contenteditables managed by this medium-editor instance. Otherwise keep the ranges,
+            // because we were okay with the behavior that it did.
+            if (!isRelatedTargetOwnedByThisEditor) {
+                this.options.contentWindow.getSelection().removeAllRanges();
             }
             this.checkState();
         },

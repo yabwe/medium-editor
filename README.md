@@ -100,10 +100,11 @@ var elements = document.querySelectorAll('.editable'),
 * __updateOnEmptySelection__: update the state of the toolbar buttons even when the selection is collapse (there is no selection, just a cursor). Default: false
 
 ### Anchor form options
-* __anchorButton__: enables/disables adding class __anchorButtonClass__ to anchor tags. Default: false
+* __anchorButton__: enables/disables displaying a checkbox for whether the user wants the link to be displayed as a "button". If checkbox is checked, the created link will have __anchorButtonClass__ added to the class list. Default: false
 * __anchorButtonClass__: class to add to anchor tags, when __anchorButton__ is set to true. Default: btn
+* __anchorTarget__: enables/disables displaying a "Open in new window" checkbox, which when checked changes the `target` attribute of the created link. Default: false
+* __anchorInputCheckboxLabel__: text to be shown in the checkbox enabled via the __anchorTarget__ option. Default: _Open in new window_
 * __anchorInputPlaceholder__: text to be shown as placeholder of the anchor input. Default: _Paste or type a link_
-* __anchorInputCheckboxLabel__: text to be shown for the anchor new window target. Default: _Open in new window_
 * __anchorPreviewHideDelay__: time in milliseconds to show the anchor tag preview after the mouse has left the anchor tag. Default: 500
 * __checkLinkFormat__: enables/disables check for common URL protocols on anchor links. Default: false
 * __targetBlank__: enables/disables target="\_blank" for anchor tags. Default: false
