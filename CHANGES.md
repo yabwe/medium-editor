@@ -1,4 +1,5 @@
 4.0.1 / 2015-03-24
+==================
 * Fix issue with dragged in image sizes
 * Fix isues with focus/blur when using standardizeSelectionStart option
 
