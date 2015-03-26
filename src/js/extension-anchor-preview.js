@@ -12,6 +12,10 @@ var AnchorPreview;
 
     AnchorPreview.prototype = {
 
+        // the default selector to locate where to
+        // put the activeAnchor value in the preview
+        previewValueSelector: 'i',
+
         init: function (instance) {
             this.base = instance;
             this.anchorPreview = this.createPreview();
@@ -62,7 +66,9 @@ var AnchorPreview;
                 return true;
             }
 
-            this.anchorPreview.querySelector('i').textContent = anchorEl.attributes.href.value;
+            if (this.previewValueSelector) {
+                this.anchorPreview.querySelector(this.previewValueSelector).textContent = anchorEl.attributes.href.value;
+            }
 
             this.anchorPreview.classList.add('medium-toolbar-arrow-over');
             this.anchorPreview.classList.remove('medium-toolbar-arrow-under');
