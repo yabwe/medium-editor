@@ -96,9 +96,7 @@ var Util;
             return !!(obj && obj.nodeType === 1);
         },
 
-        now: Date.now || function now() {
-            return +new Date();
-        },
+        now: Date.now,
 
         // https://github.com/jashkenas/underscore
         throttle: function (func, wait) {
