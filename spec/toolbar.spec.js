@@ -138,6 +138,9 @@ describe('Toolbar TestCase', function () {
             });
 
             placeCursorInsideElement(this.el.firstChild, 'This is my text'.length);
+            fireEvent(document.documentElement, 'mousedown', {
+                target: document.body
+            });
             fireEvent(this.el, 'blur', {
                 relatedTarget: document.createElement('div')
             });

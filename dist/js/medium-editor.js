@@ -2299,6 +2299,7 @@ var Toolbar;
         },
 
         attachEventHandlers: function () {
+            this.base.on(this.options.ownerDocument.documentElement, 'mousedown', this.handleDocumentMousedown.bind(this));
             // Handle mouseup on document for updating the selection in the toolbar
             this.base.on(this.options.ownerDocument.documentElement, 'mouseup', this.handleDocumentMouseup.bind(this));
 
@@ -2332,7 +2333,12 @@ var Toolbar;
             this.throttledPositionToolbar();
         },
 
+        handleDocumentMousedown: function (event) {
+            this.lastMousedownTarget = event.target;
+        },
+
         handleDocumentMouseup: function (event) {
+            this.lastMousedownTarget = null;
             // Do not trigger checkState when mouseup fires over the toolbar
             if (event &&
                     event.target &&
@@ -2355,28 +2361,23 @@ var Toolbar;
         },
 
         handleEditableBlur: function (event) {
-            var getBlurRelatedTarget = function (e) {
-                return e.relatedTarget || // standard HTML5 DOM
-                    e.explicitOriginalTarget || // Firefox only
-                    document.activeElement; // IE9-11
-            },
-                isRelatedTargetOwnedByThisEditor = false;
-            // Do not trigger checkState when bluring the editable area and clicking into the toolbar
-            if (event &&
-                    getBlurRelatedTarget(event) &&
-                    Util.isDescendant(this.getToolbarElement(), getBlurRelatedTarget(event))) {
+            var isRelatedTargetOwnedByThisEditor = false;
+            // Do not trigger checkState when blurring the editable area and clicking into the toolbar
+            if (Util.isDescendant(this.getToolbarElement(), this.lastMousedownTarget)) {
                 return false;
             }
-            // Remove all selections before checking state. This is necessary to avoid issues with
-            // standardizeSelectionStart 'canceling' the blur event by moving the selection.
-            this.base.elements.forEach(function (el) {
-                isRelatedTargetOwnedByThisEditor = isRelatedTargetOwnedByThisEditor || Util.isDescendant(el, getBlurRelatedTarget(event)) ||
-                    getBlurRelatedTarget(event) === el;
-            });
-            // We only remove all the ranges if the user clicked outside the contenteditables managed by this medium-editor instance. Otherwise keep the ranges,
-            // because we were okay with the behavior that it did.
-            if (!isRelatedTargetOwnedByThisEditor) {
-                this.options.contentWindow.getSelection().removeAllRanges();
+            if (this.lastMousedownTarget) {
+                // Remove all selections before checking state. This is necessary to avoid issues with
+                // standardizeSelectionStart 'canceling' the blur event by moving the selection.
+                this.base.elements.forEach(function (el) {
+                    isRelatedTargetOwnedByThisEditor = isRelatedTargetOwnedByThisEditor || Util.isDescendant(el, this.lastMousedownTarget) ||
+                        this.lastMousedownTarget === el;
+                }, this);
+                // We only remove all the ranges if the user clicked outside the contenteditables managed by this medium-editor instance. Otherwise keep the ranges,
+                // because we were okay with the behavior that it did.
+                if (!isRelatedTargetOwnedByThisEditor) {
+                    this.options.contentWindow.getSelection().removeAllRanges();
+                }
             }
             this.checkState();
         },
