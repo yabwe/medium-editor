@@ -55,6 +55,42 @@ var AnchorExtension;
             return this.form;
         },
 
+        getTemplate: function () {
+
+            var template = [
+                '<input type="text" class="medium-editor-toolbar-input" placeHolder="', this.base.options.anchorInputPlaceholder, '">'
+            ];
+
+            template.push(
+                '<a href="#" class="medium-editor-toolbar-save">',
+                this.base.options.buttonLabels === 'fontawesome' ? '<i class="fa fa-check"></i>' : this.formSaveLabel,
+                '</a>'
+            );
+
+            template.push('<a href="#" class="medium-editor-toolbar-close">',
+                this.base.options.buttonLabels === 'fontawesome' ? '<i class="fa fa-times"></i>' : this.formCloseLabel,
+                '</a>');
+
+            if (this.base.options.anchorTarget) {
+                template.push(
+                    '<input type="checkbox" class="medium-editor-toolbar-anchor-target">',
+                    '<label>',
+                    this.base.options.anchorInputCheckboxLabel,
+                    '</label>'
+                );
+            }
+
+            if (this.base.options.anchorButton) {
+                template.push(
+                    '<input type="checkbox" class="medium-editor-toolbar-anchor-button">',
+                    '<label>Button</label>'
+                );
+            }
+
+            return template.join("");
+
+        },
+
         // Used by medium-editor when the default toolbar is to be displayed
         isDisplayed: function () {
             return this.getForm().style.display === 'block';
@@ -92,14 +128,13 @@ var AnchorExtension;
 
         // core methods
 
-        doFormSave: function () {
+        getFormOpts: function () {
+            // no notion of private functions? wanted `_getFormOpts`
             var targetCheckbox = this.getForm().querySelector('.medium-editor-toolbar-anchor-target'),
                 buttonCheckbox = this.getForm().querySelector('.medium-editor-toolbar-anchor-button'),
                 opts = {
                     url: this.getInput().value
                 };
-
-            this.base.restoreSelection();
 
             if (this.base.options.checkLinkFormat) {
                 opts.url = this.checkLinkFormat(opts.url);
@@ -115,6 +150,16 @@ var AnchorExtension;
                 opts.buttonClass = this.base.options.anchorButtonClass;
             }
 
+            return opts;
+        },
+
+        doFormSave: function () {
+            var opts = this.getFormOpts();
+            this.completeFormSave(opts);
+        },
+
+        completeFormSave: function (opts) {
+            this.base.restoreSelection();
             this.base.createLink(opts);
             this.base.checkSelection();
         },
@@ -131,80 +176,34 @@ var AnchorExtension;
 
         // form creation and event handling
 
-        createForm: function () {
-            var doc = this.base.options.ownerDocument,
-                form = doc.createElement('div'),
-                input = doc.createElement('input'),
-                close = doc.createElement('a'),
-                save = doc.createElement('a'),
-                target,
-                target_label,
-                button,
-                button_label;
-
-            // Anchor Form (div)
-            form.className = 'medium-editor-toolbar-form';
-            form.id = 'medium-editor-toolbar-form-anchor-' + this.base.id;
+        attachFormEvents: function (form) {
+            var close = form.querySelector(".medium-editor-toolbar-close"),
+                save = form.querySelector(".medium-editor-toolbar-save"),
+                input = form.querySelector(".medium-editor-toolbar-input");
 
             // Handle clicks on the form itself
             this.base.on(form, 'click', this.handleFormClick.bind(this));
 
-            // Add url textbox
-            input.setAttribute('type', 'text');
-            input.className = 'medium-editor-toolbar-input';
-            input.setAttribute('placeholder', this.base.options.anchorInputPlaceholder);
-            form.appendChild(input);
-
             // Handle typing in the textbox
             this.base.on(input, 'keyup', this.handleTextboxKeyup.bind(this));
-
-            // Add save buton
-            save.setAttribute('href', '#');
-            save.className = 'medium-editor-toolbar-save';
-            save.innerHTML = this.base.options.buttonLabels === 'fontawesome' ?
-                             '<i class="fa fa-check"></i>' :
-                             this.formSaveLabel;
-            form.appendChild(save);
-
-            // Handle save button clicks (capture)
-            this.base.on(save, 'click', this.handleSaveClick.bind(this), true);
-
-            // Add close button
-            close.setAttribute('href', '#');
-            close.className = 'medium-editor-toolbar-close';
-            close.innerHTML = this.base.options.buttonLabels === 'fontawesome' ?
-                              '<i class="fa fa-times"></i>' :
-                              this.formCloseLabel;
-            form.appendChild(close);
 
             // Handle close button clicks
             this.base.on(close, 'click', this.handleCloseClick.bind(this));
 
-            // (Optional) Add 'open in new window' checkbox
-            if (this.base.options.anchorTarget) {
-                target = doc.createElement('input');
-                target.setAttribute('type', 'checkbox');
-                target.className = 'medium-editor-toolbar-anchor-target';
+            // Handle save button clicks (capture)
+            this.base.on(save, 'click', this.handleSaveClick.bind(this), true);
 
-                target_label = doc.createElement('label');
-                target_label.innerHTML = this.base.options.anchorInputCheckboxLabel;
-                target_label.insertBefore(target, target_label.firstChild);
+        },
 
-                form.appendChild(target_label);
-            }
+        createForm: function () {
+            var doc = this.base.options.ownerDocument,
+                form = doc.createElement('div');
 
-            // (Optional) Add 'add button class to anchor' checkbox
-            if (this.base.options.anchorButton) {
-                button = doc.createElement('input');
-                button.setAttribute('type', 'checkbox');
-                button.className = 'medium-editor-toolbar-anchor-button';
-
-                button_label = doc.createElement('label');
-                button_label.innerHTML = "Button";
-                button_label.insertBefore(button, button_label.firstChild);
-
-                form.appendChild(button_label);
-            }
+            // Anchor Form (div)
+            form.className = 'medium-editor-toolbar-form';
+            form.id = 'medium-editor-toolbar-form-anchor-' + this.base.id;
+            form.innerHTML = this.getTemplate();
+            this.attachFormEvents(form);
 
             return form;
         },
@@ -247,4 +246,5 @@ var AnchorExtension;
     };
 
     AnchorExtension = Util.derives(DefaultButton, AnchorDerived);
+
 }(window, document));
