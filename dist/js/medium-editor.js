@@ -494,8 +494,8 @@ var Util;
             return !!(obj && obj.nodeType === 1);
         },
 
-        now: function now() {
-            return Date.now() || new Date().getTime();
+        now: Date.now || function now() {
+            return +new Date();
         },
 
         // https://github.com/jashkenas/underscore
@@ -1723,6 +1723,10 @@ var AnchorExtension;
 
         // Button and Extension handling
 
+        // labels for the anchor-edit form buttons
+        formSaveLabel: '&#10003;',
+        formCloseLabel: '&times;',
+
         // Called when the button the toolbar is clicked
         // Overrides DefaultButton.handleClick
         handleClick: function (evt) {
@@ -1858,7 +1862,7 @@ var AnchorExtension;
             save.className = 'medium-editor-toolbar-save';
             save.innerHTML = this.base.options.buttonLabels === 'fontawesome' ?
                              '<i class="fa fa-check"></i>' :
-                             '&#10003;';
+                             this.formSaveLabel;
             form.appendChild(save);
 
             // Handle save button clicks (capture)
@@ -1869,7 +1873,7 @@ var AnchorExtension;
             close.className = 'medium-editor-toolbar-close';
             close.innerHTML = this.base.options.buttonLabels === 'fontawesome' ?
                               '<i class="fa fa-times"></i>' :
-                              '&times;';
+                              this.formCloseLabel;
             form.appendChild(close);
 
             // Handle close button clicks
@@ -1956,6 +1960,10 @@ var AnchorPreview;
 
     AnchorPreview.prototype = {
 
+        // the default selector to locate where to
+        // put the activeAnchor value in the preview
+        previewValueSelector: 'i',
+
         init: function (instance) {
             this.base = instance;
             this.anchorPreview = this.createPreview();
@@ -2006,7 +2014,9 @@ var AnchorPreview;
                 return true;
             }
 
-            this.anchorPreview.querySelector('i').textContent = anchorEl.attributes.href.value;
+            if (this.previewValueSelector) {
+                this.anchorPreview.querySelector(this.previewValueSelector).textContent = anchorEl.attributes.href.value;
+            }
 
             this.anchorPreview.classList.add('medium-toolbar-arrow-over');
             this.anchorPreview.classList.remove('medium-toolbar-arrow-under');

@@ -66,10 +66,9 @@ var AnchorPreview;
                 return true;
             }
 
-            if(this.previewValueSelector){
+            if (this.previewValueSelector) {
                 this.anchorPreview.querySelector(this.previewValueSelector).textContent = anchorEl.attributes.href.value;
             }
-
 
             this.anchorPreview.classList.add('medium-toolbar-arrow-over');
             this.anchorPreview.classList.remove('medium-toolbar-arrow-under');
