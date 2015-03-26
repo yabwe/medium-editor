@@ -58,7 +58,7 @@ var AnchorExtension;
         getTemplate: function () {
 
             var template = [
-                '<input type="text" class="medium-editor-toolbar-input" placeHolder="', this.base.options.anchorInputPlaceholder, '">'
+                '<input type="text" class="medium-editor-toolbar-input" placeholder="', this.base.options.anchorInputPlaceholder, '">'
             ];
 
             template.push(
@@ -71,7 +71,12 @@ var AnchorExtension;
                 this.base.options.buttonLabels === 'fontawesome' ? '<i class="fa fa-times"></i>' : this.formCloseLabel,
                 '</a>');
 
+            // both of these options are slightly moot with the ability to
+            // override the various form buildup/serialize functions.
+
             if (this.base.options.anchorTarget) {
+                // fixme: ideally, this options.anchorInputCheckboxLabel would be a formLabel too,
+                // figure out how to deprecate? also consider `fa-` icon default implcations.
                 template.push(
                     '<input type="checkbox" class="medium-editor-toolbar-anchor-target">',
                     '<label>',
@@ -81,6 +86,8 @@ var AnchorExtension;
             }
 
             if (this.base.options.anchorButton) {
+                // fixme: expose this `Button` text as a formLabel property, too
+                // and provide similar access to a `fa-` icon default.
                 template.push(
                     '<input type="checkbox" class="medium-editor-toolbar-anchor-button">',
                     '<label>Button</label>'
