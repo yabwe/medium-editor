@@ -107,11 +107,6 @@ module.exports = function (grunt) {
                         options: {
                             dir: 'reports/jasmine/lcov'
                         }
-                    }, {
-                        type: 'html',
-                        options: {
-                            dir: 'coverage'
-                        }
                     }]
                 },
                 summary: true
