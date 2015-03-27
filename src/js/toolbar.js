@@ -111,7 +111,7 @@ var Toolbar;
         },
 
         attachEventHandlers: function () {
-            //this.base.on(this.options.ownerDocument.documentElement, 'mousedown', this.handleDocumentMousedown.bind(this));
+            this.base.on(this.options.ownerDocument.documentElement, 'mousedown', this.handleDocumentMousedown.bind(this));
             // Handle mouseup on document for updating the selection in the toolbar
             this.base.on(this.options.ownerDocument.documentElement, 'mouseup', this.handleDocumentMouseup.bind(this));
 
@@ -145,12 +145,12 @@ var Toolbar;
             this.throttledPositionToolbar();
         },
 
-        /*handleDocumentMousedown: function (event) {
+        handleDocumentMousedown: function (event) {
             this.lastMousedownTarget = event.target;
-        },*/
+        },
 
         handleDocumentMouseup: function (event) {
-            //this.lastMousedownTarget = null;
+            this.lastMousedownTarget = null;
             // Do not trigger checkState when mouseup fires over the toolbar
             if (event &&
                     event.target &&
@@ -173,30 +173,24 @@ var Toolbar;
         },
 
         handleEditableBlur: function (event) {
-            /*var isRelatedTargetOwnedByThisEditor = false;
+            var isRelatedTargetOwnedByThisEditor = false,
+                relatedTarget = (event && event.relatedTarget) ? event.relatedTarget : this.lastMousedownTarget;
             // Do not trigger checkState when blurring the editable area and clicking into the toolbar
-            if (Util.isDescendant(this.getToolbarElement(), this.lastMousedownTarget)) {
+            if (Util.isDescendant(this.getToolbarElement(), relatedTarget)) {
                 return false;
             }
-            if (this.lastMousedownTarget) {
+            if (relatedTarget) {
                 // Remove all selections before checking state. This is necessary to avoid issues with
                 // standardizeSelectionStart 'canceling' the blur event by moving the selection.
                 this.base.elements.forEach(function (el) {
-                    isRelatedTargetOwnedByThisEditor = isRelatedTargetOwnedByThisEditor || Util.isDescendant(el, this.lastMousedownTarget) ||
-                        this.lastMousedownTarget === el;
+                    isRelatedTargetOwnedByThisEditor = isRelatedTargetOwnedByThisEditor || Util.isDescendant(el, relatedTarget) ||
+                        relatedTarget === el;
                 }, this);
                 // We only remove all the ranges if the user clicked outside the contenteditables managed by this medium-editor instance. Otherwise keep the ranges,
                 // because we were okay with the behavior that it did.
                 if (!isRelatedTargetOwnedByThisEditor) {
                     this.options.contentWindow.getSelection().removeAllRanges();
                 }
-            }*/
-
-            // Do not trigger checkState when bluring the editable area and clicking into the toolbar
-            if (event &&
-                    event.relatedTarget &&
-                    Util.isDescendant(this.getToolbarElement(), event.relatedTarget)) {
-                return false;
             }
             this.checkState();
         },
