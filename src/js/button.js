@@ -219,6 +219,13 @@ var DefaultButton,
                 return [options.secondHeader];
             },
             contentDefault: '<b>H2</b>'
+        },
+        'removeFormat': {
+            name: 'removeFormat',
+            aria: 'remove formatting',
+            action: 'removeFormat',
+            contentDefault: '<b>X</b>',
+            contentFA: '<i class="fa fa-eraser"></i>'
         }
     };
 

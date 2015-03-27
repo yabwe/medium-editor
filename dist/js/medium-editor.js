@@ -1321,6 +1321,13 @@ var DefaultButton,
                 return [options.secondHeader];
             },
             contentDefault: '<b>H2</b>'
+        },
+        'removeFormat': {
+            name: 'removeFormat',
+            aria: 'remove formatting',
+            action: 'removeFormat',
+            contentDefault: '<b>X</b>',
+            contentFA: '<i class="fa fa-eraser"></i>'
         }
     };
 
@@ -2369,13 +2376,17 @@ var Toolbar;
             }
             if (relatedTarget) {
                 // Remove all selections before checking state. This is necessary to avoid issues with
-                // standardizeSelectionStart 'canceling' the blur event by moving the selection.
+                // standardizeSelectionStart 'canceling' the blur event by moving the selection (in Chrome only).
+                // In Safari, when you click on a non-button element outside of the contenteditable, the selection
+                // is already nulled out by the browser at this point, but remained set in Chrome, Firefox, and IE11.
+                // This change will effectively normalize all browsers' behavior to be the same as Safari.
                 this.base.elements.forEach(function (el) {
                     isRelatedTargetOwnedByThisEditor = isRelatedTargetOwnedByThisEditor || Util.isDescendant(el, relatedTarget) ||
                         relatedTarget === el;
                 }, this);
-                // We only remove all the ranges if the user clicked outside the contenteditables managed by this medium-editor instance. Otherwise keep the ranges,
-                // because we were okay with the behavior that it did.
+                // We only remove all the ranges if the user clicked outside the contenteditables managed by this
+                // medium-editor instance. Otherwise keep the ranges if they are set, we need the range to be present
+                // for various things done by the toolbar to work.
                 if (!isRelatedTargetOwnedByThisEditor) {
                     this.options.contentWindow.getSelection().removeAllRanges();
                 }
