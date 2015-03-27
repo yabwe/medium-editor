@@ -129,7 +129,7 @@ describe('Toolbar TestCase', function () {
             jasmine.clock().uninstall();
         });
 
-        it('should let the user click outside of the selected area to leave', function () {
+        xit('should let the user click outside of the selected area to leave', function () {
             this.el.innerHTML = 'This is my text<span>and this is some other text</span>';
             var editor = new MediumEditor('.editor', {
                 staticToolbar: true,
