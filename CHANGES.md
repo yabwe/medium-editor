@@ -1,7 +1,14 @@
+4.0.2 / 2015-03-26
+==================
+* Fix bug causing toolbar to disappaer on click in safari (rollback fix from 4.0.1)
+* Break up anchor form extension logic into more overrideable parts
+
+
 4.0.1 / 2015-03-24
 ==================
 * Fix issue with dragged in image sizes
 * Fix isues with focus/blur when using standardizeSelectionStart option
+
 
 4.0.0 / 2015-03-23
 ==================
