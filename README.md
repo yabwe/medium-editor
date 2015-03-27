@@ -141,6 +141,7 @@ Medium Editor, by default, will show only the buttons listed above to avoid a hu
 * __image__ (this simply converts selected text to an image tag)
 * __indent__ (moves the selected text up one level)
 * __outdent__ (moves the selected text down one level)
+* __removeFormat__ (clears inline style formatting, preserves blocks)
 
 
 ## Themes

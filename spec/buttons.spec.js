@@ -656,6 +656,35 @@ describe('Buttons TestCase', function () {
         });
     });
 
+    describe('Remove Formatting', function () {
+
+        it('should unwrap basic things', function () {
+            var editor = new MediumEditor('.editor', {
+                    buttons: ['removeFormat']
+                }),
+                button = editor.toolbar.getToolbarElement().querySelector('[data-action="removeFormat"]');
+
+            expect(button).toBeTruthy();
+
+            this.el.innerHTML = "<p>foo<b>bar</b><i>baz</i><strong>bam</strong></p>";
+            selectElementContentsAndFire(editor.elements[0].querySelector('p'));
+            fireEvent(button, "click");
+            expect(this.el.innerHTML).toBe("<p>foobarbazbam</p>");
+
+            this.el.innerHTML = "<div><p><b>foo</b></p><p><i>bar</i></p><ul><li>on<b>e</b></li></ul></div>";
+            selectElementContentsAndFire(editor.elements[0].querySelector('div'));
+            fireEvent(button, "click");
+            expect(this.el.innerHTML).toBe("<div><p>foo</p><p>bar</p><ul><li>one</li></ul></div>");
+
+            this.el.innerHTML = "<div><h2>b<i>a</i>r</h2><p><span style='color:red'>foo</span></p><pre>foo<i>bar</i>baz</pre></div>";
+            selectElementContentsAndFire(editor.elements[0].querySelector('div'));
+            fireEvent(button, "click");
+            expect(this.el.innerHTML).toBe("<div><h2>bar</h2><p>foo</p><pre>foobarbaz</pre></div>");
+
+        });
+
+    });
+
     describe('Header', function () {
         it('buttons should be active if the selection already has the element', function () {
             var editor = new MediumEditor('.editor', {
