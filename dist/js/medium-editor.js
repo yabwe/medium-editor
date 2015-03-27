@@ -2361,12 +2361,11 @@ var Toolbar;
         },
 
         handleEditableBlur: function (event) {
-            //var isRelatedTargetOwnedByThisEditor = false;
+            /*var isRelatedTargetOwnedByThisEditor = false;
             // Do not trigger checkState when blurring the editable area and clicking into the toolbar
             if (Util.isDescendant(this.getToolbarElement(), this.lastMousedownTarget)) {
                 return false;
             }
-            /*
             if (this.lastMousedownTarget) {
                 // Remove all selections before checking state. This is necessary to avoid issues with
                 // standardizeSelectionStart 'canceling' the blur event by moving the selection.
@@ -2380,6 +2379,13 @@ var Toolbar;
                     this.options.contentWindow.getSelection().removeAllRanges();
                 }
             }*/
+
+            // Do not trigger checkState when bluring the editable area and clicking into the toolbar
+            if (event &&
+                    event.relatedTarget &&
+                    Util.isDescendant(this.getToolbarElement(), event.relatedTarget)) {
+                return false;
+            }
             this.checkState();
         },
 
