@@ -220,6 +220,8 @@ var DefaultButton,
             },
             contentDefault: '<b>H2</b>'
         },
+        // Known inline elements that are not removed, or not removed consistantly across browsers:
+        // <span>, <label>, <br>
         'removeFormat': {
             name: 'removeFormat',
             aria: 'remove formatting',
