@@ -10,5 +10,6 @@
   "noarg": true,
   "sub": true,
   "undef": true,
-  "unused": true
+  "unused": true,
+  "validthis": true
 }
