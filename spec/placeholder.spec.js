@@ -1,6 +1,5 @@
-/*global MediumEditor, describe, it, expect, spyOn,
-         afterEach, beforeEach, selectElementContents,
-         jasmine, fireEvent, tearDown, console */
+/*global MediumEditor, describe, it, expect,
+    afterEach, beforeEach, fireEvent, tearDown */
 
 describe('Placeholder TestCase', function () {
     'use strict';

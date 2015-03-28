@@ -1,7 +1,5 @@
-/*global MediumEditor, describe, it, expect, spyOn,
-         afterEach, beforeEach, selectElementContents,
-         jasmine, fireEvent, tearDown, console,
-         selectElementContentsAndFire, xit */
+/*global MediumEditor, describe, it, expect, afterEach,
+    beforeEach, tearDown, selectElementContentsAndFire */
 
 describe('Full Content Action TestCase', function () {
     'use strict';

@@ -1,4 +1,4 @@
-/*global MediumEditor, describe, it, expect, spyOn,
+/*global MediumEditor, describe, it, expect,
          afterEach, beforeEach, tearDown*/
 
 describe('Elements TestCase', function () {

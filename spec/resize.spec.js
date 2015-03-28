@@ -1,7 +1,6 @@
 /*global MediumEditor, describe, it, expect,
          afterEach, beforeEach, fireEvent, spyOn,
-         selectElementContentsAndFire, jasmine, tearDown,
-         console, xit*/
+         selectElementContentsAndFire, jasmine, tearDown */
 
 describe('Resize TestCase', function () {
     'use strict';

@@ -1,7 +1,7 @@
 /*global MediumEditor, describe, it, expect, spyOn,
-         afterEach, beforeEach, fireEvent, waits,
+         afterEach, beforeEach, fireEvent,
          jasmine, selectElementContents, tearDown,
-         selectElementContentsAndFire, console */
+         selectElementContentsAndFire */
 
 describe('Selection TestCase', function () {
     'use strict';
