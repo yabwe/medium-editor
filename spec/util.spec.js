@@ -1,4 +1,4 @@
-/*global Util, describe, it, expect, spyOn, jasmine*/
+/*global Util, describe, it, expect, spyOn */
 
 describe('Util', function () {
     'use strict';

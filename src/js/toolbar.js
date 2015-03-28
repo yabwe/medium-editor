@@ -1,8 +1,8 @@
-/*global Util, Selection, console*/
+/*global Util, Selection*/
 
 var Toolbar;
 
-(function (window, document) {
+(function () {
     'use strict';
 
     Toolbar = function Toolbar(instance) {
@@ -103,7 +103,7 @@ var Toolbar;
             // throttledPositionToolbar is throttled because:
             // - It will be called when the browser is resizing, which can fire many times very quickly
             // - For some event (like resize) a slight lag in UI responsiveness is OK and provides performance benefits
-            this.throttledPositionToolbar = Util.throttle(function (event) {
+            this.throttledPositionToolbar = Util.throttle(function () {
                 if (this.base.isActive) {
                     this.positionToolbarIfShown();
                 }
@@ -137,11 +137,11 @@ var Toolbar;
             }.bind(this));
         },
 
-        handleWindowScroll: function (event) {
+        handleWindowScroll: function () {
             this.positionToolbarIfShown();
         },
 
-        handleWindowResize: function (event) {
+        handleWindowResize: function () {
             this.throttledPositionToolbar();
         },
 
@@ -160,7 +160,7 @@ var Toolbar;
             this.checkState();
         },
 
-        handleEditableClick: function (event) {
+        handleEditableClick: function () {
             // Delay the call to checkState to handle bug where selection is empty
             // immediately after clicking inside a pre-existing selection
             setTimeout(function () {
@@ -168,7 +168,7 @@ var Toolbar;
             }.bind(this), 0);
         },
 
-        handleEditableKeyup: function (event) {
+        handleEditableKeyup: function () {
             this.checkState();
         },
 
@@ -199,7 +199,7 @@ var Toolbar;
             this.checkState();
         },
 
-        handleBlur: function (event) {
+        handleBlur: function () {
             // Delay the call to hideToolbar to handle bug with multiple editors on the page at once
             setTimeout(function () {
                 this.hideToolbar();
@@ -558,4 +558,4 @@ var Toolbar;
             }
         }
     };
-}(window, document));
+}());

@@ -1,8 +1,7 @@
 /*global MediumEditor, describe, it, expect, spyOn,
-         afterEach, beforeEach, selectElementContents, runs,
-         fireEvent, waitsFor, tearDown, xit, jasmine,
-         selectElementContentsAndFire, placeCursorInsideElement,
-         console, Toolbar*/
+    afterEach, beforeEach, selectElementContents,
+    fireEvent, tearDown, jasmine, selectElementContentsAndFire,
+    placeCursorInsideElement, Toolbar */
 
 describe('Toolbar TestCase', function () {
     'use strict';

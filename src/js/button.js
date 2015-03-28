@@ -1,9 +1,7 @@
-/*global console */
-
 var DefaultButton,
     ButtonsData;
 
-(function (window, document) {
+(function () {
     'use strict';
 
     ButtonsData = {
@@ -353,4 +351,4 @@ var DefaultButton,
             return isMatch;
         }
     };
-}(window, document));
+}());

@@ -1,7 +1,6 @@
 /*global MediumEditor, describe, it, expect, spyOn,
-         afterEach, beforeEach, selectElementContents,
-         jasmine, fireEvent, console, tearDown,
-         selectElementContentsAndFire */
+    afterEach, beforeEach, selectElementContents,
+    jasmine, tearDown, selectElementContentsAndFire */
 
 describe('Pasting content', function () {
     'use strict';

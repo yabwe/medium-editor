@@ -400,7 +400,7 @@ if (!("classList" in document.createElement("_"))) {
 
 var Util;
 
-(function (window, document) {
+(function (window) {
     'use strict';
 
     function copyInto(dest, source, overwrite) {
@@ -764,11 +764,11 @@ var Util;
             }
         }
     };
-}(window, document));
+}(window));
 
 var Selection;
 
-(function (window, document) {
+(function () {
     'use strict';
 
     Selection = {
@@ -864,11 +864,11 @@ var Selection;
             return selectedParentElement;
         }
     };
-}(document, window));
+}());
 
 var Events;
 
-(function (window, document) {
+(function () {
     'use strict';
 
     Events = function (instance) {
@@ -1040,17 +1040,17 @@ var Events;
             // to disapper when selecting from right to left and
             // the selection ends at the beginning of the text.
             for (i = 0; i < this.base.elements.length; i += 1) {
-                if (this.base.elements[i] === event.target
-                        || Util.isDescendant(this.base.elements[i], event.target)
-                        || Util.isDescendant(this.base.elements[i], selRange)) {
+                if (this.base.elements[i] === event.target ||
+                        Util.isDescendant(this.base.elements[i], event.target) ||
+                        Util.isDescendant(this.base.elements[i], selRange)) {
                     isDescendantOfEditorElements = true;
                     break;
                 }
             }
             // If it's not part of the editor, toolbar, or anchor preview
-            if (!isDescendantOfEditorElements
-                    && (!toolbarEl || (toolbarEl !== event.target && !Util.isDescendant(toolbarEl, event.target)))
-                    && (!previewEl || (previewEl !== event.target && !Util.isDescendant(previewEl, event.target)))) {
+            if (!isDescendantOfEditorElements &&
+                    (!toolbarEl || (toolbarEl !== event.target && !Util.isDescendant(toolbarEl, event.target))) &&
+                    (!previewEl || (previewEl !== event.target && !Util.isDescendant(previewEl, event.target)))) {
                 this.triggerCustomEvent('externalInteraction', event);
             }
         },
@@ -1101,11 +1101,12 @@ var Events;
         }
     };
 
-}(window, document));
+}());
+
 var DefaultButton,
     ButtonsData;
 
-(function (window, document) {
+(function () {
     'use strict';
 
     ButtonsData = {
@@ -1455,11 +1456,11 @@ var DefaultButton,
             return isMatch;
         }
     };
-}(window, document));
+}());
 
 var PasteHandler;
 
-(function (window, document) {
+(function () {
     'use strict';
     /*jslint regexp: true*/
     /*
@@ -1533,9 +1534,9 @@ var PasteHandler;
                 dataFormatPlain = 'Text';
             }
 
-            if (event.clipboardData
-                    && event.clipboardData.getData
-                    && !event.defaultPrevented) {
+            if (event.clipboardData &&
+                    event.clipboardData.getData &&
+                    !event.defaultPrevented) {
                 event.preventDefault();
 
                 if (this.options.cleanPastedHTML && event.clipboardData.getData(dataFormatHTML)) {
@@ -1705,11 +1706,11 @@ var PasteHandler;
             }
         }
     };
-}(window, document));
+}());
 
 var AnchorExtension;
 
-(function (window, document) {
+(function () {
     'use strict';
 
     function AnchorDerived() {
@@ -1960,11 +1961,11 @@ var AnchorExtension;
 
     AnchorExtension = Util.derives(DefaultButton, AnchorDerived);
 
-}(window, document));
+}());
 
 var AnchorPreview;
 
-(function (window, document) {
+(function () {
     'use strict';
 
     AnchorPreview = function () {
@@ -2023,8 +2024,8 @@ var AnchorPreview;
         },
 
         showPreview: function (anchorEl) {
-            if (this.anchorPreview.classList.contains('medium-editor-anchor-preview-active')
-                    || anchorEl.getAttribute('data-disable-preview')) {
+            if (this.anchorPreview.classList.contains('medium-editor-anchor-preview-active') ||
+                    anchorEl.getAttribute('data-disable-preview')) {
                 return true;
             }
 
@@ -2071,7 +2072,7 @@ var AnchorPreview;
             this.base.subscribe('editableMouseover', this.handleEditableMouseover.bind(this));
         },
 
-        handleClick: function (event) {
+        handleClick: function () {
             var range,
                 sel,
                 anchorExtension = this.base.getExtensionByName('anchor'),
@@ -2097,7 +2098,7 @@ var AnchorPreview;
             this.hidePreview();
         },
 
-        handleAnchorMouseout: function (event) {
+        handleAnchorMouseout: function () {
             this.anchorToPreview = null;
             this.base.off(this.activeAnchor, 'mouseout', this.instance_handleAnchorMouseout);
             this.instance_handleAnchorMouseout = null;
@@ -2140,7 +2141,7 @@ var AnchorPreview;
             }
         },
 
-        handlePreviewMouseover: function (event) {
+        handlePreviewMouseover: function () {
             this.lastOver = (new Date()).getTime();
             this.hovering = true;
         },
@@ -2195,11 +2196,11 @@ var AnchorPreview;
             this.base.on(this.activeAnchor, 'mouseout', this.instance_handlePreviewMouseout);
         }
     };
-}(window, document));
+}());
 
 var Toolbar;
 
-(function (window, document) {
+(function () {
     'use strict';
 
     Toolbar = function Toolbar(instance) {
@@ -2300,7 +2301,7 @@ var Toolbar;
             // throttledPositionToolbar is throttled because:
             // - It will be called when the browser is resizing, which can fire many times very quickly
             // - For some event (like resize) a slight lag in UI responsiveness is OK and provides performance benefits
-            this.throttledPositionToolbar = Util.throttle(function (event) {
+            this.throttledPositionToolbar = Util.throttle(function () {
                 if (this.base.isActive) {
                     this.positionToolbarIfShown();
                 }
@@ -2334,11 +2335,11 @@ var Toolbar;
             }.bind(this));
         },
 
-        handleWindowScroll: function (event) {
+        handleWindowScroll: function () {
             this.positionToolbarIfShown();
         },
 
-        handleWindowResize: function (event) {
+        handleWindowResize: function () {
             this.throttledPositionToolbar();
         },
 
@@ -2357,7 +2358,7 @@ var Toolbar;
             this.checkState();
         },
 
-        handleEditableClick: function (event) {
+        handleEditableClick: function () {
             // Delay the call to checkState to handle bug where selection is empty
             // immediately after clicking inside a pre-existing selection
             setTimeout(function () {
@@ -2365,7 +2366,7 @@ var Toolbar;
             }.bind(this), 0);
         },
 
-        handleEditableKeyup: function (event) {
+        handleEditableKeyup: function () {
             this.checkState();
         },
 
@@ -2396,7 +2397,7 @@ var Toolbar;
             this.checkState();
         },
 
-        handleBlur: function (event) {
+        handleBlur: function () {
             // Delay the call to hideToolbar to handle bug with multiple editors on the page at once
             setTimeout(function () {
                 this.hideToolbar();
@@ -2755,11 +2756,11 @@ var Toolbar;
             }
         }
     };
-}(window, document));
+}());
 
 var Placeholders;
 
-(function (window, document) {
+(function () {
     'use strict';
 
     Placeholders = function (instance) {
@@ -2822,13 +2823,14 @@ var Placeholders;
             this.updatePlaceholder(element);
         },
 
-        handleExternalInteraction: function (event) {
+        handleExternalInteraction: function () {
             // Update all placeholders
             this.initPlaceholders();
         }
     };
 
-}(window, document));
+}());
+
 function MediumEditor(elements, options) {
     'use strict';
     return this.init(elements, options);
@@ -2850,7 +2852,7 @@ function MediumEditor(elements, options) {
         }
     }
 
-    function handleTabKeydown(event, element) {
+    function handleTabKeydown(event) {
         // Override tab only for pre nodes
         var node = Util.getSelectionStart(this.options.ownerDocument),
             tag = node && node.tagName.toLowerCase();
@@ -2873,19 +2875,19 @@ function MediumEditor(elements, options) {
         }
     }
 
-    function handleBlockDeleteKeydowns(event, element) {
+    function handleBlockDeleteKeydowns(event) {
         var range, sel, p, node = Util.getSelectionStart(this.options.ownerDocument),
             tagName = node.tagName.toLowerCase(),
             isEmpty = /^(\s+|<br\/?>)?$/i,
             isHeader = /h\d/i;
 
-        if ((event.which === Util.keyCode.BACKSPACE || event.which === Util.keyCode.ENTER)
+        if ((event.which === Util.keyCode.BACKSPACE || event.which === Util.keyCode.ENTER) &&
                 // has a preceeding sibling
-                && node.previousElementSibling
+                node.previousElementSibling &&
                 // in a header
-                && isHeader.test(tagName)
+                isHeader.test(tagName) &&
                 // at the very end of the block
-                && Selection.getCaretOffsets(node).left === 0) {
+                Selection.getCaretOffsets(node).left === 0) {
             if (event.which === Util.keyCode.BACKSPACE && isEmpty.test(node.previousElementSibling.innerHTML)) {
                 // backspacing the begining of a header into an empty previous element will
                 // change the tagName of the current node to prevent one
@@ -2900,16 +2902,16 @@ function MediumEditor(elements, options) {
                 node.previousElementSibling.parentNode.insertBefore(p, node);
                 event.preventDefault();
             }
-        } else if (event.which === Util.keyCode.DELETE
+        } else if (event.which === Util.keyCode.DELETE &&
                     // between two sibling elements
-                    && node.nextElementSibling
-                    && node.previousElementSibling
+                    node.nextElementSibling &&
+                    node.previousElementSibling &&
                     // not in a header
-                    && !isHeader.test(tagName)
+                    !isHeader.test(tagName) &&
                     // in an empty tag
-                    && isEmpty.test(node.innerHTML)
+                    isEmpty.test(node.innerHTML) &&
                     // when the next tag *is* a header
-                    && isHeader.test(node.nextElementSibling.tagName)) {
+                    isHeader.test(node.nextElementSibling.tagName)) {
             // hitting delete in an empty element preceding a header, ex:
             //  <p>[CURSOR]</p><h1>Header</h1>
             // Will cause the h1 to become a paragraph.
@@ -2928,16 +2930,16 @@ function MediumEditor(elements, options) {
             node.previousElementSibling.parentNode.removeChild(node);
 
             event.preventDefault();
-        } else if (event.which === Util.keyCode.BACKSPACE
-                && tagName === 'li'
+        } else if (event.which === Util.keyCode.BACKSPACE &&
+                tagName === 'li' &&
                 // hitting backspace inside an empty li
-                && isEmpty.test(node.innerHTML)
+                isEmpty.test(node.innerHTML) &&
                 // is first element (no preceeding siblings)
-                && !node.previousElementSibling
+                !node.previousElementSibling &&
                 // parent also does not have a sibling
-                && !node.parentElement.previousElementSibling
+                !node.parentElement.previousElementSibling &&
                 // is not the only li in a list
-                && node.nextElementSibling.tagName.toLowerCase() === 'li') {
+                node.nextElementSibling.tagName.toLowerCase() === 'li') {
             // backspacing in an empty first list element in the first list (with more elements) ex:
             //  <ul><li>[CURSOR]</li><li>List Item 2</li></ul>
             // will remove the first <li> but add some extra element before (varies based on browser)
@@ -2966,7 +2968,7 @@ function MediumEditor(elements, options) {
         }
     }
 
-    function handleDrag(event, element) {
+    function handleDrag(event) {
         var className = 'medium-editor-dragover';
         event.preventDefault();
         event.dataTransfer.dropEffect = 'copy';
@@ -2978,7 +2980,7 @@ function MediumEditor(elements, options) {
         }
     }
 
-    function handleDrop(event, element) {
+    function handleDrop(event) {
         var className = 'medium-editor-dragover',
             files;
         event.preventDefault();

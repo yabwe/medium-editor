@@ -1,0 +1,15 @@
+{
+  "boss": true,
+  "browser": true,
+  "curly": true,
+  "eqeqeq": true,
+  "eqnull": true,
+  "immed": true,
+  "latedef": true,
+  "newcap": false,
+  "noarg": true,
+  "sub": true,
+  "undef": true,
+  "unused": true,
+  "validthis": true
+}

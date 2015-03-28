@@ -1,7 +1,7 @@
 /*global Util */
 var Selection;
 
-(function (window, document) {
+(function () {
     'use strict';
 
     Selection = {
@@ -97,4 +97,4 @@ var Selection;
             return selectedParentElement;
         }
     };
-}(document, window));
+}());
