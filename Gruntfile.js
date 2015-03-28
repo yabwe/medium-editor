@@ -64,11 +64,11 @@ module.exports = function (grunt) {
 
     gruntConfig.jshint = {
         options: {
+            ignores: ['src/js/polyfills.js'],
             jshintrc: true,
             reporter: require('jshint-stylish')
         },
         all: {
-            ignores: ['src/js/polyfills.js'],
             src: [
                 'src/js/**/*.js',
                 'spec/*.spec.js',
