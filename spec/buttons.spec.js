@@ -1,7 +1,6 @@
 /*global MediumEditor, describe, it, expect, spyOn,
-         afterEach, beforeEach, selectElementContents,
-         jasmine, fireEvent, tearDown, console,
-         selectElementContentsAndFire, xit, isOldIE, isIE */
+         afterEach, beforeEach, jasmine, fireEvent, tearDown,
+         selectElementContentsAndFire, isOldIE, isIE */
 
 describe('Buttons TestCase', function () {
     'use strict';

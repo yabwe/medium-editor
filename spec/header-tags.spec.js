@@ -1,6 +1,5 @@
-/*global MediumEditor, describe, it, expect, spyOn,
-         afterEach, beforeEach, fireEvent, waits,
-         jasmine, selectElementContents, tearDown */
+/*global MediumEditor, describe, it, expect, afterEach,
+    beforeEach, fireEvent, jasmine, tearDown */
 
 describe('Protect Header Tags TestCase', function () {
     'use strict';

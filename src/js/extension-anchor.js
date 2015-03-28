@@ -1,9 +1,8 @@
-/*global Util, console, Selection,
-  ButtonsData, DefaultButton */
+/*global Util, Selection, DefaultButton */
 
 var AnchorExtension;
 
-(function (window, document) {
+(function () {
     'use strict';
 
     function AnchorDerived() {
@@ -254,4 +253,4 @@ var AnchorExtension;
 
     AnchorExtension = Util.derives(DefaultButton, AnchorDerived);
 
-}(window, document));
+}());

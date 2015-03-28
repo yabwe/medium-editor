@@ -1,5 +1,4 @@
-/*global module, console, define, FileReader,
- Util, ButtonsData, DefaultButton,
+/*global FileReader, Util, ButtonsData, DefaultButton,
  PasteHandler, Selection, AnchorExtension,
  Toolbar, AnchorPreview, Events, Placeholders */
 
@@ -24,7 +23,7 @@ function MediumEditor(elements, options) {
         }
     }
 
-    function handleTabKeydown(event, element) {
+    function handleTabKeydown(event) {
         // Override tab only for pre nodes
         var node = Util.getSelectionStart(this.options.ownerDocument),
             tag = node && node.tagName.toLowerCase();
@@ -47,19 +46,19 @@ function MediumEditor(elements, options) {
         }
     }
 
-    function handleBlockDeleteKeydowns(event, element) {
+    function handleBlockDeleteKeydowns(event) {
         var range, sel, p, node = Util.getSelectionStart(this.options.ownerDocument),
             tagName = node.tagName.toLowerCase(),
             isEmpty = /^(\s+|<br\/?>)?$/i,
             isHeader = /h\d/i;
 
-        if ((event.which === Util.keyCode.BACKSPACE || event.which === Util.keyCode.ENTER)
+        if ((event.which === Util.keyCode.BACKSPACE || event.which === Util.keyCode.ENTER) &&
                 // has a preceeding sibling
-                && node.previousElementSibling
+                node.previousElementSibling &&
                 // in a header
-                && isHeader.test(tagName)
+                isHeader.test(tagName) &&
                 // at the very end of the block
-                && Selection.getCaretOffsets(node).left === 0) {
+                Selection.getCaretOffsets(node).left === 0) {
             if (event.which === Util.keyCode.BACKSPACE && isEmpty.test(node.previousElementSibling.innerHTML)) {
                 // backspacing the begining of a header into an empty previous element will
                 // change the tagName of the current node to prevent one
@@ -74,16 +73,16 @@ function MediumEditor(elements, options) {
                 node.previousElementSibling.parentNode.insertBefore(p, node);
                 event.preventDefault();
             }
-        } else if (event.which === Util.keyCode.DELETE
+        } else if (event.which === Util.keyCode.DELETE &&
                     // between two sibling elements
-                    && node.nextElementSibling
-                    && node.previousElementSibling
+                    node.nextElementSibling &&
+                    node.previousElementSibling &&
                     // not in a header
-                    && !isHeader.test(tagName)
+                    !isHeader.test(tagName) &&
                     // in an empty tag
-                    && isEmpty.test(node.innerHTML)
+                    isEmpty.test(node.innerHTML) &&
                     // when the next tag *is* a header
-                    && isHeader.test(node.nextElementSibling.tagName)) {
+                    isHeader.test(node.nextElementSibling.tagName)) {
             // hitting delete in an empty element preceding a header, ex:
             //  <p>[CURSOR]</p><h1>Header</h1>
             // Will cause the h1 to become a paragraph.
@@ -102,16 +101,16 @@ function MediumEditor(elements, options) {
             node.previousElementSibling.parentNode.removeChild(node);
 
             event.preventDefault();
-        } else if (event.which === Util.keyCode.BACKSPACE
-                && tagName === 'li'
+        } else if (event.which === Util.keyCode.BACKSPACE &&
+                tagName === 'li' &&
                 // hitting backspace inside an empty li
-                && isEmpty.test(node.innerHTML)
+                isEmpty.test(node.innerHTML) &&
                 // is first element (no preceeding siblings)
-                && !node.previousElementSibling
+                !node.previousElementSibling &&
                 // parent also does not have a sibling
-                && !node.parentElement.previousElementSibling
+                !node.parentElement.previousElementSibling &&
                 // is not the only li in a list
-                && node.nextElementSibling.tagName.toLowerCase() === 'li') {
+                node.nextElementSibling.tagName.toLowerCase() === 'li') {
             // backspacing in an empty first list element in the first list (with more elements) ex:
             //  <ul><li>[CURSOR]</li><li>List Item 2</li></ul>
             // will remove the first <li> but add some extra element before (varies based on browser)
@@ -140,7 +139,7 @@ function MediumEditor(elements, options) {
         }
     }
 
-    function handleDrag(event, element) {
+    function handleDrag(event) {
         var className = 'medium-editor-dragover';
         event.preventDefault();
         event.dataTransfer.dropEffect = 'copy';
@@ -152,7 +151,7 @@ function MediumEditor(elements, options) {
         }
     }
 
-    function handleDrop(event, element) {
+    function handleDrop(event) {
         var className = 'medium-editor-dragover',
             files;
         event.preventDefault();

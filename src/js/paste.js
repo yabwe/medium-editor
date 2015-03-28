@@ -1,7 +1,7 @@
-/*global Util, Selection, console*/
+/*global Util, Selection*/
 var PasteHandler;
 
-(function (window, document) {
+(function () {
     'use strict';
     /*jslint regexp: true*/
     /*
@@ -75,9 +75,9 @@ var PasteHandler;
                 dataFormatPlain = 'Text';
             }
 
-            if (event.clipboardData
-                    && event.clipboardData.getData
-                    && !event.defaultPrevented) {
+            if (event.clipboardData &&
+                    event.clipboardData.getData &&
+                    !event.defaultPrevented) {
                 event.preventDefault();
 
                 if (this.options.cleanPastedHTML && event.clipboardData.getData(dataFormatHTML)) {
@@ -247,4 +247,4 @@ var PasteHandler;
             }
         }
     };
-}(window, document));
+}());

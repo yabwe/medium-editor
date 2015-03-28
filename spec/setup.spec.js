@@ -1,6 +1,6 @@
-/*global MediumEditor, describe, it, expect, spyOn, jasmine, fireEvent,
-         afterEach, beforeEach, selectElementContents, runs, waitsFor,
-         tearDown, xit, selectElementContentsAndFire */
+/*global MediumEditor, describe, it, expect, spyOn, jasmine,
+    fireEvent, afterEach, beforeEach, selectElementContents,
+    tearDown, selectElementContentsAndFire */
 
 describe('Setup/Destroy TestCase', function () {
     'use strict';

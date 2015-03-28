@@ -1,6 +1,5 @@
-/*global MediumEditor, describe, it, expect, spyOn,
-         afterEach, beforeEach, selectElementContents,
-         fireEvent, tearDown*/
+/*global MediumEditor, describe, it, expect,
+    afterEach, beforeEach, tearDown */
 
 describe('Anchor Button TestCase', function () {
     'use strict';

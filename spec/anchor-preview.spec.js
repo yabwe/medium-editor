@@ -1,6 +1,5 @@
-/*global MediumEditor, describe, it, xit, expect, spyOn,
-         afterEach, beforeEach, selectElementContents,
-         jasmine, fireEvent, console, tearDown*/
+/*global MediumEditor, describe, it,  expect, spyOn,
+    afterEach, beforeEach, jasmine, fireEvent, tearDown */
 
 describe('Anchor Preview TestCase', function () {
     'use strict';
