@@ -1,9 +1,8 @@
-/*global Util, console, Selection,
-  ButtonsData, DefaultButton */
+/*global Util, Selection */
 
 var Events;
 
-(function (window, document) {
+(function () {
     'use strict';
 
     Events = function (instance) {
@@ -175,17 +174,17 @@ var Events;
             // to disapper when selecting from right to left and
             // the selection ends at the beginning of the text.
             for (i = 0; i < this.base.elements.length; i += 1) {
-                if (this.base.elements[i] === event.target
-                        || Util.isDescendant(this.base.elements[i], event.target)
-                        || Util.isDescendant(this.base.elements[i], selRange)) {
+                if (this.base.elements[i] === event.target ||
+                        Util.isDescendant(this.base.elements[i], event.target) ||
+                        Util.isDescendant(this.base.elements[i], selRange)) {
                     isDescendantOfEditorElements = true;
                     break;
                 }
             }
             // If it's not part of the editor, toolbar, or anchor preview
-            if (!isDescendantOfEditorElements
-                    && (!toolbarEl || (toolbarEl !== event.target && !Util.isDescendant(toolbarEl, event.target)))
-                    && (!previewEl || (previewEl !== event.target && !Util.isDescendant(previewEl, event.target)))) {
+            if (!isDescendantOfEditorElements &&
+                    (!toolbarEl || (toolbarEl !== event.target && !Util.isDescendant(toolbarEl, event.target))) &&
+                    (!previewEl || (previewEl !== event.target && !Util.isDescendant(previewEl, event.target)))) {
                 this.triggerCustomEvent('externalInteraction', event);
             }
         },
@@ -236,4 +235,4 @@ var Events;
         }
     };
 
-}(window, document));
+}());
