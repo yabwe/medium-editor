@@ -3664,7 +3664,8 @@ MediumEditor.version = (function(major, minor, revision) {
             }
         };
     }).apply(this, ({
-        "version": "4.0.9"
+        // grunt-bump looks for this:
+        "version": "4.0.3"
     }).version.split("."));
 
     return MediumEditor;
