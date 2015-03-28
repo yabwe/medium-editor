@@ -2,7 +2,7 @@
 
 var Util;
 
-(function (window, document) {
+(function (window) {
     'use strict';
 
     function copyInto(dest, source, overwrite) {
@@ -366,4 +366,4 @@ var Util;
             }
         }
     };
-}(window, document));
+}(window));

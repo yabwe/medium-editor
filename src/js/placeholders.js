@@ -1,9 +1,6 @@
-/*global Util, console, Selection,
-  ButtonsData, DefaultButton */
-
 var Placeholders;
 
-(function (window, document) {
+(function () {
     'use strict';
 
     Placeholders = function (instance) {
@@ -66,10 +63,10 @@ var Placeholders;
             this.updatePlaceholder(element);
         },
 
-        handleExternalInteraction: function (event) {
+        handleExternalInteraction: function () {
             // Update all placeholders
             this.initPlaceholders();
         }
     };
 
-}(window, document));
+}());

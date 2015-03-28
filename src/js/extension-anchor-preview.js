@@ -1,8 +1,6 @@
-/*global Util, Selection, console*/
-
 var AnchorPreview;
 
-(function (window, document) {
+(function () {
     'use strict';
 
     AnchorPreview = function () {
@@ -61,8 +59,8 @@ var AnchorPreview;
         },
 
         showPreview: function (anchorEl) {
-            if (this.anchorPreview.classList.contains('medium-editor-anchor-preview-active')
-                    || anchorEl.getAttribute('data-disable-preview')) {
+            if (this.anchorPreview.classList.contains('medium-editor-anchor-preview-active') ||
+                    anchorEl.getAttribute('data-disable-preview')) {
                 return true;
             }
 
@@ -109,7 +107,7 @@ var AnchorPreview;
             this.base.subscribe('editableMouseover', this.handleEditableMouseover.bind(this));
         },
 
-        handleClick: function (event) {
+        handleClick: function () {
             var range,
                 sel,
                 anchorExtension = this.base.getExtensionByName('anchor'),
@@ -135,7 +133,7 @@ var AnchorPreview;
             this.hidePreview();
         },
 
-        handleAnchorMouseout: function (event) {
+        handleAnchorMouseout: function () {
             this.anchorToPreview = null;
             this.base.off(this.activeAnchor, 'mouseout', this.instance_handleAnchorMouseout);
             this.instance_handleAnchorMouseout = null;
@@ -178,7 +176,7 @@ var AnchorPreview;
             }
         },
 
-        handlePreviewMouseover: function (event) {
+        handlePreviewMouseover: function () {
             this.lastOver = (new Date()).getTime();
             this.hovering = true;
         },
@@ -233,4 +231,4 @@ var AnchorPreview;
             this.base.on(this.activeAnchor, 'mouseout', this.instance_handlePreviewMouseout);
         }
     };
-}(window, document));
+}());
