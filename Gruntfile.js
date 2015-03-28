@@ -62,6 +62,7 @@ module.exports = function (grunt) {
         }
     };
 
+    // TODO: build check with debug and devel false
     gruntConfig.jshint = {
         options: {
             ignores: ['src/js/polyfills.js'],
