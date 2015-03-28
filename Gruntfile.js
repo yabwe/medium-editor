@@ -22,7 +22,8 @@ module.exports = function (grunt) {
             'src/js/extension-anchor-preview.js',
             'src/js/toolbar.js',
             'src/js/placeholders.js',
-            'src/js/core.js'
+            'src/js/core.js',
+            'src/js/version.js'
         ],
         browsers = [ {
             browserName: "internet explorer",
@@ -267,7 +268,7 @@ module.exports = function (grunt) {
 
     gruntConfig.bump = {
         options: {
-            files: ['bower.json', 'package.json'],
+            files: ['bower.json', 'package.json','src/js/version.js'],
             updateConfigs: [],
             commit: false,
             createTag: false,
