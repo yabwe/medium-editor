@@ -62,21 +62,17 @@ module.exports = function (grunt) {
         }
     };
 
-    gruntConfig.jslint = {
-        client: {
-            exclude: ['src/js/polyfills.js'],
+    gruntConfig.jshint = {
+        options: {
+            reporter: require('jshint-stylish')
+        },
+        all: {
+            ignores: ['src/js/polyfills.js'],
             src: [
                 'src/js/**/*.js',
                 'spec/*.spec.js',
                 'Gruntfile.js'
-            ],
-            directives: {
-                browser: true,
-                unparam: true,
-                todo: true,
-                regexp: true,
-                debug: true
-            }
+            ]
         }
     };
 
@@ -288,14 +284,14 @@ module.exports = function (grunt) {
     });
 
     if (parseInt(process.env.TRAVIS_PULL_REQUEST, 10) > 0) {
-        grunt.registerTask('travis', ['jslint', 'jasmine:suite', 'csslint', 'coveralls']);
+        grunt.registerTask('travis', ['jshint', 'jasmine:suite', 'csslint', 'coveralls']);
     } else {
-        grunt.registerTask('travis', ['connect', 'jslint', 'jasmine:suite', 'csslint', 'saucelabs-jasmine', 'coveralls']);
+        grunt.registerTask('travis', ['connect', 'jshint', 'jasmine:suite', 'csslint', 'saucelabs-jasmine', 'coveralls']);
     }
 
-    grunt.registerTask('test', ['jslint', 'concat', 'jasmine:suite', 'csslint']);
+    grunt.registerTask('test', ['jshint', 'concat', 'jasmine:suite', 'csslint']);
     grunt.registerTask('sauce', ['connect', 'saucelabs-jasmine']);
-    grunt.registerTask('js', ['jslint', 'concat', 'jasmine:suite', 'uglify']);
+    grunt.registerTask('js', ['jshint', 'concat', 'jasmine:suite', 'uglify']);
     grunt.registerTask('css', ['sass', 'autoprefixer', 'cssmin', 'csslint']);
     grunt.registerTask('default', ['js', 'css']);
 
