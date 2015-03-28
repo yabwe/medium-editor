@@ -1,7 +1,16 @@
-/*global Util, describe, it, expect, spyOn */
+/*global MediumEditor, Util, describe, it, expect, spyOn */
 
 describe('Util', function () {
     'use strict';
+
+    describe('Exposure', function () {
+
+        it("is exposed on the MediumEditor ctor", function () {
+            expect(MediumEditor.Util).toBeTruthy();
+            expect(MediumEditor.Util).toEqual(Util);
+        });
+
+    });
 
     describe('Deprecated', function () {
         it('should warn when a method is deprecated', function () {

@@ -1,7 +1,7 @@
 /*global MediumEditor, describe, it, expect, spyOn,
          afterEach, beforeEach, fireEvent,
          jasmine, selectElementContents, tearDown,
-         selectElementContentsAndFire */
+         selectElementContentsAndFire, Selection */
 
 describe('Selection TestCase', function () {
     'use strict';
@@ -17,6 +17,13 @@ describe('Selection TestCase', function () {
     afterEach(function () {
         tearDown(this.el);
         jasmine.clock().uninstall();
+    });
+
+    describe('Exposure', function () {
+        it("is exposed on the MediumEditor ctor", function () {
+            expect(MediumEditor.Selection).toBeTruthy();
+            expect(MediumEditor.Selection).toEqual(Selection);
+        });
     });
 
     describe('Saving Selection', function () {

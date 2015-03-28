@@ -395,6 +395,9 @@ function MediumEditor(elements, options) {
         AnchorPreview: AnchorPreview
     };
 
+    MediumEditor.Util = Util;
+    MediumEditor.Selection = Selection;
+
     MediumEditor.prototype = {
         defaults: {
             allowMultiParagraphSelection: true,
