@@ -1,6 +1,7 @@
 /*global MediumEditor, describe, it, expect, spyOn,
     fireEvent, afterEach, beforeEach, selectElementContents,
-    tearDown, placeCursorInsideElement, isFirefox, Util */
+    tearDown, placeCursorInsideElement, isFirefox, Util,
+    selectElementContentsAndFire */
 
 describe('Content TestCase', function () {
     'use strict';
@@ -201,10 +202,12 @@ describe('Content TestCase', function () {
 
     it('should removing paragraphs when a list is inserted inside of it', function () {
         this.el.innerHTML = '<p>lorem ipsum<ul><li>dolor</li></ul></p>';
-        var editor = new MediumEditor('.editor'),
+        var editor = new MediumEditor('.editor', {
+            buttons: ['orderedlist']
+        }),
             target = editor.elements[0].querySelector('p');
-        selectElementContents(target);
-        editor.execAction('insertorderedlist');
+        selectElementContentsAndFire(target);
+        fireEvent(editor.toolbar.getToolbarElement().querySelector('[data-action="insertorderedlist"]'), 'click');
         expect(this.el.innerHTML).toMatch(/^<ol><li>lorem ipsum(<br>)?<\/li><\/ol><ul><li>dolor<\/li><\/ul>?/);
     });
 });
