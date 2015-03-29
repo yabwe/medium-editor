@@ -675,6 +675,7 @@ describe('Buttons TestCase', function () {
             fireEvent(button, "click");
             expect(this.el.innerHTML).toBe("<div><p>foo</p><p>bar</p><ul><li>one</li></ul></div>");
 
+            // TODO: IE does not unwrap something like <p><span style='color:red'>bar</span></p>
             this.el.innerHTML = "<div><h2>b<i>a</i>r</h2><p><em><strong><u><sub><sup>foo</sup></sub></u></strong></em></p><pre>foo<i>bar</i>baz</pre></div>";
             selectElementContentsAndFire(editor.elements[0].querySelector('div'));
             fireEvent(button, "click");
