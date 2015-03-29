@@ -164,9 +164,16 @@ describe('Pasting content', function () {
     });
 
     describe('pasteHTML', function () {
+        it('should remove certain attributes and tags by default', function () {
+            var editor = new MediumEditor('.editor');
+            selectElementContents(this.el.firstChild);
+            editor.pasteHTML('<p class="some-class" style="font-weight: bold" dir="ltr"><meta name="description" content="test" />test</p>');
+            expect(editor.elements[0].innerHTML).toBe('<p>test</p>');
+        });
+
         it('should accept a list of attrs to clean up', function () {
             var editor = new MediumEditor('.editor');
-            selectElementContents(this.el);
+            selectElementContents(this.el.firstChild);
             editor.pasteHTML(
                 '<table class="medium-editor-table" dir="ltr" style="border: 1px solid red;"><tbody><tr><td>test</td></tr></tbody></table>',
                 {cleanAttrs: ['style', 'dir']}
@@ -176,7 +183,7 @@ describe('Pasting content', function () {
 
         it('should accept a list of tags to clean up', function () {
             var editor = new MediumEditor('.editor');
-            selectElementContents(this.el);
+            selectElementContents(this.el.firstChild);
             editor.pasteHTML(
                 '<div><i>test</i><meta name="description" content="test" /><b>test</b></div>',
                 {cleanTags: ['meta', 'b']}
