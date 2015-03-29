@@ -21,8 +21,8 @@ describe('Selection TestCase', function () {
 
     describe('Exposure', function () {
         it("is exposed on the MediumEditor ctor", function () {
-            expect(MediumEditor.Selection).toBeTruthy();
-            expect(MediumEditor.Selection).toEqual(Selection);
+            expect(MediumEditor.selection).toBeTruthy();
+            expect(MediumEditor.selection).toEqual(Selection);
         });
     });
 

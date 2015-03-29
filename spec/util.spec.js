@@ -6,8 +6,8 @@ describe('Util', function () {
     describe('Exposure', function () {
 
         it("is exposed on the MediumEditor ctor", function () {
-            expect(MediumEditor.Util).toBeTruthy();
-            expect(MediumEditor.Util).toEqual(Util);
+            expect(MediumEditor.util).toBeTruthy();
+            expect(MediumEditor.util).toEqual(Util);
         });
 
     });

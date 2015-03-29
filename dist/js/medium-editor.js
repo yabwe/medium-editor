@@ -3224,8 +3224,8 @@ function MediumEditor(elements, options) {
         AnchorPreview: AnchorPreview
     };
 
-    MediumEditor.Util = Util;
-    MediumEditor.Selection = Selection;
+    MediumEditor.util = Util;
+    MediumEditor.selection = Selection;
 
     MediumEditor.prototype = {
         defaults: {
