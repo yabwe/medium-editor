@@ -364,6 +364,20 @@ var Util;
             if (typeof this[newName] === 'function') {
                 this[newName].apply(this, args);
             }
+        },
+
+        cleanupAttrs: function (el, attrs) {
+            attrs.forEach(function (attr) {
+                el.removeAttribute(attr);
+            });
+        },
+
+        cleanupTags: function (el, tags) {
+            tags.forEach(function (tag) {
+                if (el.tagName.toLowerCase() === tag) {
+                    el.parentNode.removeChild(el);
+                }
+            });
         }
     };
 }(window));

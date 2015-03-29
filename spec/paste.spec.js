@@ -162,4 +162,26 @@ describe('Pasting content', function () {
             }.bind(this));
         });
     });
+
+    describe('pasteHTML', function () {
+        it('should accept a list of attrs to clean up', function () {
+            var editor = new MediumEditor('.editor');
+            selectElementContents(this.el);
+            editor.pasteHTML(
+                '<table class="medium-editor-table" dir="ltr" style="border: 1px solid red;"></table>',
+                {cleanAttrs: ['style', 'dir']}
+            );
+            expect(editor.elements[0].innerHTML).toBe('<table class="medium-editor-table"></table>');
+        });
+
+        it('should accept a list of tags to clean up', function () {
+            var editor = new MediumEditor('.editor');
+            selectElementContents(this.el);
+            editor.pasteHTML(
+                '<div><i>test</i><meta name="description" content="test" /><b>test</b></div>',
+                {cleanTags: ['meta', 'b']}
+            );
+            expect(editor.elements[0].innerHTML).toBe('<div><i>test</i></div>');
+        });
+    });
 });
