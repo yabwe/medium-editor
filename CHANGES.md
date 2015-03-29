@@ -1,3 +1,11 @@
+4.1.0 / 2015-03-29
+==================
+* Expose Util and Selection methods externally via MediumEditor.util and MediumEditor.selection
+* Expose MediumEditor.version for version info
+* Add support for custom cleaning of attributes and tags for .pasteHTML
+* Move from jslint to jshint
+
+
 4.0.3 / 2015-03-27
 ==================
 * Introduce 'removeFormat' button, for removing formatting from selection
