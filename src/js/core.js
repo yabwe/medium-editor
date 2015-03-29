@@ -819,8 +819,8 @@ function MediumEditor(elements, options) {
             this.pasteHandler.cleanPaste(text);
         },
 
-        pasteHTML: function (html) {
-            this.pasteHandler.pasteHTML(html);
+        pasteHTML: function (html, options) {
+            this.pasteHandler.pasteHTML(html, options);
         }
     };
 }());
