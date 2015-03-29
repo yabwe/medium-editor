@@ -168,10 +168,10 @@ describe('Pasting content', function () {
             var editor = new MediumEditor('.editor');
             selectElementContents(this.el);
             editor.pasteHTML(
-                '<table class="medium-editor-table" dir="ltr" style="border: 1px solid red;"></table>',
+                '<table class="medium-editor-table" dir="ltr" style="border: 1px solid red;"><tbody><tr><td>test</td></tr></tbody></table>',
                 {cleanAttrs: ['style', 'dir']}
             );
-            expect(editor.elements[0].innerHTML).toBe('<table class="medium-editor-table"></table>');
+            expect(editor.elements[0].innerHTML).toBe('<table class="medium-editor-table"><tbody><tr><td>test</td></tr></tbody></table>');
         });
 
         it('should accept a list of tags to clean up', function () {
