@@ -1,4 +1,4 @@
-/*global Util, Selection*/
+/*global Util, Selection, console */
 
 var Toolbar;
 
@@ -37,7 +37,8 @@ var Toolbar;
             });
 
             this.attachEventHandlers();
-            this.base.subscribe('externalInteraction', this.handleBlur.bind(this));
+            this.base.subscribe('blur', this.handleBlur.bind(this));
+            this.base.subscribe('focus', this.handleFocus.bind(this));
 
             return toolbar;
         },
@@ -201,9 +202,23 @@ var Toolbar;
 
         handleBlur: function () {
             // Delay the call to hideToolbar to handle bug with multiple editors on the page at once
-            setTimeout(function () {
+            if (this.base.tracingOn) {
+                console.log("HANDLE BLUR on" + event.type);
+            }
+            clearTimeout(this.hideTimeout);
+            this.hideTimeout = setTimeout(function () {
+                if (this.base.tracingOn) {
+                    console.log("BLUR NOT CANCELED -> HIDING");
+                }
                 this.hideToolbar();
             }.bind(this), 0);
+        },
+
+        handleFocus: function (event) {
+            if (this.base.tracingOn) {
+                console.log("HANDLE FOCUS on" + event.type);
+            }
+            this.checkState();
         },
 
         // Hiding/showing toolbar
@@ -213,6 +228,7 @@ var Toolbar;
         },
 
         showToolbar: function () {
+            clearTimeout(this.hideTimeout);
             if (!this.isDisplayed()) {
                 this.getToolbarElement().classList.add('medium-editor-toolbar-active');
                 if (typeof this.options.onShowToolbar === 'function') {

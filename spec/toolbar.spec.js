@@ -1,7 +1,7 @@
 /*global MediumEditor, describe, it, expect, spyOn,
     afterEach, beforeEach, selectElementContents,
     fireEvent, tearDown, jasmine, selectElementContentsAndFire,
-    placeCursorInsideElement, Toolbar */
+    placeCursorInsideElement, Toolbar, console */
 
 describe('Toolbar TestCase', function () {
     'use strict';
@@ -202,14 +202,21 @@ describe('Toolbar TestCase', function () {
             editorOne = new MediumEditor('.editor', { staticToolbar: true });
             editorTwo = new MediumEditor(document.getElementById('editor-div-two'), { staticToolbar: true });
 
-            selectElementContentsAndFire(document.getElementById('editor-span-1'));
+            selectElementContents(document.getElementById('editor-span-1'));
+            fireEvent(this.el, 'focus', {
+                target: this.el,
+                relatedTarget: elTwo
+            });
 
             jasmine.clock().tick(1); // checkSelection delay
 
             expect(editorOne.toolbar.getToolbarElement().classList.contains('medium-editor-toolbar-active')).toBe(true);
             expect(editorTwo.toolbar.getToolbarElement().classList.contains('medium-editor-toolbar-active')).toBe(false);
 
-            selectElementContentsAndFire(document.getElementById('editor-span-2'));
+            editorOne.startTracing();
+            editorTwo.startTracing();
+
+            selectElementContents(document.getElementById('editor-span-2'));
             fireEvent(elTwo, 'focus', {
                 target: elTwo,
                 relatedTarget: this.el
@@ -218,7 +225,10 @@ describe('Toolbar TestCase', function () {
             jasmine.clock().tick(1); // checkSelection delay
 
             expect(editorOne.toolbar.getToolbarElement().classList.contains('medium-editor-toolbar-active')).toBe(false);
+            console.log("CHECK 2");
             expect(editorTwo.toolbar.getToolbarElement().classList.contains('medium-editor-toolbar-active')).toBe(true);
+            editorOne.startTracing();
+            editorTwo.stopTracing();
         });
     });
 

@@ -1,4 +1,4 @@
-/*global Util, Selection */
+/*global Util, Selection, console */
 
 var Events;
 
@@ -79,9 +79,19 @@ var Events;
 
             switch (name) {
             case 'externalInteraction':
-                // Detecting when focus is lost
+                // Detecting when user has interacted with elements outside of MediumEditor
                 this.attachDOMEvent(this.options.ownerDocument.body, 'click', this.handleInteraction.bind(this), true);
                 this.attachDOMEvent(this.options.ownerDocument.body, 'focus', this.handleInteraction.bind(this), true);
+                this.listeners[name] = true;
+                break;
+            case 'blur':
+                // Detecting when focus is lost
+                this.setupListener('externalInteraction');
+                this.listeners[name] = true;
+                break;
+            case 'focus':
+                // Detecting when focus moves into some part of MediumEditor
+                this.setupListener('externalInteraction');
                 this.listeners[name] = true;
                 break;
             case 'editableClick':
@@ -160,15 +170,24 @@ var Events;
         },
 
         handleInteraction: function (event) {
-            var isDescendantOfEditorElements = false,
-                selection = this.options.contentWindow.getSelection(),
+            var selection = this.options.contentWindow.getSelection(),
                 toolbarEl = this.base.toolbar ? this.base.toolbar.getToolbarElement() : null,
                 anchorPreview = this.base.getExtensionByName('anchor-preview'),
                 previewEl = (anchorPreview && anchorPreview.getPreviewElement) ? anchorPreview.getPreviewElement() : null,
                 selRange = selection.isCollapsed ?
                            null :
                            Selection.getSelectedParentElement(selection.getRangeAt(0)),
-                i;
+                i,
+                focused,
+                toFocus;
+
+            // Find the element that has focus
+            for (i = 0; i < this.base.elements.length; i += 1) {
+                if (this.base.elements[i].getAttribute('data-medium-focused')) {
+                    focused = this.base.elements[i];
+                    break;
+                }
+            }
 
             // This control was introduced also to avoid the toolbar
             // to disapper when selecting from right to left and
@@ -177,14 +196,41 @@ var Events;
                 if (this.base.elements[i] === event.target ||
                         Util.isDescendant(this.base.elements[i], event.target) ||
                         Util.isDescendant(this.base.elements[i], selRange)) {
-                    isDescendantOfEditorElements = true;
+                    toFocus = this.base.elements[i];
                     break;
                 }
             }
-            // If it's not part of the editor, toolbar, or anchor preview
-            if (!isDescendantOfEditorElements &&
-                    (!toolbarEl || (toolbarEl !== event.target && !Util.isDescendant(toolbarEl, event.target))) &&
+
+            // If focus is going into an editor element
+            if (toFocus) {
+                // If this element didn't already have focus
+                if (toFocus !== focused) {
+                    if (this.base.tracingOn) {
+                        console.log("FOCUSING INTO EDITABLE");
+                    }
+
+                    // If an element was focused, trigger blur
+                    if (focused) {
+                        if (this.base.tracingOn) {
+                            console.log("BLURRING EXISTING ELEMENT WITH FOCUS");
+                        }
+                        focused.removeAttribute('data-medium-focused');
+                        this.triggerCustomEvent('blur', event, focused);
+                    }
+
+                    // Trigger focus on the editable that now has focus
+                    toFocus.setAttribute('data-medium-focused', true);
+                    this.triggerCustomEvent('focus', event, toFocus);
+                }
+            } else if ((!toolbarEl || (toolbarEl !== event.target && !Util.isDescendant(toolbarEl, event.target))) &&
                     (!previewEl || (previewEl !== event.target && !Util.isDescendant(previewEl, event.target)))) {
+                // If it's not part of the editor, toolbar, or anchorpreview
+
+                // If we have a focused element, trigger blur
+                if (focused) {
+                    focused.removeAttribute('data-medium-focused');
+                    this.triggerCustomEvent('blur', event, focused);
+                }
                 this.triggerCustomEvent('externalInteraction', event);
             }
         },
