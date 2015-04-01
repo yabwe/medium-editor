@@ -11,5 +11,5 @@
         };
     }).apply(this, ({
         // grunt-bump looks for this:
-        "version": "4.1.0"
+        "version": "4.1.1"
     }).version.split("."));
