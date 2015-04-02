@@ -163,7 +163,7 @@ Check out the Wiki page for a list of available themes: [https://github.com/davi
 * __.stopSelectionUpdates()__: stop the toolbar from updating to reflect the state of the selected text
 * __.startSelectionUpdates()__: put the toolbar back into its normal updating state
 * __.cleanPaste(text)__: convert text to plaintext and replace current selection with result
-* __.pasteHTML(html)__: replace the current selection with html
+* __.pasteHTML(html, options)__: replace the current selection with html
 
 ### Helper Methods
 * __.on(target, event, listener, useCapture)__: attach a listener to a DOM event which will be detached when MediumEditor is deactivated
