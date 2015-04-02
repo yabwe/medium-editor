@@ -1,3 +1,5 @@
+/*global console */
+
 var AnchorPreview;
 
 (function () {
@@ -108,21 +110,25 @@ var AnchorPreview;
         },
 
         handleClick: function () {
-            var range,
-                sel,
-                anchorExtension = this.base.getExtensionByName('anchor'),
+            //var range,
+            //    sel,
+            var anchorExtension = this.base.getExtensionByName('anchor'),
                 activeAnchor = this.activeAnchor;
 
             if (anchorExtension && activeAnchor) {
-                range = this.base.options.ownerDocument.createRange();
+                /*range = this.base.options.ownerDocument.createRange();
                 range.selectNodeContents(this.activeAnchor);
 
                 sel = this.base.options.contentWindow.getSelection();
                 sel.removeAllRanges();
-                sel.addRange(range);
+                sel.addRange(range);*/
+                this.base.selectElement(this.activeAnchor);
                 // Using setTimeout + options.delay because:
                 // We may actually be displaying the anchor form, which should be controlled by options.delay
                 this.base.delay(function () {
+                    if (this.base.tracingOn) {
+                        console.log("DELAYED CHECK");
+                    }
                     if (activeAnchor) {
                         anchorExtension.showForm(activeAnchor.attributes.href.value);
                         activeAnchor = null;

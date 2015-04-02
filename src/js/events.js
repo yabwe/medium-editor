@@ -181,6 +181,10 @@ var Events;
                 focused,
                 toFocus;
 
+            if (this.base.tracingOn) {
+                console.log("!! HANDLE-INTERACTION (" + event.type + ") !!");
+            }
+
             // Find the element that has focus
             for (i = 0; i < this.base.elements.length; i += 1) {
                 if (this.base.elements[i].getAttribute('data-medium-focused')) {
@@ -212,7 +216,7 @@ var Events;
                     // If an element was focused, trigger blur
                     if (focused) {
                         if (this.base.tracingOn) {
-                            console.log("BLURRING EXISTING ELEMENT WITH FOCUS");
+                            console.log("FOCUS -> BLURRING EXISTING ELEMENT WITH FOCUS");
                         }
                         focused.removeAttribute('data-medium-focused');
                         this.triggerCustomEvent('blur', event, focused);
@@ -228,10 +232,20 @@ var Events;
 
                 // If we have a focused element, trigger blur
                 if (focused) {
+                    if (this.base.tracingOn) {
+                        console.log("NO FOCUS -> BLURRING EXISTING ELEMENT WITH FOCUS");
+                    }
                     focused.removeAttribute('data-medium-focused');
                     this.triggerCustomEvent('blur', event, focused);
                 }
+                if (this.base.tracingOn) {
+                    console.log("TRIGGERING EXTERNAL INTERACTION");
+                }
                 this.triggerCustomEvent('externalInteraction', event);
+            } else {
+                if (this.base.tracingOn) {
+                    console.log("IGNORED " + event.type);
+                }
             }
         },
 

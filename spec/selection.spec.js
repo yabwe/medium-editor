@@ -89,7 +89,7 @@ describe('Selection TestCase', function () {
             var editor = new MediumEditor('.editor', {
                 allowMultiParagraphSelection: false
             });
-            selectElementContentsAndFire(document.getElementById('p-one'));
+            selectElementContentsAndFire(document.getElementById('p-one'), { eventToFire: 'focus' });
             expect(editor.toolbar.getToolbarElement().classList.contains('medium-editor-toolbar-active')).toBe(true);
             selectElementContentsAndFire(this.el);
             expect(editor.toolbar.getToolbarElement().classList.contains('medium-editor-toolbar-active')).toBe(false);

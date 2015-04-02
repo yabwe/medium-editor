@@ -1,7 +1,7 @@
 /*global MediumEditor, describe, it, expect, spyOn,
     afterEach, beforeEach, selectElementContents,
     fireEvent, tearDown, jasmine, selectElementContentsAndFire,
-    placeCursorInsideElement, Toolbar, console */
+    placeCursorInsideElement, Toolbar */
 
 describe('Toolbar TestCase', function () {
     'use strict';
@@ -103,7 +103,7 @@ describe('Toolbar TestCase', function () {
                 onHideToolbar: temp.onHide
             });
 
-            selectElementContentsAndFire(this.el);
+            selectElementContentsAndFire(this.el, { eventToFire: 'focus' });
 
             expect(editor.toolbar.getToolbarElement().classList.contains('medium-editor-toolbar-active')).toBe(true);
             expect(temp.onShow).toHaveBeenCalled();
@@ -137,14 +137,14 @@ describe('Toolbar TestCase', function () {
             });
 
             placeCursorInsideElement(this.el.firstChild, 'This is my text'.length);
-            fireEvent(document.documentElement, 'mousedown', {
-                target: document.body
+            fireEvent(this.el.parentNode, 'click', {
+                target: this.el.parentNode,
+                currentTarget: this.el
             });
-            fireEvent(this.el, 'blur', {
-                relatedTarget: document.createElement('div')
-            });
+
+            jasmine.clock().tick(1);
             expect(editor.toolbar.getToolbarElement().classList.contains('medium-editor-toolbar-active')).toBe(false);
-            expect(window.getSelection().anchorNode).toBe(null);
+            expect(this.el.getAttribute('medium-editor-focused')).not.toBeTruthy();
         });
 
         it('should not throw an error when check selection is called when there is an empty selection', function () {
@@ -154,7 +154,7 @@ describe('Toolbar TestCase', function () {
                 stickyToolbar: true
             });
 
-            selectElementContents(this.el.querySelector('b'));
+            selectElementContentsAndFire(this.el.querySelector('b'), { eventToFire: 'focus' });
             window.getSelection().removeAllRanges();
             editor.checkSelection();
             jasmine.clock().tick(1); // checkSelection delay
@@ -213,9 +213,6 @@ describe('Toolbar TestCase', function () {
             expect(editorOne.toolbar.getToolbarElement().classList.contains('medium-editor-toolbar-active')).toBe(true);
             expect(editorTwo.toolbar.getToolbarElement().classList.contains('medium-editor-toolbar-active')).toBe(false);
 
-            editorOne.startTracing();
-            editorTwo.startTracing();
-
             selectElementContents(document.getElementById('editor-span-2'));
             fireEvent(elTwo, 'focus', {
                 target: elTwo,
@@ -225,10 +222,7 @@ describe('Toolbar TestCase', function () {
             jasmine.clock().tick(1); // checkSelection delay
 
             expect(editorOne.toolbar.getToolbarElement().classList.contains('medium-editor-toolbar-active')).toBe(false);
-            console.log("CHECK 2");
             expect(editorTwo.toolbar.getToolbarElement().classList.contains('medium-editor-toolbar-active')).toBe(true);
-            editorOne.startTracing();
-            editorTwo.stopTracing();
         });
     });
 
@@ -316,8 +310,7 @@ describe('Toolbar TestCase', function () {
             editor = new MediumEditor(document.querySelectorAll('.editor'));
             expect(editor.elements.length).toEqual(3);
             expect(editor.toolbar.getToolbarElement().style.display).toBe('');
-            selectElementContents(this.el);
-            editor.checkSelection();
+            selectElementContentsAndFire(this.el, { eventToFire: 'focus'});
 
             expect(editor.toolbar.getToolbarElement().classList.contains('medium-editor-toolbar-active')).toBe(true);
             // Remove the new element from the DOM

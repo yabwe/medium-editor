@@ -112,9 +112,9 @@ var Toolbar;
         },
 
         attachEventHandlers: function () {
-            this.base.on(this.options.ownerDocument.documentElement, 'mousedown', this.handleDocumentMousedown.bind(this));
+            //this.base.on(this.options.ownerDocument.documentElement, 'mousedown', this.handleDocumentMousedown.bind(this));
             // Handle mouseup on document for updating the selection in the toolbar
-            this.base.on(this.options.ownerDocument.documentElement, 'mouseup', this.handleDocumentMouseup.bind(this));
+            //this.base.on(this.options.ownerDocument.documentElement, 'mouseup', this.handleDocumentMouseup.bind(this));
 
             // Add a scroll event for sticky toolbar
             if (this.options.staticToolbar && this.options.stickyToolbar) {
@@ -134,7 +134,7 @@ var Toolbar;
                 this.base.on(element, 'keyup', this.handleEditableKeyup.bind(this));
 
                 // Attach blur handler to each contenteditable element
-                this.base.on(element, 'blur', this.handleEditableBlur.bind(this));
+                //this.base.on(element, 'blur', this.handleEditableBlur.bind(this));
             }, this);
         },
 
@@ -146,17 +146,20 @@ var Toolbar;
             this.throttledPositionToolbar();
         },
 
-        handleDocumentMousedown: function (event) {
-            this.lastMousedownTarget = event.target;
+        handleDocumentMousedown: function () {
+            //this.lastMousedownTarget = event.target;
         },
 
         handleDocumentMouseup: function (event) {
-            this.lastMousedownTarget = null;
+            //this.lastMousedownTarget = null;
             // Do not trigger checkState when mouseup fires over the toolbar
             if (event &&
                     event.target &&
                     Util.isDescendant(this.getToolbarElement(), event.target)) {
                 return false;
+            }
+            if (this.base.tracingOn) {
+                console.log("** MOUSEUP ** -> checkState");
             }
             this.checkState();
         },
@@ -165,11 +168,17 @@ var Toolbar;
             // Delay the call to checkState to handle bug where selection is empty
             // immediately after clicking inside a pre-existing selection
             setTimeout(function () {
+                if (this.base.tracingOn) {
+                    console.log("** EDITABLE CLICK ** -> setTimeout -> checkState");
+                }
                 this.checkState();
             }.bind(this), 0);
         },
 
         handleEditableKeyup: function () {
+            if (this.base.tracingOn) {
+                console.log("** EDITABLE KEYUP ** -> setTimeout -> checkState");
+            }
             this.checkState();
         },
 
@@ -197,7 +206,10 @@ var Toolbar;
                     this.options.contentWindow.getSelection().removeAllRanges();
                 }
             }
-            this.checkState();
+            if (this.base.tracingOn) {
+                console.log('** EDITABLE BLUR ** -> checkState');
+            }
+            //this.checkState();
         },
 
         handleBlur: function () {
@@ -205,7 +217,12 @@ var Toolbar;
             if (this.base.tracingOn) {
                 console.log("HANDLE BLUR on" + event.type);
             }
+
             clearTimeout(this.hideTimeout);
+            if (this.base.tracingOn) {
+                console.log("Timeout cleared");
+            }
+
             this.hideTimeout = setTimeout(function () {
                 if (this.base.tracingOn) {
                     console.log("BLUR NOT CANCELED -> HIDING");
@@ -216,7 +233,7 @@ var Toolbar;
 
         handleFocus: function (event) {
             if (this.base.tracingOn) {
-                console.log("HANDLE FOCUS on" + event.type);
+                console.log("HANDLE FOCUS on" + event.type + " -> checkState");
             }
             this.checkState();
         },
@@ -228,6 +245,9 @@ var Toolbar;
         },
 
         showToolbar: function () {
+            if (this.base.tracingOn) {
+                console.log("SHOW TOOLBAR -> clearTimeout(" + this.hideTimeout + ")");
+            }
             clearTimeout(this.hideTimeout);
             if (!this.isDisplayed()) {
                 this.getToolbarElement().classList.add('medium-editor-toolbar-active');
@@ -238,6 +258,9 @@ var Toolbar;
         },
 
         hideToolbar: function () {
+            if (this.base.tracingOn) {
+                console.log("Trying to hide | isDisplayed() = " + this.isDisplayed());
+            }
             if (this.isDisplayed()) {
                 this.base.commands.forEach(function (extension) {
                     if (typeof extension.onHide === 'function') {
@@ -272,6 +295,9 @@ var Toolbar;
             // Using setTimeout + options.delay because:
             // We will actually be displaying the toolbar, which should be controlled by options.delay
             this.base.delay(function () {
+                if (this.base.tracingOn) {
+                    console.log("showToolbarDefaultActions -> delayed -> showToolbar()");
+                }
                 this.showToolbar();
             }.bind(this));
         },
@@ -342,6 +368,9 @@ var Toolbar;
 
             for (i = 0; i < this.base.elements.length; i += 1) {
                 if (this.base.elements[i] === selectionElement) {
+                    if (this.base.tracingOn) {
+                        console.log("checkSelectionElement -> showAndUpdateToolbar()");
+                    }
                     this.showAndUpdateToolbar();
                     return;
                 }
@@ -352,25 +381,42 @@ var Toolbar;
             }
         },
 
+        editorHasFocus: function () {
+            return !!this.getFocusedEditable();
+        },
+
+        getFocusedEditable: function () {
+            for (var i = 0; i < this.base.elements.length; i += 1) {
+                if (this.base.elements[i].getAttribute('data-medium-focused')) {
+                    return this.base.elements[i];
+                }
+            }
+            return null;
+        },
+
         checkState: function () {
             var newSelection,
                 selectionElement;
 
             if (!this.base.preventSelectionUpdates) {
                 newSelection = this.options.contentWindow.getSelection();
+
                 if ((!this.options.updateOnEmptySelection && newSelection.toString().trim() === '') ||
                         (this.options.allowMultiParagraphSelection === false && this.multipleBlockElementsSelected()) ||
                         Selection.selectionInContentEditableFalse(this.options.contentWindow)) {
-                    if (!this.options.staticToolbar) {
+                    if (!this.options.staticToolbar || !this.editorHasFocus()) {
                         this.hideToolbar();
                     } else {
+                        if (this.base.tracingOn) {
+                            console.log("checkState -> showAndUpdateToolbar()");
+                        }
                         this.showAndUpdateToolbar();
                     }
 
                 } else {
                     selectionElement = Selection.getSelectionElement(this.options.contentWindow);
                     if (!selectionElement || selectionElement.getAttribute('data-disable-toolbar')) {
-                        if (!this.options.staticToolbar) {
+                        if (!this.options.staticToolbar || !this.editorHasFocus()) {
                             this.hideToolbar();
                         }
                     } else {
@@ -384,7 +430,13 @@ var Toolbar;
 
         showAndUpdateToolbar: function () {
             this.setToolbarButtonStates();
+            if (this.base.tracingOn) {
+                console.log("ShowAndUpdateToolbar -> showToolbarDefaultActions()");
+            }
             this.showToolbarDefaultActions();
+            if (this.base.tracingOn) {
+                console.log("ShowAndUpdateToolbar -> setToolbarPosition()");
+            }
             this.setToolbarPosition();
         },
 
@@ -458,25 +510,36 @@ var Toolbar;
         },
 
         setToolbarPosition: function () {
-            var container = Selection.getSelectionElement(this.options.contentWindow),
+            //var container = Selection.getSelectionElement(this.options.contentWindow),
+            var container = this.getFocusedEditable(),
                 selection = this.options.contentWindow.getSelection(),
                 anchorPreview;
 
             // If there isn't a valid selection, bail
-            if (!container || !this.options.contentWindow.getSelection().focusNode) {
+            //if (!container || !this.options.contentWindow.getSelection().focusNode) {
+            if (!container) {
+                if (this.base.tracingOn) {
+                    console.log("NOT POSITION (container = " + container + " | selection.isCollapsed = " + selection.isCollapsed + ")");
+                }
                 return this;
             }
 
             // If the container isn't part of this medium-editor instance, bail
-            if (this.base.elements.indexOf(container) === -1) {
+            /*if (this.base.elements.indexOf(container) === -1) {
                 return this;
-            }
+            }*/
 
             if (this.options.staticToolbar) {
+                if (this.base.tracingOn) {
+                    console.log("setToolbarPosition -> staticToolbar -> showToolbar()");
+                }
                 this.showToolbar();
                 this.positionStaticToolbar(container);
 
             } else if (!selection.isCollapsed) {
+                if (this.base.tracingOn) {
+                    console.log("setToolbarPosition -> !selection.isCollapsed -> showToolbar()");
+                }
                 this.showToolbar();
                 this.positionToolbar(selection);
             }

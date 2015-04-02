@@ -719,9 +719,9 @@ function MediumEditor(elements, options) {
         },
 
         selectAllContents: function () {
-            var range = this.options.ownerDocument.createRange(),
-                sel = this.options.contentWindow.getSelection(),
-                currNode = Selection.getSelectionElement(this.options.contentWindow);
+            //var range = this.options.ownerDocument.createRange(),
+            //    sel = this.options.contentWindow.getSelection(),
+                var currNode = Selection.getSelectionElement(this.options.contentWindow);
 
             if (currNode) {
                 // Move to the lowest descendant node that still selects all of the contents
@@ -729,9 +729,26 @@ function MediumEditor(elements, options) {
                     currNode = currNode.children[0];
                 }
 
-                range.selectNodeContents(currNode);
-                sel.removeAllRanges();
-                sel.addRange(range);
+                this.selectElement(currNode);
+
+                //range.selectNodeContents(currNode);
+                //sel.removeAllRanges();
+                //sel.addRange(range);
+            }
+        },
+
+        selectElement: function (element) {
+            var range = this.options.ownerDocument.createRange(),
+                sel = this.options.contentWindow.getSelection(),
+                selElement;
+
+            range.selectNodeContents(element);
+            sel.removeAllRanges();
+            sel.addRange(range);
+
+            selElement = Selection.getSelectionElement(this.options.contentWindow);
+            if (selElement) {
+                selElement.focus();
             }
         },
 
