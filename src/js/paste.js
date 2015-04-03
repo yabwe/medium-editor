@@ -103,8 +103,7 @@ var PasteHandler;
             var i, elList, workEl,
                 el = Selection.getSelectionElement(this.options.contentWindow),
                 multiline = /<p|<br|<div/.test(text),
-                replacements = createReplacements();
-
+                replacements = createReplacements().concat(this.options.pasteReplacements || []);
             for (i = 0; i < replacements.length; i += 1) {
                 text = text.replace(replacements[i][0], replacements[i][1]);
             }
