@@ -113,7 +113,7 @@ var PasteHandler;
                 // double br's aren't converted to p tags, but we want paragraphs.
                 elList = text.split('<br><br>');
 
-                this.pasteHTML('<p>' + elList.join('</p><p>') + '</p>');
+                this.pasteHTML('<p>' + elList.join('</p><p>') + '</p>', this.base.options);
 
                 try {
                     this.options.ownerDocument.execCommand('insertText', false, "\n");
@@ -145,7 +145,7 @@ var PasteHandler;
                     }
                 }
             } else {
-                this.pasteHTML(text);
+                this.pasteHTML(text, this.base.options);
             }
         },
 
