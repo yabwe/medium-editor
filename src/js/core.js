@@ -268,11 +268,33 @@ function MediumEditor(elements, options) {
         return shouldAdd;
     }
 
+    function createContentEditable(index) {
+        var div = this.options.ownerDocument.createElement('div');
+        var id = (+new Date());
+        var textarea;
+        div.innerHTML = this.elements[index].value;
+        div.setAttribute('data-textarea', id);
+        this.elements[index].classList.add('medium-editor-hidden');
+        this.elements[index].setAttribute('data-textarea', id);
+        this.elements[index].parentNode.insertBefore(
+            div,
+            this.elements[index]
+        );
+        textarea = this.options.ownerDocument.querySelectorAll('textarea[data-textarea="' + id + '"]')[0];
+        this.on(div, 'input', function (e) {
+            textarea.value = e.target.innerHTML;
+        }.bind(this));
+        return div;
+    }
+
     function initElements() {
         var i,
             addToolbar = false;
         for (i = 0; i < this.elements.length; i += 1) {
             if (!this.options.disableEditing && !this.elements[i].getAttribute('data-disable-editing')) {
+                if (this.elements[i].tagName.toLowerCase() === 'textarea') {
+                    this.elements[i] = createContentEditable.call(this, i);
+                }
                 this.elements[i].setAttribute('contentEditable', true);
             }
             if (!this.elements[i].getAttribute('data-placeholder')) {
