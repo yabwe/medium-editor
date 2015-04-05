@@ -1,5 +1,5 @@
 /*global MediumEditor, describe, it, expect, spyOn,
-         afterEach, beforeEach, tearDown*/
+         afterEach, beforeEach, tearDown, _ */
 
 describe('Initialization TestCase', function () {
     'use strict';
@@ -110,8 +110,6 @@ describe('Initialization TestCase', function () {
                 contentWindow: window,
                 ownerDocument: document,
                 firstHeader: 'h3',
-                forcePlainText: true,
-                cleanPastedHTML: false,
                 allowMultiParagraphSelection: true,
                 placeholder: 'Type your text',
                 secondHeader: 'h4',
@@ -126,10 +124,18 @@ describe('Initialization TestCase', function () {
                 extensions: {},
                 activeButtonClass: 'medium-editor-button-active',
                 firstButtonClass: 'medium-editor-button-first',
-                lastButtonClass: 'medium-editor-button-last'
+                lastButtonClass: 'medium-editor-button-last',
+                paste: {
+                    forcePlainText: true,
+                    cleanPastedHTML: false,
+                    cleanReplacements: [],
+                    cleanAttrs: ['class', 'style', 'dir'],
+                    cleanTags: ['meta']
+                }
             },
                 editor = new MediumEditor('.editor');
-            expect(editor.options).toEqual(defaultOptions);
+            expect(Object.keys(editor.options).length).toBe(Object.keys(defaultOptions).length);
+            expect(_.isEqual(editor.options, defaultOptions)).toBe(true);
         });
 
         it('should accept custom options values', function () {

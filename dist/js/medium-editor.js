@@ -407,7 +407,9 @@ var Util;
         var prop;
         dest = dest || {};
         for (prop in source) {
-            if (source.hasOwnProperty(prop) && (overwrite || dest.hasOwnProperty(prop) === false)) {
+            if (source.hasOwnProperty(prop) &&
+                source[prop] !== undefined &&
+                (overwrite || dest.hasOwnProperty(prop) === false)) {
                 dest[prop] = source[prop];
             }
         }
@@ -431,6 +433,10 @@ var Util;
         },
 
         parentElements: ['p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'blockquote', 'pre'],
+
+        extend: function extend(dest, source) {
+            return copyInto(dest, source, true);
+        },
 
         defaults: function defaults(dest, source) {
             return copyInto(dest, source);
@@ -1520,9 +1526,26 @@ var PasteHandler;
     }
     /*jslint regexp: false*/
 
-    PasteHandler = function (instance) {
+    /* Paste Options:
+     *
+     * forcePlainText: Forces pasting as plain text. Default: true
+     * cleanPastedHtml: cleans pasted content from different sources, like google docs etc. Default: false
+     * cleanReplacements: custom pairs (2 element arrays) of RegExp and replacement text to use during paste when
+     *                    __forcePlainText__ or __cleanPastedHtml__ are `true` OR when calling `cleanPaste(text)`
+     *                    helper method. Default: []
+     * cleanAttrs: list of attributes to remove when ... default: ['class', 'style', 'dir']
+     * cleanTags: list of element tag names to remove... default: ['meta']
+     *
+     * ----- internal options needed from base -----
+     * disableReturn
+     * targetBlank
+     * contentWindow
+     * ownerDocument
+     */
+
+    PasteHandler = function (instance, options) {
         this.base = instance;
-        this.options = this.base.options;
+        this.options = options;
 
         if (this.options.forcePlainText || this.options.cleanPastedHTML) {
             this.base.subscribe('editablePaste', this.handlePaste.bind(this));
@@ -3201,6 +3224,24 @@ function MediumEditor(elements, options) {
         }
     }
 
+    function initPasteHandler() {
+        var pasteOptions = Util.extend({}, this.options.paste);
+
+        // Backwards compatability
+        pasteOptions = Util.extend(pasteOptions, {
+            forcePlainText: this.options.forcePlainText,
+            cleanPastedHtml: this.options.cleanPastedHtml,
+            cleanAttrs: this.options.cleanAttrs,
+            cleanTags: this.options.cleanTags,
+            disableReturn: this.options.disableReturn,
+            targetBlank: this.options.targetBlank,
+            contentWindow: this.options.contentWindow,
+            ownerDocument: this.options.ownerDocument
+        });
+
+        this.pasteHandler = new PasteHandler(this, pasteOptions);
+    }
+
     function initCommands() {
         var buttons = this.options.buttons,
             extensions = this.options.extensions,
@@ -3277,7 +3318,6 @@ function MediumEditor(elements, options) {
             buttons: ['bold', 'italic', 'underline', 'anchor', 'header1', 'header2', 'quote'],
             buttonLabels: false,
             checkLinkFormat: false,
-            cleanPastedHTML: false,
             delay: 0,
             diffLeft: 0,
             diffTop: -10,
@@ -3294,7 +3334,6 @@ function MediumEditor(elements, options) {
             contentWindow: window,
             ownerDocument: document,
             firstHeader: 'h3',
-            forcePlainText: true,
             placeholder: 'Type your text',
             secondHeader: 'h4',
             targetBlank: false,
@@ -3304,7 +3343,14 @@ function MediumEditor(elements, options) {
             extensions: {},
             activeButtonClass: 'medium-editor-button-active',
             firstButtonClass: 'medium-editor-button-first',
-            lastButtonClass: 'medium-editor-button-last'
+            lastButtonClass: 'medium-editor-button-last',
+            paste: {
+                forcePlainText: true,
+                cleanPastedHTML: false,
+                cleanReplacements: [],
+                cleanAttrs: ['class', 'style', 'dir'],
+                cleanTags: ['meta']
+            }
         },
 
         // NOT DOCUMENTED - exposed for backwards compatability
@@ -3343,7 +3389,7 @@ function MediumEditor(elements, options) {
             initElements.call(this);
             attachHandlers.call(this);
 
-            this.pasteHandler = new PasteHandler(this);
+            initPasteHandler.call(this);
 
             if (!this.options.disablePlaceholders) {
                 this.placeholders = new Placeholders(this);
@@ -3706,7 +3752,7 @@ MediumEditor.version = (function(major, minor, revision) {
         };
     }).apply(this, ({
         // grunt-bump looks for this:
-        "version": "4.1.1"
+        "version": "4.2.0"
     }).version.split("."));
 
     return MediumEditor;

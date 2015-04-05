@@ -9,7 +9,9 @@ var Util;
         var prop;
         dest = dest || {};
         for (prop in source) {
-            if (source.hasOwnProperty(prop) && (overwrite || dest.hasOwnProperty(prop) === false)) {
+            if (source.hasOwnProperty(prop) &&
+                source[prop] !== undefined &&
+                (overwrite || dest.hasOwnProperty(prop) === false)) {
                 dest[prop] = source[prop];
             }
         }
@@ -33,6 +35,10 @@ var Util;
         },
 
         parentElements: ['p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'blockquote', 'pre'],
+
+        extend: function extend(dest, source) {
+            return copyInto(dest, source, true);
+        },
 
         defaults: function defaults(dest, source) {
             return copyInto(dest, source);
