@@ -3122,10 +3122,8 @@ function MediumEditor(elements, options) {
         div.className = textarea.className;
         div.id = id;
         div.innerHTML = textarea.value;
-        div.setAttribute('data-textarea', id);
 
         textarea.classList.add('medium-editor-hidden');
-        textarea.setAttribute('data-textarea', id);
         textarea.parentNode.insertBefore(
             div,
             textarea
