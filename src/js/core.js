@@ -356,18 +356,19 @@ function MediumEditor(elements, options) {
     }
 
     function initPasteHandler() {
-        var pasteOptions = Util.extend({}, this.options.paste);
-
-        // Backwards compatability
-        pasteOptions = Util.extend(pasteOptions, {
-            forcePlainText: this.options.forcePlainText,
-            cleanPastedHtml: this.options.cleanPastedHtml,
-            cleanAttrs: this.options.cleanAttrs,
-            cleanTags: this.options.cleanTags,
-            disableReturn: this.options.disableReturn,
-            targetBlank: this.options.targetBlank,
-            contentWindow: this.options.contentWindow,
-            ownerDocument: this.options.ownerDocument
+        var pasteOptions = Util.extend(
+            {},
+            this.options.paste,
+            // Backwards compatability
+            {
+                forcePlainText: this.options.forcePlainText,
+                cleanPastedHtml: this.options.cleanPastedHtml,
+                cleanAttrs: this.options.cleanAttrs,
+                cleanTags: this.options.cleanTags,
+                disableReturn: this.options.disableReturn,
+                targetBlank: this.options.targetBlank,
+                contentWindow: this.options.contentWindow,
+                ownerDocument: this.options.ownerDocument
         });
 
         this.pasteHandler = new PasteHandler(this, pasteOptions);

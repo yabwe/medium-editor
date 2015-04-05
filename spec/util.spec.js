@@ -1,4 +1,4 @@
-/*global MediumEditor, Util, describe, it, expect, spyOn */
+/*global MediumEditor, Util, describe, it, expect, spyOn, _ */
 
 describe('Util', function () {
     'use strict';
@@ -10,6 +10,26 @@ describe('Util', function () {
             expect(MediumEditor.util).toEqual(Util);
         });
 
+    });
+
+    describe('Extend', function () {
+        it('should overwrite values from right to left', function () {
+            var objOne = { one: "one" };
+            var objTwo = { one: "two", three: "three" };
+            var objThree = { three: "four", five: "six" };
+            var result = MediumEditor.util.extend({}, objOne, objTwo, objThree);
+            expect(_.isEqual(result, { one: "two", three: "four", five: "six" })).toBe(true);
+        });
+    });
+
+    describe('Defaults', function () {
+        it('should overwrite values from left to right', function () {
+            var objOne = { one: "one" };
+            var objTwo = { one: "two", three: "three" };
+            var objThree = { three: "four", five: "six" };
+            var result = MediumEditor.util.defaults({}, objOne, objTwo, objThree);
+            expect(_.isEqual(result, { one: "one", three: "three", five: "six" })).toBe(true);
+        });
     });
 
     describe('Deprecated', function () {

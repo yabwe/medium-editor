@@ -5,14 +5,18 @@ var Util;
 (function (window) {
     'use strict';
 
-    function copyInto(dest, source, overwrite) {
-        var prop;
+    function copyInto(overwrite, dest) {
+        var prop,
+            sources = Array.prototype.slice.call(arguments, 2);
         dest = dest || {};
-        for (prop in source) {
-            if (source.hasOwnProperty(prop) &&
-                source[prop] !== undefined &&
-                (overwrite || dest.hasOwnProperty(prop) === false)) {
-                dest[prop] = source[prop];
+        for (var i = 0; i < sources.length; i++) {
+            var source = sources[i];
+            for (prop in source) {
+                if (source.hasOwnProperty(prop) &&
+                    source[prop] !== undefined &&
+                    (overwrite || dest.hasOwnProperty(prop) === false)) {
+                    dest[prop] = source[prop];
+                }
             }
         }
         return dest;
@@ -36,12 +40,14 @@ var Util;
 
         parentElements: ['p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'blockquote', 'pre'],
 
-        extend: function extend(dest, source) {
-            return copyInto(dest, source, true);
+        extend: function extend(/* dest, source1, source2, ...*/) {
+            var args = [true].concat(Array.prototype.slice.call(arguments));
+            return copyInto.apply(this, args);
         },
 
-        defaults: function defaults(dest, source) {
-            return copyInto(dest, source);
+        defaults: function defaults(/*dest, source1, source2, ...*/) {
+            var args = [false].concat(Array.prototype.slice.call(arguments));
+            return copyInto.apply(this, args);
         },
 
         derives: function derives(base, derived) {
@@ -50,7 +56,7 @@ var Util;
             Proto.prototype = base.prototype;
             derived.prototype = new Proto();
             derived.prototype.constructor = base;
-            derived.prototype = copyInto(derived.prototype, origPrototype);
+            derived.prototype = copyInto(false, derived.prototype, origPrototype);
             return derived;
         },
 
