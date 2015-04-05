@@ -63,6 +63,10 @@ var elements = document.querySelectorAll('.editable'),
     editor = new MediumEditor(elements);
 ```
 
+MediumEditor also supports textarea. If you provide a textarea element, the script
+will create a new div with `contentEditable=true`, hide the textarea and link
+the textarea value to the div HTML content.
+
 ## Initialization options
 
 ### Core options
