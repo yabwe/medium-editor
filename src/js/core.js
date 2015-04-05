@@ -1,6 +1,6 @@
 /*global FileReader, Util, ButtonsData, DefaultButton,
  PasteHandler, Selection, AnchorExtension,
- Toolbar, AnchorPreview, Events, Placeholders */
+ Toolbar, AnchorPreview, Events, Placeholders*/
 
 function MediumEditor(elements, options) {
     'use strict';
@@ -272,17 +272,21 @@ function MediumEditor(elements, options) {
         var div = this.options.ownerDocument.createElement('div');
         var id = (+new Date());
         var textarea = this.elements[index];
-        div.innerHTML = textarea.value;
+
         div.className = textarea.className;
+        div.id = id;
+        div.innerHTML = textarea.value;
         div.setAttribute('data-textarea', id);
+
         textarea.classList.add('medium-editor-hidden');
         textarea.setAttribute('data-textarea', id);
         textarea.parentNode.insertBefore(
             div,
             textarea
         );
-        this.on(div, 'input', function (e) {
-            textarea.value = e.target.innerHTML.trim();
+
+        this.on(div, 'input', function () {
+            textarea.value = this.serialize()[id].value;
         }.bind(this));
         return div;
     }
