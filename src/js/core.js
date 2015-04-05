@@ -273,6 +273,7 @@ function MediumEditor(elements, options) {
         var id = (+new Date());
         var textarea = this.elements[index];
         div.innerHTML = textarea.value;
+        div.className = textarea.className;
         div.setAttribute('data-textarea', id);
         textarea.classList.add('medium-editor-hidden');
         textarea.setAttribute('data-textarea', id);
