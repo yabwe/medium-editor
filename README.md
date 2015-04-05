@@ -215,6 +215,8 @@ The source files are located inside the __src__ directory.
 
 ## Contributing
 
+[Kill some bugs :)](https://github.com/daviferreira/medium-editor/issues?q=is%3Aopen+is%3Aissue+label%3Abug)
+
 1. Fork it
 2. Create your feature branch (`git checkout -b my-new-feature`)
 3. Test your changes to the best of your ability.
