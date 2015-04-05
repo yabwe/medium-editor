@@ -3117,18 +3117,17 @@ function MediumEditor(elements, options) {
     function createContentEditable(index) {
         var div = this.options.ownerDocument.createElement('div');
         var id = (+new Date());
-        var textarea;
-        div.innerHTML = this.elements[index].value;
+        var textarea = this.elements[index];
+        div.innerHTML = textarea.value;
         div.setAttribute('data-textarea', id);
-        this.elements[index].classList.add('medium-editor-hidden');
-        this.elements[index].setAttribute('data-textarea', id);
-        this.elements[index].parentNode.insertBefore(
+        textarea.classList.add('medium-editor-hidden');
+        textarea.setAttribute('data-textarea', id);
+        textarea.parentNode.insertBefore(
             div,
-            this.elements[index]
+            textarea
         );
-        textarea = this.options.ownerDocument.querySelectorAll('textarea[data-textarea="' + id + '"]')[0];
         this.on(div, 'input', function (e) {
-            textarea.value = e.target.innerHTML;
+            textarea.value = e.target.innerHTML.trim();
         }.bind(this));
         return div;
     }
