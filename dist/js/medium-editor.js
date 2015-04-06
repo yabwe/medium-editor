@@ -1607,7 +1607,11 @@ var PasteHandler;
             var i, elList, workEl,
                 el = Selection.getSelectionElement(this.options.contentWindow),
                 multiline = /<p|<br|<div/.test(text),
-                replacements = createReplacements().concat(this.options.cleanReplacements);
+                replacements = createReplacements();
+            if (this.options.cleanReplacements &&
+                    this.options.cleanReplacements.length) {
+                replacements = replacements.concat(this.options.cleanReplacements);
+            }
 
             for (i = 0; i < replacements.length; i += 1) {
                 text = text.replace(replacements[i][0], replacements[i][1]);
@@ -3289,7 +3293,7 @@ function MediumEditor(elements, options) {
             if (!tempOpts[toMerge]) {
                 tempOpts[toMerge] = defaults[toMerge];
             } else {
-                tempOpts[toMerge] = Util.defaults({}, tempOpts[toMerge], options[toMerge]);
+                tempOpts[toMerge] = Util.defaults({}, tempOpts[toMerge], defaults[toMerge]);
             }
         });
 
@@ -3369,7 +3373,6 @@ function MediumEditor(elements, options) {
             paste: {
                 forcePlainText: true,
                 cleanPastedHTML: false,
-                cleanReplacements: [],
                 cleanAttrs: ['class', 'style', 'dir'],
                 cleanTags: ['meta']
             }

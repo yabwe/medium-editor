@@ -75,8 +75,10 @@ describe('Pasting content', function () {
                 editorEl = this.el,
                 editor = new MediumEditor('.editor', {
                     delay: 200,
-                    forcePlainText: false,
-                    cleanPastedHTML: true
+                    paste: {
+                        forcePlainText: false,
+                        cleanPastedHTML: true
+                    }
                 });
 
             for (i = 0; i < multiLineTests.length; i += 1) {
@@ -94,8 +96,10 @@ describe('Pasting content', function () {
 
         it('should filter multi-line rich-text pastes when "insertHTML" command is not supported', function () {
             var editor = new MediumEditor('.editor', {
-                forcePlainText: false,
-                cleanPastedHTML: true
+                paste: {
+                    forcePlainText: false,
+                    cleanPastedHTML: true
+                }
             });
 
             spyOn(document, "queryCommandSupported").and.returnValue(false);
@@ -109,15 +113,19 @@ describe('Pasting content', function () {
                 expect(this.el.innerHTML).toEqual(test.output);
             }.bind(this));
         });
+    });
 
-        it('should filter inline rich-text pastes', function () {
+    describe('cleanPaste', function () {
+        it('should filter inline rich-text', function () {
             var i,
                 regex,
                 editorEl = this.el,
                 editor = new MediumEditor('.editor', {
                     delay: 200,
-                    forcePlainText: false,
-                    cleanPastedHTML: true
+                    paste: {
+                        forcePlainText: false,
+                        cleanPastedHTML: true
+                    }
                 });
 
             for (i = 0; i < inlineTests.length; i += 1) {
@@ -138,11 +146,13 @@ describe('Pasting content', function () {
             }
         });
 
-        it('should filter inline rich-text pastes when "insertHTML" command is not supported', function () {
+        it('should filter inline rich-text when "insertHTML" command is not supported', function () {
             var regex,
                 editor = new MediumEditor('.editor', {
-                    forcePlainText: false,
-                    cleanPastedHTML: true
+                    paste: {
+                        forcePlainText: false,
+                        cleanPastedHTML: true
+                    }
                 });
 
             spyOn(document, "queryCommandSupported").and.returnValue(false);
@@ -160,6 +170,23 @@ describe('Pasting content', function () {
                 regex = new RegExp("^Before(&nbsp;|\\s)(<span id=\"editor-inner\">)?" + test.output + "(</span>)?(&nbsp;|\\s)after\\.$");
                 expect(regex.test(this.el.innerHTML)).toBe(true);
             }.bind(this));
+        });
+
+        it('should respect custom replacments when passed during instantiation', function () {
+            var editor = new MediumEditor('.editor', {
+                paste: {
+                    forcePlainText: false,
+                    cleanPastedHTML: true,
+                    cleanReplacements: [[new RegExp(/<label>/gi), '<sub>'], [new RegExp(/<\/label>/gi), '</sub>']]
+                }
+            });
+
+            this.el.innerHTML = 'Before&nbsp;<span id="editor-inner">&nbsp;</span>&nbsp;after.';
+            selectElementContents(document.getElementById('editor-inner'));
+
+            editor.cleanPaste('<label>div one</label><label>div two</label>');
+
+            expect(this.el.innerHTML).toBe('Before&nbsp;<sub>div one</sub><sub>div two</sub>&nbsp;after.');
         });
     });
 

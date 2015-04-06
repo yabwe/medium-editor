@@ -128,7 +128,6 @@ describe('Initialization TestCase', function () {
                 paste: {
                     forcePlainText: true,
                     cleanPastedHTML: false,
-                    cleanReplacements: [],
                     cleanAttrs: ['class', 'style', 'dir'],
                     cleanTags: ['meta']
                 }
