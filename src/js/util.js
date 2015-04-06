@@ -11,11 +11,13 @@ var Util;
         dest = dest || {};
         for (var i = 0; i < sources.length; i++) {
             var source = sources[i];
-            for (prop in source) {
-                if (source.hasOwnProperty(prop) &&
-                    source[prop] !== undefined &&
-                    (overwrite || dest.hasOwnProperty(prop) === false)) {
-                    dest[prop] = source[prop];
+            if (source) {
+                for (prop in source) {
+                    if (source.hasOwnProperty(prop) &&
+                        typeof source[prop] !== 'undefined' &&
+                        (overwrite || dest.hasOwnProperty(prop) === false)) {
+                        dest[prop] = source[prop];
+                    }
                 }
             }
         }

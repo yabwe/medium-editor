@@ -120,7 +120,7 @@ var PasteHandler;
             var i, elList, workEl,
                 el = Selection.getSelectionElement(this.options.contentWindow),
                 multiline = /<p|<br|<div/.test(text),
-                replacements = createReplacements();
+                replacements = createReplacements().concat(this.options.cleanReplacements);
 
             for (i = 0; i < replacements.length; i += 1) {
                 text = text.replace(replacements[i][0], replacements[i][1]);
@@ -167,10 +167,7 @@ var PasteHandler;
         },
 
         pasteHTML: function (html, options) {
-            options = Util.defaults(options, {
-                cleanAttrs: ['class', 'style', 'dir'],
-                cleanTags: ['meta']
-            });
+            options = Util.defaults({}, options, this.options);
 
             var elList, workEl, i, fragmentBody, pasteBlock = this.options.ownerDocument.createDocumentFragment();
 

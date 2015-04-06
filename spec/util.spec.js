@@ -17,7 +17,8 @@ describe('Util', function () {
             var objOne = { one: "one" };
             var objTwo = { one: "two", three: "three" };
             var objThree = { three: "four", five: "six" };
-            var result = MediumEditor.util.extend({}, objOne, objTwo, objThree);
+            var objFour;
+            var result = MediumEditor.util.extend({}, objOne, objTwo, objThree, objFour);
             expect(_.isEqual(result, { one: "two", three: "four", five: "six" })).toBe(true);
         });
     });
@@ -27,7 +28,8 @@ describe('Util', function () {
             var objOne = { one: "one" };
             var objTwo = { one: "two", three: "three" };
             var objThree = { three: "four", five: "six" };
-            var result = MediumEditor.util.defaults({}, objOne, objTwo, objThree);
+            var objFour;
+            var result = MediumEditor.util.defaults({}, objOne, objTwo, objThree, objFour);
             expect(_.isEqual(result, { one: "one", three: "three", five: "six" })).toBe(true);
         });
     });
