@@ -406,6 +406,22 @@ function MediumEditor(elements, options) {
         }
     }
 
+    function mergeOptions(defaults, options) {
+        var nestedMerges = ['paste'];
+
+        var tempOpts = Util.extend({}, options);
+
+        nestedMerges.forEach(function (toMerge) {
+            if (!tempOpts[toMerge]) {
+                tempOpts[toMerge] = defaults[toMerge];
+            } else {
+                tempOpts[toMerge] = Util.defaults({}, tempOpts[toMerge], options[toMerge]);
+            }
+        });
+
+        return Util.defaults(tempOpts, defaults);
+    }
+
     function execActionInternal(action, opts) {
         /*jslint regexp: true*/
         var appendAction = /^append-(.+)$/gi,
@@ -489,7 +505,7 @@ function MediumEditor(elements, options) {
         init: function (elements, options) {
             var uniqueId = 1;
 
-            this.options = Util.defaults(options, this.defaults);
+            this.options = mergeOptions.call(this, this.defaults, options);
             createElementsArray.call(this, elements);
             if (this.elements.length === 0) {
                 return;

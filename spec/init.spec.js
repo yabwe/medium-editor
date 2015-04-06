@@ -149,7 +149,9 @@ describe('Initialization TestCase', function () {
                 delay: 300
             },
                 editor = new MediumEditor('.editor', options);
-            expect(editor.options).toEqual(options);
+            Object.keys(options).forEach(function (customOption) {
+                expect(editor.options[customOption]).toBe(options[customOption]);
+            });
         });
 
         it('should call the default initialization methods', function () {
