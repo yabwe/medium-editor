@@ -118,7 +118,6 @@ describe('Pasting content', function () {
     describe('cleanPaste', function () {
         it('should filter inline rich-text', function () {
             var i,
-                regex,
                 editorEl = this.el,
                 editor = new MediumEditor('.editor', {
                     delay: 200,
@@ -141,14 +140,12 @@ describe('Pasting content', function () {
                 // Firefox and IE: doing an insertHTML while this <span> is selected results in the html being inserted inside of the span
                 // Firefox replace the &nbsp; other either side of the <span> with a space
                 // Webkit: doing an insertHTML while this <span> is selected results in the span being replaced completely
-                regex = new RegExp("^Before(&nbsp;|\\s)(<span id=\"editor-inner\">)?" + inlineTests[i].output + "(</span>)?(&nbsp;|\\s)after\\.$");
-                expect(regex.test(editorEl.innerHTML)).toBe(true);
+                expect(editorEl.innerHTML).toMatch(new RegExp("^Before(&nbsp;|\\s)(<span id=\"editor-inner\">)?" + inlineTests[i].output + "(</span>)?(&nbsp;|\\s)after\\.$"));
             }
         });
 
         it('should filter inline rich-text when "insertHTML" command is not supported', function () {
-            var regex,
-                editor = new MediumEditor('.editor', {
+            var editor = new MediumEditor('.editor', {
                     paste: {
                         forcePlainText: false,
                         cleanPastedHTML: true
@@ -167,8 +164,7 @@ describe('Pasting content', function () {
                 // Firefox and IE: doing an insertHTML while this <span> is selected results in the html being inserted inside of the span
                 // Firefox replace the &nbsp; other either side of the <span> with a space
                 // Webkit: doing an insertHTML while this <span> is selected results in the span being replaced completely
-                regex = new RegExp("^Before(&nbsp;|\\s)(<span id=\"editor-inner\">)?" + test.output + "(</span>)?(&nbsp;|\\s)after\\.$");
-                expect(regex.test(this.el.innerHTML)).toBe(true);
+                expect(this.el.innerHTML).toMatch(new RegExp("^Before(&nbsp;|\\s)(<span id=\"editor-inner\">)?" + test.output + "(</span>)?(&nbsp;|\\s)after\\.$"));
             }.bind(this));
         });
 
@@ -186,7 +182,7 @@ describe('Pasting content', function () {
 
             editor.cleanPaste('<label>div one</label><label>div two</label>');
 
-            expect(this.el.innerHTML).toBe('Before&nbsp;<sub>div one</sub><sub>div two</sub>&nbsp;after.');
+            expect(this.el.innerHTML).toMatch(new RegExp("^Before(&nbsp;|\\s)(<span id=\"editor-inner\">)?<sub>div one</sub><sub>div two</sub>(</span>)?(&nbsp;|\\s)after\\.$"));
         });
     });
 
