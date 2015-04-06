@@ -71,7 +71,6 @@ the textarea value to the div HTML content.
 
 ### Core options
 * __allowMultiParagraphSelection__: enables the toolbar when selecting multiple paragraphs/block elements. Default: true
-* __cleanPastedHTML__: cleans pasted content from different sources, like google docs etc. Default: false
 * __delay__: time in milliseconds to show the toolbar or anchor tag preview. Default: 0
 * __disableAnchorPreview__: enables/disables the anchor preview element, which appears when hovering links and allows the user to edit the link when clicking. If toolbar is diabled (via __disableToolbar__ or `data-disable-toolbar attribute`) the anchor preview is always disabled so this option will be ignored. Default: false
 * __disableReturn__:  enables/disables the use of the return-key. You can also set specific element behavior by using setting a data-disable-return attribute. Default: false
@@ -81,7 +80,6 @@ the textarea value to the div HTML content.
 * __elementsContainer__: specifies a DOM node to contain MediumEditor's toolbar and anchor preview elements. Default: document.body
 * __extensions__: extension to use (see [Custom Buttons and Extensions](https://github.com/daviferreira/medium-editor/wiki/Custom-Buttons-and-Extensions)) for more. Default: {}
 * __firstHeader__: HTML tag to be used as first header. Default: h3
-* __forcePlainText__: Forces pasting as plain text. Default: true
 * __imageDragging__: Allows image drag and drop into the editor. Default: true
 * __placeholder__: Defines the default placeholder for empty contenteditables when __disablePlaceholders__ is not set to true. You can overwrite it by setting a data-placeholder attribute on your elements. Default: 'Type your text'
 * __secondHeader__: HTML tag to be used as second header. Default: h4
@@ -113,7 +111,29 @@ the textarea value to the div HTML content.
 * __checkLinkFormat__: enables/disables check for common URL protocols on anchor links. Default: false
 * __targetBlank__: enables/disables target="\_blank" for anchor tags. Default: false
 
-Example:
+### Paste Options
+Options for paste are passed as an object that is a member of the outer options object. Example:
+```javascript
+var editor = new MediumEditor('.editable', {
+    buttons: ['bold', 'italic', 'quote'],
+    paste: {
+        // This example includes the default options for paste, if nothing is passed this is what it used
+        forcePlainText: true,
+        cleanPastedHtml: false,
+        cleanReplacements: [],
+        cleanAttrs: ['class', 'style', 'dir']
+        cleanTags: ['meta']
+    }
+});
+```
+
+* __forcePlainText__: Forces pasting as plain text. Default: true
+* __cleanPastedHtml__: cleans pasted content from different sources, like google docs etc. Default: false
+* __cleanReplacements__: custom pairs (2 element arrays) of RegExp and replacement text to use during paste when __forcePlainText__ or __cleanPastedHtml__ are `true` OR when calling `cleanPaste(text)` helper method. Default: []
+* __cleanAttrs__: list of attributes to remove when ... default: ['class', 'style', 'dir']
+* __cleanTags__: list of element tag names to remove... default: ['meta']
+
+### Options Example:
 
 ```javascript
 var editor = new MediumEditor('.editable', {
@@ -124,7 +144,12 @@ var editor = new MediumEditor('.editable', {
     firstHeader: 'h1',
     secondHeader: 'h2',
     delay: 1000,
-    targetBlank: true
+    targetBlank: true,
+    paste: {
+        cleanPastedHtml: true,
+        cleanAttrs: ['style', 'dir']
+        cleanTags: ['label', 'meta']
+    }
 });
 ```
 
