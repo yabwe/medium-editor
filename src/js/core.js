@@ -361,10 +361,8 @@ function MediumEditor(elements, options) {
             this.options.paste,
             // Backwards compatability
             {
-                forcePlainText: this.options.forcePlainText,
-                cleanPastedHtml: this.options.cleanPastedHtml,
-                cleanAttrs: this.options.cleanAttrs,
-                cleanTags: this.options.cleanTags,
+                forcePlainText: this.options.forcePlainText, // deprecated
+                cleanPastedHtml: this.options.cleanPastedHtml, // deprecated
                 disableReturn: this.options.disableReturn,
                 targetBlank: this.options.targetBlank,
                 contentWindow: this.options.contentWindow,
