@@ -1,6 +1,6 @@
 /*global MediumEditor, describe, it, expect, spyOn,
     afterEach, beforeEach, jasmine, tearDown,
-    selectElementContentsAndFire */
+    selectElementContentsAndFire, Extension */
 
 describe('Extensions TestCase', function () {
     'use strict';
@@ -84,6 +84,53 @@ describe('Extensions TestCase', function () {
             expect(ext2.me instanceof MediumEditor).toBeTruthy();
             editor.destroy();
         });
+    });
+
+    describe('Core Extension', function () {
+
+        it("exists", function(){
+            expect(MediumEditor.Extension).toBeTruthy();
+            expect(MediumEditor.Extension).toBe(Extension);
+        });
+
+        it("provides an .extend method", function() {
+
+            expect(Extension.extend).toBeTruthy();
+            var Extended = Extension.extend({
+                foo: "bar"
+            });
+            expect(Extended.prototype.foo).toBe("bar");
+            expect(Extended.extend).toBe(Extension.extend);
+        });
+
+        it("can be passed as an extension", function(){
+
+            var Sub, editor, e1, e2;
+
+            Sub = Extension.extend({
+                parent: true,
+                y: 10
+            });
+
+            e1 = new Sub();
+            e2 = new Sub({ y: 20 });
+
+            spyOn(e1, "init");
+
+            editor = new MediumEditor(".editor", {
+                extensions: {
+                    "foo": e1,
+                    "bar": e2
+                }
+            });
+
+            expect(e1.y).toBe(10);
+            expect(e2.y).toBe(20);
+
+            expect(e1.init).toHaveBeenCalledWith(editor);
+
+        });
+
     });
 
     describe('Button integration', function () {
