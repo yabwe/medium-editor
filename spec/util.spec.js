@@ -1,4 +1,4 @@
-/*global MediumEditor, Util, describe, it, expect, spyOn */
+/*global MediumEditor, Util, describe, it, expect, spyOn, _ */
 
 describe('Util', function () {
     'use strict';
@@ -10,6 +10,28 @@ describe('Util', function () {
             expect(MediumEditor.util).toEqual(Util);
         });
 
+    });
+
+    describe('Extend', function () {
+        it('should overwrite values from right to left', function () {
+            var objOne = { one: "one" };
+            var objTwo = { one: "two", three: "three" };
+            var objThree = { three: "four", five: "six" };
+            var objFour;
+            var result = MediumEditor.util.extend({}, objOne, objTwo, objThree, objFour);
+            expect(_.isEqual(result, { one: "two", three: "four", five: "six" })).toBe(true);
+        });
+    });
+
+    describe('Defaults', function () {
+        it('should overwrite values from left to right', function () {
+            var objOne = { one: "one" };
+            var objTwo = { one: "two", three: "three" };
+            var objThree = { three: "four", five: "six" };
+            var objFour;
+            var result = MediumEditor.util.defaults({}, objOne, objTwo, objThree, objFour);
+            expect(_.isEqual(result, { one: "one", three: "three", five: "six" })).toBe(true);
+        });
     });
 
     describe('Deprecated', function () {
@@ -31,6 +53,22 @@ describe('Util', function () {
             expect(testObj.newMethod).toHaveBeenCalledWith('arg1', true);
             expect(window.console.warn).toHaveBeenCalledWith(
                 'test is deprecated and will be removed, please use newMethod instead'
+            );
+        });
+
+        it('should warn when an option is deprecated', function () {
+            // IE9 mock for SauceLabs
+            if (window.console === undefined) {
+                window.console = {
+                    warn: function (msg) {
+                        return msg;
+                    }
+                };
+            }
+            spyOn(window.console, 'warn').and.callThrough();
+            Util.deprecatedOption('oldOption', 'sub.newOption');
+            expect(window.console.warn).toHaveBeenCalledWith(
+                'oldOption option is deprecated and will be removed, please use sub.newOption instead'
             );
         });
     });

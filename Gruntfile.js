@@ -86,6 +86,7 @@ module.exports = function (grunt) {
                 specs: ['spec/*.spec.js'],
                 helpers: 'spec/helpers/*.js',
                 vendor: [
+                    'node_modules/lodash/index.js',
                     'spec/vendor/jasmine-jsreporter.js',
                     'spec/vendor/jasmine-jsreporter-script.js'
                 ],

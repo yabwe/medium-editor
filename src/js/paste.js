@@ -47,9 +47,26 @@ var PasteHandler;
     }
     /*jslint regexp: false*/
 
-    PasteHandler = function (instance) {
+    /* Paste Options:
+     *
+     * forcePlainText: Forces pasting as plain text. Default: true
+     * cleanPastedHtml: cleans pasted content from different sources, like google docs etc. Default: false
+     * cleanReplacements: custom pairs (2 element arrays) of RegExp and replacement text to use during paste when
+     *                    __forcePlainText__ or __cleanPastedHtml__ are `true` OR when calling `cleanPaste(text)`
+     *                    helper method. Default: []
+     * cleanAttrs: list of attributes to remove when ... default: ['class', 'style', 'dir']
+     * cleanTags: list of element tag names to remove... default: ['meta']
+     *
+     * ----- internal options needed from base -----
+     * disableReturn
+     * targetBlank
+     * contentWindow
+     * ownerDocument
+     */
+
+    PasteHandler = function (instance, options) {
         this.base = instance;
-        this.options = this.base.options;
+        this.options = options;
 
         if (this.options.forcePlainText || this.options.cleanPastedHTML) {
             this.base.subscribe('editablePaste', this.handlePaste.bind(this));
@@ -104,6 +121,10 @@ var PasteHandler;
                 el = Selection.getSelectionElement(this.options.contentWindow),
                 multiline = /<p|<br|<div/.test(text),
                 replacements = createReplacements();
+            if (this.options.cleanReplacements &&
+                    this.options.cleanReplacements.length) {
+                replacements = replacements.concat(this.options.cleanReplacements);
+            }
 
             for (i = 0; i < replacements.length; i += 1) {
                 text = text.replace(replacements[i][0], replacements[i][1]);
@@ -150,10 +171,7 @@ var PasteHandler;
         },
 
         pasteHTML: function (html, options) {
-            options = Util.defaults(options, {
-                cleanAttrs: ['class', 'style', 'dir'],
-                cleanTags: ['meta']
-            });
+            options = Util.defaults({}, options, this.options);
 
             var elList, workEl, i, fragmentBody, pasteBlock = this.options.ownerDocument.createDocumentFragment();
 

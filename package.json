@@ -54,6 +54,7 @@
     "grunt-template-jasmine-istanbul": "~0.3.3",
     "jshint-stylish": "^1.0.1",
     "load-grunt-tasks": "^3.1.0",
+    "lodash": "~3.6.0",
     "time-grunt": "^1.0.0"
   },
   "scripts": {

@@ -403,12 +403,20 @@ var Util;
 (function (window) {
     'use strict';
 
-    function copyInto(dest, source, overwrite) {
-        var prop;
+    function copyInto(overwrite, dest) {
+        var prop,
+            sources = Array.prototype.slice.call(arguments, 2);
         dest = dest || {};
-        for (prop in source) {
-            if (source.hasOwnProperty(prop) && (overwrite || dest.hasOwnProperty(prop) === false)) {
-                dest[prop] = source[prop];
+        for (var i = 0; i < sources.length; i++) {
+            var source = sources[i];
+            if (source) {
+                for (prop in source) {
+                    if (source.hasOwnProperty(prop) &&
+                        typeof source[prop] !== 'undefined' &&
+                        (overwrite || dest.hasOwnProperty(prop) === false)) {
+                        dest[prop] = source[prop];
+                    }
+                }
             }
         }
         return dest;
@@ -432,8 +440,14 @@ var Util;
 
         parentElements: ['p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'blockquote', 'pre'],
 
-        defaults: function defaults(dest, source) {
-            return copyInto(dest, source);
+        extend: function extend(/* dest, source1, source2, ...*/) {
+            var args = [true].concat(Array.prototype.slice.call(arguments));
+            return copyInto.apply(this, args);
+        },
+
+        defaults: function defaults(/*dest, source1, source2, ...*/) {
+            var args = [false].concat(Array.prototype.slice.call(arguments));
+            return copyInto.apply(this, args);
         },
 
         derives: function derives(base, derived) {
@@ -442,7 +456,7 @@ var Util;
             Proto.prototype = base.prototype;
             derived.prototype = new Proto();
             derived.prototype.constructor = base;
-            derived.prototype = copyInto(derived.prototype, origPrototype);
+            derived.prototype = copyInto(false, derived.prototype, origPrototype);
             return derived;
         },
 
@@ -761,6 +775,15 @@ var Util;
             }
             if (typeof this[newName] === 'function') {
                 this[newName].apply(this, args);
+            }
+        },
+
+        deprecatedOption: function (oldName, newName) {
+            if (window.console !== undefined) {
+                console.warn(oldName +
+                    ' option is deprecated and will be removed, please use ' +
+                    newName +
+                    ' instead');
             }
         },
 
@@ -1520,9 +1543,26 @@ var PasteHandler;
     }
     /*jslint regexp: false*/
 
-    PasteHandler = function (instance) {
+    /* Paste Options:
+     *
+     * forcePlainText: Forces pasting as plain text. Default: true
+     * cleanPastedHtml: cleans pasted content from different sources, like google docs etc. Default: false
+     * cleanReplacements: custom pairs (2 element arrays) of RegExp and replacement text to use during paste when
+     *                    __forcePlainText__ or __cleanPastedHtml__ are `true` OR when calling `cleanPaste(text)`
+     *                    helper method. Default: []
+     * cleanAttrs: list of attributes to remove when ... default: ['class', 'style', 'dir']
+     * cleanTags: list of element tag names to remove... default: ['meta']
+     *
+     * ----- internal options needed from base -----
+     * disableReturn
+     * targetBlank
+     * contentWindow
+     * ownerDocument
+     */
+
+    PasteHandler = function (instance, options) {
         this.base = instance;
-        this.options = this.base.options;
+        this.options = options;
 
         if (this.options.forcePlainText || this.options.cleanPastedHTML) {
             this.base.subscribe('editablePaste', this.handlePaste.bind(this));
@@ -1577,6 +1617,10 @@ var PasteHandler;
                 el = Selection.getSelectionElement(this.options.contentWindow),
                 multiline = /<p|<br|<div/.test(text),
                 replacements = createReplacements();
+            if (this.options.cleanReplacements &&
+                    this.options.cleanReplacements.length) {
+                replacements = replacements.concat(this.options.cleanReplacements);
+            }
 
             for (i = 0; i < replacements.length; i += 1) {
                 text = text.replace(replacements[i][0], replacements[i][1]);
@@ -1623,10 +1667,7 @@ var PasteHandler;
         },
 
         pasteHTML: function (html, options) {
-            options = Util.defaults(options, {
-                cleanAttrs: ['class', 'style', 'dir'],
-                cleanTags: ['meta']
-            });
+            options = Util.defaults({}, options, this.options);
 
             var elList, workEl, i, fragmentBody, pasteBlock = this.options.ownerDocument.createDocumentFragment();
 
@@ -3201,6 +3242,23 @@ function MediumEditor(elements, options) {
         }
     }
 
+    function initPasteHandler() {
+        var pasteOptions = Util.extend(
+            {},
+            this.options.paste,
+            // Backwards compatability
+            {
+                forcePlainText: this.options.forcePlainText, // deprecated
+                cleanPastedHtml: this.options.cleanPastedHtml, // deprecated
+                disableReturn: this.options.disableReturn,
+                targetBlank: this.options.targetBlank,
+                contentWindow: this.options.contentWindow,
+                ownerDocument: this.options.ownerDocument
+        });
+
+        this.pasteHandler = new PasteHandler(this, pasteOptions);
+    }
+
     function initCommands() {
         var buttons = this.options.buttons,
             extensions = this.options.extensions,
@@ -3231,6 +3289,31 @@ function MediumEditor(elements, options) {
         if (shouldAddDefaultAnchorPreview.call(this)) {
             this.commands.push(initExtension(new AnchorPreview(), 'anchor-preview', this));
         }
+    }
+
+    function mergeOptions(defaults, options) {
+        // warn about using deprecated properties
+        if (options) {
+            [['forcePlainText', 'paste.forcePlainText'],
+             ['cleanPastedHtml', 'paste.cleanPastedHtml']].forEach(function (pair) {
+                if (options.hasOwnProperty(pair[0]) && options[pair[0]] !== undefined) {
+                    Util.deprecatedOption(pair[0], pair[1]);
+                }
+            });
+        }
+
+        var nestedMerges = ['paste'];
+        var tempOpts = Util.extend({}, options);
+
+        nestedMerges.forEach(function (toMerge) {
+            if (!tempOpts[toMerge]) {
+                tempOpts[toMerge] = defaults[toMerge];
+            } else {
+                tempOpts[toMerge] = Util.defaults({}, tempOpts[toMerge], defaults[toMerge]);
+            }
+        });
+
+        return Util.defaults(tempOpts, defaults);
     }
 
     function execActionInternal(action, opts) {
@@ -3277,7 +3360,6 @@ function MediumEditor(elements, options) {
             buttons: ['bold', 'italic', 'underline', 'anchor', 'header1', 'header2', 'quote'],
             buttonLabels: false,
             checkLinkFormat: false,
-            cleanPastedHTML: false,
             delay: 0,
             diffLeft: 0,
             diffTop: -10,
@@ -3294,7 +3376,6 @@ function MediumEditor(elements, options) {
             contentWindow: window,
             ownerDocument: document,
             firstHeader: 'h3',
-            forcePlainText: true,
             placeholder: 'Type your text',
             secondHeader: 'h4',
             targetBlank: false,
@@ -3304,14 +3385,20 @@ function MediumEditor(elements, options) {
             extensions: {},
             activeButtonClass: 'medium-editor-button-active',
             firstButtonClass: 'medium-editor-button-first',
-            lastButtonClass: 'medium-editor-button-last'
+            lastButtonClass: 'medium-editor-button-last',
+            paste: {
+                forcePlainText: true,
+                cleanPastedHtml: false,
+                cleanAttrs: ['class', 'style', 'dir'],
+                cleanTags: ['meta']
+            }
         },
 
         // NOT DOCUMENTED - exposed for backwards compatability
         init: function (elements, options) {
             var uniqueId = 1;
 
-            this.options = Util.defaults(options, this.defaults);
+            this.options = mergeOptions.call(this, this.defaults, options);
             createElementsArray.call(this, elements);
             if (this.elements.length === 0) {
                 return;
@@ -3343,7 +3430,7 @@ function MediumEditor(elements, options) {
             initElements.call(this);
             attachHandlers.call(this);
 
-            this.pasteHandler = new PasteHandler(this);
+            initPasteHandler.call(this);
 
             if (!this.options.disablePlaceholders) {
                 this.placeholders = new Placeholders(this);
@@ -3706,7 +3793,7 @@ MediumEditor.version = (function(major, minor, revision) {
         };
     }).apply(this, ({
         // grunt-bump looks for this:
-        "version": "4.1.1"
+        "version": "4.2.0"
     }).version.split("."));
 
     return MediumEditor;

@@ -355,6 +355,23 @@ function MediumEditor(elements, options) {
         }
     }
 
+    function initPasteHandler() {
+        var pasteOptions = Util.extend(
+            {},
+            this.options.paste,
+            // Backwards compatability
+            {
+                forcePlainText: this.options.forcePlainText, // deprecated
+                cleanPastedHtml: this.options.cleanPastedHtml, // deprecated
+                disableReturn: this.options.disableReturn,
+                targetBlank: this.options.targetBlank,
+                contentWindow: this.options.contentWindow,
+                ownerDocument: this.options.ownerDocument
+        });
+
+        this.pasteHandler = new PasteHandler(this, pasteOptions);
+    }
+
     function initCommands() {
         var buttons = this.options.buttons,
             extensions = this.options.extensions,
@@ -385,6 +402,31 @@ function MediumEditor(elements, options) {
         if (shouldAddDefaultAnchorPreview.call(this)) {
             this.commands.push(initExtension(new AnchorPreview(), 'anchor-preview', this));
         }
+    }
+
+    function mergeOptions(defaults, options) {
+        // warn about using deprecated properties
+        if (options) {
+            [['forcePlainText', 'paste.forcePlainText'],
+             ['cleanPastedHtml', 'paste.cleanPastedHtml']].forEach(function (pair) {
+                if (options.hasOwnProperty(pair[0]) && options[pair[0]] !== undefined) {
+                    Util.deprecatedOption(pair[0], pair[1]);
+                }
+            });
+        }
+
+        var nestedMerges = ['paste'];
+        var tempOpts = Util.extend({}, options);
+
+        nestedMerges.forEach(function (toMerge) {
+            if (!tempOpts[toMerge]) {
+                tempOpts[toMerge] = defaults[toMerge];
+            } else {
+                tempOpts[toMerge] = Util.defaults({}, tempOpts[toMerge], defaults[toMerge]);
+            }
+        });
+
+        return Util.defaults(tempOpts, defaults);
     }
 
     function execActionInternal(action, opts) {
@@ -431,7 +473,6 @@ function MediumEditor(elements, options) {
             buttons: ['bold', 'italic', 'underline', 'anchor', 'header1', 'header2', 'quote'],
             buttonLabels: false,
             checkLinkFormat: false,
-            cleanPastedHTML: false,
             delay: 0,
             diffLeft: 0,
             diffTop: -10,
@@ -448,7 +489,6 @@ function MediumEditor(elements, options) {
             contentWindow: window,
             ownerDocument: document,
             firstHeader: 'h3',
-            forcePlainText: true,
             placeholder: 'Type your text',
             secondHeader: 'h4',
             targetBlank: false,
@@ -458,14 +498,20 @@ function MediumEditor(elements, options) {
             extensions: {},
             activeButtonClass: 'medium-editor-button-active',
             firstButtonClass: 'medium-editor-button-first',
-            lastButtonClass: 'medium-editor-button-last'
+            lastButtonClass: 'medium-editor-button-last',
+            paste: {
+                forcePlainText: true,
+                cleanPastedHtml: false,
+                cleanAttrs: ['class', 'style', 'dir'],
+                cleanTags: ['meta']
+            }
         },
 
         // NOT DOCUMENTED - exposed for backwards compatability
         init: function (elements, options) {
             var uniqueId = 1;
 
-            this.options = Util.defaults(options, this.defaults);
+            this.options = mergeOptions.call(this, this.defaults, options);
             createElementsArray.call(this, elements);
             if (this.elements.length === 0) {
                 return;
@@ -497,7 +543,7 @@ function MediumEditor(elements, options) {
             initElements.call(this);
             attachHandlers.call(this);
 
-            this.pasteHandler = new PasteHandler(this);
+            initPasteHandler.call(this);
 
             if (!this.options.disablePlaceholders) {
                 this.placeholders = new Placeholders(this);

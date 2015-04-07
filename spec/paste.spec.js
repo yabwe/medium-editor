@@ -69,14 +69,14 @@ describe('Pasting content', function () {
         jasmine.clock().uninstall();
     });
 
-    describe('using cleanPastedHTML option', function () {
+    describe('using cleanPastedHtml option', function () {
         it('should filter multi-line rich-text pastes', function () {
             var i,
                 editorEl = this.el,
                 editor = new MediumEditor('.editor', {
                     delay: 200,
                     forcePlainText: false,
-                    cleanPastedHTML: true
+                    cleanPastedHtml: true
                 });
 
             for (i = 0; i < multiLineTests.length; i += 1) {
@@ -109,15 +109,16 @@ describe('Pasting content', function () {
                 expect(this.el.innerHTML).toEqual(test.output);
             }.bind(this));
         });
+    });
 
-        it('should filter inline rich-text pastes', function () {
+    describe('cleanPaste', function () {
+        it('should filter inline rich-text', function () {
             var i,
-                regex,
                 editorEl = this.el,
                 editor = new MediumEditor('.editor', {
                     delay: 200,
                     forcePlainText: false,
-                    cleanPastedHTML: true
+                    cleanPastedHtml: true
                 });
 
             for (i = 0; i < inlineTests.length; i += 1) {
@@ -133,16 +134,14 @@ describe('Pasting content', function () {
                 // Firefox and IE: doing an insertHTML while this <span> is selected results in the html being inserted inside of the span
                 // Firefox replace the &nbsp; other either side of the <span> with a space
                 // Webkit: doing an insertHTML while this <span> is selected results in the span being replaced completely
-                regex = new RegExp("^Before(&nbsp;|\\s)(<span id=\"editor-inner\">)?" + inlineTests[i].output + "(</span>)?(&nbsp;|\\s)after\\.$");
-                expect(regex.test(editorEl.innerHTML)).toBe(true);
+                expect(editorEl.innerHTML).toMatch(new RegExp("^Before(&nbsp;|\\s)(<span id=\"editor-inner\">)?" + inlineTests[i].output + "(</span>)?(&nbsp;|\\s)after\\.$"));
             }
         });
 
-        it('should filter inline rich-text pastes when "insertHTML" command is not supported', function () {
-            var regex,
-                editor = new MediumEditor('.editor', {
+        it('should filter inline rich-text when "insertHTML" command is not supported', function () {
+            var editor = new MediumEditor('.editor', {
                     forcePlainText: false,
-                    cleanPastedHTML: true
+                    cleanPastedHtml: true
                 });
 
             spyOn(document, "queryCommandSupported").and.returnValue(false);
@@ -157,9 +156,25 @@ describe('Pasting content', function () {
                 // Firefox and IE: doing an insertHTML while this <span> is selected results in the html being inserted inside of the span
                 // Firefox replace the &nbsp; other either side of the <span> with a space
                 // Webkit: doing an insertHTML while this <span> is selected results in the span being replaced completely
-                regex = new RegExp("^Before(&nbsp;|\\s)(<span id=\"editor-inner\">)?" + test.output + "(</span>)?(&nbsp;|\\s)after\\.$");
-                expect(regex.test(this.el.innerHTML)).toBe(true);
+                expect(this.el.innerHTML).toMatch(new RegExp("^Before(&nbsp;|\\s)(<span id=\"editor-inner\">)?" + test.output + "(</span>)?(&nbsp;|\\s)after\\.$"));
             }.bind(this));
+        });
+
+        it('should respect custom replacments when passed during instantiation', function () {
+            var editor = new MediumEditor('.editor', {
+                paste: {
+                    forcePlainText: false,
+                    cleanPastedHtml: true,
+                    cleanReplacements: [[new RegExp(/<label>/gi), '<sub>'], [new RegExp(/<\/label>/gi), '</sub>']]
+                }
+            });
+
+            this.el.innerHTML = 'Before&nbsp;<span id="editor-inner">&nbsp;</span>&nbsp;after.';
+            selectElementContents(document.getElementById('editor-inner'));
+
+            editor.cleanPaste('<label>div one</label><label>div two</label>');
+
+            expect(this.el.innerHTML).toMatch(new RegExp("^Before(&nbsp;|\\s)(<span id=\"editor-inner\">)?<sub>div one</sub><sub>div two</sub>(</span>)?(&nbsp;|\\s)after\\.$"));
         });
     });
 
@@ -189,6 +204,24 @@ describe('Pasting content', function () {
                 {cleanTags: ['meta', 'b']}
             );
             expect(editor.elements[0].innerHTML).toBe('<div><i>test</i></div>');
+        });
+
+        it('should respect custom clean up options passed during instantiation', function () {
+            var editor = new MediumEditor('.editor', {
+                paste: {
+                    cleanAttrs: ['style', 'dir'],
+                    cleanTags: ['meta', 'b']
+                }
+            });
+            selectElementContents(this.el.firstChild);
+            editor.pasteHTML(
+                '<table class="medium-editor-table" dir="ltr" style="border: 1px solid red;"><tbody><tr><td>test</td></tr></tbody></table>' +
+                '<div><i>test</i><meta name="description" content="test" /><b>test</b></div>'
+            );
+            expect(editor.elements[0].innerHTML).toBe(
+                '<table class="medium-editor-table"><tbody><tr><td>test</td></tr></tbody></table>' +
+                '<div><i>test</i></div>'
+            );
         });
     });
 });
