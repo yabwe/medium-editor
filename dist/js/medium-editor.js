@@ -519,7 +519,7 @@ var Util;
                 timeout = null,
                 previous = 0,
                 later = function () {
-                    previous = Util.now();
+                    previous = Date.now();
                     timeout = null;
                     result = func.apply(context, args);
                     if (!timeout) {
@@ -532,7 +532,7 @@ var Util;
             }
 
             return function () {
-                var now = Util.now(),
+                var now = Date.now(),
                     remaining = wait - (now - previous);
 
                 context = this;
@@ -1034,7 +1034,7 @@ var Events;
                 // Detecting mouseover on the contenteditables
                 this.base.elements.forEach(function (element) {
                     this.attachDOMEvent(element, 'mouseover', this.handleMouseover.bind(this));
-                }.bind(this));
+                }, this);
                 this.listeners[name] = true;
                 break;
             case 'editableDrag':
@@ -1042,21 +1042,21 @@ var Events;
                 this.base.elements.forEach(function (element) {
                     this.attachDOMEvent(element, 'dragover', this.handleDragging.bind(this));
                     this.attachDOMEvent(element, 'dragleave', this.handleDragging.bind(this));
-                }.bind(this));
+                }, this);
                 this.listeners[name] = true;
                 break;
             case 'editableDrop':
                 // Detecting drop on the contenteditables
                 this.base.elements.forEach(function (element) {
                     this.attachDOMEvent(element, 'drop', this.handleDrop.bind(this));
-                }.bind(this));
+                }, this);
                 this.listeners[name] = true;
                 break;
             case 'editablePaste':
                 // Detecting paste on the contenteditables
                 this.base.elements.forEach(function (element) {
                     this.attachDOMEvent(element, 'paste', this.handlePaste.bind(this));
-                }.bind(this));
+                }, this);
                 this.listeners[name] = true;
                 break;
             }
@@ -1065,7 +1065,7 @@ var Events;
         handleInteraction: function (event) {
             var isDescendantOfEditorElements = false,
                 selection = this.options.contentWindow.getSelection(),
-                toolbarEl = (this.base.toolbar) ? this.base.toolbar.getToolbarElement() : null,
+                toolbarEl = this.base.toolbar ? this.base.toolbar.getToolbarElement() : null,
                 anchorPreview = this.base.getExtensionByName('anchor-preview'),
                 previewEl = (anchorPreview && anchorPreview.getPreviewElement) ? anchorPreview.getPreviewElement() : null,
                 selRange = selection.isCollapsed ?
@@ -1487,7 +1487,7 @@ var DefaultButton,
                             this.knownState = isMatch;
                         }
                     }
-                }.bind(this));
+                }, this);
             }
 
             return isMatch;
@@ -1616,11 +1616,7 @@ var PasteHandler;
             var i, elList, workEl,
                 el = Selection.getSelectionElement(this.options.contentWindow),
                 multiline = /<p|<br|<div/.test(text),
-                replacements = createReplacements();
-            if (this.options.cleanReplacements &&
-                    this.options.cleanReplacements.length) {
-                replacements = replacements.concat(this.options.cleanReplacements);
-            }
+                replacements = createReplacements().concat(this.options.cleanReplacements || []);
 
             for (i = 0; i < replacements.length; i += 1) {
                 text = text.replace(replacements[i][0], replacements[i][1]);
@@ -2390,7 +2386,7 @@ var Toolbar;
 
                 // Attach blur handler to each contenteditable element
                 this.base.on(element, 'blur', this.handleEditableBlur.bind(this));
-            }.bind(this));
+            }, this);
         },
 
         handleWindowScroll: function () {
@@ -2833,7 +2829,7 @@ var Placeholders;
         initPlaceholders: function () {
             this.base.elements.forEach(function (el) {
                 this.updatePlaceholder(el);
-            }.bind(this));
+            }, this);
         },
 
         showPlaceholder: function (el) {
@@ -3232,7 +3228,7 @@ function MediumEditor(elements, options) {
                 if (!element.getAttribute('data-disable-return')) {
                     this.on(element, 'keyup', handleKeyup.bind(this));
                 }
-            }.bind(this));
+            }, this);
         }
 
         // drag and drop of images
@@ -3277,7 +3273,7 @@ function MediumEditor(elements, options) {
                 ext = new DefaultButton(ButtonsData[buttonName], this);
                 this.commands.push(ext);
             }
-        }.bind(this));
+        }, this);
 
         for (name in extensions) {
             if (extensions.hasOwnProperty(name) && buttons.indexOf(name) === -1) {
@@ -3460,7 +3456,7 @@ function MediumEditor(elements, options) {
                 if (typeof extension.deactivate === 'function') {
                     extension.deactivate();
                 }
-            }.bind(this));
+            }, this);
 
             this.events.detachAllDOMEvents();
         },
@@ -3502,10 +3498,12 @@ function MediumEditor(elements, options) {
         getExtensionByName: function (name) {
             var extension;
             if (this.commands && this.commands.length) {
-                this.commands.forEach(function (ext) {
+                this.commands.some(function (ext) {
                     if (ext.name === name) {
                         extension = ext;
+                        return true;
                     }
+                    return false;
                 });
             }
             return extension;
@@ -3664,11 +3662,12 @@ function MediumEditor(elements, options) {
                 preSelectionRange = range.cloneRange();
 
                 // Find element current selection is inside
-                this.elements.forEach(function (el, index) {
+                this.elements.some(function (el, index) {
                     if (el === range.startContainer || Util.isDescendant(el, range.startContainer)) {
                         editableElementIndex = index;
-                        return false;
+                        return true;
                     }
+                    return false;
                 });
 
                 if (editableElementIndex > -1) {

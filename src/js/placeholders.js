@@ -15,7 +15,7 @@ var Placeholders;
         initPlaceholders: function () {
             this.base.elements.forEach(function (el) {
                 this.updatePlaceholder(el);
-            }.bind(this));
+            }, this);
         },
 
         showPlaceholder: function (el) {

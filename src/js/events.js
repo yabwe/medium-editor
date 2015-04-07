@@ -131,7 +131,7 @@ var Events;
                 // Detecting mouseover on the contenteditables
                 this.base.elements.forEach(function (element) {
                     this.attachDOMEvent(element, 'mouseover', this.handleMouseover.bind(this));
-                }.bind(this));
+                }, this);
                 this.listeners[name] = true;
                 break;
             case 'editableDrag':
@@ -139,21 +139,21 @@ var Events;
                 this.base.elements.forEach(function (element) {
                     this.attachDOMEvent(element, 'dragover', this.handleDragging.bind(this));
                     this.attachDOMEvent(element, 'dragleave', this.handleDragging.bind(this));
-                }.bind(this));
+                }, this);
                 this.listeners[name] = true;
                 break;
             case 'editableDrop':
                 // Detecting drop on the contenteditables
                 this.base.elements.forEach(function (element) {
                     this.attachDOMEvent(element, 'drop', this.handleDrop.bind(this));
-                }.bind(this));
+                }, this);
                 this.listeners[name] = true;
                 break;
             case 'editablePaste':
                 // Detecting paste on the contenteditables
                 this.base.elements.forEach(function (element) {
                     this.attachDOMEvent(element, 'paste', this.handlePaste.bind(this));
-                }.bind(this));
+                }, this);
                 this.listeners[name] = true;
                 break;
             }
@@ -162,7 +162,7 @@ var Events;
         handleInteraction: function (event) {
             var isDescendantOfEditorElements = false,
                 selection = this.options.contentWindow.getSelection(),
-                toolbarEl = (this.base.toolbar) ? this.base.toolbar.getToolbarElement() : null,
+                toolbarEl = this.base.toolbar ? this.base.toolbar.getToolbarElement() : null,
                 anchorPreview = this.base.getExtensionByName('anchor-preview'),
                 previewEl = (anchorPreview && anchorPreview.getPreviewElement) ? anchorPreview.getPreviewElement() : null,
                 selRange = selection.isCollapsed ?
