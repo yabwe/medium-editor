@@ -14,7 +14,6 @@ module.exports = function (grunt) {
         },
         srcFiles = [
             'src/js/util.js',
-            'src/js/defaults/options.js',
             'src/js/extension.js',
             'src/js/selection.js',
             'src/js/events.js',
@@ -24,6 +23,8 @@ module.exports = function (grunt) {
             'src/js/extension-anchor-preview.js',
             'src/js/toolbar.js',
             'src/js/placeholders.js',
+            'src/js/defaults/options.js',
+            'src/js/defaults/extensions.js',
             'src/js/core.js',
             'src/js/version.js'
         ],
