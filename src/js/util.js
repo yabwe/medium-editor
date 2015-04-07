@@ -380,6 +380,15 @@ var Util;
             }
         },
 
+        deprecatedOption: function (oldName, newName) {
+            if (window.console !== undefined) {
+                console.warn(oldName +
+                    ' option is deprecated and will be removed, please use ' +
+                    newName +
+                    ' instead');
+            }
+        },
+
         cleanupAttrs: function (el, attrs) {
             attrs.forEach(function (attr) {
                 el.removeAttribute(attr);

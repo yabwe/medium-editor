@@ -407,8 +407,17 @@ function MediumEditor(elements, options) {
     }
 
     function mergeOptions(defaults, options) {
-        var nestedMerges = ['paste'];
+        // warn about using deprecated properties
+        if (options) {
+            [['forcePlainText', 'paste.forcePlainText'],
+             ['cleanPastedHtml', 'paste.cleanPastedHtml']].forEach(function (pair) {
+                if (options.hasOwnProperty(pair[0]) && options[pair[0]] !== undefined) {
+                    Util.deprecatedOption(pair[0], pair[1]);
+                }
+            });
+        }
 
+        var nestedMerges = ['paste'];
         var tempOpts = Util.extend({}, options);
 
         nestedMerges.forEach(function (toMerge) {
@@ -494,7 +503,7 @@ function MediumEditor(elements, options) {
             lastButtonClass: 'medium-editor-button-last',
             paste: {
                 forcePlainText: true,
-                cleanPastedHTML: false,
+                cleanPastedHtml: false,
                 cleanAttrs: ['class', 'style', 'dir'],
                 cleanTags: ['meta']
             }

@@ -127,7 +127,7 @@ describe('Initialization TestCase', function () {
                 lastButtonClass: 'medium-editor-button-last',
                 paste: {
                     forcePlainText: true,
-                    cleanPastedHTML: false,
+                    cleanPastedHtml: false,
                     cleanAttrs: ['class', 'style', 'dir'],
                     cleanTags: ['meta']
                 }

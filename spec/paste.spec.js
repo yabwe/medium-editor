@@ -69,16 +69,14 @@ describe('Pasting content', function () {
         jasmine.clock().uninstall();
     });
 
-    describe('using cleanPastedHTML option', function () {
+    describe('using cleanPastedHtml option', function () {
         it('should filter multi-line rich-text pastes', function () {
             var i,
                 editorEl = this.el,
                 editor = new MediumEditor('.editor', {
                     delay: 200,
-                    paste: {
-                        forcePlainText: false,
-                        cleanPastedHTML: true
-                    }
+                    forcePlainText: false,
+                    cleanPastedHtml: true
                 });
 
             for (i = 0; i < multiLineTests.length; i += 1) {
@@ -96,10 +94,8 @@ describe('Pasting content', function () {
 
         it('should filter multi-line rich-text pastes when "insertHTML" command is not supported', function () {
             var editor = new MediumEditor('.editor', {
-                paste: {
-                    forcePlainText: false,
-                    cleanPastedHTML: true
-                }
+                forcePlainText: false,
+                cleanPastedHTML: true
             });
 
             spyOn(document, "queryCommandSupported").and.returnValue(false);
@@ -121,10 +117,8 @@ describe('Pasting content', function () {
                 editorEl = this.el,
                 editor = new MediumEditor('.editor', {
                     delay: 200,
-                    paste: {
-                        forcePlainText: false,
-                        cleanPastedHTML: true
-                    }
+                    forcePlainText: false,
+                    cleanPastedHtml: true
                 });
 
             for (i = 0; i < inlineTests.length; i += 1) {
@@ -146,10 +140,8 @@ describe('Pasting content', function () {
 
         it('should filter inline rich-text when "insertHTML" command is not supported', function () {
             var editor = new MediumEditor('.editor', {
-                    paste: {
-                        forcePlainText: false,
-                        cleanPastedHTML: true
-                    }
+                    forcePlainText: false,
+                    cleanPastedHtml: true
                 });
 
             spyOn(document, "queryCommandSupported").and.returnValue(false);
@@ -172,7 +164,7 @@ describe('Pasting content', function () {
             var editor = new MediumEditor('.editor', {
                 paste: {
                     forcePlainText: false,
-                    cleanPastedHTML: true,
+                    cleanPastedHtml: true,
                     cleanReplacements: [[new RegExp(/<label>/gi), '<sub>'], [new RegExp(/<\/label>/gi), '</sub>']]
                 }
             });

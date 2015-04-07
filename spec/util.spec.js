@@ -55,6 +55,22 @@ describe('Util', function () {
                 'test is deprecated and will be removed, please use newMethod instead'
             );
         });
+
+        it('should warn when an option is deprecated', function () {
+            // IE9 mock for SauceLabs
+            if (window.console === undefined) {
+                window.console = {
+                    warn: function (msg) {
+                        return msg;
+                    }
+                };
+            }
+            spyOn(window.console, 'warn').and.callThrough();
+            Util.deprecatedOption('oldOption', 'sub.newOption');
+            expect(window.console.warn).toHaveBeenCalledWith(
+                'oldOption option is deprecated and will be removed, please use sub.newOption instead'
+            );
+        });
     });
 });
 
