@@ -1,5 +1,5 @@
 /*global FileReader, Util, ButtonsData, DefaultButton,
- PasteHandler, Selection, AnchorExtension,
+ PasteHandler, Selection, AnchorExtension, Extension,
  Toolbar, AnchorPreview, Events, Placeholders*/
 
 function MediumEditor(elements, options) {
@@ -461,6 +461,7 @@ function MediumEditor(elements, options) {
         AnchorPreview: AnchorPreview
     };
 
+    MediumEditor.Extension = Extension;
     MediumEditor.util = Util;
     MediumEditor.selection = Selection;
 
