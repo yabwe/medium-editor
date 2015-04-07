@@ -171,7 +171,7 @@ Check out the Wiki page for a list of available themes: [https://github.com/davi
 
 ### Helper Methods
 * __.on(target, event, listener, useCapture)__: attach a listener to a DOM event which will be detached when MediumEditor is deactivated
-* __.off(target, event, listener, useCapture)__: detach a listener to a DOM even that was attached via `on()`
+* __.off(target, event, listener, useCapture)__: detach a listener to a DOM event that was attached via `on()`
 * __.delay(fn)__: delay any function from being executed by the amount of time passed as the `delay` option
 * __.getSelectionParentElement(range)__: get the parent contenteditable element that contains the current selection
 * __.getExtensionByName(name)__: get a reference to an extension with the specified name
