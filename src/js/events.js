@@ -183,6 +183,11 @@ var Events;
 
             if (this.base.tracingOn) {
                 console.log("!! HANDLE-INTERACTION (" + event.type + ") !!");
+                if (event.type === 'focus') {
+                    console.log(event);
+                } else {
+                    console.log(event.target);
+                }
             }
 
             // Find the element that has focus
@@ -205,6 +210,49 @@ var Events;
                 }
             }
 
+            if (focused &&
+                    focused !== toFocus &&
+                    focused !== event.target &&
+                    !Util.isDescendant(focused, event.target) &&
+                    (!toolbarEl || (toolbarEl !== event.target && !Util.isDescendant(toolbarEl, event.target))) &&
+                    (!previewEl || (previewEl !== event.target && !Util.isDescendant(previewEl, event.target)))) {
+
+                if (this.base.tracingOn) {
+                    console.log(event.type + " -> BLURRING EXISTING ELEMENT WITH FOCUS");
+                }
+                // Focus/Click happened outside of this editor
+                focused.removeAttribute('data-medium-focused');
+                this.triggerCustomEvent('blur', event, focused);
+            }
+
+            if (toFocus && focused !== toFocus) {
+                if (this.base.tracingOn) {
+                    console.log(event.type + " -> FOCUSING INTO EDITABLE");
+                }
+                // Trigger focus on the editable that now has focus
+                toFocus.setAttribute('data-medium-focused', true);
+                this.triggerCustomEvent('focus', event, toFocus);
+            }
+
+            /*if (toFocus !== focused) {
+                // If the element that triggered the event is not part of the editor, toolbar, or anchorpreview
+                if (focused &&
+                        (!toolbarEl || (toolbarEl !== event.target && !Util.isDescendant(toolbarEl, event.target))) &&
+                        (!previewEl || (previewEl !== event.target && !Util.isDescendant(previewEl, event.target)))) {
+
+                    if (this.base.tracingOn) {
+                        console.log(event.type + " -> BLURRING EXISTING ELEMENT WITH FOCUS");
+                    }
+                    // Focus/Click happened outside of this editor
+                    focused.removeAttribute('data-medium-focused');
+                    this.triggerCustomEvent('blur', event, focused);
+                }
+
+                if (toFocus) {
+
+                }
+            }
+
             // If focus is going into an editor element
             if (toFocus) {
                 // If this element didn't already have focus
@@ -213,18 +261,12 @@ var Events;
                         console.log("FOCUSING INTO EDITABLE");
                     }
 
-                    // If an element was focused, trigger blur
+
                     if (focused) {
-                        if (this.base.tracingOn) {
-                            console.log("FOCUS -> BLURRING EXISTING ELEMENT WITH FOCUS");
-                        }
-                        focused.removeAttribute('data-medium-focused');
-                        this.triggerCustomEvent('blur', event, focused);
+
                     }
 
-                    // Trigger focus on the editable that now has focus
-                    toFocus.setAttribute('data-medium-focused', true);
-                    this.triggerCustomEvent('focus', event, toFocus);
+
                 }
             } else if ((!toolbarEl || (toolbarEl !== event.target && !Util.isDescendant(toolbarEl, event.target))) &&
                     (!previewEl || (previewEl !== event.target && !Util.isDescendant(previewEl, event.target)))) {
@@ -246,7 +288,7 @@ var Events;
                 if (this.base.tracingOn) {
                     console.log("IGNORED " + event.type);
                 }
-            }
+            }*/
         },
 
         handleClick: function (event) {

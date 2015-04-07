@@ -114,7 +114,7 @@ var Toolbar;
         attachEventHandlers: function () {
             //this.base.on(this.options.ownerDocument.documentElement, 'mousedown', this.handleDocumentMousedown.bind(this));
             // Handle mouseup on document for updating the selection in the toolbar
-            //this.base.on(this.options.ownerDocument.documentElement, 'mouseup', this.handleDocumentMouseup.bind(this));
+            this.base.on(this.options.ownerDocument.documentElement, 'mouseup', this.handleDocumentMouseup.bind(this));
 
             // Add a scroll event for sticky toolbar
             if (this.options.staticToolbar && this.options.stickyToolbar) {
@@ -150,14 +150,14 @@ var Toolbar;
             //this.lastMousedownTarget = event.target;
         },
 
-        handleDocumentMouseup: function (event) {
+        handleDocumentMouseup: function () {
             //this.lastMousedownTarget = null;
             // Do not trigger checkState when mouseup fires over the toolbar
-            if (event &&
+            /*if (event &&
                     event.target &&
                     Util.isDescendant(this.getToolbarElement(), event.target)) {
                 return false;
-            }
+            }*/
             if (this.base.tracingOn) {
                 console.log("** MOUSEUP ** -> checkState");
             }
@@ -404,13 +404,17 @@ var Toolbar;
                 if ((!this.options.updateOnEmptySelection && newSelection.toString().trim() === '') ||
                         (this.options.allowMultiParagraphSelection === false && this.multipleBlockElementsSelected()) ||
                         Selection.selectionInContentEditableFalse(this.options.contentWindow)) {
-                    if (!this.options.staticToolbar || !this.editorHasFocus()) {
-                        this.hideToolbar();
-                    } else {
+
+                    if (this.options.staticToolbar && this.editorHasFocus()) {
                         if (this.base.tracingOn) {
                             console.log("checkState -> showAndUpdateToolbar()");
                         }
                         this.showAndUpdateToolbar();
+                    } else {
+                        if (this.base.tracingOn) {
+                            console.log("checkState -> hideToolbar()");
+                        }
+                        this.hideToolbar();
                     }
 
                 } else {

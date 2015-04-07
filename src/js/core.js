@@ -565,7 +565,7 @@ function MediumEditor(elements, options) {
 
         delay: function (fn) {
             var self = this;
-            setTimeout(function () {
+            return setTimeout(function () {
                 if (self.isActive) {
                     fn();
                 }
