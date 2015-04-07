@@ -345,7 +345,7 @@ function MediumEditor(elements, options) {
                 if (!element.getAttribute('data-disable-return')) {
                     this.on(element, 'keyup', handleKeyup.bind(this));
                 }
-            }.bind(this));
+            }, this);
         }
 
         // drag and drop of images
@@ -390,7 +390,7 @@ function MediumEditor(elements, options) {
                 ext = new DefaultButton(ButtonsData[buttonName], this);
                 this.commands.push(ext);
             }
-        }.bind(this));
+        }, this);
 
         for (name in extensions) {
             if (extensions.hasOwnProperty(name) && buttons.indexOf(name) === -1) {
@@ -573,7 +573,7 @@ function MediumEditor(elements, options) {
                 if (typeof extension.deactivate === 'function') {
                     extension.deactivate();
                 }
-            }.bind(this));
+            }, this);
 
             this.events.detachAllDOMEvents();
         },
@@ -615,10 +615,12 @@ function MediumEditor(elements, options) {
         getExtensionByName: function (name) {
             var extension;
             if (this.commands && this.commands.length) {
-                this.commands.forEach(function (ext) {
+                this.commands.some(function (ext) {
                     if (ext.name === name) {
                         extension = ext;
+                        return true;
                     }
+                    return false;
                 });
             }
             return extension;
@@ -777,11 +779,12 @@ function MediumEditor(elements, options) {
                 preSelectionRange = range.cloneRange();
 
                 // Find element current selection is inside
-                this.elements.forEach(function (el, index) {
+                this.elements.some(function (el, index) {
                     if (el === range.startContainer || Util.isDescendant(el, range.startContainer)) {
                         editableElementIndex = index;
-                        return false;
+                        return true;
                     }
+                    return false;
                 });
 
                 if (editableElementIndex > -1) {

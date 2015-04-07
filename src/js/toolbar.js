@@ -134,7 +134,7 @@ var Toolbar;
 
                 // Attach blur handler to each contenteditable element
                 this.base.on(element, 'blur', this.handleEditableBlur.bind(this));
-            }.bind(this));
+            }, this);
         },
 
         handleWindowScroll: function () {

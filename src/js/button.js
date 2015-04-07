@@ -345,7 +345,7 @@ var DefaultButton,
                             this.knownState = isMatch;
                         }
                     }
-                }.bind(this));
+                }, this);
             }
 
             return isMatch;
