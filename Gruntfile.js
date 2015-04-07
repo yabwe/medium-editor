@@ -14,6 +14,7 @@ module.exports = function (grunt) {
         },
         srcFiles = [
             'src/js/util.js',
+            'src/js/defaults/options.js',
             'src/js/extension.js',
             'src/js/selection.js',
             'src/js/events.js',
