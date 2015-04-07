@@ -121,7 +121,7 @@ var Util;
                 timeout = null,
                 previous = 0,
                 later = function () {
-                    previous = Util.now();
+                    previous = Date.now();
                     timeout = null;
                     result = func.apply(context, args);
                     if (!timeout) {
@@ -134,7 +134,7 @@ var Util;
             }
 
             return function () {
-                var now = Util.now(),
+                var now = Date.now(),
                     remaining = wait - (now - previous);
 
                 context = this;
