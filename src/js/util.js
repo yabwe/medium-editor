@@ -5,6 +5,30 @@ var Util;
 (function (window) {
     'use strict';
 
+    function getProp(/*Array*/parts, /*Boolean*/create, /*Object*/context){
+        if(!context){
+            context = window;
+        }
+
+        try{
+            for(var i = 0; i < parts.length; i++){
+                var p = parts[i];
+                if(!(p in context)){
+                    if(create){
+                        context[p] = {};
+                    }else{
+                        return;     // return undefined
+                    }
+                }
+                context = context[p];
+            }
+            return context; // mixed
+        }catch(e){
+            // "p in context" throws an exception when context is a number, boolean, etc. rather than an object,
+            // so in that corner case just return undefined (by having no return statement)
+        }
+    }
+
     function copyInto(overwrite, dest) {
         var prop,
             sources = Array.prototype.slice.call(arguments, 2);
@@ -367,25 +391,26 @@ var Util;
             parent.removeChild(element);
         },
 
-        deprecatedMethod: function (oldName, newName, args) {
-            // Thanks IE9, you're the best
-            if (window.console !== undefined) {
-                console.warn(oldName +
-                    ' is deprecated and will be removed, please use ' +
-                    newName +
-                    ' instead');
-            }
-            if (typeof this[newName] === 'function') {
-                this[newName].apply(this, args);
+        warn: function(){
+            if(window.console !== undefined){
+                console.warn.apply(console, arguments);
             }
         },
 
-        deprecatedOption: function (oldName, newName) {
-            if (window.console !== undefined) {
-                console.warn(oldName +
-                    ' option is deprecated and will be removed, please use ' +
-                    newName +
-                    ' instead');
+        deprecated: function(oldName, newName, version){
+            // simple deprecation warning mechanism.
+            var m = oldName + " is deprecated, please use " + newName + " instead.";
+            if(version){
+                m += " Will be removed in " + version;
+            }
+            Util.warn(m);
+        },
+
+        deprecatedMethod: function (oldName, newName, args, version) {
+            // run the replacement and warn when someone calls a deprecated method
+            Util.deprecated(oldName, newName, version);
+            if (typeof this[newName] === 'function') {
+                this[newName].apply(this, args);
             }
         },
 
@@ -401,6 +426,20 @@ var Util;
                     el.parentNode.removeChild(el);
                 }
             });
+        },
+
+        setObject: function(name, value, context){
+            // summary:
+            //      Set a property from a dot-separated string, such as "A.B.C"
+            var parts = name.split("."), p = parts.pop(), obj = getProp(parts, true, context);
+            return obj && p ? (obj[p] = value) : undefined; // Object
+        },
+
+        getObject: function(name, create, context){
+            // summary:
+            //      Get a property from a dot-separated string, such as "A.B.C"
+            return getProp(name ? name.split(".") : [], create, context); // Object
         }
+
     };
 }(window));

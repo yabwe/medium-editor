@@ -1,6 +1,6 @@
 /*global FileReader, Util, ButtonsData, DefaultButton,
- PasteHandler, Selection, AnchorExtension, Extension,
- Toolbar, AnchorPreview, Events, Placeholders, EditorDefaults */
+ PasteHandler, Selection, AnchorExtension, Extension, extensionDefaults,
+ Toolbar, AnchorPreview, Events, Placeholders, editorDefaults */
 
 function MediumEditor(elements, options) {
     'use strict';
@@ -410,7 +410,7 @@ function MediumEditor(elements, options) {
             [['forcePlainText', 'paste.forcePlainText'],
              ['cleanPastedHtml', 'paste.cleanPastedHtml']].forEach(function (pair) {
                 if (options.hasOwnProperty(pair[0]) && options[pair[0]] !== undefined) {
-                    Util.deprecatedOption(pair[0], pair[1]);
+                    Util.deprecated(pair[0], pair[1]);
                 }
             });
         }
@@ -464,13 +464,13 @@ function MediumEditor(elements, options) {
 
     MediumEditor.Extension = Extension;
 
-    MediumEditor.extensions = {}; // reserved
+    MediumEditor.extensions = extensionDefaults;
     MediumEditor.util = Util;
     MediumEditor.selection = Selection;
 
     MediumEditor.prototype = {
 
-        defaults: EditorDefaults,
+        defaults: editorDefaults,
 
         // NOT DOCUMENTED - exposed for backwards compatability
         init: function (elements, options) {
