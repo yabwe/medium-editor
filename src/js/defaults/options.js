@@ -1,9 +1,9 @@
-var EditorDefaults;
+var editorDefaults;
 (function(){
 
     // summary: The default options hash used by the Editor
 
-    EditorDefaults = {
+    editorDefaults = {
 
         allowMultiParagraphSelection: true,
         anchorInputPlaceholder: 'Paste or type a link',
@@ -45,6 +45,7 @@ var EditorDefaults;
             cleanAttrs: ['class', 'style', 'dir'],
             cleanTags: ['meta']
         }
+
     };
 
 })();
