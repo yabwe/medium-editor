@@ -5,25 +5,26 @@ var Util;
 (function (window) {
     'use strict';
 
-    function getProp(/*Array*/parts, /*Boolean*/create, /*Object*/context){
-        if(!context){
+    // Params: Array, Boolean, Object
+    function getProp(parts, create, context) {
+        if (!context) {
             context = window;
         }
 
-        try{
-            for(var i = 0; i < parts.length; i++){
+        try {
+            for (var i = 0; i < parts.length; i++) {
                 var p = parts[i];
-                if(!(p in context)){
-                    if(create){
+                if (!(p in context)) {
+                    if (create) {
                         context[p] = {};
-                    }else{
-                        return;     // return undefined
+                    } else {
+                        return;
                     }
                 }
                 context = context[p];
             }
-            return context; // mixed
-        }catch(e){
+            return context;
+        } catch (e) {
             // "p in context" throws an exception when context is a number, boolean, etc. rather than an object,
             // so in that corner case just return undefined (by having no return statement)
         }
