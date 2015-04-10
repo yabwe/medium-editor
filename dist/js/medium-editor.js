@@ -1292,6 +1292,15 @@ var Selection;
                 selectedParentElement = range.startContainer;
             }
             return selectedParentElement;
+        },
+
+        selectNode: function (node, doc) {
+            var range = doc.createRange(),
+                sel = doc.getSelection();
+
+            range.selectNodeContents(node);
+            sel.removeAllRanges();
+            sel.addRange(range);
         }
     };
 }());
@@ -3807,15 +3816,9 @@ function MediumEditor(elements, options) {
         },
 
         selectElement: function (element) {
-            var range = this.options.ownerDocument.createRange(),
-                sel = this.options.contentWindow.getSelection(),
-                selElement;
+            Selection.selectNode(element, this.options.ownerDocument);
 
-            range.selectNodeContents(element);
-            sel.removeAllRanges();
-            sel.addRange(range);
-
-            selElement = Selection.getSelectionElement(this.options.contentWindow);
+            var selElement = Selection.getSelectionElement(this.options.contentWindow);
             if (selElement) {
                 this.events.focusElement(selElement);
             }

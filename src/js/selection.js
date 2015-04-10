@@ -95,6 +95,15 @@ var Selection;
                 selectedParentElement = range.startContainer;
             }
             return selectedParentElement;
+        },
+
+        selectNode: function (node, doc) {
+            var range = doc.createRange(),
+                sel = doc.getSelection();
+
+            range.selectNodeContents(node);
+            sel.removeAllRanges();
+            sel.addRange(range);
         }
     };
 }());
