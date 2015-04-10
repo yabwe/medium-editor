@@ -140,7 +140,13 @@ var Toolbar;
             this.throttledPositionToolbar();
         },
 
-        handleDocumentMouseup: function () {
+        handleDocumentMouseup: function (event) {
+            // Do not trigger checkState when mouseup fires over the toolbar
+            if (event &&
+                    event.target &&
+                    Util.isDescendant(this.getToolbarElement(), event.target)) {
+                return false;
+            }
             this.checkState();
         },
 
