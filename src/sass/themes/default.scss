@@ -1,6 +1,6 @@
-$medium_editor_bgcolor:       #242424;
-$medium_editor_button_size:   50px;
-$medium_editor_border_radius: 5px;
+$medium_editor_bgcolor:             #242424 !default;
+$medium_editor_button_size:         50px !default;
+$medium_editor_border_radius:       5px !default;
 
 .medium-toolbar-arrow-under:after {
     top: $medium_editor_button_size;

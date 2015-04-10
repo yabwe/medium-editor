@@ -1,6 +1,8 @@
 @import "clearfix";
 @import "pop-upwards";
 
+$medium_editor_z_index: 2000 !default;
+
 .data-medium-element {
     sup {
         vertical-align: super;
@@ -45,7 +47,7 @@
     position: absolute;
     top: 0;
     left: 0;
-    z-index: 2000;
+    z-index: $medium_editor_z_index;
     visibility: hidden;
     font-size: 16px;
     font-family: HelveticaNeue, Helvetica, Arial, sans-serif;
