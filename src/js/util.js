@@ -116,9 +116,12 @@ var Util;
             return nextNode;
         },
 
-        isDescendant: function isDescendant(parent, child) {
+        isDescendant: function isDescendant(parent, child, checkEquality) {
             if (!parent || !child) {
                 return false;
+            }
+            if (checkEquality && parent === child) {
+                return true;
             }
             var node = child.parentNode;
             while (node !== null) {
