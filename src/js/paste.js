@@ -102,17 +102,21 @@ var PasteHandler;
                 }
 
                 if (!(this.options.disableReturn || element.getAttribute('data-disable-return'))) {
-                    paragraphs = event.clipboardData.getData(dataFormatPlain).split(/[\r\n]/g);
-                    for (p = 0; p < paragraphs.length; p += 1) {
-                        if (paragraphs[p] !== '') {
-                            html += '<p>' + Util.htmlEntities(paragraphs[p]) + '</p>';
+                    paragraphs = event.clipboardData.getData(dataFormatPlain).split(/[\r\n]+/g);
+                    // If there are no \r\n in data, don't wrap in <p>
+                    if (paragraphs.length > 1) {
+                        for (p = 0; p < paragraphs.length; p += 1) {
+                            if (paragraphs[p] !== '') {
+                                html += '<p>' + Util.htmlEntities(paragraphs[p]) + '</p>';
+                            }
                         }
+                    } else {
+                        html = Util.htmlEntities(paragraphs[0]);
                     }
-                    Util.insertHTMLCommand(this.options.ownerDocument, html);
                 } else {
                     html = Util.htmlEntities(event.clipboardData.getData(dataFormatPlain));
-                    Util.insertHTMLCommand(this.options.ownerDocument, html);
                 }
+                Util.insertHTMLCommand(this.options.ownerDocument, html);
             }
         },
 
