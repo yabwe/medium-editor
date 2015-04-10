@@ -147,7 +147,6 @@ var ButtonsData;
                 prop: 'text-align',
                 value: 'center'
             },
-            useQueryState: true,
             contentDefault: '<b>C</b>',
             contentFA: '<i class="fa fa-align-center"></i>'
         },
@@ -160,7 +159,6 @@ var ButtonsData;
                 prop: 'text-align',
                 value: 'justify'
             },
-            useQueryState: true,
             contentDefault: '<b>J</b>',
             contentFA: '<i class="fa fa-align-justify"></i>'
         },
@@ -173,7 +171,6 @@ var ButtonsData;
                 prop: 'text-align',
                 value: 'left'
             },
-            useQueryState: true,
             contentDefault: '<b>L</b>',
             contentFA: '<i class="fa fa-align-left"></i>'
         },
@@ -186,7 +183,6 @@ var ButtonsData;
                 prop: 'text-align',
                 value: 'right'
             },
-            useQueryState: true,
             contentDefault: '<b>R</b>',
             contentFA: '<i class="fa fa-align-right"></i>'
         },
