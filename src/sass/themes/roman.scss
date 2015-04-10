@@ -1,9 +1,11 @@
 // inspired by http://dribbble.com/shots/848100-Toolbar-Psd
-$medium_editor_bgcolor:       #fff;
-$medium_editor_border_color:  #a8a8a8;
-$medium_editor_button_size:   50px;
-$medium_editor_link_color:    #889aac;
-$medium_editor_border_radius: 5px;
+$medium_editor_bgcolor:                     #fff !default;
+$medium_editor_border_color:                #a8a8a8 !default;
+$medium_editor_button_size:                 50px !default;
+$medium_editor_button_hover_text_color:     #fff !default;
+$medium_editor_button_active_text_color:    #000 !default;
+$medium_editor_link_color:                  #889aac !default;
+$medium_editor_border_radius:               5px !default;
 
 .medium-toolbar-arrow-under:after,
 .medium-toolbar-arrow-over:before {
@@ -25,12 +27,12 @@ $medium_editor_border_radius: 5px;
             background-color: transparent;
             color: $medium_editor_link_color;
             box-shadow: inset 0 0 3px #f8f8e6;
-            background: linear-gradient(to top, $medium_editor_bgcolor, rgba(#000, .1));
+            background: linear-gradient(to bottom, $medium_editor_bgcolor, rgba(#000, .2));
             text-shadow: 1px 4px 6px #def, 0 0 0 #000, 1px 4px 6px #def;
             transition: background-color .2s ease-in;
             &:hover {
                 background-color: #fff;
-                color: #000;
+                color: $medium_editor_button_hover_text_color;
                 color: rgba(#000, .8);
             }
         }
@@ -47,9 +49,9 @@ $medium_editor_border_radius: 5px;
 
         .medium-editor-button-active {
             background-color: #ccc;
-            color: #000;
+            color: $medium_editor_button_active_text_color;
             color: rgba(#000, .8);
-            background: linear-gradient(to bottom, $medium_editor_bgcolor, rgba(#000, .2));
+            background: linear-gradient(to top, $medium_editor_bgcolor, rgba(#000, .1));
         }
     }
 }

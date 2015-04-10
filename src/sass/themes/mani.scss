@@ -1,10 +1,12 @@
 // inspired by http://dribbble.com/shots/857472-Toolbar
-$medium_editor_bgcolor:       #dee7f0;
-$medium_editor_bgcolor_alt:   #5c90c7;
-$medium_editor_border_color:  #cdd6e0;
-$medium_editor_button_size:   50px;
-$medium_editor_link_color:    #40648a;
-$medium_editor_border_radius: 2px;
+$medium_editor_bgcolor:                     #dee7f0 !default;
+$medium_editor_bgcolor_alt:                 #5c90c7 !default;
+$medium_editor_border_color:                #cdd6e0 !default;
+$medium_editor_button_size:                 50px !default;
+$medium_editor_button_hover_text_color:     #fff !default;
+$medium_editor_button_active_text_color:    #000 !default;
+$medium_editor_link_color:                  #40648a !default;
+$medium_editor_border_radius:               2px !default;
 
 .medium-toolbar-arrow-under:after,
 .medium-toolbar-arrow-over:before {
@@ -15,7 +17,7 @@ $medium_editor_border_radius: 2px;
     border: 1px solid $medium_editor_border_color;
     background-color: $medium_editor_bgcolor;
     background-color: rgba($medium_editor_bgcolor, .95);
-    background: linear-gradient(to bottom, $medium_editor_bgcolor, rgba(#fff, 1));
+    background: linear-gradient(to top, $medium_editor_bgcolor, rgba(#fff, 1));
     border-radius: $medium_editor_border_radius;
     box-shadow: 0 2px 6px rgba(#000, .45);
 
@@ -31,7 +33,7 @@ $medium_editor_border_radius: 2px;
             &:hover {
                 background-color: $medium_editor_bgcolor_alt;
                 background-color: rgba($medium_editor_bgcolor_alt, .45);
-                color: #fff;
+                color: $medium_editor_button_hover_text_color;
             }
         }
 
@@ -48,7 +50,7 @@ $medium_editor_border_radius: 2px;
         .medium-editor-button-active {
             background-color: $medium_editor_bgcolor_alt;
             background-color: rgba($medium_editor_bgcolor_alt, .45);
-            color: #000;
+            color: $medium_editor_button_active_text_color;
             background: linear-gradient(to bottom, $medium_editor_bgcolor, rgba(#000, .1));
         }
     }
