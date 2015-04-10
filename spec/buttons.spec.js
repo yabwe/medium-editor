@@ -576,6 +576,28 @@ describe('Buttons TestCase', function () {
     });
 
     describe('Justify', function () {
+        it('button should be activated based on text-align values', function () {
+            this.el.innerHTML = '<div><p id="justify-para-one">lorem ipsum</p></div>';
+            document.body.style.textAlign = 'center';
+            try {
+                var editor = new MediumEditor('.editor', {
+                        buttons: ['justifyCenter', 'justifyRight']
+                    }),
+                    rightButton = editor.toolbar.getToolbarElement().querySelector('[data-action="justifyRight"]'),
+                    centerButton = editor.toolbar.getToolbarElement().querySelector('[data-action="justifyCenter"]');
+
+                selectElementContentsAndFire(document.getElementById('justify-para-one'));
+                expect(rightButton.classList.contains('medium-editor-button-active')).toBe(false);
+                expect(centerButton.classList.contains('medium-editor-button-active')).toBe(true);
+
+                fireEvent(rightButton, 'click');
+                expect(rightButton.classList.contains('medium-editor-button-active')).toBe(true);
+                expect(centerButton.classList.contains('medium-editor-button-active')).toBe(false);
+            } finally {
+                document.body.style.textAlign = null;
+            }
+        });
+
         it('buttons should deactivate other justify buttons', function () {
             this.el.innerHTML = '<p id="justify-para-one">lorem ipsum</p>' +
                                 '<p id="justify-para-two" align="left">lorem ipsum</p>' +
