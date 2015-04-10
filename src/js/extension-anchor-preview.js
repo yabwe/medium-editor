@@ -1,5 +1,3 @@
-/*global console */
-
 var AnchorPreview;
 
 (function () {
@@ -126,9 +124,6 @@ var AnchorPreview;
                 // Using setTimeout + options.delay because:
                 // We may actually be displaying the anchor form, which should be controlled by options.delay
                 this.base.delay(function () {
-                    if (this.base.tracingOn) {
-                        console.log("DELAYED CHECK");
-                    }
                     if (activeAnchor) {
                         anchorExtension.showForm(activeAnchor.attributes.href.value);
                         activeAnchor = null;

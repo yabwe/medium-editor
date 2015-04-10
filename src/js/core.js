@@ -555,14 +555,6 @@ function MediumEditor(elements, options) {
             this.events.attachCustomEvent(event, listener);
         },
 
-        startTracing: function () {
-            this.tracingOn = true;
-        },
-
-        stopTracing: function () {
-            this.tracingOn = false;
-        },
-
         delay: function (fn) {
             var self = this;
             return setTimeout(function () {
