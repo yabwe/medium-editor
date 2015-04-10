@@ -115,11 +115,12 @@ describe('Selection TestCase', function () {
             expect(editor.toolbar.showAndUpdateToolbar).toHaveBeenCalled();
         });
 
-        it('should update button states when updateOnEmptySelection is true and the selection is empty', function () {
+        it('should update button states for static toolbar when updateOnEmptySelection is true and the selection is empty', function () {
             spyOn(MediumEditor.statics.Toolbar.prototype, 'setToolbarButtonStates').and.callThrough();
 
             var editor = new MediumEditor('.editor', {
-                updateOnEmptySelection: true
+                updateOnEmptySelection: true,
+                staticToolbar: true
             });
 
             selectElementContentsAndFire(this.el, { collapse: 'toStart' });

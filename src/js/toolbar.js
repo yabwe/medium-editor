@@ -316,7 +316,7 @@ var Toolbar;
                 // Now we know there's a focused editable with a selection
 
                 // If the updateOnEmptySelection option is true, show the toolbar
-                if (this.options.updateOnEmptySelection) {
+                if (this.options.updateOnEmptySelection && this.options.staticToolbar) {
                     this.showAndUpdateToolbar();
                     return;
                 }
