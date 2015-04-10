@@ -176,7 +176,16 @@ var Events;
             }
         },
 
+        focusElement: function (element) {
+            element.focus();
+            this.updateFocus(element, { target: element, type: 'focus' });
+        },
+
         handleInteraction: function (event) {
+            this.updateFocus(event.target, event);
+        },
+
+        updateFocus: function (target, eventObj) {
             var selection = this.options.contentWindow.getSelection(),
                 toolbarEl = this.base.toolbar ? this.base.toolbar.getToolbarElement() : null,
                 anchorPreview = this.base.getExtensionByName('anchor-preview'),
@@ -196,7 +205,7 @@ var Events;
                 // Find the element that is receiving focus
                 if (!toFocus &&
                         // target is part of an editor element
-                        (Util.isDescendant(element, event.target, true) ||
+                        (Util.isDescendant(element, target, true) ||
                         // introduced also to avoid the toolbar to disapper when selecting from right to left and the selection ends at the beginning of the text.
                         Util.isDescendant(element, selRange))) {
                     toFocus = element;
@@ -206,10 +215,10 @@ var Events;
                 return !!focused && !!toFocus;
             }, this);
 
-            // Check if the event is external (not part of the editor, toolbar, or anchorpreview)
-            var externalEvent = !Util.isDescendant(focused, event.target, true) &&
-                                !Util.isDescendant(toolbarEl, event.target, true) &&
-                                !Util.isDescendant(previewEl, event.target, true);
+            // Check if the target is external (not part of the editor, toolbar, or anchorpreview)
+            var externalEvent = !Util.isDescendant(focused, target, true) &&
+                                !Util.isDescendant(toolbarEl, target, true) &&
+                                !Util.isDescendant(previewEl, target, true);
 
             if (toFocus !== focused) {
                 // If element has focus, and focus is going outside of editor
@@ -217,19 +226,19 @@ var Events;
                 if (focused && externalEvent) {
                     // Trigger blur on the editable that has lost focus
                     focused.removeAttribute('data-medium-focused');
-                    this.triggerCustomEvent('blur', event, focused);
+                    this.triggerCustomEvent('blur', eventObj, focused);
                 }
 
                 // If focus is going into an editor element
                 if (toFocus) {
                     // Trigger focus on the editable that now has focus
                     toFocus.setAttribute('data-medium-focused', true);
-                    this.triggerCustomEvent('focus', event, toFocus);
+                    this.triggerCustomEvent('focus', eventObj, toFocus);
                 }
             }
 
             if (externalEvent) {
-                this.triggerCustomEvent('externalInteraction', event);
+                this.triggerCustomEvent('externalInteraction', eventObj);
             }
         },
 

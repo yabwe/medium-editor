@@ -423,7 +423,6 @@ var Toolbar;
         },
 
         setToolbarPosition: function () {
-            //var container = Selection.getSelectionElement(this.options.contentWindow),
             var container = this.getFocusedEditable(),
                 selection = this.options.contentWindow.getSelection(),
                 anchorPreview;

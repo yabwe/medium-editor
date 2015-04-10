@@ -61,6 +61,7 @@ describe('Placeholder TestCase', function () {
         this.el.innerHTML = 'some text';
         var editor = new MediumEditor('.editor');
         editor.elements[0].focus();
+        fireEvent(editor.elements[0], 'focus');
         expect(editor.elements[0].className).not.toContain('medium-editor-placeholder');
         editor.elements[0].innerHTML = '';
         fireEvent(document.querySelector('div'), 'click');

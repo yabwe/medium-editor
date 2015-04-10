@@ -32,7 +32,7 @@ describe('Resize TestCase', function () {
 
     it('should not call setToolbarPosition when toolbar is not visible', function () {
         var editor = new MediumEditor('.editor');
-        spyOn(MediumEditor.statics.Toolbar.prototype, 'setToolbarPosition');
+        spyOn(editor.toolbar, 'setToolbarPosition').and.callThrough();
         fireEvent(window, 'resize');
         jasmine.clock().tick(1);
         expect(editor.toolbar.getToolbarElement().className.indexOf('active')).toBe(-1);
@@ -48,7 +48,7 @@ describe('Resize TestCase', function () {
         jasmine.clock().tick(1);
         expect(editor.toolbar.getToolbarElement().className.indexOf('active') > -1).toBe(true);
 
-        spyOn(MediumEditor.statics.Toolbar.prototype, 'setToolbarPosition');
+        spyOn(editor.toolbar, 'setToolbarPosition').and.callThrough();
         for (totalTicks = 0; totalTicks < tickTime; totalTicks += 10) {
             fireEvent(window, 'resize');
             jasmine.clock().tick(10);

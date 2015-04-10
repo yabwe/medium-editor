@@ -105,7 +105,7 @@ describe('Anchor Preview TestCase', function () {
             // load into editor
             jasmine.clock().tick(1);
             fireEvent(anchorPreview.getPreviewElement(), 'click');
-            jasmine.clock().tick(201);
+            jasmine.clock().tick(200);
 
             expect(editor.toolbar.isDisplayed()).toBe(true);
             expect(editor.getExtensionByName('anchor').isDisplayed()).toBe(true);
