@@ -183,11 +183,6 @@ var Events;
 
             if (this.base.tracingOn) {
                 console.log("!! HANDLE-INTERACTION (" + event.type + ") !!");
-                if (event.type === 'focus') {
-                    console.log(event);
-                } else {
-                    console.log(event.target);
-                }
             }
 
             // Find the element that has focus
@@ -208,6 +203,11 @@ var Events;
                     toFocus = this.base.elements[i];
                     break;
                 }
+            }
+
+            if (this.base.tracingOn) {
+                console.log("FOCUSED: " + focused);
+                console.log("toFOCUS: " + toFocus);
             }
 
             if (toFocus !== focused) {

@@ -323,14 +323,9 @@ var Toolbar;
             return !!hasMultiParagraphs && hasMultiParagraphs.length > 1;
         },
 
-        // TODO: selection and selectionRange should be properties of the
-        //       Selection object
-        checkSelectionElement: function (newSelection, selectionElement) {
-            var i,
-                adjacentNode,
-                offset = 0,
-                newRange,
-                selectionRange = newSelection.getRangeAt(0);
+        modifySelection: function () {
+            var selection = this.options.contentWindow.getSelection(),
+                selectionRange = selection.getRangeAt(0);
 
             /*
             * In firefox, there are cases (ie doubleclick of a word) where the selectionRange start
@@ -351,33 +346,19 @@ var Toolbar;
             if (this.options.standardizeSelectionStart &&
                     selectionRange.startContainer.nodeValue &&
                     (selectionRange.startOffset === selectionRange.startContainer.nodeValue.length)) {
-                adjacentNode = Util.findAdjacentTextNodeWithContent(Selection.getSelectionElement(this.options.contentWindow), selectionRange.startContainer, this.options.ownerDocument);
+                var adjacentNode = Util.findAdjacentTextNodeWithContent(Selection.getSelectionElement(this.options.contentWindow), selectionRange.startContainer, this.options.ownerDocument);
                 if (adjacentNode) {
-                    offset = 0;
+                    var offset = 0;
                     while (adjacentNode.nodeValue.substr(offset, 1).trim().length === 0) {
                         offset = offset + 1;
                     }
-                    newRange = this.options.ownerDocument.createRange();
+                    var newRange = this.options.ownerDocument.createRange();
                     newRange.setStart(adjacentNode, offset);
                     newRange.setEnd(selectionRange.endContainer, selectionRange.endOffset);
-                    newSelection.removeAllRanges();
-                    newSelection.addRange(newRange);
+                    selection.removeAllRanges();
+                    selection.addRange(newRange);
                     selectionRange = newRange;
                 }
-            }
-
-            for (i = 0; i < this.base.elements.length; i += 1) {
-                if (this.base.elements[i] === selectionElement) {
-                    if (this.base.tracingOn) {
-                        console.log("checkSelectionElement -> showAndUpdateToolbar()");
-                    }
-                    this.showAndUpdateToolbar();
-                    return;
-                }
-            }
-
-            if (!this.options.staticToolbar) {
-                this.hideToolbar();
             }
         },
 
@@ -434,8 +415,7 @@ var Toolbar;
                 }
 
                 // If we don't have a "valid" selection -> hide toolbar
-                var newSelection = this.options.contentWindow.getSelection();
-                if (newSelection.toString().trim() === '' ||
+                if (this.options.contentWindow.getSelection().toString().trim() === '' ||
                     (this.options.allowMultiParagraphSelection === false && this.multipleBlockElementsSelected())) {
                     this.hideToolbar();
                 } else {
@@ -477,6 +457,7 @@ var Toolbar;
         // Updating the toolbar
 
         showAndUpdateToolbar: function () {
+            this.modifySelection();
             this.setToolbarButtonStates();
             if (this.base.tracingOn) {
                 console.log("ShowAndUpdateToolbar -> showToolbarDefaultActions()");

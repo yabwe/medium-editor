@@ -60,6 +60,7 @@ describe('Placeholder TestCase', function () {
     it('should add a placeholder to empty elements on blur', function () {
         this.el.innerHTML = 'some text';
         var editor = new MediumEditor('.editor');
+        editor.elements[0].focus();
         expect(editor.elements[0].className).not.toContain('medium-editor-placeholder');
         editor.elements[0].innerHTML = '';
         fireEvent(document.querySelector('div'), 'click');

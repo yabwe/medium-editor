@@ -54,10 +54,9 @@ describe('Anchor Preview TestCase', function () {
             nextRange.selectNodeContents(document.getElementById('another-element'));
             sel.removeAllRanges();
             sel.addRange(nextRange);
-            fireEvent(document.documentElement, 'click');
+            fireEvent(document.getElementById('another-element'), 'click');
             jasmine.clock().tick(200);
             expect(editor.toolbar.hideToolbar).toHaveBeenCalled();
-
         });
 
         it('should show the unencoded link', function () {

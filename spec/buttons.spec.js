@@ -239,7 +239,7 @@ describe('Buttons TestCase', function () {
             expect(button.classList.contains('medium-editor-button-active')).toBe(false);
 
             this.el.innerHTML = '<strong>lorem ipsum</strong>';
-            selectElementContentsAndFire(editor.elements[0]);
+            selectElementContentsAndFire(editor.elements[0], { eventToFire: 'mouseup' });
             expect(button.classList.contains('medium-editor-button-active')).toBe(true);
         });
 
@@ -304,7 +304,7 @@ describe('Buttons TestCase', function () {
             expect(button.classList.contains('medium-editor-button-active')).toBe(false);
 
             this.el.innerHTML = '<em>lorem ipsum</em>';
-            selectElementContentsAndFire(editor.elements[0]);
+            selectElementContentsAndFire(editor.elements[0], { eventToFire: 'mouseup' });
             expect(button.classList.contains('medium-editor-button-active')).toBe(true);
         });
 
@@ -487,7 +487,7 @@ describe('Buttons TestCase', function () {
             selectElementContentsAndFire(document.getElementById('link'));
             expect(button.classList.contains('medium-editor-button-active')).toBe(true);
 
-            selectElementContentsAndFire(document.getElementById('span-lorem'));
+            selectElementContentsAndFire(document.getElementById('span-lorem'), { eventToFire: 'mouseup' });
             expect(button.classList.contains('medium-editor-button-active')).toBe(false);
         });
 
@@ -626,7 +626,7 @@ describe('Buttons TestCase', function () {
             expect(fullButton.classList.contains('medium-editor-button-active')).toBe(true);
 
             // Second paragraph should have justifyLeft activated
-            selectElementContentsAndFire(document.getElementById('justify-para-two'));
+            selectElementContentsAndFire(document.getElementById('justify-para-two'), { eventToFire: 'mouseup' });
             expect(leftButton.classList.contains('medium-editor-button-active')).toBe(true);
             expect(rightButton.classList.contains('medium-editor-button-active')).toBe(false);
             expect(centerButton.classList.contains('medium-editor-button-active')).toBe(false);
@@ -640,7 +640,7 @@ describe('Buttons TestCase', function () {
             expect(fullButton.classList.contains('medium-editor-button-active')).toBe(false);
 
             // Third paragraph should have justifyRight activated
-            selectElementContentsAndFire(document.getElementById('justify-para-three'));
+            selectElementContentsAndFire(document.getElementById('justify-para-three'), { eventToFire: 'mouseup' });
             expect(leftButton.classList.contains('medium-editor-button-active')).toBe(false);
             expect(rightButton.classList.contains('medium-editor-button-active')).toBe(true);
             expect(centerButton.classList.contains('medium-editor-button-active')).toBe(false);
@@ -654,7 +654,7 @@ describe('Buttons TestCase', function () {
             expect(fullButton.classList.contains('medium-editor-button-active')).toBe(false);
 
             // Fourth paragraph should have justifyCenter activated
-            selectElementContentsAndFire(document.getElementById('justify-para-four'));
+            selectElementContentsAndFire(document.getElementById('justify-para-four'), { eventToFire: 'mouseup' });
             expect(leftButton.classList.contains('medium-editor-button-active')).toBe(false);
             expect(rightButton.classList.contains('medium-editor-button-active')).toBe(false);
             expect(centerButton.classList.contains('medium-editor-button-active')).toBe(true);
@@ -662,14 +662,14 @@ describe('Buttons TestCase', function () {
 
             // Trigger justify right, only it should be active
             fireEvent(rightButton, 'click');
-            selectElementContentsAndFire(document.getElementById('justify-para-four'));
+            selectElementContentsAndFire(document.getElementById('justify-para-four'), { eventToFire: 'mouseup' });
             expect(leftButton.classList.contains('medium-editor-button-active')).toBe(false);
             expect(rightButton.classList.contains('medium-editor-button-active')).toBe(true);
             expect(centerButton.classList.contains('medium-editor-button-active')).toBe(false);
             expect(fullButton.classList.contains('medium-editor-button-active')).toBe(false);
 
             // Fifth paragraph should have justifyFull activated
-            selectElementContentsAndFire(document.getElementById('justify-para-five'));
+            selectElementContentsAndFire(document.getElementById('justify-para-five'), { eventToFire: 'mouseup' });
             expect(leftButton.classList.contains('medium-editor-button-active')).toBe(false);
             expect(rightButton.classList.contains('medium-editor-button-active')).toBe(false);
             expect(centerButton.classList.contains('medium-editor-button-active')).toBe(false);
@@ -720,11 +720,11 @@ describe('Buttons TestCase', function () {
             expect(buttonOne.classList.contains('medium-editor-button-active')).toBe(false);
             expect(buttonTwo.classList.contains('medium-editor-button-active')).toBe(false);
 
-            selectElementContentsAndFire(editor.elements[0].querySelector('h3'));
+            selectElementContentsAndFire(editor.elements[0].querySelector('h3'), { eventToFire: 'mouseup' });
             expect(buttonOne.classList.contains('medium-editor-button-active')).toBe(true);
             expect(buttonTwo.classList.contains('medium-editor-button-active')).toBe(false);
 
-            selectElementContentsAndFire(editor.elements[0].querySelector('h4'));
+            selectElementContentsAndFire(editor.elements[0].querySelector('h4'), { eventToFire: 'mouseup' });
             expect(buttonOne.classList.contains('medium-editor-button-active')).toBe(false);
             expect(buttonTwo.classList.contains('medium-editor-button-active')).toBe(true);
         });
@@ -746,11 +746,11 @@ describe('Buttons TestCase', function () {
             expect(buttonOne.classList.contains('medium-editor-button-active')).toBe(true);
             expect(buttonTwo.classList.contains('medium-editor-button-active')).toBe(false);
 
-            selectElementContentsAndFire(editor.elements[0].querySelector('h3'));
+            selectElementContentsAndFire(editor.elements[0].querySelector('h3'), { eventToFire: 'mouseup' });
             expect(buttonOne.classList.contains('medium-editor-button-active')).toBe(false);
             expect(buttonTwo.classList.contains('medium-editor-button-active')).toBe(false);
 
-            selectElementContentsAndFire(editor.elements[0].querySelector('h5'));
+            selectElementContentsAndFire(editor.elements[0].querySelector('h5'), { eventToFire: 'mouseup' });
             expect(buttonOne.classList.contains('medium-editor-button-active')).toBe(false);
             expect(buttonTwo.classList.contains('medium-editor-button-active')).toBe(true);
         });

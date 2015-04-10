@@ -80,7 +80,7 @@ describe('Toolbar TestCase', function () {
             expect(editor.toolbar.getToolbarElement().querySelector('button[data-action="bold"]').classList.contains('medium-editor-button-active')).toBe(false);
 
             editor.startSelectionUpdates();
-            selectElementContentsAndFire(document.getElementById('bold_dolorTwo'));
+            selectElementContentsAndFire(document.getElementById('bold_dolorTwo'), { eventToFire: 'mouseup' });
 
             jasmine.clock().tick(51);
             expect(editor.toolbar.getToolbarElement().querySelector('button[data-action="bold"]').classList.contains('medium-editor-button-active')).toBe(true);
@@ -154,22 +154,12 @@ describe('Toolbar TestCase', function () {
                 stickyToolbar: true
             });
 
-            selectElementContentsAndFire(this.el.querySelector('b'), { eventToFire: 'focus' });
+            selectElementContentsAndFire(this.el.querySelector('b'));
             window.getSelection().removeAllRanges();
             editor.checkSelection();
             jasmine.clock().tick(1); // checkSelection delay
             expect(editor.toolbar.getToolbarElement().classList.contains('medium-editor-toolbar-active')).toBe(true);
-            expect(editor.toolbar.getToolbarElement().querySelector('[data-action="bold"]').classList.contains('medium-editor-button-active')).toBe(false);
-        });
-
-        it('should update toolbar position when user clicks on medium editor element', function () {
-            var editor = new MediumEditor('.editor', {
-                staticToolbar: true
-            });
-            spyOn(MediumEditor.statics.Toolbar.prototype, 'setToolbarPosition').and.callThrough();
-            fireEvent(editor.elements[0], 'click');
-            jasmine.clock().tick(1); // checkSelection delay
-            expect(editor.toolbar.setToolbarPosition).toHaveBeenCalled();
+            expect(editor.toolbar.getToolbarElement().querySelector('[data-action="bold"]').classList.contains('medium-editor-button-active')).toBe(true);
         });
 
         it('should show and update toolbar buttons when staticToolbar and updateOnEmptySelection options are set to true', function () {
@@ -180,7 +170,7 @@ describe('Toolbar TestCase', function () {
                 updateOnEmptySelection: true
             });
 
-            selectElementContents(this.el.querySelector('b'));
+            selectElementContentsAndFire(this.el.querySelector('b'));
             window.getSelection().getRangeAt(0).collapse(false);
             editor.checkSelection();
             jasmine.clock().tick(1); // checkSelection delay

@@ -91,7 +91,7 @@ describe('Selection TestCase', function () {
             });
             selectElementContentsAndFire(document.getElementById('p-one'), { eventToFire: 'focus' });
             expect(editor.toolbar.getToolbarElement().classList.contains('medium-editor-toolbar-active')).toBe(true);
-            selectElementContentsAndFire(this.el);
+            selectElementContentsAndFire(this.el, { eventToFire: 'mouseup' });
             expect(editor.toolbar.getToolbarElement().classList.contains('medium-editor-toolbar-active')).toBe(false);
         });
 

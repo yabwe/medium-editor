@@ -1,4 +1,4 @@
-/*global Util, Selection, DefaultButton */
+/*global Util, Selection, DefaultButton, console */
 
 var AnchorExtension;
 
@@ -228,6 +228,9 @@ var AnchorExtension;
 
             // For ESCAPE -> close the form
             if (event.keyCode === Util.keyCode.ESCAPE) {
+                if (this.base.tracingOn) {
+                    console.log("HIT ESCAPE");
+                }
                 event.preventDefault();
                 this.doFormCancel();
             }

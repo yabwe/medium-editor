@@ -1,6 +1,6 @@
 /*global MediumEditor, describe, it, expect, spyOn,
      afterEach, beforeEach, selectElementContents,
-     jasmine, fireEvent, tearDown,
+     jasmine, fireEvent, tearDown, Util,
      selectElementContentsAndFire */
 
 describe('Anchor Button TestCase', function () {
@@ -174,7 +174,7 @@ describe('Anchor Button TestCase', function () {
             button.checked = true;
 
             fireEvent(input, 'keyup', {
-                keyCode: 13
+                keyCode: Util.keyCode.ENTER
             });
             opts = {
                 url: 'test',
@@ -198,7 +198,7 @@ describe('Anchor Button TestCase', function () {
                 cancel,
                 anchorExtension = editor.getExtensionByName('anchor');
 
-            selectElementContents(editor.elements[0]);
+            selectElementContentsAndFire(editor.elements[0]);
             button = editor.toolbar.getToolbarElement().querySelector('[data-action="createLink"]');
             cancel = anchorExtension.getForm().querySelector('a.medium-editor-toolbar-close');
             fireEvent(button, 'click');
@@ -207,15 +207,16 @@ describe('Anchor Button TestCase', function () {
             expect(editor.toolbar.showAndUpdateToolbar).toHaveBeenCalled();
             expect(anchorExtension.isDisplayed()).toBe(false);
         });
+
         it('should close the link form when user presses escape', function () {
             var editor = new MediumEditor('.editor'),
                 anchorExtension = editor.getExtensionByName('anchor');
 
-            selectElementContents(editor.elements[0]);
+            selectElementContentsAndFire(editor.elements[0]);
             fireEvent(editor.toolbar.getToolbarElement().querySelector('[data-action="createLink"]'), 'click');
             expect(anchorExtension.isDisplayed()).toBe(true);
             fireEvent(anchorExtension.getInput(), 'keyup', {
-                keyCode: 27
+                keyCode: Util.keyCode.ESCAPE
             });
             expect(anchorExtension.isDisplayed()).toBe(false);
         });
