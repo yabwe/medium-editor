@@ -1,3 +1,11 @@
+4.3.0 / 2015-04-10
+* Add override options for pasteHTML and cleanPaste
+* Support overriding of scss theme variables
+* Fix for justify button states in IE
+* New helpers for manipulating nested objects
+* Internal tooling prep for options and defaults
+
+
 4.2.0 / 2015-04-05
 ==================
 * Add textarea support
