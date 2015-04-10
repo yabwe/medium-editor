@@ -2760,32 +2760,13 @@ var Toolbar;
             }
         },
 
-        hasElement: function (el) {
-            return this.base.elements.some(function (element) {
-                return element === el;
-            });
-        },
-
-        editorHasFocus: function () {
-            return !!this.getFocusedEditable();
-        },
-
-        getFocusedEditable: function () {
-            for (var i = 0; i < this.base.elements.length; i += 1) {
-                if (this.base.elements[i].getAttribute('data-medium-focused')) {
-                    return this.base.elements[i];
-                }
-            }
-            return null;
-        },
-
         checkState: function () {
 
             if (!this.base.preventSelectionUpdates) {
 
                 // If no editable has focus OR selection is inside contenteditable = false
                 // hide toolbar
-                if (!this.editorHasFocus() ||
+                if (!this.getFocusedElement() ||
                         Selection.selectionInContentEditableFalse(this.options.contentWindow)) {
                     this.hideToolbar();
                     return;
@@ -2796,8 +2777,8 @@ var Toolbar;
                 // hide toolbar
                 var selectionElement = Selection.getSelectionElement(this.options.contentWindow);
                 if (!selectionElement ||
-                        selectionElement.getAttribute('data-disable-toolbar') ||
-                        !this.hasElement(selectionElement)) {
+                        this.base.elements.indexOf(selectionElement) === -1 ||
+                        selectionElement.getAttribute('data-disable-toolbar')) {
                     this.hideToolbar();
                     return;
                 }
@@ -2818,6 +2799,15 @@ var Toolbar;
                     this.showAndUpdateToolbar();
                 }
             }
+        },
+
+        getFocusedElement: function () {
+            for (var i = 0; i < this.base.elements.length; i += 1) {
+                if (this.base.elements[i].getAttribute('data-medium-focused')) {
+                    return this.base.elements[i];
+                }
+            }
+            return null;
         },
 
         // Updating the toolbar
@@ -2899,7 +2889,7 @@ var Toolbar;
         },
 
         setToolbarPosition: function () {
-            var container = this.getFocusedEditable(),
+            var container = this.getFocusedElement(),
                 selection = this.options.contentWindow.getSelection(),
                 anchorPreview;
 

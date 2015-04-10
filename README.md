@@ -200,6 +200,7 @@ Check out the Wiki page for a list of available themes: [https://github.com/davi
 * __.delay(fn)__: delay any function from being executed by the amount of time passed as the `delay` option
 * __.getSelectionParentElement(range)__: get the parent contenteditable element that contains the current selection
 * __.getExtensionByName(name)__: get a reference to an extension with the specified name
+* __.selectElement(element)__: change selection to be a specific element and update the toolbar to reflect the selection
 
 ## Capturing DOM changes
 
