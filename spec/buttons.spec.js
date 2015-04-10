@@ -578,7 +578,7 @@ describe('Buttons TestCase', function () {
     describe('Justify', function () {
         it('button should be activated based on text-align values', function () {
             this.el.innerHTML = '<div><p id="justify-para-one">lorem ipsum</p></div>';
-            document.body.style.textAlign = 'center';
+            document.body.style.setProperty('text-align', 'center');
             try {
                 var editor = new MediumEditor('.editor', {
                         buttons: ['justifyCenter', 'justifyRight']
@@ -594,7 +594,7 @@ describe('Buttons TestCase', function () {
                 expect(rightButton.classList.contains('medium-editor-button-active')).toBe(true);
                 expect(centerButton.classList.contains('medium-editor-button-active')).toBe(false);
             } finally {
-                document.body.style.textAlign = null;
+                document.body.style.removeProperty('text-align');
             }
         });
 
