@@ -210,6 +210,32 @@ var Events;
                 }
             }
 
+            if (toFocus !== focused) {
+                // If the element that triggered the event is not part of the editor, toolbar, or anchorpreview
+                if (focused && (focused !== event.target && !Util.isDescendant(focused, event.target)) &&
+                        (!toolbarEl || (toolbarEl !== event.target && !Util.isDescendant(toolbarEl, event.target))) &&
+                        (!previewEl || (previewEl !== event.target && !Util.isDescendant(previewEl, event.target)))) {
+
+                    if (this.base.tracingOn) {
+                        console.log(event.type + " -> BLURRING EXISTING ELEMENT WITH FOCUS");
+                    }
+                    // Focus/Click happened outside of this editor
+                    focused.removeAttribute('data-medium-focused');
+                    this.triggerCustomEvent('blur', event, focused);
+                }
+
+                // If focus is going into an editor element
+                if (toFocus) {
+                    if (this.base.tracingOn) {
+                        console.log(event.type + " -> FOCUSING INTO EDITABLE");
+                    }
+                    // Trigger focus on the editable that now has focus
+                    toFocus.setAttribute('data-medium-focused', true);
+                    this.triggerCustomEvent('focus', event, toFocus);
+                }
+            }
+
+            /*
             if (focused &&
                     focused !== toFocus &&
                     focused !== event.target &&
@@ -234,26 +260,6 @@ var Events;
                 this.triggerCustomEvent('focus', event, toFocus);
             }
 
-            /*if (toFocus !== focused) {
-                // If the element that triggered the event is not part of the editor, toolbar, or anchorpreview
-                if (focused &&
-                        (!toolbarEl || (toolbarEl !== event.target && !Util.isDescendant(toolbarEl, event.target))) &&
-                        (!previewEl || (previewEl !== event.target && !Util.isDescendant(previewEl, event.target)))) {
-
-                    if (this.base.tracingOn) {
-                        console.log(event.type + " -> BLURRING EXISTING ELEMENT WITH FOCUS");
-                    }
-                    // Focus/Click happened outside of this editor
-                    focused.removeAttribute('data-medium-focused');
-                    this.triggerCustomEvent('blur', event, focused);
-                }
-
-                if (toFocus) {
-
-                }
-            }
-
-            // If focus is going into an editor element
             if (toFocus) {
                 // If this element didn't already have focus
                 if (toFocus !== focused) {

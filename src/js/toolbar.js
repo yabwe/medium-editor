@@ -381,6 +381,12 @@ var Toolbar;
             }
         },
 
+        hasElement: function (el) {
+            return this.base.elements.some(function (element) {
+                return element === el;
+            });
+        },
+
         editorHasFocus: function () {
             return !!this.getFocusedEditable();
         },
@@ -395,10 +401,48 @@ var Toolbar;
         },
 
         checkState: function () {
-            var newSelection,
-                selectionElement;
+            /*var newSelection,
+                selectionElement;*/
 
             if (!this.base.preventSelectionUpdates) {
+
+                // If no editable has focus OR selection is inside contenteditable = false
+                // hide toolbar
+                if (!this.editorHasFocus() ||
+                        Selection.selectionInContentEditableFalse(this.options.contentWindow)) {
+                    this.hideToolbar();
+                    return;
+                }
+
+                // If there's no selection element, selection element doesn't belong to this editor
+                // or toolbar is disabled for this selection element
+                // hide toolbar
+                var selectionElement = Selection.getSelectionElement(this.options.contentWindow);
+                if (!selectionElement ||
+                        selectionElement.getAttribute('data-disable-toolbar') ||
+                        !this.hasElement(selectionElement)) {
+                    this.hideToolbar();
+                    return;
+                }
+
+                // Now we know there's a focused editable with a selection
+
+                // If the updateOnEmptySelection option is true, show the toolbar
+                if (this.options.updateOnEmptySelection) {
+                    this.showAndUpdateToolbar();
+                    return;
+                }
+
+                // If we don't have a "valid" selection -> hide toolbar
+                var newSelection = this.options.contentWindow.getSelection();
+                if (newSelection.toString().trim() === '' ||
+                    (this.options.allowMultiParagraphSelection === false && this.multipleBlockElementsSelected())) {
+                    this.hideToolbar();
+                } else {
+                    this.showAndUpdateToolbar();
+                }
+
+                /*
                 newSelection = this.options.contentWindow.getSelection();
 
                 if ((!this.options.updateOnEmptySelection && newSelection.toString().trim() === '') ||
@@ -426,7 +470,7 @@ var Toolbar;
                     } else {
                         this.checkSelectionElement(newSelection, selectionElement);
                     }
-                }
+                }*/
             }
         },
 
@@ -602,7 +646,7 @@ var Toolbar;
             if (targetLeft < 0) {
                 targetLeft = 0;
             } else if ((targetLeft + toolbarWidth) > windowWidth) {
-                targetLeft = windowWidth - toolbarWidth;
+                targetLeft = (windowWidth - Math.ceil(toolbarWidth) - 1);
             }
 
             toolbarElement.style.left = targetLeft + 'px';
