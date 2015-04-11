@@ -1,4 +1,12 @@
+4.4.0 / 2015-04-11
+==================
+* Expose smart 'blur' and 'focus' events which account for toolbar interaction
+* Expose selectElement method for selecting text and updating toolbar
+* Fix always wrapping pasted text in a <p> tag
+
+
 4.3.0 / 2015-04-10
+==================
 * Add override options for pasteHTML and cleanPaste
 * Support overriding of scss theme variables
 * Fix for justify button states in IE
