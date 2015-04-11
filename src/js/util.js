@@ -424,14 +424,6 @@ var Util;
             });
         },
 
-        cleanupTags: function (el, tags) {
-            tags.forEach(function (tag) {
-                if (el.tagName.toLowerCase() === tag) {
-                    el.parentNode.removeChild(el);
-                }
-            });
-        },
-
         setObject: function(name, value, context){
             // summary:
             //      Set a property from a dot-separated string, such as "A.B.C"

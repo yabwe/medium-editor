@@ -181,13 +181,13 @@ var PasteHandler;
             fragmentBody.innerHTML = html;
 
             this.cleanupSpans(fragmentBody);
+            this.unwrapTags(fragmentBody, options.cleanTags);
 
             elList = fragmentBody.querySelectorAll('*');
 
             for (i = 0; i < elList.length; i += 1) {
                 workEl = elList[i];
                 Util.cleanupAttrs(workEl, options.cleanAttrs);
-                Util.cleanupTags(workEl, options.cleanTags);
             }
 
             Util.insertHTMLCommand(this.options.ownerDocument, fragmentBody.innerHTML.replace(/&nbsp;/g, ' '));
@@ -228,14 +228,32 @@ var PasteHandler;
             }
         },
 
+        unwrapTags: function (container, tags) {
+            if (container && tags && tags.length) {
+                var toUnwrap = Array.prototype.slice.call(container.querySelectorAll(tags.join(","))),
+                    isCEF = function (el) {
+                        return (el && el.nodeName !== '#text' && el.getAttribute('contenteditable') === 'false');
+                    };
+                toUnwrap.forEach(function (element) {
+                    // bail if element is in contenteditable = false
+                    if (Util.traverseUp(element, isCEF)) {
+                        return false;
+                    }
+
+                    if (!element.hasChildNodes() || !element.textContent.length) {
+                        element.parentNode.removeChild(element);
+                    } else {
+                        element.parentNode.replaceChild(this.options.ownerDocument.createTextNode(element.textContent), element);
+                    }
+                }, this);
+            }
+        },
+
         cleanupSpans: function (container_el) {
             var i,
                 el,
                 new_el,
-                spans = container_el.querySelectorAll('.replace-with'),
-                isCEF = function (el) {
-                    return (el && el.nodeName !== '#text' && el.getAttribute('contenteditable') === 'false');
-                };
+                spans = container_el.querySelectorAll('.replace-with');
 
             for (i = 0; i < spans.length; i += 1) {
                 el = spans[i];
@@ -248,23 +266,6 @@ var PasteHandler;
                     new_el.innerHTML = el.innerHTML;
                 }
                 el.parentNode.replaceChild(new_el, el);
-            }
-
-            spans = container_el.querySelectorAll('span');
-            for (i = 0; i < spans.length; i += 1) {
-                el = spans[i];
-
-                // bail if span is in contenteditable = false
-                if (Util.traverseUp(el, isCEF)) {
-                    return false;
-                }
-
-                // remove empty spans, replace others with their contents
-                if (/^\s*$/.test()) {
-                    el.parentNode.removeChild(el);
-                } else {
-                    el.parentNode.replaceChild(this.options.ownerDocument.createTextNode(el.textContent), el);
-                }
             }
         }
     };
