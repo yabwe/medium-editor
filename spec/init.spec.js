@@ -129,7 +129,7 @@ describe('Initialization TestCase', function () {
                     forcePlainText: true,
                     cleanPastedHtml: false,
                     cleanAttrs: ['class', 'style', 'dir'],
-                    cleanTags: ['meta']
+                    cleanTags: ['meta', 'span']
                 }
             },
                 editor = new MediumEditor('.editor');

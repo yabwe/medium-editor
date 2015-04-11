@@ -43,7 +43,7 @@ var editorDefaults;
             forcePlainText: true,
             cleanPastedHtml: false,
             cleanAttrs: ['class', 'style', 'dir'],
-            cleanTags: ['meta']
+            cleanTags: ['meta', 'span']
         }
 
     };

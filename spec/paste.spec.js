@@ -182,7 +182,7 @@ describe('Pasting content', function () {
         it('should remove certain attributes and tags by default', function () {
             var editor = new MediumEditor('.editor');
             selectElementContents(this.el.firstChild);
-            editor.pasteHTML('<p class="some-class" style="font-weight: bold" dir="ltr"><meta name="description" content="test" />test</p>');
+            editor.pasteHTML('<p class="some-class" style="font-weight: bold" dir="ltr"><meta name="description" content="test" /><span>test</span></p>');
             expect(editor.elements[0].innerHTML).toBe('<p>test</p>');
         });
 
@@ -203,7 +203,7 @@ describe('Pasting content', function () {
                 '<div><i>test</i><meta name="description" content="test" /><b>test</b></div>',
                 {cleanTags: ['meta', 'b']}
             );
-            expect(editor.elements[0].innerHTML).toBe('<div><i>test</i></div>');
+            expect(editor.elements[0].innerHTML).toBe('<div><i>test</i>test</div>');
         });
 
         it('should respect custom clean up options passed during instantiation', function () {
@@ -216,11 +216,11 @@ describe('Pasting content', function () {
             selectElementContents(this.el.firstChild);
             editor.pasteHTML(
                 '<table class="medium-editor-table" dir="ltr" style="border: 1px solid red;"><tbody><tr><td>test</td></tr></tbody></table>' +
-                '<div><i>test</i><meta name="description" content="test" /><b>test</b></div>'
+                '<div><i>test</i><meta name="description" content="test" /><span><b>test</b></span></div>'
             );
             expect(editor.elements[0].innerHTML).toBe(
                 '<table class="medium-editor-table"><tbody><tr><td>test</td></tr></tbody></table>' +
-                '<div><i>test</i></div>'
+                '<div><i>test</i><span>test</span></div>'
             );
         });
     });
