@@ -275,7 +275,7 @@ describe('Pasting content', function () {
                 editorEl.innerHTML = '<div id="editor-inner">&nbsp</div>';
 
                 range = document.createRange();
-                range.selectNodeContents(editorEl);
+                range.selectNodeContents(editorEl.firstChild);
                 sel.removeAllRanges();
                 sel.addRange(range);
 
