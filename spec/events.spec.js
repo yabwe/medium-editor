@@ -117,4 +117,30 @@ describe('Events TestCase', function () {
             expect(blurSpy.calls.count()).toBe(1);
         });
     });
+
+    describe('Subscribe', function () {
+        it('to editableInput should trigger with the corresponding editor element passed as an argument', function () {
+            var editableTwo = document.createElement('div'),
+                editor,
+                handler,
+                firedTarget;
+            editableTwo.className = 'editor';
+            editableTwo.textContent = 'lore ipsum';
+            document.body.appendChild(editableTwo);
+
+            editor = new MediumEditor('.editor');
+            expect(editor.elements.length).toBe(2);
+
+            handler = function (event, editable) {
+                firedTarget = editable;
+            };
+
+            editor.subscribe('editableInput', handler);
+
+            fireEvent(editableTwo, 'input');
+            expect(firedTarget).toBe(editableTwo);
+
+            tearDown(editableTwo);
+        });
+    });
 });

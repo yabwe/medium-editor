@@ -116,6 +116,13 @@ var Events;
                 this.setupListener('externalInteraction');
                 this.listeners[name] = true;
                 break;
+            case 'editableInput':
+                // Detecting when the content of an editable has been changed
+                this.base.elements.forEach(function (element) {
+                    this.attachDOMEvent(element, 'input', this.handleInput.bind(this));
+                }.bind(this));
+                this.listeners[name] = true;
+                break;
             case 'editableClick':
                 // Detecting click in the contenteditables
                 this.base.elements.forEach(function (element) {
@@ -280,6 +287,10 @@ var Events;
 
         handleBodyMousedown: function (event) {
             this.lastMousedownTarget = event.target;
+        },
+
+        handleInput: function (event) {
+            this.triggerCustomEvent('editableInput', event, event.currentTarget);
         },
 
         handleClick: function (event) {
