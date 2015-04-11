@@ -89,9 +89,9 @@ describe('Selection TestCase', function () {
             var editor = new MediumEditor('.editor', {
                 allowMultiParagraphSelection: false
             });
-            selectElementContentsAndFire(document.getElementById('p-one'));
+            selectElementContentsAndFire(document.getElementById('p-one'), { eventToFire: 'focus' });
             expect(editor.toolbar.getToolbarElement().classList.contains('medium-editor-toolbar-active')).toBe(true);
-            selectElementContentsAndFire(this.el);
+            selectElementContentsAndFire(this.el, { eventToFire: 'mouseup' });
             expect(editor.toolbar.getToolbarElement().classList.contains('medium-editor-toolbar-active')).toBe(false);
         });
 
@@ -115,11 +115,12 @@ describe('Selection TestCase', function () {
             expect(editor.toolbar.showAndUpdateToolbar).toHaveBeenCalled();
         });
 
-        it('should update button states when updateOnEmptySelection is true and the selection is empty', function () {
+        it('should update button states for static toolbar when updateOnEmptySelection is true and the selection is empty', function () {
             spyOn(MediumEditor.statics.Toolbar.prototype, 'setToolbarButtonStates').and.callThrough();
 
             var editor = new MediumEditor('.editor', {
-                updateOnEmptySelection: true
+                updateOnEmptySelection: true,
+                staticToolbar: true
             });
 
             selectElementContentsAndFire(this.el, { collapse: 'toStart' });

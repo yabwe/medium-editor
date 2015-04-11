@@ -56,6 +56,8 @@ function fireEvent(element, event, options) {
         evt = document.createEvent("HTMLEvents");
         evt.initEvent(event, true, true); // event type,bubbling,cancelable
 
+        evt.currentTarget = element;
+
         if (options.keyCode) {
             evt.keyCode = options.keyCode;
             evt.which = options.keyCode;
@@ -119,7 +121,7 @@ function selectElementContents(el, options) {
 function selectElementContentsAndFire(el, options) {
     options = options || {};
     selectElementContents(el, options);
-    fireEvent(el, options.eventToFire || 'mouseup');
+    fireEvent(el, options.eventToFire || 'focus');
 }
 
 function tearDown(el) {

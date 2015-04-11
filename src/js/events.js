@@ -79,9 +79,19 @@ var Events;
 
             switch (name) {
             case 'externalInteraction':
-                // Detecting when focus is lost
+                // Detecting when user has interacted with elements outside of MediumEditor
                 this.attachDOMEvent(this.options.ownerDocument.body, 'click', this.handleInteraction.bind(this), true);
                 this.attachDOMEvent(this.options.ownerDocument.body, 'focus', this.handleInteraction.bind(this), true);
+                this.listeners[name] = true;
+                break;
+            case 'blur':
+                // Detecting when focus is lost
+                this.setupListener('externalInteraction');
+                this.listeners[name] = true;
+                break;
+            case 'focus':
+                // Detecting when focus moves into some part of MediumEditor
+                this.setupListener('externalInteraction');
                 this.listeners[name] = true;
                 break;
             case 'editableClick':
@@ -102,6 +112,13 @@ var Events;
                 // Detecting keypress in the contenteditables
                 this.base.elements.forEach(function (element) {
                     this.attachDOMEvent(element, 'keypress', this.handleKeypress.bind(this));
+                }.bind(this));
+                this.listeners[name] = true;
+                break;
+            case 'editableKeyup':
+                // Detecting keyup in the contenteditables
+                this.base.elements.forEach(function (element) {
+                    this.attachDOMEvent(element, 'keyup', this.handleKeyup.bind(this));
                 }.bind(this));
                 this.listeners[name] = true;
                 break;
@@ -159,33 +176,69 @@ var Events;
             }
         },
 
+        focusElement: function (element) {
+            element.focus();
+            this.updateFocus(element, { target: element, type: 'focus' });
+        },
+
         handleInteraction: function (event) {
-            var isDescendantOfEditorElements = false,
-                selection = this.options.contentWindow.getSelection(),
+            this.updateFocus(event.target, event);
+        },
+
+        updateFocus: function (target, eventObj) {
+            var selection = this.options.contentWindow.getSelection(),
                 toolbarEl = this.base.toolbar ? this.base.toolbar.getToolbarElement() : null,
                 anchorPreview = this.base.getExtensionByName('anchor-preview'),
                 previewEl = (anchorPreview && anchorPreview.getPreviewElement) ? anchorPreview.getPreviewElement() : null,
                 selRange = selection.isCollapsed ?
                            null :
                            Selection.getSelectedParentElement(selection.getRangeAt(0)),
-                i;
+                focused,
+                toFocus;
 
-            // This control was introduced also to avoid the toolbar
-            // to disapper when selecting from right to left and
-            // the selection ends at the beginning of the text.
-            for (i = 0; i < this.base.elements.length; i += 1) {
-                if (this.base.elements[i] === event.target ||
-                        Util.isDescendant(this.base.elements[i], event.target) ||
-                        Util.isDescendant(this.base.elements[i], selRange)) {
-                    isDescendantOfEditorElements = true;
-                    break;
+            this.base.elements.some(function (element) {
+                // Find the element that has focus
+                if (!focused && element.getAttribute('data-medium-focused')) {
+                    focused = element;
+                }
+
+                // Find the element that is receiving focus
+                if (!toFocus &&
+                        // target is part of an editor element
+                        (Util.isDescendant(element, target, true) ||
+                        // introduced also to avoid the toolbar to disapper when selecting from right to left and the selection ends at the beginning of the text.
+                        Util.isDescendant(element, selRange))) {
+                    toFocus = element;
+                }
+
+                // bail if we found both focused and toFocus elements
+                return !!focused && !!toFocus;
+            }, this);
+
+            // Check if the target is external (not part of the editor, toolbar, or anchorpreview)
+            var externalEvent = !Util.isDescendant(focused, target, true) &&
+                                !Util.isDescendant(toolbarEl, target, true) &&
+                                !Util.isDescendant(previewEl, target, true);
+
+            if (toFocus !== focused) {
+                // If element has focus, and focus is going outside of editor
+                // Don't blur focused element if clicking on editor, toolbar, or anchorpreview
+                if (focused && externalEvent) {
+                    // Trigger blur on the editable that has lost focus
+                    focused.removeAttribute('data-medium-focused');
+                    this.triggerCustomEvent('blur', eventObj, focused);
+                }
+
+                // If focus is going into an editor element
+                if (toFocus) {
+                    // Trigger focus on the editable that now has focus
+                    toFocus.setAttribute('data-medium-focused', true);
+                    this.triggerCustomEvent('focus', eventObj, toFocus);
                 }
             }
-            // If it's not part of the editor, toolbar, or anchor preview
-            if (!isDescendantOfEditorElements &&
-                    (!toolbarEl || (toolbarEl !== event.target && !Util.isDescendant(toolbarEl, event.target))) &&
-                    (!previewEl || (previewEl !== event.target && !Util.isDescendant(previewEl, event.target)))) {
-                this.triggerCustomEvent('externalInteraction', event);
+
+            if (externalEvent) {
+                this.triggerCustomEvent('externalInteraction', eventObj);
             }
         },
 
@@ -199,6 +252,10 @@ var Events;
 
         handleKeypress: function (event) {
             this.triggerCustomEvent('editableKeypress', event, event.currentTarget);
+        },
+
+        handleKeyup: function (event) {
+            this.triggerCustomEvent('editableKeyup', event, event.currentTarget);
         },
 
         handleMouseover: function (event) {

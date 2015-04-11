@@ -42,7 +42,7 @@ var Placeholders;
 
         attachEventHandlers: function () {
             // Custom events
-            this.base.subscribe('externalInteraction', this.handleExternalInteraction.bind(this));
+            this.base.subscribe('blur', this.handleExternalInteraction.bind(this));
 
             // Check placeholder on blur
             this.base.subscribe('editableBlur', this.handleBlur.bind(this));

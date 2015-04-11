@@ -557,7 +557,7 @@ function MediumEditor(elements, options) {
 
         delay: function (fn) {
             var self = this;
-            setTimeout(function () {
+            return setTimeout(function () {
                 if (self.isActive) {
                     fn();
                 }
@@ -711,9 +711,7 @@ function MediumEditor(elements, options) {
         },
 
         selectAllContents: function () {
-            var range = this.options.ownerDocument.createRange(),
-                sel = this.options.contentWindow.getSelection(),
-                currNode = Selection.getSelectionElement(this.options.contentWindow);
+            var currNode = Selection.getSelectionElement(this.options.contentWindow);
 
             if (currNode) {
                 // Move to the lowest descendant node that still selects all of the contents
@@ -721,9 +719,16 @@ function MediumEditor(elements, options) {
                     currNode = currNode.children[0];
                 }
 
-                range.selectNodeContents(currNode);
-                sel.removeAllRanges();
-                sel.addRange(range);
+                this.selectElement(currNode);
+            }
+        },
+
+        selectElement: function (element) {
+            Selection.selectNode(element, this.options.ownerDocument);
+
+            var selElement = Selection.getSelectionElement(this.options.contentWindow);
+            if (selElement) {
+                this.events.focusElement(selElement);
             }
         },
 

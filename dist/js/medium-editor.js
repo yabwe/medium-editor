@@ -514,9 +514,12 @@ var Util;
             return nextNode;
         },
 
-        isDescendant: function isDescendant(parent, child) {
+        isDescendant: function isDescendant(parent, child, checkEquality) {
             if (!parent || !child) {
                 return false;
+            }
+            if (checkEquality && parent === child) {
+                return true;
             }
             var node = child.parentNode;
             while (node !== null) {
@@ -1289,6 +1292,15 @@ var Selection;
                 selectedParentElement = range.startContainer;
             }
             return selectedParentElement;
+        },
+
+        selectNode: function (node, doc) {
+            var range = doc.createRange(),
+                sel = doc.getSelection();
+
+            range.selectNodeContents(node);
+            sel.removeAllRanges();
+            sel.addRange(range);
         }
     };
 }());
@@ -1372,9 +1384,19 @@ var Events;
 
             switch (name) {
             case 'externalInteraction':
-                // Detecting when focus is lost
+                // Detecting when user has interacted with elements outside of MediumEditor
                 this.attachDOMEvent(this.options.ownerDocument.body, 'click', this.handleInteraction.bind(this), true);
                 this.attachDOMEvent(this.options.ownerDocument.body, 'focus', this.handleInteraction.bind(this), true);
+                this.listeners[name] = true;
+                break;
+            case 'blur':
+                // Detecting when focus is lost
+                this.setupListener('externalInteraction');
+                this.listeners[name] = true;
+                break;
+            case 'focus':
+                // Detecting when focus moves into some part of MediumEditor
+                this.setupListener('externalInteraction');
                 this.listeners[name] = true;
                 break;
             case 'editableClick':
@@ -1395,6 +1417,13 @@ var Events;
                 // Detecting keypress in the contenteditables
                 this.base.elements.forEach(function (element) {
                     this.attachDOMEvent(element, 'keypress', this.handleKeypress.bind(this));
+                }.bind(this));
+                this.listeners[name] = true;
+                break;
+            case 'editableKeyup':
+                // Detecting keyup in the contenteditables
+                this.base.elements.forEach(function (element) {
+                    this.attachDOMEvent(element, 'keyup', this.handleKeyup.bind(this));
                 }.bind(this));
                 this.listeners[name] = true;
                 break;
@@ -1452,33 +1481,69 @@ var Events;
             }
         },
 
+        focusElement: function (element) {
+            element.focus();
+            this.updateFocus(element, { target: element, type: 'focus' });
+        },
+
         handleInteraction: function (event) {
-            var isDescendantOfEditorElements = false,
-                selection = this.options.contentWindow.getSelection(),
+            this.updateFocus(event.target, event);
+        },
+
+        updateFocus: function (target, eventObj) {
+            var selection = this.options.contentWindow.getSelection(),
                 toolbarEl = this.base.toolbar ? this.base.toolbar.getToolbarElement() : null,
                 anchorPreview = this.base.getExtensionByName('anchor-preview'),
                 previewEl = (anchorPreview && anchorPreview.getPreviewElement) ? anchorPreview.getPreviewElement() : null,
                 selRange = selection.isCollapsed ?
                            null :
                            Selection.getSelectedParentElement(selection.getRangeAt(0)),
-                i;
+                focused,
+                toFocus;
 
-            // This control was introduced also to avoid the toolbar
-            // to disapper when selecting from right to left and
-            // the selection ends at the beginning of the text.
-            for (i = 0; i < this.base.elements.length; i += 1) {
-                if (this.base.elements[i] === event.target ||
-                        Util.isDescendant(this.base.elements[i], event.target) ||
-                        Util.isDescendant(this.base.elements[i], selRange)) {
-                    isDescendantOfEditorElements = true;
-                    break;
+            this.base.elements.some(function (element) {
+                // Find the element that has focus
+                if (!focused && element.getAttribute('data-medium-focused')) {
+                    focused = element;
+                }
+
+                // Find the element that is receiving focus
+                if (!toFocus &&
+                        // target is part of an editor element
+                        (Util.isDescendant(element, target, true) ||
+                        // introduced also to avoid the toolbar to disapper when selecting from right to left and the selection ends at the beginning of the text.
+                        Util.isDescendant(element, selRange))) {
+                    toFocus = element;
+                }
+
+                // bail if we found both focused and toFocus elements
+                return !!focused && !!toFocus;
+            }, this);
+
+            // Check if the target is external (not part of the editor, toolbar, or anchorpreview)
+            var externalEvent = !Util.isDescendant(focused, target, true) &&
+                                !Util.isDescendant(toolbarEl, target, true) &&
+                                !Util.isDescendant(previewEl, target, true);
+
+            if (toFocus !== focused) {
+                // If element has focus, and focus is going outside of editor
+                // Don't blur focused element if clicking on editor, toolbar, or anchorpreview
+                if (focused && externalEvent) {
+                    // Trigger blur on the editable that has lost focus
+                    focused.removeAttribute('data-medium-focused');
+                    this.triggerCustomEvent('blur', eventObj, focused);
+                }
+
+                // If focus is going into an editor element
+                if (toFocus) {
+                    // Trigger focus on the editable that now has focus
+                    toFocus.setAttribute('data-medium-focused', true);
+                    this.triggerCustomEvent('focus', eventObj, toFocus);
                 }
             }
-            // If it's not part of the editor, toolbar, or anchor preview
-            if (!isDescendantOfEditorElements &&
-                    (!toolbarEl || (toolbarEl !== event.target && !Util.isDescendant(toolbarEl, event.target))) &&
-                    (!previewEl || (previewEl !== event.target && !Util.isDescendant(previewEl, event.target)))) {
-                this.triggerCustomEvent('externalInteraction', event);
+
+            if (externalEvent) {
+                this.triggerCustomEvent('externalInteraction', eventObj);
             }
         },
 
@@ -1492,6 +1557,10 @@ var Events;
 
         handleKeypress: function (event) {
             this.triggerCustomEvent('editableKeypress', event, event.currentTarget);
+        },
+
+        handleKeyup: function (event) {
+            this.triggerCustomEvent('editableKeyup', event, event.currentTarget);
         },
 
         handleMouseover: function (event) {
@@ -2291,18 +2360,12 @@ var AnchorPreview;
         },
 
         handleClick: function () {
-            var range,
-                sel,
-                anchorExtension = this.base.getExtensionByName('anchor'),
+            var anchorExtension = this.base.getExtensionByName('anchor'),
                 activeAnchor = this.activeAnchor;
 
             if (anchorExtension && activeAnchor) {
-                range = this.base.options.ownerDocument.createRange();
-                range.selectNodeContents(this.activeAnchor);
+                this.base.selectElement(this.activeAnchor);
 
-                sel = this.base.options.contentWindow.getSelection();
-                sel.removeAllRanges();
-                sel.addRange(range);
                 // Using setTimeout + options.delay because:
                 // We may actually be displaying the anchor form, which should be controlled by options.delay
                 this.base.delay(function () {
@@ -2453,7 +2516,6 @@ var Toolbar;
             });
 
             this.attachEventHandlers();
-            this.base.subscribe('externalInteraction', this.handleBlur.bind(this));
 
             return toolbar;
         },
@@ -2527,7 +2589,15 @@ var Toolbar;
         },
 
         attachEventHandlers: function () {
-            this.base.on(this.options.ownerDocument.documentElement, 'mousedown', this.handleDocumentMousedown.bind(this));
+
+            // MediumEditor custom events for when user beings and ends interaction with a contenteditable and its elements
+            this.base.subscribe('blur', this.handleBlur.bind(this));
+            this.base.subscribe('focus', this.handleFocus.bind(this));
+
+            // Updating the state of the toolbar as things change
+            this.base.subscribe('editableClick', this.handleEditableClick.bind(this));
+            this.base.subscribe('editableKeyup', this.handleEditableKeyup.bind(this));
+
             // Handle mouseup on document for updating the selection in the toolbar
             this.base.on(this.options.ownerDocument.documentElement, 'mouseup', this.handleDocumentMouseup.bind(this));
 
@@ -2539,18 +2609,6 @@ var Toolbar;
 
             // On resize, re-position the toolbar
             this.base.on(this.options.contentWindow, 'resize', this.handleWindowResize.bind(this));
-
-            // Handlers for each contentedtiable element
-            this.base.elements.forEach(function (element) {
-                // Attach click handler to each contenteditable element
-                this.base.on(element, 'click', this.handleEditableClick.bind(this));
-
-                // Attach keyup handler to each contenteditable element
-                this.base.on(element, 'keyup', this.handleEditableKeyup.bind(this));
-
-                // Attach blur handler to each contenteditable element
-                this.base.on(element, 'blur', this.handleEditableBlur.bind(this));
-            }, this);
         },
 
         handleWindowScroll: function () {
@@ -2561,12 +2619,7 @@ var Toolbar;
             this.throttledPositionToolbar();
         },
 
-        handleDocumentMousedown: function (event) {
-            this.lastMousedownTarget = event.target;
-        },
-
         handleDocumentMouseup: function (event) {
-            this.lastMousedownTarget = null;
             // Do not trigger checkState when mouseup fires over the toolbar
             if (event &&
                     event.target &&
@@ -2588,38 +2641,17 @@ var Toolbar;
             this.checkState();
         },
 
-        handleEditableBlur: function (event) {
-            var isRelatedTargetOwnedByThisEditor = false,
-                relatedTarget = (event && event.relatedTarget) ? event.relatedTarget : this.lastMousedownTarget;
-            // Do not trigger checkState when blurring the editable area and clicking into the toolbar
-            if (Util.isDescendant(this.getToolbarElement(), relatedTarget)) {
-                return false;
-            }
-            if (relatedTarget) {
-                // Remove all selections before checking state. This is necessary to avoid issues with
-                // standardizeSelectionStart 'canceling' the blur event by moving the selection (in Chrome only).
-                // In Safari, when you click on a non-button element outside of the contenteditable, the selection
-                // is already nulled out by the browser at this point, but remained set in Chrome, Firefox, and IE11.
-                // This change will effectively normalize all browsers' behavior to be the same as Safari.
-                this.base.elements.forEach(function (el) {
-                    isRelatedTargetOwnedByThisEditor = isRelatedTargetOwnedByThisEditor || Util.isDescendant(el, relatedTarget) ||
-                        relatedTarget === el;
-                }, this);
-                // We only remove all the ranges if the user clicked outside the contenteditables managed by this
-                // medium-editor instance. Otherwise keep the ranges if they are set, we need the range to be present
-                // for various things done by the toolbar to work.
-                if (!isRelatedTargetOwnedByThisEditor) {
-                    this.options.contentWindow.getSelection().removeAllRanges();
-                }
-            }
-            this.checkState();
-        },
-
         handleBlur: function () {
+            clearTimeout(this.hideTimeout);
+
             // Delay the call to hideToolbar to handle bug with multiple editors on the page at once
-            setTimeout(function () {
+            this.hideTimeout = setTimeout(function () {
                 this.hideToolbar();
             }.bind(this), 0);
+        },
+
+        handleFocus: function () {
+            this.checkState();
         },
 
         // Hiding/showing toolbar
@@ -2629,6 +2661,7 @@ var Toolbar;
         },
 
         showToolbar: function () {
+            clearTimeout(this.hideTimeout);
             if (!this.isDisplayed()) {
                 this.getToolbarElement().classList.add('medium-editor-toolbar-active');
                 if (typeof this.options.onShowToolbar === 'function') {
@@ -2697,14 +2730,9 @@ var Toolbar;
             return !!hasMultiParagraphs && hasMultiParagraphs.length > 1;
         },
 
-        // TODO: selection and selectionRange should be properties of the
-        //       Selection object
-        checkSelectionElement: function (newSelection, selectionElement) {
-            var i,
-                adjacentNode,
-                offset = 0,
-                newRange,
-                selectionRange = newSelection.getRangeAt(0);
+        modifySelection: function () {
+            var selection = this.options.contentWindow.getSelection(),
+                selectionRange = selection.getRangeAt(0);
 
             /*
             * In firefox, there are cases (ie doubleclick of a word) where the selectionRange start
@@ -2725,64 +2753,76 @@ var Toolbar;
             if (this.options.standardizeSelectionStart &&
                     selectionRange.startContainer.nodeValue &&
                     (selectionRange.startOffset === selectionRange.startContainer.nodeValue.length)) {
-                adjacentNode = Util.findAdjacentTextNodeWithContent(Selection.getSelectionElement(this.options.contentWindow), selectionRange.startContainer, this.options.ownerDocument);
+                var adjacentNode = Util.findAdjacentTextNodeWithContent(Selection.getSelectionElement(this.options.contentWindow), selectionRange.startContainer, this.options.ownerDocument);
                 if (adjacentNode) {
-                    offset = 0;
+                    var offset = 0;
                     while (adjacentNode.nodeValue.substr(offset, 1).trim().length === 0) {
                         offset = offset + 1;
                     }
-                    newRange = this.options.ownerDocument.createRange();
+                    var newRange = this.options.ownerDocument.createRange();
                     newRange.setStart(adjacentNode, offset);
                     newRange.setEnd(selectionRange.endContainer, selectionRange.endOffset);
-                    newSelection.removeAllRanges();
-                    newSelection.addRange(newRange);
+                    selection.removeAllRanges();
+                    selection.addRange(newRange);
                     selectionRange = newRange;
                 }
-            }
-
-            for (i = 0; i < this.base.elements.length; i += 1) {
-                if (this.base.elements[i] === selectionElement) {
-                    this.showAndUpdateToolbar();
-                    return;
-                }
-            }
-
-            if (!this.options.staticToolbar) {
-                this.hideToolbar();
             }
         },
 
         checkState: function () {
-            var newSelection,
-                selectionElement;
 
             if (!this.base.preventSelectionUpdates) {
-                newSelection = this.options.contentWindow.getSelection();
-                if ((!this.options.updateOnEmptySelection && newSelection.toString().trim() === '') ||
-                        (this.options.allowMultiParagraphSelection === false && this.multipleBlockElementsSelected()) ||
-                        Selection.selectionInContentEditableFalse(this.options.contentWindow)) {
-                    if (!this.options.staticToolbar) {
-                        this.hideToolbar();
-                    } else {
-                        this.showAndUpdateToolbar();
-                    }
 
+                // If no editable has focus OR selection is inside contenteditable = false
+                // hide toolbar
+                if (!this.getFocusedElement() ||
+                        Selection.selectionInContentEditableFalse(this.options.contentWindow)) {
+                    this.hideToolbar();
+                    return;
+                }
+
+                // If there's no selection element, selection element doesn't belong to this editor
+                // or toolbar is disabled for this selection element
+                // hide toolbar
+                var selectionElement = Selection.getSelectionElement(this.options.contentWindow);
+                if (!selectionElement ||
+                        this.base.elements.indexOf(selectionElement) === -1 ||
+                        selectionElement.getAttribute('data-disable-toolbar')) {
+                    this.hideToolbar();
+                    return;
+                }
+
+                // Now we know there's a focused editable with a selection
+
+                // If the updateOnEmptySelection option is true, show the toolbar
+                if (this.options.updateOnEmptySelection && this.options.staticToolbar) {
+                    this.showAndUpdateToolbar();
+                    return;
+                }
+
+                // If we don't have a "valid" selection -> hide toolbar
+                if (this.options.contentWindow.getSelection().toString().trim() === '' ||
+                    (this.options.allowMultiParagraphSelection === false && this.multipleBlockElementsSelected())) {
+                    this.hideToolbar();
                 } else {
-                    selectionElement = Selection.getSelectionElement(this.options.contentWindow);
-                    if (!selectionElement || selectionElement.getAttribute('data-disable-toolbar')) {
-                        if (!this.options.staticToolbar) {
-                            this.hideToolbar();
-                        }
-                    } else {
-                        this.checkSelectionElement(newSelection, selectionElement);
-                    }
+                    this.showAndUpdateToolbar();
                 }
             }
+        },
+
+        getFocusedElement: function () {
+            for (var i = 0; i < this.base.elements.length; i += 1) {
+                if (this.base.elements[i].getAttribute('data-medium-focused')) {
+                    return this.base.elements[i];
+                }
+            }
+            return null;
         },
 
         // Updating the toolbar
 
         showAndUpdateToolbar: function () {
+            this.modifySelection();
             this.setToolbarButtonStates();
             this.showToolbarDefaultActions();
             this.setToolbarPosition();
@@ -2858,17 +2898,12 @@ var Toolbar;
         },
 
         setToolbarPosition: function () {
-            var container = Selection.getSelectionElement(this.options.contentWindow),
+            var container = this.getFocusedElement(),
                 selection = this.options.contentWindow.getSelection(),
                 anchorPreview;
 
             // If there isn't a valid selection, bail
-            if (!container || !this.options.contentWindow.getSelection().focusNode) {
-                return this;
-            }
-
-            // If the container isn't part of this medium-editor instance, bail
-            if (this.base.elements.indexOf(container) === -1) {
+            if (!container) {
                 return this;
             }
 
@@ -2935,7 +2970,7 @@ var Toolbar;
             if (targetLeft < 0) {
                 targetLeft = 0;
             } else if ((targetLeft + toolbarWidth) > windowWidth) {
-                targetLeft = windowWidth - toolbarWidth;
+                targetLeft = (windowWidth - Math.ceil(toolbarWidth) - 1);
             }
 
             toolbarElement.style.left = targetLeft + 'px';
@@ -3020,7 +3055,7 @@ var Placeholders;
 
         attachEventHandlers: function () {
             // Custom events
-            this.base.subscribe('externalInteraction', this.handleExternalInteraction.bind(this));
+            this.base.subscribe('blur', this.handleExternalInteraction.bind(this));
 
             // Check placeholder on blur
             this.base.subscribe('editableBlur', this.handleBlur.bind(this));
@@ -3614,7 +3649,7 @@ function MediumEditor(elements, options) {
 
         delay: function (fn) {
             var self = this;
-            setTimeout(function () {
+            return setTimeout(function () {
                 if (self.isActive) {
                     fn();
                 }
@@ -3768,9 +3803,7 @@ function MediumEditor(elements, options) {
         },
 
         selectAllContents: function () {
-            var range = this.options.ownerDocument.createRange(),
-                sel = this.options.contentWindow.getSelection(),
-                currNode = Selection.getSelectionElement(this.options.contentWindow);
+            var currNode = Selection.getSelectionElement(this.options.contentWindow);
 
             if (currNode) {
                 // Move to the lowest descendant node that still selects all of the contents
@@ -3778,9 +3811,16 @@ function MediumEditor(elements, options) {
                     currNode = currNode.children[0];
                 }
 
-                range.selectNodeContents(currNode);
-                sel.removeAllRanges();
-                sel.addRange(range);
+                this.selectElement(currNode);
+            }
+        },
+
+        selectElement: function (element) {
+            Selection.selectNode(element, this.options.ownerDocument);
+
+            var selElement = Selection.getSelectionElement(this.options.contentWindow);
+            if (selElement) {
+                this.events.focusElement(selElement);
             }
         },
 

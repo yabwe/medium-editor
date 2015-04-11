@@ -1,6 +1,6 @@
 /*global MediumEditor, describe, it, expect, spyOn,
      afterEach, beforeEach, selectElementContents,
-     jasmine, fireEvent, tearDown,
+     jasmine, fireEvent, tearDown, Util,
      selectElementContentsAndFire */
 
 describe('Anchor Button TestCase', function () {
@@ -49,6 +49,24 @@ describe('Anchor Button TestCase', function () {
 
     });
 
+    describe('Anchor Form', function () {
+        it('should not hide the toolbar when mouseup fires inside the anchor form', function () {
+            var editor = new MediumEditor('.editor'),
+                anchorExtension = editor.getExtensionByName('anchor');
+
+            selectElementContentsAndFire(editor.elements[0]);
+            var button = editor.toolbar.getToolbarElement().querySelector('[data-action="createLink"]');
+            fireEvent(button, 'click');
+
+            expect(editor.toolbar.isDisplayed()).toBe(true);
+            expect(anchorExtension.isDisplayed()).toBe(true);
+
+            fireEvent(anchorExtension.getInput(), 'mouseup');
+            expect(editor.toolbar.isDisplayed()).toBe(true);
+            expect(anchorExtension.isDisplayed()).toBe(true);
+        });
+    });
+
     describe('Link Creation', function () {
         it('should create a link when user presses enter', function () {
             spyOn(MediumEditor.prototype, 'createLink').and.callThrough();
@@ -62,10 +80,11 @@ describe('Anchor Button TestCase', function () {
             input = editor.getExtensionByName('anchor').getInput();
             input.value = 'test';
             fireEvent(input, 'keyup', {
-                keyCode: 13
+                keyCode: Util.keyCode.ENTER
             });
             expect(editor.createLink).toHaveBeenCalled();
         });
+
         it('shouldn\'t create a link when user presses enter without value', function () {
             spyOn(MediumEditor.prototype, 'createLink').and.callThrough();
             var editor = new MediumEditor('.editor'),
@@ -78,7 +97,7 @@ describe('Anchor Button TestCase', function () {
             input = editor.getExtensionByName('anchor').getInput();
             input.value = '';
             fireEvent(input, 'keyup', {
-                keyCode: 13
+                keyCode: Util.keyCode.ENTER
             });
             expect(editor.elements[0].querySelector('a')).toBeNull();
         });
@@ -174,7 +193,7 @@ describe('Anchor Button TestCase', function () {
             button.checked = true;
 
             fireEvent(input, 'keyup', {
-                keyCode: 13
+                keyCode: Util.keyCode.ENTER
             });
             opts = {
                 url: 'test',
@@ -198,7 +217,7 @@ describe('Anchor Button TestCase', function () {
                 cancel,
                 anchorExtension = editor.getExtensionByName('anchor');
 
-            selectElementContents(editor.elements[0]);
+            selectElementContentsAndFire(editor.elements[0]);
             button = editor.toolbar.getToolbarElement().querySelector('[data-action="createLink"]');
             cancel = anchorExtension.getForm().querySelector('a.medium-editor-toolbar-close');
             fireEvent(button, 'click');
@@ -207,15 +226,16 @@ describe('Anchor Button TestCase', function () {
             expect(editor.toolbar.showAndUpdateToolbar).toHaveBeenCalled();
             expect(anchorExtension.isDisplayed()).toBe(false);
         });
+
         it('should close the link form when user presses escape', function () {
             var editor = new MediumEditor('.editor'),
                 anchorExtension = editor.getExtensionByName('anchor');
 
-            selectElementContents(editor.elements[0]);
+            selectElementContentsAndFire(editor.elements[0]);
             fireEvent(editor.toolbar.getToolbarElement().querySelector('[data-action="createLink"]'), 'click');
             expect(anchorExtension.isDisplayed()).toBe(true);
             fireEvent(anchorExtension.getInput(), 'keyup', {
-                keyCode: 27
+                keyCode: Util.keyCode.ESCAPE
             });
             expect(anchorExtension.isDisplayed()).toBe(false);
         });
