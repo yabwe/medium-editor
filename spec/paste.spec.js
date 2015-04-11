@@ -52,6 +52,27 @@ describe('Pasting content', function () {
                 source: 'Inside editor',
                 paste: '<meta charset=\'utf-8\'><b style="color: rgb(0, 0, 0); font-family: \'Helvetica Neue\', Helvetica, Arial, sans-serif; font-size: 22.22222328186035px; font-style: normal; font-variant: normal; letter-spacing: normal; line-height: 30px; orphans: auto; text-align: start; text-indent: 0px; text-transform: none; white-space: normal; widows: auto; word-spacing: 0px; -webkit-text-stroke-width: 0px;">Bold,</b><span style="color: rgb(0, 0, 0); font-family: \'Helvetica Neue\', Helvetica, Arial, sans-serif; font-size: 22.22222328186035px; font-style: normal; font-variant: normal; font-weight: normal; letter-spacing: normal; line-height: 30px; orphans: auto; text-align: start; text-indent: 0px; text-transform: none; white-space: normal; widows: auto; word-spacing: 0px; -webkit-text-stroke-width: 0px; display: inline !important; float: none;"> </span><i style="color: rgb(0, 0, 0); font-family: \'Helvetica Neue\', Helvetica, Arial, sans-serif; font-size: 22.22222328186035px; font-variant: normal; font-weight: normal; letter-spacing: normal; line-height: 30px; orphans: auto; text-align: start; text-indent: 0px; text-transform: none; white-space: normal; widows: auto; word-spacing: 0px; -webkit-text-stroke-width: 0px;">italic,</i><span style="color: rgb(0, 0, 0); font-family: \'Helvetica Neue\', Helvetica, Arial, sans-serif; font-size: 22.22222328186035px; font-style: normal; font-variant: normal; font-weight: normal; letter-spacing: normal; line-height: 30px; orphans: auto; text-align: start; text-indent: 0px; text-transform: none; white-space: normal; widows: auto; word-spacing: 0px; -webkit-text-stroke-width: 0px; display: inline !important; float: none;"><span class="Apple-converted-space"> </span></span><b style="color: rgb(0, 0, 0); font-family: \'Helvetica Neue\', Helvetica, Arial, sans-serif; font-size: 22.22222328186035px; font-style: normal; font-variant: normal; letter-spacing: normal; line-height: 30px; orphans: auto; text-align: start; text-indent: 0px; text-transform: none; white-space: normal; widows: auto; word-spacing: 0px; -webkit-text-stroke-width: 0px;"><i>bold and italic</i></b><span style="color: rgb(0, 0, 0); font-family: \'Helvetica Neue\', Helvetica, Arial, sans-serif; font-size: 22.22222328186035px; font-style: normal; font-variant: normal; font-weight: normal; letter-spacing: normal; line-height: 30px; orphans: auto; text-align: start; text-indent: 0px; text-transform: none; white-space: normal; widows: auto; word-spacing: 0px; -webkit-text-stroke-width: 0px; display: inline !important; float: none;">, and<span class="Apple-converted-space"> </span></span><a href="http://en.wikipedia.org/wiki/Link_(The_Legend_of_Zelda)" style="color: black; font-family: \'Helvetica Neue\', Helvetica, Arial, sans-serif; font-size: 22.22222328186035px; font-style: normal; font-variant: normal; font-weight: normal; letter-spacing: normal; line-height: 30px; orphans: auto; text-align: start; text-indent: 0px; text-transform: none; white-space: normal; widows: auto; word-spacing: 0px; -webkit-text-stroke-width: 0px;">a link</a><span style="color: rgb(0, 0, 0); font-family: \'Helvetica Neue\', Helvetica, Arial, sans-serif; font-size: 22.22222328186035px; font-style: normal; font-variant: normal; font-weight: normal; letter-spacing: normal; line-height: 30px; orphans: auto; text-align: start; text-indent: 0px; text-transform: none; white-space: normal; widows: auto; word-spacing: 0px; -webkit-text-stroke-width: 0px; display: inline !important; float: none;">.</span>',
                 output: "<b>Bold,</b> <i>italic,</i> <b><i>bold and italic</i></b>, and <a href=\"http://en.wikipedia.org/wiki/Link_\\(The_Legend_of_Zelda\\)\">a link</a>\\."
+            }],
+        textTests = [
+            {
+                source: "Text single word",
+                paste: "supercalifragilisticexpalidocious",
+                output: '<div id="editor-inner">supercalifragilisticexpalidocious</div>'
+            },
+            {
+                source: "Text single word with leading/trailing space",
+                paste: " supercalifragilisticexpalidocious ",
+                output: '<div id="editor-inner"> supercalifragilisticexpalidocious </div>'
+            },
+            {
+                source: "Text multi-word with no line breaks",
+                paste: "Their relationship consisted in discussing if it existed",
+                output: '<div id="editor-inner">Their relationship consisted in discussing if it existed</div>'
+            },
+            {
+                source: 'Text with multiple line breaks',
+                paste: 'Only one thing made him happy\nAnd now that it was gone\nEverything made him happy\r\n',
+                output: '<div id="editor-inner"><p>Only one thing made him happy</p><p>And now that it was gone</p><p>Everything made him happy</p></div>'
             }
         ];
 
@@ -224,4 +245,46 @@ describe('Pasting content', function () {
             );
         });
     });
+
+    describe('text', function () {
+        it('handlePaste should handle text with/without linebreaks', function () {
+            var range, i,
+                editorEl = this.el,
+                sel = window.getSelection(),
+                editor = new MediumEditor('.editor', {
+                    delay: 200,
+                    disableReturn: false
+                }),
+
+                // mock event with clipboardData API
+                // test requires creating a function, so can't loop or jslint balks
+                evt = {
+                    pasteText: null,
+                    preventDefault: function () {
+                        return;
+                    },
+                    clipboardData: {
+                        getData: function () {
+                            // do we need to return different results for the different types? text/plain, text/html
+                            return this.pasteText;
+                        }
+                    }
+                };
+
+            for (i = 0; i < textTests.length; i += 1) {
+                editorEl.innerHTML = '<div id="editor-inner">&nbsp</div>';
+
+                range = document.createRange();
+                range.selectNodeContents(editorEl);
+                sel.removeAllRanges();
+                sel.addRange(range);
+
+                evt.clipboardData.pasteText = textTests[i].paste;
+                editor.pasteHandler.handlePaste(evt, editorEl);
+                jasmine.clock().tick(100);
+                expect(editorEl.innerHTML).toEqual(textTests[i].output);
+            }
+        });
+    });
+
 });
