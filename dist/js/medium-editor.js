@@ -1797,7 +1797,7 @@ var PasteHandler;
         this.base = instance;
         this.options = options;
 
-        if (this.options.forcePlainText || this.options.cleanPastedHTML) {
+        if (this.options.forcePlainText || this.options.cleanPastedHtml) {
             this.base.subscribe('editablePaste', this.handlePaste.bind(this));
         }
     };
@@ -1826,7 +1826,7 @@ var PasteHandler;
                     !event.defaultPrevented) {
                 event.preventDefault();
 
-                if (this.options.cleanPastedHTML && event.clipboardData.getData(dataFormatHTML)) {
+                if (this.options.cleanPastedHtml && event.clipboardData.getData(dataFormatHTML)) {
                     return this.cleanPaste(event.clipboardData.getData(dataFormatHTML));
                 }
 
@@ -3458,7 +3458,7 @@ function MediumEditor(elements, options) {
             // Backwards compatability
             {
                 forcePlainText: this.options.forcePlainText, // deprecated
-                cleanPastedHtml: this.options.cleanPastedHtml, // deprecated
+                cleanPastedHtml: this.options.cleanPastedHTML, // deprecated
                 disableReturn: this.options.disableReturn,
                 targetBlank: this.options.targetBlank,
                 contentWindow: this.options.contentWindow,
@@ -3504,7 +3504,7 @@ function MediumEditor(elements, options) {
         // warn about using deprecated properties
         if (options) {
             [['forcePlainText', 'paste.forcePlainText'],
-             ['cleanPastedHtml', 'paste.cleanPastedHtml']].forEach(function (pair) {
+             ['cleanPastedHTML', 'paste.cleanPastedHtml']].forEach(function (pair) {
                 if (options.hasOwnProperty(pair[0]) && options[pair[0]] !== undefined) {
                     Util.deprecated(pair[0], pair[1]);
                 }
