@@ -90,14 +90,16 @@ describe('Pasting content', function () {
         jasmine.clock().uninstall();
     });
 
-    describe('using cleanPastedHtml option', function () {
+    describe('using cleanPastedHTML option', function () {
         it('should filter multi-line rich-text pastes', function () {
             var i,
                 editorEl = this.el,
                 editor = new MediumEditor('.editor', {
                     delay: 200,
-                    forcePlainText: false,
-                    cleanPastedHtml: true
+                    paste: {
+                        forcePlainText: false,
+                        cleanPastedHTML: true
+                    }
                 });
 
             for (i = 0; i < multiLineTests.length; i += 1) {
@@ -115,8 +117,10 @@ describe('Pasting content', function () {
 
         it('should filter multi-line rich-text pastes when "insertHTML" command is not supported', function () {
             var editor = new MediumEditor('.editor', {
-                forcePlainText: false,
-                cleanPastedHTML: true
+                paste: {
+                    forcePlainText: false,
+                    cleanPastedHTML: true
+                }
             });
 
             spyOn(document, "queryCommandSupported").and.returnValue(false);
@@ -133,13 +137,41 @@ describe('Pasting content', function () {
     });
 
     describe('cleanPaste', function () {
+        it('should filter inline rich-text by passing deprecated options', function () {
+            var i,
+                editorEl = this.el,
+                editor = new MediumEditor('.editor', {
+                    delay: 200,
+                    forcePlainText: false, // deprecated option
+                    cleanPastedHTML: true // deprecated option
+                });
+
+            for (i = 0; i < inlineTests.length; i += 1) {
+
+                // move caret to editor
+                editorEl.innerHTML = 'Before&nbsp;<span id="editor-inner">&nbsp;</span>&nbsp;after.';
+
+                selectElementContents(document.getElementById('editor-inner'));
+
+                editor.cleanPaste(inlineTests[i].paste);
+                jasmine.clock().tick(100);
+
+                // Firefox and IE: doing an insertHTML while this <span> is selected results in the html being inserted inside of the span
+                // Firefox replace the &nbsp; other either side of the <span> with a space
+                // Webkit: doing an insertHTML while this <span> is selected results in the span being replaced completely
+                expect(editorEl.innerHTML).toMatch(new RegExp("^Before(&nbsp;|\\s)(<span id=\"editor-inner\">)?" + inlineTests[i].output + "(</span>)?(&nbsp;|\\s)after\\.$"));
+            }
+        });
+
         it('should filter inline rich-text', function () {
             var i,
                 editorEl = this.el,
                 editor = new MediumEditor('.editor', {
                     delay: 200,
-                    forcePlainText: false,
-                    cleanPastedHtml: true
+                    paste: {
+                        forcePlainText: false,
+                        cleanPastedHTML: true
+                    }
                 });
 
             for (i = 0; i < inlineTests.length; i += 1) {
@@ -161,8 +193,10 @@ describe('Pasting content', function () {
 
         it('should filter inline rich-text when "insertHTML" command is not supported', function () {
             var editor = new MediumEditor('.editor', {
-                    forcePlainText: false,
-                    cleanPastedHtml: true
+                    paste: {
+                        forcePlainText: false,
+                        cleanPastedHTML: true
+                    }
                 });
 
             spyOn(document, "queryCommandSupported").and.returnValue(false);
@@ -185,7 +219,7 @@ describe('Pasting content', function () {
             var editor = new MediumEditor('.editor', {
                 paste: {
                     forcePlainText: false,
-                    cleanPastedHtml: true,
+                    cleanPastedHTML: true,
                     cleanReplacements: [[new RegExp(/<label>/gi), '<sub>'], [new RegExp(/<\/label>/gi), '</sub>']]
                 }
             });

@@ -119,7 +119,7 @@ var editor = new MediumEditor('.editable', {
     paste: {
         // This example includes the default options for paste, if nothing is passed this is what it used
         forcePlainText: true,
-        cleanPastedHtml: false,
+        cleanPastedHTML: false,
         cleanReplacements: [],
         cleanAttrs: ['class', 'style', 'dir']
         cleanTags: ['meta']
@@ -128,8 +128,8 @@ var editor = new MediumEditor('.editable', {
 ```
 
 * __forcePlainText__: Forces pasting as plain text. Default: true
-* __cleanPastedHtml__: cleans pasted content from different sources, like google docs etc. Default: false
-* __cleanReplacements__: custom pairs (2 element arrays) of RegExp and replacement text to use during paste when __forcePlainText__ or __cleanPastedHtml__ are `true` OR when calling `cleanPaste(text)` helper method. Default: []
+* __cleanPastedHTML__: cleans pasted content from different sources, like google docs etc. Default: false
+* __cleanReplacements__: custom pairs (2 element arrays) of RegExp and replacement text to use during paste when __forcePlainText__ or __cleanPastedHTML__ are `true` OR when calling `cleanPaste(text)` helper method. Default: []
 * __cleanAttrs__: list of attributes to remove when ... default: ['class', 'style', 'dir']
 * __cleanTags__: list of element tag names to remove... default: ['meta']
 
@@ -146,7 +146,7 @@ var editor = new MediumEditor('.editable', {
     delay: 1000,
     targetBlank: true,
     paste: {
-        cleanPastedHtml: true,
+        cleanPastedHTML: true,
         cleanAttrs: ['style', 'dir']
         cleanTags: ['label', 'meta']
     }
