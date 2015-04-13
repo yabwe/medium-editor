@@ -1,3 +1,10 @@
+4.5.0 / 2015-04-13
+==================
+* Expose 'unsubscribe' for custom events
+* Detach custom events when editor is destroyed
+* Fix fontawesome url in demo page
+
+
 4.4.0 / 2015-04-11
 ==================
 * Expose smart 'blur' and 'focus' events which account for toolbar interaction
