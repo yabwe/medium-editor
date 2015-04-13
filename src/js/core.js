@@ -362,7 +362,7 @@ function MediumEditor(elements, options) {
             // Backwards compatability
             {
                 forcePlainText: this.options.forcePlainText, // deprecated
-                cleanPastedHtml: this.options.cleanPastedHTML, // deprecated
+                cleanPastedHtml: this.options.cleanPastedHtml, // deprecated
                 disableReturn: this.options.disableReturn,
                 targetBlank: this.options.targetBlank,
                 contentWindow: this.options.contentWindow,
@@ -408,7 +408,7 @@ function MediumEditor(elements, options) {
         // warn about using deprecated properties
         if (options) {
             [['forcePlainText', 'paste.forcePlainText'],
-             ['cleanPastedHTML', 'paste.cleanPastedHtml']].forEach(function (pair) {
+             ['cleanPastedHtml', 'paste.cleanPastedHtml']].forEach(function (pair) {
                 if (options.hasOwnProperty(pair[0]) && options[pair[0]] !== undefined) {
                     Util.deprecated(pair[0], pair[1]);
                 }

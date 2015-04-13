@@ -68,7 +68,7 @@ var PasteHandler;
         this.base = instance;
         this.options = options;
 
-        if (this.options.forcePlainText || this.options.cleanPastedHtml) {
+        if (this.options.forcePlainText || this.options.cleanPastedHTML) {
             this.base.subscribe('editablePaste', this.handlePaste.bind(this));
         }
     };
@@ -97,7 +97,7 @@ var PasteHandler;
                     !event.defaultPrevented) {
                 event.preventDefault();
 
-                if (this.options.cleanPastedHtml && event.clipboardData.getData(dataFormatHTML)) {
+                if (this.options.cleanPastedHTML && event.clipboardData.getData(dataFormatHTML)) {
                     return this.cleanPaste(event.clipboardData.getData(dataFormatHTML));
                 }
 
