@@ -1356,21 +1356,42 @@ var Events;
         },
 
         // custom events
-        attachCustomEvent: function (event, handler) {
+        attachCustomEvent: function (event, listener) {
             this.setupListener(event);
             // If we don't suppot this custom event, don't do anything
             if (this.listeners[event]) {
                 if (!this.customEvents[event]) {
                     this.customEvents[event] = [];
                 }
-                this.customEvents[event].push(handler);
+                this.customEvents[event].push(listener);
             }
+        },
+
+        detachCustomEvent: function (event, listener) {
+            var index = this.indexOfCustomListener(event, listener);
+            if (index !== -1) {
+                this.customEvents[event].splice(index, 1);
+                // TODO: If array is empty, should detach internal listeners via destoryListener()
+            }
+        },
+
+        indexOfCustomListener: function (event, listener) {
+            if (!this.customEvents[event] || !this.customEvents[event].length) {
+                return -1;
+            }
+
+            return this.customEvents[event].indexOf(listener);
+        },
+
+        detachAllCustomEvents: function () {
+            this.customEvents = {};
+            // TODO: Should detach internal listeners here via destroyListener()
         },
 
         triggerCustomEvent: function (name, data, editable) {
             if (this.customEvents[name]) {
-                this.customEvents[name].forEach(function (handler) {
-                    handler(data, editable);
+                this.customEvents[name].forEach(function (listener) {
+                    listener(data, editable);
                 });
             }
         },
@@ -3637,6 +3658,7 @@ function MediumEditor(elements, options) {
             }, this);
 
             this.events.detachAllDOMEvents();
+            this.events.detachAllCustomEvents();
         },
 
         on: function (target, event, listener, useCapture) {
@@ -3649,6 +3671,10 @@ function MediumEditor(elements, options) {
 
         subscribe: function (event, listener) {
             this.events.attachCustomEvent(event, listener);
+        },
+
+        unsubscribe: function (event, listener) {
+            this.events.detachCustomEvent(event, listener);
         },
 
         delay: function (fn) {
