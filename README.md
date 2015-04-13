@@ -186,6 +186,7 @@ Check out the Wiki page for a list of available themes: [https://github.com/davi
 * __.execAction(action, opts)__: executes an built-in action via `document.execCommand`
 * __.createLink(opts)__: creates a link via the native `document.execCommand('createLink')` command
 * __.subscribe(event, listener)__: attaches a listener to a custom medium-editor event
+* __.unsubscribe(event, listener)__: detaches a listener from a custom medium-editor event
 * __.saveSelection()__: internally store the set of selected text
 * __.restoreSelection()__: restore the selection to what was selected when `saveSelection()` was called
 * __.selectAllContents()__: expands the selection to contain all text within the focused contenteditable

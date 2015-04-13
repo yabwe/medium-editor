@@ -541,6 +541,7 @@ function MediumEditor(elements, options) {
             }, this);
 
             this.events.detachAllDOMEvents();
+            this.events.detachAllCustomEvents();
         },
 
         on: function (target, event, listener, useCapture) {
@@ -553,6 +554,10 @@ function MediumEditor(elements, options) {
 
         subscribe: function (event, listener) {
             this.events.attachCustomEvent(event, listener);
+        },
+
+        unsubscribe: function (event, listener) {
+            this.events.detachCustomEvent(event, listener);
         },
 
         delay: function (fn) {
