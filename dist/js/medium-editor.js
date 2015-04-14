@@ -1115,7 +1115,7 @@ var editorDefaults;
 
         paste: {
             forcePlainText: true,
-            cleanPastedHtml: false,
+            cleanPastedHTML: false,
             cleanAttrs: ['class', 'style', 'dir'],
             cleanTags: ['meta']
         }
@@ -1800,9 +1800,9 @@ var PasteHandler;
     /* Paste Options:
      *
      * forcePlainText: Forces pasting as plain text. Default: true
-     * cleanPastedHtml: cleans pasted content from different sources, like google docs etc. Default: false
+     * cleanPastedHTML: cleans pasted content from different sources, like google docs etc. Default: false
      * cleanReplacements: custom pairs (2 element arrays) of RegExp and replacement text to use during paste when
-     *                    __forcePlainText__ or __cleanPastedHtml__ are `true` OR when calling `cleanPaste(text)`
+     *                    __forcePlainText__ or __cleanPastedHTML__ are `true` OR when calling `cleanPaste(text)`
      *                    helper method. Default: []
      * cleanAttrs: list of attributes to remove when ... default: ['class', 'style', 'dir']
      * cleanTags: list of element tag names to remove... default: ['meta']
@@ -3479,7 +3479,7 @@ function MediumEditor(elements, options) {
             // Backwards compatability
             {
                 forcePlainText: this.options.forcePlainText, // deprecated
-                cleanPastedHtml: this.options.cleanPastedHtml, // deprecated
+                cleanPastedHTML: this.options.cleanPastedHTML, // deprecated
                 disableReturn: this.options.disableReturn,
                 targetBlank: this.options.targetBlank,
                 contentWindow: this.options.contentWindow,
@@ -3525,7 +3525,7 @@ function MediumEditor(elements, options) {
         // warn about using deprecated properties
         if (options) {
             [['forcePlainText', 'paste.forcePlainText'],
-             ['cleanPastedHtml', 'paste.cleanPastedHtml']].forEach(function (pair) {
+             ['cleanPastedHTML', 'paste.cleanPastedHTML']].forEach(function (pair) {
                 if (options.hasOwnProperty(pair[0]) && options[pair[0]] !== undefined) {
                     Util.deprecated(pair[0], pair[1]);
                 }

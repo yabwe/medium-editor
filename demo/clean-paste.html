@@ -23,8 +23,10 @@
     <script>
         var editor = new MediumEditor('.editable', {
             buttonLabels: 'fontawesome',
-            cleanPastedHTML: true,
-            forcePlainText: false
+            paste: {
+                cleanPastedHTML: true,
+                forcePlainText: false
+            }
         });
     </script>
 </body>

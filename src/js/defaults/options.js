@@ -41,7 +41,7 @@ var editorDefaults;
 
         paste: {
             forcePlainText: true,
-            cleanPastedHtml: false,
+            cleanPastedHTML: false,
             cleanAttrs: ['class', 'style', 'dir'],
             cleanTags: ['meta']
         }
