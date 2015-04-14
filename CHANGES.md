@@ -1,3 +1,8 @@
+4.5.1 / 2015-04-14
+==================
+* Fix broken 'paste.cleanPastedHtml' option and rename to 'paste.cleanPastedHTML'
+
+
 4.5.0 / 2015-04-13
 ==================
 * Expose 'unsubscribe' for custom events
