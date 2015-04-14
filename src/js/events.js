@@ -203,10 +203,6 @@ var Events;
             this.updateFocus(element, { target: element, type: 'focus' });
         },
 
-        handleInteraction: function (event) {
-            this.updateFocus(event.target, event);
-        },
-
         updateFocus: function (target, eventObj) {
             var toolbarEl = this.base.toolbar ? this.base.toolbar.getToolbarElement() : null,
                 anchorPreview = this.base.getExtensionByName('anchor-preview'),
