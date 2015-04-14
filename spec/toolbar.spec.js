@@ -151,6 +151,7 @@ describe('Toolbar TestCase', function () {
 
             expect(document.getSelection().rangeCount).toBe(1);
             expect(editor.toolbar.isDisplayed()).toBe(false);
+            tearDown(outsideElement);
         });
     });
 
