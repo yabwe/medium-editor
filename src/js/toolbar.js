@@ -27,6 +27,7 @@ var Toolbar;
                 toolbar.className += " stalker-toolbar";
             }
 
+
             toolbar.appendChild(this.createToolbarButtons());
 
             // Add any forms that extensions may have
@@ -163,12 +164,17 @@ var Toolbar;
         },
 
         handleBlur: function () {
+            // Kill any previously delayed calls to hide the toolbar
             clearTimeout(this.hideTimeout);
+
+            // Blur may fire even if we have a selection, so we want to prevent any delayed showToolbar
+            // calls from happening in this specific case
+            clearTimeout(this.delayShowTimeout);
 
             // Delay the call to hideToolbar to handle bug with multiple editors on the page at once
             this.hideTimeout = setTimeout(function () {
                 this.hideToolbar();
-            }.bind(this), 0);
+            }.bind(this), 1);
         },
 
         handleFocus: function () {
@@ -225,7 +231,7 @@ var Toolbar;
 
             // Using setTimeout + options.delay because:
             // We will actually be displaying the toolbar, which should be controlled by options.delay
-            this.base.delay(function () {
+            this.delayShowTimeout = this.base.delay(function () {
                 this.showToolbar();
             }.bind(this));
         },
