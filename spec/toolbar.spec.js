@@ -117,6 +117,41 @@ describe('Toolbar TestCase', function () {
             expect(editor.toolbar.getToolbarElement().classList.contains('medium-editor-toolbar-active')).toBe(false);
             expect(temp.onHide).toHaveBeenCalled();
         });
+
+        it('should not hide when selecting text within editor, but release mouse outside of editor', function () {
+            this.el.innerHTML = 'lorem ipsum';
+            var editor = new MediumEditor('.editor');
+
+            selectElementContentsAndFire(editor.elements[0].firstChild);
+            fireEvent(editor.elements[0], 'mousedown');
+            fireEvent(document.body, 'mouseup');
+            fireEvent(document.body, 'click');
+            jasmine.clock().tick(51);
+
+            expect(editor.toolbar.isDisplayed()).toBe(true);
+        });
+
+        it('should hide the toolbar when clicking outside the toolbar on an element that does not clear selection', function () {
+            this.el.innerHTML = 'lorem ipsum';
+            var outsideElement = document.createElement('div'),
+                editor = new MediumEditor('.editor');
+
+            outsideElement.style = "-webkit-user-select: none; -moz-user-select: none; -ms-user-select: none; user-select: none;";
+            outsideElement.innerHTML = "Click Me, I don't clear selection";
+            document.body.appendChild(outsideElement);
+
+            selectElementContentsAndFire(editor.elements[0].firstChild);
+            jasmine.clock().tick(51);
+            expect(editor.toolbar.isDisplayed()).toBe(true);
+
+            fireEvent(outsideElement, 'mousedown');
+            fireEvent(outsideElement, 'mouseup');
+            fireEvent(outsideElement, 'click');
+            jasmine.clock().tick(51);
+
+            expect(document.getSelection().rangeCount).toBe(1);
+            expect(editor.toolbar.isDisplayed()).toBe(false);
+        });
     });
 
     describe('Static Toolbars', function () {
