@@ -54,8 +54,12 @@ var PasteHandler;
      * cleanReplacements: custom pairs (2 element arrays) of RegExp and replacement text to use during paste when
      *                    __forcePlainText__ or __cleanPastedHTML__ are `true` OR when calling `cleanPaste(text)`
      *                    helper method. Default: []
-     * cleanAttrs: list of attributes to remove when ... default: ['class', 'style', 'dir']
-     * cleanTags: list of element tag names to remove... default: ['meta']
+     * cleanAttrs: list of element attributes to remove during paste when __cleanPastedHTML__ is `true` or when
+     *             calling `cleanPaste(text)` or `pasteHTML(html,options)` helper methods.
+     *             Default: ['class', 'style', 'dir']
+     * cleanTags: list of element tag names to remove during paste when __cleanPastedHTML__ is `true` or when
+     *            calling `cleanPaste(text)` or `pasteHTML(html,options)` helper methods.
+     *            Default: ['meta']
      *
      * ----- internal options needed from base -----
      * disableReturn
