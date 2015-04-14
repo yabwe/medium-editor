@@ -136,7 +136,7 @@ describe('Toolbar TestCase', function () {
             var outsideElement = document.createElement('div'),
                 editor = new MediumEditor('.editor');
 
-            outsideElement.style = "-webkit-user-select: none; -moz-user-select: none; -ms-user-select: none; user-select: none;";
+            outsideElement.setAttribute('style', '-webkit-user-select: none; -moz-user-select: none; -ms-user-select: none; user-select: none;');
             outsideElement.innerHTML = "Click Me, I don't clear selection";
             document.body.appendChild(outsideElement);
 
