@@ -19,36 +19,6 @@ describe('Anchor Button TestCase', function () {
         jasmine.clock().uninstall();
     });
 
-    describe('Click', function () {
-        it('should display the anchor form when toolbar is visible', function () {
-            spyOn(MediumEditor.statics.AnchorExtension.prototype, 'showForm').and.callThrough();
-            var button,
-                editor = new MediumEditor('.editor'),
-                anchorExtension = editor.getExtensionByName('anchor');
-            selectElementContentsAndFire(editor.elements[0]);
-            jasmine.clock().tick(1);
-            button = editor.toolbar.getToolbarElement().querySelector('[data-action="createLink"]');
-            fireEvent(button, 'click');
-            expect(editor.toolbar.getToolbarActionsElement().style.display).toBe('none');
-            expect(anchorExtension.isDisplayed()).toBe(true);
-            expect(anchorExtension.showForm).toHaveBeenCalled();
-        });
-
-        it('should unlink when selection is a link', function () {
-            spyOn(document, 'execCommand').and.callThrough();
-            this.el.innerHTML = '<a href="#">link</a>';
-            var button,
-                editor = new MediumEditor('.editor');
-            selectElementContentsAndFire(editor.elements[0]);
-            jasmine.clock().tick(11); // checkSelection delay
-            button = editor.toolbar.getToolbarElement().querySelector('[data-action="createLink"]');
-            fireEvent(button, 'click');
-            expect(this.el.innerHTML, 'link');
-            expect(document.execCommand).toHaveBeenCalled();
-        });
-
-    });
-
     describe('Anchor Form', function () {
         it('should not hide the toolbar when mouseup fires inside the anchor form', function () {
             var editor = new MediumEditor('.editor'),
@@ -239,6 +209,38 @@ describe('Anchor Button TestCase', function () {
             });
             expect(anchorExtension.isDisplayed()).toBe(false);
         });
+    });
+
+    describe('Click', function () {
+        it('should display the anchor form when toolbar is visible', function () {
+            spyOn(MediumEditor.statics.AnchorExtension.prototype, 'showForm').and.callThrough();
+            var button,
+                editor = new MediumEditor('.editor'),
+                anchorExtension = editor.getExtensionByName('anchor');
+            selectElementContentsAndFire(editor.elements[0]);
+            jasmine.clock().tick(1);
+            button = editor.toolbar.getToolbarElement().querySelector('[data-action="createLink"]');
+            fireEvent(button, 'click');
+            expect(editor.toolbar.getToolbarActionsElement().style.display).toBe('none');
+            expect(anchorExtension.isDisplayed()).toBe(true);
+            expect(anchorExtension.showForm).toHaveBeenCalled();
+            editor.destroy();
+        });
+
+        it('should unlink when selection is a link', function () {
+            spyOn(document, 'execCommand').and.callThrough();
+            this.el.innerHTML = '<a href="#">link</a>';
+            var button,
+                editor = new MediumEditor('.editor');
+            selectElementContentsAndFire(editor.elements[0]);
+            jasmine.clock().tick(11); // checkSelection delay
+            button = editor.toolbar.getToolbarElement().querySelector('[data-action="createLink"]');
+            fireEvent(button, 'click');
+            expect(this.el.innerHTML).toBe('link');
+            expect(document.execCommand).toHaveBeenCalled();
+            editor.destroy();
+        });
+
     });
 
 });

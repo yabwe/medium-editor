@@ -59,6 +59,8 @@ describe('Events TestCase', function () {
             expect(focusedEditable).toBe(this.el);
             expect(blurredEditable).toBeUndefined();
 
+            fireEvent(document.body, 'mousedown');
+            fireEvent(document.body, 'mouseup');
             fireEvent(document.body, 'click');
             expect(blurredEditable).toBe(this.el);
         });

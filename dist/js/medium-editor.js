@@ -1406,8 +1406,9 @@ var Events;
             switch (name) {
             case 'externalInteraction':
                 // Detecting when user has interacted with elements outside of MediumEditor
-                this.attachDOMEvent(this.options.ownerDocument.body, 'click', this.handleInteraction.bind(this), true);
-                this.attachDOMEvent(this.options.ownerDocument.body, 'focus', this.handleInteraction.bind(this), true);
+                this.attachDOMEvent(this.options.ownerDocument.body, 'mousedown', this.handleBodyMousedown.bind(this), true);
+                this.attachDOMEvent(this.options.ownerDocument.body, 'click', this.handleBodyClick.bind(this), true);
+                this.attachDOMEvent(this.options.ownerDocument.body, 'focus', this.handleBodyFocus.bind(this), true);
                 this.listeners[name] = true;
                 break;
             case 'blur':
@@ -1507,52 +1508,58 @@ var Events;
             this.updateFocus(element, { target: element, type: 'focus' });
         },
 
-        handleInteraction: function (event) {
-            this.updateFocus(event.target, event);
-        },
-
         updateFocus: function (target, eventObj) {
-            var selection = this.options.contentWindow.getSelection(),
-                toolbarEl = this.base.toolbar ? this.base.toolbar.getToolbarElement() : null,
+            var toolbarEl = this.base.toolbar ? this.base.toolbar.getToolbarElement() : null,
                 anchorPreview = this.base.getExtensionByName('anchor-preview'),
                 previewEl = (anchorPreview && anchorPreview.getPreviewElement) ? anchorPreview.getPreviewElement() : null,
-                selRange = selection.isCollapsed ?
-                           null :
-                           Selection.getSelectedParentElement(selection.getRangeAt(0)),
-                focused,
+                hadFocus,
                 toFocus;
 
             this.base.elements.some(function (element) {
                 // Find the element that has focus
-                if (!focused && element.getAttribute('data-medium-focused')) {
-                    focused = element;
+                if (!hadFocus && element.getAttribute('data-medium-focused')) {
+                    hadFocus = element;
                 }
 
-                // Find the element that is receiving focus
-                if (!toFocus &&
-                        // target is part of an editor element
-                        (Util.isDescendant(element, target, true) ||
-                        // introduced also to avoid the toolbar to disapper when selecting from right to left and the selection ends at the beginning of the text.
-                        Util.isDescendant(element, selRange))) {
-                    toFocus = element;
-                }
-
-                // bail if we found both focused and toFocus elements
-                return !!focused && !!toFocus;
+                // bail if we found the element that had focus
+                return !!hadFocus;
             }, this);
 
+            // For clicks, we need to know if the mousedown that caused the click happened inside the existing focused element.
+            // If so, we don't want to focus another element
+            if (hadFocus &&
+                    eventObj.type === 'click' &&
+                    this.lastMousedownTarget &&
+                    (Util.isDescendant(hadFocus, this.lastMousedownTarget, true) ||
+                     Util.isDescendant(toolbarEl, this.lastMousedownTarget, true) ||
+                     Util.isDescendant(previewEl, this.lastMousedownTarget, true))) {
+                toFocus = hadFocus;
+            }
+
+            if (!toFocus) {
+                this.base.elements.some(function (element) {
+                    // If the target is part of an editor element, this is the element getting focus
+                    if (!toFocus && (Util.isDescendant(element, target, true))) {
+                        toFocus = element;
+                    }
+
+                    // bail if we found an element that's getting focus
+                    return !!toFocus;
+                }, this);
+            }
+
             // Check if the target is external (not part of the editor, toolbar, or anchorpreview)
-            var externalEvent = !Util.isDescendant(focused, target, true) &&
+            var externalEvent = !Util.isDescendant(hadFocus, target, true) &&
                                 !Util.isDescendant(toolbarEl, target, true) &&
                                 !Util.isDescendant(previewEl, target, true);
 
-            if (toFocus !== focused) {
+            if (toFocus !== hadFocus) {
                 // If element has focus, and focus is going outside of editor
                 // Don't blur focused element if clicking on editor, toolbar, or anchorpreview
-                if (focused && externalEvent) {
+                if (hadFocus && externalEvent) {
                     // Trigger blur on the editable that has lost focus
-                    focused.removeAttribute('data-medium-focused');
-                    this.triggerCustomEvent('blur', eventObj, focused);
+                    hadFocus.removeAttribute('data-medium-focused');
+                    this.triggerCustomEvent('blur', eventObj, hadFocus);
                 }
 
                 // If focus is going into an editor element
@@ -1566,6 +1573,18 @@ var Events;
             if (externalEvent) {
                 this.triggerCustomEvent('externalInteraction', eventObj);
             }
+        },
+
+        handleBodyClick: function (event) {
+            this.updateFocus(event.target, event);
+        },
+
+        handleBodyFocus: function (event) {
+            this.updateFocus(event.target, event);
+        },
+
+        handleBodyMousedown: function (event) {
+            this.lastMousedownTarget = event.target;
         },
 
         handleClick: function (event) {
@@ -2535,6 +2554,7 @@ var Toolbar;
                 toolbar.className += " stalker-toolbar";
             }
 
+
             toolbar.appendChild(this.createToolbarButtons());
 
             // Add any forms that extensions may have
@@ -2671,12 +2691,17 @@ var Toolbar;
         },
 
         handleBlur: function () {
+            // Kill any previously delayed calls to hide the toolbar
             clearTimeout(this.hideTimeout);
+
+            // Blur may fire even if we have a selection, so we want to prevent any delayed showToolbar
+            // calls from happening in this specific case
+            clearTimeout(this.delayShowTimeout);
 
             // Delay the call to hideToolbar to handle bug with multiple editors on the page at once
             this.hideTimeout = setTimeout(function () {
                 this.hideToolbar();
-            }.bind(this), 0);
+            }.bind(this), 1);
         },
 
         handleFocus: function () {
@@ -2733,7 +2758,7 @@ var Toolbar;
 
             // Using setTimeout + options.delay because:
             // We will actually be displaying the toolbar, which should be controlled by options.delay
-            this.base.delay(function () {
+            this.delayShowTimeout = this.base.delay(function () {
                 this.showToolbar();
             }.bind(this));
         },
