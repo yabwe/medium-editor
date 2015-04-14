@@ -1,3 +1,8 @@
+4.5.2 / 2015-04-14
+==================
+* Fix blur event detection when clicking on elements that don't clear focus
+
+
 4.5.1 / 2015-04-14
 ==================
 * Fix broken 'paste.cleanPastedHtml' option and rename to 'paste.cleanPastedHTML'

@@ -4030,7 +4030,7 @@ MediumEditor.version = (function(major, minor, revision) {
         };
     }).apply(this, ({
         // grunt-bump looks for this:
-        "version": "4.5.1"
+        "version": "4.5.2"
     }).version.split("."));
 
     return MediumEditor;
