@@ -429,7 +429,21 @@ var Util;
                 if (el.tagName.toLowerCase() === tag) {
                     el.parentNode.removeChild(el);
                 }
-            });
+            }, this);
+        },
+
+        unwrap: function (el, doc) {
+            var fragment = doc.createDocumentFragment();
+
+            for (var i = 0; i < el.childNodes.length; i++) {
+                fragment.appendChild(el.childNodes[i]);
+            }
+
+            if (fragment.childNodes.length) {
+                el.parentNode.replaceChild(fragment, el);
+            } else {
+                el.parentNode.removeChild(el);
+            }
         },
 
         setObject: function(name, value, context){
