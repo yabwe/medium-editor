@@ -38,7 +38,7 @@ var editorDefaults;
         activeButtonClass: 'medium-editor-button-active',
         firstButtonClass: 'medium-editor-button-first',
         lastButtonClass: 'medium-editor-button-last',
-        spellcheck: false,
+        spellcheck: true,
 
         paste: {
             forcePlainText: true,
