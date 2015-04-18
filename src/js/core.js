@@ -298,6 +298,7 @@ function MediumEditor(elements, options) {
                     this.elements[i] = createContentEditable.call(this, i);
                 }
                 this.elements[i].setAttribute('contentEditable', true);
+                this.elements[i].setAttribute('spellcheck', this.options.spellcheck);
             }
             if (!this.elements[i].getAttribute('data-placeholder')) {
                 this.elements[i].setAttribute('data-placeholder', this.options.placeholder);
@@ -531,6 +532,7 @@ function MediumEditor(elements, options) {
 
             for (i = 0; i < this.elements.length; i += 1) {
                 this.elements[i].removeAttribute('contentEditable');
+                this.elements[i].setAttribute('spellcheck');
                 this.elements[i].removeAttribute('data-medium-element');
             }
 

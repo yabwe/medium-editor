@@ -125,6 +125,7 @@ describe('Initialization TestCase', function () {
                 activeButtonClass: 'medium-editor-button-active',
                 firstButtonClass: 'medium-editor-button-first',
                 lastButtonClass: 'medium-editor-button-last',
+                spellcheck: false,
                 paste: {
                     forcePlainText: true,
                     cleanPastedHTML: false,

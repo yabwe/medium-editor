@@ -17,6 +17,17 @@ describe('Content TestCase', function () {
         tearDown(this.el);
     });
 
+    it('should removing paragraphs when a list is inserted inside of it', function () {
+        this.el.innerHTML = '<p>lorem ipsum<ul><li>dolor</li></ul></p>';
+        var editor = new MediumEditor('.editor', {
+            buttons: ['orderedlist']
+        }),
+            target = editor.elements[0].querySelector('p');
+        selectElementContentsAndFire(target);
+        fireEvent(editor.toolbar.getToolbarElement().querySelector('[data-action="insertorderedlist"]'), 'click');
+        expect(this.el.innerHTML).toMatch(/^<ol><li>lorem ipsum(<br>)?<\/li><\/ol><ul><li>dolor<\/li><\/ul>?/);
+    });
+
     describe('when the tab key is pressed', function () {
         it('should indent when within an <li>', function () {
             this.el.innerHTML = '<ol><li>lorem</li><li>ipsum</li></ol>';
@@ -200,14 +211,15 @@ describe('Content TestCase', function () {
         });
     });
 
-    it('should removing paragraphs when a list is inserted inside of it', function () {
-        this.el.innerHTML = '<p>lorem ipsum<ul><li>dolor</li></ul></p>';
-        var editor = new MediumEditor('.editor', {
-            buttons: ['orderedlist']
-        }),
-            target = editor.elements[0].querySelector('p');
-        selectElementContentsAndFire(target);
-        fireEvent(editor.toolbar.getToolbarElement().querySelector('[data-action="insertorderedlist"]'), 'click');
-        expect(this.el.innerHTML).toMatch(/^<ol><li>lorem ipsum(<br>)?<\/li><\/ol><ul><li>dolor<\/li><\/ul>?/);
+    describe('spellcheck', function () {
+      it('should have spellcheck attribute set to false by default', function () {
+          var editor = new MediumEditor('.editor');
+          expect(editor.elements[0].getAttribute('spellcheck')).toBe('false');
+      });
+
+      it('should accept spellcheck as an options', function () {
+          var editor = new MediumEditor('.editor', {spellcheck: true});
+          expect(editor.elements[0].getAttribute('spellcheck')).toBe('true');
+      });
     });
 });
