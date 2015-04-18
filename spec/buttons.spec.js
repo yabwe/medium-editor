@@ -109,6 +109,19 @@ describe('Buttons TestCase', function () {
             }
         });
 
+        it('should have aria-label and title attributes set', function () {
+            var button,
+                editor = new MediumEditor('.editor', {
+                    buttons: allButtons
+                });
+            Object.keys(customLabels).forEach(function (buttonName) {
+                button = editor.toolbar.getToolbarElement().querySelector('.medium-editor-action-' + buttonName);
+                expect(button).not.toBeUndefined();
+                expect(button.getAttribute('aria-label')).toBe(customLabels[buttonName]);
+                expect(button.getAttribute('title')).toBe(customLabels[buttonName]);
+            });
+        });
+
         it('should contain default content if no custom labels are provided', function () {
             spyOn(MediumEditor.prototype, 'execAction');
             var button,

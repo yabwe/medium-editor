@@ -1674,11 +1674,15 @@ var DefaultButton;
         },
         createButton: function () {
             var button = this.base.options.ownerDocument.createElement('button'),
-                content = this.options.contentDefault;
+                content = this.options.contentDefault,
+                ariaLabel = this.getAria();
             button.classList.add('medium-editor-action');
             button.classList.add('medium-editor-action-' + this.name);
             button.setAttribute('data-action', this.getAction());
-            button.setAttribute('aria-label', this.getAria());
+            if (ariaLabel) {
+                button.setAttribute('title', ariaLabel);
+                button.setAttribute('aria-label', ariaLabel);
+            }
             if (this.base.options.buttonLabels) {
                 if (this.base.options.buttonLabels === 'fontawesome' && this.options.contentFA) {
                     content = this.options.contentFA;
