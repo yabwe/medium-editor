@@ -532,7 +532,7 @@ function MediumEditor(elements, options) {
 
             for (i = 0; i < this.elements.length; i += 1) {
                 this.elements[i].removeAttribute('contentEditable');
-                this.elements[i].setAttribute('spellcheck');
+                this.elements[i].removeAttribute('spellcheck');
                 this.elements[i].removeAttribute('data-medium-element');
             }
 
