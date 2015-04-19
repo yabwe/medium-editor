@@ -83,6 +83,7 @@ the textarea value to the div HTML content.
 * __imageDragging__: Allows image drag and drop into the editor. Default: true
 * __placeholder__: Defines the default placeholder for empty contenteditables when __disablePlaceholders__ is not set to true. You can overwrite it by setting a data-placeholder attribute on your elements. Default: 'Type your text'
 * __secondHeader__: HTML tag to be used as second header. Default: h4
+* __spellcheck__: Enable/disable native contentEditable automatic spellcheck. Default: true
 * __standardizeSelectionStart__: Standardizes how the beginning of a range is decided between browsers whenever the selected text is analyzed for updating toolbar buttons status
 
 ### Toolbar options
