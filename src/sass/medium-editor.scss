@@ -90,12 +90,13 @@ $medium_editor_z_index: 2000 !default;
 }
 
 .medium-editor-anchor-preview {
-    i {
+    a {
         display: inline-block;
         margin: 5px 5px 5px 10px;
         text-decoration: underline;
         font-style: normal;
         cursor: pointer;
+        color: #fff;
     }
 }
 
