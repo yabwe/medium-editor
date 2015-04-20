@@ -1,7 +1,7 @@
 /*global MediumEditor, describe, it, expect, spyOn,
      afterEach, beforeEach, selectElementContents,
      jasmine, fireEvent, tearDown,
-     selectElementContentsAndFire */
+     selectElementContentsAndFire, isIE9 */
 
 describe('Font Size Button TestCase', function () {
     'use strict';
@@ -69,6 +69,16 @@ describe('Font Size Button TestCase', function () {
             testFontSizeContents(this.el, '7');
         });
 
+        it('should display current font size when displayed', function () {
+            spyOn(MediumEditor.statics.FontSizeExtension.prototype, 'showForm').and.callThrough();
+            var editor = new MediumEditor('.editor', this.mediumOpts),
+                fontSizeExtension = editor.getExtensionByName('fontsize');
+            this.el.innerHTML = '<font size="7">lorem ipsum dolor</font>';
+            selectElementContentsAndFire(editor.elements[0].firstChild);
+            fireEvent(editor.toolbar.getToolbarElement().querySelector('[data-action="fontSize"]'), 'click');
+            expect(fontSizeExtension.showForm).toHaveBeenCalledWith('7');
+        });
+
         it('should revert font size when slider value is set to 4', function () {
             spyOn(document, 'execCommand').and.callThrough();
             spyOn(MediumEditor.statics.FontSizeExtension.prototype, 'clearFontSize').and.callThrough();
@@ -119,8 +129,12 @@ describe('Font Size Button TestCase', function () {
             fireEvent(input, 'change');
             fireEvent(cancel, 'click');
             expect(this.el.innerHTML).toMatch(/^(<font>)?lorem ipsum(<\/font>)?$/i);
-            // IE9 resets the input value to empty instead of 4
-            expect(input.value).toMatch(/^4?$/);
+            // IE9 doesn't support sliders
+            if (isIE9()) {
+                expect(input.value).toBe('');
+            } else {
+                expect(input.value).toBe('4');
+            }
             expect(editor.toolbar.showAndUpdateToolbar).toHaveBeenCalled();
             expect(fontSizeExtension.isDisplayed()).toBe(false);
         });

@@ -2591,7 +2591,9 @@ var FontSizeExtension;
             evt.stopPropagation();
 
             if (!this.isDisplayed()) {
-                this.showForm(/* TODO: insert current font size here */);
+                // Get fontsize of current selection (convert to string since IE returns this as number)
+                var fontSize = this.base.options.ownerDocument.queryCommandValue('fontSize') + '';
+                this.showForm(fontSize);
             }
 
             return false;
