@@ -396,8 +396,8 @@ var Util;
         },
 
         warn: function(){
-            if(window.console !== undefined){
-                console.warn.apply(console, arguments);
+            if(window.console !== undefined && typeof window.console.warn === 'function'){
+                window.console.warn.apply(console, arguments);
             }
         },
 
