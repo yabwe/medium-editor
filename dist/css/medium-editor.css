@@ -123,9 +123,6 @@
 .medium-editor-anchor-preview a {
   display: inline-block;
   margin: 5px 5px 5px 10px;
-  text-decoration: underline;
-  font-style: normal;
-  cursor: pointer;
   color: #fff; }
 
 .medium-editor-toolbar-active, .medium-editor-anchor-preview-active {
