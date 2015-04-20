@@ -116,6 +116,10 @@ describe('Util', function () {
                         return msg;
                     }
                 };
+            } else if (typeof window.console.warn !== 'function') {
+                window.console.warn = function (msg) {
+                    return msg;
+                };
             }
 
             var spy = spyOn(window.console.warn, "apply").and.callThrough();
