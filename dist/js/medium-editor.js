@@ -2350,6 +2350,7 @@ var AnchorPreview;
         previewValueSelector: 'i',
 
         init: function (instance) {
+
             this.base = instance;
             this.anchorPreview = this.createPreview();
             this.base.options.elementsContainer.appendChild(this.anchorPreview);
@@ -2468,17 +2469,29 @@ var AnchorPreview;
             this.instance_handleAnchorMouseout = null;
         },
 
-       handleEditableMouseover: function (event) {
+        getClosestTag : function(el, tag) {
+
+            do {
+              if (el.nodeName === tag.toUpperCase()) {
+
+                return el;
+              }
+            } while (el = el.parentNode);
+
+
+            return null;
+          },
+
+        handleEditableMouseover: function (event) {
             var target;
 
-             if(event.target){
-
+            if(event.target){
                 if(event.target.tagName.toLowerCase() === 'a'){
-                    var target = event.target;
-                }else if(event.target.parentNode.tagName.toLowerCase() === 'a'){
-                    var target = event.target.parentNode;
-                }
-            }
+                   target = event.target;
+               }else{
+                   target = this.getClosestTag(event.target,'a');
+               }
+           }
 
             if (target) {
 

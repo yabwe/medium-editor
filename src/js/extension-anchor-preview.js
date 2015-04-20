@@ -15,6 +15,7 @@ var AnchorPreview;
         previewValueSelector: 'i',
 
         init: function (instance) {
+
             this.base = instance;
             this.anchorPreview = this.createPreview();
             this.base.options.elementsContainer.appendChild(this.anchorPreview);
@@ -133,13 +134,36 @@ var AnchorPreview;
             this.instance_handleAnchorMouseout = null;
         },
 
+        getClosestTag : function(el, tag) {
+
+            do {
+              if (el.nodeName === tag.toUpperCase()) {
+
+                return el;
+              }
+            } while (el = el.parentNode);
+
+
+            return null;
+          },
+
         handleEditableMouseover: function (event) {
-            if (event.target && event.target.tagName.toLowerCase() === 'a') {
+            var target;
+
+            if(event.target){
+                if(event.target.tagName.toLowerCase() === 'a'){
+                   target = event.target;
+               }else{
+                   target = this.getClosestTag(event.target,'a');
+               }
+           }
+
+            if (target) {
 
                 // Detect empty href attributes
                 // The browser will make href="" or href="#top"
                 // into absolute urls when accessed as event.targed.href, so check the html
-                if (!/href=["']\S+["']/.test(event.target.outerHTML) || /href=["']#\S+["']/.test(event.target.outerHTML)) {
+                if (!/href=["']\S+["']/.test(target.outerHTML) || /href=["']#\S+["']/.test(target.outerHTML)) {
                     return true;
                 }
 
@@ -150,11 +174,11 @@ var AnchorPreview;
                 }
 
                 // detach handler for other anchor in case we hovered multiple anchors quickly
-                if (this.activeAnchor && this.activeAnchor !== event.target) {
+                if (this.activeAnchor && this.activeAnchor !== target) {
                     this.detachPreviewHandlers();
                 }
 
-                this.anchorToPreview = event.target;
+                this.anchorToPreview = target;
 
                 this.instance_handleAnchorMouseout = this.handleAnchorMouseout.bind(this);
                 this.base.on(this.anchorToPreview, 'mouseout', this.instance_handleAnchorMouseout);
