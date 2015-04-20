@@ -794,8 +794,8 @@ var Util;
         },
 
         warn: function(){
-            if(window.console !== undefined){
-                console.warn.apply(console, arguments);
+            if(window.console !== undefined && typeof window.console.warn === 'function'){
+                window.console.warn.apply(console, arguments);
             }
         },
 
@@ -1294,6 +1294,35 @@ var Selection;
                 selectedParentElement = range.startContainer;
             }
             return selectedParentElement;
+        },
+
+        getSelectedElements: function (doc) {
+            var selection = doc.getSelection(),
+                range,
+                toRet,
+                currNode;
+
+            if (!selection.rangeCount ||
+                    !selection.getRangeAt(0).commonAncestorContainer) {
+                return [];
+            }
+
+            range = selection.getRangeAt(0);
+
+            if (range.commonAncestorContainer.nodeType === 3) {
+                toRet = [];
+                currNode = range.commonAncestorContainer;
+                while (currNode.parentNode && currNode.parentNode.childNodes.length === 1) {
+                    toRet.push(currNode.parentNode);
+                    currNode = currNode.parentNode;
+                }
+
+                return toRet;
+            }
+
+            return [].filter.call(range.commonAncestorContainer.getElementsByTagName('*'), function (el) {
+                return (typeof selection.containsNode === 'function') ? selection.containsNode(el, true) : true;
+            });
         },
 
         selectNode: function (node, doc) {
@@ -2680,7 +2709,7 @@ var FontSizeExtension;
         },
 
         clearFontSize: function () {
-            this.base.getSelectionEls().forEach(function (el) {
+            Selection.getSelectedElements(this.base.options.ownerDocument).forEach(function (el) {
                 if (el.tagName === 'FONT' && el.hasAttribute('size')) {
                     el.removeAttribute('size');
                 }
@@ -2692,7 +2721,7 @@ var FontSizeExtension;
             if (size === '4') {
                 this.clearFontSize();
             } else {
-                this.base.fontSize({size: size});
+                this.base.execAction('fontSize', { size: size });
             }
         },
 
@@ -3783,7 +3812,7 @@ function MediumEditor(elements, options) {
         }
 
         if (action === 'fontSize') {
-            return this.fontSize(opts);
+            return this.options.ownerDocument.execCommand('fontSize', false, opts.size);
         }
 
         if (action === 'createLink') {
@@ -4172,39 +4201,6 @@ function MediumEditor(elements, options) {
             sel = this.options.contentWindow.getSelection();
             sel.removeAllRanges();
             sel.addRange(range);
-        },
-
-        getSelectionEls: function () {
-            var selection = window.getSelection(),
-                range,
-                toRet,
-                currNode;
-
-            if (!selection.rangeCount ||
-                    !selection.getRangeAt(0).commonAncestorContainer) {
-                return [];
-            }
-
-            range = selection.getRangeAt(0);
-
-            if (range.commonAncestorContainer.nodeType === 3) {
-                toRet = [];
-                currNode = range.commonAncestorContainer;
-                while (currNode.parentNode && currNode.parentNode.childNodes.length === 1) {
-                    toRet.push(currNode.parentNode);
-                    currNode = currNode.parentNode;
-                }
-
-                return toRet;
-            }
-
-            return [].filter.call(range.commonAncestorContainer.getElementsByTagName('*'), function (el) {
-                return selection.containsNode(el, true);
-            });
-        },
-
-        fontSize: function (opts) {
-            return this.options.ownerDocument.execCommand('fontSize', false, opts.size);
         },
 
         createLink: function (opts) {

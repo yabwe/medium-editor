@@ -48,7 +48,7 @@ describe('Font Size Button TestCase', function () {
 
     describe('Font Size', function () {
         it('should change font size when slider is moved', function () {
-            spyOn(MediumEditor.prototype, 'fontSize').and.callThrough();
+            spyOn(document, 'execCommand').and.callThrough();
             var editor = new MediumEditor('.editor', this.mediumOpts),
                 fontSizeExtension = editor.getExtensionByName('fontsize'),
                 button,
@@ -63,14 +63,14 @@ describe('Font Size Button TestCase', function () {
             selectElementContents(this.el);
             fireEvent(input, 'change');
 
-            expect(editor.fontSize).toHaveBeenCalled();
+            expect(document.execCommand).toHaveBeenCalledWith('fontSize', false, '7');
 
             fireEvent(fontSizeExtension.getForm().querySelector('a.medium-editor-toobar-save'), 'click');
             testFontSizeContents(this.el, '7');
         });
 
         it('should revert font size when slider value is set to 4', function () {
-            spyOn(MediumEditor.prototype, 'fontSize').and.callThrough();
+            spyOn(document, 'execCommand').and.callThrough();
             spyOn(MediumEditor.statics.FontSizeExtension.prototype, 'clearFontSize').and.callThrough();
             var editor = new MediumEditor('.editor', this.mediumOpts),
                 fontSizeExtension = editor.getExtensionByName('fontsize'),
@@ -85,7 +85,7 @@ describe('Font Size Button TestCase', function () {
             input.value = '1';
             selectElementContents(editor.elements[0]);
             fireEvent(input, 'change');
-            expect(editor.fontSize).toHaveBeenCalled();
+            expect(document.execCommand).toHaveBeenCalledWith('fontSize', false, '1');
             expect(fontSizeExtension.clearFontSize).not.toHaveBeenCalled();
             testFontSizeContents(this.el, '1');
 
@@ -119,7 +119,8 @@ describe('Font Size Button TestCase', function () {
             fireEvent(input, 'change');
             fireEvent(cancel, 'click');
             expect(this.el.innerHTML).toMatch(/^(<font>)?lorem ipsum(<\/font>)?$/i);
-            expect(input.value).toBe('4');
+            // IE9 resets the input value to empty instead of 4
+            expect(input.value).toMatch(/^4?$/);
             expect(editor.toolbar.showAndUpdateToolbar).toHaveBeenCalled();
             expect(fontSizeExtension.isDisplayed()).toBe(false);
         });

@@ -1,4 +1,4 @@
-/*global Util, DefaultButton */
+/*global Util, DefaultButton, Selection */
 
 var FontSizeExtension;
 
@@ -147,7 +147,7 @@ var FontSizeExtension;
         },
 
         clearFontSize: function () {
-            this.base.getSelectionEls().forEach(function (el) {
+            Selection.getSelectedElements(this.base.options.ownerDocument).forEach(function (el) {
                 if (el.tagName === 'FONT' && el.hasAttribute('size')) {
                     el.removeAttribute('size');
                 }
@@ -159,7 +159,7 @@ var FontSizeExtension;
             if (size === '4') {
                 this.clearFontSize();
             } else {
-                this.base.fontSize({size: size});
+                this.base.execAction('fontSize', { size: size });
             }
         },
 
