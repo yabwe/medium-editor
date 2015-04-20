@@ -4203,6 +4203,39 @@ function MediumEditor(elements, options) {
             sel.addRange(range);
         },
 
+        getSelectionEls: function () {
+            var selection = window.getSelection(),
+                range,
+                toRet,
+                currNode;
+
+            if (!selection.rangeCount ||
+                    !selection.getRangeAt(0).commonAncestorContainer) {
+                return [];
+            }
+
+            range = selection.getRangeAt(0);
+
+            if (range.commonAncestorContainer.nodeType === 3) {
+                toRet = [];
+                currNode = range.commonAncestorContainer;
+                while (currNode.parentNode && currNode.parentNode.childNodes.length === 1) {
+                    toRet.push(currNode.parentNode);
+                    currNode = currNode.parentNode;
+                }
+
+                return toRet;
+            }
+
+            return [].filter.call(range.commonAncestorContainer.getElementsByTagName('*'), function (el) {
+                return selection.containsNode(el, true);
+            });
+        },
+
+        fontSize: function (opts) {
+            return this.options.ownerDocument.execCommand('fontSize', false, opts.size);
+        },
+
         createLink: function (opts) {
             var customEvent,
                 i;

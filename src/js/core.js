@@ -838,6 +838,10 @@ function MediumEditor(elements, options) {
             sel.addRange(range);
         },
 
+        fontSize: function (opts) {
+            return this.options.ownerDocument.execCommand('fontSize', false, opts.size);
+        },
+
         createLink: function (opts) {
             var customEvent,
                 i;
