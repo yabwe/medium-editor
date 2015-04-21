@@ -402,10 +402,7 @@ function MediumEditor(elements, options) {
             }
         }
 
-        // Add PasteHandler as extension if needed
-        if (this.options.paste) {
-            this.commands.push(initExtension(initPasteHandler.call(this, this.options.paste), 'paste', this));
-        }
+        this.commands.push(initExtension(initPasteHandler.call(this, this.options.paste), 'paste', this));
 
         // Add AnchorPreview as extension if needed
         if (shouldAddDefaultAnchorPreview.call(this)) {
