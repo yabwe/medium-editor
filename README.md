@@ -122,7 +122,7 @@ var editor = new MediumEditor('.editable', {
         forcePlainText: true,
         cleanPastedHTML: false,
         cleanReplacements: [],
-        cleanAttrs: ['class', 'style', 'dir']
+        cleanAttrs: ['class', 'style', 'dir'],
         cleanTags: ['meta']
     }
 });
@@ -148,7 +148,7 @@ var editor = new MediumEditor('.editable', {
     targetBlank: true,
     paste: {
         cleanPastedHTML: true,
-        cleanAttrs: ['style', 'dir']
+        cleanAttrs: ['style', 'dir'],
         cleanTags: ['label', 'meta']
     }
 });

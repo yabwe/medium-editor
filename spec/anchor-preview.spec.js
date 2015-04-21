@@ -41,7 +41,7 @@ describe('Anchor Preview TestCase', function () {
             expect(anchorPreview.showPreview).toHaveBeenCalled();
 
             // link is set in preview
-            expect(anchorPreview.getPreviewElement().querySelector('i').innerHTML).toBe(document.getElementById('test-link').attributes.href.value);
+            expect(anchorPreview.getPreviewElement().querySelector('a').innerHTML).toBe(document.getElementById('test-link').attributes.href.value);
 
             // load into editor
             spyOn(MediumEditor.statics.AnchorExtension.prototype, 'showForm').and.callThrough();
@@ -64,9 +64,8 @@ describe('Anchor Preview TestCase', function () {
             var editor = new MediumEditor('.editor', {
                 delay: 200
             }),
-                sel = window.getSelection(),
-                anchorPreview = editor.getExtensionByName('anchor-preview'),
-                nextRange;
+            anchorPreview = editor.getExtensionByName('anchor-preview');
+
 
             // show preview
             spyOn(MediumEditor.statics.AnchorPreview.prototype, 'showPreview').and.callThrough();
@@ -78,7 +77,7 @@ describe('Anchor Preview TestCase', function () {
             expect(anchorPreview.showPreview).toHaveBeenCalled();
 
             // link is set in preview
-            expect(anchorPreview.getPreviewElement().querySelector('i').innerHTML).toBe(document.getElementById('test-markup-link').attributes.href.value);
+            expect(anchorPreview.getPreviewElement().querySelector('a').innerHTML).toBe(document.getElementById('test-markup-link').attributes.href.value);
         });
 
         it('should show the unencoded link', function () {
@@ -92,7 +91,7 @@ describe('Anchor Preview TestCase', function () {
             jasmine.clock().tick(200);
 
             // link is set in preview
-            expect(anchorPreview.getPreviewElement().querySelector('i').innerHTML).toBe(document.getElementById('test-symbol-link').attributes.href.value);
+            expect(anchorPreview.getPreviewElement().querySelector('a').innerHTML).toBe(document.getElementById('test-symbol-link').attributes.href.value);
         });
 
         it('should display different urls when hovering over different links consecutively', function () {
@@ -106,7 +105,7 @@ describe('Anchor Preview TestCase', function () {
 
             // preview shows only after delay
             jasmine.clock().tick(300);
-            expect(anchorPreview.getPreviewElement().querySelector('i').innerHTML).toBe(document.getElementById('test-link').attributes.href.value);
+            expect(anchorPreview.getPreviewElement().querySelector('a').innerHTML).toBe(document.getElementById('test-link').attributes.href.value);
 
             // show preview for second link
             fireEvent(document.getElementById('test-symbol-link'), 'mouseover');
@@ -114,7 +113,7 @@ describe('Anchor Preview TestCase', function () {
 
             // wait for delay
             jasmine.clock().tick(300);
-            expect(anchorPreview.getPreviewElement().querySelector('i').innerHTML).toBe(document.getElementById('test-symbol-link').attributes.href.value);
+            expect(anchorPreview.getPreviewElement().querySelector('a').innerHTML).toBe(document.getElementById('test-symbol-link').attributes.href.value);
         });
 
         it('should display the anchor form in the toolbar when clicked', function () {

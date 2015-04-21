@@ -12,7 +12,7 @@ var AnchorPreview;
 
         // the default selector to locate where to
         // put the activeAnchor value in the preview
-        previewValueSelector: 'i',
+        previewValueSelector: 'a',
 
         init: function (instance) {
 
@@ -41,7 +41,7 @@ var AnchorPreview;
 
         getTemplate: function () {
             return '<div class="medium-editor-toolbar-anchor-preview" id="medium-editor-toolbar-anchor-preview">' +
-                '    <i class="medium-editor-toolbar-anchor-preview-inner"></i>' +
+                '    <a class="medium-editor-toolbar-anchor-preview-inner"></a>' +
                 '</div>';
         },
 
@@ -67,6 +67,7 @@ var AnchorPreview;
 
             if (this.previewValueSelector) {
                 this.anchorPreview.querySelector(this.previewValueSelector).textContent = anchorEl.attributes.href.value;
+                this.anchorPreview.querySelector(this.previewValueSelector).href = anchorEl.attributes.href.value;
             }
 
             this.anchorPreview.classList.add('medium-toolbar-arrow-over');
@@ -108,11 +109,13 @@ var AnchorPreview;
             this.base.subscribe('editableMouseover', this.handleEditableMouseover.bind(this));
         },
 
-        handleClick: function () {
+        handleClick: function (event) {
             var anchorExtension = this.base.getExtensionByName('anchor'),
                 activeAnchor = this.activeAnchor;
 
             if (anchorExtension && activeAnchor) {
+                event.preventDefault();
+
                 this.base.selectElement(this.activeAnchor);
 
                 // Using setTimeout + options.delay because:

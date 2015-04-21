@@ -827,7 +827,21 @@ var Util;
                 if (el.tagName.toLowerCase() === tag) {
                     el.parentNode.removeChild(el);
                 }
-            });
+            }, this);
+        },
+
+        unwrap: function (el, doc) {
+            var fragment = doc.createDocumentFragment();
+
+            for (var i = 0; i < el.childNodes.length; i++) {
+                fragment.appendChild(el.childNodes[i]);
+            }
+
+            if (fragment.childNodes.length) {
+                el.parentNode.replaceChild(fragment, el);
+            } else {
+                el.parentNode.removeChild(el);
+            }
         },
 
         setObject: function(name, value, context){
@@ -1838,7 +1852,7 @@ var PasteHandler;
             [new RegExp(/&lt;(\/?)(i|b|a)&gt;/gi), '<$1$2>'],
 
              // replace manually a tags with real ones, converting smart-quotes from google docs
-            [new RegExp(/&lt;a\s+href=(&quot;|&rdquo;|&ldquo;|“|”)([^&]+)(&quot;|&rdquo;|&ldquo;|“|”)&gt;/gi), '<a href="$2">'],
+            [new RegExp(/&lt;a(?:(?!href).)+href=(?:&quot;|&rdquo;|&ldquo;|"|“|”)(((?!&quot;|&rdquo;|&ldquo;|"|“|”).)*)(?:&quot;|&rdquo;|&ldquo;|"|“|”)(?:(?!&gt;).)*&gt;/gi), '<a href="$1">'],
 
             // Newlines between paragraphs in html have no syntactic value,
             // but then have a tendency to accidentally become additional paragraphs down the line
@@ -1887,7 +1901,9 @@ var PasteHandler;
                 html = '',
                 p,
                 dataFormatHTML = 'text/html',
-                dataFormatPlain = 'text/plain';
+                dataFormatPlain = 'text/plain',
+                pastedHTML,
+                pastedPlain;
 
             if (this.options.contentWindow.clipboardData && event.clipboardData === undefined) {
                 event.clipboardData = this.options.contentWindow.clipboardData;
@@ -1905,12 +1921,19 @@ var PasteHandler;
                     !event.defaultPrevented) {
                 event.preventDefault();
 
-                if (this.options.cleanPastedHTML && event.clipboardData.getData(dataFormatHTML)) {
-                    return this.cleanPaste(event.clipboardData.getData(dataFormatHTML));
+                pastedHTML = event.clipboardData.getData(dataFormatHTML);
+                pastedPlain = event.clipboardData.getData(dataFormatPlain);
+
+                if (!pastedHTML) {
+                    pastedHTML = pastedPlain;
+                }
+
+                if (this.options.cleanPastedHTML && pastedHTML) {
+                    return this.cleanPaste(pastedHTML);
                 }
 
                 if (!(this.options.disableReturn || element.getAttribute('data-disable-return'))) {
-                    paragraphs = event.clipboardData.getData(dataFormatPlain).split(/[\r\n]+/g);
+                    paragraphs = pastedPlain.split(/[\r\n]+/g);
                     // If there are no \r\n in data, don't wrap in <p>
                     if (paragraphs.length > 1) {
                         for (p = 0; p < paragraphs.length; p += 1) {
@@ -1922,7 +1945,7 @@ var PasteHandler;
                         html = Util.htmlEntities(paragraphs[0]);
                     }
                 } else {
-                    html = Util.htmlEntities(event.clipboardData.getData(dataFormatPlain));
+                    html = Util.htmlEntities(pastedPlain);
                 }
                 Util.insertHTMLCommand(this.options.ownerDocument, html);
             }
@@ -2068,11 +2091,7 @@ var PasteHandler;
                 }
 
                 // remove empty spans, replace others with their contents
-                if (/^\s*$/.test()) {
-                    el.parentNode.removeChild(el);
-                } else {
-                    el.parentNode.replaceChild(this.options.ownerDocument.createTextNode(el.textContent), el);
-                }
+                Util.unwrap(el, this.options.ownerDocument);
             }
         }
     };
@@ -2347,7 +2366,7 @@ var AnchorPreview;
 
         // the default selector to locate where to
         // put the activeAnchor value in the preview
-        previewValueSelector: 'i',
+        previewValueSelector: 'a',
 
         init: function (instance) {
 
@@ -2376,7 +2395,7 @@ var AnchorPreview;
 
         getTemplate: function () {
             return '<div class="medium-editor-toolbar-anchor-preview" id="medium-editor-toolbar-anchor-preview">' +
-                '    <i class="medium-editor-toolbar-anchor-preview-inner"></i>' +
+                '    <a class="medium-editor-toolbar-anchor-preview-inner"></a>' +
                 '</div>';
         },
 
@@ -2402,6 +2421,7 @@ var AnchorPreview;
 
             if (this.previewValueSelector) {
                 this.anchorPreview.querySelector(this.previewValueSelector).textContent = anchorEl.attributes.href.value;
+                this.anchorPreview.querySelector(this.previewValueSelector).href = anchorEl.attributes.href.value;
             }
 
             this.anchorPreview.classList.add('medium-toolbar-arrow-over');
@@ -2443,11 +2463,13 @@ var AnchorPreview;
             this.base.subscribe('editableMouseover', this.handleEditableMouseover.bind(this));
         },
 
-        handleClick: function () {
+        handleClick: function (event) {
             var anchorExtension = this.base.getExtensionByName('anchor'),
                 activeAnchor = this.activeAnchor;
 
             if (anchorExtension && activeAnchor) {
+                event.preventDefault();
+
                 this.base.selectElement(this.activeAnchor);
 
                 // Using setTimeout + options.delay because:
