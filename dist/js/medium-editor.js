@@ -2952,13 +2952,15 @@ var Toolbar;
             var ul = this.base.options.ownerDocument.createElement('ul'),
                 li,
                 btn,
-                buttons;
+                buttons,
+                extension;
 
             ul.id = 'medium-editor-toolbar-actions' + this.base.id;
             ul.className = 'medium-editor-toolbar-actions clearfix';
             ul.style.display = 'block';
 
-            this.base.commands.forEach(function (extension) {
+            this.base.options.buttons.forEach(function (button) {
+                extension = this.base.getExtensionByName(button);
                 if (typeof extension.getButton === 'function') {
                     btn = extension.getButton(this.base);
                     li = this.base.options.ownerDocument.createElement('li');
@@ -3525,7 +3527,7 @@ var extensionDefaults;
     // for now this is empty because nothing interally uses an Extension default.
     // as they are converted, provide them here.
     extensionDefaults = {
-
+    	paste: PasteHandler
     };
 
 })();
@@ -3884,20 +3886,23 @@ function MediumEditor(elements, options) {
     }
 
     function initPasteHandler(options) {
-        return new PasteHandler(
-            Util.extend({},
-                options,
-                // Backwards compatability
-                {
-                    forcePlainText: this.options.forcePlainText, // deprecated
-                    cleanPastedHTML: this.options.cleanPastedHTML, // deprecated
-                    disableReturn: this.options.disableReturn,
-                    targetBlank: this.options.targetBlank,
-                    contentWindow: this.options.contentWindow,
-                    ownerDocument: this.options.ownerDocument
-                }
-            )
-        );
+        // Backwards compatability
+        var defaultsBC = {
+            forcePlainText: this.options.forcePlainText, // deprecated
+            cleanPastedHTML: this.options.cleanPastedHTML, // deprecated
+            disableReturn: this.options.disableReturn,
+            targetBlank: this.options.targetBlank,
+            contentWindow: this.options.contentWindow,
+            ownerDocument: this.options.ownerDocument
+        };
+
+        if (typeof options === 'function') {
+            return new options(defaultsBC);
+        } else {
+            return new MediumEditor.extensions.paste(
+                Util.extend({}, options, defaultsBC)
+            );
+        }
     }
 
     function initCommands() {
@@ -3926,10 +3931,14 @@ function MediumEditor(elements, options) {
         for (name in extensions) {
             if (extensions.hasOwnProperty(name) && buttons.indexOf(name) === -1) {
                 ext = initExtension(extensions[name], name, this);
+                this.commands.push(ext);
             }
         }
 
-        this.commands.push(initExtension(initPasteHandler.call(this, this.options.paste), 'paste', this));
+        // Only add default paste extension if it wasn't overriden
+        if (!this.options.extensions['paste']) {
+            this.commands.push(initExtension(initPasteHandler.call(this, this.options.paste), 'paste', this));
+        }
 
         // Add AnchorPreview as extension if needed
         if (shouldAddDefaultAnchorPreview.call(this)) {
