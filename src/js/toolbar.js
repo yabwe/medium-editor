@@ -46,13 +46,15 @@ var Toolbar;
             var ul = this.base.options.ownerDocument.createElement('ul'),
                 li,
                 btn,
-                buttons;
+                buttons,
+                extension;
 
             ul.id = 'medium-editor-toolbar-actions' + this.base.id;
             ul.className = 'medium-editor-toolbar-actions clearfix';
             ul.style.display = 'block';
 
-            this.base.commands.forEach(function (extension) {
+            this.base.options.buttons.forEach(function (button) {
+                extension = this.base.getExtensionByName(button);
                 if (typeof extension.getButton === 'function') {
                     btn = extension.getButton(this.base);
                     li = this.base.options.ownerDocument.createElement('li');

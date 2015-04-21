@@ -402,10 +402,14 @@ function MediumEditor(elements, options) {
         for (name in extensions) {
             if (extensions.hasOwnProperty(name) && buttons.indexOf(name) === -1) {
                 ext = initExtension(extensions[name], name, this);
+                this.commands.push(ext);
             }
         }
 
-        this.commands.push(initExtension(initPasteHandler.call(this, this.options.paste), 'paste', this));
+        // Only add default paste extension if it wasn't overriden
+        if (!this.options.extensions['paste']) {
+            this.commands.push(initExtension(initPasteHandler.call(this, this.options.paste), 'paste', this));
+        }
 
         // Add AnchorPreview as extension if needed
         if (shouldAddDefaultAnchorPreview.call(this)) {

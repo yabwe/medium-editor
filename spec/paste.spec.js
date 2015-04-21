@@ -330,7 +330,7 @@ describe('Pasting content', function () {
 
     describe('using custom paste handler', function () {
         it('should be overrideable via paste options', function () {
-            var origInit = spyOn(MediumEditor.extensions.paste.prototype, "init"),
+            var origInit = spyOn(MediumEditor.extensions.paste.prototype, 'init'),
                 newInit = jasmine.createSpy('spy'),
                 editor = new MediumEditor('.editor', {
                     paste: {
@@ -343,6 +343,32 @@ describe('Pasting content', function () {
             selectElementContents(this.el.firstChild);
             editor.pasteHTML('<p class="some-class" style="font-weight: bold" dir="ltr"><meta name="description" content="test" />test</p>');
             expect(editor.elements[0].innerHTML).toBe('<p>test</p>');
+        });
+
+        it('should be overrideable via custom extension', function () {
+            var origInit = spyOn(MediumEditor.extensions.paste.prototype, 'init'),
+                newInit = jasmine.createSpy('spy'),
+                origPasteHTML = spyOn(MediumEditor.extensions.paste.prototype, 'pasteHTML'),
+                newPasteHTML = jasmine.createSpy('spy'),
+                customPasteHandler = {
+                    name: 'paste',
+                    init: newInit,
+                    pasteHTML: newPasteHTML
+                },
+                editor = new MediumEditor('.editor', {
+                    extensions: {
+                        paste: customPasteHandler
+                    }
+                }),
+                testString = '<p>test</p>';
+
+            expect(origInit).not.toHaveBeenCalled();
+            expect(newInit).toHaveBeenCalled();
+            expect(editor.getExtensionByName('paste')).toBe(customPasteHandler);
+
+            editor.pasteHTML(testString);
+            expect(origPasteHTML).not.toHaveBeenCalled();
+            expect(newPasteHTML).toHaveBeenCalledWith(testString, undefined);
         });
     });
 });
