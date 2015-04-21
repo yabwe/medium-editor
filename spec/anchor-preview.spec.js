@@ -12,6 +12,7 @@ describe('Anchor Preview TestCase', function () {
             '<a id="test-link" href="http://test.com">ipsum</a> ' +
             'preview <span id="another-element">&nbsp;</span> ' +
             '<a id="test-empty-link" href="">ipsum</a> ' +
+            '<a id="test-markup-link" href="http://test.com"><b>ipsum</b></a> ' +
             '<a id="test-symbol-link" href="http://[{~#custom#~}].com"></a>';
         document.body.appendChild(this.el);
     });
@@ -57,6 +58,27 @@ describe('Anchor Preview TestCase', function () {
             fireEvent(document.getElementById('another-element'), 'click');
             jasmine.clock().tick(200);
             expect(editor.toolbar.hideToolbar).toHaveBeenCalled();
+        });
+
+       it('should be displayed on hover of a link element with markup inside', function () {
+            var editor = new MediumEditor('.editor', {
+                delay: 200
+            }),
+                sel = window.getSelection(),
+                anchorPreview = editor.getExtensionByName('anchor-preview'),
+                nextRange;
+
+            // show preview
+            spyOn(MediumEditor.statics.AnchorPreview.prototype, 'showPreview').and.callThrough();
+            fireEvent(document.getElementById('test-markup-link'), 'mouseover');
+
+            // preview shows only after delay
+            expect(anchorPreview.showPreview).not.toHaveBeenCalled();
+            jasmine.clock().tick(250);
+            expect(anchorPreview.showPreview).toHaveBeenCalled();
+
+            // link is set in preview
+            expect(anchorPreview.getPreviewElement().querySelector('i').innerHTML).toBe(document.getElementById('test-markup-link').attributes.href.value);
         });
 
         it('should show the unencoded link', function () {
