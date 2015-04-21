@@ -295,6 +295,7 @@ describe('Pasting content', function () {
                     delay: 200,
                     disableReturn: false
                 }),
+                pasteHandler = editor.getExtensionByName('paste'),
 
                 // mock event with clipboardData API
                 // test requires creating a function, so can't loop or jslint balks
@@ -320,7 +321,7 @@ describe('Pasting content', function () {
                 sel.addRange(range);
 
                 evt.clipboardData.pasteText = textTests[i].paste;
-                editor.pasteHandler.handlePaste(evt, editorEl);
+                pasteHandler.handlePaste(evt, editorEl);
                 jasmine.clock().tick(100);
                 expect(editorEl.innerHTML).toEqual(textTests[i].output);
             }

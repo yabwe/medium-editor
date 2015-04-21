@@ -356,21 +356,21 @@ function MediumEditor(elements, options) {
         }
     }
 
-    function initPasteHandler() {
-        var pasteOptions = Util.extend(
-            {},
-            this.options.paste,
-            // Backwards compatability
-            {
-                forcePlainText: this.options.forcePlainText, // deprecated
-                cleanPastedHTML: this.options.cleanPastedHTML, // deprecated
-                disableReturn: this.options.disableReturn,
-                targetBlank: this.options.targetBlank,
-                contentWindow: this.options.contentWindow,
-                ownerDocument: this.options.ownerDocument
-        });
-
-        this.pasteHandler = new PasteHandler(this, pasteOptions);
+    function initPasteHandler(options) {
+        return new PasteHandler(
+            Util.extend({},
+                options,
+                // Backwards compatability
+                {
+                    forcePlainText: this.options.forcePlainText, // deprecated
+                    cleanPastedHTML: this.options.cleanPastedHTML, // deprecated
+                    disableReturn: this.options.disableReturn,
+                    targetBlank: this.options.targetBlank,
+                    contentWindow: this.options.contentWindow,
+                    ownerDocument: this.options.ownerDocument
+                }
+            )
+        );
     }
 
     function initCommands() {
@@ -400,6 +400,11 @@ function MediumEditor(elements, options) {
             if (extensions.hasOwnProperty(name) && buttons.indexOf(name) === -1) {
                 ext = initExtension(extensions[name], name, this);
             }
+        }
+
+        // Add PasteHandler as extension if needed
+        if (this.options.paste) {
+            this.commands.push(initExtension(initPasteHandler.call(this, this.options.paste), 'paste', this));
         }
 
         // Add AnchorPreview as extension if needed
@@ -517,8 +522,6 @@ function MediumEditor(elements, options) {
             initElements.call(this);
             attachHandlers.call(this);
 
-            initPasteHandler.call(this);
-
             if (!this.options.disablePlaceholders) {
                 this.placeholders = new Placeholders(this);
             }
@@ -545,7 +548,9 @@ function MediumEditor(elements, options) {
             }
 
             this.commands.forEach(function (extension) {
-                if (typeof extension.deactivate === 'function') {
+                if (typeof extension.destroy === 'function') {
+                    extension.destroy();
+                } else if (typeof extension.deactivate === 'function') {
                     extension.deactivate();
                 }
             }, this);
@@ -878,11 +883,11 @@ function MediumEditor(elements, options) {
         },
 
         cleanPaste: function (text) {
-            this.pasteHandler.cleanPaste(text);
+            this.getExtensionByName('paste').cleanPaste(text);
         },
 
         pasteHTML: function (html, options) {
-            this.pasteHandler.pasteHTML(html, options);
+            this.getExtensionByName('paste').pasteHTML(html, options);
         }
     };
 }());

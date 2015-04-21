@@ -1,4 +1,4 @@
-/*global Util, Selection*/
+/*global Util, Selection, Extension */
 var PasteHandler;
 
 (function () {
@@ -47,37 +47,53 @@ var PasteHandler;
     }
     /*jslint regexp: false*/
 
-    /* Paste Options:
-     *
-     * forcePlainText: Forces pasting as plain text. Default: true
-     * cleanPastedHTML: cleans pasted content from different sources, like google docs etc. Default: false
-     * cleanReplacements: custom pairs (2 element arrays) of RegExp and replacement text to use during paste when
-     *                    __forcePlainText__ or __cleanPastedHTML__ are `true` OR when calling `cleanPaste(text)`
-     *                    helper method. Default: []
-     * cleanAttrs: list of element attributes to remove during paste when __cleanPastedHTML__ is `true` or when
-     *             calling `cleanPaste(text)` or `pasteHTML(html,options)` helper methods.
-     *             Default: ['class', 'style', 'dir']
-     * cleanTags: list of element tag names to remove during paste when __cleanPastedHTML__ is `true` or when
-     *            calling `cleanPaste(text)` or `pasteHTML(html,options)` helper methods.
-     *            Default: ['meta']
-     *
-     * ----- internal options needed from base -----
-     * disableReturn
-     * targetBlank
-     * contentWindow
-     * ownerDocument
-     */
+     PasteHandler = Extension.extend({
 
-    PasteHandler = function (instance, options) {
-        this.base = instance;
-        this.options = options;
+        /* Paste Options */
 
-        if (this.options.forcePlainText || this.options.cleanPastedHTML) {
-            this.base.subscribe('editablePaste', this.handlePaste.bind(this));
-        }
-    };
+        /* forcePlainText: [boolean]
+         * Forces pasting as plain text.
+         */
+        forcePlainText: true,
 
-    PasteHandler.prototype = {
+        /* cleanPastedHTML: [boolean]
+         * cleans pasted content from different sources, like google docs etc.
+         */
+        cleanPastedHTML: false,
+
+        /* cleanReplacements: [Array]
+         * custom pairs (2 element arrays) of RegExp and replacement text to use during paste when
+         * __forcePlainText__ or __cleanPastedHTML__ are `true` OR when calling `cleanPaste(text)` helper method.
+         */
+        cleanReplacements: [],
+
+        /* cleanAttrs:: [Array]
+         * list of element attributes to remove during paste when __cleanPastedHTML__ is `true` or when
+         * calling `cleanPaste(text)` or `pasteHTML(html, options)` helper methods.
+         */
+        cleanAttrs: ['class', 'style', 'dir'],
+
+        /* cleanTags: [Array]
+         * list of element tag names to remove during paste when __cleanPastedHTML__ is `true` or when
+         * calling `cleanPaste(text)` or `pasteHTML(html, options)` helper methods.
+         */
+        cleanTags: ['meta'],
+
+        /* ----- internal options needed from base ----- */
+        contentWindow: window,
+        ownerDocument: document,
+        targetBlank: false,
+        disableReturn: false,
+
+        // Need a reference to MediumEditor (this.base)
+        parent: true,
+
+        init: function () {
+            if (this.forcePlainText || this.cleanPastedHTML) {
+                this.base.subscribe('editablePaste', this.handlePaste.bind(this));
+            }
+        },
+
         handlePaste: function (event, element) {
             var paragraphs,
                 html = '',
@@ -87,8 +103,8 @@ var PasteHandler;
                 pastedHTML,
                 pastedPlain;
 
-            if (this.options.contentWindow.clipboardData && event.clipboardData === undefined) {
-                event.clipboardData = this.options.contentWindow.clipboardData;
+            if (this.contentWindow.clipboardData && event.clipboardData === undefined) {
+                event.clipboardData = this.contentWindow.clipboardData;
                 // If window.clipboardData exists, but event.clipboardData doesn't exist,
                 // we're probably in IE. IE only has two possibilities for clipboard
                 // data format: 'Text' and 'URL'.
@@ -110,11 +126,11 @@ var PasteHandler;
                     pastedHTML = pastedPlain;
                 }
 
-                if (this.options.cleanPastedHTML && pastedHTML) {
+                if (this.cleanPastedHTML && pastedHTML) {
                     return this.cleanPaste(pastedHTML);
                 }
 
-                if (!(this.options.disableReturn || element.getAttribute('data-disable-return'))) {
+                if (!(this.disableReturn || element.getAttribute('data-disable-return'))) {
                     paragraphs = pastedPlain.split(/[\r\n]+/g);
                     // If there are no \r\n in data, don't wrap in <p>
                     if (paragraphs.length > 1) {
@@ -129,15 +145,15 @@ var PasteHandler;
                 } else {
                     html = Util.htmlEntities(pastedPlain);
                 }
-                Util.insertHTMLCommand(this.options.ownerDocument, html);
+                Util.insertHTMLCommand(this.ownerDocument, html);
             }
         },
 
         cleanPaste: function (text) {
             var i, elList, workEl,
-                el = Selection.getSelectionElement(this.options.contentWindow),
+                el = Selection.getSelectionElement(this.contentWindow),
                 multiline = /<p|<br|<div/.test(text),
-                replacements = createReplacements().concat(this.options.cleanReplacements || []);
+                replacements = createReplacements().concat(this.cleanReplacements || []);
 
             for (i = 0; i < replacements.length; i += 1) {
                 text = text.replace(replacements[i][0], replacements[i][1]);
@@ -150,7 +166,7 @@ var PasteHandler;
                 this.pasteHTML('<p>' + elList.join('</p><p>') + '</p>');
 
                 try {
-                    this.options.ownerDocument.execCommand('insertText', false, "\n");
+                    this.ownerDocument.execCommand('insertText', false, "\n");
                 } catch (ignore) { }
 
                 // block element cleanup
@@ -165,7 +181,7 @@ var PasteHandler;
 
                     switch (workEl.tagName.toLowerCase()) {
                     case 'a':
-                        if (this.options.targetBlank) {
+                        if (this.targetBlank) {
                             Util.setTargetBlank(workEl);
                         }
                         break;
@@ -184,11 +200,14 @@ var PasteHandler;
         },
 
         pasteHTML: function (html, options) {
-            options = Util.defaults({}, options, this.options);
+            options = Util.defaults({}, options, {
+                cleanAttrs: this.cleanAttrs,
+                cleanTags: this.cleanTags
+            });
 
-            var elList, workEl, i, fragmentBody, pasteBlock = this.options.ownerDocument.createDocumentFragment();
+            var elList, workEl, i, fragmentBody, pasteBlock = this.ownerDocument.createDocumentFragment();
 
-            pasteBlock.appendChild(this.options.ownerDocument.createElement('body'));
+            pasteBlock.appendChild(this.ownerDocument.createElement('body'));
 
             fragmentBody = pasteBlock.querySelector('body');
             fragmentBody.innerHTML = html;
@@ -203,7 +222,7 @@ var PasteHandler;
                 Util.cleanupTags(workEl, options.cleanTags);
             }
 
-            Util.insertHTMLCommand(this.options.ownerDocument, fragmentBody.innerHTML.replace(/&nbsp;/g, ' '));
+            Util.insertHTMLCommand(this.ownerDocument, fragmentBody.innerHTML.replace(/&nbsp;/g, ' '));
         },
 
         isCommonBlock: function (el) {
@@ -252,7 +271,7 @@ var PasteHandler;
 
             for (i = 0; i < spans.length; i += 1) {
                 el = spans[i];
-                new_el = this.options.ownerDocument.createElement(el.classList.contains('bold') ? 'b' : 'i');
+                new_el = this.ownerDocument.createElement(el.classList.contains('bold') ? 'b' : 'i');
 
                 if (el.classList.contains('bold') && el.classList.contains('italic')) {
                     // add an i tag as well if this has both italics and bold
@@ -273,8 +292,9 @@ var PasteHandler;
                 }
 
                 // remove empty spans, replace others with their contents
-                Util.unwrap(el, this.options.ownerDocument);
+                Util.unwrap(el, this.ownerDocument);
             }
         }
-    };
+     });
+
 }());
