@@ -1,3 +1,5 @@
+/*global Util*/
+
 var AnchorPreview;
 
 (function () {
@@ -137,18 +139,6 @@ var AnchorPreview;
             this.instance_handleAnchorMouseout = null;
         },
 
-        getClosestTag : function(el, tag) {
-
-            do {
-              if (el.nodeName === tag.toUpperCase()) {
-
-                return el;
-              }
-            } while (el = el.parentNode);
-
-
-            return null;
-          },
 
         handleEditableMouseover: function (event) {
             var target;
@@ -157,7 +147,7 @@ var AnchorPreview;
                 if(event.target.tagName.toLowerCase() === 'a'){
                    target = event.target;
                }else{
-                   target = this.getClosestTag(event.target,'a');
+                   target = Util.getClosestTag(event.target,'a');
                }
            }
 
