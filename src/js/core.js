@@ -1,5 +1,5 @@
 /*global FileReader, Util, ButtonsData, DefaultButton,
- PasteHandler, Selection, AnchorExtension, FontSizeExtension, Extension, extensionDefaults,
+ Selection, AnchorExtension, FontSizeExtension, Extension, extensionDefaults,
  Toolbar, AnchorPreview, Events, Placeholders, editorDefaults */
 
 function MediumEditor(elements, options) {
@@ -357,20 +357,23 @@ function MediumEditor(elements, options) {
     }
 
     function initPasteHandler(options) {
-        return new PasteHandler(
-            Util.extend({},
-                options,
-                // Backwards compatability
-                {
-                    forcePlainText: this.options.forcePlainText, // deprecated
-                    cleanPastedHTML: this.options.cleanPastedHTML, // deprecated
-                    disableReturn: this.options.disableReturn,
-                    targetBlank: this.options.targetBlank,
-                    contentWindow: this.options.contentWindow,
-                    ownerDocument: this.options.ownerDocument
-                }
-            )
-        );
+        // Backwards compatability
+        var defaultsBC = {
+            forcePlainText: this.options.forcePlainText, // deprecated
+            cleanPastedHTML: this.options.cleanPastedHTML, // deprecated
+            disableReturn: this.options.disableReturn,
+            targetBlank: this.options.targetBlank,
+            contentWindow: this.options.contentWindow,
+            ownerDocument: this.options.ownerDocument
+        };
+
+        if (typeof options === 'function') {
+            return new options(defaultsBC);
+        } else {
+            return new MediumEditor.extensions.paste(
+                Util.extend({}, options, defaultsBC)
+            );
+        }
     }
 
     function initCommands() {

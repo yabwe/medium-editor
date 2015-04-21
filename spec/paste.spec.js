@@ -142,7 +142,7 @@ describe('Pasting content', function () {
         });
     });
 
-    describe('cleanPaste', function () {
+    describe('using cleanPaste', function () {
         it('should filter inline rich-text by passing deprecated options', function () {
             var i,
                 editorEl = this.el,
@@ -239,7 +239,7 @@ describe('Pasting content', function () {
         });
     });
 
-    describe('pasteHTML', function () {
+    describe('using pasteHTML', function () {
         it('should remove certain attributes and tags by default', function () {
             var editor = new MediumEditor('.editor');
             selectElementContents(this.el.firstChild);
@@ -286,8 +286,8 @@ describe('Pasting content', function () {
         });
     });
 
-    describe('text', function () {
-        it('handlePaste should handle text with/without linebreaks', function () {
+    describe('text with/without linebreaks', function () {
+        it('should be handled consistantly', function () {
             var range, i,
                 editorEl = this.el,
                 sel = window.getSelection(),
@@ -328,4 +328,21 @@ describe('Pasting content', function () {
         });
     });
 
+    describe('using custom paste handler', function () {
+        it('should be overrideable via paste options', function () {
+            var origInit = spyOn(MediumEditor.extensions.paste.prototype, "init"),
+                newInit = jasmine.createSpy('spy'),
+                editor = new MediumEditor('.editor', {
+                    paste: {
+                        init: newInit
+                    }
+                });
+            expect(origInit).not.toHaveBeenCalled();
+            expect(newInit).toHaveBeenCalled();
+
+            selectElementContents(this.el.firstChild);
+            editor.pasteHTML('<p class="some-class" style="font-weight: bold" dir="ltr"><meta name="description" content="test" />test</p>');
+            expect(editor.elements[0].innerHTML).toBe('<p>test</p>');
+        });
+    });
 });
