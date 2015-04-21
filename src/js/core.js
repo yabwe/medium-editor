@@ -1,5 +1,5 @@
 /*global FileReader, Util, ButtonsData, DefaultButton,
- PasteHandler, Selection, AnchorExtension, FontSizeExtension, Extension, extensionDefaults,
+ Selection, AnchorExtension, FontSizeExtension, Extension, extensionDefaults,
  Toolbar, AnchorPreview, Events, Placeholders, editorDefaults */
 
 function MediumEditor(elements, options) {
@@ -356,21 +356,20 @@ function MediumEditor(elements, options) {
         }
     }
 
-    function initPasteHandler() {
-        var pasteOptions = Util.extend(
-            {},
-            this.options.paste,
-            // Backwards compatability
-            {
-                forcePlainText: this.options.forcePlainText, // deprecated
-                cleanPastedHTML: this.options.cleanPastedHTML, // deprecated
-                disableReturn: this.options.disableReturn,
-                targetBlank: this.options.targetBlank,
-                contentWindow: this.options.contentWindow,
-                ownerDocument: this.options.ownerDocument
-        });
+    function initPasteHandler(options) {
+        // Backwards compatability
+        var defaultsBC = {
+            forcePlainText: this.options.forcePlainText, // deprecated
+            cleanPastedHTML: this.options.cleanPastedHTML, // deprecated
+            disableReturn: this.options.disableReturn,
+            targetBlank: this.options.targetBlank,
+            "window": this.options.contentWindow,
+            "document": this.options.ownerDocument
+        };
 
-        this.pasteHandler = new PasteHandler(this, pasteOptions);
+        return new MediumEditor.extensions.paste(
+            Util.extend({}, options, defaultsBC)
+        );
     }
 
     function initCommands() {
@@ -399,7 +398,13 @@ function MediumEditor(elements, options) {
         for (name in extensions) {
             if (extensions.hasOwnProperty(name) && buttons.indexOf(name) === -1) {
                 ext = initExtension(extensions[name], name, this);
+                this.commands.push(ext);
             }
+        }
+
+        // Only add default paste extension if it wasn't overriden
+        if (!this.options.extensions['paste']) {
+            this.commands.push(initExtension(initPasteHandler.call(this, this.options.paste), 'paste', this));
         }
 
         // Add AnchorPreview as extension if needed
@@ -414,7 +419,7 @@ function MediumEditor(elements, options) {
             [['forcePlainText', 'paste.forcePlainText'],
              ['cleanPastedHTML', 'paste.cleanPastedHTML']].forEach(function (pair) {
                 if (options.hasOwnProperty(pair[0]) && options[pair[0]] !== undefined) {
-                    Util.deprecated(pair[0], pair[1]);
+                    Util.deprecated(pair[0], pair[1], 'v5.0.0');
                 }
             });
         }
@@ -516,8 +521,6 @@ function MediumEditor(elements, options) {
             initCommands.call(this);
             initElements.call(this);
             attachHandlers.call(this);
-
-            initPasteHandler.call(this);
 
             if (!this.options.disablePlaceholders) {
                 this.placeholders = new Placeholders(this);
@@ -838,10 +841,6 @@ function MediumEditor(elements, options) {
             sel.addRange(range);
         },
 
-        fontSize: function (opts) {
-            return this.options.ownerDocument.execCommand('fontSize', false, opts.size);
-        },
-
         createLink: function (opts) {
             var customEvent,
                 i;
@@ -869,20 +868,20 @@ function MediumEditor(elements, options) {
 
         // alias for setup - keeping for backwards compatability
         activate: function () {
-            Util.deprecatedMethod.call(this, 'activate', 'setup', arguments);
+            Util.deprecatedMethod.call(this, 'activate', 'setup', arguments, 'v5.0.0');
         },
 
-        // alias for destory - keeping for backwards compatability
+        // alias for destroy - keeping for backwards compatability
         deactivate: function () {
-            Util.deprecatedMethod.call(this, 'deactivate', 'destroy', arguments);
+            Util.deprecatedMethod.call(this, 'deactivate', 'destroy', arguments, 'v5.0.0');
         },
 
         cleanPaste: function (text) {
-            this.pasteHandler.cleanPaste(text);
+            this.getExtensionByName('paste').cleanPaste(text);
         },
 
         pasteHTML: function (html, options) {
-            this.pasteHandler.pasteHTML(html, options);
+            this.getExtensionByName('paste').pasteHTML(html, options);
         }
     };
 }());

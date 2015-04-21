@@ -1207,8 +1207,124 @@ var Extension;
             // has a .base value pointing to the editor
             // owning us. has been given a .name if no
             // name present
-        }
-        // core API definition for an "extension" follows:
+        },
+
+        /* parent: [boolean]
+         *
+         * setting this to true will set the .base property
+         * of the extension to be a reference to the
+         * medium-editor instance that is using the extension
+         */
+        parent: false,
+
+        /* base: [MediumEditor instance]
+         *
+         * If .parent is set to true, this will be set to the
+         * current MediumEditor instance before init() is called
+         */
+        base: null,
+
+        /* name: [string]
+         *
+         * 'name' of the extension, used for retrieving the extension.
+         * If not set, MediumEditor will set this to be the key
+         * used when passing the extension into MediumEditor via the
+         * 'extensions' option
+         */
+        name: null,
+
+        /* checkState: [function (node)]
+         *
+         * If implemented, this function will be called one or more times
+         * the state of the editor & toolbar are updated.
+         * When the state is updated, the editor does the following:
+         *
+         * 1) Find the parent node containing the current selection
+         * 2) Call checkState on the extension, passing the node as an argument
+         * 3) Get tha parent node of the previous node
+         * 4) Repeat steps #2 and #3 until we move outside the parent contenteditable
+         */
+        checkState: null,
+
+        /* getButton: [function ()]
+         *
+         * If implemented, this function will be called when
+         * the toolbar is being created.  The DOM Element returned
+         * by this function will be appended to the toolbar along
+         * with any other buttons.
+         */
+        getButton: null,
+
+        /* As alternatives to checkState, these functions provide a more structured
+         * path to updating the state of an extension (usually a button) whenever
+         * the state of the editor & toolbar are updated.
+         */
+
+        /* queryCommandState: [function ()]
+         *
+         * If implemented, this function will be called once on each extension
+         * when the state of the editor/toolbar is being updated.
+         *
+         * If this function returns a non-null value, the exntesion will
+         * be ignored as the code climbs the dom tree.
+         *
+         * If this function returns true, and the setActive() function is defined
+         * setActive() will be called
+         */
+        queryCommandState: null,
+
+        /* isActive: [function ()]
+         *
+         * If implemented, this function will be called when MediumEditor
+         * has determined that this extension is 'active' for the current selection.
+         * This may be called when the editor & toolbar are being updated,
+         * but only if queryCommandState() or isAlreadyApplied() functions
+         * are implemented, and when called, return true.
+         */
+        isActive: null,
+
+        /* isAlreadyApplied: [function (node)]
+         *
+         * If implemented, this function is similar to checkState() in
+         * that it will be calle repeatedly as MediumEditor moves up
+         * the DOM to update the editor & toolbar after a state change.
+         *
+         * NOTE: This function will NOT be called if checkState() has
+         * been implemented. This function will NOT be called if
+         * queryCommandState() is implemented and returns a non-null
+         * value when called
+         */
+        isAlreadyApplied: null,
+
+        /* setActive: [function ()]
+         *
+         * If implemented, this function is called when MediumEditor knows
+         * that this extension is currently enabled.  Currently, this
+         * function is called when updating the editor & toolbar, and
+         * only if queryCommandState() or isAlreadyApplied(node) return
+         * true when called
+         */
+        setActive: null,
+
+        /* setInactive: [function ()]
+         *
+         * If implemented, this function is called when MediumEditor knows
+         * that this extension is currently disabled.  Curently, this
+         * is called at the beginning of each state change for
+         * the editor & toolbar. After calling this, MediumEditor
+         * will attempt to update the extension, either via checkState()
+         * or the combination of queryCommandState(), isAlreadyApplied(node),
+         * isActive(), and setActive()
+         */
+        setInactive: null,
+
+
+        /* onHide: [function ()]
+         *
+         * If implemented, this function is called each time the
+         * toolbar is hidden
+         */
+        onHide: null
     };
 
 })();
@@ -1865,37 +1981,53 @@ var PasteHandler;
     }
     /*jslint regexp: false*/
 
-    /* Paste Options:
-     *
-     * forcePlainText: Forces pasting as plain text. Default: true
-     * cleanPastedHTML: cleans pasted content from different sources, like google docs etc. Default: false
-     * cleanReplacements: custom pairs (2 element arrays) of RegExp and replacement text to use during paste when
-     *                    __forcePlainText__ or __cleanPastedHTML__ are `true` OR when calling `cleanPaste(text)`
-     *                    helper method. Default: []
-     * cleanAttrs: list of element attributes to remove during paste when __cleanPastedHTML__ is `true` or when
-     *             calling `cleanPaste(text)` or `pasteHTML(html,options)` helper methods.
-     *             Default: ['class', 'style', 'dir']
-     * cleanTags: list of element tag names to remove during paste when __cleanPastedHTML__ is `true` or when
-     *            calling `cleanPaste(text)` or `pasteHTML(html,options)` helper methods.
-     *            Default: ['meta']
-     *
-     * ----- internal options needed from base -----
-     * disableReturn
-     * targetBlank
-     * contentWindow
-     * ownerDocument
-     */
+     PasteHandler = Extension.extend({
 
-    PasteHandler = function (instance, options) {
-        this.base = instance;
-        this.options = options;
+        /* Paste Options */
 
-        if (this.options.forcePlainText || this.options.cleanPastedHTML) {
-            this.base.subscribe('editablePaste', this.handlePaste.bind(this));
-        }
-    };
+        /* forcePlainText: [boolean]
+         * Forces pasting as plain text.
+         */
+        forcePlainText: true,
 
-    PasteHandler.prototype = {
+        /* cleanPastedHTML: [boolean]
+         * cleans pasted content from different sources, like google docs etc.
+         */
+        cleanPastedHTML: false,
+
+        /* cleanReplacements: [Array]
+         * custom pairs (2 element arrays) of RegExp and replacement text to use during paste when
+         * __forcePlainText__ or __cleanPastedHTML__ are `true` OR when calling `cleanPaste(text)` helper method.
+         */
+        cleanReplacements: [],
+
+        /* cleanAttrs:: [Array]
+         * list of element attributes to remove during paste when __cleanPastedHTML__ is `true` or when
+         * calling `cleanPaste(text)` or `pasteHTML(html, options)` helper methods.
+         */
+        cleanAttrs: ['class', 'style', 'dir'],
+
+        /* cleanTags: [Array]
+         * list of element tag names to remove during paste when __cleanPastedHTML__ is `true` or when
+         * calling `cleanPaste(text)` or `pasteHTML(html, options)` helper methods.
+         */
+        cleanTags: ['meta'],
+
+        /* ----- internal options needed from base ----- */
+        "window": window,
+        "document": document,
+        targetBlank: false,
+        disableReturn: false,
+
+        // Need a reference to MediumEditor (this.base)
+        parent: true,
+
+        init: function () {
+            if (this.forcePlainText || this.cleanPastedHTML) {
+                this.base.subscribe('editablePaste', this.handlePaste.bind(this));
+            }
+        },
+
         handlePaste: function (event, element) {
             var paragraphs,
                 html = '',
@@ -1905,8 +2037,8 @@ var PasteHandler;
                 pastedHTML,
                 pastedPlain;
 
-            if (this.options.contentWindow.clipboardData && event.clipboardData === undefined) {
-                event.clipboardData = this.options.contentWindow.clipboardData;
+            if (this.window.clipboardData && event.clipboardData === undefined) {
+                event.clipboardData = this.window.clipboardData;
                 // If window.clipboardData exists, but event.clipboardData doesn't exist,
                 // we're probably in IE. IE only has two possibilities for clipboard
                 // data format: 'Text' and 'URL'.
@@ -1928,11 +2060,11 @@ var PasteHandler;
                     pastedHTML = pastedPlain;
                 }
 
-                if (this.options.cleanPastedHTML && pastedHTML) {
+                if (this.cleanPastedHTML && pastedHTML) {
                     return this.cleanPaste(pastedHTML);
                 }
 
-                if (!(this.options.disableReturn || element.getAttribute('data-disable-return'))) {
+                if (!(this.disableReturn || element.getAttribute('data-disable-return'))) {
                     paragraphs = pastedPlain.split(/[\r\n]+/g);
                     // If there are no \r\n in data, don't wrap in <p>
                     if (paragraphs.length > 1) {
@@ -1947,15 +2079,15 @@ var PasteHandler;
                 } else {
                     html = Util.htmlEntities(pastedPlain);
                 }
-                Util.insertHTMLCommand(this.options.ownerDocument, html);
+                Util.insertHTMLCommand(this.document, html);
             }
         },
 
         cleanPaste: function (text) {
             var i, elList, workEl,
-                el = Selection.getSelectionElement(this.options.contentWindow),
+                el = Selection.getSelectionElement(this.window),
                 multiline = /<p|<br|<div/.test(text),
-                replacements = createReplacements().concat(this.options.cleanReplacements || []);
+                replacements = createReplacements().concat(this.cleanReplacements || []);
 
             for (i = 0; i < replacements.length; i += 1) {
                 text = text.replace(replacements[i][0], replacements[i][1]);
@@ -1968,7 +2100,7 @@ var PasteHandler;
                 this.pasteHTML('<p>' + elList.join('</p><p>') + '</p>');
 
                 try {
-                    this.options.ownerDocument.execCommand('insertText', false, "\n");
+                    this.document.execCommand('insertText', false, "\n");
                 } catch (ignore) { }
 
                 // block element cleanup
@@ -1983,7 +2115,7 @@ var PasteHandler;
 
                     switch (workEl.tagName.toLowerCase()) {
                     case 'a':
-                        if (this.options.targetBlank) {
+                        if (this.targetBlank) {
                             Util.setTargetBlank(workEl);
                         }
                         break;
@@ -2002,11 +2134,14 @@ var PasteHandler;
         },
 
         pasteHTML: function (html, options) {
-            options = Util.defaults({}, options, this.options);
+            options = Util.defaults({}, options, {
+                cleanAttrs: this.cleanAttrs,
+                cleanTags: this.cleanTags
+            });
 
-            var elList, workEl, i, fragmentBody, pasteBlock = this.options.ownerDocument.createDocumentFragment();
+            var elList, workEl, i, fragmentBody, pasteBlock = this.document.createDocumentFragment();
 
-            pasteBlock.appendChild(this.options.ownerDocument.createElement('body'));
+            pasteBlock.appendChild(this.document.createElement('body'));
 
             fragmentBody = pasteBlock.querySelector('body');
             fragmentBody.innerHTML = html;
@@ -2021,7 +2156,7 @@ var PasteHandler;
                 Util.cleanupTags(workEl, options.cleanTags);
             }
 
-            Util.insertHTMLCommand(this.options.ownerDocument, fragmentBody.innerHTML.replace(/&nbsp;/g, ' '));
+            Util.insertHTMLCommand(this.document, fragmentBody.innerHTML.replace(/&nbsp;/g, ' '));
         },
 
         isCommonBlock: function (el) {
@@ -2070,7 +2205,7 @@ var PasteHandler;
 
             for (i = 0; i < spans.length; i += 1) {
                 el = spans[i];
-                new_el = this.options.ownerDocument.createElement(el.classList.contains('bold') ? 'b' : 'i');
+                new_el = this.document.createElement(el.classList.contains('bold') ? 'b' : 'i');
 
                 if (el.classList.contains('bold') && el.classList.contains('italic')) {
                     // add an i tag as well if this has both italics and bold
@@ -2091,10 +2226,11 @@ var PasteHandler;
                 }
 
                 // remove empty spans, replace others with their contents
-                Util.unwrap(el, this.options.ownerDocument);
+                Util.unwrap(el, this.document);
             }
         }
-    };
+     });
+
 }());
 
 var AnchorExtension;
@@ -2816,13 +2952,15 @@ var Toolbar;
             var ul = this.base.options.ownerDocument.createElement('ul'),
                 li,
                 btn,
-                buttons;
+                buttons,
+                extension;
 
             ul.id = 'medium-editor-toolbar-actions' + this.base.id;
             ul.className = 'medium-editor-toolbar-actions clearfix';
             ul.style.display = 'block';
 
-            this.base.commands.forEach(function (extension) {
+            this.base.options.buttons.forEach(function (button) {
+                extension = this.base.getExtensionByName(button);
                 if (typeof extension.getButton === 'function') {
                     btn = extension.getButton(this.base);
                     li = this.base.options.ownerDocument.createElement('li');
@@ -3127,7 +3265,8 @@ var Toolbar;
 
         setToolbarButtonStates: function () {
             this.base.commands.forEach(function (extension) {
-                if (typeof extension.isActive === 'function') {
+                if (typeof extension.isActive === 'function' &&
+                    typeof extension.setInactive === 'function') {
                     extension.setInactive();
                 }
             }.bind(this));
@@ -3143,7 +3282,8 @@ var Toolbar;
                     if (typeof extension.checkState === 'function') {
                         extension.checkState(parentNode);
                     } else if (typeof extension.isActive === 'function' &&
-                               typeof extension.isAlreadyApplied === 'function') {
+                               typeof extension.isAlreadyApplied === 'function' &&
+                               typeof extension.setActive === 'function') {
                         if (!extension.isActive() && extension.isAlreadyApplied(parentNode)) {
                             extension.setActive();
                         }
@@ -3164,7 +3304,7 @@ var Toolbar;
                     // If queryCommandState returns a valid value, we can trust the browser
                     // and don't need to do our manual checks
                     if (queryState !== null) {
-                        if (queryState) {
+                        if (queryState && typeof command.setActive === 'function') {
                             command.setActive();
                         }
                         return;
@@ -3387,7 +3527,7 @@ var extensionDefaults;
     // for now this is empty because nothing interally uses an Extension default.
     // as they are converted, provide them here.
     extensionDefaults = {
-
+    	paste: PasteHandler
     };
 
 })();
@@ -3745,21 +3885,20 @@ function MediumEditor(elements, options) {
         }
     }
 
-    function initPasteHandler() {
-        var pasteOptions = Util.extend(
-            {},
-            this.options.paste,
-            // Backwards compatability
-            {
-                forcePlainText: this.options.forcePlainText, // deprecated
-                cleanPastedHTML: this.options.cleanPastedHTML, // deprecated
-                disableReturn: this.options.disableReturn,
-                targetBlank: this.options.targetBlank,
-                contentWindow: this.options.contentWindow,
-                ownerDocument: this.options.ownerDocument
-        });
+    function initPasteHandler(options) {
+        // Backwards compatability
+        var defaultsBC = {
+            forcePlainText: this.options.forcePlainText, // deprecated
+            cleanPastedHTML: this.options.cleanPastedHTML, // deprecated
+            disableReturn: this.options.disableReturn,
+            targetBlank: this.options.targetBlank,
+            "window": this.options.contentWindow,
+            "document": this.options.ownerDocument
+        };
 
-        this.pasteHandler = new PasteHandler(this, pasteOptions);
+        return new MediumEditor.extensions.paste(
+            Util.extend({}, options, defaultsBC)
+        );
     }
 
     function initCommands() {
@@ -3788,7 +3927,13 @@ function MediumEditor(elements, options) {
         for (name in extensions) {
             if (extensions.hasOwnProperty(name) && buttons.indexOf(name) === -1) {
                 ext = initExtension(extensions[name], name, this);
+                this.commands.push(ext);
             }
+        }
+
+        // Only add default paste extension if it wasn't overriden
+        if (!this.options.extensions['paste']) {
+            this.commands.push(initExtension(initPasteHandler.call(this, this.options.paste), 'paste', this));
         }
 
         // Add AnchorPreview as extension if needed
@@ -3803,7 +3948,7 @@ function MediumEditor(elements, options) {
             [['forcePlainText', 'paste.forcePlainText'],
              ['cleanPastedHTML', 'paste.cleanPastedHTML']].forEach(function (pair) {
                 if (options.hasOwnProperty(pair[0]) && options[pair[0]] !== undefined) {
-                    Util.deprecated(pair[0], pair[1]);
+                    Util.deprecated(pair[0], pair[1], 'v5.0.0');
                 }
             });
         }
@@ -3905,8 +4050,6 @@ function MediumEditor(elements, options) {
             initCommands.call(this);
             initElements.call(this);
             attachHandlers.call(this);
-
-            initPasteHandler.call(this);
 
             if (!this.options.disablePlaceholders) {
                 this.placeholders = new Placeholders(this);
@@ -4227,10 +4370,6 @@ function MediumEditor(elements, options) {
             sel.addRange(range);
         },
 
-        fontSize: function (opts) {
-            return this.options.ownerDocument.execCommand('fontSize', false, opts.size);
-        },
-
         createLink: function (opts) {
             var customEvent,
                 i;
@@ -4258,20 +4397,20 @@ function MediumEditor(elements, options) {
 
         // alias for setup - keeping for backwards compatability
         activate: function () {
-            Util.deprecatedMethod.call(this, 'activate', 'setup', arguments);
+            Util.deprecatedMethod.call(this, 'activate', 'setup', arguments, 'v5.0.0');
         },
 
-        // alias for destory - keeping for backwards compatability
+        // alias for destroy - keeping for backwards compatability
         deactivate: function () {
-            Util.deprecatedMethod.call(this, 'deactivate', 'destroy', arguments);
+            Util.deprecatedMethod.call(this, 'deactivate', 'destroy', arguments, 'v5.0.0');
         },
 
         cleanPaste: function (text) {
-            this.pasteHandler.cleanPaste(text);
+            this.getExtensionByName('paste').cleanPaste(text);
         },
 
         pasteHTML: function (html, options) {
-            this.pasteHandler.pasteHTML(html, options);
+            this.getExtensionByName('paste').pasteHTML(html, options);
         }
     };
 }());
