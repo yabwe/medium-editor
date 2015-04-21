@@ -106,7 +106,23 @@ describe('Pasting content', function () {
                         forcePlainText: false,
                         cleanPastedHTML: true
                     }
-                });
+                }),
+                pasteHandler = editor.getExtensionByName('paste'),
+
+                // mock event with clipboardData API
+                // test requires creating a function, so can't loop or jslint balks
+                evt = {
+                    pasteText: null,
+                    preventDefault: function () {
+                        return;
+                    },
+                    clipboardData: {
+                        getData: function () {
+                            // do we need to return different results for the different types? text/plain, text/html
+                            return this.pasteText;
+                        }
+                    }
+                };
 
             for (i = 0; i < multiLineTests.length; i += 1) {
 
@@ -115,7 +131,8 @@ describe('Pasting content', function () {
 
                 selectElementContentsAndFire(editorEl);
 
-                editor.cleanPaste(multiLineTests[i].paste);
+                evt.clipboardData.pasteText = multiLineTests[i].paste;
+                pasteHandler.handlePaste(evt, editorEl);
                 jasmine.clock().tick(100);
                 expect(editorEl.innerHTML).toEqual(multiLineTests[i].output);
             }
@@ -334,6 +351,8 @@ describe('Pasting content', function () {
                 newInit = jasmine.createSpy('spy'),
                 editor = new MediumEditor('.editor', {
                     paste: {
+                        forcePlainText: false,
+                        cleanPastedHTML: true,
                         init: newInit
                     }
                 });
@@ -341,8 +360,8 @@ describe('Pasting content', function () {
             expect(newInit).toHaveBeenCalled();
 
             selectElementContents(this.el.firstChild);
-            editor.pasteHTML('<p class="some-class" style="font-weight: bold" dir="ltr"><meta name="description" content="test" />test</p>');
-            expect(editor.elements[0].innerHTML).toBe('<p>test</p>');
+            editor.cleanPaste("<p>One\nTwo\n</p>\n\n<p>Three Four</p>");
+            expect(editor.elements[0].innerHTML).toBe('<p>One Two </p><p>Three Four</p>');
         });
 
         it('should be overrideable via custom extension', function () {

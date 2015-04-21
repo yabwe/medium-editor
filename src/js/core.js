@@ -367,13 +367,9 @@ function MediumEditor(elements, options) {
             ownerDocument: this.options.ownerDocument
         };
 
-        if (typeof options === 'function') {
-            return new options(defaultsBC);
-        } else {
-            return new MediumEditor.extensions.paste(
-                Util.extend({}, options, defaultsBC)
-            );
-        }
+        return new MediumEditor.extensions.paste(
+            Util.extend({}, options, defaultsBC)
+        );
     }
 
     function initCommands() {
@@ -552,9 +548,7 @@ function MediumEditor(elements, options) {
             }
 
             this.commands.forEach(function (extension) {
-                if (typeof extension.destroy === 'function') {
-                    extension.destroy();
-                } else if (typeof extension.deactivate === 'function') {
+                if (typeof extension.deactivate === 'function') {
                     extension.deactivate();
                 }
             }, this);
@@ -847,10 +841,6 @@ function MediumEditor(elements, options) {
             sel.addRange(range);
         },
 
-        fontSize: function (opts) {
-            return this.options.ownerDocument.execCommand('fontSize', false, opts.size);
-        },
-
         createLink: function (opts) {
             var customEvent,
                 i;
@@ -881,7 +871,7 @@ function MediumEditor(elements, options) {
             Util.deprecatedMethod.call(this, 'activate', 'setup', arguments);
         },
 
-        // alias for destory - keeping for backwards compatability
+        // alias for destroy - keeping for backwards compatability
         deactivate: function () {
             Util.deprecatedMethod.call(this, 'deactivate', 'destroy', arguments);
         },

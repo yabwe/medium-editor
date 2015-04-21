@@ -3896,13 +3896,9 @@ function MediumEditor(elements, options) {
             ownerDocument: this.options.ownerDocument
         };
 
-        if (typeof options === 'function') {
-            return new options(defaultsBC);
-        } else {
-            return new MediumEditor.extensions.paste(
-                Util.extend({}, options, defaultsBC)
-            );
-        }
+        return new MediumEditor.extensions.paste(
+            Util.extend({}, options, defaultsBC)
+        );
     }
 
     function initCommands() {
@@ -4374,10 +4370,6 @@ function MediumEditor(elements, options) {
             sel = this.options.contentWindow.getSelection();
             sel.removeAllRanges();
             sel.addRange(range);
-        },
-
-        fontSize: function (opts) {
-            return this.options.ownerDocument.execCommand('fontSize', false, opts.size);
         },
 
         createLink: function (opts) {
