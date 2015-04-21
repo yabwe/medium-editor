@@ -3948,7 +3948,7 @@ function MediumEditor(elements, options) {
             [['forcePlainText', 'paste.forcePlainText'],
              ['cleanPastedHTML', 'paste.cleanPastedHTML']].forEach(function (pair) {
                 if (options.hasOwnProperty(pair[0]) && options[pair[0]] !== undefined) {
-                    Util.deprecated(pair[0], pair[1]);
+                    Util.deprecated(pair[0], pair[1], 'v5.0.0');
                 }
             });
         }
@@ -4397,12 +4397,12 @@ function MediumEditor(elements, options) {
 
         // alias for setup - keeping for backwards compatability
         activate: function () {
-            Util.deprecatedMethod.call(this, 'activate', 'setup', arguments);
+            Util.deprecatedMethod.call(this, 'activate', 'setup', arguments, 'v5.0.0');
         },
 
         // alias for destroy - keeping for backwards compatability
         deactivate: function () {
-            Util.deprecatedMethod.call(this, 'deactivate', 'destroy', arguments);
+            Util.deprecatedMethod.call(this, 'deactivate', 'destroy', arguments, 'v5.0.0');
         },
 
         cleanPaste: function (text) {

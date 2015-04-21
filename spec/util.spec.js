@@ -44,10 +44,10 @@ describe('Util', function () {
             };
             spyOn(testObj, 'newMethod').and.callThrough();
             spyOn(Util, 'warn').and.callThrough();
-            Util.deprecatedMethod.call(testObj, 'test', 'newMethod', ['arg1', true]);
+            Util.deprecatedMethod.call(testObj, 'test', 'newMethod', ['arg1', true], 'some version');
             expect(testObj.newMethod).toHaveBeenCalledWith('arg1', true);
             expect(Util.warn).toHaveBeenCalledWith(
-                'test is deprecated, please use newMethod instead.'
+                'test is deprecated, please use newMethod instead. Will be removed in some version'
             );
         });
 
