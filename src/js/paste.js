@@ -80,8 +80,8 @@ var PasteHandler;
         cleanTags: ['meta'],
 
         /* ----- internal options needed from base ----- */
-        contentWindow: window,
-        ownerDocument: document,
+        "window": window,
+        "document": document,
         targetBlank: false,
         disableReturn: false,
 
@@ -103,8 +103,8 @@ var PasteHandler;
                 pastedHTML,
                 pastedPlain;
 
-            if (this.contentWindow.clipboardData && event.clipboardData === undefined) {
-                event.clipboardData = this.contentWindow.clipboardData;
+            if (this.window.clipboardData && event.clipboardData === undefined) {
+                event.clipboardData = this.window.clipboardData;
                 // If window.clipboardData exists, but event.clipboardData doesn't exist,
                 // we're probably in IE. IE only has two possibilities for clipboard
                 // data format: 'Text' and 'URL'.
@@ -145,13 +145,13 @@ var PasteHandler;
                 } else {
                     html = Util.htmlEntities(pastedPlain);
                 }
-                Util.insertHTMLCommand(this.ownerDocument, html);
+                Util.insertHTMLCommand(this.document, html);
             }
         },
 
         cleanPaste: function (text) {
             var i, elList, workEl,
-                el = Selection.getSelectionElement(this.contentWindow),
+                el = Selection.getSelectionElement(this.window),
                 multiline = /<p|<br|<div/.test(text),
                 replacements = createReplacements().concat(this.cleanReplacements || []);
 
@@ -166,7 +166,7 @@ var PasteHandler;
                 this.pasteHTML('<p>' + elList.join('</p><p>') + '</p>');
 
                 try {
-                    this.ownerDocument.execCommand('insertText', false, "\n");
+                    this.document.execCommand('insertText', false, "\n");
                 } catch (ignore) { }
 
                 // block element cleanup
@@ -205,9 +205,9 @@ var PasteHandler;
                 cleanTags: this.cleanTags
             });
 
-            var elList, workEl, i, fragmentBody, pasteBlock = this.ownerDocument.createDocumentFragment();
+            var elList, workEl, i, fragmentBody, pasteBlock = this.document.createDocumentFragment();
 
-            pasteBlock.appendChild(this.ownerDocument.createElement('body'));
+            pasteBlock.appendChild(this.document.createElement('body'));
 
             fragmentBody = pasteBlock.querySelector('body');
             fragmentBody.innerHTML = html;
@@ -222,7 +222,7 @@ var PasteHandler;
                 Util.cleanupTags(workEl, options.cleanTags);
             }
 
-            Util.insertHTMLCommand(this.ownerDocument, fragmentBody.innerHTML.replace(/&nbsp;/g, ' '));
+            Util.insertHTMLCommand(this.document, fragmentBody.innerHTML.replace(/&nbsp;/g, ' '));
         },
 
         isCommonBlock: function (el) {
@@ -271,7 +271,7 @@ var PasteHandler;
 
             for (i = 0; i < spans.length; i += 1) {
                 el = spans[i];
-                new_el = this.ownerDocument.createElement(el.classList.contains('bold') ? 'b' : 'i');
+                new_el = this.document.createElement(el.classList.contains('bold') ? 'b' : 'i');
 
                 if (el.classList.contains('bold') && el.classList.contains('italic')) {
                     // add an i tag as well if this has both italics and bold
@@ -292,7 +292,7 @@ var PasteHandler;
                 }
 
                 // remove empty spans, replace others with their contents
-                Util.unwrap(el, this.ownerDocument);
+                Util.unwrap(el, this.document);
             }
         }
      });

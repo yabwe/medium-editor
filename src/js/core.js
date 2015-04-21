@@ -363,8 +363,8 @@ function MediumEditor(elements, options) {
             cleanPastedHTML: this.options.cleanPastedHTML, // deprecated
             disableReturn: this.options.disableReturn,
             targetBlank: this.options.targetBlank,
-            contentWindow: this.options.contentWindow,
-            ownerDocument: this.options.ownerDocument
+            "window": this.options.contentWindow,
+            "document": this.options.ownerDocument
         };
 
         return new MediumEditor.extensions.paste(
