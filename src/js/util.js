@@ -432,6 +432,19 @@ var Util;
             }, this);
         },
 
+        getClosestTag : function(el, tag) { // get the closest parent
+
+            do {
+              if (el.nodeName === tag.toUpperCase()) {
+
+                return el;
+              }
+            } while (el = el.parentNode);
+
+
+            return null;
+        },
+
         unwrap: function (el, doc) {
             var fragment = doc.createDocumentFragment();
 
