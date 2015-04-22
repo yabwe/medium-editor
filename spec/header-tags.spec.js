@@ -38,8 +38,6 @@ describe('Protect Header Tags TestCase', function () {
             el = document.getElementById("header");
             expect(el).toBeDefined();
             expect(el.tagName).toBe('H2');
-
-
         });
 
         it('header leading return inserts paragraph, not additional header', function () {

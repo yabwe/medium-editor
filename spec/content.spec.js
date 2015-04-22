@@ -212,14 +212,14 @@ describe('Content TestCase', function () {
     });
 
     describe('spellcheck', function () {
-      it('should have spellcheck attribute set to true by default', function () {
-          var editor = new MediumEditor('.editor');
-          expect(editor.elements[0].getAttribute('spellcheck')).toBe('true');
-      });
+        it('should have spellcheck attribute set to true by default', function () {
+            var editor = new MediumEditor('.editor');
+            expect(editor.elements[0].getAttribute('spellcheck')).toBe('true');
+        });
 
-      it('should accept spellcheck as an options', function () {
-          var editor = new MediumEditor('.editor', {spellcheck: false});
-          expect(editor.elements[0].getAttribute('spellcheck')).toBe('false');
-      });
+        it('should accept spellcheck as an options', function () {
+            var editor = new MediumEditor('.editor', {spellcheck: false});
+            expect(editor.elements[0].getAttribute('spellcheck')).toBe('false');
+        });
     });
 });

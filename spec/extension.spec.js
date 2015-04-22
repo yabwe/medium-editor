@@ -88,12 +88,12 @@ describe('Extensions TestCase', function () {
 
     describe('Core Extension', function () {
 
-        it("exists", function(){
+        it("exists", function () {
             expect(MediumEditor.Extension).toBeTruthy();
             expect(MediumEditor.Extension).toBe(Extension);
         });
 
-        it("provides an .extend method", function() {
+        it("provides an .extend method", function () {
 
             expect(Extension.extend).toBeTruthy();
             var Extended = Extension.extend({
@@ -103,7 +103,7 @@ describe('Extensions TestCase', function () {
             expect(Extended.extend).toBe(Extension.extend);
         });
 
-        it("can be passed as an extension", function(){
+        it("can be passed as an extension", function () {
 
             var Sub, editor, e1, e2;
 

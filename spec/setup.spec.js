@@ -52,7 +52,7 @@ describe('Setup/Destroy TestCase', function () {
             expect(editor.setup).toHaveBeenCalled();
         });
 
-        it('should know about defaults', function() {
+        it('should know about defaults', function () {
             expect(MediumEditor.prototype.defaults).toBe(editorDefaults);
         });
     });

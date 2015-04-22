@@ -7,11 +7,11 @@ describe('Font Size Button TestCase', function () {
     'use strict';
 
     function testFontSizeContents (el, size) {
-      expect(el.childNodes.length).toBe(1);
-      var child = el.childNodes[0];
-      expect(child.tagName).toBe('FONT');
-      expect(child.getAttribute('size')).toBe(size);
-      expect(child.innerHTML).toBe('lorem ipsum');
+        expect(el.childNodes.length).toBe(1);
+        var child = el.childNodes[0];
+        expect(child.tagName).toBe('FONT');
+        expect(child.getAttribute('size')).toBe(size);
+        expect(child.innerHTML).toBe('lorem ipsum');
     }
 
     beforeEach(function () {
