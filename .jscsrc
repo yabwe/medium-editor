@@ -20,6 +20,10 @@
     "--"
   ],
   "disallowSpacesInCallExpression": true,
+  "disallowSpacesInsideArrayBrackets": true,
+  "disallowSpacesInsideBrackets": true,
+  "requireSpacesInsideObjectBrackets": "all",
+  "disallowSpacesInsideParentheses": true,
   "disallowTrailingComma": true,
   "disallowTrailingWhitespace": true,
   "requireBlocksOnNewline": true,
@@ -53,5 +57,6 @@
     ">=",
     "<",
     "<="
-  ]
+  ],
+  "validateQuoteMarks": "'"
 }

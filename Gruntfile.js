@@ -31,7 +31,7 @@ module.exports = function (grunt) {
             'src/js/core.js',
             'src/js/version.js'
         ],
-        browsers = [ {
+        browsers = [{
             browserName: 'internet explorer',
             version: '9',
             platform: 'WIN7'
