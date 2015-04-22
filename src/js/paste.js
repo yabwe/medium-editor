@@ -263,7 +263,7 @@ var PasteHandler;
         cleanupSpans: function (containerEl) {
             var i,
                 el,
-                new_el,
+                newEl,
                 spans = containerEl.querySelectorAll('.replace-with'),
                 isCEF = function (el) {
                     return (el && el.nodeName !== '#text' && el.getAttribute('contenteditable') === 'false');
@@ -271,15 +271,15 @@ var PasteHandler;
 
             for (i = 0; i < spans.length; i += 1) {
                 el = spans[i];
-                new_el = this.document.createElement(el.classList.contains('bold') ? 'b' : 'i');
+                newEl = this.document.createElement(el.classList.contains('bold') ? 'b' : 'i');
 
                 if (el.classList.contains('bold') && el.classList.contains('italic')) {
                     // add an i tag as well if this has both italics and bold
-                    new_el.innerHTML = '<i>' + el.innerHTML + '</i>';
+                    newEl.innerHTML = '<i>' + el.innerHTML + '</i>';
                 } else {
-                    new_el.innerHTML = el.innerHTML;
+                    newEl.innerHTML = el.innerHTML;
                 }
-                el.parentNode.replaceChild(new_el, el);
+                el.parentNode.replaceChild(newEl, el);
             }
 
             spans = containerEl.querySelectorAll('span');

@@ -107,7 +107,7 @@ var AnchorExtension;
             this.getInput().value = '';
         },
 
-        showForm: function (link_value) {
+        showForm: function (linkValue) {
             var input = this.getInput();
 
             this.base.saveSelection();
@@ -115,7 +115,7 @@ var AnchorExtension;
             this.getForm().style.display = 'block';
             this.base.setToolbarPosition();
 
-            input.value = link_value || '';
+            input.value = linkValue || '';
             input.focus();
         },
 
