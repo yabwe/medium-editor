@@ -139,7 +139,6 @@ var AnchorPreview;
             this.instanceHandleAnchorMouseout = null;
         },
 
-
         handleEditableMouseover: function (event) {
             var target;
 
@@ -211,7 +210,7 @@ var AnchorPreview;
 
         detachPreviewHandlers: function () {
             // cleanup
-            clearInterval(this.interval_timer);
+            clearInterval(this.intervalTimer);
             if (this.instanceHandlePreviewMouseover) {
                 this.base.off(this.anchorPreview, 'mouseover', this.instanceHandlePreviewMouseover);
                 this.base.off(this.anchorPreview, 'mouseout', this.instanceHandlePreviewMouseout);
@@ -234,7 +233,7 @@ var AnchorPreview;
             this.instanceHandlePreviewMouseover = this.handlePreviewMouseover.bind(this);
             this.instanceHandlePreviewMouseout = this.handlePreviewMouseout.bind(this);
 
-            this.interval_timer = setInterval(this.updatePreview.bind(this), 200);
+            this.intervalTimer = setInterval(this.updatePreview.bind(this), 200);
 
             this.base.on(this.anchorPreview, 'mouseover', this.instanceHandlePreviewMouseover);
             this.base.on(this.anchorPreview, 'mouseout', this.instanceHandlePreviewMouseout);

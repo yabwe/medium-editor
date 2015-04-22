@@ -6,7 +6,9 @@ var Selection;
 
     Selection = {
         findMatchingSelectionParent: function (testElementFunction, contentWindow) {
-            var selection = contentWindow.getSelection(), range, current;
+            var selection = contentWindow.getSelection(),
+                range,
+                current;
 
             if (selection.rangeCount === 0) {
                 return false;

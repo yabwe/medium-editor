@@ -441,7 +441,6 @@ var Util;
               }
             } while (el = el.parentNode);
 
-
             return null;
         },
 
@@ -462,7 +461,9 @@ var Util;
         setObject: function(name, value, context){
             // summary:
             //      Set a property from a dot-separated string, such as "A.B.C"
-            var parts = name.split("."), p = parts.pop(), obj = getProp(parts, true, context);
+            var parts = name.split("."),
+                p = parts.pop(),
+                obj = getProp(parts, true, context);
             return obj && p ? (obj[p] = value) : undefined; // Object
         },
 

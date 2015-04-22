@@ -27,7 +27,6 @@ var Toolbar;
                 toolbar.className += " stalker-toolbar";
             }
 
-
             toolbar.appendChild(this.createToolbarButtons());
 
             // Add any forms that extensions may have
