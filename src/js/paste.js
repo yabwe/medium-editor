@@ -260,11 +260,11 @@ var PasteHandler;
             }
         },
 
-        cleanupSpans: function (container_el) {
+        cleanupSpans: function (containerEl) {
             var i,
                 el,
                 new_el,
-                spans = container_el.querySelectorAll('.replace-with'),
+                spans = containerEl.querySelectorAll('.replace-with'),
                 isCEF = function (el) {
                     return (el && el.nodeName !== '#text' && el.getAttribute('contenteditable') === 'false');
                 };
@@ -282,7 +282,7 @@ var PasteHandler;
                 el.parentNode.replaceChild(new_el, el);
             }
 
-            spans = container_el.querySelectorAll('span');
+            spans = containerEl.querySelectorAll('span');
             for (i = 0; i < spans.length; i += 1) {
                 el = spans[i];
 
