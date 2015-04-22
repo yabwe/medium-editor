@@ -66,7 +66,6 @@ describe('Anchor Preview TestCase', function () {
             }),
             anchorPreview = editor.getExtensionByName('anchor-preview');
 
-
             // show preview
             spyOn(MediumEditor.statics.AnchorPreview.prototype, 'showPreview').and.callThrough();
             fireEvent(document.getElementById('test-markup-link'), 'mouseover');

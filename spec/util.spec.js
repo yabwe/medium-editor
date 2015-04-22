@@ -14,11 +14,11 @@ describe('Util', function () {
 
     describe('Extend', function () {
         it('should overwrite values from right to left', function () {
-            var objOne = {one: "one"};
-            var objTwo = {one: "two", three: "three"};
-            var objThree = {three: "four", five: "six"};
-            var objFour;
-            var result = MediumEditor.util.extend({}, objOne, objTwo, objThree, objFour);
+            var objOne = {one: "one"},
+                objTwo = {one: "two", three: "three"},
+                objThree = {three: "four", five: "six"},
+                objFour,
+                result = MediumEditor.util.extend({}, objOne, objTwo, objThree, objFour);
             // expect(_.isEqual(result, { one: "two", three: "four", five: "six" })).toBe(true);
             expect(result).toEqual({ one: "two", three: "four", five: "six" });
         });
@@ -26,11 +26,11 @@ describe('Util', function () {
 
     describe('Defaults', function () {
         it('should overwrite values from left to right', function () {
-            var objOne = { one: "one" };
-            var objTwo = { one: "two", three: "three" };
-            var objThree = { three: "four", five: "six" };
-            var objFour;
-            var result = MediumEditor.util.defaults({}, objOne, objTwo, objThree, objFour);
+            var objOne = { one: "one" },
+                objTwo = { one: "two", three: "three" },
+                objThree = { three: "four", five: "six" },
+                objFour,
+                result = MediumEditor.util.defaults({}, objOne, objTwo, objThree, objFour);
             // expect(_.isEqual(result, { one: "one", three: "three", five: "six" })).toBe(true);
             expect(result).toEqual({ one: "one", three: "three", five: "six" });
         });

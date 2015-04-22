@@ -50,8 +50,12 @@ describe('Events TestCase', function () {
             var editor = new MediumEditor('.editor'),
                 focusedEditable,
                 blurredEditable,
-                focusListener = function (event, editable) { focusedEditable = editable; },
-                blurListener = function (event, editable) { blurredEditable = editable; };
+                focusListener = function (event, editable) {
+                    focusedEditable = editable;
+                },
+                blurListener = function (event, editable) {
+                    blurredEditable = editable;
+                };
             editor.subscribe('focus', focusListener);
             editor.subscribe('blur', blurListener);
 
