@@ -1,0 +1,20 @@
+{
+  "disallowEmptyBlocks": true,
+  "disallowKeywords": [
+    "with"
+  ],
+  "disallowKeywordsOnNewLine": [
+    "else"
+  ],
+  "disallowMultipleLineBreaks": true,
+  "disallowSpaceAfterObjectKeys": true,
+  "disallowSpacesInsideParentheses": true,
+  "disallowTrailingWhitespace": true,
+  "requireCapitalizedConstructors": true,
+  "requireParenthesesAroundIIFE": true,
+  "requireSpacesInFunctionExpression": {
+    "beforeOpeningCurlyBrace": true,
+    "beforeOpeningRoundBrace": true
+  },
+  "validateIndentation": 4
+}

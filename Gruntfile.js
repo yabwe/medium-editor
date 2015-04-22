@@ -32,32 +32,32 @@ module.exports = function (grunt) {
             'src/js/version.js'
         ],
         browsers = [ {
-            browserName: "internet explorer",
-            version: "9",
-            platform: "WIN7"
+            browserName: 'internet explorer',
+            version: '9',
+            platform: 'WIN7'
         }, {
-            browserName: "internet explorer",
-            version: "10",
-            platform: "WIN8"
+            browserName: 'internet explorer',
+            version: '10',
+            platform: 'WIN8'
         }, {
-            browserName: "internet explorer",
-            version: "11",
-            platform: "WIN8.1"
+            browserName: 'internet explorer',
+            version: '11',
+            platform: 'WIN8.1'
         }, {
-            browserName: "chrome",
-            platform: "WIN8.1"
+            browserName: 'chrome',
+            platform: 'WIN8.1'
         }, {
-            browserName: "firefox",
-            platform: "WIN8.1"
+            browserName: 'firefox',
+            platform: 'WIN8.1'
         }, {
-            browserName: "safari",
-            platform: "OS X 10.10"
+            browserName: 'safari',
+            platform: 'OS X 10.10'
         }, {
-            browserName: "firefox",
-            platform: "OS X 10.10"
+            browserName: 'firefox',
+            platform: 'OS X 10.10'
         }, {
-            browserName: "googlechrome",
-            platform: "OS X 10.10"
+            browserName: 'googlechrome',
+            platform: 'OS X 10.10'
         }];
 
     gruntConfig.connect = {
@@ -82,6 +82,18 @@ module.exports = function (grunt) {
                 'spec/*.spec.js',
                 'Gruntfile.js'
             ]
+        }
+    };
+
+    // TODO: "maximumLineLength": 120
+    gruntConfig.jscs = {
+        src: [
+            'src/js/**/*.js',
+            'spec/*.spec.js',
+            'Gruntfile.js'
+        ],
+        options: {
+            config: '.jscsrc'
         }
     };
 
