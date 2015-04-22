@@ -14,8 +14,8 @@ var PasteHandler;
         return [
 
             // replace two bogus tags that begin pastes from google docs
-            [new RegExp(/<[^>]*docs-internal-guid[^>]*>/gi), ""],
-            [new RegExp(/<\/b>(<br[^>]*>)?$/gi), ""],
+            [new RegExp(/<[^>]*docs-internal-guid[^>]*>/gi), ''],
+            [new RegExp(/<\/b>(<br[^>]*>)?$/gi), ''],
 
              // un-html spaces and newlines inserted by OS X
             [new RegExp(/<span class="Apple-converted-space">\s+<\/span>/g), ' '],
@@ -80,8 +80,8 @@ var PasteHandler;
         cleanTags: ['meta'],
 
         /* ----- internal options needed from base ----- */
-        "window": window,
-        "document": document,
+        'window': window,
+        'document': document,
         targetBlank: false,
         disableReturn: false,
 
@@ -166,7 +166,7 @@ var PasteHandler;
                 this.pasteHTML('<p>' + elList.join('</p><p>') + '</p>');
 
                 try {
-                    this.document.execCommand('insertText', false, "\n");
+                    this.document.execCommand('insertText', false, '\n');
                 } catch (ignore) { }
 
                 // block element cleanup

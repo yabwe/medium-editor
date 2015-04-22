@@ -25,7 +25,7 @@ var Util;
             }
             return context;
         } catch (e) {
-            // "p in context" throws an exception when context is a number, boolean, etc. rather than an object,
+            // 'p in context' throws an exception when context is a number, boolean, etc. rather than an object,
             // so in that corner case just return undefined (by having no return statement)
         }
     }
@@ -237,7 +237,7 @@ var Util;
                 }
                 range.deleteContents();
 
-                el = doc.createElement("div");
+                el = doc.createElement('div');
                 el.innerHTML = html;
                 fragment = doc.createDocumentFragment();
                 while (el.firstChild) {
@@ -403,9 +403,9 @@ var Util;
 
         deprecated: function(oldName, newName, version){
             // simple deprecation warning mechanism.
-            var m = oldName + " is deprecated, please use " + newName + " instead.";
+            var m = oldName + ' is deprecated, please use ' + newName + ' instead.';
             if(version){
-                m += " Will be removed in " + version;
+                m += ' Will be removed in ' + version;
             }
             Util.warn(m);
         },
@@ -460,8 +460,8 @@ var Util;
 
         setObject: function(name, value, context){
             // summary:
-            //      Set a property from a dot-separated string, such as "A.B.C"
-            var parts = name.split("."),
+            //      Set a property from a dot-separated string, such as 'A.B.C'
+            var parts = name.split('.'),
                 p = parts.pop(),
                 obj = getProp(parts, true, context);
             return obj && p ? (obj[p] = value) : undefined; // Object
@@ -469,8 +469,8 @@ var Util;
 
         getObject: function(name, create, context){
             // summary:
-            //      Get a property from a dot-separated string, such as "A.B.C"
-            return getProp(name ? name.split(".") : [], create, context); // Object
+            //      Get a property from a dot-separated string, such as 'A.B.C'
+            return getProp(name ? name.split('.') : [], create, context); // Object
         }
 
     };

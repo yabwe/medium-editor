@@ -262,7 +262,7 @@ describe('Buttons TestCase', function () {
                 }),
                 button = editor.toolbar.getToolbarElement().querySelector('[data-action="bold"]');
 
-            spyOn(document, "queryCommandState").and.throwError("DOM ERROR");
+            spyOn(document, "queryCommandState").and.throwError('DOM ERROR');
 
             this.el.innerHTML = '<b><i><u>lorem ipsum</u></i></b>';
             selectElementContentsAndFire(editor.elements[0].querySelector('u'));
@@ -327,7 +327,7 @@ describe('Buttons TestCase', function () {
                 }),
                 button = editor.toolbar.getToolbarElement().querySelector('[data-action="italic"]');
 
-            spyOn(document, "queryCommandState").and.throwError("DOM ERROR");
+            spyOn(document, "queryCommandState").and.throwError('DOM ERROR');
 
             this.el.innerHTML = '<i><b><u>lorem ipsum</u></b></i>';
             selectElementContentsAndFire(editor.elements[0].querySelector('u'));
@@ -377,7 +377,7 @@ describe('Buttons TestCase', function () {
                 }),
                 button = editor.toolbar.getToolbarElement().querySelector('[data-action="underline"]');
 
-            spyOn(document, "queryCommandState").and.throwError("DOM ERROR");
+            spyOn(document, "queryCommandState").and.throwError('DOM ERROR');
 
             this.el.innerHTML = '<u><b><i>lorem ipsum</i></b></u>';
             selectElementContentsAndFire(editor.elements[0].querySelector('i'));
@@ -427,7 +427,7 @@ describe('Buttons TestCase', function () {
                 }),
                 button = editor.toolbar.getToolbarElement().querySelector('[data-action="strikethrough"]');
 
-            spyOn(document, "queryCommandState").and.throwError("DOM ERROR");
+            spyOn(document, "queryCommandState").and.throwError('DOM ERROR');
 
             this.el.innerHTML = '<strike><b><i>lorem ipsum</i></b></strike>';
             selectElementContentsAndFire(editor.elements[0].querySelector('i'));

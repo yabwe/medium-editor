@@ -39,7 +39,7 @@ var Extension;
         // (the "constructor" property in your `extend` definition), or defaulted
         // by us to simply call the parent's constructor.
 
-        if (protoProps && protoProps.hasOwnProperty("constructor")) {
+        if (protoProps && protoProps.hasOwnProperty('constructor')) {
             child = protoProps.constructor;
         } else {
             child = function () {

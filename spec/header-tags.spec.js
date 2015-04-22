@@ -23,7 +23,7 @@ describe('Protect Header Tags TestCase', function () {
 
             // place cursor at begining of header
             var editor = new MediumEditor('.editor'),
-                el = document.getElementById("header"),
+                el = document.getElementById('header'),
                 range = document.createRange(),
                 sel = window.getSelection();
 
@@ -35,7 +35,7 @@ describe('Protect Header Tags TestCase', function () {
             // hit return
             fireEvent(editor.elements[0], 'keypress', 13);
 
-            el = document.getElementById("header");
+            el = document.getElementById('header');
             expect(el).toBeDefined();
             expect(el.tagName).toBe('H2');
         });
@@ -45,7 +45,7 @@ describe('Protect Header Tags TestCase', function () {
 
             // place cursor at begining of header
             var editor = new MediumEditor('.editor'),
-                el = document.getElementById("header"),
+                el = document.getElementById('header'),
                 range = document.createRange(),
                 sel = window.getSelection();
             range.setStart(el, 0);
@@ -56,7 +56,7 @@ describe('Protect Header Tags TestCase', function () {
             // hit return
             fireEvent(editor.elements[0], 'keypress', 13);
 
-            el = document.getElementById("header");
+            el = document.getElementById('header');
             expect(el.previousElementSibling.tagName).toBe('P');
 
         });
@@ -66,8 +66,8 @@ describe('Protect Header Tags TestCase', function () {
 
             // place cursor at begining of header
             var editor = new MediumEditor('.editor'),
-                originalHTML = document.getElementById("editor").innerHTML,
-                el = document.getElementById("header"),
+                originalHTML = document.getElementById('editor').innerHTML,
+                el = document.getElementById('header'),
                 range = document.createRange(),
                 sel = window.getSelection();
             range.setStart(el, 0);
@@ -78,11 +78,11 @@ describe('Protect Header Tags TestCase', function () {
             // hit backspace
             fireEvent(editor.elements[0].querySelector(el.tagName.toLowerCase()), 'keydown', { keyCode: 8 });
 
-            el = document.getElementById("header");
+            el = document.getElementById('header');
             expect(el).toBeDefined();
             expect(el.tagName).toBe('H2');
 
-            el = document.getElementById("editor");
+            el = document.getElementById('editor');
             expect(el.innerHTML).not.toBe(originalHTML);
 
         });
