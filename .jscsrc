@@ -7,26 +7,9 @@
   "disallowMultipleLineBreaks": true,
   "disallowMultipleLineStrings": true,
   "disallowMultipleSpaces": true,
-  "disallowNewlineBeforeBlockStatements": true,
   "disallowOperatorBeforeLineBreak": [
     "+",
     "."
-  ],
-  "disallowPaddingNewlinesBeforeKeywords": [
-    "do",
-    "for",
-    "if",
-    "else",
-    "switch",
-    "case",
-    "try",
-    "catch",
-    "void",
-    "while",
-    "with",
-    "return",
-    "typeof",
-    "function"
   ],
   "disallowSpaceAfterPrefixUnaryOperators": [
     "++",
