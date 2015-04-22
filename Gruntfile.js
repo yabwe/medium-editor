@@ -90,7 +90,8 @@ module.exports = function (grunt) {
         src: [
             'src/js/**/*.js',
             'spec/*.spec.js',
-            'Gruntfile.js'
+            'Gruntfile.js',
+            '!src/js/polyfills.js'
         ],
         options: {
             config: '.jscsrc'
