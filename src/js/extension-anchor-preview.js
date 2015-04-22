@@ -141,15 +141,7 @@ var AnchorPreview;
 
 
         handleEditableMouseover: function (event) {
-            var target;
-
-            if(event.target){
-                if(event.target.tagName.toLowerCase() === 'a'){
-                   target = event.target;
-               }else{
-                   target = Util.getClosestTag(event.target,'a');
-               }
-           }
+            var target = Util.getClosestTag(event.target, 'a');
 
             if (target) {
 

@@ -583,6 +583,9 @@ var Util;
         },
 
         traverseUp: function (current, testElementFunction) {
+            if (!current) {
+                return false;
+            }
 
             do {
                 if (current.nodeType === 1) {
@@ -599,7 +602,6 @@ var Util;
             } while (current);
 
             return false;
-
         },
 
         htmlEntities: function (str) {
@@ -831,16 +833,9 @@ var Util;
         },
 
         getClosestTag : function(el, tag) { // get the closest parent
-
-            do {
-              if (el.nodeName === tag.toUpperCase()) {
-
-                return el;
-              }
-            } while (el = el.parentNode);
-
-
-            return null;
+            return Util.traverseUp(el, function (element) {
+                return element.tagName.toLowerCase() === tag.toLowerCase();
+            });
         },
 
         unwrap: function (el, doc) {
@@ -2642,15 +2637,7 @@ var AnchorPreview;
 
 
         handleEditableMouseover: function (event) {
-            var target;
-
-            if(event.target){
-                if(event.target.tagName.toLowerCase() === 'a'){
-                   target = event.target;
-               }else{
-                   target = Util.getClosestTag(event.target,'a');
-               }
-           }
+            var target = Util.getClosestTag(event.target, 'a');
 
             if (target) {
 
