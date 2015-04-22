@@ -1,3 +1,15 @@
+4.6.0 / 2015-04-22
+==================
+* Add 'beta' version of fontSize button/form
+* Add option for enabling/disabling spellcheck
+* Add titles to toolbar buttons for tooltips
+* Use actual anchor tag in anchor preview
+* Fix anchor preview issue with tags nested inside anchors
+
+* Speed up travis builds
+* Convert paste handler into overrideable extension
+
+
 4.5.2 / 2015-04-14
 ==================
 * Fix blur event detection when clicking on elements that don't clear focus

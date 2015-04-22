@@ -185,6 +185,9 @@ var Util;
         },
 
         traverseUp: function (current, testElementFunction) {
+            if (!current) {
+                return false;
+            }
 
             do {
                 if (current.nodeType === 1) {
@@ -201,7 +204,6 @@ var Util;
             } while (current);
 
             return false;
-
         },
 
         htmlEntities: function (str) {
@@ -433,15 +435,9 @@ var Util;
         },
 
         getClosestTag : function(el, tag) { // get the closest parent
-
-            do {
-              if (el.nodeName === tag.toUpperCase()) {
-
-                return el;
-              }
-            } while (el = el.parentNode);
-
-            return null;
+            return Util.traverseUp(el, function (element) {
+                return element.tagName.toLowerCase() === tag.toLowerCase();
+            });
         },
 
         unwrap: function (el, doc) {

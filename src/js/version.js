@@ -5,11 +5,11 @@ MediumEditor.version = (function(major, minor, revision) {
         major: parseInt(major, 10),
         minor: parseInt(minor, 10),
         revision: parseInt(revision, 10),
-        toString: function () {
+        toString: function(){
             return [major, minor, revision].join('.');
         }
     };
 }).apply(this, ({
     // grunt-bump looks for this:
-    'version': '4.5.2'
+    'version': '4.6.0'
 }).version.split('.'));
