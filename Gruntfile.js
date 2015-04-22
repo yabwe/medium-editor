@@ -307,9 +307,9 @@ module.exports = function (grunt) {
     });
 
     if (parseInt(process.env.TRAVIS_PULL_REQUEST, 10) > 0) {
-        grunt.registerTask('travis', ['jshint', 'jasmine:suite', 'csslint', 'coveralls']);
+        grunt.registerTask('travis', ['jshint', 'jscs', 'jasmine:suite', 'csslint', 'coveralls']);
     } else {
-        grunt.registerTask('travis', ['connect', 'jshint', 'jasmine:suite', 'csslint', 'saucelabs-jasmine', 'coveralls']);
+        grunt.registerTask('travis', ['connect', 'jshint', 'jscs', 'jasmine:suite', 'csslint', 'saucelabs-jasmine', 'coveralls']);
     }
 
     grunt.registerTask('test', ['jshint', 'jscs', 'concat', 'jasmine:suite', 'csslint']);
