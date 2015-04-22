@@ -14,9 +14,9 @@ describe('Util', function () {
 
     describe('Extend', function () {
         it('should overwrite values from right to left', function () {
-            var objOne = { one: "one" };
-            var objTwo = { one: "two", three: "three" };
-            var objThree = { three: "four", five: "six" };
+            var objOne = {one: "one"};
+            var objTwo = {one: "two", three: "three"};
+            var objThree = {three: "four", five: "six"};
             var objFour;
             var result = MediumEditor.util.extend({}, objOne, objTwo, objThree, objFour);
             // expect(_.isEqual(result, { one: "two", three: "four", five: "six" })).toBe(true);
@@ -130,4 +130,3 @@ describe('Util', function () {
     });
 
 });
-

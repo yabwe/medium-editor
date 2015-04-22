@@ -7,10 +7,6 @@
   "disallowMultipleLineBreaks": true,
   "disallowMultipleLineStrings": true,
   "disallowMultipleSpaces": true,
-  "disallowOperatorBeforeLineBreak": [
-    "+",
-    "."
-  ],
   "disallowSpaceAfterPrefixUnaryOperators": [
     "++",
     "--",
