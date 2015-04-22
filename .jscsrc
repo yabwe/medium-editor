@@ -34,7 +34,6 @@
     "do",
     "try",
     "catch",
-    "case",
     "default"
   ],
   "requireLineBreakAfterVariableAssignment": true,
