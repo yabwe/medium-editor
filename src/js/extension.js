@@ -1,5 +1,5 @@
 var Extension;
-(function(){
+(function () {
 
     /* global Util */
 
@@ -49,7 +49,7 @@ var Extension;
 
         // Set the prototype chain to inherit from `parent`, without calling
         // `parent`'s constructor function.
-        var Surrogate = function(){ this.constructor = child; };
+        var Surrogate = function () { this.constructor = child; };
         Surrogate.prototype = parent.prototype;
         child.prototype = new Surrogate();
 

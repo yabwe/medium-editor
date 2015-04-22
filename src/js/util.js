@@ -395,7 +395,7 @@ var Util;
             parent.removeChild(element);
         },
 
-        warn: function(){
+        warn: function () {
             if(window.console !== undefined && typeof window.console.warn === 'function'){
                 window.console.warn.apply(console, arguments);
             }

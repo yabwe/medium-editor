@@ -269,9 +269,9 @@ function MediumEditor(elements, options) {
     }
 
     function createContentEditable(index) {
-        var div = this.options.ownerDocument.createElement('div');
-        var id = (+new Date());
-        var textarea = this.elements[index];
+        var div = this.options.ownerDocument.createElement('div'),
+            id = (+new Date()),
+            textarea = this.elements[index];
 
         div.className = textarea.className;
         div.id = id;
@@ -424,8 +424,8 @@ function MediumEditor(elements, options) {
             });
         }
 
-        var nestedMerges = ['paste'];
-        var tempOpts = Util.extend({}, options);
+        var nestedMerges = ['paste'],
+            tempOpts = Util.extend({}, options);
 
         nestedMerges.forEach(function (toMerge) {
             if (!tempOpts[toMerge]) {
