@@ -1,8 +1,8 @@
-/*global Util */
 var Selection;
-
 (function () {
     'use strict';
+
+    /*global Util */
 
     Selection = {
         findMatchingSelectionParent: function (testElementFunction, contentWindow) {

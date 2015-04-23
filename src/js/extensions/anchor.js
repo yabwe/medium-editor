@@ -4,21 +4,6 @@ var AnchorExtension;
 
     /*global Util, Selection, FormExtension */
 
-    /*function AnchorDerived() {
-        this.parent = true;
-        this.options = {
-            name: 'anchor',
-            action: 'createLink',
-            aria: 'link',
-            tagNames: ['a'],
-            contentDefault: '<b>#</b>',
-            contentFA: '<i class="fa fa-link"></i>',
-            key: 'k'
-        };
-        this.name = 'anchor';
-        this.hasForm = true;
-    }*/
-
     AnchorExtension = FormExtension.extend({
 
         name: 'anchor',

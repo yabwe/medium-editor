@@ -121,7 +121,7 @@ module.exports = function (grunt) {
                     consolidate: true
                 },
                 keepRunner: true,
-                //template: require('grunt-template-jasmine-istanbul'),
+                template: require('grunt-template-jasmine-istanbul'),
                 templateOptions: {
                     coverage: 'reports/jasmine/coverage.json',
                     report: [{

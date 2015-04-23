@@ -1,24 +1,9 @@
-/*global FormExtension, Selection */
-
 var FontSizeExtension;
-
 (function () {
     'use strict';
 
-    /*function FontSizeDerived() {
-        this.parent = true;
-        this.options = {
-            name: 'fontsize',
-            action: 'fontSize',
-            aria: 'increase/decrease font size',
-            contentDefault: '&#xB1;', // ±
-            contentFA: '<i class="fa fa-text-height"></i>'
-        };
-        this.name = 'fontsize';
-        this.hasForm = true;
-    }
+    /*global FormExtension, Selection */
 
-    FontSizeDerived.prototype = {*/
     FontSizeExtension = FormExtension.extend({
 
         name: 'fontsize',

@@ -1,9 +1,8 @@
-/*global NodeFilter, console*/
-
 var Util;
-
 (function (window) {
     'use strict';
+
+    /*global NodeFilter, console*/
 
     // Params: Array, Boolean, Object
     function getProp(parts, create, context) {

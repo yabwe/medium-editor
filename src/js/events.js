@@ -1,9 +1,8 @@
-/*global Util */
-
 var Events;
-
 (function () {
     'use strict';
+
+    /*global Util */
 
     Events = function (instance) {
         this.base = instance;
