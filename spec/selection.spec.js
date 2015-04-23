@@ -46,7 +46,7 @@ describe('Selection TestCase', function () {
             fireEvent(button, 'click');
 
             // Restore selection back to <i> tag and add a <strike> tag
-            regex = new RegExp("^<u>lorem (<i><strike>|<strike><i>)ipsum(</i></strike>|</strike></i>) dolor</u>$");
+            regex = new RegExp('^<u>lorem (<i><strike>|<strike><i>)ipsum(</i></strike>|</strike></i>) dolor</u>$');
             editor.restoreSelection();
             button = editor.toolbar.getToolbarElement().querySelector('[data-action="strikethrough"]');
             fireEvent(button, 'click');

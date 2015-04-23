@@ -262,7 +262,7 @@ describe('Buttons TestCase', function () {
                 }),
                 button = editor.toolbar.getToolbarElement().querySelector('[data-action="bold"]');
 
-            spyOn(document, "queryCommandState").and.throwError('DOM ERROR');
+            spyOn(document, 'queryCommandState').and.throwError('DOM ERROR');
 
             this.el.innerHTML = '<b><i><u>lorem ipsum</u></i></b>';
             selectElementContentsAndFire(editor.elements[0].querySelector('u'));
@@ -327,7 +327,7 @@ describe('Buttons TestCase', function () {
                 }),
                 button = editor.toolbar.getToolbarElement().querySelector('[data-action="italic"]');
 
-            spyOn(document, "queryCommandState").and.throwError('DOM ERROR');
+            spyOn(document, 'queryCommandState').and.throwError('DOM ERROR');
 
             this.el.innerHTML = '<i><b><u>lorem ipsum</u></b></i>';
             selectElementContentsAndFire(editor.elements[0].querySelector('u'));
@@ -377,7 +377,7 @@ describe('Buttons TestCase', function () {
                 }),
                 button = editor.toolbar.getToolbarElement().querySelector('[data-action="underline"]');
 
-            spyOn(document, "queryCommandState").and.throwError('DOM ERROR');
+            spyOn(document, 'queryCommandState').and.throwError('DOM ERROR');
 
             this.el.innerHTML = '<u><b><i>lorem ipsum</i></b></u>';
             selectElementContentsAndFire(editor.elements[0].querySelector('i'));
@@ -427,7 +427,7 @@ describe('Buttons TestCase', function () {
                 }),
                 button = editor.toolbar.getToolbarElement().querySelector('[data-action="strikethrough"]');
 
-            spyOn(document, "queryCommandState").and.throwError('DOM ERROR');
+            spyOn(document, 'queryCommandState').and.throwError('DOM ERROR');
 
             this.el.innerHTML = '<strike><b><i>lorem ipsum</i></b></strike>';
             selectElementContentsAndFire(editor.elements[0].querySelector('i'));
@@ -700,21 +700,21 @@ describe('Buttons TestCase', function () {
 
             expect(button).toBeTruthy();
 
-            this.el.innerHTML = "<p>foo<b>bar</b><i>baz</i><strong>bam</strong></p>";
+            this.el.innerHTML = '<p>foo<b>bar</b><i>baz</i><strong>bam</strong></p>';
             selectElementContentsAndFire(editor.elements[0].querySelector('p'));
-            fireEvent(button, "click");
-            expect(this.el.innerHTML).toBe("<p>foobarbazbam</p>");
+            fireEvent(button, 'click');
+            expect(this.el.innerHTML).toBe('<p>foobarbazbam</p>');
 
-            this.el.innerHTML = "<div><p><b>foo</b></p><p><i>bar</i></p><ul><li>on<b>e</b></li></ul></div>";
+            this.el.innerHTML = '<div><p><b>foo</b></p><p><i>bar</i></p><ul><li>on<b>e</b></li></ul></div>';
             selectElementContentsAndFire(editor.elements[0].querySelector('div'));
-            fireEvent(button, "click");
-            expect(this.el.innerHTML).toBe("<div><p>foo</p><p>bar</p><ul><li>one</li></ul></div>");
+            fireEvent(button, 'click');
+            expect(this.el.innerHTML).toBe('<div><p>foo</p><p>bar</p><ul><li>one</li></ul></div>');
 
             // TODO: IE does not unwrap something like <p><span style='color:red'>bar</span></p>
-            this.el.innerHTML = "<div><h2>b<i>a</i>r</h2><p><em><strong><u><sub><sup>foo</sup></sub></u></strong></em></p><pre>foo<i>bar</i>baz</pre></div>";
+            this.el.innerHTML = '<div><h2>b<i>a</i>r</h2><p><em><strong><u><sub><sup>foo</sup></sub></u></strong></em></p><pre>foo<i>bar</i>baz</pre></div>';
             selectElementContentsAndFire(editor.elements[0].querySelector('div'));
-            fireEvent(button, "click");
-            expect(this.el.innerHTML).toBe("<div><h2>bar</h2><p>foo</p><pre>foobarbaz</pre></div>");
+            fireEvent(button, 'click');
+            expect(this.el.innerHTML).toBe('<div><h2>bar</h2><p>foo</p><pre>foobarbaz</pre></div>');
 
         });
 

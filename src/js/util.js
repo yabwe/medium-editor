@@ -403,7 +403,7 @@ var Util;
             }
         },
 
-        deprecated: function(oldName, newName, version){
+        deprecated: function (oldName, newName, version) {
             // simple deprecation warning mechanism.
             var m = oldName + ' is deprecated, please use ' + newName + ' instead.';
             if(version){
@@ -434,7 +434,7 @@ var Util;
             }, this);
         },
 
-        getClosestTag : function(el, tag) { // get the closest parent
+        getClosestTag: function (el, tag) { // get the closest parent
             return Util.traverseUp(el, function (element) {
                 return element.tagName.toLowerCase() === tag.toLowerCase();
             });
@@ -454,7 +454,7 @@ var Util;
             }
         },
 
-        setObject: function(name, value, context){
+        setObject: function (name, value, context) {
             // summary:
             //      Set a property from a dot-separated string, such as 'A.B.C'
             var parts = name.split('.'),
@@ -463,7 +463,7 @@ var Util;
             return obj && p ? (obj[p] = value) : undefined; // Object
         },
 
-        getObject: function(name, create, context){
+        getObject: function (name, create, context) {
             // summary:
             //      Get a property from a dot-separated string, such as 'A.B.C'
             return getProp(name ? name.split('.') : [], create, context); // Object

@@ -85,7 +85,7 @@ describe('Placeholder TestCase', function () {
             // In firefox, getComputedStyle().getPropertyValue('content') can return attr() instead of what attr() evaluates to
             expect(match[1]).toEqual('data-placeholder');
         } else {
-            expect(placeholder).toEqual("'" + expectedValue + "'");
+            expect(placeholder).toEqual('\'' + expectedValue + '\'');
         }
     }
     /*jslint regexp: false*/

@@ -16,7 +16,7 @@ describe('Font Size Button TestCase', function () {
 
     beforeEach(function () {
         jasmine.clock().install();
-        this.mediumOpts = {buttons: ['fontsize']};
+        this.mediumOpts = { buttons: ['fontsize'] };
         this.el = document.createElement('div');
         this.el.className = 'editor';
         this.el.innerHTML = 'lorem ipsum';

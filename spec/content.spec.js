@@ -218,7 +218,7 @@ describe('Content TestCase', function () {
         });
 
         it('should accept spellcheck as an options', function () {
-            var editor = new MediumEditor('.editor', {spellcheck: false});
+            var editor = new MediumEditor('.editor', { spellcheck: false });
             expect(editor.elements[0].getAttribute('spellcheck')).toBe('false');
         });
     });

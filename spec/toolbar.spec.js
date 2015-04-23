@@ -336,7 +336,7 @@ describe('Toolbar TestCase', function () {
             editor = new MediumEditor(document.querySelectorAll('.editor'));
             expect(editor.elements.length).toEqual(3);
             expect(editor.toolbar.getToolbarElement().style.display).toBe('');
-            selectElementContentsAndFire(this.el, { eventToFire: 'focus'});
+            selectElementContentsAndFire(this.el, { eventToFire: 'focus' });
 
             expect(editor.toolbar.getToolbarElement().classList.contains('medium-editor-toolbar-active')).toBe(true);
             // Remove the new element from the DOM

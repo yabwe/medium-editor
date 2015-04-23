@@ -97,7 +97,7 @@ describe('Extensions TestCase', function () {
 
             expect(Extension.extend).toBeTruthy();
             var Extended = Extension.extend({
-                foo: "bar"
+                foo: 'bar'
             });
             expect(Extended.prototype.foo).toBe('bar');
             expect(Extended.extend).toBe(Extension.extend);
@@ -115,12 +115,12 @@ describe('Extensions TestCase', function () {
             e1 = new Sub();
             e2 = new Sub({ y: 20 });
 
-            spyOn(e1, "init");
+            spyOn(e1, 'init');
 
             editor = new MediumEditor('.editor', {
                 extensions: {
-                    "foo": e1,
-                    "bar": e2
+                    'foo': e1,
+                    'bar': e2
                 }
             });
 

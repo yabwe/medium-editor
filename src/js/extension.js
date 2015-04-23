@@ -68,7 +68,7 @@ var Extension;
     };
 
     Extension.prototype = {
-        init: function(/* instance */){
+        init: function (/* instance */) {
             // called when properly decorated and used.
             // has a .base value pointing to the editor
             // owning us. has been given a .name if no
