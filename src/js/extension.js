@@ -77,11 +77,13 @@ var Extension;
 
         /* parent: [boolean]
          *
-         * setting this to true will set the .base property
-         * of the extension to be a reference to the
-         * medium-editor instance that is using the extension
+         * Setting this to false will prevent MediumEditor
+         * from setting the .base property.
+         * If left as true, the .base property of the extension
+         * will be assigned a reference to the
+         * MediumEditor instance that is using the extension
          */
-        parent: false,
+        parent: true,
 
         /* base: [MediumEditor instance]
          *
@@ -111,15 +113,6 @@ var Extension;
          * 4) Repeat steps #2 and #3 until we move outside the parent contenteditable
          */
         checkState: null,
-
-        /* getButton: [function ()]
-         *
-         * If implemented, this function will be called when
-         * the toolbar is being created.  The DOM Element returned
-         * by this function will be appended to the toolbar along
-         * with any other buttons.
-         */
-        getButton: null,
 
         /* As alternatives to checkState, these functions provide a more structured
          * path to updating the state of an extension (usually a button) whenever

@@ -1,5 +1,5 @@
-/*global Util, ButtonsData, DefaultButton,
- Selection, AnchorExtension, FontSizeExtension, Extension, extensionDefaults,
+/*global Util, ButtonsData, Button, Selection,
+ AnchorExtension, FontSizeExtension, Extension, extensionDefaults,
  Toolbar, AnchorPreview, AutoLink, ImageDragging,
  Events, Placeholders, editorDefaults */
 
@@ -391,7 +391,7 @@ function MediumEditor(elements, options) {
                 ext = initExtension(new FontSizeExtension(), buttonName, this);
                 this.commands.push(ext);
             } else if (ButtonsData.hasOwnProperty(buttonName)) {
-                ext = new DefaultButton(ButtonsData[buttonName], this);
+                ext = initExtension(new Button(ButtonsData[buttonName]), buttonName, this);
                 this.commands.push(ext);
             }
         }, this);
@@ -478,7 +478,7 @@ function MediumEditor(elements, options) {
     // deprecate
     MediumEditor.statics = {
         ButtonsData: ButtonsData,
-        DefaultButton: DefaultButton,
+        DefaultButton: Button,
         AnchorExtension: AnchorExtension,
         FontSizeExtension: FontSizeExtension,
         Toolbar: Toolbar,

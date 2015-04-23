@@ -17,10 +17,10 @@ module.exports = function (grunt) {
             'src/js/defaults/buttons.js',
             'src/js/defaults/options.js',
             'src/js/extension.js',
-            'src/js/form-extension.js',
             'src/js/selection.js',
             'src/js/events.js',
             'src/js/button.js',
+            'src/js/form-extension.js',
             'src/js/extensions/anchor.js',
             'src/js/extensions/anchor-preview.js',
             'src/js/extensions/auto-link.js',
@@ -121,7 +121,7 @@ module.exports = function (grunt) {
                     consolidate: true
                 },
                 keepRunner: true,
-                template: require('grunt-template-jasmine-istanbul'),
+                //template: require('grunt-template-jasmine-istanbul'),
                 templateOptions: {
                     coverage: 'reports/jasmine/coverage.json',
                     report: [{
