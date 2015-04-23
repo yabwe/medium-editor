@@ -1,41 +1,41 @@
-/*global Util */
-
-var DefaultButton;
-
+var Button;
 (function () {
     'use strict';
 
-    DefaultButton = function (options, instance) {
-        this.options = options;
-        this.name = options.name;
-        this.init(instance);
-    };
+    /*global Util, Extension */
 
-    DefaultButton.prototype = {
-        init: function (instance) {
-            this.base = instance;
+    Button = Extension.extend({
 
+        init: function () {
             this.button = this.createButton();
             this.base.on(this.button, 'click', this.handleClick.bind(this));
-            if (this.options.key) {
+            if (this.key) {
                 this.base.subscribe('editableKeydown', this.handleKeydown.bind(this));
             }
         },
+
+        /* getButton: [function ()]
+         *
+         * If implemented, this function will be called when
+         * the toolbar is being created.  The DOM Element returned
+         * by this function will be appended to the toolbar along
+         * with any other buttons.
+         */
         getButton: function () {
             return this.button;
         },
         getAction: function () {
-            return (typeof this.options.action === 'function') ? this.options.action(this.base.options) : this.options.action;
+            return (typeof this.action === 'function') ? this.action(this.base.options) : this.action;
         },
         getAria: function () {
-            return (typeof this.options.aria === 'function') ? this.options.aria(this.base.options) : this.options.aria;
+            return (typeof this.aria === 'function') ? this.aria(this.base.options) : this.aria;
         },
         getTagNames: function () {
-            return (typeof this.options.tagNames === 'function') ? this.options.tagNames(this.base.options) : this.options.tagNames;
+            return (typeof this.tagNames === 'function') ? this.tagNames(this.base.options) : this.tagNames;
         },
         createButton: function () {
             var button = this.base.options.ownerDocument.createElement('button'),
-                content = this.options.contentDefault,
+                content = this.contentDefault,
                 ariaLabel = this.getAria();
             button.classList.add('medium-editor-action');
             button.classList.add('medium-editor-action-' + this.name);
@@ -45,10 +45,10 @@ var DefaultButton;
                 button.setAttribute('aria-label', ariaLabel);
             }
             if (this.base.options.buttonLabels) {
-                if (this.base.options.buttonLabels === 'fontawesome' && this.options.contentFA) {
-                    content = this.options.contentFA;
+                if (this.base.options.buttonLabels === 'fontawesome' && this.contentFA) {
+                    content = this.contentFA;
                 } else if (typeof this.base.options.buttonLabels === 'object' && this.base.options.buttonLabels[this.name]) {
-                    content = this.base.options.buttonLabels[this.options.name];
+                    content = this.base.options.buttonLabels[this.name];
                 }
             }
             button.innerHTML = content;
@@ -58,7 +58,7 @@ var DefaultButton;
             var key = String.fromCharCode(evt.which || evt.keyCode).toLowerCase(),
                 action;
 
-            if (this.options.key === key && Util.isMetaCtrlKey(evt)) {
+            if (this.key === key && Util.isMetaCtrlKey(evt)) {
                 evt.preventDefault();
                 evt.stopPropagation();
 
@@ -91,7 +91,7 @@ var DefaultButton;
         },
         queryCommandState: function () {
             var queryState = null;
-            if (this.options.useQueryState) {
+            if (this.useQueryState) {
                 queryState = this.base.queryCommandState(this.getAction());
             }
             return queryState;
@@ -110,16 +110,16 @@ var DefaultButton;
                 isMatch = tagNames.indexOf(node.tagName.toLowerCase()) !== -1;
             }
 
-            if (!isMatch && this.options.style) {
-                styleVals = this.options.style.value.split('|');
-                computedStyle = this.base.options.contentWindow.getComputedStyle(node, null).getPropertyValue(this.options.style.prop);
+            if (!isMatch && this.style) {
+                styleVals = this.style.value.split('|');
+                computedStyle = this.base.options.contentWindow.getComputedStyle(node, null).getPropertyValue(this.style.prop);
                 styleVals.forEach(function (val) {
                     if (!this.knownState) {
                         isMatch = (computedStyle.indexOf(val) !== -1);
                         // text-decoration is not inherited by default
                         // so if the computed style for text-decoration doesn't match
                         // don't write to knownState so we can fallback to other checks
-                        if (isMatch || this.options.style.prop !== 'text-decoration') {
+                        if (isMatch || this.style.prop !== 'text-decoration') {
                             this.knownState = isMatch;
                         }
                     }
@@ -128,5 +128,5 @@ var DefaultButton;
 
             return isMatch;
         }
-    };
+    });
 }());

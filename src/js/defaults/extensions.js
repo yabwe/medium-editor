@@ -1,11 +1,13 @@
-/*global PasteHandler, AutoLink, ImageDragging */
-
 var extensionDefaults;
 (function () {
-    // for now this is empty because nothing interally uses an Extension default.
-    // as they are converted, provide them here.
+    'use strict';
+
+    /*global AnchorForm, AutoLink, FontSizeForm, ImageDragging, PasteHandler */
+
     extensionDefaults = {
+        anchorForm: AnchorForm,
         autoLink: AutoLink,
+        fontsizeForm: FontSizeForm,
         imageDragging: ImageDragging,
         paste: PasteHandler
     };

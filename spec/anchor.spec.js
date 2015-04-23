@@ -1,7 +1,7 @@
 /*global MediumEditor, describe, it, expect, spyOn,
      afterEach, beforeEach, selectElementContents,
-     jasmine, fireEvent, Util, setupTestHelpers,
-     selectElementContentsAndFire */
+     jasmine, fireEvent, setupTestHelpers,
+     Util, selectElementContentsAndFire, AnchorForm */
 
 describe('Anchor Button TestCase', function () {
     'use strict';
@@ -226,7 +226,7 @@ describe('Anchor Button TestCase', function () {
 
     describe('Click', function () {
         it('should display the anchor form when toolbar is visible', function () {
-            spyOn(MediumEditor.statics.AnchorExtension.prototype, 'showForm').and.callThrough();
+            spyOn(AnchorForm.prototype, 'showForm').and.callThrough();
             var button,
                 editor = this.newMediumEditor('.editor'),
                 anchorExtension = editor.getExtensionByName('anchor');
