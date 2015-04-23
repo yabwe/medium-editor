@@ -1,9 +1,9 @@
-(function() {
+(function () {
     jasmine.getEnv().addReporter(new jasmine.JSReporter2());                   //< for jsreporter
 
     var oldFunc = window.jasmine.getJSReport;
 
-    window.jasmine.getJSReport = function() {
+    window.jasmine.getJSReport = function () {
      var results = oldFunc();
      return removePassing(results);
     };

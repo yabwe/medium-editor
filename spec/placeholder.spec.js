@@ -77,7 +77,7 @@ describe('Placeholder TestCase', function () {
     });
 
     /*jslint regexp: true*/
-    function validatePlaceholderContent(element, expectedValue) {
+    function validatePlaceholderContent (element, expectedValue) {
         var placeholder = window.getComputedStyle(element, ':after').getPropertyValue('content'),
             regex = /^attr\(([^\)]+)\)$/g,
             match = regex.exec(placeholder);
@@ -85,7 +85,7 @@ describe('Placeholder TestCase', function () {
             // In firefox, getComputedStyle().getPropertyValue('content') can return attr() instead of what attr() evaluates to
             expect(match[1]).toEqual('data-placeholder');
         } else {
-            expect(placeholder).toEqual("'" + expectedValue + "'");
+            expect(placeholder).toEqual('\'' + expectedValue + '\'');
         }
     }
     /*jslint regexp: false*/

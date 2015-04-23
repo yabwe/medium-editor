@@ -5,7 +5,7 @@ var FontSizeExtension;
 (function () {
     'use strict';
 
-    function FontSizeDerived() {
+    function FontSizeDerived () {
         this.parent = true;
         this.options = {
             name: 'fontsize',

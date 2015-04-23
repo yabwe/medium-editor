@@ -88,22 +88,22 @@ describe('Extensions TestCase', function () {
 
     describe('Core Extension', function () {
 
-        it("exists", function(){
+        it('exists', function () {
             expect(MediumEditor.Extension).toBeTruthy();
             expect(MediumEditor.Extension).toBe(Extension);
         });
 
-        it("provides an .extend method", function() {
+        it('provides an .extend method', function () {
 
             expect(Extension.extend).toBeTruthy();
             var Extended = Extension.extend({
-                foo: "bar"
+                foo: 'bar'
             });
-            expect(Extended.prototype.foo).toBe("bar");
+            expect(Extended.prototype.foo).toBe('bar');
             expect(Extended.extend).toBe(Extension.extend);
         });
 
-        it("can be passed as an extension", function(){
+        it('can be passed as an extension', function () {
 
             var Sub, editor, e1, e2;
 
@@ -115,12 +115,12 @@ describe('Extensions TestCase', function () {
             e1 = new Sub();
             e2 = new Sub({ y: 20 });
 
-            spyOn(e1, "init");
+            spyOn(e1, 'init');
 
-            editor = new MediumEditor(".editor", {
+            editor = new MediumEditor('.editor', {
                 extensions: {
-                    "foo": e1,
-                    "bar": e2
+                    'foo': e1,
+                    'bar': e2
                 }
             });
 

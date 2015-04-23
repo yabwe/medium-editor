@@ -22,11 +22,10 @@ var Toolbar;
             toolbar.className = 'medium-editor-toolbar';
 
             if (this.options.staticToolbar) {
-                toolbar.className += " static-toolbar";
+                toolbar.className += ' static-toolbar';
             } else {
-                toolbar.className += " stalker-toolbar";
+                toolbar.className += ' stalker-toolbar';
             }
-
 
             toolbar.appendChild(this.createToolbarButtons());
 
@@ -329,7 +328,7 @@ var Toolbar;
                     return;
                 }
 
-                // If we don't have a "valid" selection -> hide toolbar
+                // If we don't have a 'valid' selection -> hide toolbar
                 if (this.options.contentWindow.getSelection().toString().trim() === '' ||
                     (this.options.allowMultiParagraphSelection === false && this.multipleBlockElementsSelected())) {
                     this.hideToolbar();
@@ -479,15 +478,15 @@ var Toolbar;
                 // Stick the toolbar to the top of the window
                 } else if (scrollTop > (containerTop - toolbarHeight)) {
                     toolbarElement.classList.add('sticky-toolbar');
-                    toolbarElement.style.top = "0px";
+                    toolbarElement.style.top = '0px';
 
                 // Normal static toolbar position
                 } else {
                     toolbarElement.classList.remove('sticky-toolbar');
-                    toolbarElement.style.top = containerTop - toolbarHeight + "px";
+                    toolbarElement.style.top = containerTop - toolbarHeight + 'px';
                 }
             } else {
-                toolbarElement.style.top = containerTop - toolbarHeight + "px";
+                toolbarElement.style.top = containerTop - toolbarHeight + 'px';
             }
 
             if (this.options.toolbarAlign === 'left') {

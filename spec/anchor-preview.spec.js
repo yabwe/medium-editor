@@ -60,12 +60,11 @@ describe('Anchor Preview TestCase', function () {
             expect(editor.toolbar.hideToolbar).toHaveBeenCalled();
         });
 
-       it('should be displayed on hover of a link element with markup inside', function () {
+        it('should be displayed on hover of a link element with markup inside', function () {
             var editor = new MediumEditor('.editor', {
                 delay: 200
             }),
             anchorPreview = editor.getExtensionByName('anchor-preview');
-
 
             // show preview
             spyOn(MediumEditor.statics.AnchorPreview.prototype, 'showPreview').and.callThrough();

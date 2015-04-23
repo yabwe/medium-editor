@@ -1,5 +1,5 @@
 var editorDefaults;
-(function(){
+(function () {
 
     // summary: The default options hash used by the Editor
 

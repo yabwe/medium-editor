@@ -1,11 +1,11 @@
 /*global atob, unescape, Uint8Array, Blob*/
 
 function isIE9() {
-    return navigator.appName.indexOf("Internet Explorer") !== -1 && navigator.appVersion.indexOf("MSIE 9") !== -1;
+    return navigator.appName.indexOf('Internet Explorer') !== -1 && navigator.appVersion.indexOf("MSIE 9") !== -1;
 }
 
 function isIE10() {
-    return navigator.appName.indexOf("Internet Explorer") !== -1 && navigator.appVersion.indexOf("MSIE 10") !== -1;
+    return navigator.appName.indexOf('Internet Explorer') !== -1 && navigator.appVersion.indexOf("MSIE 10") !== -1;
 }
 
 function isOldIE() {
@@ -17,7 +17,7 @@ function isIE() {
 }
 
 function isFirefox() {
-    return navigator.userAgent.toLowerCase().indexOf("firefox") !== -1;
+    return navigator.userAgent.toLowerCase().indexOf('firefox') !== -1;
 }
 
 function dataURItoBlob(dataURI) {
@@ -53,7 +53,7 @@ function fireEvent(element, event, options) {
 
     if (document.createEvent) {
         // dispatch for firefox + others
-        evt = document.createEvent("HTMLEvents");
+        evt = document.createEvent('HTMLEvents');
         evt.initEvent(event, true, true); // event type,bubbling,cancelable
 
         evt.currentTarget = element;

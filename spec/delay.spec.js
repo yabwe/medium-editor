@@ -20,7 +20,7 @@ describe('Delay TestCase', function () {
     it('should call function after delay', function () {
         var editor, spy;
 
-        editor = new MediumEditor('.editor', {delay: 100});
+        editor = new MediumEditor('.editor', { delay: 100 });
         spy = jasmine.createSpy('spy');
         editor.delay(spy);
         jasmine.clock().tick(50);
@@ -31,7 +31,7 @@ describe('Delay TestCase', function () {
     it('should not call function if editor not active', function () {
         var editor, spy;
 
-        editor = new MediumEditor('.editor', {delay: 1});
+        editor = new MediumEditor('.editor', { delay: 1 });
         spy = jasmine.createSpy('spy');
 
         editor.destroy();

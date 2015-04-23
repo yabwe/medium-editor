@@ -33,12 +33,12 @@ describe('Pasting content', function () {
             },
             {
                 source: 'Microsoft Word - line breaks',
-                paste: "<p>One\nTwo\n</p>\n\n<p>Three Four</p>",
+                paste: '<p>One\nTwo\n</p>\n\n<p>Three Four</p>',
                 output: '<p>One Two </p><p>Three Four</p>'
             },
             {
                 source: 'Microsoft Word - Proprietary elements',
-                paste: "<p>One<o:p></o:p></p><p>Two<o:p></o:p></p>",
+                paste: '<p>One<o:p></o:p></p><p>Two<o:p></o:p></p>',
                 output: '<p>One</p><p>Two</p>'
             }
         ],
@@ -46,12 +46,12 @@ describe('Pasting content', function () {
             {
                 source: 'Google docs',
                 paste: '<meta charset=\'utf-8\'><meta charset="utf-8"><b style="font-weight:normal;" id="docs-internal-guid-2f060cc5-1888-a396-af95-bfb31478c7ae"><span style="font-size:15px;font-family:Arial;color:#000000;background-color:transparent;font-weight:bold;font-style:normal;font-variant:normal;text-decoration:none;vertical-align:baseline;white-space:pre-wrap;">Bold,</span><span style="font-size:15px;font-family:Arial;color:#000000;background-color:transparent;font-weight:normal;font-style:normal;font-variant:normal;text-decoration:none;vertical-align:baseline;white-space:pre-wrap;"> </span><span style="font-size:15px;font-family:Arial;color:#000000;background-color:transparent;font-weight:normal;font-style:italic;font-variant:normal;text-decoration:none;vertical-align:baseline;white-space:pre-wrap;">italic,</span><span style="font-size:15px;font-family:Arial;color:#000000;background-color:transparent;font-weight:normal;font-style:normal;font-variant:normal;text-decoration:none;vertical-align:baseline;white-space:pre-wrap;"> </span><span style="font-size:15px;font-family:Arial;color:#000000;background-color:transparent;font-weight:bold;font-style:italic;font-variant:normal;text-decoration:none;vertical-align:baseline;white-space:pre-wrap;">bold and italic</span><span style="font-size:15px;font-family:Arial;color:#000000;background-color:transparent;font-weight:normal;font-style:normal;font-variant:normal;text-decoration:none;vertical-align:baseline;white-space:pre-wrap;">, and </span><a href="http://en.wikipedia.org/wiki/Link_(The_Legend_of_Zelda)" style="text-decoration:none;"><span style="font-size:15px;font-family:Arial;color:#1155cc;background-color:transparent;font-weight:normal;font-style:normal;font-variant:normal;text-decoration:underline;vertical-align:baseline;white-space:pre-wrap;">a link</span></a><span style="font-size:15px;font-family:Arial;color:#000000;background-color:transparent;font-weight:normal;font-style:normal;font-variant:normal;text-decoration:none;vertical-align:baseline;white-space:pre-wrap;">.</span></b>',
-                output: "<b>Bold,</b> <i>italic,</i> <b><i>bold and italic</i></b>, and <a href=\"http://en.wikipedia.org/wiki/Link_\\(The_Legend_of_Zelda\\)\">a link</a>\\."
+                output: '<b>Bold,</b> <i>italic,</i> <b><i>bold and italic</i></b>, and <a href="http://en.wikipedia.org/wiki/Link_\\(The_Legend_of_Zelda\\)">a link</a>\\.'
             },
             {
                 source: 'Inside editor',
                 paste: '<meta charset=\'utf-8\'><b style="color: rgb(0, 0, 0); font-family: \'Helvetica Neue\', Helvetica, Arial, sans-serif; font-size: 22.22222328186035px; font-style: normal; font-variant: normal; letter-spacing: normal; line-height: 30px; orphans: auto; text-align: start; text-indent: 0px; text-transform: none; white-space: normal; widows: auto; word-spacing: 0px; -webkit-text-stroke-width: 0px;">Bold,</b><span style="color: rgb(0, 0, 0); font-family: \'Helvetica Neue\', Helvetica, Arial, sans-serif; font-size: 22.22222328186035px; font-style: normal; font-variant: normal; font-weight: normal; letter-spacing: normal; line-height: 30px; orphans: auto; text-align: start; text-indent: 0px; text-transform: none; white-space: normal; widows: auto; word-spacing: 0px; -webkit-text-stroke-width: 0px; display: inline !important; float: none;"> </span><i style="color: rgb(0, 0, 0); font-family: \'Helvetica Neue\', Helvetica, Arial, sans-serif; font-size: 22.22222328186035px; font-variant: normal; font-weight: normal; letter-spacing: normal; line-height: 30px; orphans: auto; text-align: start; text-indent: 0px; text-transform: none; white-space: normal; widows: auto; word-spacing: 0px; -webkit-text-stroke-width: 0px;">italic,</i><span style="color: rgb(0, 0, 0); font-family: \'Helvetica Neue\', Helvetica, Arial, sans-serif; font-size: 22.22222328186035px; font-style: normal; font-variant: normal; font-weight: normal; letter-spacing: normal; line-height: 30px; orphans: auto; text-align: start; text-indent: 0px; text-transform: none; white-space: normal; widows: auto; word-spacing: 0px; -webkit-text-stroke-width: 0px; display: inline !important; float: none;"><span class="Apple-converted-space"> </span></span><b style="color: rgb(0, 0, 0); font-family: \'Helvetica Neue\', Helvetica, Arial, sans-serif; font-size: 22.22222328186035px; font-style: normal; font-variant: normal; letter-spacing: normal; line-height: 30px; orphans: auto; text-align: start; text-indent: 0px; text-transform: none; white-space: normal; widows: auto; word-spacing: 0px; -webkit-text-stroke-width: 0px;"><i>bold and italic</i></b><span style="color: rgb(0, 0, 0); font-family: \'Helvetica Neue\', Helvetica, Arial, sans-serif; font-size: 22.22222328186035px; font-style: normal; font-variant: normal; font-weight: normal; letter-spacing: normal; line-height: 30px; orphans: auto; text-align: start; text-indent: 0px; text-transform: none; white-space: normal; widows: auto; word-spacing: 0px; -webkit-text-stroke-width: 0px; display: inline !important; float: none;">, and<span class="Apple-converted-space"> </span></span><a href="http://en.wikipedia.org/wiki/Link_(The_Legend_of_Zelda)" style="color: black; font-family: \'Helvetica Neue\', Helvetica, Arial, sans-serif; font-size: 22.22222328186035px; font-style: normal; font-variant: normal; font-weight: normal; letter-spacing: normal; line-height: 30px; orphans: auto; text-align: start; text-indent: 0px; text-transform: none; white-space: normal; widows: auto; word-spacing: 0px; -webkit-text-stroke-width: 0px;">a link</a><span style="color: rgb(0, 0, 0); font-family: \'Helvetica Neue\', Helvetica, Arial, sans-serif; font-size: 22.22222328186035px; font-style: normal; font-variant: normal; font-weight: normal; letter-spacing: normal; line-height: 30px; orphans: auto; text-align: start; text-indent: 0px; text-transform: none; white-space: normal; widows: auto; word-spacing: 0px; -webkit-text-stroke-width: 0px; display: inline !important; float: none;">.</span>',
-                output: "<b>Bold,</b> <i>italic,</i> <b><i>bold and italic</i></b>, and <a href=\"http://en.wikipedia.org/wiki/Link_\\(The_Legend_of_Zelda\\)\">a link</a>\\."
+                output: '<b>Bold,</b> <i>italic,</i> <b><i>bold and italic</i></b>, and <a href="http://en.wikipedia.org/wiki/Link_\\(The_Legend_of_Zelda\\)">a link</a>\\.'
             },
             {
                 source: 'Copy and pasted anchor from chrome',
@@ -61,18 +61,18 @@ describe('Pasting content', function () {
         ],
         textTests = [
             {
-                source: "Text single word",
-                paste: "supercalifragilisticexpalidocious",
+                source: 'Text single word',
+                paste: 'supercalifragilisticexpalidocious',
                 output: '<div id="editor-inner">supercalifragilisticexpalidocious</div>'
             },
             {
-                source: "Text single word with leading/trailing space",
-                paste: " supercalifragilisticexpalidocious ",
+                source: 'Text single word with leading/trailing space',
+                paste: ' supercalifragilisticexpalidocious ',
                 output: '<div id="editor-inner"> supercalifragilisticexpalidocious </div>'
             },
             {
-                source: "Text multi-word with no line breaks",
-                paste: "Their relationship consisted in discussing if it existed",
+                source: 'Text multi-word with no line breaks',
+                paste: 'Their relationship consisted in discussing if it existed',
                 output: '<div id="editor-inner">Their relationship consisted in discussing if it existed</div>'
             },
             {
@@ -146,7 +146,7 @@ describe('Pasting content', function () {
                 }
             });
 
-            spyOn(document, "queryCommandSupported").and.returnValue(false);
+            spyOn(document, 'queryCommandSupported').and.returnValue(false);
 
             multiLineTests.forEach(function (test) {
                 this.el.innerHTML = '<span id="editor-inner">lorem ipsum</span>';
@@ -182,7 +182,7 @@ describe('Pasting content', function () {
                 // Firefox and IE: doing an insertHTML while this <span> is selected results in the html being inserted inside of the span
                 // Firefox replace the &nbsp; other either side of the <span> with a space
                 // Webkit: doing an insertHTML while this <span> is selected results in the span being replaced completely
-                expect(editorEl.innerHTML).toMatch(new RegExp("^Before(&nbsp;|\\s)(<span id=\"editor-inner\">)?" + inlineTests[i].output + "(</span>)?(&nbsp;|\\s)after\\.$"));
+                expect(editorEl.innerHTML).toMatch(new RegExp('^Before(&nbsp;|\\s)(<span id="editor-inner">)?' + inlineTests[i].output + '(</span>)?(&nbsp;|\\s)after\\.$'));
             }
         });
 
@@ -210,7 +210,7 @@ describe('Pasting content', function () {
                 // Firefox and IE: doing an insertHTML while this <span> is selected results in the html being inserted inside of the span
                 // Firefox replace the &nbsp; other either side of the <span> with a space
                 // Webkit: doing an insertHTML while this <span> is selected results in the span being replaced completely
-                expect(editorEl.innerHTML).toMatch(new RegExp("^Before(&nbsp;|\\s)(<span id=\"editor-inner\">)?" + inlineTests[i].output + "(</span>)?(&nbsp;|\\s)after\\.$"));
+                expect(editorEl.innerHTML).toMatch(new RegExp('^Before(&nbsp;|\\s)(<span id="editor-inner">)?' + inlineTests[i].output + '(</span>)?(&nbsp;|\\s)after\\.$'));
             }
         });
 
@@ -222,7 +222,7 @@ describe('Pasting content', function () {
                     }
                 });
 
-            spyOn(document, "queryCommandSupported").and.returnValue(false);
+            spyOn(document, 'queryCommandSupported').and.returnValue(false);
 
             inlineTests.forEach(function (test) {
                 this.el.innerHTML = 'Before&nbsp;<span id="editor-inner">&nbsp;</span>&nbsp;after.';
@@ -234,7 +234,7 @@ describe('Pasting content', function () {
                 // Firefox and IE: doing an insertHTML while this <span> is selected results in the html being inserted inside of the span
                 // Firefox replace the &nbsp; other either side of the <span> with a space
                 // Webkit: doing an insertHTML while this <span> is selected results in the span being replaced completely
-                expect(this.el.innerHTML).toMatch(new RegExp("^Before(&nbsp;|\\s)(<span id=\"editor-inner\">)?" + test.output + "(</span>)?(&nbsp;|\\s)after\\.$"));
+                expect(this.el.innerHTML).toMatch(new RegExp('^Before(&nbsp;|\\s)(<span id="editor-inner">)?' + test.output + '(</span>)?(&nbsp;|\\s)after\\.$'));
             }.bind(this));
         });
 
@@ -252,7 +252,7 @@ describe('Pasting content', function () {
 
             editor.cleanPaste('<label>div one</label><label>div two</label>');
 
-            expect(this.el.innerHTML).toMatch(new RegExp("^Before(&nbsp;|\\s)(<span id=\"editor-inner\">)?<sub>div one</sub><sub>div two</sub>(</span>)?(&nbsp;|\\s)after\\.$"));
+            expect(this.el.innerHTML).toMatch(new RegExp('^Before(&nbsp;|\\s)(<span id="editor-inner">)?<sub>div one</sub><sub>div two</sub>(</span>)?(&nbsp;|\\s)after\\.$'));
         });
     });
 
@@ -269,7 +269,7 @@ describe('Pasting content', function () {
             selectElementContents(this.el.firstChild);
             editor.pasteHTML(
                 '<table class="medium-editor-table" dir="ltr" style="border: 1px solid red;"><tbody><tr><td>test</td></tr></tbody></table>',
-                {cleanAttrs: ['style', 'dir']}
+                { cleanAttrs: ['style', 'dir'] }
             );
             expect(editor.elements[0].innerHTML).toBe('<table class="medium-editor-table"><tbody><tr><td>test</td></tr></tbody></table>');
         });
@@ -279,7 +279,7 @@ describe('Pasting content', function () {
             selectElementContents(this.el.firstChild);
             editor.pasteHTML(
                 '<div><i>test</i><meta name="description" content="test" /><b>test</b></div>',
-                {cleanTags: ['meta', 'b']}
+                { cleanTags: ['meta', 'b'] }
             );
             expect(editor.elements[0].innerHTML).toBe('<div><i>test</i></div>');
         });
@@ -360,7 +360,7 @@ describe('Pasting content', function () {
             expect(newInit).toHaveBeenCalled();
 
             selectElementContents(this.el.firstChild);
-            editor.cleanPaste("<p>One\nTwo\n</p>\n\n<p>Three Four</p>");
+            editor.cleanPaste('<p>One\nTwo\n</p>\n\n<p>Three Four</p>');
             expect(editor.elements[0].innerHTML).toBe('<p>One Two </p><p>Three Four</p>');
         });
 

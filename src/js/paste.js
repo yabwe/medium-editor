@@ -10,12 +10,12 @@ var PasteHandler;
         block, negation is used specifically to match the end of an html
         tag, and in fact unicode characters *should* be allowed.
     */
-    function createReplacements() {
+    function createReplacements () {
         return [
 
             // replace two bogus tags that begin pastes from google docs
-            [new RegExp(/<[^>]*docs-internal-guid[^>]*>/gi), ""],
-            [new RegExp(/<\/b>(<br[^>]*>)?$/gi), ""],
+            [new RegExp(/<[^>]*docs-internal-guid[^>]*>/gi), ''],
+            [new RegExp(/<\/b>(<br[^>]*>)?$/gi), ''],
 
              // un-html spaces and newlines inserted by OS X
             [new RegExp(/<span class="Apple-converted-space">\s+<\/span>/g), ' '],
@@ -47,7 +47,7 @@ var PasteHandler;
     }
     /*jslint regexp: false*/
 
-     PasteHandler = Extension.extend({
+    PasteHandler = Extension.extend({
 
         /* Paste Options */
 
@@ -80,8 +80,8 @@ var PasteHandler;
         cleanTags: ['meta'],
 
         /* ----- internal options needed from base ----- */
-        "window": window,
-        "document": document,
+        'window': window,
+        'document': document,
         targetBlank: false,
         disableReturn: false,
 
@@ -166,7 +166,7 @@ var PasteHandler;
                 this.pasteHTML('<p>' + elList.join('</p><p>') + '</p>');
 
                 try {
-                    this.document.execCommand('insertText', false, "\n");
+                    this.document.execCommand('insertText', false, '\n');
                 } catch (ignore) { }
 
                 // block element cleanup
@@ -260,29 +260,29 @@ var PasteHandler;
             }
         },
 
-        cleanupSpans: function (container_el) {
+        cleanupSpans: function (containerEl) {
             var i,
                 el,
-                new_el,
-                spans = container_el.querySelectorAll('.replace-with'),
+                newEl,
+                spans = containerEl.querySelectorAll('.replace-with'),
                 isCEF = function (el) {
                     return (el && el.nodeName !== '#text' && el.getAttribute('contenteditable') === 'false');
                 };
 
             for (i = 0; i < spans.length; i += 1) {
                 el = spans[i];
-                new_el = this.document.createElement(el.classList.contains('bold') ? 'b' : 'i');
+                newEl = this.document.createElement(el.classList.contains('bold') ? 'b' : 'i');
 
                 if (el.classList.contains('bold') && el.classList.contains('italic')) {
                     // add an i tag as well if this has both italics and bold
-                    new_el.innerHTML = '<i>' + el.innerHTML + '</i>';
+                    newEl.innerHTML = '<i>' + el.innerHTML + '</i>';
                 } else {
-                    new_el.innerHTML = el.innerHTML;
+                    newEl.innerHTML = el.innerHTML;
                 }
-                el.parentNode.replaceChild(new_el, el);
+                el.parentNode.replaceChild(newEl, el);
             }
 
-            spans = container_el.querySelectorAll('span');
+            spans = containerEl.querySelectorAll('span');
             for (i = 0; i < spans.length; i += 1) {
                 el = spans[i];
 
@@ -295,6 +295,6 @@ var PasteHandler;
                 Util.unwrap(el, this.document);
             }
         }
-     });
+    });
 
 }());

@@ -162,7 +162,7 @@ function MediumEditor(elements, options) {
         if (event.dataTransfer.files) {
             files = Array.prototype.slice.call(event.dataTransfer.files, 0);
             files.some(function (file) {
-                if (file.type.match("image")) {
+                if (file.type.match('image')) {
                     var fileReader, id;
                     fileReader = new FileReader();
                     fileReader.readAsDataURL(file);
@@ -269,9 +269,9 @@ function MediumEditor(elements, options) {
     }
 
     function createContentEditable(index) {
-        var div = this.options.ownerDocument.createElement('div');
-        var id = (+new Date());
-        var textarea = this.elements[index];
+        var div = this.options.ownerDocument.createElement('div'),
+            id = (+new Date()),
+            textarea = this.elements[index];
 
         div.className = textarea.className;
         div.id = id;
@@ -363,8 +363,8 @@ function MediumEditor(elements, options) {
             cleanPastedHTML: this.options.cleanPastedHTML, // deprecated
             disableReturn: this.options.disableReturn,
             targetBlank: this.options.targetBlank,
-            "window": this.options.contentWindow,
-            "document": this.options.ownerDocument
+            'window': this.options.contentWindow,
+            'document': this.options.ownerDocument
         };
 
         return new MediumEditor.extensions.paste(
@@ -424,8 +424,8 @@ function MediumEditor(elements, options) {
             });
         }
 
-        var nestedMerges = ['paste'];
-        var tempOpts = Util.extend({}, options);
+        var nestedMerges = ['paste'],
+            tempOpts = Util.extend({}, options);
 
         nestedMerges.forEach(function (toMerge) {
             if (!tempOpts[toMerge]) {
@@ -857,9 +857,9 @@ function MediumEditor(elements, options) {
                 }
             }
 
-            if (this.options.targetBlank || opts.target === "_blank" || opts.buttonClass) {
-                customEvent = this.options.ownerDocument.createEvent("HTMLEvents");
-                customEvent.initEvent("input", true, true, this.options.contentWindow);
+            if (this.options.targetBlank || opts.target === '_blank' || opts.buttonClass) {
+                customEvent = this.options.ownerDocument.createEvent('HTMLEvents');
+                customEvent.initEvent('input', true, true, this.options.contentWindow);
                 for (i = 0; i < this.elements.length; i += 1) {
                     this.elements[i].dispatchEvent(customEvent);
                 }

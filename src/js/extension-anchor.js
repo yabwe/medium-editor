@@ -93,7 +93,7 @@ var AnchorExtension;
                 );
             }
 
-            return template.join("");
+            return template.join('');
 
         },
 
@@ -107,7 +107,7 @@ var AnchorExtension;
             this.getInput().value = '';
         },
 
-        showForm: function (link_value) {
+        showForm: function (linkValue) {
             var input = this.getInput();
 
             this.base.saveSelection();
@@ -115,7 +115,7 @@ var AnchorExtension;
             this.getForm().style.display = 'block';
             this.base.setToolbarPosition();
 
-            input.value = link_value || '';
+            input.value = linkValue || '';
             input.focus();
         },
 
@@ -147,9 +147,9 @@ var AnchorExtension;
             }
 
             if (targetCheckbox && targetCheckbox.checked) {
-                opts.target = "_blank";
+                opts.target = '_blank';
             } else {
-                opts.target = "_self";
+                opts.target = '_self';
             }
 
             if (buttonCheckbox && buttonCheckbox.checked) {
@@ -183,9 +183,9 @@ var AnchorExtension;
         // form creation and event handling
 
         attachFormEvents: function (form) {
-            var close = form.querySelector(".medium-editor-toolbar-close"),
-                save = form.querySelector(".medium-editor-toolbar-save"),
-                input = form.querySelector(".medium-editor-toolbar-input");
+            var close = form.querySelector('.medium-editor-toolbar-close'),
+                save = form.querySelector('.medium-editor-toolbar-save'),
+                input = form.querySelector('.medium-editor-toolbar-input');
 
             // Handle clicks on the form itself
             this.base.on(form, 'click', this.handleFormClick.bind(this));

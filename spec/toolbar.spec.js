@@ -137,7 +137,7 @@ describe('Toolbar TestCase', function () {
                 editor = new MediumEditor('.editor');
 
             outsideElement.setAttribute('style', '-webkit-user-select: none; -moz-user-select: none; -ms-user-select: none; user-select: none;');
-            outsideElement.innerHTML = "Click Me, I don't clear selection";
+            outsideElement.innerHTML = 'Click Me, I don\'t clear selection';
             document.body.appendChild(outsideElement);
 
             selectElementContentsAndFire(editor.elements[0].firstChild);
@@ -325,7 +325,7 @@ describe('Toolbar TestCase', function () {
             expect(editor.toolbar.getToolbarElement().classList.contains('medium-editor-toolbar-active')).toBe(false);
         });
 
-        it('should show the toolbar if it\'s text are selected even though one or more elements that has a data attr of disable-toolbar', function () {
+        it('should show the toolbar if its text are selected even though one or more elements that has a data attr of disable-toolbar', function () {
             var editor,
                 element = document.createElement('div');
 
@@ -336,7 +336,7 @@ describe('Toolbar TestCase', function () {
             editor = new MediumEditor(document.querySelectorAll('.editor'));
             expect(editor.elements.length).toEqual(3);
             expect(editor.toolbar.getToolbarElement().style.display).toBe('');
-            selectElementContentsAndFire(this.el, { eventToFire: 'focus'});
+            selectElementContentsAndFire(this.el, { eventToFire: 'focus' });
 
             expect(editor.toolbar.getToolbarElement().classList.contains('medium-editor-toolbar-active')).toBe(true);
             // Remove the new element from the DOM

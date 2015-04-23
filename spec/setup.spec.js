@@ -52,7 +52,7 @@ describe('Setup/Destroy TestCase', function () {
             expect(editor.setup).toHaveBeenCalled();
         });
 
-        it('should know about defaults', function() {
+        it('should know about defaults', function () {
             expect(MediumEditor.prototype.defaults).toBe(editorDefaults);
         });
     });
@@ -84,7 +84,7 @@ describe('Setup/Destroy TestCase', function () {
         it('should abort any pending throttled event handlers', function () {
             var editor, triggerEvents, toolbar;
 
-            editor = new MediumEditor('.editor', {delay: 5});
+            editor = new MediumEditor('.editor', { delay: 5 });
             triggerEvents = function () {
                 fireEvent(window, 'resize');
                 fireEvent(document.body, 'click', {

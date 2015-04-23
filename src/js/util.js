@@ -6,7 +6,7 @@ var Util;
     'use strict';
 
     // Params: Array, Boolean, Object
-    function getProp(parts, create, context) {
+    function getProp (parts, create, context) {
         if (!context) {
             context = window;
         }
@@ -25,12 +25,12 @@ var Util;
             }
             return context;
         } catch (e) {
-            // "p in context" throws an exception when context is a number, boolean, etc. rather than an object,
+            // 'p in context' throws an exception when context is a number, boolean, etc. rather than an object,
             // so in that corner case just return undefined (by having no return statement)
         }
     }
 
-    function copyInto(overwrite, dest) {
+    function copyInto (overwrite, dest) {
         var prop,
             sources = Array.prototype.slice.call(arguments, 2);
         dest = dest || {};
@@ -79,7 +79,7 @@ var Util;
 
         derives: function derives(base, derived) {
             var origPrototype = derived.prototype;
-            function Proto() { }
+            function Proto () { }
             Proto.prototype = base.prototype;
             derived.prototype = new Proto();
             derived.prototype.constructor = base;
@@ -239,7 +239,7 @@ var Util;
                 }
                 range.deleteContents();
 
-                el = doc.createElement("div");
+                el = doc.createElement('div');
                 el.innerHTML = html;
                 fragment = doc.createDocumentFragment();
                 while (el.firstChild) {
@@ -397,17 +397,17 @@ var Util;
             parent.removeChild(element);
         },
 
-        warn: function(){
-            if(window.console !== undefined && typeof window.console.warn === 'function'){
+        warn: function () {
+            if (window.console !== undefined && typeof window.console.warn === 'function') {
                 window.console.warn.apply(console, arguments);
             }
         },
 
-        deprecated: function(oldName, newName, version){
+        deprecated: function (oldName, newName, version) {
             // simple deprecation warning mechanism.
-            var m = oldName + " is deprecated, please use " + newName + " instead.";
-            if(version){
-                m += " Will be removed in " + version;
+            var m = oldName + ' is deprecated, please use ' + newName + ' instead.';
+            if (version) {
+                m += ' Will be removed in ' + version;
             }
             Util.warn(m);
         },
@@ -434,7 +434,7 @@ var Util;
             }, this);
         },
 
-        getClosestTag : function(el, tag) { // get the closest parent
+        getClosestTag: function (el, tag) { // get the closest parent
             return Util.traverseUp(el, function (element) {
                 return element.tagName.toLowerCase() === tag.toLowerCase();
             });
@@ -454,17 +454,19 @@ var Util;
             }
         },
 
-        setObject: function(name, value, context){
+        setObject: function (name, value, context) {
             // summary:
-            //      Set a property from a dot-separated string, such as "A.B.C"
-            var parts = name.split("."), p = parts.pop(), obj = getProp(parts, true, context);
+            //      Set a property from a dot-separated string, such as 'A.B.C'
+            var parts = name.split('.'),
+                p = parts.pop(),
+                obj = getProp(parts, true, context);
             return obj && p ? (obj[p] = value) : undefined; // Object
         },
 
-        getObject: function(name, create, context){
+        getObject: function (name, create, context) {
             // summary:
-            //      Get a property from a dot-separated string, such as "A.B.C"
-            return getProp(name ? name.split(".") : [], create, context); // Object
+            //      Get a property from a dot-separated string, such as 'A.B.C'
+            return getProp(name ? name.split('.') : [], create, context); // Object
         }
 
     };

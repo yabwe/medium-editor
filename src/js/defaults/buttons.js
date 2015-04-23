@@ -1,5 +1,5 @@
 var ButtonsData;
-(function(){
+(function () {
     'use strict';
 
     ButtonsData = {
