@@ -1,9 +1,8 @@
+/*global Util, Selection, Extension */
 var PasteHandler;
+
 (function () {
     'use strict';
-
-    /*global Util, Selection, Extension */
-
     /*jslint regexp: true*/
     /*
         jslint does not allow character negation, because the negation

@@ -399,10 +399,9 @@ if (!("classList" in document.createElement("_"))) {
     'use strict';
 
 var Util;
+
 (function (window) {
     'use strict';
-
-    /*global NodeFilter, console*/
 
     // Params: Array, Boolean, Object
     function getProp(parts, create, context) {
@@ -1405,10 +1404,9 @@ var editorDefaults;
 })();
 
 var Extension;
+
 (function () {
     'use strict';
-
-    /* global Util */
 
     Extension = function (options) {
         Util.extend(this, options);
@@ -1594,10 +1592,9 @@ var Extension;
 })();
 
 var Selection;
+
 (function () {
     'use strict';
-
-    /*global Util */
 
     Selection = {
         findMatchingSelectionParent: function (testElementFunction, contentWindow) {
@@ -1735,10 +1732,9 @@ var Selection;
 }());
 
 var Events;
+
 (function () {
     'use strict';
-
-    /*global Util */
 
     Events = function (instance) {
         this.base = instance;
@@ -2379,6 +2375,7 @@ var DefaultButton;
         }
     };
 }());
+
 var Button;
 (function () {
     'use strict';
@@ -3081,11 +3078,11 @@ var AnchorExtension;
     AnchorExtension = Util.derives(DefaultButton, AnchorDerived);
 
 }());
+
 var AnchorPreview;
+
 (function () {
     'use strict';
-
-    /*global Util*/
 
     AnchorPreview = function () {
         this.parent = true;
@@ -3907,12 +3904,11 @@ var FontSizeExtension;
 
     FontSizeExtension = Util.derives(DefaultButton, FontSizeDerived);
 }());
+
 var PasteHandler;
+
 (function () {
     'use strict';
-
-    /*global Util, Selection, Extension */
-
     /*jslint regexp: true*/
     /*
         jslint does not allow character negation, because the negation
@@ -4206,10 +4202,9 @@ var PasteHandler;
 }());
 
 var Toolbar;
+
 (function () {
     'use strict';
-
-    /*global Util, Selection */
 
     Toolbar = function Toolbar(instance) {
         this.base = instance;
@@ -4748,6 +4743,7 @@ var Toolbar;
 }());
 
 var Placeholders;
+
 (function () {
     'use strict';
 
@@ -4821,8 +4817,6 @@ var Placeholders;
 var extensionDefaults;
 (function () {
     'use strict';
-
-    /*global AnchorForm, AutoLink, FontSizeForm, ImageDragging, PasteHandler */
 
     extensionDefaults = {
         anchorForm: AnchorForm,

@@ -1,8 +1,9 @@
+/*global Util*/
+
 var AnchorPreview;
+
 (function () {
     'use strict';
-
-    /*global Util*/
 
     AnchorPreview = function () {
         this.parent = true;

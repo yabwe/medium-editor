@@ -1,8 +1,9 @@
+/*global Util, Selection */
+
 var Toolbar;
+
 (function () {
     'use strict';
-
-    /*global Util, Selection */
 
     Toolbar = function Toolbar(instance) {
         this.base = instance;
