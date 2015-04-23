@@ -77,7 +77,7 @@ describe('Placeholder TestCase', function () {
     });
 
     /*jslint regexp: true*/
-    function validatePlaceholderContent (element, expectedValue) {
+    function validatePlaceholderContent(element, expectedValue) {
         var placeholder = window.getComputedStyle(element, ':after').getPropertyValue('content'),
             regex = /^attr\(([^\)]+)\)$/g,
             match = regex.exec(placeholder);

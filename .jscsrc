@@ -22,6 +22,9 @@
     "--"
   ],
   "disallowSpacesInCallExpression": true,
+  "disallowSpacesInFunctionDeclaration": {
+    "beforeOpeningRoundBrace": true
+  },
   "disallowSpacesInsideArrayBrackets": true,
   "disallowSpacesInsideBrackets": true,
   "disallowSpacesInsideParentheses": true,
@@ -101,6 +104,9 @@
   },
   "requireSpacesInForStatement": true,
   "requireSpacesInFunctionDeclaration": {
+    "beforeOpeningCurlyBrace": true
+  },
+  "requireSpacesInFunction": {
     "beforeOpeningCurlyBrace": true
   },
   "requireSpacesInsideObjectBrackets": {

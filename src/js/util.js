@@ -6,7 +6,7 @@ var Util;
     'use strict';
 
     // Params: Array, Boolean, Object
-    function getProp (parts, create, context) {
+    function getProp(parts, create, context) {
         if (!context) {
             context = window;
         }
@@ -30,7 +30,7 @@ var Util;
         }
     }
 
-    function copyInto (overwrite, dest) {
+    function copyInto(overwrite, dest) {
         var prop,
             sources = Array.prototype.slice.call(arguments, 2);
         dest = dest || {};
@@ -79,7 +79,7 @@ var Util;
 
         derives: function derives(base, derived) {
             var origPrototype = derived.prototype;
-            function Proto () { }
+            function Proto() { }
             Proto.prototype = base.prototype;
             derived.prototype = new Proto();
             derived.prototype.constructor = base;

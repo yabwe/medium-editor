@@ -6,7 +6,7 @@
 describe('Font Size Button TestCase', function () {
     'use strict';
 
-    function testFontSizeContents (el, size) {
+    function testFontSizeContents(el, size) {
         expect(el.childNodes.length).toBe(1);
         var child = el.childNodes[0];
         expect(child.tagName).toBe('FONT');
