@@ -404,7 +404,7 @@ var Util;
     'use strict';
 
     // Params: Array, Boolean, Object
-    function getProp(parts, create, context) {
+    function getProp (parts, create, context) {
         if (!context) {
             context = window;
         }
@@ -423,12 +423,12 @@ var Util;
             }
             return context;
         } catch (e) {
-            // "p in context" throws an exception when context is a number, boolean, etc. rather than an object,
+            // 'p in context' throws an exception when context is a number, boolean, etc. rather than an object,
             // so in that corner case just return undefined (by having no return statement)
         }
     }
 
-    function copyInto(overwrite, dest) {
+    function copyInto (overwrite, dest) {
         var prop,
             sources = Array.prototype.slice.call(arguments, 2);
         dest = dest || {};
@@ -477,7 +477,7 @@ var Util;
 
         derives: function derives(base, derived) {
             var origPrototype = derived.prototype;
-            function Proto() { }
+            function Proto () { }
             Proto.prototype = base.prototype;
             derived.prototype = new Proto();
             derived.prototype.constructor = base;
@@ -637,7 +637,7 @@ var Util;
                 }
                 range.deleteContents();
 
-                el = doc.createElement("div");
+                el = doc.createElement('div');
                 el.innerHTML = html;
                 fragment = doc.createDocumentFragment();
                 while (el.firstChild) {
@@ -795,17 +795,17 @@ var Util;
             parent.removeChild(element);
         },
 
-        warn: function(){
-            if(window.console !== undefined && typeof window.console.warn === 'function'){
+        warn: function () {
+            if (window.console !== undefined && typeof window.console.warn === 'function') {
                 window.console.warn.apply(console, arguments);
             }
         },
 
-        deprecated: function(oldName, newName, version){
+        deprecated: function (oldName, newName, version) {
             // simple deprecation warning mechanism.
-            var m = oldName + " is deprecated, please use " + newName + " instead.";
-            if(version){
-                m += " Will be removed in " + version;
+            var m = oldName + ' is deprecated, please use ' + newName + ' instead.';
+            if (version) {
+                m += ' Will be removed in ' + version;
             }
             Util.warn(m);
         },
@@ -832,7 +832,7 @@ var Util;
             }, this);
         },
 
-        getClosestTag : function(el, tag) { // get the closest parent
+        getClosestTag: function (el, tag) { // get the closest parent
             return Util.traverseUp(el, function (element) {
                 return element.tagName.toLowerCase() === tag.toLowerCase();
             });
@@ -852,24 +852,26 @@ var Util;
             }
         },
 
-        setObject: function(name, value, context){
+        setObject: function (name, value, context) {
             // summary:
-            //      Set a property from a dot-separated string, such as "A.B.C"
-            var parts = name.split("."), p = parts.pop(), obj = getProp(parts, true, context);
+            //      Set a property from a dot-separated string, such as 'A.B.C'
+            var parts = name.split('.'),
+                p = parts.pop(),
+                obj = getProp(parts, true, context);
             return obj && p ? (obj[p] = value) : undefined; // Object
         },
 
-        getObject: function(name, create, context){
+        getObject: function (name, create, context) {
             // summary:
-            //      Get a property from a dot-separated string, such as "A.B.C"
-            return getProp(name ? name.split(".") : [], create, context); // Object
+            //      Get a property from a dot-separated string, such as 'A.B.C'
+            return getProp(name ? name.split('.') : [], create, context); // Object
         }
 
     };
 }(window));
 
 var ButtonsData;
-(function(){
+(function () {
     'use strict';
 
     ButtonsData = {
@@ -1095,7 +1097,7 @@ var ButtonsData;
 
 })();
 var editorDefaults;
-(function(){
+(function () {
 
     // summary: The default options hash used by the Editor
 
@@ -1148,10 +1150,8 @@ var editorDefaults;
 })();
 
 var Extension;
-(function(){
 
-    /* global Util */
-
+(function () {
     Extension = function (options) {
         Util.extend(this, options);
     };
@@ -1181,16 +1181,19 @@ var Extension;
         //      will cause the instance to instantiate through that
         //      instead of the parent's constructor.
 
-        var parent = this, child;
+        var parent = this,
+            child;
 
         // The constructor function for the new subclass is either defined by you
         // (the "constructor" property in your `extend` definition), or defaulted
         // by us to simply call the parent's constructor.
 
-        if (protoProps && protoProps.hasOwnProperty("constructor")) {
+        if (protoProps && protoProps.hasOwnProperty('constructor')) {
             child = protoProps.constructor;
         } else {
-            child = function () { return parent.apply(this, arguments); };
+            child = function () {
+                return parent.apply(this, arguments);
+            };
         }
 
         // das statics (.extend comes over, so your subclass can have subclasses too)
@@ -1198,11 +1201,15 @@ var Extension;
 
         // Set the prototype chain to inherit from `parent`, without calling
         // `parent`'s constructor function.
-        var Surrogate = function(){ this.constructor = child; };
+        var Surrogate = function () {
+            this.constructor = child;
+        };
         Surrogate.prototype = parent.prototype;
         child.prototype = new Surrogate();
 
-        if (protoProps) { Util.extend(child.prototype, protoProps); }
+        if (protoProps) {
+            Util.extend(child.prototype, protoProps);
+        }
 
         // todo: $super?
 
@@ -1210,7 +1217,7 @@ var Extension;
     };
 
     Extension.prototype = {
-        init: function(/* instance */){
+        init: function (/* instance */) {
             // called when properly decorated and used.
             // has a .base value pointing to the editor
             // owning us. has been given a .name if no
@@ -1326,7 +1333,6 @@ var Extension;
          */
         setInactive: null,
 
-
         /* onHide: [function ()]
          *
          * If implemented, this function is called each time the
@@ -1334,8 +1340,8 @@ var Extension;
          */
         onHide: null
     };
-
 })();
+
 var Selection;
 
 (function () {
@@ -1343,7 +1349,9 @@ var Selection;
 
     Selection = {
         findMatchingSelectionParent: function (testElementFunction, contentWindow) {
-            var selection = contentWindow.getSelection(), range, current;
+            var selection = contentWindow.getSelection(),
+                range,
+                current;
 
             if (selection.rangeCount === 0) {
                 return false;
@@ -1952,12 +1960,12 @@ var PasteHandler;
         block, negation is used specifically to match the end of an html
         tag, and in fact unicode characters *should* be allowed.
     */
-    function createReplacements() {
+    function createReplacements () {
         return [
 
             // replace two bogus tags that begin pastes from google docs
-            [new RegExp(/<[^>]*docs-internal-guid[^>]*>/gi), ""],
-            [new RegExp(/<\/b>(<br[^>]*>)?$/gi), ""],
+            [new RegExp(/<[^>]*docs-internal-guid[^>]*>/gi), ''],
+            [new RegExp(/<\/b>(<br[^>]*>)?$/gi), ''],
 
              // un-html spaces and newlines inserted by OS X
             [new RegExp(/<span class="Apple-converted-space">\s+<\/span>/g), ' '],
@@ -1989,7 +1997,7 @@ var PasteHandler;
     }
     /*jslint regexp: false*/
 
-     PasteHandler = Extension.extend({
+    PasteHandler = Extension.extend({
 
         /* Paste Options */
 
@@ -2022,8 +2030,8 @@ var PasteHandler;
         cleanTags: ['meta'],
 
         /* ----- internal options needed from base ----- */
-        "window": window,
-        "document": document,
+        'window': window,
+        'document': document,
         targetBlank: false,
         disableReturn: false,
 
@@ -2108,7 +2116,7 @@ var PasteHandler;
                 this.pasteHTML('<p>' + elList.join('</p><p>') + '</p>');
 
                 try {
-                    this.document.execCommand('insertText', false, "\n");
+                    this.document.execCommand('insertText', false, '\n');
                 } catch (ignore) { }
 
                 // block element cleanup
@@ -2202,29 +2210,29 @@ var PasteHandler;
             }
         },
 
-        cleanupSpans: function (container_el) {
+        cleanupSpans: function (containerEl) {
             var i,
                 el,
-                new_el,
-                spans = container_el.querySelectorAll('.replace-with'),
+                newEl,
+                spans = containerEl.querySelectorAll('.replace-with'),
                 isCEF = function (el) {
                     return (el && el.nodeName !== '#text' && el.getAttribute('contenteditable') === 'false');
                 };
 
             for (i = 0; i < spans.length; i += 1) {
                 el = spans[i];
-                new_el = this.document.createElement(el.classList.contains('bold') ? 'b' : 'i');
+                newEl = this.document.createElement(el.classList.contains('bold') ? 'b' : 'i');
 
                 if (el.classList.contains('bold') && el.classList.contains('italic')) {
                     // add an i tag as well if this has both italics and bold
-                    new_el.innerHTML = '<i>' + el.innerHTML + '</i>';
+                    newEl.innerHTML = '<i>' + el.innerHTML + '</i>';
                 } else {
-                    new_el.innerHTML = el.innerHTML;
+                    newEl.innerHTML = el.innerHTML;
                 }
-                el.parentNode.replaceChild(new_el, el);
+                el.parentNode.replaceChild(newEl, el);
             }
 
-            spans = container_el.querySelectorAll('span');
+            spans = containerEl.querySelectorAll('span');
             for (i = 0; i < spans.length; i += 1) {
                 el = spans[i];
 
@@ -2237,7 +2245,7 @@ var PasteHandler;
                 Util.unwrap(el, this.document);
             }
         }
-     });
+    });
 
 }());
 
@@ -2334,7 +2342,7 @@ var AnchorExtension;
                 );
             }
 
-            return template.join("");
+            return template.join('');
 
         },
 
@@ -2348,7 +2356,7 @@ var AnchorExtension;
             this.getInput().value = '';
         },
 
-        showForm: function (link_value) {
+        showForm: function (linkValue) {
             var input = this.getInput();
 
             this.base.saveSelection();
@@ -2356,7 +2364,7 @@ var AnchorExtension;
             this.getForm().style.display = 'block';
             this.base.setToolbarPosition();
 
-            input.value = link_value || '';
+            input.value = linkValue || '';
             input.focus();
         },
 
@@ -2388,9 +2396,9 @@ var AnchorExtension;
             }
 
             if (targetCheckbox && targetCheckbox.checked) {
-                opts.target = "_blank";
+                opts.target = '_blank';
             } else {
-                opts.target = "_self";
+                opts.target = '_self';
             }
 
             if (buttonCheckbox && buttonCheckbox.checked) {
@@ -2424,9 +2432,9 @@ var AnchorExtension;
         // form creation and event handling
 
         attachFormEvents: function (form) {
-            var close = form.querySelector(".medium-editor-toolbar-close"),
-                save = form.querySelector(".medium-editor-toolbar-save"),
-                input = form.querySelector(".medium-editor-toolbar-input");
+            var close = form.querySelector('.medium-editor-toolbar-close'),
+                save = form.querySelector('.medium-editor-toolbar-save'),
+                input = form.querySelector('.medium-editor-toolbar-input');
 
             // Handle clicks on the form itself
             this.base.on(form, 'click', this.handleFormClick.bind(this));
@@ -2631,10 +2639,9 @@ var AnchorPreview;
 
         handleAnchorMouseout: function () {
             this.anchorToPreview = null;
-            this.base.off(this.activeAnchor, 'mouseout', this.instance_handleAnchorMouseout);
-            this.instance_handleAnchorMouseout = null;
+            this.base.off(this.activeAnchor, 'mouseout', this.instanceHandleAnchorMouseout);
+            this.instanceHandleAnchorMouseout = null;
         },
-
 
         handleEditableMouseover: function (event) {
             var target = Util.getClosestTag(event.target, 'a');
@@ -2661,8 +2668,8 @@ var AnchorPreview;
 
                 this.anchorToPreview = target;
 
-                this.instance_handleAnchorMouseout = this.handleAnchorMouseout.bind(this);
-                this.base.on(this.anchorToPreview, 'mouseout', this.instance_handleAnchorMouseout);
+                this.instanceHandleAnchorMouseout = this.handleAnchorMouseout.bind(this);
+                this.base.on(this.anchorToPreview, 'mouseout', this.instanceHandleAnchorMouseout);
                 // Using setTimeout + options.delay because:
                 // - We're going to show the anchor preview according to the configured delay
                 //   if the mouse has not left the anchor tag in that time
@@ -2699,19 +2706,19 @@ var AnchorPreview;
 
         detachPreviewHandlers: function () {
             // cleanup
-            clearInterval(this.interval_timer);
-            if (this.instance_handlePreviewMouseover) {
-                this.base.off(this.anchorPreview, 'mouseover', this.instance_handlePreviewMouseover);
-                this.base.off(this.anchorPreview, 'mouseout', this.instance_handlePreviewMouseout);
+            clearInterval(this.intervalTimer);
+            if (this.instanceHandlePreviewMouseover) {
+                this.base.off(this.anchorPreview, 'mouseover', this.instanceHandlePreviewMouseover);
+                this.base.off(this.anchorPreview, 'mouseout', this.instanceHandlePreviewMouseout);
                 if (this.activeAnchor) {
-                    this.base.off(this.activeAnchor, 'mouseover', this.instance_handlePreviewMouseover);
-                    this.base.off(this.activeAnchor, 'mouseout', this.instance_handlePreviewMouseout);
+                    this.base.off(this.activeAnchor, 'mouseover', this.instanceHandlePreviewMouseover);
+                    this.base.off(this.activeAnchor, 'mouseout', this.instanceHandlePreviewMouseout);
                 }
             }
 
             this.hidePreview();
 
-            this.hovering = this.instance_handlePreviewMouseover = this.instance_handlePreviewMouseout = null;
+            this.hovering = this.instanceHandlePreviewMouseover = this.instanceHandlePreviewMouseout = null;
         },
 
         // TODO: break up method and extract out handlers
@@ -2719,15 +2726,15 @@ var AnchorPreview;
             this.lastOver = (new Date()).getTime();
             this.hovering = true;
 
-            this.instance_handlePreviewMouseover = this.handlePreviewMouseover.bind(this);
-            this.instance_handlePreviewMouseout = this.handlePreviewMouseout.bind(this);
+            this.instanceHandlePreviewMouseover = this.handlePreviewMouseover.bind(this);
+            this.instanceHandlePreviewMouseout = this.handlePreviewMouseout.bind(this);
 
-            this.interval_timer = setInterval(this.updatePreview.bind(this), 200);
+            this.intervalTimer = setInterval(this.updatePreview.bind(this), 200);
 
-            this.base.on(this.anchorPreview, 'mouseover', this.instance_handlePreviewMouseover);
-            this.base.on(this.anchorPreview, 'mouseout', this.instance_handlePreviewMouseout);
-            this.base.on(this.activeAnchor, 'mouseover', this.instance_handlePreviewMouseover);
-            this.base.on(this.activeAnchor, 'mouseout', this.instance_handlePreviewMouseout);
+            this.base.on(this.anchorPreview, 'mouseover', this.instanceHandlePreviewMouseover);
+            this.base.on(this.anchorPreview, 'mouseout', this.instanceHandlePreviewMouseout);
+            this.base.on(this.activeAnchor, 'mouseover', this.instanceHandlePreviewMouseover);
+            this.base.on(this.activeAnchor, 'mouseout', this.instanceHandlePreviewMouseout);
         }
     };
 }());
@@ -2737,7 +2744,7 @@ var FontSizeExtension;
 (function () {
     'use strict';
 
-    function FontSizeDerived() {
+    function FontSizeDerived () {
         this.parent = true;
         this.options = {
             name: 'fontsize',
@@ -2940,11 +2947,10 @@ var Toolbar;
             toolbar.className = 'medium-editor-toolbar';
 
             if (this.options.staticToolbar) {
-                toolbar.className += " static-toolbar";
+                toolbar.className += ' static-toolbar';
             } else {
-                toolbar.className += " stalker-toolbar";
+                toolbar.className += ' stalker-toolbar';
             }
-
 
             toolbar.appendChild(this.createToolbarButtons());
 
@@ -3247,7 +3253,7 @@ var Toolbar;
                     return;
                 }
 
-                // If we don't have a "valid" selection -> hide toolbar
+                // If we don't have a 'valid' selection -> hide toolbar
                 if (this.options.contentWindow.getSelection().toString().trim() === '' ||
                     (this.options.allowMultiParagraphSelection === false && this.multipleBlockElementsSelected())) {
                     this.hideToolbar();
@@ -3397,15 +3403,15 @@ var Toolbar;
                 // Stick the toolbar to the top of the window
                 } else if (scrollTop > (containerTop - toolbarHeight)) {
                     toolbarElement.classList.add('sticky-toolbar');
-                    toolbarElement.style.top = "0px";
+                    toolbarElement.style.top = '0px';
 
                 // Normal static toolbar position
                 } else {
                     toolbarElement.classList.remove('sticky-toolbar');
-                    toolbarElement.style.top = containerTop - toolbarHeight + "px";
+                    toolbarElement.style.top = containerTop - toolbarHeight + 'px';
                 }
             } else {
-                toolbarElement.style.top = containerTop - toolbarHeight + "px";
+                toolbarElement.style.top = containerTop - toolbarHeight + 'px';
             }
 
             if (this.options.toolbarAlign === 'left') {
@@ -3534,15 +3540,14 @@ var Placeholders;
 }());
 
 var extensionDefaults;
-(function(){
-
+(function () {
     // for now this is empty because nothing interally uses an Extension default.
     // as they are converted, provide them here.
     extensionDefaults = {
-    	paste: PasteHandler
+        paste: PasteHandler
     };
-
 })();
+
 function MediumEditor(elements, options) {
     'use strict';
     return this.init(elements, options);
@@ -3703,7 +3708,7 @@ function MediumEditor(elements, options) {
         if (event.dataTransfer.files) {
             files = Array.prototype.slice.call(event.dataTransfer.files, 0);
             files.some(function (file) {
-                if (file.type.match("image")) {
+                if (file.type.match('image')) {
                     var fileReader, id;
                     fileReader = new FileReader();
                     fileReader.readAsDataURL(file);
@@ -3810,9 +3815,9 @@ function MediumEditor(elements, options) {
     }
 
     function createContentEditable(index) {
-        var div = this.options.ownerDocument.createElement('div');
-        var id = (+new Date());
-        var textarea = this.elements[index];
+        var div = this.options.ownerDocument.createElement('div'),
+            id = (+new Date()),
+            textarea = this.elements[index];
 
         div.className = textarea.className;
         div.id = id;
@@ -3904,8 +3909,8 @@ function MediumEditor(elements, options) {
             cleanPastedHTML: this.options.cleanPastedHTML, // deprecated
             disableReturn: this.options.disableReturn,
             targetBlank: this.options.targetBlank,
-            "window": this.options.contentWindow,
-            "document": this.options.ownerDocument
+            'window': this.options.contentWindow,
+            'document': this.options.ownerDocument
         };
 
         return new MediumEditor.extensions.paste(
@@ -3965,8 +3970,8 @@ function MediumEditor(elements, options) {
             });
         }
 
-        var nestedMerges = ['paste'];
-        var tempOpts = Util.extend({}, options);
+        var nestedMerges = ['paste'],
+            tempOpts = Util.extend({}, options);
 
         nestedMerges.forEach(function (toMerge) {
             if (!tempOpts[toMerge]) {
@@ -4398,9 +4403,9 @@ function MediumEditor(elements, options) {
                 }
             }
 
-            if (this.options.targetBlank || opts.target === "_blank" || opts.buttonClass) {
-                customEvent = this.options.ownerDocument.createEvent("HTMLEvents");
-                customEvent.initEvent("input", true, true, this.options.contentWindow);
+            if (this.options.targetBlank || opts.target === '_blank' || opts.buttonClass) {
+                customEvent = this.options.ownerDocument.createEvent('HTMLEvents');
+                customEvent.initEvent('input', true, true, this.options.contentWindow);
                 for (i = 0; i < this.elements.length; i += 1) {
                     this.elements[i].dispatchEvent(customEvent);
                 }
@@ -4427,19 +4432,19 @@ function MediumEditor(elements, options) {
     };
 }());
 
-MediumEditor.version = (function(major, minor, revision) {
-        return {
-            major: parseInt(major, 10),
-            minor: parseInt(minor, 10),
-            revision: parseInt(revision, 10),
-            toString: function(){
-                return [major, minor, revision].join(".");
-            }
-        };
-    }).apply(this, ({
-        // grunt-bump looks for this:
-        "version": "4.6.0"
-    }).version.split("."));
+MediumEditor.version = (function (major, minor, revision) {
+    return {
+        major: parseInt(major, 10),
+        minor: parseInt(minor, 10),
+        revision: parseInt(revision, 10),
+        toString: function () {
+            return [major, minor, revision].join('.');
+        }
+    };
+}).apply(this, ({
+    // grunt-bump looks for this:
+    'version': '4.6.0'
+}).version.split('.'));
 
     return MediumEditor;
 }()));
