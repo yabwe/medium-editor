@@ -1,5 +1,5 @@
 var FormExtension;
-(function(){
+(function () {
 
     /* global Extension */
 
