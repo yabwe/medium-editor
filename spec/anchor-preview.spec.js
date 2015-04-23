@@ -60,7 +60,7 @@ describe('Anchor Preview TestCase', function () {
             expect(editor.toolbar.hideToolbar).toHaveBeenCalled();
         });
 
-       it('should be displayed on hover of a link element with markup inside', function () {
+        it('should be displayed on hover of a link element with markup inside', function () {
             var editor = new MediumEditor('.editor', {
                 delay: 200
             }),

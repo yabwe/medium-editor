@@ -10,7 +10,7 @@ var PasteHandler;
         block, negation is used specifically to match the end of an html
         tag, and in fact unicode characters *should* be allowed.
     */
-    function createReplacements() {
+    function createReplacements () {
         return [
 
             // replace two bogus tags that begin pastes from google docs
@@ -47,7 +47,7 @@ var PasteHandler;
     }
     /*jslint regexp: false*/
 
-     PasteHandler = Extension.extend({
+    PasteHandler = Extension.extend({
 
         /* Paste Options */
 
@@ -295,6 +295,6 @@ var PasteHandler;
                 Util.unwrap(el, this.document);
             }
         }
-     });
+    });
 
 }());

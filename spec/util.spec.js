@@ -62,7 +62,7 @@ describe('Util', function () {
 
         it('should allow passing a version when the removal will happen', function () {
             spyOn(Util, 'warn').and.callThrough();
-            Util.deprecated('old','new','11tybillion');
+            Util.deprecated('old', 'new', '11tybillion');
             expect(Util.warn).toHaveBeenCalledWith(
                 'old is deprecated, please use new instead. Will be removed in 11tybillion'
             );

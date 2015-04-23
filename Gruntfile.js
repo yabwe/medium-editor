@@ -288,7 +288,7 @@ module.exports = function (grunt) {
 
     gruntConfig.bump = {
         options: {
-            files: ['bower.json', 'package.json','src/js/version.js'],
+            files: ['bower.json', 'package.json', 'src/js/version.js'],
             updateConfigs: [],
             commit: false,
             createTag: false,
