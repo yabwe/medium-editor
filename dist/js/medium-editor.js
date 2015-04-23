@@ -404,7 +404,7 @@ var Util;
     'use strict';
 
     // Params: Array, Boolean, Object
-    function getProp (parts, create, context) {
+    function getProp(parts, create, context) {
         if (!context) {
             context = window;
         }
@@ -428,7 +428,7 @@ var Util;
         }
     }
 
-    function copyInto (overwrite, dest) {
+    function copyInto(overwrite, dest) {
         var prop,
             sources = Array.prototype.slice.call(arguments, 2);
         dest = dest || {};
@@ -477,7 +477,7 @@ var Util;
 
         derives: function derives(base, derived) {
             var origPrototype = derived.prototype;
-            function Proto () { }
+            function Proto() { }
             Proto.prototype = base.prototype;
             derived.prototype = new Proto();
             derived.prototype.constructor = base;
@@ -1960,7 +1960,7 @@ var PasteHandler;
         block, negation is used specifically to match the end of an html
         tag, and in fact unicode characters *should* be allowed.
     */
-    function createReplacements () {
+    function createReplacements() {
         return [
 
             // replace two bogus tags that begin pastes from google docs
@@ -2744,7 +2744,7 @@ var FontSizeExtension;
 (function () {
     'use strict';
 
-    function FontSizeDerived () {
+    function FontSizeDerived() {
         this.parent = true;
         this.options = {
             name: 'fontsize',
