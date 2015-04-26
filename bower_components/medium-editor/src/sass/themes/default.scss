@@ -1,0 +1,84 @@
+$medium_editor_bgcolor:             #242424 !default;
+$medium_editor_button_size:         50px !default;
+$medium_editor_border_radius:       5px !default;
+
+.medium-toolbar-arrow-under:after {
+    top: $medium_editor_button_size;
+    border-color: $medium_editor_bgcolor transparent transparent transparent;
+}
+
+.medium-toolbar-arrow-over:before {
+    top: -8px;
+    border-color: transparent transparent $medium_editor_bgcolor transparent;
+}
+
+.medium-editor-toolbar {
+    border: 1px solid #000;
+    background-color: $medium_editor_bgcolor;
+    background: linear-gradient(to bottom, $medium_editor_bgcolor, rgba($medium_editor_bgcolor, 0.75));
+    border-radius: $medium_editor_border_radius;
+    box-shadow: 0 0 3px #000;
+
+    li {
+        button {
+            min-width: $medium_editor_button_size;
+            height: $medium_editor_button_size;
+            border: 0;
+            border-right: 1px solid #000;
+            border-left: 1px solid #333;
+            border-left: 1px solid rgba(#fff, .1);
+            background-color: $medium_editor_bgcolor;
+            color: #fff;
+            background: linear-gradient(to bottom, $medium_editor_bgcolor, rgba($medium_editor_bgcolor, 0.89));
+            box-shadow: 0 2px 2px rgba(0,0,0,0.3);
+            transition: background-color .2s ease-in;
+            &:hover {
+                background-color: #000;
+                color: yellow;
+            }
+        }
+
+        .medium-editor-button-first {
+            border-top-left-radius: $medium_editor_border_radius;
+            border-bottom-left-radius: $medium_editor_border_radius;
+        }
+
+        .medium-editor-button-last {
+            border-top-right-radius: $medium_editor_border_radius;
+            border-bottom-right-radius: $medium_editor_border_radius;
+        }
+
+        .medium-editor-button-active {
+            background-color: #000;
+            color: #fff;
+            background: linear-gradient(to bottom, $medium_editor_bgcolor, rgba(#000, 0.89));
+        }
+    }
+}
+
+.medium-editor-toolbar-form {
+    background: $medium_editor_bgcolor;
+    color: #999;
+    border-radius: $medium_editor_border_radius;
+
+    .medium-editor-toolbar-input {
+        height: $medium_editor_button_size;
+        background: $medium_editor_bgcolor;
+        color: #ccc;
+        box-sizing: border-box;
+    }
+
+    a {
+        color: #fff;
+    }
+}
+
+.medium-editor-toolbar-anchor-preview {
+    background: $medium_editor_bgcolor;
+    color: #fff;
+    border-radius: $medium_editor_border_radius;
+}
+
+.medium-editor-placeholder:after {
+    color: #b3b3b1;
+}

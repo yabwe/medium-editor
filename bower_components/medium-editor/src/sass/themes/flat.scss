@@ -1,0 +1,88 @@
+$medium_editor_bgcolor:                     #57ad68 !default;
+$medium_editor_border_color:                #fff !default;
+$medium_editor_button_size:                 60px !default;
+$medium_editor_button_active_text_color:    #fff !default;
+$medium_editor_link_color:                  #fff !default;
+$medium_editor_placeholder_color:           #fff !default;
+
+.medium-toolbar-arrow-under:after {
+    top: $medium_editor_button_size;
+    border-color: $medium_editor_bgcolor transparent transparent transparent;
+}
+
+.medium-toolbar-arrow-over:before {
+    top: -8px;
+    border-color: transparent transparent $medium_editor_bgcolor transparent;
+}
+
+.medium-editor-toolbar {
+    background-color: $medium_editor_bgcolor;
+
+    li {
+        padding: 0;
+
+        button {
+            min-width: $medium_editor_button_size;
+            height: $medium_editor_button_size;
+            border: none;
+            border-right: 1px solid lighten($medium_editor_bgcolor, 20);
+            background-color: transparent;
+            color: $medium_editor_link_color;
+            transition: background-color .2s ease-in, color .2s ease-in;
+            &:hover {
+                background-color: darken($medium_editor_bgcolor, 20);
+                color: $medium_editor_button_active_text_color;
+            }
+        }
+
+        .medium-editor-button-active {
+            background-color: darken($medium_editor_bgcolor, 30);
+            color: $medium_editor_button_active_text_color;
+        }
+
+        .medium-editor-button-last {
+            border-right: none;
+        }
+    }
+}
+
+.medium-editor-toolbar-form {
+    .medium-editor-toolbar-input {
+        height: $medium_editor_button_size;
+        background: $medium_editor_bgcolor;
+        color: $medium_editor_link_color;
+
+        &::-webkit-input-placeholder {
+           color: $medium_editor_placeholder_color;
+           color: rgba($medium_editor_placeholder_color, .8);
+        }
+
+        &:-moz-placeholder { /* Firefox 18- */
+           color: $medium_editor_placeholder_color;
+           color: rgba($medium_editor_placeholder_color, .8);
+        }
+
+        &::-moz-placeholder {  /* Firefox 19+ */
+           color: $medium_editor_placeholder_color;
+           color: rgba($medium_editor_placeholder_color, .8);
+        }
+
+        &:-ms-input-placeholder {
+           color: $medium_editor_placeholder-color;
+           color: rgba($medium_editor_placeholder_color, .8);
+        }
+    }
+
+    a {
+        color: $medium_editor_link_color;
+    }
+}
+
+.medium-editor-toolbar-anchor-preview {
+    background: $medium_editor_bgcolor;
+    color: $medium_editor_link_color;
+}
+
+.medium-editor-placeholder:after {
+    color: $medium_editor_border_color;
+}

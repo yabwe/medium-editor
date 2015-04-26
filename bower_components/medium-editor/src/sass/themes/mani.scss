@@ -1,0 +1,84 @@
+// inspired by http://dribbble.com/shots/857472-Toolbar
+$medium_editor_bgcolor:                     #dee7f0 !default;
+$medium_editor_bgcolor_alt:                 #5c90c7 !default;
+$medium_editor_border_color:                #cdd6e0 !default;
+$medium_editor_button_size:                 50px !default;
+$medium_editor_button_hover_text_color:     #fff !default;
+$medium_editor_button_active_text_color:    #000 !default;
+$medium_editor_link_color:                  #40648a !default;
+$medium_editor_border_radius:               2px !default;
+
+.medium-toolbar-arrow-under:after,
+.medium-toolbar-arrow-over:before {
+    display: none;
+}
+
+.medium-editor-toolbar {
+    border: 1px solid $medium_editor_border_color;
+    background-color: $medium_editor_bgcolor;
+    background-color: rgba($medium_editor_bgcolor, .95);
+    background: linear-gradient(to top, $medium_editor_bgcolor, rgba(#fff, 1));
+    border-radius: $medium_editor_border_radius;
+    box-shadow: 0 2px 6px rgba(#000, .45);
+
+    li {
+        button {
+            min-width: $medium_editor_button_size;
+            height: $medium_editor_button_size;
+            border: none;
+            border-right: 1px solid $medium_editor_border_color;
+            background-color: transparent;
+            color: $medium_editor_link_color;
+            transition: background-color .2s ease-in, color .2s ease-in;
+            &:hover {
+                background-color: $medium_editor_bgcolor_alt;
+                background-color: rgba($medium_editor_bgcolor_alt, .45);
+                color: $medium_editor_button_hover_text_color;
+            }
+        }
+
+        .medium-editor-button-first {
+            border-top-left-radius: $medium_editor_border_radius;
+            border-bottom-left-radius: $medium_editor_border_radius;
+        }
+
+        .medium-editor-button-last {
+            border-top-right-radius: $medium_editor_border_radius;
+            border-bottom-right-radius: $medium_editor_border_radius;
+        }
+
+        .medium-editor-button-active {
+            background-color: $medium_editor_bgcolor_alt;
+            background-color: rgba($medium_editor_bgcolor_alt, .45);
+            color: $medium_editor_button_active_text_color;
+            background: linear-gradient(to bottom, $medium_editor_bgcolor, rgba(#000, .1));
+        }
+    }
+}
+
+.medium-editor-toolbar-form {
+    background: $medium_editor_bgcolor;
+    color: #999;
+    border-radius: $medium_editor_border_radius;
+
+    .medium-editor-toolbar-input {
+        height: $medium_editor_button_size;
+        background: $medium_editor_bgcolor;
+        color: $medium_editor_link_color;
+        box-sizing: border-box;
+    }
+
+    a {
+        color: $medium_editor_link_color;
+    }
+}
+
+.medium-editor-toolbar-anchor-preview {
+    background: $medium_editor_bgcolor;
+    color: $medium_editor_link_color;
+    border-radius: $medium_editor_border_radius;
+}
+
+.medium-editor-placeholder:after {
+    color: $medium_editor_border_color;
+}
