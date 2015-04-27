@@ -787,6 +787,10 @@ function MediumEditor(elements, options) {
                 }
             }
 
+            if (selectionState !== null && selectionState.editableElementIndex === 0) {
+                delete selectionState.editableElementIndex;
+            }
+
             return selectionState;
         },
 
@@ -797,12 +801,19 @@ function MediumEditor(elements, options) {
         // http://stackoverflow.com/questions/17678843/cant-restore-selection-after-html-modify-even-if-its-the-same-html
         // Tim Down
         // TODO: move to selection.js and clean up old methods there
-        importSelection: function (selectionState) {
-            if (!selectionState) {
+        importSelection: function (inSelectionState) {
+            if (!inSelectionState) {
                 return;
             }
 
-            var editableElement = this.elements[selectionState.editableElementIndex],
+            var editableElementIndex = inSelectionState.editableElementIndex === undefined ?
+                                                0 : inSelectionState.editableElementIndex,
+                selectionState = {
+                    editableElementIndex: editableElementIndex,
+                    start: inSelectionState.start,
+                    end: inSelectionState.end
+                },
+                editableElement = this.elements[selectionState.editableElementIndex],
                 charIndex = 0,
                 range = this.options.ownerDocument.createRange(),
                 nodeStack = [editableElement],

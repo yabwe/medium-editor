@@ -35,13 +35,32 @@ describe('Selection TestCase', function () {
 
             selectElementContents(editor.elements[0].querySelector('i'));
             var exportedSelection = editor.exportSelection();
-            expect(Object.keys(exportedSelection).sort()).toEqual(['editableElementIndex', 'end', 'start']);
+            expect(Object.keys(exportedSelection).sort()).toEqual(['end', 'start']);
 
             selectElementContents(editor.elements[0]);
             expect(exportedSelection).not.toEqual(editor.exportSelection());
 
             editor.importSelection(exportedSelection);
             expect(exportedSelection).toEqual(editor.exportSelection());
+        });
+
+        it('should have an index in the exported selection when it is in the second contenteditable', function () {
+            var el2 = document.createElement('div');
+            el2.className = 'editor';
+            el2.innerHTML = 'lorem <i>ipsum</i> dolor';
+            try {
+                document.body.appendChild(el2);
+                var editor = new MediumEditor('.editor', {
+                    buttons: ['italic', 'underline', 'strikethrough']
+                });
+
+                selectElementContents(editor.elements[1].querySelector('i'));
+                var exportedSelection = editor.exportSelection();
+                expect(Object.keys(exportedSelection).sort()).toEqual(['editableElementIndex', 'end', 'start']);
+                expect(exportedSelection.editableElementIndex).toEqual(1);
+            } finally {
+                document.body.removeChild(el2);
+            }
         });
     });
 
