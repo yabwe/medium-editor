@@ -26,6 +26,25 @@ describe('Selection TestCase', function () {
         });
     });
 
+    describe('Export/Import Selection', function () {
+        it('should be able to import an exported selection', function () {
+            this.el.innerHTML = 'lorem <i>ipsum</i> dolor';
+            var editor = new MediumEditor('.editor', {
+                buttons: ['italic', 'underline', 'strikethrough']
+            });
+
+            selectElementContents(editor.elements[0].querySelector('i'));
+            var exportedSelection = editor.exportSelection();
+            expect(Object.keys(exportedSelection).sort()).toEqual(['editableElementIndex', 'end', 'start']);
+
+            selectElementContents(editor.elements[0]);
+            expect(exportedSelection).not.toEqual(editor.exportSelection());
+
+            editor.importSelection(exportedSelection);
+            expect(exportedSelection).toEqual(editor.exportSelection());
+        });
+    });
+
     describe('Saving Selection', function () {
         it('should be applicable if html changes but text does not', function () {
             this.el.innerHTML = 'lorem <i>ipsum</i> dolor';
