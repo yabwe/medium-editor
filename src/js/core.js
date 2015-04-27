@@ -753,10 +753,9 @@ function MediumEditor(elements, options) {
         // http://stackoverflow.com/questions/17678843/cant-restore-selection-after-html-modify-even-if-its-the-same-html
         // Tim Down
         // TODO: move to selection.js and clean up old methods there
-        saveSelection: function () {
-            this.selectionState = null;
-
-            var selection = this.options.contentWindow.getSelection(),
+        exportSelection: function () {
+            var selectionState = null,
+                selection = this.options.contentWindow.getSelection(),
                 range,
                 preSelectionRange,
                 start,
@@ -780,24 +779,41 @@ function MediumEditor(elements, options) {
                     preSelectionRange.setEnd(range.startContainer, range.startOffset);
                     start = preSelectionRange.toString().length;
 
-                    this.selectionState = {
+                    selectionState = {
                         start: start,
                         end: start + range.toString().length,
                         editableElementIndex: editableElementIndex
                     };
                 }
             }
+
+            if (selectionState !== null && selectionState.editableElementIndex === 0) {
+                delete selectionState.editableElementIndex;
+            }
+
+            return selectionState;
+        },
+
+        saveSelection: function () {
+            this.selectionState = this.exportSelection();
         },
 
         // http://stackoverflow.com/questions/17678843/cant-restore-selection-after-html-modify-even-if-its-the-same-html
         // Tim Down
         // TODO: move to selection.js and clean up old methods there
-        restoreSelection: function () {
-            if (!this.selectionState) {
+        importSelection: function (inSelectionState) {
+            if (!inSelectionState) {
                 return;
             }
 
-            var editableElement = this.elements[this.selectionState.editableElementIndex],
+            var editableElementIndex = inSelectionState.editableElementIndex === undefined ?
+                                                0 : inSelectionState.editableElementIndex,
+                selectionState = {
+                    editableElementIndex: editableElementIndex,
+                    start: inSelectionState.start,
+                    end: inSelectionState.end
+                },
+                editableElement = this.elements[selectionState.editableElementIndex],
                 charIndex = 0,
                 range = this.options.ownerDocument.createRange(),
                 nodeStack = [editableElement],
@@ -815,12 +831,12 @@ function MediumEditor(elements, options) {
             while (!stop && node) {
                 if (node.nodeType === 3) {
                     nextCharIndex = charIndex + node.length;
-                    if (!foundStart && this.selectionState.start >= charIndex && this.selectionState.start <= nextCharIndex) {
-                        range.setStart(node, this.selectionState.start - charIndex);
+                    if (!foundStart && selectionState.start >= charIndex && selectionState.start <= nextCharIndex) {
+                        range.setStart(node, selectionState.start - charIndex);
                         foundStart = true;
                     }
-                    if (foundStart && this.selectionState.end >= charIndex && this.selectionState.end <= nextCharIndex) {
-                        range.setEnd(node, this.selectionState.end - charIndex);
+                    if (foundStart && selectionState.end >= charIndex && selectionState.end <= nextCharIndex) {
+                        range.setEnd(node, selectionState.end - charIndex);
                         stop = true;
                     }
                     charIndex = nextCharIndex;
@@ -839,6 +855,10 @@ function MediumEditor(elements, options) {
             sel = this.options.contentWindow.getSelection();
             sel.removeAllRanges();
             sel.addRange(range);
+        },
+
+        restoreSelection: function () {
+            this.importSelection(this.selectionState);
         },
 
         createLink: function (opts) {
