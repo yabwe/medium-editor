@@ -203,6 +203,8 @@ Check out the Wiki page for a list of available themes: [https://github.com/davi
 * __.getSelectionParentElement(range)__: get the parent contenteditable element that contains the current selection
 * __.getExtensionByName(name)__: get a reference to an extension with the specified name
 * __.selectElement(element)__: change selection to be a specific element and update the toolbar to reflect the selection
+* __.exportSelection()__: return a data representation of the selected text, which can be applied via `importSelection()`
+* __.importSelection(selectionState)__: restore the selection using a data representation of previously selected text (ie value returned by `exportSelection()`)
 
 ## Capturing DOM changes
 
