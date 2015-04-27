@@ -750,6 +750,9 @@ function MediumEditor(elements, options) {
             }
         },
 
+        // http://stackoverflow.com/questions/17678843/cant-restore-selection-after-html-modify-even-if-its-the-same-html
+        // Tim Down
+        // TODO: move to selection.js and clean up old methods there
         exportSelection: function () {
             var selectionState = null,
                 selection = this.options.contentWindow.getSelection(),
@@ -787,13 +790,13 @@ function MediumEditor(elements, options) {
             return selectionState;
         },
 
-        // http://stackoverflow.com/questions/17678843/cant-restore-selection-after-html-modify-even-if-its-the-same-html
-        // Tim Down
-        // TODO: move to selection.js and clean up old methods there
         saveSelection: function () {
             this.selectionState = this.exportSelection();
         },
 
+        // http://stackoverflow.com/questions/17678843/cant-restore-selection-after-html-modify-even-if-its-the-same-html
+        // Tim Down
+        // TODO: move to selection.js and clean up old methods there
         importSelection: function (selectionState) {
             if (!selectionState) {
                 return;
@@ -843,9 +846,6 @@ function MediumEditor(elements, options) {
             sel.addRange(range);
         },
 
-        // http://stackoverflow.com/questions/17678843/cant-restore-selection-after-html-modify-even-if-its-the-same-html
-        // Tim Down
-        // TODO: move to selection.js and clean up old methods there
         restoreSelection: function () {
             this.importSelection(this.selectionState);
         },
