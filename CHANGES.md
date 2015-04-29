@@ -1,7 +1,7 @@
 4.7.0 / 2015-04-27
 ==================
 * Expose importSelection + exportSelection helper methods
-* Fix issue with initilization of MediumEditor using textarea
+* Fix issue with initialization of MediumEditor using textarea
 * Introduce jscs
 
 4.6.0 / 2015-04-22
