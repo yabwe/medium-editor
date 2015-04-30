@@ -1,3 +1,9 @@
+4.7.1 / 2015-04-30
+==================
+* Make anchor preview wrap for long links
+* Fix issue when clean pasting spans with child nodes
+
+
 4.7.0 / 2015-04-27
 ==================
 * Expose importSelection + exportSelection helper methods
