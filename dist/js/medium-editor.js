@@ -842,6 +842,8 @@ var Util;
             var fragment = doc.createDocumentFragment(),
                 nodes = Array.prototype.slice.call(el.childNodes);
 
+            // cast nodeList to array since appending child
+            // to a different node will alter length of el.childNodes
             for (var i = 0; i < nodes.length; i++) {
                 fragment.appendChild(nodes[i]);
             }
