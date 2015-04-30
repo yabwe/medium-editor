@@ -441,10 +441,13 @@ var Util;
         },
 
         unwrap: function (el, doc) {
-            var fragment = doc.createDocumentFragment();
+            var fragment = doc.createDocumentFragment(),
+                nodes = Array.prototype.slice.call(el.childNodes);
 
-            for (var i = 0; i < el.childNodes.length; i++) {
-                fragment.appendChild(el.childNodes[i]);
+            // cast nodeList to array since appending child
+            // to a different node will alter length of el.childNodes
+            for (var i = 0; i < nodes.length; i++) {
+                fragment.appendChild(nodes[i]);
             }
 
             if (fragment.childNodes.length) {
