@@ -35,6 +35,22 @@ describe('Anchor Button TestCase', function () {
             expect(editor.toolbar.isDisplayed()).toBe(true);
             expect(anchorExtension.isDisplayed()).toBe(true);
         });
+
+        it('should show the form on shortcut', function () {
+            var editor = new MediumEditor('.editor'),
+                anchorExtension = editor.getExtensionByName('anchor'),
+                code = 'k'.charCodeAt(0);
+
+            selectElementContentsAndFire(editor.elements[0]);
+            jasmine.clock().tick(1);
+            fireEvent(editor.elements[0], 'keydown', {
+                keyCode: code,
+                ctrlKey: true
+            });
+
+            expect(editor.toolbar.isDisplayed()).toBe(true);
+            expect(anchorExtension.isDisplayed()).toBe(true);
+        });
     });
 
     describe('Link Creation', function () {
