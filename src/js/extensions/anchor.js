@@ -13,7 +13,8 @@ var AnchorExtension;
             aria: 'link',
             tagNames: ['a'],
             contentDefault: '<b>#</b>',
-            contentFA: '<i class="fa fa-link"></i>'
+            contentFA: '<i class="fa fa-link"></i>',
+            key: 'k'
         };
         this.name = 'anchor';
         this.hasForm = true;
@@ -44,6 +45,22 @@ var AnchorExtension;
             }
 
             return false;
+        },
+
+        // Called when user hits the defined shortcut (CTRL / COMMAND + K)
+        // Overrides DefaultButton.handleKeydown
+        handleKeydown: function (evt) {
+            var key;
+
+            if (evt.ctrlKey || evt.metaKey) {
+                key = String.fromCharCode(evt.which || evt.keyCode).toLowerCase();
+                if (this.options.key === key) {
+                    evt.preventDefault();
+                    evt.stopPropagation();
+
+                    this.handleClick(evt);
+                }
+            }
         },
 
         // Called by medium-editor to append form to the toolbar
