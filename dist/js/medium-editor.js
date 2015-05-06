@@ -3591,7 +3591,7 @@ function MediumEditor(elements, options) {
     function handleDisabledEnterKeydown(event, element) {
         if (this.options.disableReturn || element.getAttribute('data-disable-return')) {
             event.preventDefault();
-        } else if (this.options.disableDoubleReturn || this.getAttribute('data-disable-double-return')) {
+        } else if (this.options.disableDoubleReturn || element.getAttribute('data-disable-double-return')) {
             var node = Util.getSelectionStart(this.options.ownerDocument);
             if (node && node.textContent.trim() === '') {
                 event.preventDefault();
