@@ -71,7 +71,8 @@ describe('Buttons TestCase', function () {
             jasmine.clock().tick(1);
             fireEvent(editor.elements[0], 'keydown', {
                 keyCode: code,
-                ctrlKey: true
+                ctrlKey: true,
+                metaKey: true
             });
             expect(editor.execAction).toHaveBeenCalled();
         });

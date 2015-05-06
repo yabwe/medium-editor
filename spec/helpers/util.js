@@ -67,6 +67,10 @@ function fireEvent(element, event, options) {
             evt.ctrlKey = true;
         }
 
+        if (options.metaKey) {
+            evt.metaKey = true;
+        }
+
         if (options.target) {
             evt.target = options.target;
         }

@@ -1,3 +1,5 @@
+/*global Util */
+
 var DefaultButton;
 
 (function () {
@@ -53,18 +55,16 @@ var DefaultButton;
             return button;
         },
         handleKeydown: function (evt) {
-            var key, action;
+            var key = String.fromCharCode(evt.which || evt.keyCode).toLowerCase(),
+                action;
 
-            if (evt.ctrlKey || evt.metaKey) {
-                key = String.fromCharCode(evt.which || evt.keyCode).toLowerCase();
-                if (this.options.key === key) {
-                    evt.preventDefault();
-                    evt.stopPropagation();
+            if (this.options.key === key && Util.isMetaCtrlKey(evt)) {
+                evt.preventDefault();
+                evt.stopPropagation();
 
-                    action = this.getAction();
-                    if (action) {
-                        this.base.execAction(action);
-                    }
+                action = this.getAction();
+                if (action) {
+                    this.base.execAction(action);
                 }
             }
         },

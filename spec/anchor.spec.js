@@ -45,7 +45,8 @@ describe('Anchor Button TestCase', function () {
             jasmine.clock().tick(1);
             fireEvent(editor.elements[0], 'keydown', {
                 keyCode: code,
-                ctrlKey: true
+                ctrlKey: true,
+                metaKey: true
             });
 
             expect(editor.toolbar.isDisplayed()).toBe(true);
