@@ -50,16 +50,13 @@ var AnchorExtension;
         // Called when user hits the defined shortcut (CTRL / COMMAND + K)
         // Overrides DefaultButton.handleKeydown
         handleKeydown: function (evt) {
-            var key;
+            var key = String.fromCharCode(evt.which || evt.keyCode).toLowerCase();
 
-            if (evt.ctrlKey || evt.metaKey) {
-                key = String.fromCharCode(evt.which || evt.keyCode).toLowerCase();
-                if (this.options.key === key) {
-                    evt.preventDefault();
-                    evt.stopPropagation();
+            if (this.options.key === key && Util.isMetaCtrlKey(evt)) {
+                evt.preventDefault();
+                evt.stopPropagation();
 
-                    this.handleClick(evt);
-                }
+                this.handleClick(evt);
             }
         },
 

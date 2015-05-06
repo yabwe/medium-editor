@@ -453,6 +453,9 @@ var Util;
         // by rg89
         isIE: ((navigator.appName === 'Microsoft Internet Explorer') || ((navigator.appName === 'Netscape') && (new RegExp('Trident/.*rv:([0-9]{1,}[.0-9]{0,})').exec(navigator.userAgent) !== null))),
 
+        // http://stackoverflow.com/a/11752084/569101
+        isMac: (window.navigator.platform.toUpperCase().indexOf('MAC') >= 0),
+
         // https://github.com/jashkenas/underscore
         keyCode: {
             BACKSPACE: 8,
@@ -461,6 +464,18 @@ var Util;
             ESCAPE: 27,
             SPACE: 32,
             DELETE: 46
+        },
+
+        /**
+         * Returns true if it's metaKey on Mac, or ctrlKey on non-Mac.
+         * See #591
+         */
+        isMetaCtrlKey: function (event) {
+            if ((this.isMac && event.metaKey) || (!this.isMac && event.ctrlKey)) {
+                return true;
+            }
+
+            return false;
         },
 
         parentElements: ['p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'blockquote', 'pre'],
@@ -1874,18 +1889,16 @@ var DefaultButton;
             return button;
         },
         handleKeydown: function (evt) {
-            var key, action;
+            var key = String.fromCharCode(evt.which || evt.keyCode).toLowerCase(),
+                action;
 
-            if (evt.ctrlKey || evt.metaKey) {
-                key = String.fromCharCode(evt.which || evt.keyCode).toLowerCase();
-                if (this.options.key === key) {
-                    evt.preventDefault();
-                    evt.stopPropagation();
+            if (this.options.key === key && Util.isMetaCtrlKey(evt)) {
+                evt.preventDefault();
+                evt.stopPropagation();
 
-                    action = this.getAction();
-                    if (action) {
-                        this.base.execAction(action);
-                    }
+                action = this.getAction();
+                if (action) {
+                    this.base.execAction(action);
                 }
             }
         },
@@ -2302,16 +2315,13 @@ var AnchorExtension;
         // Called when user hits the defined shortcut (CTRL / COMMAND + K)
         // Overrides DefaultButton.handleKeydown
         handleKeydown: function (evt) {
-            var key;
+            var key = String.fromCharCode(evt.which || evt.keyCode).toLowerCase();
 
-            if (evt.ctrlKey || evt.metaKey) {
-                key = String.fromCharCode(evt.which || evt.keyCode).toLowerCase();
-                if (this.options.key === key) {
-                    evt.preventDefault();
-                    evt.stopPropagation();
+            if (this.options.key === key && Util.isMetaCtrlKey(evt)) {
+                evt.preventDefault();
+                evt.stopPropagation();
 
-                    this.handleClick(evt);
-                }
+                this.handleClick(evt);
             }
         },
 
