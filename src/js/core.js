@@ -312,7 +312,7 @@ function MediumEditor(elements, options) {
     }
 
     function initElements() {
-        this.elements.forEach(function (element) {
+        this.elements.forEach(function (element, index) {
             if (!this.options.disableEditing && !element.getAttribute('data-disable-editing')) {
                 element.setAttribute('contentEditable', true);
                 element.setAttribute('spellcheck', this.options.spellcheck);
@@ -323,6 +323,7 @@ function MediumEditor(elements, options) {
             element.setAttribute('data-medium-element', true);
             element.setAttribute('role', 'textbox');
             element.setAttribute('aria-multiline', true);
+            element.setAttribute('medium-editor-index', index);
 
             if (element.hasAttribute('medium-editor-textarea-id')) {
                 this.on(element, 'input', function (event) {

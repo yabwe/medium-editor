@@ -120,9 +120,18 @@ var Events;
                 break;
             case 'editableInput':
                 // Detecting when the content of an editable has been changed
-                this.base.elements.forEach(function (element) {
-                    this.attachDOMEvent(element, 'input', this.handleInput.bind(this));
-                }.bind(this));
+                if (this.InputEventOnContenteditableSupported) {
+                    this.base.elements.forEach(function (element) {
+                        this.attachDOMEvent(element, 'input', this.handleInput.bind(this));
+                    }.bind(this));
+                } else {
+                    this.contentCache = [];
+                    this.base.elements.forEach(function (element) {
+                        this.attachDOMEvent(element, 'selectionchange', this.handleInput.bind(this));
+                        this.attachDOMEvent(element, 'keypress', this.handleInput.bind(this));
+                        this.contentCache[element.getAttribute('medium-editor-index')] = element.innerHTML;
+                    }.bind(this));
+                }
                 this.listeners[name] = true;
                 break;
             case 'editableClick':
@@ -279,6 +288,15 @@ var Events;
             }
         },
 
+        handleInput: function (event) {
+            var element = event.currentTarget,
+                index = element.getAttribute('medium-editor-index');
+            if (element.innerHTML !== this.contentCache[index]) {
+                this.triggerCustomEvent('editableInput', event, event.currentTarget);
+            }
+            this.contentCache[index] = element.innerHTML;
+        },
+
         handleBodyClick: function (event) {
             this.updateFocus(event.target, event);
         },
@@ -289,10 +307,6 @@ var Events;
 
         handleBodyMousedown: function (event) {
             this.lastMousedownTarget = event.target;
-        },
-
-        handleInput: function (event) {
-            this.triggerCustomEvent('editableInput', event, event.currentTarget);
         },
 
         handleClick: function (event) {
@@ -359,6 +373,9 @@ var Events;
     tempElement.setAttribute('contenteditable', true);
     tempElement.innerHTML = 't';
     tempElement.addEventListener('input', tempFunction);
+    tempElement.style.position = 'absolute';
+    tempElement.style.left = '-100px';
+    tempElement.style.top = '-100px';
     document.body.appendChild(tempElement);
 
     // Store any existing ranges that may exist

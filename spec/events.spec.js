@@ -137,7 +137,41 @@ describe('Events TestCase', function () {
 
             editor.subscribe('editableInput', handler);
 
+            editableTwo.textContent = 'lore ipsum!';
             fireEvent(editableTwo, 'input');
+            fireEvent(editableTwo, 'keypress');
+            expect(firedTarget).toBe(editableTwo);
+
+            tearDown(editableTwo);
+        });
+
+        it('to editableInput should only trigger when the content has actually changed', function () {
+            var editableTwo = document.createElement('div'),
+                editor,
+                handler,
+                firedTarget;
+            editableTwo.className = 'editor';
+            editableTwo.textContent = 'lore ipsum';
+            document.body.appendChild(editableTwo);
+
+            editor = new MediumEditor('.editor');
+            expect(editor.elements.length).toBe(2);
+
+            handler = function (event, editable) {
+                firedTarget = editable;
+            };
+
+            editor.subscribe('editableInput', handler);
+
+            // If content hasn't changed, custom event won't fire
+            fireEvent(editableTwo, 'input');
+            fireEvent(editableTwo, 'keypress');
+            expect(firedTarget).toBeUndefined();
+
+            // Change the content, custom event should fire
+            editableTwo.textContent = 'lore ipsum!';
+            fireEvent(editableTwo, 'input');
+            fireEvent(editableTwo, 'keypress');
             expect(firedTarget).toBe(editableTwo);
 
             tearDown(editableTwo);
