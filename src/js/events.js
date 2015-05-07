@@ -15,6 +15,8 @@ var Events;
 
     Events.prototype = {
 
+        InputEventOnContenteditableSupported: false,
+
         // Helpers for event handling
 
         attachDOMEvent: function (target, event, listener, useCapture) {
@@ -342,5 +344,50 @@ var Events;
             }
         }
     };
+
+    // Do feature detection to determine with the 'input' event is supported on contenteditable elements
+    // Currently, IE does not support this event on contenteditable elements
+
+    var tempFunction = function () {
+            Events.InputEventOnContenteditableSupported = true;
+        },
+        tempElement,
+        existingRanges = [];
+
+    // Create a temporary contenteditable element with an 'oninput' event listener
+    tempElement = document.createElement('div');
+    tempElement.setAttribute('contenteditable', true);
+    tempElement.innerHTML = 't';
+    tempElement.addEventListener('input', tempFunction);
+    document.body.appendChild(tempElement);
+
+    // Store any existing ranges that may exist
+    var selection = document.getSelection();
+    for (var i = 0; i < selection.rangeCount; i++) {
+        existingRanges.push(selection.getRangeAt(i));
+    }
+
+    // Create a new range containing the content of the temporary contenteditable element
+    // and replace the selection to only contain this range
+    var range = document.createRange();
+    range.selectNodeContents(tempElement);
+    selection.removeAllRanges();
+    selection.addRange(range);
+
+    // Call 'execCommand' on the current selection, which will cause the input event to be triggered if it's supported
+    document.execCommand('bold', false, null);
+
+    // Cleanup the temporary element
+    tempElement.removeEventListener('input', tempFunction);
+    tempElement.parentNode.removeChild(tempElement);
+    tempElement.removeEventListener('input', tempFunction);
+    selection.removeAllRanges();
+
+    // Restore any existing ranges
+    if (existingRanges.length) {
+        for (i = 0; i < existingRanges.length; i++) {
+            selection.addRange(existingRanges[i]);
+        }
+    }
 
 }());
