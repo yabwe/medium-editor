@@ -323,4 +323,8 @@ module.exports = function (grunt) {
         grunt.task.run(taskName + ':spec');
     });
 
+    // release tasks
+    grunt.registerTask('patch', ['bump', 'css', 'js']);
+    grunt.registerTask('minor', ['bump:minor', 'css', 'js']);
+    grunt.registerTask('major', ['bump:major', 'css', 'js']);
 };
