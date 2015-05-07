@@ -1,3 +1,8 @@
+4.7.3 / 2015-05-07
+==================
+* Update version number in dist files
+
+
 4.7.2 / 2015-05-06
 ==================
 * Add shortcut to insert a link (ctrl/cmd + k)
