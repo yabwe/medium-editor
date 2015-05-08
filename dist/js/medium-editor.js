@@ -631,7 +631,7 @@ var Util;
 
             if (doc.queryCommandSupported('insertHTML')) {
                 try {
-                    return doc.execCommand('insertHTML', false, html);
+                    return this.execCommand(doc, 'insertHTML', false, html);
                 } catch (ignore) {}
             }
 
@@ -708,6 +708,22 @@ var Util;
             };
         },
 
+        execCommand: function (doc, command, showDefaultUI, valueArg) {
+            var args = Array.prototype.slice.call(arguments, 1),
+                result = doc.execCommand.apply(doc, args);
+
+            // For some events, we need a hook to listen to whenever execCommand is being called
+            if (typeof this.onExecCommand === 'function') {
+                this.onExecCommand({
+                    command: command,
+                    value: valueArg,
+                    args: args,
+                    result: result
+                });
+            }
+            return result;
+        },
+
         execFormatBlock: function (doc, tagName) {
             var selectionData = this.getSelectionData(this.getSelectionStart(doc));
             // FF handles blockquote differently on formatBlock
@@ -715,7 +731,7 @@ var Util;
             // https://developer.mozilla.org/en-US/docs/Rich-Text_Editing_in_Mozilla
             if (tagName === 'blockquote' && selectionData.el &&
                     selectionData.el.parentNode.tagName.toLowerCase() === 'blockquote') {
-                return doc.execCommand('outdent', false, null);
+                return this.execCommand(doc, 'outdent', false, null);
             }
             if (selectionData.tagName === tagName) {
                 tagName = 'p';
@@ -726,11 +742,11 @@ var Util;
             // http://stackoverflow.com/questions/1816223/rich-text-editor-with-blockquote-function/1821777#1821777
             if (this.isIE) {
                 if (tagName === 'blockquote') {
-                    return doc.execCommand('indent', false, tagName);
+                    return this.execCommand(doc, 'indent', false, tagName);
                 }
                 tagName = '<' + tagName + '>';
             }
-            return doc.execCommand('formatBlock', false, tagName);
+            return this.execCommand(doc, 'formatBlock', false, tagName);
         },
 
         // TODO: not sure if this should be here
@@ -1515,6 +1531,8 @@ var Events;
 
     Events.prototype = {
 
+        InputEventOnContenteditableSupported: false,
+
         // Helpers for event handling
 
         attachDOMEvent: function (target, event, listener, useCapture) {
@@ -1617,10 +1635,27 @@ var Events;
                 this.listeners[name] = true;
                 break;
             case 'editableInput':
-                // Detecting when the content of an editable has been changed
+                // setup cache for knowing when the content has changed
+                this.contentCache = [];
                 this.base.elements.forEach(function (element) {
-                    this.attachDOMEvent(element, 'input', this.handleInput.bind(this));
+                    this.contentCache[element.getAttribute('medium-editor-index')] = element.innerHTML;
+
+                    // Attach to the 'oninput' event, handled correctly by most browsers
+                    if (this.InputEventOnContenteditableSupported) {
+                        this.attachDOMEvent(element, 'input', this.handleInput.bind(this));
+                    }
                 }.bind(this));
+
+                // For browsers which don't support the input event on contenteditable (IE)
+                // we'll attach to 'selectionchange' on the document and 'keypress' on the editables
+                if (!this.InputEventOnContenteditableSupported) {
+                    this.setupListener('editableKeypress');
+                    this.keypressUpdateInput = true;
+                    this.attachDOMEvent(document, 'selectionchange', this.handleDocumentSelectionChange.bind(this));
+                    // Listen to calls to execCommand
+                    Util.onExecCommand = this.handleDocumentExecCommand.bind(this);
+                }
+
                 this.listeners[name] = true;
                 break;
             case 'editableClick':
@@ -1714,18 +1749,8 @@ var Events;
             var toolbarEl = this.base.toolbar ? this.base.toolbar.getToolbarElement() : null,
                 anchorPreview = this.base.getExtensionByName('anchor-preview'),
                 previewEl = (anchorPreview && anchorPreview.getPreviewElement) ? anchorPreview.getPreviewElement() : null,
-                hadFocus,
+                hadFocus = this.base.getFocusedElement(),
                 toFocus;
-
-            this.base.elements.some(function (element) {
-                // Find the element that has focus
-                if (!hadFocus && element.getAttribute('data-medium-focused')) {
-                    hadFocus = element;
-                }
-
-                // bail if we found the element that had focus
-                return !!hadFocus;
-            }, this);
 
             // For clicks, we need to know if the mousedown that caused the click happened inside the existing focused element.
             // If so, we don't want to focus another element
@@ -1777,6 +1802,39 @@ var Events;
             }
         },
 
+        updateInput: function (target, eventObj) {
+            var index = target.getAttribute('medium-editor-index');
+            if (target.innerHTML !== this.contentCache[index]) {
+                this.triggerCustomEvent('editableInput', eventObj, target);
+            }
+            this.contentCache[index] = target.innerHTML;
+        },
+
+        handleDocumentSelectionChange: function (event) {
+            if (event.currentTarget &&
+                event.currentTarget.activeElement) {
+                var activeElement = event.currentTarget.activeElement,
+                    currentTarget;
+                this.base.elements.some(function (element) {
+                    if (Util.isDescendant(element, activeElement, true)) {
+                        currentTarget = element;
+                        return true;
+                    }
+                    return false;
+                }, this);
+                if (currentTarget) {
+                    this.updateInput(currentTarget, { target: activeElement, currentTarget: currentTarget });
+                }
+            }
+        },
+
+        handleDocumentExecCommand: function () {
+            var target = this.base.getFocusedElement();
+            if (target) {
+                this.updateInput(target, { target: target, currentTarget: target });
+            }
+        },
+
         handleBodyClick: function (event) {
             this.updateFocus(event.target, event);
         },
@@ -1790,7 +1848,7 @@ var Events;
         },
 
         handleInput: function (event) {
-            this.triggerCustomEvent('editableInput', event, event.currentTarget);
+            this.updateInput(event.currentTarget, event);
         },
 
         handleClick: function (event) {
@@ -1803,6 +1861,13 @@ var Events;
 
         handleKeypress: function (event) {
             this.triggerCustomEvent('editableKeypress', event, event.currentTarget);
+
+            if (this.keypressUpdateInput) {
+                var eventObj = { target: event.target, currentTarget: event.currentTarget };
+                setTimeout(function () {
+                    this.updateInput(eventObj.currentTarget, eventObj);
+                }.bind(this), 0);
+            }
         },
 
         handleKeyup: function (event) {
@@ -1842,6 +1907,54 @@ var Events;
             }
         }
     };
+
+    // Do feature detection to determine with the 'input' event is supported on contenteditable elements
+    // Currently, IE does not support this event on contenteditable elements
+
+    var tempFunction = function () {
+            Events.prototype.InputEventOnContenteditableSupported = true;
+        },
+        tempElement,
+        existingRanges = [];
+
+    // Create a temporary contenteditable element with an 'oninput' event listener
+    tempElement = document.createElement('div');
+    tempElement.setAttribute('contenteditable', true);
+    tempElement.innerHTML = 't';
+    tempElement.addEventListener('input', tempFunction);
+    tempElement.style.position = 'absolute';
+    tempElement.style.left = '-100px';
+    tempElement.style.top = '-100px';
+    document.body.appendChild(tempElement);
+
+    // Store any existing ranges that may exist
+    var selection = document.getSelection();
+    for (var i = 0; i < selection.rangeCount; i++) {
+        existingRanges.push(selection.getRangeAt(i));
+    }
+
+    // Create a new range containing the content of the temporary contenteditable element
+    // and replace the selection to only contain this range
+    var range = document.createRange();
+    range.selectNodeContents(tempElement);
+    selection.removeAllRanges();
+    selection.addRange(range);
+
+    // Call 'execCommand' on the current selection, which will cause the input event to be triggered if it's supported
+    document.execCommand('bold', false, null);
+
+    // Cleanup the temporary element
+    tempElement.removeEventListener('input', tempFunction);
+    tempElement.parentNode.removeChild(tempElement);
+    tempElement.removeEventListener('input', tempFunction);
+    selection.removeAllRanges();
+
+    // Restore any existing ranges
+    if (existingRanges.length) {
+        for (i = 0; i < existingRanges.length; i++) {
+            selection.addRange(existingRanges[i]);
+        }
+    }
 
 }());
 
@@ -2143,7 +2256,7 @@ var PasteHandler;
                 this.pasteHTML('<p>' + elList.join('</p><p>') + '</p>');
 
                 try {
-                    this.document.execCommand('insertText', false, '\n');
+                    Util.execCommand(this.document, 'insertText', false, '\n');
                 } catch (ignore) { }
 
                 // block element cleanup
@@ -3626,9 +3739,9 @@ function MediumEditor(elements, options) {
 
             // If Shift is down, outdent, otherwise indent
             if (event.shiftKey) {
-                this.options.ownerDocument.execCommand('outdent', false, null);
+                Util.execCommand(this.options.ownerDocument, 'outdent', false, null);
             } else {
-                this.options.ownerDocument.execCommand('indent', false, null);
+                Util.execCommand(this.options.ownerDocument, 'indent', false, null);
             }
         }
     }
@@ -3780,18 +3893,18 @@ function MediumEditor(elements, options) {
         }
 
         if (node.getAttribute('data-medium-element') && node.children.length === 0) {
-            this.options.ownerDocument.execCommand('formatBlock', false, 'p');
+            Util.execCommand(this.options.ownerDocument, 'formatBlock', false, 'p');
         }
 
         if (event.which === Util.keyCode.ENTER && !Util.isListItem(node)) {
             tagName = node.tagName.toLowerCase();
             // For anchor tags, unlink
             if (tagName === 'a') {
-                this.options.ownerDocument.execCommand('unlink', false, null);
+                Util.execCommand(this.options.ownerDocument, 'unlink', false, null);
             } else if (!event.shiftKey) {
                 // only format block if this is not a header tag
                 if (!/h\d/.test(tagName)) {
-                    this.options.ownerDocument.execCommand('formatBlock', false, 'p');
+                    Util.execCommand(this.options.ownerDocument, 'formatBlock', false, 'p');
                 }
             }
         }
@@ -3899,7 +4012,7 @@ function MediumEditor(elements, options) {
     }
 
     function initElements() {
-        this.elements.forEach(function (element) {
+        this.elements.forEach(function (element, index) {
             if (!this.options.disableEditing && !element.getAttribute('data-disable-editing')) {
                 element.setAttribute('contentEditable', true);
                 element.setAttribute('spellcheck', this.options.spellcheck);
@@ -3910,6 +4023,7 @@ function MediumEditor(elements, options) {
             element.setAttribute('data-medium-element', true);
             element.setAttribute('role', 'textbox');
             element.setAttribute('aria-multiline', true);
+            element.setAttribute('medium-editor-index', index);
 
             if (element.hasAttribute('medium-editor-textarea-id')) {
                 this.on(element, 'input', function (event) {
@@ -4073,7 +4187,7 @@ function MediumEditor(elements, options) {
         }
 
         if (action === 'fontSize') {
-            return this.options.ownerDocument.execCommand('fontSize', false, opts.size);
+            return Util.execCommand(this.options.ownerDocument, 'fontSize', false, opts.size);
         }
 
         if (action === 'createLink') {
@@ -4081,10 +4195,10 @@ function MediumEditor(elements, options) {
         }
 
         if (action === 'image') {
-            return this.options.ownerDocument.execCommand('insertImage', false, this.options.contentWindow.getSelection());
+            return Util.execCommand(this.options.ownerDocument, 'insertImage', false, this.options.contentWindow.getSelection());
         }
 
-        return this.options.ownerDocument.execCommand(action, false, null);
+        return Util.execCommand(this.options.ownerDocument, action, false, null);
     }
 
     // deprecate
@@ -4372,6 +4486,21 @@ function MediumEditor(elements, options) {
             }
         },
 
+        getFocusedElement: function () {
+            var focused;
+            this.elements.some(function (element) {
+                // Find the element that has focus
+                if (!focused && element.getAttribute('data-medium-focused')) {
+                    focused = element;
+                }
+
+                // bail if we found the element that had focus
+                return !!focused;
+            }, this);
+
+            return focused;
+        },
+
         // http://stackoverflow.com/questions/17678843/cant-restore-selection-after-html-modify-even-if-its-the-same-html
         // Tim Down
         // TODO: move to selection.js and clean up old methods there
@@ -4488,7 +4617,7 @@ function MediumEditor(elements, options) {
                 i;
 
             if (opts.url && opts.url.trim().length > 0) {
-                this.options.ownerDocument.execCommand('createLink', false, opts.url);
+                Util.execCommand(this.options.ownerDocument, 'createLink', false, opts.url);
 
                 if (this.options.targetBlank || opts.target === '_blank') {
                     Util.setTargetBlank(Util.getSelectionStart(this.options.ownerDocument));
