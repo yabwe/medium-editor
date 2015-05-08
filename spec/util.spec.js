@@ -1,4 +1,5 @@
-/*global MediumEditor, Util, describe, it, expect, spyOn */
+/*global MediumEditor, Util, describe, it, expect,
+    spyOn, jasmine */
 
 describe('Util', function () {
     'use strict';
@@ -19,7 +20,6 @@ describe('Util', function () {
                 objThree = { three: 'four', five: 'six' },
                 objFour,
                 result = MediumEditor.util.extend({}, objOne, objTwo, objThree, objFour);
-            // expect(_.isEqual(result, { one: 'two', three: 'four', five: 'six' })).toBe(true);
             expect(result).toEqual({ one: 'two', three: 'four', five: 'six' });
         });
     });
@@ -31,7 +31,6 @@ describe('Util', function () {
                 objThree = { three: 'four', five: 'six' },
                 objFour,
                 result = MediumEditor.util.defaults({}, objOne, objTwo, objThree, objFour);
-            // expect(_.isEqual(result, { one: 'one', three: 'three', five: 'six' })).toBe(true);
             expect(result).toEqual({ one: 'one', three: 'three', five: 'six' });
         });
     });
@@ -129,4 +128,21 @@ describe('Util', function () {
 
     });
 
+    describe('ExecCommand', function () {
+        it('should call execCommand as well as any callback that may exist', function () {
+            var callback = jasmine.createSpy('spy'),
+                execSpy = spyOn(document, 'execCommand').and.callThrough(),
+                args = ['bold', false, null];
+            Util.onExecCommand = callback;
+
+            Util.execCommand.apply(Util, [document].concat(args));
+            expect(callback).toHaveBeenCalledWith({
+                command: 'bold',
+                value: null,
+                args: args,
+                result: false
+            });
+            expect(execSpy).toHaveBeenCalledWith('bold', false, null);
+        });
+    });
 });

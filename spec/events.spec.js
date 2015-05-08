@@ -1,5 +1,6 @@
 /*global MediumEditor, describe, it, expect, jasmine,
-    fireEvent, afterEach, beforeEach, tearDown */
+    fireEvent, afterEach, beforeEach, tearDown,
+    selectElementContentsAndFire, Events */
 
 describe('Events TestCase', function () {
     'use strict';
@@ -118,63 +119,91 @@ describe('Events TestCase', function () {
         });
     });
 
-    describe('Subscribe', function () {
-        it('to editableInput should trigger with the corresponding editor element passed as an argument', function () {
-            var editableTwo = document.createElement('div'),
-                editor,
-                handler,
-                firedTarget;
-            editableTwo.className = 'editor';
-            editableTwo.textContent = 'lore ipsum';
-            document.body.appendChild(editableTwo);
+    describe('Custom EditableInput Listener', function () {
 
-            editor = new MediumEditor('.editor');
-            expect(editor.elements.length).toBe(2);
+        function runEditableInputTests(namePrefix) {
+            it(namePrefix + ' should trigger with the corresponding editor element passed as an argument', function () {
+                var editableTwo = document.createElement('div'),
+                    firedTarget;
+                editableTwo.className = 'editor';
+                editableTwo.textContent = 'lore ipsum';
+                document.body.appendChild(editableTwo);
 
-            handler = function (event, editable) {
-                firedTarget = editable;
-            };
+                var editor = new MediumEditor('.editor'),
+                    handler = function (event, editable) {
+                        firedTarget = editable;
+                    };
+                expect(editor.elements.length).toBe(2);
+                editor.subscribe('editableInput', handler);
 
-            editor.subscribe('editableInput', handler);
+                editableTwo.textContent = 'lore ipsum!';
+                fireEvent(editableTwo, 'input');
+                fireEvent(editableTwo, 'keypress');
+                expect(firedTarget).toBe(editableTwo);
 
-            editableTwo.textContent = 'lore ipsum!';
-            fireEvent(editableTwo, 'input');
-            fireEvent(editableTwo, 'keypress');
-            expect(firedTarget).toBe(editableTwo);
+                tearDown(editableTwo);
+            });
 
-            tearDown(editableTwo);
-        });
+            it(namePrefix + ' should only trigger when the content has actually changed', function () {
+                var editableTwo = document.createElement('div'),
+                    firedTarget;
+                editableTwo.className = 'editor';
+                editableTwo.textContent = 'lore ipsum';
+                document.body.appendChild(editableTwo);
 
-        it('to editableInput should only trigger when the content has actually changed', function () {
-            var editableTwo = document.createElement('div'),
-                editor,
-                handler,
-                firedTarget;
-            editableTwo.className = 'editor';
-            editableTwo.textContent = 'lore ipsum';
-            document.body.appendChild(editableTwo);
+                var editor = new MediumEditor('.editor'),
+                    handler = function (event, editable) {
+                        firedTarget = editable;
+                    };
+                expect(editor.elements.length).toBe(2);
+                editor.subscribe('editableInput', handler);
 
-            editor = new MediumEditor('.editor');
-            expect(editor.elements.length).toBe(2);
+                // If content hasn't changed, custom event won't fire
+                fireEvent(editableTwo, 'input');
+                fireEvent(editableTwo, 'keypress');
+                expect(firedTarget).toBeUndefined();
 
-            handler = function (event, editable) {
-                firedTarget = editable;
-            };
+                // Change the content, custom event should fire
+                editableTwo.textContent = 'lore ipsum!';
+                fireEvent(editableTwo, 'input');
+                fireEvent(editableTwo, 'keypress');
+                expect(firedTarget).toBe(editableTwo);
 
-            editor.subscribe('editableInput', handler);
+                tearDown(editableTwo);
+            });
 
-            // If content hasn't changed, custom event won't fire
-            fireEvent(editableTwo, 'input');
-            fireEvent(editableTwo, 'keypress');
-            expect(firedTarget).toBeUndefined();
+            it(namePrefix + ' should trigger when bolding text', function () {
+                var editableTwo = document.createElement('div'),
+                    firedTarget;
+                editableTwo.className = 'editor';
+                editableTwo.textContent = 'lore ipsum';
+                document.body.appendChild(editableTwo);
 
-            // Change the content, custom event should fire
-            editableTwo.textContent = 'lore ipsum!';
-            fireEvent(editableTwo, 'input');
-            fireEvent(editableTwo, 'keypress');
-            expect(firedTarget).toBe(editableTwo);
+                var editor = new MediumEditor('.editor'),
+                    button = editor.toolbar.getToolbarElement().querySelector('[data-action="bold"]'),
+                    handler = function (event, editable) {
+                        firedTarget = editable;
+                    };
+                expect(editor.elements.length).toBe(2);
+                editor.subscribe('editableInput', handler);
 
-            tearDown(editableTwo);
-        });
+                selectElementContentsAndFire(editableTwo.firstChild);
+                expect(firedTarget).toBeUndefined();
+                fireEvent(button, 'click');
+
+                expect(firedTarget).toBe(editableTwo);
+
+                tearDown(editableTwo);
+            });
+        }
+
+        var originalState = Events.prototype.InputEventOnContenteditableSupported;
+
+        Events.prototype.InputEventOnContenteditableSupported = true;
+        runEditableInputTests('when Input is supported');
+        Events.prototype.InputEventOnContenteditableSupported = false;
+        runEditableInputTests('when Input is NOT supported');
+
+        Events.prototype.InputEventOnContenteditableSupported = originalState;
     });
 });

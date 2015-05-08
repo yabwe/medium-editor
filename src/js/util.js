@@ -313,6 +313,8 @@ var Util;
         execCommand: function (doc, command, showDefaultUI, valueArg) {
             var args = Array.prototype.slice.call(arguments, 1),
                 result = doc.execCommand.apply(doc, args);
+
+            // For some events, we need a hook to listen to whenever execCommand is being called
             if (typeof this.onExecCommand === 'function') {
                 this.onExecCommand({
                     command: command,

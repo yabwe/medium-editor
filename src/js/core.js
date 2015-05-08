@@ -749,21 +749,6 @@ function MediumEditor(elements, options) {
             return Selection.getSelectedParentElement(range);
         },
 
-        getFocusedElement: function () {
-            var focused;
-            this.elements.some(function (element) {
-                // Find the element that has focus
-                if (!focused && element.getAttribute('data-medium-focused')) {
-                    focused = element;
-                }
-
-                // bail if we found the element that had focus
-                return !!focused;
-            }, this);
-
-            return focused;
-        },
-
         // NOT DOCUMENTED - exposed as extension helper
         hideToolbarDefaultActions: function () {
             if (this.toolbar) {
@@ -799,6 +784,21 @@ function MediumEditor(elements, options) {
             if (selElement) {
                 this.events.focusElement(selElement);
             }
+        },
+
+        getFocusedElement: function () {
+            var focused;
+            this.elements.some(function (element) {
+                // Find the element that has focus
+                if (!focused && element.getAttribute('data-medium-focused')) {
+                    focused = element;
+                }
+
+                // bail if we found the element that had focus
+                return !!focused;
+            }, this);
+
+            return focused;
         },
 
         // http://stackoverflow.com/questions/17678843/cant-restore-selection-after-html-modify-even-if-its-the-same-html
