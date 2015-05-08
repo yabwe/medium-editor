@@ -136,6 +136,8 @@ var Events;
                     this.setupListener('editableKeypress');
                     this.keypressUpdateInput = true;
                     this.attachDOMEvent(document, 'selectionchange', this.handleDocumentSelectionChange.bind(this));
+                    // Listen to calls to execCommand
+                    Util.onExecCommand = this.handleDocumentExecCommand.bind(this);
                 }
 
                 this.listeners[name] = true;
@@ -231,18 +233,8 @@ var Events;
             var toolbarEl = this.base.toolbar ? this.base.toolbar.getToolbarElement() : null,
                 anchorPreview = this.base.getExtensionByName('anchor-preview'),
                 previewEl = (anchorPreview && anchorPreview.getPreviewElement) ? anchorPreview.getPreviewElement() : null,
-                hadFocus,
+                hadFocus = this.base.getFocusedElement(),
                 toFocus;
-
-            this.base.elements.some(function (element) {
-                // Find the element that has focus
-                if (!hadFocus && element.getAttribute('data-medium-focused')) {
-                    hadFocus = element;
-                }
-
-                // bail if we found the element that had focus
-                return !!hadFocus;
-            }, this);
 
             // For clicks, we need to know if the mousedown that caused the click happened inside the existing focused element.
             // If so, we don't want to focus another element
@@ -317,6 +309,13 @@ var Events;
                 if (currentTarget) {
                     this.updateInput(currentTarget, { target: activeElement, currentTarget: currentTarget });
                 }
+            }
+        },
+
+        handleDocumentExecCommand: function () {
+            var target = this.base.getFocusedElement();
+            if (target) {
+                this.updateInput(target, { target: target, currentTarget: target });
             }
         },
 

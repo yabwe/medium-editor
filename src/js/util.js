@@ -233,7 +233,7 @@ var Util;
 
             if (doc.queryCommandSupported('insertHTML')) {
                 try {
-                    return doc.execCommand('insertHTML', false, html);
+                    return this.execCommand(doc, 'insertHTML', false, html);
                 } catch (ignore) {}
             }
 
@@ -310,6 +310,20 @@ var Util;
             };
         },
 
+        execCommand: function (doc, command, showDefaultUI, valueArg) {
+            var args = Array.prototype.slice.call(arguments, 1),
+                result = doc.execCommand.apply(doc, args);
+            if (typeof this.onExecCommand === 'function') {
+                this.onExecCommand({
+                    command: command,
+                    value: valueArg,
+                    args: args,
+                    result: result
+                });
+            }
+            return result;
+        },
+
         execFormatBlock: function (doc, tagName) {
             var selectionData = this.getSelectionData(this.getSelectionStart(doc));
             // FF handles blockquote differently on formatBlock
@@ -317,7 +331,7 @@ var Util;
             // https://developer.mozilla.org/en-US/docs/Rich-Text_Editing_in_Mozilla
             if (tagName === 'blockquote' && selectionData.el &&
                     selectionData.el.parentNode.tagName.toLowerCase() === 'blockquote') {
-                return doc.execCommand('outdent', false, null);
+                return this.execCommand(doc, 'outdent', false, null);
             }
             if (selectionData.tagName === tagName) {
                 tagName = 'p';
@@ -328,11 +342,11 @@ var Util;
             // http://stackoverflow.com/questions/1816223/rich-text-editor-with-blockquote-function/1821777#1821777
             if (this.isIE) {
                 if (tagName === 'blockquote') {
-                    return doc.execCommand('indent', false, tagName);
+                    return this.execCommand(doc, 'indent', false, tagName);
                 }
                 tagName = '<' + tagName + '>';
             }
-            return doc.execCommand('formatBlock', false, tagName);
+            return this.execCommand(doc, 'formatBlock', false, tagName);
         },
 
         // TODO: not sure if this should be here

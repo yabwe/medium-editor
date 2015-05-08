@@ -166,7 +166,7 @@ var PasteHandler;
                 this.pasteHTML('<p>' + elList.join('</p><p>') + '</p>');
 
                 try {
-                    this.document.execCommand('insertText', false, '\n');
+                    Util.execCommand(this.document, 'insertText', false, '\n');
                 } catch (ignore) { }
 
                 // block element cleanup

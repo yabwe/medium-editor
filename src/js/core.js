@@ -39,9 +39,9 @@ function MediumEditor(elements, options) {
 
             // If Shift is down, outdent, otherwise indent
             if (event.shiftKey) {
-                this.options.ownerDocument.execCommand('outdent', false, null);
+                Util.execCommand(this.options.ownerDocument, 'outdent', false, null);
             } else {
-                this.options.ownerDocument.execCommand('indent', false, null);
+                Util.execCommand(this.options.ownerDocument, 'indent', false, null);
             }
         }
     }
@@ -193,18 +193,18 @@ function MediumEditor(elements, options) {
         }
 
         if (node.getAttribute('data-medium-element') && node.children.length === 0) {
-            this.options.ownerDocument.execCommand('formatBlock', false, 'p');
+            Util.execCommand(this.options.ownerDocument, 'formatBlock', false, 'p');
         }
 
         if (event.which === Util.keyCode.ENTER && !Util.isListItem(node)) {
             tagName = node.tagName.toLowerCase();
             // For anchor tags, unlink
             if (tagName === 'a') {
-                this.options.ownerDocument.execCommand('unlink', false, null);
+                Util.execCommand(this.options.ownerDocument, 'unlink', false, null);
             } else if (!event.shiftKey) {
                 // only format block if this is not a header tag
                 if (!/h\d/.test(tagName)) {
-                    this.options.ownerDocument.execCommand('formatBlock', false, 'p');
+                    Util.execCommand(this.options.ownerDocument, 'formatBlock', false, 'p');
                 }
             }
         }
@@ -487,7 +487,7 @@ function MediumEditor(elements, options) {
         }
 
         if (action === 'fontSize') {
-            return this.options.ownerDocument.execCommand('fontSize', false, opts.size);
+            return Util.execCommand(this.options.ownerDocument, 'fontSize', false, opts.size);
         }
 
         if (action === 'createLink') {
@@ -495,10 +495,10 @@ function MediumEditor(elements, options) {
         }
 
         if (action === 'image') {
-            return this.options.ownerDocument.execCommand('insertImage', false, this.options.contentWindow.getSelection());
+            return Util.execCommand(this.options.ownerDocument, 'insertImage', false, this.options.contentWindow.getSelection());
         }
 
-        return this.options.ownerDocument.execCommand(action, false, null);
+        return Util.execCommand(this.options.ownerDocument, action, false, null);
     }
 
     // deprecate
@@ -749,6 +749,21 @@ function MediumEditor(elements, options) {
             return Selection.getSelectedParentElement(range);
         },
 
+        getFocusedElement: function () {
+            var focused;
+            this.elements.some(function (element) {
+                // Find the element that has focus
+                if (!focused && element.getAttribute('data-medium-focused')) {
+                    focused = element;
+                }
+
+                // bail if we found the element that had focus
+                return !!focused;
+            }, this);
+
+            return focused;
+        },
+
         // NOT DOCUMENTED - exposed as extension helper
         hideToolbarDefaultActions: function () {
             if (this.toolbar) {
@@ -902,7 +917,7 @@ function MediumEditor(elements, options) {
                 i;
 
             if (opts.url && opts.url.trim().length > 0) {
-                this.options.ownerDocument.execCommand('createLink', false, opts.url);
+                Util.execCommand(this.options.ownerDocument, 'createLink', false, opts.url);
 
                 if (this.options.targetBlank || opts.target === '_blank') {
                     Util.setTargetBlank(Util.getSelectionStart(this.options.ownerDocument));
