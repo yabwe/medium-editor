@@ -103,6 +103,7 @@ var Events;
 
         // Listening to calls to document.execCommand
 
+        // Attach a listener to be notified when document.execCommand is called
         attachToExecCommand: function () {
             if (this.execCommandListener) {
                 return;
@@ -122,6 +123,7 @@ var Events;
             this.options.ownerDocument.execCommand.listeners.push(this.execCommandListener);
         },
 
+        // Remove our listener for calls to document.execCommand
         detachExecCommand: function () {
             var doc = this.options.ownerDocument;
             if (!this.execCommandListener || !doc.execCommand.listeners) {
@@ -140,6 +142,7 @@ var Events;
             }
         },
 
+        // Wrap document.execCommand in a custom method so we can listen to calls to it
         wrapExecCommand: function () {
             var doc = this.options.ownerDocument;
 
@@ -181,6 +184,7 @@ var Events;
             doc.execCommand = wrapper;
         },
 
+        // Revert document.execCommand back to its original self
         unwrapExecCommand: function () {
             var doc = this.options.ownerDocument;
             if (!doc.execCommand.orig) {
@@ -386,7 +390,7 @@ var Events;
 
         updateInput: function (target, eventObj) {
             // An event triggered which signifies that the user may have changed someting
-            // Look in our cache of input for the contenteditables to see if somethign changed
+            // Look in our cache of input for the contenteditables to see if something changed
             var index = target.getAttribute('medium-editor-index');
             if (target.innerHTML !== this.contentCache[index]) {
                 // The content has changed since the last time we checked, fire the event
@@ -509,7 +513,7 @@ var Events;
         }
     };
 
-    // Do feature detection to determine with the 'input' event is supported on contenteditable elements
+    // Do feature detection to determine if the 'input' event is supported correctly
     // Currently, IE does not support this event on contenteditable elements
 
     var tempFunction = function () {
@@ -547,7 +551,6 @@ var Events;
     // Cleanup the temporary element
     tempElement.removeEventListener('input', tempFunction);
     tempElement.parentNode.removeChild(tempElement);
-    tempElement.removeEventListener('input', tempFunction);
     selection.removeAllRanges();
 
     // Restore any existing ranges

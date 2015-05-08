@@ -1,5 +1,4 @@
-/*global MediumEditor, Util, describe, it, expect,
-    spyOn */
+/*global MediumEditor, Util, describe, it, expect, spyOn */
 
 describe('Util', function () {
     'use strict';
