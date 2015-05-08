@@ -119,19 +119,25 @@ var Events;
                 this.listeners[name] = true;
                 break;
             case 'editableInput':
-                // Detecting when the content of an editable has been changed
-                if (this.InputEventOnContenteditableSupported) {
-                    this.base.elements.forEach(function (element) {
+                // setup cache for knowing when the content has changed
+                this.contentCache = [];
+                this.base.elements.forEach(function (element) {
+                    this.contentCache[element.getAttribute('medium-editor-index')] = element.innerHTML;
+
+                    // Attach to the 'oninput' event, handled correctly by most browsers
+                    if (this.InputEventOnContenteditableSupported) {
                         this.attachDOMEvent(element, 'input', this.handleInput.bind(this));
-                    }.bind(this));
-                } else {
-                    this.contentCache = [];
-                    this.base.elements.forEach(function (element) {
-                        this.attachDOMEvent(element, 'selectionchange', this.handleInput.bind(this));
-                        this.attachDOMEvent(element, 'keypress', this.handleInput.bind(this));
-                        this.contentCache[element.getAttribute('medium-editor-index')] = element.innerHTML;
-                    }.bind(this));
+                    }
+                }.bind(this));
+
+                // For browsers which don't support the input event on contenteditable (IE)
+                // we'll attach to 'selectionchange' on the document and 'keypress' on the editables
+                if (!this.InputEventOnContenteditableSupported) {
+                    this.setupListener('editableKeypress');
+                    this.keypressUpdateInput = true;
+                    this.attachDOMEvent(document, 'selectionchange', this.handleDocumentSelectionChange.bind(this));
                 }
+
                 this.listeners[name] = true;
                 break;
             case 'editableClick':
@@ -288,13 +294,30 @@ var Events;
             }
         },
 
-        handleInput: function (event) {
-            var element = event.currentTarget,
-                index = element.getAttribute('medium-editor-index');
-            if (element.innerHTML !== this.contentCache[index]) {
-                this.triggerCustomEvent('editableInput', event, event.currentTarget);
+        updateInput: function (target, eventObj) {
+            var index = target.getAttribute('medium-editor-index');
+            if (target.innerHTML !== this.contentCache[index]) {
+                this.triggerCustomEvent('editableInput', eventObj, target);
             }
-            this.contentCache[index] = element.innerHTML;
+            this.contentCache[index] = target.innerHTML;
+        },
+
+        handleDocumentSelectionChange: function (event) {
+            if (event.currentTarget &&
+                event.currentTarget.activeElement) {
+                var activeElement = event.currentTarget.activeElement,
+                    currentTarget;
+                this.base.elements.some(function (element) {
+                    if (Util.isDescendant(element, activeElement, true)) {
+                        currentTarget = element;
+                        return true;
+                    }
+                    return false;
+                }, this);
+                if (currentTarget) {
+                    this.updateInput(currentTarget, { target: activeElement, currentTarget: currentTarget });
+                }
+            }
         },
 
         handleBodyClick: function (event) {
@@ -309,6 +332,10 @@ var Events;
             this.lastMousedownTarget = event.target;
         },
 
+        handleInput: function (event) {
+            this.updateInput(event.currentTarget, event);
+        },
+
         handleClick: function (event) {
             this.triggerCustomEvent('editableClick', event, event.currentTarget);
         },
@@ -319,6 +346,13 @@ var Events;
 
         handleKeypress: function (event) {
             this.triggerCustomEvent('editableKeypress', event, event.currentTarget);
+
+            if (this.keypressUpdateInput) {
+                var eventObj = { target: event.target, currentTarget: event.currentTarget };
+                setTimeout(function () {
+                    this.updateInput(eventObj.currentTarget, eventObj);
+                }.bind(this), 0);
+            }
         },
 
         handleKeyup: function (event) {
@@ -363,7 +397,7 @@ var Events;
     // Currently, IE does not support this event on contenteditable elements
 
     var tempFunction = function () {
-            Events.InputEventOnContenteditableSupported = true;
+            Events.prototype.InputEventOnContenteditableSupported = true;
         },
         tempElement,
         existingRanges = [];
