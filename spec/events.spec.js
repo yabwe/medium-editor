@@ -121,7 +121,9 @@ describe('Events TestCase', function () {
 
     describe('Custom EditableInput Listener', function () {
 
-        function runEditableInputTests(namePrefix) {
+        function runEditableInputTests(inputSupported) {
+            var namePrefix = inputSupported ? 'when Input is supported' : 'when Input is NOT supported';
+
             it(namePrefix + ' should trigger with the corresponding editor element passed as an argument', function () {
                 var editableTwo = document.createElement('div'),
                     firedTarget;
@@ -132,17 +134,27 @@ describe('Events TestCase', function () {
                 var editor = new MediumEditor('.editor'),
                     handler = function (event, editable) {
                         firedTarget = editable;
-                    };
+                    },
+                    originalInputSupport = Events.prototype.InputEventOnContenteditableSupported;
                 expect(editor.elements.length).toBe(2);
+
+                Events.prototype.InputEventOnContenteditableSupported = inputSupported;
                 editor.subscribe('editableInput', handler);
+                editor.selectElement(editableTwo.firstChild);
 
                 editableTwo.textContent = 'lore ipsum!';
+
+                // trigger onInput
                 fireEvent(editableTwo, 'input');
-                fireEvent(editableTwo, 'keypress');
+
+                // trigger faked 'selectionchange' event
+                fireEvent(document, 'selectionchange', { target: document, currentTarget: editableTwo });
+
                 jasmine.clock().tick(1);
                 expect(firedTarget).toBe(editableTwo);
 
                 tearDown(editableTwo);
+                Events.prototype.InputEventOnContenteditableSupported = originalInputSupport;
             });
 
             it(namePrefix + ' should only trigger when the content has actually changed', function () {
@@ -155,8 +167,11 @@ describe('Events TestCase', function () {
                 var editor = new MediumEditor('.editor'),
                     handler = function (event, editable) {
                         firedTarget = editable;
-                    };
+                    },
+                    originalInputSupport = Events.prototype.InputEventOnContenteditableSupported;
                 expect(editor.elements.length).toBe(2);
+
+                Events.prototype.InputEventOnContenteditableSupported = inputSupported;
                 editor.subscribe('editableInput', handler);
 
                 // If content hasn't changed, custom event won't fire
@@ -172,41 +187,40 @@ describe('Events TestCase', function () {
                 expect(firedTarget).toBe(editableTwo);
 
                 tearDown(editableTwo);
-            });
-
-            it(namePrefix + ' should trigger when bolding text', function () {
-                var editableTwo = document.createElement('div'),
-                    firedTarget;
-                editableTwo.className = 'editor';
-                editableTwo.textContent = 'lore ipsum';
-                document.body.appendChild(editableTwo);
-
-                var editor = new MediumEditor('.editor'),
-                    button = editor.toolbar.getToolbarElement().querySelector('[data-action="bold"]'),
-                    handler = function (event, editable) {
-                        firedTarget = editable;
-                    };
-                expect(editor.elements.length).toBe(2);
-                editor.subscribe('editableInput', handler);
-
-                selectElementContentsAndFire(editableTwo.firstChild);
-                expect(firedTarget).toBeUndefined();
-                fireEvent(button, 'click');
-                jasmine.clock().tick(1);
-
-                expect(firedTarget).toBe(editableTwo);
-
-                tearDown(editableTwo);
+                Events.prototype.InputEventOnContenteditableSupported = originalInputSupport;
             });
         }
 
-        var originalState = Events.prototype.InputEventOnContenteditableSupported;
+        runEditableInputTests(true);
+        runEditableInputTests(false);
 
-        Events.prototype.InputEventOnContenteditableSupported = true;
-        runEditableInputTests('when Input is supported');
-        Events.prototype.InputEventOnContenteditableSupported = false;
-        runEditableInputTests('when Input is NOT supported');
+        it('should trigger when bolding text when input event is NOT supported', function () {
+            var editableTwo = document.createElement('div'),
+                firedTarget;
+            editableTwo.className = 'editor';
+            editableTwo.textContent = 'lore ipsum';
+            document.body.appendChild(editableTwo);
 
-        Events.prototype.InputEventOnContenteditableSupported = originalState;
+            var editor = new MediumEditor('.editor'),
+                button = editor.toolbar.getToolbarElement().querySelector('[data-action="bold"]'),
+                handler = function (event, editable) {
+                    firedTarget = editable;
+                },
+                originalInputSupport = Events.prototype.InputEventOnContenteditableSupported;
+            expect(editor.elements.length).toBe(2);
+
+            Events.prototype.InputEventOnContenteditableSupported = false;
+            editor.subscribe('editableInput', handler);
+
+            selectElementContentsAndFire(editableTwo.firstChild);
+            expect(firedTarget).toBeUndefined();
+            fireEvent(button, 'click');
+            jasmine.clock().tick(1);
+
+            expect(firedTarget).toBe(editableTwo);
+
+            tearDown(editableTwo);
+            Events.prototype.InputEventOnContenteditableSupported = originalInputSupport;
+        });
     });
 });
