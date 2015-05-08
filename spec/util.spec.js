@@ -1,5 +1,5 @@
 /*global MediumEditor, Util, describe, it, expect,
-    spyOn, jasmine, isIE */
+    spyOn */
 
 describe('Util', function () {
     'use strict';
@@ -126,23 +126,5 @@ describe('Util', function () {
             expect(spy).toHaveBeenCalled();
         });
 
-    });
-
-    describe('ExecCommand', function () {
-        it('should call execCommand as well as any callback that may exist', function () {
-            var callback = jasmine.createSpy('spy'),
-                execSpy = spyOn(document, 'execCommand').and.callThrough(),
-                args = ['bold', false, null];
-            Util.onExecCommand = callback;
-
-            Util.execCommand.apply(Util, [document].concat(args));
-            expect(callback).toHaveBeenCalledWith({
-                command: 'bold',
-                value: null,
-                args: args,
-                result: (isIE() ? true : false)
-            });
-            expect(execSpy).toHaveBeenCalledWith('bold', false, null);
-        });
     });
 });

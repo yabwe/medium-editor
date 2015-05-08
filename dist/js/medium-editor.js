@@ -631,7 +631,7 @@ var Util;
 
             if (doc.queryCommandSupported('insertHTML')) {
                 try {
-                    return this.execCommand(doc, 'insertHTML', false, html);
+                    return doc.execCommand('insertHTML', false, html);
                 } catch (ignore) {}
             }
 
@@ -708,22 +708,6 @@ var Util;
             };
         },
 
-        execCommand: function (doc, command, showDefaultUI, valueArg) {
-            var args = Array.prototype.slice.call(arguments, 1),
-                result = doc.execCommand.apply(doc, args);
-
-            // For some events, we need a hook to listen to whenever execCommand is being called
-            if (typeof this.onExecCommand === 'function') {
-                this.onExecCommand({
-                    command: command,
-                    value: valueArg,
-                    args: args,
-                    result: result
-                });
-            }
-            return result;
-        },
-
         execFormatBlock: function (doc, tagName) {
             var selectionData = this.getSelectionData(this.getSelectionStart(doc));
             // FF handles blockquote differently on formatBlock
@@ -731,7 +715,7 @@ var Util;
             // https://developer.mozilla.org/en-US/docs/Rich-Text_Editing_in_Mozilla
             if (tagName === 'blockquote' && selectionData.el &&
                     selectionData.el.parentNode.tagName.toLowerCase() === 'blockquote') {
-                return this.execCommand(doc, 'outdent', false, null);
+                return doc.execCommand('outdent', false, null);
             }
             if (selectionData.tagName === tagName) {
                 tagName = 'p';
@@ -742,11 +726,11 @@ var Util;
             // http://stackoverflow.com/questions/1816223/rich-text-editor-with-blockquote-function/1821777#1821777
             if (this.isIE) {
                 if (tagName === 'blockquote') {
-                    return this.execCommand(doc, 'indent', false, tagName);
+                    return doc.execCommand('indent', false, tagName);
                 }
                 tagName = '<' + tagName + '>';
             }
-            return this.execCommand(doc, 'formatBlock', false, tagName);
+            return doc.execCommand('formatBlock', false, tagName);
         },
 
         // TODO: not sure if this should be here
@@ -1609,6 +1593,104 @@ var Events;
             }
         },
 
+        // Cleaning up
+
+        destroy: function () {
+            this.detachAllDOMEvents();
+            this.detachAllCustomEvents();
+            this.detachExecCommand();
+        },
+
+        // Listening to calls to document.execCommand
+
+        attachToExecCommand: function () {
+            if (this.execCommandListener) {
+                return;
+            }
+
+            // Store an instance of the listener so:
+            // 1) We only attach to execCommand once
+            // 2) We can remove the listener later
+            this.execCommandListener = function (execInfo) {
+                this.handleDocumentExecCommand(execInfo);
+            }.bind(this);
+
+            // Ensure that execCommand has been wrapped correctly
+            this.wrapExecCommand();
+
+            // Add listener to list of execCommand listeners
+            this.options.ownerDocument.execCommand.listeners.push(this.execCommandListener);
+        },
+
+        detachExecCommand: function () {
+            var doc = this.options.ownerDocument;
+            if (!this.execCommandListener || !doc.execCommand.listeners) {
+                return;
+            }
+
+            // Find the index of this listener in the array of listeners so it can be removed
+            var index = doc.execCommand.listeners.indexOf(this.execCommandListener);
+            if (index !== -1) {
+                doc.execCommand.listeners.splice(index, 1);
+            }
+
+            // If the list of listeners is now empty, put execCommand back to its original state
+            if (!doc.execCommand.listeners.length) {
+                this.unwrapExecCommand();
+            }
+        },
+
+        wrapExecCommand: function () {
+            var doc = this.options.ownerDocument;
+
+            // Ensure all instance of MediumEditor only wrap execCommand once
+            if (doc.execCommand.listeners) {
+                return;
+            }
+
+            // Create a wrapper method for execCommand which will:
+            // 1) Call document.execCommand with the correct arguments
+            // 2) Loop through any listeners and notify them that execCommand was called
+            //    passing extra info on the call
+            // 3) Return the result
+            var wrapper = function (aCommandName, aShowDefaultUI, aValueArgument) {
+                var result = doc.execCommand.orig.apply(this, arguments);
+
+                if (doc.execCommand.listeners) {
+                    var args = Array.prototype.slice.call(arguments);
+                    doc.execCommand.listeners.forEach(function (listener) {
+                        listener({
+                            command: aCommandName,
+                            value: aValueArgument,
+                            args: args,
+                            result: result
+                        });
+                    });
+                }
+
+                return result;
+            };
+
+            // Store a reference to the original execCommand
+            wrapper.orig = doc.execCommand;
+
+            // Attach an array for storing listeners
+            wrapper.listeners = [];
+
+            // Overwrite execCommand
+            doc.execCommand = wrapper;
+        },
+
+        unwrapExecCommand: function () {
+            var doc = this.options.ownerDocument;
+            if (!doc.execCommand.orig) {
+                return;
+            }
+
+            // Use the reference to the original execCommand to revert back
+            doc.execCommand = doc.execCommand.orig;
+        },
+
         // Listening to browser events to emit events medium-editor cares about
 
         setupListener: function (name) {
@@ -1653,7 +1735,7 @@ var Events;
                     this.keypressUpdateInput = true;
                     this.attachDOMEvent(document, 'selectionchange', this.handleDocumentSelectionChange.bind(this));
                     // Listen to calls to execCommand
-                    Util.onExecCommand = this.handleDocumentExecCommand.bind(this);
+                    this.attachToExecCommand();
                 }
 
                 this.listeners[name] = true;
@@ -1803,18 +1885,27 @@ var Events;
         },
 
         updateInput: function (target, eventObj) {
+            // An event triggered which signifies that the user may have changed someting
+            // Look in our cache of input for the contenteditables to see if somethign changed
             var index = target.getAttribute('medium-editor-index');
             if (target.innerHTML !== this.contentCache[index]) {
+                // The content has changed since the last time we checked, fire the event
                 this.triggerCustomEvent('editableInput', eventObj, target);
             }
             this.contentCache[index] = target.innerHTML;
         },
 
         handleDocumentSelectionChange: function (event) {
+            // When selectionchange fires, target and current target are set
+            // to document, since this is where the event is handled
+            // However, currentTarget will have an 'activeElement' property
+            // which will point to whatever element has focus.
             if (event.currentTarget &&
                 event.currentTarget.activeElement) {
                 var activeElement = event.currentTarget.activeElement,
                     currentTarget;
+                // We can look at the 'activeElement' to determine if the selectionchange has
+                // happened within a contenteditable owned by this instance of MediumEditor
                 this.base.elements.some(function (element) {
                     if (Util.isDescendant(element, activeElement, true)) {
                         currentTarget = element;
@@ -1822,6 +1913,8 @@ var Events;
                     }
                     return false;
                 }, this);
+
+                // We know selectionchange fired within one of our contenteditables
                 if (currentTarget) {
                     this.updateInput(currentTarget, { target: activeElement, currentTarget: currentTarget });
                 }
@@ -1829,6 +1922,9 @@ var Events;
         },
 
         handleDocumentExecCommand: function () {
+            // document.execCommand has been called
+            // If one of our contenteditables currently has focus, we should
+            // attempt to trigger the 'editableInput' event
             var target = this.base.getFocusedElement();
             if (target) {
                 this.updateInput(target, { target: target, currentTarget: target });
@@ -1862,8 +1958,13 @@ var Events;
         handleKeypress: function (event) {
             this.triggerCustomEvent('editableKeypress', event, event.currentTarget);
 
+            // If we're doing manual detection of the editableInput event we need
+            // to check for input changes during 'keypress'
             if (this.keypressUpdateInput) {
                 var eventObj = { target: event.target, currentTarget: event.currentTarget };
+
+                // In IE, we need to let the rest of the event stack complete before we detect
+                // changes to input, so using setTimeout here
                 setTimeout(function () {
                     this.updateInput(eventObj.currentTarget, eventObj);
                 }.bind(this), 0);
@@ -2256,7 +2357,7 @@ var PasteHandler;
                 this.pasteHTML('<p>' + elList.join('</p><p>') + '</p>');
 
                 try {
-                    Util.execCommand(this.document, 'insertText', false, '\n');
+                    this.document.execCommand('insertText', false, '\n');
                 } catch (ignore) { }
 
                 // block element cleanup
@@ -3739,9 +3840,9 @@ function MediumEditor(elements, options) {
 
             // If Shift is down, outdent, otherwise indent
             if (event.shiftKey) {
-                Util.execCommand(this.options.ownerDocument, 'outdent', false, null);
+                this.options.ownerDocument.execCommand('outdent', false, null);
             } else {
-                Util.execCommand(this.options.ownerDocument, 'indent', false, null);
+                this.options.ownerDocument.execCommand('indent', false, null);
             }
         }
     }
@@ -3893,18 +3994,18 @@ function MediumEditor(elements, options) {
         }
 
         if (node.getAttribute('data-medium-element') && node.children.length === 0) {
-            Util.execCommand(this.options.ownerDocument, 'formatBlock', false, 'p');
+            this.options.ownerDocument.execCommand('formatBlock', false, 'p');
         }
 
         if (event.which === Util.keyCode.ENTER && !Util.isListItem(node)) {
             tagName = node.tagName.toLowerCase();
             // For anchor tags, unlink
             if (tagName === 'a') {
-                Util.execCommand(this.options.ownerDocument, 'unlink', false, null);
+                this.options.ownerDocument.execCommand('unlink', false, null);
             } else if (!event.shiftKey) {
                 // only format block if this is not a header tag
                 if (!/h\d/.test(tagName)) {
-                    Util.execCommand(this.options.ownerDocument, 'formatBlock', false, 'p');
+                    this.options.ownerDocument.execCommand('formatBlock', false, 'p');
                 }
             }
         }
@@ -4187,7 +4288,7 @@ function MediumEditor(elements, options) {
         }
 
         if (action === 'fontSize') {
-            return Util.execCommand(this.options.ownerDocument, 'fontSize', false, opts.size);
+            return this.options.ownerDocument.execCommand('fontSize', false, opts.size);
         }
 
         if (action === 'createLink') {
@@ -4195,10 +4296,10 @@ function MediumEditor(elements, options) {
         }
 
         if (action === 'image') {
-            return Util.execCommand(this.options.ownerDocument, 'insertImage', false, this.options.contentWindow.getSelection());
+            return this.options.ownerDocument.execCommand('insertImage', false, this.options.contentWindow.getSelection());
         }
 
-        return Util.execCommand(this.options.ownerDocument, action, false, null);
+        return this.options.ownerDocument.execCommand(action, false, null);
     }
 
     // deprecate
@@ -4289,8 +4390,7 @@ function MediumEditor(elements, options) {
                 }
             }, this);
 
-            this.events.detachAllDOMEvents();
-            this.events.detachAllCustomEvents();
+            this.events.destroy();
         },
 
         on: function (target, event, listener, useCapture) {
@@ -4617,7 +4717,7 @@ function MediumEditor(elements, options) {
                 i;
 
             if (opts.url && opts.url.trim().length > 0) {
-                Util.execCommand(this.options.ownerDocument, 'createLink', false, opts.url);
+                this.options.ownerDocument.execCommand('createLink', false, opts.url);
 
                 if (this.options.targetBlank || opts.target === '_blank') {
                     Util.setTargetBlank(Util.getSelectionStart(this.options.ownerDocument));

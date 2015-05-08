@@ -93,6 +93,104 @@ var Events;
             }
         },
 
+        // Cleaning up
+
+        destroy: function () {
+            this.detachAllDOMEvents();
+            this.detachAllCustomEvents();
+            this.detachExecCommand();
+        },
+
+        // Listening to calls to document.execCommand
+
+        attachToExecCommand: function () {
+            if (this.execCommandListener) {
+                return;
+            }
+
+            // Store an instance of the listener so:
+            // 1) We only attach to execCommand once
+            // 2) We can remove the listener later
+            this.execCommandListener = function (execInfo) {
+                this.handleDocumentExecCommand(execInfo);
+            }.bind(this);
+
+            // Ensure that execCommand has been wrapped correctly
+            this.wrapExecCommand();
+
+            // Add listener to list of execCommand listeners
+            this.options.ownerDocument.execCommand.listeners.push(this.execCommandListener);
+        },
+
+        detachExecCommand: function () {
+            var doc = this.options.ownerDocument;
+            if (!this.execCommandListener || !doc.execCommand.listeners) {
+                return;
+            }
+
+            // Find the index of this listener in the array of listeners so it can be removed
+            var index = doc.execCommand.listeners.indexOf(this.execCommandListener);
+            if (index !== -1) {
+                doc.execCommand.listeners.splice(index, 1);
+            }
+
+            // If the list of listeners is now empty, put execCommand back to its original state
+            if (!doc.execCommand.listeners.length) {
+                this.unwrapExecCommand();
+            }
+        },
+
+        wrapExecCommand: function () {
+            var doc = this.options.ownerDocument;
+
+            // Ensure all instance of MediumEditor only wrap execCommand once
+            if (doc.execCommand.listeners) {
+                return;
+            }
+
+            // Create a wrapper method for execCommand which will:
+            // 1) Call document.execCommand with the correct arguments
+            // 2) Loop through any listeners and notify them that execCommand was called
+            //    passing extra info on the call
+            // 3) Return the result
+            var wrapper = function (aCommandName, aShowDefaultUI, aValueArgument) {
+                var result = doc.execCommand.orig.apply(this, arguments);
+
+                if (doc.execCommand.listeners) {
+                    var args = Array.prototype.slice.call(arguments);
+                    doc.execCommand.listeners.forEach(function (listener) {
+                        listener({
+                            command: aCommandName,
+                            value: aValueArgument,
+                            args: args,
+                            result: result
+                        });
+                    });
+                }
+
+                return result;
+            };
+
+            // Store a reference to the original execCommand
+            wrapper.orig = doc.execCommand;
+
+            // Attach an array for storing listeners
+            wrapper.listeners = [];
+
+            // Overwrite execCommand
+            doc.execCommand = wrapper;
+        },
+
+        unwrapExecCommand: function () {
+            var doc = this.options.ownerDocument;
+            if (!doc.execCommand.orig) {
+                return;
+            }
+
+            // Use the reference to the original execCommand to revert back
+            doc.execCommand = doc.execCommand.orig;
+        },
+
         // Listening to browser events to emit events medium-editor cares about
 
         setupListener: function (name) {
@@ -137,7 +235,7 @@ var Events;
                     this.keypressUpdateInput = true;
                     this.attachDOMEvent(document, 'selectionchange', this.handleDocumentSelectionChange.bind(this));
                     // Listen to calls to execCommand
-                    Util.onExecCommand = this.handleDocumentExecCommand.bind(this);
+                    this.attachToExecCommand();
                 }
 
                 this.listeners[name] = true;
@@ -287,18 +385,27 @@ var Events;
         },
 
         updateInput: function (target, eventObj) {
+            // An event triggered which signifies that the user may have changed someting
+            // Look in our cache of input for the contenteditables to see if somethign changed
             var index = target.getAttribute('medium-editor-index');
             if (target.innerHTML !== this.contentCache[index]) {
+                // The content has changed since the last time we checked, fire the event
                 this.triggerCustomEvent('editableInput', eventObj, target);
             }
             this.contentCache[index] = target.innerHTML;
         },
 
         handleDocumentSelectionChange: function (event) {
+            // When selectionchange fires, target and current target are set
+            // to document, since this is where the event is handled
+            // However, currentTarget will have an 'activeElement' property
+            // which will point to whatever element has focus.
             if (event.currentTarget &&
                 event.currentTarget.activeElement) {
                 var activeElement = event.currentTarget.activeElement,
                     currentTarget;
+                // We can look at the 'activeElement' to determine if the selectionchange has
+                // happened within a contenteditable owned by this instance of MediumEditor
                 this.base.elements.some(function (element) {
                     if (Util.isDescendant(element, activeElement, true)) {
                         currentTarget = element;
@@ -306,6 +413,8 @@ var Events;
                     }
                     return false;
                 }, this);
+
+                // We know selectionchange fired within one of our contenteditables
                 if (currentTarget) {
                     this.updateInput(currentTarget, { target: activeElement, currentTarget: currentTarget });
                 }
@@ -313,6 +422,9 @@ var Events;
         },
 
         handleDocumentExecCommand: function () {
+            // document.execCommand has been called
+            // If one of our contenteditables currently has focus, we should
+            // attempt to trigger the 'editableInput' event
             var target = this.base.getFocusedElement();
             if (target) {
                 this.updateInput(target, { target: target, currentTarget: target });
@@ -346,8 +458,13 @@ var Events;
         handleKeypress: function (event) {
             this.triggerCustomEvent('editableKeypress', event, event.currentTarget);
 
+            // If we're doing manual detection of the editableInput event we need
+            // to check for input changes during 'keypress'
             if (this.keypressUpdateInput) {
                 var eventObj = { target: event.target, currentTarget: event.currentTarget };
+
+                // In IE, we need to let the rest of the event stack complete before we detect
+                // changes to input, so using setTimeout here
                 setTimeout(function () {
                     this.updateInput(eventObj.currentTarget, eventObj);
                 }.bind(this), 0);

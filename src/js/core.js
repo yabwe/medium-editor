@@ -39,9 +39,9 @@ function MediumEditor(elements, options) {
 
             // If Shift is down, outdent, otherwise indent
             if (event.shiftKey) {
-                Util.execCommand(this.options.ownerDocument, 'outdent', false, null);
+                this.options.ownerDocument.execCommand('outdent', false, null);
             } else {
-                Util.execCommand(this.options.ownerDocument, 'indent', false, null);
+                this.options.ownerDocument.execCommand('indent', false, null);
             }
         }
     }
@@ -193,18 +193,18 @@ function MediumEditor(elements, options) {
         }
 
         if (node.getAttribute('data-medium-element') && node.children.length === 0) {
-            Util.execCommand(this.options.ownerDocument, 'formatBlock', false, 'p');
+            this.options.ownerDocument.execCommand('formatBlock', false, 'p');
         }
 
         if (event.which === Util.keyCode.ENTER && !Util.isListItem(node)) {
             tagName = node.tagName.toLowerCase();
             // For anchor tags, unlink
             if (tagName === 'a') {
-                Util.execCommand(this.options.ownerDocument, 'unlink', false, null);
+                this.options.ownerDocument.execCommand('unlink', false, null);
             } else if (!event.shiftKey) {
                 // only format block if this is not a header tag
                 if (!/h\d/.test(tagName)) {
-                    Util.execCommand(this.options.ownerDocument, 'formatBlock', false, 'p');
+                    this.options.ownerDocument.execCommand('formatBlock', false, 'p');
                 }
             }
         }
@@ -487,7 +487,7 @@ function MediumEditor(elements, options) {
         }
 
         if (action === 'fontSize') {
-            return Util.execCommand(this.options.ownerDocument, 'fontSize', false, opts.size);
+            return this.options.ownerDocument.execCommand('fontSize', false, opts.size);
         }
 
         if (action === 'createLink') {
@@ -495,10 +495,10 @@ function MediumEditor(elements, options) {
         }
 
         if (action === 'image') {
-            return Util.execCommand(this.options.ownerDocument, 'insertImage', false, this.options.contentWindow.getSelection());
+            return this.options.ownerDocument.execCommand('insertImage', false, this.options.contentWindow.getSelection());
         }
 
-        return Util.execCommand(this.options.ownerDocument, action, false, null);
+        return this.options.ownerDocument.execCommand(action, false, null);
     }
 
     // deprecate
@@ -589,8 +589,7 @@ function MediumEditor(elements, options) {
                 }
             }, this);
 
-            this.events.detachAllDOMEvents();
-            this.events.detachAllCustomEvents();
+            this.events.destroy();
         },
 
         on: function (target, event, listener, useCapture) {
@@ -917,7 +916,7 @@ function MediumEditor(elements, options) {
                 i;
 
             if (opts.url && opts.url.trim().length > 0) {
-                Util.execCommand(this.options.ownerDocument, 'createLink', false, opts.url);
+                this.options.ownerDocument.execCommand('createLink', false, opts.url);
 
                 if (this.options.targetBlank || opts.target === '_blank') {
                     Util.setTargetBlank(Util.getSelectionStart(this.options.ownerDocument));

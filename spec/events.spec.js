@@ -1,6 +1,7 @@
 /*global MediumEditor, describe, it, expect, jasmine,
     fireEvent, afterEach, beforeEach, tearDown,
-    selectElementContentsAndFire, Events */
+    selectElementContentsAndFire, Events, spyOn, isIE,
+    selectElementContents */
 
 describe('Events TestCase', function () {
     'use strict';
@@ -116,6 +117,121 @@ describe('Events TestCase', function () {
 
             fireEvent(document.body, 'click');
             expect(blurSpy.calls.count()).toBe(1);
+        });
+    });
+
+    describe('ExecCommand Listener', function () {
+        it('should only wrap document.execCommand when required', function () {
+            var origExecCommand = document.execCommand,
+                editor = new MediumEditor('.editor');
+            expect(document.execCommand).toBe(origExecCommand);
+            editor.destroy();
+        });
+
+        it('should wrap document.execCommand with a custom method', function () {
+            spyOn(document, 'execCommand').and.callThrough();
+            var origExecCommand = document.execCommand,
+                mockInstance = {
+                    options: { ownerDocument: document }
+                },
+                events = new Events(mockInstance),
+                handler = spyOn(events, 'handleDocumentExecCommand');
+
+            events.attachToExecCommand();
+            expect(document.execCommand).not.toBe(origExecCommand);
+            expect(document.execCommand.listeners.length).toBe(1);
+
+            // Creating a real contenteditable to select to keep firefox happy during tests
+            var tempEl = document.body.appendChild(document.createElement('div'));
+            tempEl.setAttribute('contenteditable', true);
+            tempEl.innerHTML = 'firefox is lame';
+            selectElementContents(tempEl);
+            document.execCommand('bold', false, null);
+
+            expect(handler).toHaveBeenCalled();
+            expect(origExecCommand).toHaveBeenCalledWith('bold', false, null);
+
+            events.destroy();
+        });
+
+        it('should notify all listeners when execCommand is called', function () {
+            spyOn(document, 'execCommand').and.callThrough();
+            var origExecCommand = document.execCommand,
+                mockInstance = {
+                    options: { ownerDocument: document }
+                },
+                eventsOne = new Events(mockInstance),
+                eventsTwo = new Events(mockInstance),
+                handlerOne = spyOn(eventsOne, 'handleDocumentExecCommand'),
+                handlerTwo = spyOn(eventsTwo, 'handleDocumentExecCommand'),
+                args = ['bold', false, 'something'];
+
+            eventsOne.attachToExecCommand();
+            eventsTwo.attachToExecCommand();
+            expect(document.execCommand).not.toBe(origExecCommand);
+            expect(document.execCommand.listeners.length).toBe(2);
+            expect(handlerOne).not.toHaveBeenCalled();
+            expect(handlerTwo).not.toHaveBeenCalled();
+
+            document.execCommand.apply(document, args);
+
+            var expectedObj = {
+                command: 'bold',
+                value: 'something',
+                args: args,
+                result: (isIE() ? true : false)
+            };
+
+            expect(handlerOne).toHaveBeenCalledWith(expectedObj);
+            expect(handlerTwo).toHaveBeenCalledWith(expectedObj);
+            expect(origExecCommand).toHaveBeenCalledWith('bold', false, 'something');
+
+            eventsOne.destroy();
+            eventsTwo.destroy();
+        });
+
+        it('should revert back to original execCommand when all listeners are removed', function () {
+            var origExecCommand = document.execCommand,
+                mockInstance = {
+                    options: { ownerDocument: document }
+                },
+                eventsOne = new Events(mockInstance),
+                eventsTwo = new Events(mockInstance);
+
+            expect(document.execCommand).toBe(origExecCommand);
+            eventsOne.attachToExecCommand();
+            eventsTwo.attachToExecCommand();
+            expect(document.execCommand).not.toBe(origExecCommand);
+
+            eventsOne.detachExecCommand();
+            expect(document.execCommand).not.toBe(origExecCommand);
+
+            eventsTwo.detachExecCommand();
+            expect(document.execCommand).toBe(origExecCommand);
+
+            eventsOne.destroy();
+            eventsTwo.destroy();
+        });
+
+        it('should wrap and unwrap execCommand when using MediumEditor methods', function () {
+            spyOn(document, 'execCommand').and.callThrough();
+            var origExecCommand = document.execCommand,
+                editor = new MediumEditor('.editor'),
+                originalInputSupport = Events.prototype.InputEventOnContenteditableSupported;
+
+            Events.prototype.InputEventOnContenteditableSupported = false;
+
+            editor.subscribe('editableInput', function () { });
+            expect(document.execCommand).not.toBe(origExecCommand);
+
+            editor.selectElement(editor.elements[0].firstChild);
+            document.execCommand('bold', null, false);
+            expect(origExecCommand).toHaveBeenCalledWith('bold', null, false);
+
+            editor.destroy();
+            expect(document.execCommand).toBe(origExecCommand);
+
+            Events.prototype.InputEventOnContenteditableSupported = originalInputSupport;
         });
     });
 
