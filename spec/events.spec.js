@@ -139,6 +139,7 @@ describe('Events TestCase', function () {
                 editableTwo.textContent = 'lore ipsum!';
                 fireEvent(editableTwo, 'input');
                 fireEvent(editableTwo, 'keypress');
+                jasmine.clock().tick(1);
                 expect(firedTarget).toBe(editableTwo);
 
                 tearDown(editableTwo);
@@ -167,6 +168,7 @@ describe('Events TestCase', function () {
                 editableTwo.textContent = 'lore ipsum!';
                 fireEvent(editableTwo, 'input');
                 fireEvent(editableTwo, 'keypress');
+                jasmine.clock().tick(1);
                 expect(firedTarget).toBe(editableTwo);
 
                 tearDown(editableTwo);
@@ -190,6 +192,7 @@ describe('Events TestCase', function () {
                 selectElementContentsAndFire(editableTwo.firstChild);
                 expect(firedTarget).toBeUndefined();
                 fireEvent(button, 'click');
+                jasmine.clock().tick(1);
 
                 expect(firedTarget).toBe(editableTwo);
 

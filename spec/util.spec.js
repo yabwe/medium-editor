@@ -1,5 +1,5 @@
 /*global MediumEditor, Util, describe, it, expect,
-    spyOn, jasmine */
+    spyOn, jasmine, isIE */
 
 describe('Util', function () {
     'use strict';
@@ -140,7 +140,7 @@ describe('Util', function () {
                 command: 'bold',
                 value: null,
                 args: args,
-                result: false
+                result: (isIE() ? true : false)
             });
             expect(execSpy).toHaveBeenCalledWith('bold', false, null);
         });
