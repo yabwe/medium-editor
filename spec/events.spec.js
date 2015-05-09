@@ -1,6 +1,6 @@
 /*global describe, it, expect, jasmine,
     fireEvent, afterEach, beforeEach, setupTestHelpers,
-    selectElementContentsAndFire, Events, spyOn, isIE,
+    selectElementContentsAndFire, Events, spyOn,
     selectElementContents */
 
 describe('Events TestCase', function () {
@@ -164,13 +164,17 @@ describe('Events TestCase', function () {
             expect(handlerOne).not.toHaveBeenCalled();
             expect(handlerTwo).not.toHaveBeenCalled();
 
+            // Creating a real contenteditable to select to keep firefox happy during tests
+            var tempEl = this.createElement('div', '', 'firefox is lame');
+            tempEl.setAttribute('contenteditable', true);
+            selectElementContents(tempEl);
             document.execCommand.apply(document, args);
 
             var expectedObj = {
                 command: 'bold',
                 value: 'something',
                 args: args,
-                result: (isIE() ? true : false)
+                result: true
             };
 
             expect(handlerOne).toHaveBeenCalledWith(expectedObj);
