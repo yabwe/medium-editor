@@ -5,7 +5,6 @@ describe('Anchor Preview TestCase', function () {
     'use strict';
 
     beforeEach(function () {
-        jasmine.clock().install();
         setupTestHelpers.call(this);
         this.el = this.createElement('div', 'editor',
             'lorem ' +
@@ -18,7 +17,6 @@ describe('Anchor Preview TestCase', function () {
 
     afterEach(function () {
         this.cleanupTest();
-        jasmine.clock().uninstall();
     });
 
     describe('anchor preview element', function () {

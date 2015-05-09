@@ -1,6 +1,7 @@
 /*global atob, unescape, Uint8Array, Blob*/
 
 function setupTestHelpers() {
+    jasmine.clock().install();
     this.elements = [];
     this.editors = [];
 
@@ -30,6 +31,8 @@ function setupTestHelpers() {
                 element.parentNode.removeChild(element);
             }
         });
+
+        jasmine.clock().uninstall();
 
         delete this.createElement;
         delete this.createMedium;
