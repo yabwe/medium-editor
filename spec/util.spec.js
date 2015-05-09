@@ -19,7 +19,6 @@ describe('Util', function () {
                 objThree = { three: 'four', five: 'six' },
                 objFour,
                 result = MediumEditor.util.extend({}, objOne, objTwo, objThree, objFour);
-            // expect(_.isEqual(result, { one: 'two', three: 'four', five: 'six' })).toBe(true);
             expect(result).toEqual({ one: 'two', three: 'four', five: 'six' });
         });
     });
@@ -31,7 +30,6 @@ describe('Util', function () {
                 objThree = { three: 'four', five: 'six' },
                 objFour,
                 result = MediumEditor.util.defaults({}, objOne, objTwo, objThree, objFour);
-            // expect(_.isEqual(result, { one: 'one', three: 'three', five: 'six' })).toBe(true);
             expect(result).toEqual({ one: 'one', three: 'three', five: 'six' });
         });
     });
@@ -128,5 +126,4 @@ describe('Util', function () {
         });
 
     });
-
 });

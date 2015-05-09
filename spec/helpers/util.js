@@ -56,7 +56,7 @@ function fireEvent(element, event, options) {
         evt = document.createEvent('HTMLEvents');
         evt.initEvent(event, true, true); // event type,bubbling,cancelable
 
-        evt.currentTarget = element;
+        evt.currentTarget = options.currentTarget ? options.currentTarget : element;
 
         if (options.keyCode) {
             evt.keyCode = options.keyCode;

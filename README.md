@@ -200,23 +200,35 @@ Check out the Wiki page for a list of available themes: [https://github.com/davi
 * __.delay(fn)__: delay any function from being executed by the amount of time passed as the `delay` option
 * __.getSelectionParentElement(range)__: get the parent contenteditable element that contains the current selection
 * __.getExtensionByName(name)__: get a reference to an extension with the specified name
+* __.getFocusedElement()__: returns an element if any contenteditable element monitored by MediumEditor currently has focused
 * __.selectElement(element)__: change selection to be a specific element and update the toolbar to reflect the selection
 * __.exportSelection()__: return a data representation of the selected text, which can be applied via `importSelection()`
 * __.importSelection(selectionState)__: restore the selection using a data representation of previously selected text (ie value returned by `exportSelection()`)
 
 ## Capturing DOM changes
 
-For observing any changes on contentEditable
+For observing any changes on contentEditable, use the custom 'editableInput' event exposed via the `subscribe()` method:
 
 ```js
-$('.editable').on('input', function() {
-  // Do some work
+var editor = new MediumEditor('.editable');
+editor.subscribe('editableInput', function (event, editable) {
+    // Do some work
 });
 ```
 
-This is handy when you need to capture modifications to the contenteditable element that occur outside of `key up`'s scope (like clicking on toolbar buttons).
+This event is supported in all browsers supported by MediumEditor (including IE9+)!  To help with cases when one instance of MediumEditor is monitoring multiple elements, the 2nd argument passed to the event handler (`editable` in the example above) will be a reference to the contenteditable element that has actually changed.
 
-`input` is supported by Chrome, Firefox, and other modern browsers (However, [it is not supported in IE 9-11](https://connect.microsoft.com/IE/feedback/details/794285/ie10-11-input-event-does-not-fire-on-div-with-contenteditable-set)). If you want to read more or support older browsers, check [Listening to events of a contenteditable HTML element](http://stackoverflow.com/questions/7802784/listening-to-events-of-a-contenteditable-html-element/7804973#7804973) and [Detect changes in the DOM](http://stackoverflow.com/questions/3219758/detect-changes-in-the-dom)
+This is handy when you need to capture any modifications to the contenteditable element including:
+* Typing
+* Cutting/Pasting
+* Changes from clicking on buttons in the toolbar
+* Undo/Redo
+
+Why is this interesting and why should you use this event instead of just attaching to the `input` event on the contenteditable element?
+
+So for most modern browsers (Chrome, Firefox, Safari, etc.), the `input` event works just fine. Infact, `editableInput` is just a proxy for the `input` event in those browsers. However, the `input` event [is not supported for contenteditable elements in IE 9-11](https://connect.microsoft.com/IE/feedback/details/794285/ie10-11-input-event-does-not-fire-on-div-with-contenteditable-set).
+
+So, to properly support the `editableInput` event in Internet Explorer, MediumEditor uses a combination of the `selectionchange` and `keypress` events, as well as monitoring calls to `document.execCommand`.
 
 ## Extensions & Plugins
 

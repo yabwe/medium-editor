@@ -312,7 +312,7 @@ function MediumEditor(elements, options) {
     }
 
     function initElements() {
-        this.elements.forEach(function (element) {
+        this.elements.forEach(function (element, index) {
             if (!this.options.disableEditing && !element.getAttribute('data-disable-editing')) {
                 element.setAttribute('contentEditable', true);
                 element.setAttribute('spellcheck', this.options.spellcheck);
@@ -323,6 +323,7 @@ function MediumEditor(elements, options) {
             element.setAttribute('data-medium-element', true);
             element.setAttribute('role', 'textbox');
             element.setAttribute('aria-multiline', true);
+            element.setAttribute('medium-editor-index', index);
 
             if (element.hasAttribute('medium-editor-textarea-id')) {
                 this.on(element, 'input', function (event) {
@@ -588,8 +589,7 @@ function MediumEditor(elements, options) {
                 }
             }, this);
 
-            this.events.detachAllDOMEvents();
-            this.events.detachAllCustomEvents();
+            this.events.destroy();
         },
 
         on: function (target, event, listener, useCapture) {
@@ -783,6 +783,21 @@ function MediumEditor(elements, options) {
             if (selElement) {
                 this.events.focusElement(selElement);
             }
+        },
+
+        getFocusedElement: function () {
+            var focused;
+            this.elements.some(function (element) {
+                // Find the element that has focus
+                if (!focused && element.getAttribute('data-medium-focused')) {
+                    focused = element;
+                }
+
+                // bail if we found the element that had focus
+                return !!focused;
+            }, this);
+
+            return focused;
         },
 
         // http://stackoverflow.com/questions/17678843/cant-restore-selection-after-html-modify-even-if-its-the-same-html
