@@ -1,30 +1,29 @@
 /*global MediumEditor, describe, it,  expect, spyOn,
-    afterEach, beforeEach, jasmine, fireEvent, tearDown */
+    afterEach, beforeEach, jasmine, fireEvent, setupTestHelpers */
 
 describe('Anchor Preview TestCase', function () {
     'use strict';
 
     beforeEach(function () {
         jasmine.clock().install();
-        this.el = document.createElement('div');
-        this.el.className = 'editor';
-        this.el.innerHTML = 'lorem ' +
+        setupTestHelpers.call(this);
+        this.el = this.createElement('div', 'editor',
+            'lorem ' +
             '<a id="test-link" href="http://test.com">ipsum</a> ' +
             'preview <span id="another-element">&nbsp;</span> ' +
             '<a id="test-empty-link" href="">ipsum</a> ' +
             '<a id="test-markup-link" href="http://test.com"><b>ipsum</b></a> ' +
-            '<a id="test-symbol-link" href="http://[{~#custom#~}].com"></a>';
-        document.body.appendChild(this.el);
+            '<a id="test-symbol-link" href="http://[{~#custom#~}].com"></a>');
     });
 
     afterEach(function () {
-        tearDown(this.el);
+        this.cleanupTest();
         jasmine.clock().uninstall();
     });
 
     describe('anchor preview element', function () {
         it('should be displayed on hover of a link element', function () {
-            var editor = new MediumEditor('.editor', {
+            var editor = this.newMediumEditor('.editor', {
                 delay: 200
             }),
                 sel = window.getSelection(),
@@ -61,7 +60,7 @@ describe('Anchor Preview TestCase', function () {
         });
 
         it('should be displayed on hover of a link element with markup inside', function () {
-            var editor = new MediumEditor('.editor', {
+            var editor = this.newMediumEditor('.editor', {
                 delay: 200
             }),
             anchorPreview = editor.getExtensionByName('anchor-preview');
@@ -80,7 +79,7 @@ describe('Anchor Preview TestCase', function () {
         });
 
         it('should show the unencoded link', function () {
-            var editor = new MediumEditor('.editor'),
+            var editor = this.newMediumEditor('.editor'),
                 anchorPreview = editor.getExtensionByName('anchor-preview');
 
             // show preview
@@ -94,7 +93,7 @@ describe('Anchor Preview TestCase', function () {
         });
 
         it('should display different urls when hovering over different links consecutively', function () {
-            var editor = new MediumEditor('.editor', {
+            var editor = this.newMediumEditor('.editor', {
                 delay: 300
             }),
                 anchorPreview = editor.getExtensionByName('anchor-preview');
@@ -116,7 +115,7 @@ describe('Anchor Preview TestCase', function () {
         });
 
         it('should display the anchor form in the toolbar when clicked', function () {
-            var editor = new MediumEditor('.editor'),
+            var editor = this.newMediumEditor('.editor'),
                 anchorPreview = editor.getExtensionByName('anchor-preview');
 
             // show preview
@@ -132,7 +131,7 @@ describe('Anchor Preview TestCase', function () {
         });
 
         it('should NOT be displayed when the hovered link is empty', function () {
-            var editor = new MediumEditor('.editor', {
+            var editor = this.newMediumEditor('.editor', {
                 delay: 200
             }),
                 anchorPreview = editor.getExtensionByName('anchor-preview');
@@ -147,7 +146,7 @@ describe('Anchor Preview TestCase', function () {
         });
 
         it('should not be present when disableAnchorPreview option is passed', function () {
-            var editor = new MediumEditor('.editor', {
+            var editor = this.newMediumEditor('.editor', {
                 disableAnchorPreview: true
             }),
                 anchorPreview = editor.getExtensionByName('anchor-preview');
@@ -157,7 +156,7 @@ describe('Anchor Preview TestCase', function () {
         });
 
         it('should not be present when disableToolbar option is passed', function () {
-            var editor = new MediumEditor('.editor', {
+            var editor = this.newMediumEditor('.editor', {
                 disableToolbar: true
             }),
                 anchorPreview = editor.getExtensionByName('anchor-preview');
@@ -167,7 +166,7 @@ describe('Anchor Preview TestCase', function () {
         });
 
         it('should be removed from the document when editor is destroyed', function () {
-            var editor = new MediumEditor('.editor'),
+            var editor = this.newMediumEditor('.editor'),
                 anchorPreview = editor.getExtensionByName('anchor-preview');
 
             spyOn(MediumEditor.statics.AnchorPreview.prototype, 'deactivate').and.callThrough();
