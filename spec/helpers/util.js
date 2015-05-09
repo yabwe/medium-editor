@@ -1,5 +1,44 @@
 /*global atob, unescape, Uint8Array, Blob*/
 
+function setupTestHelpers() {
+    this.elements = [];
+    this.editors = [];
+
+    this.createElement = function (tag, className, html, dontAppend) {
+        var el = document.createElement(tag);
+        el.innerHTML = html || '';
+        el.className = className;
+        this.elements.push(el);
+        if (!dontAppend) {
+            document.body.appendChild(el);
+        }
+        return el;
+    };
+
+    this.newMediumEditor = function (selector, options) {
+        var editor = new MediumEditor(selector, options);
+        this.editors.push(editor);
+        return editor;
+    };
+
+    this.cleanupTest = function () {
+        this.editors.forEach(function (editor) {
+            editor.destroy();
+        });
+        this.elements.forEach(function (element) {
+            if (element.parentNode) {
+                element.parentNode.removeChild(element);
+            }
+        });
+
+        delete this.createElement;
+        delete this.createMedium;
+        delete this.elements;
+        delete this.editors;
+        delete this.cleanupTest;
+    }
+}
+
 function isIE9() {
     return navigator.appName.indexOf('Internet Explorer') !== -1 && navigator.appVersion.indexOf("MSIE 9") !== -1;
 }
