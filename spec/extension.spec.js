@@ -1,19 +1,17 @@
 /*global MediumEditor, describe, it, expect, spyOn,
-    afterEach, beforeEach, jasmine, tearDown,
+    afterEach, beforeEach, jasmine, setupTestHelpers,
     selectElementContentsAndFire, Extension */
 
 describe('Extensions TestCase', function () {
     'use strict';
 
     beforeEach(function () {
-        this.el = document.createElement('div');
-        this.el.className = 'editor';
-        this.el.innerHTML = 'lorem ipsum';
-        document.body.appendChild(this.el);
+        setupTestHelpers.call(this);
+        this.el = this.createElement('div', 'editor', 'lore ipsum');
     });
 
     afterEach(function () {
-        tearDown(this.el);
+        this.cleanupTest();
     });
 
     describe('Editor', function () {
@@ -23,7 +21,7 @@ describe('Extensions TestCase', function () {
                 'extension1': {},
                 'extension2': {}
             },
-                editor = new MediumEditor('.editor', {
+                editor = this.newMediumEditor('.editor', {
                     extensions: extensions
                 });
             expect(editor.options.extensions).toBe(extensions);
@@ -36,7 +34,7 @@ describe('Extensions TestCase', function () {
             },
                 ext1 = new Extension(),
                 ext2 = new Extension(),
-                editor = new MediumEditor('.editor', {
+                editor = this.newMediumEditor('.editor', {
                     extensions: {
                         'one': ext1,
                         'two': ext2
@@ -73,7 +71,7 @@ describe('Extensions TestCase', function () {
             ext1 = new ExtensionOne();
             ext2 = new ExtensionTwo();
 
-            editor = new MediumEditor('.editor', {
+            editor = this.newMediumEditor('.editor', {
                 extensions: {
                     'one': ext1,
                     'two': ext2
@@ -82,7 +80,6 @@ describe('Extensions TestCase', function () {
 
             expect(ext1.me instanceof MediumEditor).toBeTruthy();
             expect(ext2.me instanceof MediumEditor).toBeTruthy();
-            editor.destroy();
         });
     });
 
@@ -117,7 +114,7 @@ describe('Extensions TestCase', function () {
 
             spyOn(e1, 'init');
 
-            editor = new MediumEditor('.editor', {
+            editor = this.newMediumEditor('.editor', {
                 extensions: {
                     'foo': e1,
                     'bar': e2
@@ -154,7 +151,7 @@ describe('Extensions TestCase', function () {
             };
 
         it('should include extensions button into toolbar', function () {
-            var editor = new MediumEditor('.editor', {
+            var editor = this.newMediumEditor('.editor', {
                 buttons: ['dummy'],
                 extensions: {
                     'dummy': ExtensionWithElement
@@ -165,7 +162,7 @@ describe('Extensions TestCase', function () {
 
         it('should call checkState on extensions when toolbar selection updates', function () {
             jasmine.clock().install();
-            var editor = new MediumEditor('.editor', {
+            var editor = this.newMediumEditor('.editor', {
                     buttons: ['dummy'],
                     extensions: {
                         'dummy': ExtensionWithElement
@@ -180,7 +177,7 @@ describe('Extensions TestCase', function () {
         });
 
         it('should include extensions button by string into the toolbar', function () {
-            var editor = new MediumEditor('.editor', {
+            var editor = this.newMediumEditor('.editor', {
                 buttons: ['dummy'],
                 extensions: {
                     'dummy': ExtensionWithString
@@ -190,7 +187,7 @@ describe('Extensions TestCase', function () {
         });
 
         it('should not include extensions button into toolbar that are not in "buttons"', function () {
-            var editor = new MediumEditor('.editor', {
+            var editor = this.newMediumEditor('.editor', {
                 buttons: ['bold'],
                 extensions: {
                     'dummy': ExtensionWithElement
@@ -204,7 +201,7 @@ describe('Extensions TestCase', function () {
                 editor;
 
             spyOn(ext, 'init');
-            editor = new MediumEditor('.editor', {
+            editor = this.newMediumEditor('.editor', {
                 buttons: ['bold', 'italic'],
                 extensions: {
                     'bold': ext
@@ -227,7 +224,7 @@ describe('Extensions TestCase', function () {
             extTwo = new ExtensionTwo();
 
         it('should check if extension class has parent attribute', function () {
-            var editor = new MediumEditor('.editor', {
+            var editor = this.newMediumEditor('.editor', {
                 extensions: {
                     'one': extOne,
                     'two': extTwo
@@ -240,7 +237,7 @@ describe('Extensions TestCase', function () {
         });
 
         it('should set the base attribute to be an instance of editor', function () {
-            var editor = new MediumEditor('.editor', {
+            var editor = this.newMediumEditor('.editor', {
                 extensions: {
                     'one': extOne,
                     'two': extTwo
@@ -253,7 +250,7 @@ describe('Extensions TestCase', function () {
         });
 
         it('should set the name of the extension', function () {
-            var editor = new MediumEditor('.editor', {
+            this.newMediumEditor('.editor', {
                 extensions: {
                     'one': extOne,
                     'two': extTwo
@@ -262,7 +259,6 @@ describe('Extensions TestCase', function () {
 
             expect(extOne.name).toBe('one');
             expect(extTwo.name).toBe('two');
-            editor.destroy();
         });
     });
 });
