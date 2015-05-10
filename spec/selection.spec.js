@@ -1,22 +1,18 @@
 /*global MediumEditor, describe, it, expect, spyOn,
          afterEach, beforeEach, fireEvent,
-         jasmine, selectElementContents, tearDown,
+         jasmine, selectElementContents, setupTestHelpers,
          selectElementContentsAndFire, Selection */
 
 describe('Selection TestCase', function () {
     'use strict';
 
     beforeEach(function () {
-        this.el = document.createElement('div');
-        this.el.className = 'editor';
-        this.el.innerHTML = 'lorem ipsum';
-        document.body.appendChild(this.el);
-        jasmine.clock().install();
+        setupTestHelpers.call(this);
+        this.el = this.createElement('div', 'editor', 'lorem ipsum');
     });
 
     afterEach(function () {
-        tearDown(this.el);
-        jasmine.clock().uninstall();
+        this.cleanupTest();
     });
 
     describe('Exposure', function () {
@@ -29,7 +25,7 @@ describe('Selection TestCase', function () {
     describe('Export/Import Selection', function () {
         it('should be able to import an exported selection', function () {
             this.el.innerHTML = 'lorem <i>ipsum</i> dolor';
-            var editor = new MediumEditor('.editor', {
+            var editor = this.newMediumEditor('.editor', {
                 buttons: ['italic', 'underline', 'strikethrough']
             });
 
@@ -45,22 +41,15 @@ describe('Selection TestCase', function () {
         });
 
         it('should have an index in the exported selection when it is in the second contenteditable', function () {
-            var el2 = document.createElement('div');
-            el2.className = 'editor';
-            el2.innerHTML = 'lorem <i>ipsum</i> dolor';
-            try {
-                document.body.appendChild(el2);
-                var editor = new MediumEditor('.editor', {
-                    buttons: ['italic', 'underline', 'strikethrough']
-                });
+            this.createElement('div', 'editor', 'lorem <i>ipsum</i> dolor');
+            var editor = this.newMediumEditor('.editor', {
+                buttons: ['italic', 'underline', 'strikethrough']
+            });
 
-                selectElementContents(editor.elements[1].querySelector('i'));
-                var exportedSelection = editor.exportSelection();
-                expect(Object.keys(exportedSelection).sort()).toEqual(['editableElementIndex', 'end', 'start']);
-                expect(exportedSelection.editableElementIndex).toEqual(1);
-            } finally {
-                document.body.removeChild(el2);
-            }
+            selectElementContents(editor.elements[1].querySelector('i'));
+            var exportedSelection = editor.exportSelection();
+            expect(Object.keys(exportedSelection).sort()).toEqual(['editableElementIndex', 'end', 'start']);
+            expect(exportedSelection.editableElementIndex).toEqual(1);
         });
     });
 
@@ -68,7 +57,7 @@ describe('Selection TestCase', function () {
         it('should be applicable if html changes but text does not', function () {
             this.el.innerHTML = 'lorem <i>ipsum</i> dolor';
 
-            var editor = new MediumEditor('.editor', {
+            var editor = this.newMediumEditor('.editor', {
                 buttons: ['italic', 'underline', 'strikethrough']
             }),
                 button,
@@ -95,14 +84,14 @@ describe('Selection TestCase', function () {
     describe('CheckSelection', function () {
         it('should check for selection on mouseup event', function () {
             spyOn(MediumEditor.statics.Toolbar.prototype, 'checkState');
-            var editor = new MediumEditor('.editor');
+            var editor = this.newMediumEditor('.editor');
             fireEvent(editor.elements[0], 'mouseup');
             expect(editor.toolbar.checkState).toHaveBeenCalled();
         });
 
         it('should check for selection on keyup', function () {
             spyOn(MediumEditor.statics.Toolbar.prototype, 'checkState');
-            var editor = new MediumEditor('.editor');
+            var editor = this.newMediumEditor('.editor');
             fireEvent(editor.elements[0], 'keyup');
             expect(editor.toolbar.checkState).toHaveBeenCalled();
         });
@@ -111,7 +100,7 @@ describe('Selection TestCase', function () {
             spyOn(MediumEditor.statics.Toolbar.prototype, 'setToolbarPosition').and.callThrough();
             spyOn(MediumEditor.statics.Toolbar.prototype, 'setToolbarButtonStates').and.callThrough();
             spyOn(MediumEditor.statics.Toolbar.prototype, 'showAndUpdateToolbar').and.callThrough();
-            var editor = new MediumEditor('.editor');
+            var editor = this.newMediumEditor('.editor');
             editor.toolbar.getToolbarElement().style.display = 'block';
             editor.toolbar.getToolbarElement().classList.add('medium-editor-toolbar-active');
             expect(editor.toolbar.getToolbarElement().classList.contains('medium-editor-toolbar-active')).toBe(true);
@@ -124,7 +113,7 @@ describe('Selection TestCase', function () {
 
         it('should hide the toolbar when selecting multiple paragraphs and the allowMultiParagraphSelection option is false', function () {
             this.el.innerHTML = '<p id="p-one">lorem ipsum</p><p id="p-two">lorem ipsum</p>';
-            var editor = new MediumEditor('.editor', {
+            var editor = this.newMediumEditor('.editor', {
                 allowMultiParagraphSelection: false
             });
             selectElementContentsAndFire(document.getElementById('p-one'), { eventToFire: 'focus' });
@@ -134,7 +123,7 @@ describe('Selection TestCase', function () {
         });
 
         it('should show the toolbar when something is selected', function () {
-            var editor = new MediumEditor('.editor');
+            var editor = this.newMediumEditor('.editor');
             expect(editor.toolbar.getToolbarElement().classList.contains('medium-editor-toolbar-active')).toBe(false);
             selectElementContentsAndFire(this.el);
             jasmine.clock().tick(501);
@@ -145,7 +134,7 @@ describe('Selection TestCase', function () {
             spyOn(MediumEditor.statics.Toolbar.prototype, 'setToolbarPosition').and.callThrough();
             spyOn(MediumEditor.statics.Toolbar.prototype, 'setToolbarButtonStates').and.callThrough();
             spyOn(MediumEditor.statics.Toolbar.prototype, 'showAndUpdateToolbar').and.callThrough();
-            var editor = new MediumEditor('.editor');
+            var editor = this.newMediumEditor('.editor');
             selectElementContentsAndFire(this.el);
             jasmine.clock().tick(51);
             expect(editor.toolbar.setToolbarPosition).toHaveBeenCalled();
@@ -156,7 +145,7 @@ describe('Selection TestCase', function () {
         it('should update button states for static toolbar when updateOnEmptySelection is true and the selection is empty', function () {
             spyOn(MediumEditor.statics.Toolbar.prototype, 'setToolbarButtonStates').and.callThrough();
 
-            var editor = new MediumEditor('.editor', {
+            var editor = this.newMediumEditor('.editor', {
                 updateOnEmptySelection: true,
                 staticToolbar: true
             });

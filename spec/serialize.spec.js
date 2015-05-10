@@ -1,23 +1,21 @@
-/*global MediumEditor, describe, it, expect,
-    afterEach, beforeEach, tearDown */
+/*global describe, it, expect,
+    afterEach, beforeEach, setupTestHelpers */
 
 describe('Anchor Button TestCase', function () {
     'use strict';
 
     beforeEach(function () {
-        this.el = document.createElement('div');
-        this.el.className = 'editor';
+        setupTestHelpers.call(this);
+        this.el = this.createElement('div', 'editor', '<p>lorem <strong>ipsum</strong></p>');
         this.el.id = 'medium-editor-test';
-        this.el.innerHTML = '<p>lorem <strong>ipsum</strong></p>';
-        document.body.appendChild(this.el);
     });
 
     afterEach(function () {
-        tearDown(this.el);
+        this.cleanupTest();
     });
 
     it('should return the editor content as a JSON object', function () {
-        var editor = new MediumEditor('.editor'),
+        var editor = this.newMediumEditor('.editor'),
             json = editor.serialize();
         expect(json).toEqual({
             'medium-editor-test': {
@@ -28,7 +26,7 @@ describe('Anchor Button TestCase', function () {
 
     it('should set a custom id when elements have no ids', function () {
         this.el.removeAttribute('id');
-        var editor = new MediumEditor('.editor'),
+        var editor = this.newMediumEditor('.editor'),
             json = editor.serialize();
         expect(json).toEqual({
             'element-0': {
