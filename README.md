@@ -27,9 +27,13 @@ __demo__: [http://daviferreira.github.io/medium-editor/](http://daviferreira.git
 
 ### Installation
 
+**Via npm:**
+
+Run in your console: `npm install medium-editor`
+
 **Via bower:**
 
-Run in your console: `bower install medium-editor`
+`bower install medium-editor`
 
 **Manual installation:**
 
@@ -40,13 +44,14 @@ Download the [latest release](https://github.com/daviferreira/medium-editor/rele
 <link rel="stylesheet" href="css/themes/default.css"> <!-- or any other theme -->
 ```
 
+### Usage
+
 The next step is to reference the editor's script
 
 ```html
 <script src="js/medium-editor.js"></script>
 ```
 
-### Usage
 You can now instantiate a new MediumEditor object:
 ```html
 <script>var editor = new MediumEditor('.editable');</script>
@@ -61,9 +66,7 @@ var elements = document.querySelectorAll('.editable'),
     editor = new MediumEditor(elements);
 ```
 
-MediumEditor also supports textarea. If you provide a textarea element, the script
-will create a new div with `contentEditable=true`, hide the textarea and link
-the textarea value to the div HTML content.
+MediumEditor also supports textarea. If you provide a textarea element, the script will create a new div with `contentEditable=true`, hide the textarea and link the textarea value to the div HTML content.
 
 ## Initialization options
 
@@ -271,9 +274,27 @@ The source files are located inside the __src__ directory.  Be sure to make chan
 6. Push to the branch (`git push origin my-new-feature`)
 7. Create new Pull Request
 
+### Code Consistency
+
+To help create consistent looking code throughout the project, we use a few tools to help us. They have plugins for most popular editors/IDEs to make coding for our project, but you should use them in your project as well!
+
+#### JSHint
+
+We use [JSHint](http://jshint.com/) on each build to find easy-to-catch errors and potential problems in our js.  You can find our JSHint settings in the `.jshintrc` file in the root of the project.
+
+#### jscs
+
+We use [jscs](http://jscs.info/) on each build to enforce some code style rules we have for our project.  You can find our jscs settings in the `.jscsrc` file in the root of the project.
+
+#### EditorConfig
+
+We use [EditorConfig](http://EditorConfig.org) to maintain consistent coding styles between various editors and IDEs.  You can find our settings in the `.editorconfig` file in the root of the project.
+
+### Easy First Bugs
+
 Looking for something simple for a first contribution? Try fixing an [easy first bug](https://github.com/daviferreira/medium-editor/issues?q=is%3Aopen+is%3Aissue+label%3A%22easy+first+bug%22)!
 
-## Contributors
+## Contributors (100+ and counting!)
 
 [https://github.com/daviferreira/medium-editor/graphs/contributors](https://github.com/daviferreira/medium-editor/graphs/contributors)
 
