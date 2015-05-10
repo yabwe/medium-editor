@@ -161,7 +161,6 @@ describe('Extensions TestCase', function () {
         });
 
         it('should call checkState on extensions when toolbar selection updates', function () {
-            jasmine.clock().install();
             var editor = this.newMediumEditor('.editor', {
                     buttons: ['dummy'],
                     extensions: {
