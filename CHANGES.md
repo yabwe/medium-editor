@@ -1,3 +1,9 @@
+4.8.0 / 2015-05-11
+==================
+* Expose new 'editableInput' event for monitoring changes to editor
+* Cleanup contenteditable elements created for textareas
+
+
 4.7.3 / 2015-05-07
 ==================
 * Update version number in dist files
