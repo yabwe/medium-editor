@@ -3026,12 +3026,12 @@ LINK_REGEXP_TEXT =
                     textIndexOfEndOfFarthestNode = currentTextIndex + (newNode || currentNode).nodeValue.length +
                             (newNode ? currentNode.nodeValue.length : 0) -
                             1;
+                    var endSplitPoint = (newNode || currentNode).nodeValue.length -
+                            (textIndexOfEndOfFarthestNode + 1 - matches[matchIndex].end);
                     if (startReached && textIndexOfEndOfFarthestNode >= matches[matchIndex].end &&
-                            currentTextIndex !== textIndexOfEndOfFarthestNode) {
-                        (newNode || currentNode).splitText(
-                                (newNode || currentNode).nodeValue.length -
-                                (textIndexOfEndOfFarthestNode + 1 - matches[matchIndex].end)
-                            );
+                            currentTextIndex !== textIndexOfEndOfFarthestNode &&
+                            endSplitPoint !== 0) {
+                        (newNode || currentNode).splitText(endSplitPoint);
                     }
                     if (startReached && currentTextIndex === matches[matchIndex].end) {
                         break; // Found the node(s) corresponding to the link. Break out and move on to the next.
