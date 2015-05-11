@@ -15,7 +15,7 @@ function MediumEditor(elements, options) {
     function handleDisabledEnterKeydown(event, element) {
         if (this.options.disableReturn || element.getAttribute('data-disable-return')) {
             event.preventDefault();
-        } else if (this.options.disableDoubleReturn || this.getAttribute('data-disable-double-return')) {
+        } else if (this.options.disableDoubleReturn || element.getAttribute('data-disable-double-return')) {
             var node = Util.getSelectionStart(this.options.ownerDocument);
             if (node && node.textContent.trim() === '') {
                 event.preventDefault();
@@ -316,7 +316,7 @@ function MediumEditor(elements, options) {
     }
 
     function initElements() {
-        this.elements.forEach(function (element) {
+        this.elements.forEach(function (element, index) {
             if (!this.options.disableEditing && !element.getAttribute('data-disable-editing')) {
                 element.setAttribute('contentEditable', true);
                 element.setAttribute('spellcheck', this.options.spellcheck);
@@ -327,6 +327,7 @@ function MediumEditor(elements, options) {
             element.setAttribute('data-medium-element', true);
             element.setAttribute('role', 'textbox');
             element.setAttribute('aria-multiline', true);
+            element.setAttribute('medium-editor-index', index);
 
             if (element.hasAttribute('medium-editor-textarea-id')) {
                 this.on(element, 'input', function (event) {
@@ -575,8 +576,6 @@ function MediumEditor(elements, options) {
                 return;
             }
 
-            var i;
-
             this.isActive = false;
 
             if (this.toolbar !== undefined) {
@@ -584,11 +583,24 @@ function MediumEditor(elements, options) {
                 delete this.toolbar;
             }
 
-            for (i = 0; i < this.elements.length; i += 1) {
-                this.elements[i].removeAttribute('contentEditable');
-                this.elements[i].removeAttribute('spellcheck');
-                this.elements[i].removeAttribute('data-medium-element');
-            }
+            this.elements.forEach(function (element) {
+                element.removeAttribute('contentEditable');
+                element.removeAttribute('spellcheck');
+                element.removeAttribute('data-medium-element');
+
+                // Remove any elements created for textareas
+                if (element.hasAttribute('medium-editor-textarea-id')) {
+                    var textarea = element.parentNode.querySelector('textarea[medium-editor-textarea-id="' + element.getAttribute('medium-editor-textarea-id') + '"]');
+                    if (textarea) {
+                        // Un-hide the textarea
+                        textarea.classList.remove('medium-editor-hidden');
+                    }
+                    if (element.parentNode) {
+                        element.parentNode.removeChild(element);
+                    }
+                }
+            }, this);
+            this.elements = [];
 
             this.commands.forEach(function (extension) {
                 if (typeof extension.deactivate === 'function') {
@@ -596,8 +608,7 @@ function MediumEditor(elements, options) {
                 }
             }, this);
 
-            this.events.detachAllDOMEvents();
-            this.events.detachAllCustomEvents();
+            this.events.destroy();
         },
 
         on: function (target, event, listener, useCapture) {
@@ -791,6 +802,21 @@ function MediumEditor(elements, options) {
             if (selElement) {
                 this.events.focusElement(selElement);
             }
+        },
+
+        getFocusedElement: function () {
+            var focused;
+            this.elements.some(function (element) {
+                // Find the element that has focus
+                if (!focused && element.getAttribute('data-medium-focused')) {
+                    focused = element;
+                }
+
+                // bail if we found the element that had focus
+                return !!focused;
+            }, this);
+
+            return focused;
         },
 
         // http://stackoverflow.com/questions/17678843/cant-restore-selection-after-html-modify-even-if-its-the-same-html

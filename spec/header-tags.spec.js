@@ -1,28 +1,23 @@
-/*global MediumEditor, describe, it, expect, afterEach,
-    beforeEach, fireEvent, jasmine, tearDown */
+/*global describe, it, expect, afterEach,
+    beforeEach, fireEvent, setupTestHelpers */
 
 describe('Protect Header Tags TestCase', function () {
     'use strict';
 
     beforeEach(function () {
-        this.el = document.createElement('div');
-        this.el.className = 'editor';
+        setupTestHelpers.call(this);
+        this.el = this.createElement('div', 'editor', '<p id="first-p">lorem ipsum</p><p></p><h2 id="header">Cats</h2>');
         this.el.id = 'editor';
-        this.el.innerHTML = '<p id="first-p">lorem ipsum</p><p></p><h2 id="header">Cats</h2>';
-        document.body.appendChild(this.el);
     });
 
     afterEach(function () {
-        tearDown(this.el);
-        jasmine.clock().uninstall();
+        this.cleanupTest();
     });
 
     describe('ProtectHeaderTags', function () {
         it('header intact after leading return', function () {
-            jasmine.clock().install();
-
             // place cursor at begining of header
-            var editor = new MediumEditor('.editor'),
+            var editor = this.newMediumEditor('.editor'),
                 el = document.getElementById('header'),
                 range = document.createRange(),
                 sel = window.getSelection();
@@ -41,10 +36,8 @@ describe('Protect Header Tags TestCase', function () {
         });
 
         it('header leading return inserts paragraph, not additional header', function () {
-            jasmine.clock().install();
-
             // place cursor at begining of header
-            var editor = new MediumEditor('.editor'),
+            var editor = this.newMediumEditor('.editor'),
                 el = document.getElementById('header'),
                 range = document.createRange(),
                 sel = window.getSelection();
@@ -62,10 +55,8 @@ describe('Protect Header Tags TestCase', function () {
         });
 
         it('header leading backspace into empty p preserves header', function () {
-            jasmine.clock().install();
-
             // place cursor at begining of header
-            var editor = new MediumEditor('.editor'),
+            var editor = this.newMediumEditor('.editor'),
                 originalHTML = document.getElementById('editor').innerHTML,
                 el = document.getElementById('header'),
                 range = document.createRange(),

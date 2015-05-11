@@ -10,16 +10,14 @@ MediumEditor has been written using vanilla JavaScript, no additional frameworks
 
 [![Sauce Test Status](https://saucelabs.com/browser-matrix/mediumeditor.svg)](https://saucelabs.com/u/mediumeditor)
 
-![Firefox](https://cloud.githubusercontent.com/assets/398893/3528329/26283ab0-078e-11e4-84d4-db2cf1009953.png) | ![Chrome](https://cloud.githubusercontent.com/assets/398893/3528328/23bc7bc4-078e-11e4-8752-ba2809bf5cce.png) | ![IE](https://cloud.githubusercontent.com/assets/398893/3528325/20373e76-078e-11e4-8e3a-1cb86cf506f0.png) | ![Safari](https://cloud.githubusercontent.com/assets/398893/3528331/29df8618-078e-11e4-8e3e-ed8ac738693f.png)
---- | --- | --- | --- | --- |
-Latest ✔ | Latest ✔ | IE 9+ ✔ | Latest ✔ |
+![Supportd Browsers](https://cloud.githubusercontent.com/assets/2444240/7519189/a819e426-f4ad-11e4-8740-626396c5d61b.png)
 
 [![NPM info](https://nodei.co/npm/medium-editor.png?downloads=true)](https://nodei.co/npm/medium-editor.png?downloads=true)
 
-[![Travis build status](https://travis-ci.org/daviferreira/medium-editor.png?branch=master)](https://travis-ci.org/daviferreira/medium-editor)
-[![dependencies](https://david-dm.org/daviferreira/medium-editor.png)](https://david-dm.org/daviferreira/medium-editor)
-[![devDependency Status](https://david-dm.org/daviferreira/medium-editor/dev-status.png)](https://david-dm.org/daviferreira/medium-editor#info=devDependencies)
-[![Coverage Status](https://coveralls.io/repos/daviferreira/medium-editor/badge.svg?branch=master)](https://coveralls.io/r/daviferreira/medium-editor?branch=master)
+[![Travis build status](http://img.shields.io/travis/daviferreira/medium-editor.svg?style=flat-square)](https://travis-ci.org/daviferreira/medium-editor)
+[![dependencies](http://img.shields.io/david/daviferreira/medium-editor.svg?style=flat-square)](https://david-dm.org/daviferreira/medium-editor)
+[![devDependency Status](http://img.shields.io/david/dev/daviferreira/medium-editor.svg?style=flat-square)](https://david-dm.org/daviferreira/medium-editor#info=devDependencies)
+[![Coverage Status](http://img.shields.io/coveralls/daviferreira/medium-editor.svg?style=flat-square)](https://coveralls.io/r/daviferreira/medium-editor?branch=master)
 
 # Basic usage
 
@@ -29,9 +27,13 @@ __demo__: [http://daviferreira.github.io/medium-editor/](http://daviferreira.git
 
 ### Installation
 
+**Via npm:**
+
+Run in your console: `npm install medium-editor`
+
 **Via bower:**
 
-Run in your console: `bower install medium-editor`
+`bower install medium-editor`
 
 **Manual installation:**
 
@@ -42,13 +44,14 @@ Download the [latest release](https://github.com/daviferreira/medium-editor/rele
 <link rel="stylesheet" href="css/themes/default.css"> <!-- or any other theme -->
 ```
 
+### Usage
+
 The next step is to reference the editor's script
 
 ```html
 <script src="js/medium-editor.js"></script>
 ```
 
-### Usage
 You can now instantiate a new MediumEditor object:
 ```html
 <script>var editor = new MediumEditor('.editable');</script>
@@ -63,9 +66,7 @@ var elements = document.querySelectorAll('.editable'),
     editor = new MediumEditor(elements);
 ```
 
-MediumEditor also supports textarea. If you provide a textarea element, the script
-will create a new div with `contentEditable=true`, hide the textarea and link
-the textarea value to the div HTML content.
+MediumEditor also supports textarea. If you provide a textarea element, the script will create a new div with `contentEditable=true`, hide the textarea and link the textarea value to the div HTML content.
 
 ## Initialization options
 
@@ -203,23 +204,35 @@ Check out the Wiki page for a list of available themes: [https://github.com/davi
 * __.delay(fn)__: delay any function from being executed by the amount of time passed as the `delay` option
 * __.getSelectionParentElement(range)__: get the parent contenteditable element that contains the current selection
 * __.getExtensionByName(name)__: get a reference to an extension with the specified name
+* __.getFocusedElement()__: returns an element if any contenteditable element monitored by MediumEditor currently has focused
 * __.selectElement(element)__: change selection to be a specific element and update the toolbar to reflect the selection
 * __.exportSelection()__: return a data representation of the selected text, which can be applied via `importSelection()`
 * __.importSelection(selectionState)__: restore the selection using a data representation of previously selected text (ie value returned by `exportSelection()`)
 
 ## Capturing DOM changes
 
-For observing any changes on contentEditable
+For observing any changes on contentEditable, use the custom 'editableInput' event exposed via the `subscribe()` method:
 
 ```js
-$('.editable').on('input', function() {
-  // Do some work
+var editor = new MediumEditor('.editable');
+editor.subscribe('editableInput', function (event, editable) {
+    // Do some work
 });
 ```
 
-This is handy when you need to capture modifications to the contenteditable element that occur outside of `key up`'s scope (like clicking on toolbar buttons).
+This event is supported in all browsers supported by MediumEditor (including IE9+)!  To help with cases when one instance of MediumEditor is monitoring multiple elements, the 2nd argument passed to the event handler (`editable` in the example above) will be a reference to the contenteditable element that has actually changed.
 
-`input` is supported by Chrome, Firefox, and other modern browsers (However, [it is not supported in IE 9-11](https://connect.microsoft.com/IE/feedback/details/794285/ie10-11-input-event-does-not-fire-on-div-with-contenteditable-set)). If you want to read more or support older browsers, check [Listening to events of a contenteditable HTML element](http://stackoverflow.com/questions/7802784/listening-to-events-of-a-contenteditable-html-element/7804973#7804973) and [Detect changes in the DOM](http://stackoverflow.com/questions/3219758/detect-changes-in-the-dom)
+This is handy when you need to capture any modifications to the contenteditable element including:
+* Typing
+* Cutting/Pasting
+* Changes from clicking on buttons in the toolbar
+* Undo/Redo
+
+Why is this interesting and why should you use this event instead of just attaching to the `input` event on the contenteditable element?
+
+So for most modern browsers (Chrome, Firefox, Safari, etc.), the `input` event works just fine. Infact, `editableInput` is just a proxy for the `input` event in those browsers. However, the `input` event [is not supported for contenteditable elements in IE 9-11](https://connect.microsoft.com/IE/feedback/details/794285/ie10-11-input-event-does-not-fire-on-div-with-contenteditable-set).
+
+So, to properly support the `editableInput` event in Internet Explorer, MediumEditor uses a combination of the `selectionchange` and `keypress` events, as well as monitoring calls to `document.execCommand`.
 
 ## Extensions & Plugins
 
@@ -262,9 +275,27 @@ The source files are located inside the __src__ directory.  Be sure to make chan
 6. Push to the branch (`git push origin my-new-feature`)
 7. Create new Pull Request
 
+### Code Consistency
+
+To help create consistent looking code throughout the project, we use a few tools to help us. They have plugins for most popular editors/IDEs to make coding for our project, but you should use them in your project as well!
+
+#### JSHint
+
+We use [JSHint](http://jshint.com/) on each build to find easy-to-catch errors and potential problems in our js.  You can find our JSHint settings in the `.jshintrc` file in the root of the project.
+
+#### jscs
+
+We use [jscs](http://jscs.info/) on each build to enforce some code style rules we have for our project.  You can find our jscs settings in the `.jscsrc` file in the root of the project.
+
+#### EditorConfig
+
+We use [EditorConfig](http://EditorConfig.org) to maintain consistent coding styles between various editors and IDEs.  You can find our settings in the `.editorconfig` file in the root of the project.
+
+### Easy First Bugs
+
 Looking for something simple for a first contribution? Try fixing an [easy first bug](https://github.com/daviferreira/medium-editor/issues?q=is%3Aopen+is%3Aissue+label%3A%22easy+first+bug%22)!
 
-## Contributors
+## Contributors (100+ and counting!)
 
 [https://github.com/daviferreira/medium-editor/graphs/contributors](https://github.com/daviferreira/medium-editor/graphs/contributors)
 

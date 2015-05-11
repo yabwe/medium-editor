@@ -1,5 +1,47 @@
 /*global atob, unescape, Uint8Array, Blob*/
 
+function setupTestHelpers() {
+    jasmine.clock().install();
+    this.elements = [];
+    this.editors = [];
+
+    this.createElement = function (tag, className, html, dontAppend) {
+        var el = document.createElement(tag);
+        el.innerHTML = html || '';
+        el.className = className;
+        this.elements.push(el);
+        if (!dontAppend) {
+            document.body.appendChild(el);
+        }
+        return el;
+    };
+
+    this.newMediumEditor = function (selector, options) {
+        var editor = new MediumEditor(selector, options);
+        this.editors.push(editor);
+        return editor;
+    };
+
+    this.cleanupTest = function () {
+        this.editors.forEach(function (editor) {
+            editor.destroy();
+        });
+        this.elements.forEach(function (element) {
+            if (element.parentNode) {
+                element.parentNode.removeChild(element);
+            }
+        });
+
+        jasmine.clock().uninstall();
+
+        delete this.createElement;
+        delete this.createMedium;
+        delete this.elements;
+        delete this.editors;
+        delete this.cleanupTest;
+    }
+}
+
 function isIE9() {
     return navigator.appName.indexOf('Internet Explorer') !== -1 && navigator.appVersion.indexOf("MSIE 9") !== -1;
 }
@@ -56,7 +98,7 @@ function fireEvent(element, event, options) {
         evt = document.createEvent('HTMLEvents');
         evt.initEvent(event, true, true); // event type,bubbling,cancelable
 
-        evt.currentTarget = element;
+        evt.currentTarget = options.currentTarget ? options.currentTarget : element;
 
         if (options.keyCode) {
             evt.keyCode = options.keyCode;
@@ -65,6 +107,10 @@ function fireEvent(element, event, options) {
 
         if (options.ctrlKey) {
             evt.ctrlKey = true;
+        }
+
+        if (options.metaKey) {
+            evt.metaKey = true;
         }
 
         if (options.target) {
@@ -122,19 +168,4 @@ function selectElementContentsAndFire(el, options) {
     options = options || {};
     selectElementContents(el, options);
     fireEvent(el, options.eventToFire || 'focus');
-}
-
-function tearDown(el) {
-    var elements = document.querySelectorAll('.medium-editor-toolbar'),
-        i,
-        sel = window.getSelection();
-    for (i = 0; i < elements.length; i += 1) {
-        document.body.removeChild(elements[i]);
-    }
-    elements = document.querySelectorAll('.medium-editor-anchor-preview');
-    for (i = 0; i < elements.length; i += 1) {
-        document.body.removeChild(elements[i]);
-    }
-    document.body.removeChild(el);
-    sel.removeAllRanges();
 }

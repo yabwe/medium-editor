@@ -1,27 +1,23 @@
 /*global MediumEditor, describe, it, expect, spyOn,
-         afterEach, beforeEach, jasmine, fireEvent, tearDown,
+         afterEach, beforeEach, jasmine, fireEvent, setupTestHelpers,
          selectElementContentsAndFire, isOldIE, isIE */
 
 describe('Buttons TestCase', function () {
     'use strict';
 
     beforeEach(function () {
-        this.el = document.createElement('div');
-        this.el.className = 'editor';
-        this.el.innerHTML = 'lorem ipsum';
-        document.body.appendChild(this.el);
-        jasmine.clock().install();
+        setupTestHelpers.call(this);
+        this.el = this.createElement('div', 'editor', 'lorem ipsum');
     });
 
     afterEach(function () {
-        tearDown(this.el);
-        jasmine.clock().uninstall();
+        this.cleanupTest();
     });
 
     describe('Button click', function () {
         it('should set active class on click', function () {
             var button,
-                editor = new MediumEditor('.editor');
+                editor = this.newMediumEditor('.editor');
             selectElementContentsAndFire(editor.elements[0]);
             jasmine.clock().tick(1);
             button = editor.toolbar.getToolbarElement().querySelector('[data-action="bold"]');
@@ -32,7 +28,7 @@ describe('Buttons TestCase', function () {
         it('should check for selection when selection is undefined', function () {
             spyOn(MediumEditor.prototype, 'checkSelection');
             var button,
-                editor = new MediumEditor('.editor');
+                editor = this.newMediumEditor('.editor');
             selectElementContentsAndFire(editor.elements[0]);
             jasmine.clock().tick(1);
             button = editor.toolbar.getToolbarElement().querySelector('[data-action="bold"]');
@@ -43,7 +39,7 @@ describe('Buttons TestCase', function () {
         it('should remove active class if button has it', function () {
             this.el.innerHTML = '<b>lorem ipsum</b>';
             var button,
-                editor = new MediumEditor('.editor');
+                editor = this.newMediumEditor('.editor');
             selectElementContentsAndFire(editor.elements[0]);
             jasmine.clock().tick(11); // checkSelection delay
             button = editor.toolbar.getToolbarElement().querySelector('[data-action="bold"]');
@@ -55,7 +51,7 @@ describe('Buttons TestCase', function () {
         it('should execute the button action', function () {
             spyOn(MediumEditor.prototype, 'execAction');
             var button,
-                editor = new MediumEditor('.editor');
+                editor = this.newMediumEditor('.editor');
             selectElementContentsAndFire(editor.elements[0]);
             jasmine.clock().tick(1);
             button = editor.toolbar.getToolbarElement().querySelector('[data-action="bold"]');
@@ -65,13 +61,14 @@ describe('Buttons TestCase', function () {
 
         it('should execute the button action on shortcut', function () {
             spyOn(MediumEditor.prototype, 'execAction');
-            var editor = new MediumEditor('.editor'),
+            var editor = this.newMediumEditor('.editor'),
                 code = 'b'.charCodeAt(0);
             selectElementContentsAndFire(editor.elements[0]);
             jasmine.clock().tick(1);
             fireEvent(editor.elements[0], 'keydown', {
                 keyCode: code,
-                ctrlKey: true
+                ctrlKey: true,
+                metaKey: true
             });
             expect(editor.execAction).toHaveBeenCalled();
         });
@@ -111,7 +108,7 @@ describe('Buttons TestCase', function () {
 
         it('should have aria-label and title attributes set', function () {
             var button,
-                editor = new MediumEditor('.editor', {
+                editor = this.newMediumEditor('.editor', {
                     buttons: allButtons
                 });
             Object.keys(customLabels).forEach(function (buttonName) {
@@ -125,7 +122,7 @@ describe('Buttons TestCase', function () {
         it('should contain default content if no custom labels are provided', function () {
             spyOn(MediumEditor.prototype, 'execAction');
             var button,
-                editor = new MediumEditor('.editor', {
+                editor = this.newMediumEditor('.editor', {
                     buttons: allButtons
                 });
             expect(editor.toolbar.getToolbarElement().querySelectorAll('button').length).toBe(allButtons.length);
@@ -143,7 +140,7 @@ describe('Buttons TestCase', function () {
             spyOn(MediumEditor.prototype, 'execAction');
             var action,
                 button,
-                editor = new MediumEditor('.editor', {
+                editor = this.newMediumEditor('.editor', {
                     buttons: allButtons,
                     buttonLabels: 'fontawesome'
                 });
@@ -165,7 +162,7 @@ describe('Buttons TestCase', function () {
             spyOn(MediumEditor.prototype, 'execAction');
             var action,
                 button,
-                editor = new MediumEditor('.editor', {
+                editor = this.newMediumEditor('.editor', {
                     buttons: allButtons,
                     buttonLabels: customLabels
                 });
@@ -188,7 +185,7 @@ describe('Buttons TestCase', function () {
         it('should call the document.execCommand method when button action is append', function () {
             spyOn(document, 'execCommand');
             var button,
-                editor = new MediumEditor('.editor');
+                editor = this.newMediumEditor('.editor');
             selectElementContentsAndFire(editor.elements[0]);
             jasmine.clock().tick(1);
             button = editor.toolbar.getToolbarElement().querySelector('[data-action="append-h3"]');
@@ -203,7 +200,7 @@ describe('Buttons TestCase', function () {
         it('should create an h3 element when header1 is clicked', function () {
             this.el.innerHTML = '<p><b>lorem ipsum</b></p>';
             var button,
-                editor = new MediumEditor('.editor');
+                editor = this.newMediumEditor('.editor');
             selectElementContentsAndFire(editor.elements[0]);
             jasmine.clock().tick(1);
             button = editor.toolbar.getToolbarElement().querySelector('[data-action="append-h3"]');
@@ -217,7 +214,7 @@ describe('Buttons TestCase', function () {
         it('should get back to a p element if parent element is the same as the action', function () {
             this.el.innerHTML = '<h3><b>lorem ipsum</b></h3>';
             var button,
-                editor = new MediumEditor('.editor');
+                editor = this.newMediumEditor('.editor');
             selectElementContentsAndFire(editor.elements[0].firstChild);
             jasmine.clock().tick(1);
             button = editor.toolbar.getToolbarElement().querySelector('[data-action="append-h3"]');
@@ -228,7 +225,7 @@ describe('Buttons TestCase', function () {
 
     describe('First and Last', function () {
         it('should add a special class to the first and last buttons', function () {
-            var editor = new MediumEditor('.editor'),
+            var editor = this.newMediumEditor('.editor'),
                 buttons = editor.toolbar.getToolbarElement().querySelectorAll('button');
             expect(buttons[0].className).toContain('medium-editor-button-first');
             expect(buttons[1].className).not.toContain('medium-editor-button-first');
@@ -239,7 +236,7 @@ describe('Buttons TestCase', function () {
 
     describe('Bold', function () {
         it('button should be active if the selection already has the element', function () {
-            var editor = new MediumEditor('.editor', {
+            var editor = this.newMediumEditor('.editor', {
                     buttons: ['bold']
                 }),
                 button = editor.toolbar.getToolbarElement().querySelector('[data-action="bold"]');
@@ -257,7 +254,7 @@ describe('Buttons TestCase', function () {
         });
 
         it('button should be active if the selection is bold and queryCommandState fails', function () {
-            var editor = new MediumEditor('.editor', {
+            var editor = this.newMediumEditor('.editor', {
                     buttons: ['bold']
                 }),
                 button = editor.toolbar.getToolbarElement().querySelector('[data-action="bold"]');
@@ -273,7 +270,7 @@ describe('Buttons TestCase', function () {
         });
 
         it('button should be active for other cases when text is bold', function () {
-            var editor = new MediumEditor('.editor', {
+            var editor = this.newMediumEditor('.editor', {
                     buttons: ['bold']
                 }),
                 button = editor.toolbar.getToolbarElement().querySelector('[data-action="bold"]');
@@ -294,7 +291,7 @@ describe('Buttons TestCase', function () {
         it('should call the execCommand for native actions', function () {
             spyOn(document, 'execCommand').and.callThrough();
             var button,
-                editor = new MediumEditor('.editor');
+                editor = this.newMediumEditor('.editor');
             selectElementContentsAndFire(editor.elements[0]);
             button = editor.toolbar.getToolbarElement().querySelector('[data-action="italic"]');
             fireEvent(button, 'click');
@@ -304,7 +301,7 @@ describe('Buttons TestCase', function () {
         });
 
         it('button should be active if the selection already has the element', function () {
-            var editor = new MediumEditor('.editor', {
+            var editor = this.newMediumEditor('.editor', {
                     buttons: ['italic']
                 }),
                 button = editor.toolbar.getToolbarElement().querySelector('[data-action="italic"]');
@@ -322,7 +319,7 @@ describe('Buttons TestCase', function () {
         });
 
         it('button should be active if the selection is italic and queryCommandState fails', function () {
-            var editor = new MediumEditor('.editor', {
+            var editor = this.newMediumEditor('.editor', {
                     buttons: ['italic']
                 }),
                 button = editor.toolbar.getToolbarElement().querySelector('[data-action="italic"]');
@@ -338,7 +335,7 @@ describe('Buttons TestCase', function () {
         });
 
         it('button should be active for other cases when text is italic', function () {
-            var editor = new MediumEditor('.editor', {
+            var editor = this.newMediumEditor('.editor', {
                     buttons: ['italic']
                 }),
                 button = editor.toolbar.getToolbarElement().querySelector('[data-action="italic"]');
@@ -357,7 +354,7 @@ describe('Buttons TestCase', function () {
 
     describe('Underline', function () {
         it('button should be active if the selection already has the element', function () {
-            var editor = new MediumEditor('.editor', {
+            var editor = this.newMediumEditor('.editor', {
                     buttons: ['underline']
                 }),
                 button = editor.toolbar.getToolbarElement().querySelector('[data-action="underline"]');
@@ -372,7 +369,7 @@ describe('Buttons TestCase', function () {
         });
 
         it('button should be active if the selection is underlined and queryCommandState fails', function () {
-            var editor = new MediumEditor('.editor', {
+            var editor = this.newMediumEditor('.editor', {
                     buttons: ['underline']
                 }),
                 button = editor.toolbar.getToolbarElement().querySelector('[data-action="underline"]');
@@ -388,7 +385,7 @@ describe('Buttons TestCase', function () {
         });
 
         it('button should be active for other cases when text is underlined', function () {
-            var editor = new MediumEditor('.editor', {
+            var editor = this.newMediumEditor('.editor', {
                     buttons: ['underline']
                 }),
                 button = editor.toolbar.getToolbarElement().querySelector('[data-action="underline"]');
@@ -407,7 +404,7 @@ describe('Buttons TestCase', function () {
 
     describe('Strikethrough', function () {
         it('button should be active if the selection already has the element', function () {
-            var editor = new MediumEditor('.editor', {
+            var editor = this.newMediumEditor('.editor', {
                     buttons: ['strikethrough']
                 }),
                 button = editor.toolbar.getToolbarElement().querySelector('[data-action="strikethrough"]');
@@ -422,7 +419,7 @@ describe('Buttons TestCase', function () {
         });
 
         it('button should be active if the selection is strikethrough and queryCommandState fails', function () {
-            var editor = new MediumEditor('.editor', {
+            var editor = this.newMediumEditor('.editor', {
                     buttons: ['strikethrough']
                 }),
                 button = editor.toolbar.getToolbarElement().querySelector('[data-action="strikethrough"]');
@@ -438,7 +435,7 @@ describe('Buttons TestCase', function () {
         });
 
         it('button should be active for other cases when text is strikethrough', function () {
-            var editor = new MediumEditor('.editor', {
+            var editor = this.newMediumEditor('.editor', {
                     buttons: ['strikethrough']
                 }),
                 button = editor.toolbar.getToolbarElement().querySelector('[data-action="strikethrough"]');
@@ -457,7 +454,7 @@ describe('Buttons TestCase', function () {
 
     describe('Superscript', function () {
         it('button should be active if the selection already has the element', function () {
-            var editor = new MediumEditor('.editor', {
+            var editor = this.newMediumEditor('.editor', {
                     buttons: ['superscript']
                 }),
                 button = editor.toolbar.getToolbarElement().querySelector('[data-action="superscript"]');
@@ -474,7 +471,7 @@ describe('Buttons TestCase', function () {
 
     describe('Subscript', function () {
         it('button should be active if the selection already has the element', function () {
-            var editor = new MediumEditor('.editor', {
+            var editor = this.newMediumEditor('.editor', {
                     buttons: ['subscript']
                 }),
                 button = editor.toolbar.getToolbarElement().querySelector('[data-action="subscript"]');
@@ -491,7 +488,7 @@ describe('Buttons TestCase', function () {
 
     describe('Anchor', function () {
         it('button should be active if the selection already has the element', function () {
-            var editor = new MediumEditor('.editor', {
+            var editor = this.newMediumEditor('.editor', {
                     buttons: ['anchor']
                 }),
                 button = editor.toolbar.getToolbarElement().querySelector('[data-action="createLink"]');
@@ -507,7 +504,7 @@ describe('Buttons TestCase', function () {
         it('button should call the anchorExtension.showForm() method', function () {
             spyOn(MediumEditor.statics.AnchorExtension.prototype, 'showForm');
             var button,
-                editor = new MediumEditor('.editor');
+                editor = this.newMediumEditor('.editor');
             selectElementContentsAndFire(editor.elements[0]);
             button = editor.toolbar.getToolbarElement().querySelector('[data-action="createLink"]');
             fireEvent(button, 'click');
@@ -517,7 +514,7 @@ describe('Buttons TestCase', function () {
 
     describe('Quote', function () {
         it('button should not be active if the selection is not inside a blockquote', function () {
-            var editor = new MediumEditor('.editor', {
+            var editor = this.newMediumEditor('.editor', {
                     buttons: ['quote']
                 }),
                 button = editor.toolbar.getToolbarElement().querySelector('[data-action="append-blockquote"]');
@@ -534,7 +531,7 @@ describe('Buttons TestCase', function () {
 
     describe('OrderedList', function () {
         it('button should be active if the selection already has the element', function () {
-            var editor = new MediumEditor('.editor', {
+            var editor = this.newMediumEditor('.editor', {
                     buttons: ['orderedlist', 'unorderedlist']
                 }),
                 button = editor.toolbar.getToolbarElement().querySelector('[data-action="insertorderedlist"]');
@@ -554,7 +551,7 @@ describe('Buttons TestCase', function () {
 
     describe('UnorderedList', function () {
         it('button should be active if the selection already has the element', function () {
-            var editor = new MediumEditor('.editor', {
+            var editor = this.newMediumEditor('.editor', {
                     buttons: ['unorderedlist', 'orderedlist']
                 }),
                 button = editor.toolbar.getToolbarElement().querySelector('[data-action="insertunorderedlist"]');
@@ -574,7 +571,7 @@ describe('Buttons TestCase', function () {
 
     describe('Pre', function () {
         it('button should be active if the selection already has the element', function () {
-            var editor = new MediumEditor('.editor', {
+            var editor = this.newMediumEditor('.editor', {
                     buttons: ['pre']
                 }),
                 button = editor.toolbar.getToolbarElement().querySelector('[data-action="append-pre"]');
@@ -593,7 +590,7 @@ describe('Buttons TestCase', function () {
             this.el.innerHTML = '<div><p id="justify-para-one">lorem ipsum</p></div>';
             document.body.style.setProperty('text-align', 'center');
             try {
-                var editor = new MediumEditor('.editor', {
+                var editor = this.newMediumEditor('.editor', {
                         buttons: ['justifyCenter', 'justifyRight']
                     }),
                     rightButton = editor.toolbar.getToolbarElement().querySelector('[data-action="justifyRight"]'),
@@ -617,7 +614,7 @@ describe('Buttons TestCase', function () {
                                 '<p id="justify-para-three" align="right">lorem ipsum</p>' +
                                 '<p id="justify-para-four" align="center">lorem ipsum</p>' +
                                 '<p id="justify-para-five" align="justify">lorem ipsum</p>';
-            var editor = new MediumEditor('.editor', {
+            var editor = this.newMediumEditor('.editor', {
                     buttons: ['justifyLeft', 'justifyCenter', 'justifyRight', 'justifyFull']
                 }),
                 leftButton = editor.toolbar.getToolbarElement().querySelector('[data-action="justifyLeft"]'),
@@ -693,7 +690,7 @@ describe('Buttons TestCase', function () {
     describe('Remove Formatting', function () {
 
         it('should unwrap basic things', function () {
-            var editor = new MediumEditor('.editor', {
+            var editor = this.newMediumEditor('.editor', {
                     buttons: ['removeFormat']
                 }),
                 button = editor.toolbar.getToolbarElement().querySelector('[data-action="removeFormat"]');
@@ -722,7 +719,7 @@ describe('Buttons TestCase', function () {
 
     describe('Header', function () {
         it('buttons should be active if the selection already has the element', function () {
-            var editor = new MediumEditor('.editor', {
+            var editor = this.newMediumEditor('.editor', {
                     buttons: ['header1', 'header2']
                 }),
                 buttonOne = editor.toolbar.getToolbarElement().querySelector('[data-action="append-h3"]'),
@@ -743,7 +740,7 @@ describe('Buttons TestCase', function () {
         });
 
         it('buttons should be active if the selection already custom defined element types', function () {
-            var editor = new MediumEditor('.editor', {
+            var editor = this.newMediumEditor('.editor', {
                     buttons: ['header1', 'header2'],
                     firstHeader: 'h1',
                     secondHeader: 'h5'
@@ -769,7 +766,7 @@ describe('Buttons TestCase', function () {
         });
 
         it('buttons should convert between element types and "undo" back to original type', function () {
-            var editor = new MediumEditor('.editor', {
+            var editor = this.newMediumEditor('.editor', {
                     buttons: ['header1', 'header2'],
                     firstHeader: 'h1'
                 }),

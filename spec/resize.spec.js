@@ -1,25 +1,21 @@
 /*global MediumEditor, describe, it, expect,
          afterEach, beforeEach, fireEvent, spyOn,
-         selectElementContentsAndFire, jasmine, tearDown */
+         selectElementContentsAndFire, jasmine, setupTestHelpers */
 
 describe('Resize TestCase', function () {
     'use strict';
 
     beforeEach(function () {
-        jasmine.clock().install();
-        this.el = document.createElement('div');
-        this.el.className = 'editor';
-        this.el.innerHTML = 'test content';
-        document.body.appendChild(this.el);
+        setupTestHelpers.call(this);
+        this.el = this.createElement('div', 'editor', 'test content');
     });
 
     afterEach(function () {
-        tearDown(this.el);
-        jasmine.clock().uninstall();
+        this.cleanupTest();
     });
 
     it('should reset toolbar position on window resize', function () {
-        var editor = new MediumEditor('.editor');
+        var editor = this.newMediumEditor('.editor');
         selectElementContentsAndFire(editor.elements[0]);
         jasmine.clock().tick(1);
         expect(editor.toolbar.getToolbarElement().className.indexOf('active') > -1).toBe(true);
@@ -31,7 +27,7 @@ describe('Resize TestCase', function () {
     });
 
     it('should not call setToolbarPosition when toolbar is not visible', function () {
-        var editor = new MediumEditor('.editor');
+        var editor = this.newMediumEditor('.editor');
         spyOn(editor.toolbar, 'setToolbarPosition').and.callThrough();
         fireEvent(window, 'resize');
         jasmine.clock().tick(1);
@@ -40,7 +36,7 @@ describe('Resize TestCase', function () {
     });
 
     it('should throttle multiple calls to position toolbar', function () {
-        var editor = new MediumEditor('.editor'),
+        var editor = this.newMediumEditor('.editor'),
             tickTime = 60,
             totalTicks;
 

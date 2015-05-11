@@ -1,5 +1,4 @@
-/*global MediumEditor, describe, it, expect, tearDown,
-  beforeEach, afterEach, AutoLinkerStatics */
+/*global describe, it, expect, beforeEach, afterEach, AutoLinkerStatics, setupTestHelpers */
 
 describe('Autolink', function () {
     'use strict';
@@ -82,22 +81,20 @@ describe('Autolink', function () {
     });
 
     describe('integration', function () {
+
         beforeEach(function () {
-            this.el = document.createElement('div');
-            this.el.className = 'editor';
-            this.el.id = 'auto-link-editor';
-            this.el.innerHTML = '';
-            document.body.appendChild(this.el);
+            setupTestHelpers.call(this);
+            this.el = this.createElement('div', 'editor', '');
         });
 
         afterEach(function () {
-            tearDown(this.el);
+            this.cleanupTest();
         });
 
         describe('auto-linking typed-in text', function () {
 
             beforeEach(function () {
-                this.editor = new MediumEditor('.editor', {
+                this.editor = this.newMediumEditor('.editor', {
                     enableAutoLinker: true
                 });
             });

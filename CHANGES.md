@@ -1,3 +1,20 @@
+4.8.0 / 2015-05-11
+==================
+* Expose new 'editableInput' event for monitoring changes to editor
+* Cleanup contenteditable elements created for textareas
+
+
+4.7.3 / 2015-05-07
+==================
+* Update version number in dist files
+
+
+4.7.2 / 2015-05-06
+==================
+* Add shortcut to insert a link (ctrl/cmd + k)
+* Fix `this.getAttribute is not a function` error
+
+
 4.7.1 / 2015-04-30
 ==================
 * Make anchor preview wrap for long links
