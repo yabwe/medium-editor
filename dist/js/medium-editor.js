@@ -2943,7 +2943,7 @@ LINK_REGEXP_TEXT =
     /* END - based on http://stackoverflow.com/a/6183069 */
 
     function findDescendantTextNodes(node, document) {
-        var it = document.createNodeIterator(node, NodeFilter.SHOW_TEXT, null),
+        var it = document.createNodeIterator(node, NodeFilter.SHOW_TEXT, null, false),
             nodes = [],
             currentNode;
 
@@ -3014,7 +3014,7 @@ LINK_REGEXP_TEXT =
                 textIndexOfEndOfFarthestNode;
 
             while (matches.length > matchIndex) {
-                nodeIterator = this.base.options.ownerDocument.createNodeIterator(element, NodeFilter.SHOW_TEXT, null);
+                nodeIterator = this.base.options.ownerDocument.createNodeIterator(element, NodeFilter.SHOW_TEXT, null, false);
                 while ((currentNode = nodeIterator.nextNode()) !== null) {
                     if (!startReached && matches[matchIndex].start < (currentTextIndex + currentNode.nodeValue.length)) {
                         startReached = true;
