@@ -568,8 +568,6 @@ function MediumEditor(elements, options) {
                 return;
             }
 
-            var i;
-
             this.isActive = false;
 
             if (this.toolbar !== undefined) {
@@ -577,11 +575,24 @@ function MediumEditor(elements, options) {
                 delete this.toolbar;
             }
 
-            for (i = 0; i < this.elements.length; i += 1) {
-                this.elements[i].removeAttribute('contentEditable');
-                this.elements[i].removeAttribute('spellcheck');
-                this.elements[i].removeAttribute('data-medium-element');
-            }
+            this.elements.forEach(function (element) {
+                element.removeAttribute('contentEditable');
+                element.removeAttribute('spellcheck');
+                element.removeAttribute('data-medium-element');
+
+                // Remove any elements created for textareas
+                if (element.hasAttribute('medium-editor-textarea-id')) {
+                    var textarea = element.parentNode.querySelector('textarea[medium-editor-textarea-id="' + element.getAttribute('medium-editor-textarea-id') + '"]');
+                    if (textarea) {
+                        // Un-hide the textarea
+                        textarea.classList.remove('medium-editor-hidden');
+                    }
+                    if (element.parentNode) {
+                        element.parentNode.removeChild(element);
+                    }
+                }
+            }, this);
+            this.elements = [];
 
             this.commands.forEach(function (extension) {
                 if (typeof extension.deactivate === 'function') {

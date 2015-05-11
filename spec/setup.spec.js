@@ -1,23 +1,21 @@
 /*global MediumEditor, describe, it, expect, spyOn, jasmine,
     fireEvent, afterEach, beforeEach, selectElementContents,
-    tearDown, selectElementContentsAndFire, editorDefaults */
+    setupTestHelpers, selectElementContentsAndFire, editorDefaults */
 
 describe('Setup/Destroy TestCase', function () {
     'use strict';
 
     beforeEach(function () {
-        this.el = document.createElement('div');
-        this.el.className = 'editor';
-        this.el.textContent = 'lore ipsum';
-        document.body.appendChild(this.el);
+        setupTestHelpers.call(this);
+        this.el = this.createElement('div', 'editor', 'lore ipsum');
     });
 
     afterEach(function () {
-        tearDown(this.el);
+        this.cleanupTest();
     });
 
     it('should toggle the isActive property', function () {
-        var editor = new MediumEditor('.editor');
+        var editor = this.newMediumEditor('.editor');
         editor.destroy();
         expect(editor.isActive).toBe(false);
         editor.setup();
@@ -28,7 +26,7 @@ describe('Setup/Destroy TestCase', function () {
 
     describe('activate() and deactivate()', function () {
         it('should be aliases for setup() and destory() for backwards compatability', function () {
-            var editor = new MediumEditor('.editor');
+            var editor = this.newMediumEditor('.editor');
             expect(editor.isActive).toBe(true);
 
             spyOn(MediumEditor.prototype, 'destroy').and.callThrough();
@@ -45,7 +43,7 @@ describe('Setup/Destroy TestCase', function () {
 
     describe('Setup', function () {
         it('should init the toolbar and editor elements', function () {
-            var editor = new MediumEditor('.editor');
+            var editor = this.newMediumEditor('.editor');
             editor.destroy();
             spyOn(MediumEditor.prototype, 'setup').and.callThrough();
             editor.setup();
@@ -58,24 +56,15 @@ describe('Setup/Destroy TestCase', function () {
     });
 
     describe('Destroy', function () {
-
-        beforeEach(function () {
-            jasmine.clock().install();
-        });
-
-        afterEach(function () {
-            jasmine.clock().uninstall();
-        });
-
         it('should remove mediumEditor elements from DOM', function () {
-            var editor = new MediumEditor('.editor');
+            var editor = this.newMediumEditor('.editor');
             expect(document.querySelector('.medium-editor-toolbar')).toBeTruthy();
             editor.destroy();
             expect(document.querySelector('.medium-editor-toolbar')).toBeFalsy();
         });
 
         it('should remove all the added events', function () {
-            var editor = new MediumEditor('.editor');
+            var editor = this.newMediumEditor('.editor');
             expect(editor.events.events.length).toBeGreaterThan(0);
             editor.destroy();
             expect(editor.events.events.length).toBe(0);
@@ -84,7 +73,7 @@ describe('Setup/Destroy TestCase', function () {
         it('should abort any pending throttled event handlers', function () {
             var editor, triggerEvents, toolbar;
 
-            editor = new MediumEditor('.editor', { delay: 5 });
+            editor = this.newMediumEditor('.editor', { delay: 5 });
             triggerEvents = function () {
                 fireEvent(window, 'resize');
                 fireEvent(document.body, 'click', {
@@ -126,9 +115,7 @@ describe('Setup/Destroy TestCase', function () {
                 );
             }
 
-            jasmine.clock().install();
-
-            editor = new MediumEditor('.editor');
+            editor = this.newMediumEditor('.editor');
 
             spyOn(editor.toolbar, 'hideToolbar').and.callThrough(); // via: handleBlur
 
@@ -145,16 +132,14 @@ describe('Setup/Destroy TestCase', function () {
             jasmine.clock().tick(51);
             expect(editor.toolbar.hideToolbar).not.toHaveBeenCalled();
 
-            elements.forEach(function (el) {
-                document.body.removeChild(el);
+            elements.forEach(function (element) {
+                document.body.removeChild(element);
             });
-
-            jasmine.clock().uninstall();
         });
 
         // regression test for https://github.com/daviferreira/medium-editor/issues/197
         it('should not crash when destroy immediately after a mouse click', function () {
-            var editor = new MediumEditor('.editor');
+            var editor = this.newMediumEditor('.editor');
             // selected some content and let the toolbar appear
             selectElementContents(editor.elements[0]);
             jasmine.clock().tick(501);

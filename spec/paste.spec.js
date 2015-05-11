@@ -1,6 +1,6 @@
 /*global MediumEditor, describe, it, expect, spyOn,
     afterEach, beforeEach, selectElementContents,
-    jasmine, tearDown, selectElementContentsAndFire */
+    jasmine, setupTestHelpers, selectElementContentsAndFire */
 
 describe('Pasting content', function () {
     'use strict';
@@ -88,24 +88,20 @@ describe('Pasting content', function () {
         ];
 
     beforeEach(function () {
-        jasmine.clock().install();
-        this.el = document.createElement('div');
-        this.el.className = 'editor';
+        setupTestHelpers.call(this);
+        this.el = this.createElement('div', 'editor', 'hhh');
         this.el.id = 'paste-editor';
-        this.el.innerHTML = 'hhh';
-        document.body.appendChild(this.el);
     });
 
     afterEach(function () {
-        tearDown(this.el);
-        jasmine.clock().uninstall();
+        this.cleanupTest();
     });
 
     describe('using cleanPastedHTML option', function () {
         it('should filter multi-line rich-text pastes', function () {
             var i,
                 editorEl = this.el,
-                editor = new MediumEditor('.editor', {
+                editor = this.newMediumEditor('.editor', {
                     delay: 200,
                     paste: {
                         forcePlainText: false,
@@ -144,7 +140,7 @@ describe('Pasting content', function () {
         });
 
         it('should filter multi-line rich-text pastes when "insertHTML" command is not supported', function () {
-            var editor = new MediumEditor('.editor', {
+            var editor = this.newMediumEditor('.editor', {
                 paste: {
                     forcePlainText: false,
                     cleanPastedHTML: true
@@ -168,7 +164,7 @@ describe('Pasting content', function () {
         it('should filter inline rich-text by passing deprecated options', function () {
             var i,
                 editorEl = this.el,
-                editor = new MediumEditor('.editor', {
+                editor = this.newMediumEditor('.editor', {
                     delay: 200,
                     forcePlainText: false, // deprecated option
                     cleanPastedHTML: true // deprecated option
@@ -194,7 +190,7 @@ describe('Pasting content', function () {
         it('should filter inline rich-text', function () {
             var i,
                 editorEl = this.el,
-                editor = new MediumEditor('.editor', {
+                editor = this.newMediumEditor('.editor', {
                     delay: 200,
                     paste: {
                         forcePlainText: false,
@@ -220,7 +216,7 @@ describe('Pasting content', function () {
         });
 
         it('should filter inline rich-text when "insertHTML" command is not supported', function () {
-            var editor = new MediumEditor('.editor', {
+            var editor = this.newMediumEditor('.editor', {
                     paste: {
                         forcePlainText: false,
                         cleanPastedHTML: true
@@ -244,7 +240,7 @@ describe('Pasting content', function () {
         });
 
         it('should respect custom replacments when passed during instantiation', function () {
-            var editor = new MediumEditor('.editor', {
+            var editor = this.newMediumEditor('.editor', {
                 paste: {
                     forcePlainText: false,
                     cleanPastedHTML: true,
@@ -263,14 +259,14 @@ describe('Pasting content', function () {
 
     describe('using pasteHTML', function () {
         it('should remove certain attributes and tags by default', function () {
-            var editor = new MediumEditor('.editor');
+            var editor = this.newMediumEditor('.editor');
             selectElementContents(this.el.firstChild);
             editor.pasteHTML('<p class="some-class" style="font-weight: bold" dir="ltr"><meta name="description" content="test" />test</p>');
             expect(editor.elements[0].innerHTML).toBe('<p>test</p>');
         });
 
         it('should accept a list of attrs to clean up', function () {
-            var editor = new MediumEditor('.editor');
+            var editor = this.newMediumEditor('.editor');
             selectElementContents(this.el.firstChild);
             editor.pasteHTML(
                 '<table class="medium-editor-table" dir="ltr" style="border: 1px solid red;"><tbody><tr><td>test</td></tr></tbody></table>',
@@ -280,7 +276,7 @@ describe('Pasting content', function () {
         });
 
         it('should accept a list of tags to clean up', function () {
-            var editor = new MediumEditor('.editor');
+            var editor = this.newMediumEditor('.editor');
             selectElementContents(this.el.firstChild);
             editor.pasteHTML(
                 '<div><i>test</i><meta name="description" content="test" /><b>test</b></div>',
@@ -290,7 +286,7 @@ describe('Pasting content', function () {
         });
 
         it('should respect custom clean up options passed during instantiation', function () {
-            var editor = new MediumEditor('.editor', {
+            var editor = this.newMediumEditor('.editor', {
                 paste: {
                     cleanAttrs: ['style', 'dir'],
                     cleanTags: ['meta', 'b']
@@ -313,7 +309,7 @@ describe('Pasting content', function () {
             var range, i,
                 editorEl = this.el,
                 sel = window.getSelection(),
-                editor = new MediumEditor('.editor', {
+                editor = this.newMediumEditor('.editor', {
                     delay: 200,
                     disableReturn: false
                 }),
@@ -354,7 +350,7 @@ describe('Pasting content', function () {
         it('should be overrideable via paste options', function () {
             var origInit = spyOn(MediumEditor.extensions.paste.prototype, 'init'),
                 newInit = jasmine.createSpy('spy'),
-                editor = new MediumEditor('.editor', {
+                editor = this.newMediumEditor('.editor', {
                     paste: {
                         forcePlainText: false,
                         cleanPastedHTML: true,
@@ -379,7 +375,7 @@ describe('Pasting content', function () {
                     init: newInit,
                     pasteHTML: newPasteHTML
                 },
-                editor = new MediumEditor('.editor', {
+                editor = this.newMediumEditor('.editor', {
                     extensions: {
                         paste: customPasteHandler
                     }

@@ -1,31 +1,26 @@
-/*global MediumEditor, describe, it, expect, jasmine,
-    fireEvent, afterEach, beforeEach, tearDown,
-    selectElementContentsAndFire, Events, spyOn, isIE,
+/*global describe, it, expect, jasmine,
+    fireEvent, afterEach, beforeEach, setupTestHelpers,
+    selectElementContentsAndFire, Events, spyOn,
     selectElementContents */
 
 describe('Events TestCase', function () {
     'use strict';
 
     beforeEach(function () {
-        this.el = document.createElement('div');
-        this.el.className = 'editor';
-        this.el.textContent = 'lore ipsum';
-        document.body.appendChild(this.el);
-        jasmine.clock().install();
+        setupTestHelpers.call(this);
+        this.el = this.createElement('div', 'editor', 'lore ipsum');
     });
 
     afterEach(function () {
-        jasmine.clock().uninstall();
-        tearDown(this.el);
+        this.cleanupTest();
     });
 
     describe('On', function () {
         it('should bind listener', function () {
             var el, editor, spy;
-            el = document.createElement('div');
-            el = document.body.appendChild(el);
+            el = this.createElement('div');
             spy = jasmine.createSpy('handler');
-            editor = new MediumEditor('.editor');
+            editor = this.newMediumEditor('.editor');
             editor.on(el, 'click', spy);
             fireEvent(el, 'click');
             jasmine.clock().tick(1);
@@ -36,9 +31,9 @@ describe('Events TestCase', function () {
     describe('Off', function () {
         it('should unbind listener', function () {
             var el, editor, spy;
-            el = document.createElement('div');
+            el = this.createElement('div');
             spy = jasmine.createSpy('handler');
-            editor = new MediumEditor('.editor');
+            editor = this.newMediumEditor('.editor');
             editor.on(el, 'click', spy);
             editor.off(el, 'click', spy);
             fireEvent(el, 'click');
@@ -49,7 +44,7 @@ describe('Events TestCase', function () {
 
     describe('Custom Focus/Blur Listener', function () {
         it('should be called and passed the editable element when the editable gets focus', function () {
-            var editor = new MediumEditor('.editor'),
+            var editor = this.newMediumEditor('.editor'),
                 focusedEditable,
                 blurredEditable,
                 focusListener = function (event, editable) {
@@ -74,7 +69,7 @@ describe('Events TestCase', function () {
         it('should not trigger after detaching', function () {
             var focusSpy = jasmine.createSpy('handler'),
                 blurSpy = jasmine.createSpy('handler'),
-                editor = new MediumEditor('.editor');
+                editor = this.newMediumEditor('.editor');
             editor.subscribe('focus', focusSpy);
             editor.subscribe('blur', blurSpy);
 
@@ -95,7 +90,7 @@ describe('Events TestCase', function () {
         });
 
         it('should not be called after destroying editor', function () {
-            var editor = new MediumEditor('.editor'),
+            var editor = this.newMediumEditor('.editor'),
                 focusSpy = jasmine.createSpy('handler'),
                 blurSpy = jasmine.createSpy('handler');
             editor.subscribe('focus', focusSpy);
@@ -122,10 +117,9 @@ describe('Events TestCase', function () {
 
     describe('ExecCommand Listener', function () {
         it('should only wrap document.execCommand when required', function () {
-            var origExecCommand = document.execCommand,
-                editor = new MediumEditor('.editor');
+            var origExecCommand = document.execCommand;
+            this.newMediumEditor('.editor');
             expect(document.execCommand).toBe(origExecCommand);
-            editor.destroy();
         });
 
         it('should wrap document.execCommand with a custom method', function () {
@@ -142,16 +136,13 @@ describe('Events TestCase', function () {
             expect(document.execCommand.listeners.length).toBe(1);
 
             // Creating a real contenteditable to select to keep firefox happy during tests
-            var tempEl = document.body.appendChild(document.createElement('div'));
+            var tempEl = this.createElement('div', '', 'firefox is lame');
             tempEl.setAttribute('contenteditable', true);
-            tempEl.innerHTML = 'firefox is lame';
             selectElementContents(tempEl);
             document.execCommand('bold', false, null);
 
             expect(handler).toHaveBeenCalled();
             expect(origExecCommand).toHaveBeenCalledWith('bold', false, null);
-
-            events.destroy();
         });
 
         it('should notify all listeners when execCommand is called', function () {
@@ -173,13 +164,17 @@ describe('Events TestCase', function () {
             expect(handlerOne).not.toHaveBeenCalled();
             expect(handlerTwo).not.toHaveBeenCalled();
 
+            // Creating a real contenteditable to select to keep firefox happy during tests
+            var tempEl = this.createElement('div', '', 'firefox is lame');
+            tempEl.setAttribute('contenteditable', true);
+            selectElementContents(tempEl);
             document.execCommand.apply(document, args);
 
             var expectedObj = {
                 command: 'bold',
                 value: 'something',
                 args: args,
-                result: (isIE() ? true : false)
+                result: true
             };
 
             expect(handlerOne).toHaveBeenCalledWith(expectedObj);
@@ -216,7 +211,7 @@ describe('Events TestCase', function () {
         it('should wrap and unwrap execCommand when using MediumEditor methods', function () {
             spyOn(document, 'execCommand').and.callThrough();
             var origExecCommand = document.execCommand,
-                editor = new MediumEditor('.editor'),
+                editor = this.newMediumEditor('.editor'),
                 originalInputSupport = Events.prototype.InputEventOnContenteditableSupported;
 
             Events.prototype.InputEventOnContenteditableSupported = false;
@@ -241,13 +236,9 @@ describe('Events TestCase', function () {
             var namePrefix = inputSupported ? 'when Input is supported' : 'when Input is NOT supported';
 
             it(namePrefix + ' should trigger with the corresponding editor element passed as an argument', function () {
-                var editableTwo = document.createElement('div'),
-                    firedTarget;
-                editableTwo.className = 'editor';
-                editableTwo.textContent = 'lore ipsum';
-                document.body.appendChild(editableTwo);
-
-                var editor = new MediumEditor('.editor'),
+                var editableTwo = this.createElement('div', 'editor', 'lore ipsum'),
+                    firedTarget,
+                    editor = this.newMediumEditor('.editor'),
                     handler = function (event, editable) {
                         firedTarget = editable;
                     },
@@ -269,18 +260,13 @@ describe('Events TestCase', function () {
                 jasmine.clock().tick(1);
                 expect(firedTarget).toBe(editableTwo);
 
-                tearDown(editableTwo);
                 Events.prototype.InputEventOnContenteditableSupported = originalInputSupport;
             });
 
             it(namePrefix + ' should only trigger when the content has actually changed', function () {
-                var editableTwo = document.createElement('div'),
-                    firedTarget;
-                editableTwo.className = 'editor';
-                editableTwo.textContent = 'lore ipsum';
-                document.body.appendChild(editableTwo);
-
-                var editor = new MediumEditor('.editor'),
+                var editableTwo = this.createElement('div', 'editor', 'lore ipsum'),
+                    firedTarget,
+                    editor = this.newMediumEditor('.editor'),
                     handler = function (event, editable) {
                         firedTarget = editable;
                     },
@@ -302,7 +288,6 @@ describe('Events TestCase', function () {
                 jasmine.clock().tick(1);
                 expect(firedTarget).toBe(editableTwo);
 
-                tearDown(editableTwo);
                 Events.prototype.InputEventOnContenteditableSupported = originalInputSupport;
             });
         }
@@ -311,13 +296,9 @@ describe('Events TestCase', function () {
         runEditableInputTests(false);
 
         it('should trigger when bolding text when input event is NOT supported', function () {
-            var editableTwo = document.createElement('div'),
-                firedTarget;
-            editableTwo.className = 'editor';
-            editableTwo.textContent = 'lore ipsum';
-            document.body.appendChild(editableTwo);
-
-            var editor = new MediumEditor('.editor'),
+            var editableTwo = this.createElement('div', 'editor', 'lore ipsum'),
+                firedTarget,
+                editor = this.newMediumEditor('.editor'),
                 button = editor.toolbar.getToolbarElement().querySelector('[data-action="bold"]'),
                 handler = function (event, editable) {
                     firedTarget = editable;
@@ -335,7 +316,6 @@ describe('Events TestCase', function () {
 
             expect(firedTarget).toBe(editableTwo);
 
-            tearDown(editableTwo);
             Events.prototype.InputEventOnContenteditableSupported = originalInputSupport;
         });
     });

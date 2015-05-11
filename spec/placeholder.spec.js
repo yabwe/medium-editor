@@ -1,52 +1,50 @@
-/*global MediumEditor, describe, it, expect,
-    afterEach, beforeEach, fireEvent, tearDown */
+/*global describe, it, expect,
+    afterEach, beforeEach, fireEvent, setupTestHelpers */
 
 describe('Placeholder TestCase', function () {
     'use strict';
 
     beforeEach(function () {
-        this.el = document.createElement('div');
-        this.el.className = 'editor';
-        this.el.innerHTML = '';
-        document.body.appendChild(this.el);
+        setupTestHelpers.call(this);
+        this.el = this.createElement('div', 'editor', '');
     });
 
     afterEach(function () {
-        tearDown(this.el);
+        this.cleanupTest();
     });
 
     it('should set placeholder for empty elements', function () {
-        var editor = new MediumEditor('.editor');
+        var editor = this.newMediumEditor('.editor');
         expect(editor.elements[0].className).toContain('medium-editor-placeholder');
     });
 
     it('should not set a placeholder for elements with text content', function () {
         this.el.innerHTML = 'some text';
-        var editor = new MediumEditor('.editor');
+        var editor = this.newMediumEditor('.editor');
         expect(editor.elements[0].className).not.toContain('medium-editor-placeholder');
     });
 
     it('should not set a placeholder for elements with images only', function () {
         this.el.innerHTML = '<img src="foo.jpg">';
-        var editor = new MediumEditor('.editor');
+        var editor = this.newMediumEditor('.editor');
         expect(editor.elements[0].className).not.toContain('medium-editor-placeholder');
     });
 
     it('should set placeholder for elements with empty children', function () {
         this.el.innerHTML = '<p><br></p><div class="empty"></div>';
-        var editor = new MediumEditor('.editor');
+        var editor = this.newMediumEditor('.editor');
         expect(editor.elements[0].className).toContain('medium-editor-placeholder');
     });
 
     it('should remove the placeholder on keypress', function () {
-        var editor = new MediumEditor('.editor');
+        var editor = this.newMediumEditor('.editor');
         expect(editor.elements[0].className).toContain('medium-editor-placeholder');
         fireEvent(editor.elements[0], 'keypress');
         expect(editor.elements[0].className).not.toContain('medium-editor-placeholder');
     });
 
     it('should remove the placeholder on click', function () {
-        var editor = new MediumEditor('.editor');
+        var editor = this.newMediumEditor('.editor');
         expect(editor.elements[0].className).toContain('medium-editor-placeholder');
         fireEvent(editor.elements[0], 'click');
         expect(editor.elements[0].className).not.toContain('medium-editor-placeholder');
@@ -59,7 +57,7 @@ describe('Placeholder TestCase', function () {
 
     it('should add a placeholder to empty elements on blur', function () {
         this.el.innerHTML = 'some text';
-        var editor = new MediumEditor('.editor');
+        var editor = this.newMediumEditor('.editor');
         editor.elements[0].focus();
         fireEvent(editor.elements[0], 'focus');
         expect(editor.elements[0].className).not.toContain('medium-editor-placeholder');
@@ -69,7 +67,7 @@ describe('Placeholder TestCase', function () {
     });
 
     it('should not add a placeholder to elements with text on blur', function () {
-        var editor = new MediumEditor('.editor');
+        var editor = this.newMediumEditor('.editor');
         expect(editor.elements[0].className).toContain('medium-editor-placeholder');
         editor.elements[0].innerHTML = 'some text';
         fireEvent(editor.elements[0], 'blur');
@@ -91,7 +89,7 @@ describe('Placeholder TestCase', function () {
     /*jslint regexp: false*/
 
     it('should add the default placeholder text when data-placeholder is not present', function () {
-        var editor = new MediumEditor('.editor');
+        var editor = this.newMediumEditor('.editor');
         validatePlaceholderContent(editor.elements[0], editor.options.placeholder);
     });
 
@@ -99,12 +97,12 @@ describe('Placeholder TestCase', function () {
         var editor,
             placeholderText = 'Custom placeholder';
         this.el.setAttribute('data-placeholder', placeholderText);
-        editor = new MediumEditor('.editor');
+        editor = this.newMediumEditor('.editor');
         validatePlaceholderContent(editor.elements[0], placeholderText);
     });
 
     it('should not set placeholder for empty elements when disablePlaceholders is set to true', function () {
-        var editor = new MediumEditor('.editor', {
+        var editor = this.newMediumEditor('.editor', {
             disablePlaceholders: true
         });
         expect(editor.elements[0].className).not.toContain('medium-editor-placeholder');
@@ -112,7 +110,7 @@ describe('Placeholder TestCase', function () {
 
     it('should not add a placeholder to empty elements on blur when disablePlaceholders is set to true', function () {
         this.el.innerHTML = 'some text';
-        var editor = new MediumEditor('.editor', {
+        var editor = this.newMediumEditor('.editor', {
             disablePlaceholders: true
         });
         expect(editor.elements[0].className).not.toContain('medium-editor-placeholder');

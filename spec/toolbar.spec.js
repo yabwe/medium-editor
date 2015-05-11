@@ -1,32 +1,31 @@
 /*global MediumEditor, describe, it, expect, spyOn,
     afterEach, beforeEach, selectElementContents,
-    fireEvent, tearDown, jasmine, selectElementContentsAndFire,
+    fireEvent, setupTestHelpers, jasmine, selectElementContentsAndFire,
     placeCursorInsideElement, Toolbar */
 
 describe('Toolbar TestCase', function () {
     'use strict';
 
     beforeEach(function () {
-        this.el = document.createElement('div');
-        this.el.className = 'editor';
-        document.body.appendChild(this.el);
+        setupTestHelpers.call(this);
+        this.el = this.createElement('div', 'editor');
     });
 
     afterEach(function () {
-        tearDown(this.el);
+        this.cleanupTest();
     });
 
     describe('Initialization', function () {
         it('should call the createToolbar method', function () {
             spyOn(MediumEditor.statics.Toolbar.prototype, 'createToolbar').and.callThrough();
-            var editor = new MediumEditor('.editor');
+            var editor = this.newMediumEditor('.editor');
             expect(editor.toolbar).not.toBeUndefined();
             expect(editor.toolbar.createToolbar).toHaveBeenCalled();
         });
 
         it('should create a new element for the editor toolbar', function () {
             expect(document.querySelectorAll('.medium-editor-toolbar').length).toBe(0);
-            var editor = new MediumEditor('.editor'),
+            var editor = this.newMediumEditor('.editor'),
                 toolbar = editor.toolbar.getToolbarElement();
             expect(toolbar.className).toMatch(/medium-editor-toolbar/);
             expect(document.querySelectorAll('.medium-editor-toolbar').length).toBe(1);
@@ -34,7 +33,7 @@ describe('Toolbar TestCase', function () {
 
         it('should not create an anchor form element or anchor extension if anchor is not passed as a button', function () {
             expect(document.querySelectorAll('.medium-editor-toolbar-form-anchor').length).toBe(0);
-            var editor = new MediumEditor('.editor', {
+            var editor = this.newMediumEditor('.editor', {
                 buttons: ['bold', 'italic', 'underline']
             });
             expect(editor.toolbar.getToolbarElement().querySelectorAll('.medium-editor-toolbar-form-anchor').length).toBe(0);
@@ -43,23 +42,13 @@ describe('Toolbar TestCase', function () {
     });
 
     describe('Toolbars', function () {
-        beforeEach(function () {
-            jasmine.clock().install();
-        });
-
-        afterEach(function () {
-            jasmine.clock().uninstall();
-        });
-
         it('should enable bold button in toolbar when bold text is selected', function () {
             var editor = null,
-                newElement = document.createElement('div');
+                newElement = this.createElement('div', '', 'lorem ipsum <b><div id="bold_dolorOne">dolor</div></b>');
 
             newElement.id = 'editor-for-toolbar-test';
-            newElement.innerHTML = 'lorem ipsum <b><div id="bold_dolorOne">dolor</div></b>';
-            document.body.appendChild(newElement);
 
-            editor = new MediumEditor(document.getElementById('editor-for-toolbar-test'), { delay: 0 });
+            editor = this.newMediumEditor(document.getElementById('editor-for-toolbar-test'), { delay: 0 });
             selectElementContentsAndFire(document.getElementById('bold_dolorOne'));
 
             jasmine.clock().tick(51);
@@ -71,7 +60,7 @@ describe('Toolbar TestCase', function () {
 
             this.el.innerHTML = 'lorem ipsum <b><div id="bold_dolorTwo">dolor</div></b>';
 
-            editor = new MediumEditor(document.querySelectorAll('.editor'), { delay: 0 });
+            editor = this.newMediumEditor(document.querySelectorAll('.editor'), { delay: 0 });
 
             editor.stopSelectionUpdates();
             selectElementContentsAndFire(document.getElementById('bold_dolorTwo'));
@@ -98,7 +87,7 @@ describe('Toolbar TestCase', function () {
 
             this.el.innerHTML = 'specOnShowToolbarTest';
 
-            editor = new MediumEditor('.editor', {
+            editor = this.newMediumEditor('.editor', {
                 onShowToolbar: temp.onShow,
                 onHideToolbar: temp.onHide
             });
@@ -120,7 +109,7 @@ describe('Toolbar TestCase', function () {
 
         it('should not hide when selecting text within editor, but release mouse outside of editor', function () {
             this.el.innerHTML = 'lorem ipsum';
-            var editor = new MediumEditor('.editor');
+            var editor = this.newMediumEditor('.editor');
 
             selectElementContentsAndFire(editor.elements[0].firstChild);
             fireEvent(editor.elements[0], 'mousedown');
@@ -133,12 +122,10 @@ describe('Toolbar TestCase', function () {
 
         it('should hide the toolbar when clicking outside the toolbar on an element that does not clear selection', function () {
             this.el.innerHTML = 'lorem ipsum';
-            var outsideElement = document.createElement('div'),
-                editor = new MediumEditor('.editor');
+            var outsideElement = this.createElement('div', '', 'Click Me, I don\'t clear selection'),
+                editor = this.newMediumEditor('.editor');
 
             outsideElement.setAttribute('style', '-webkit-user-select: none; -moz-user-select: none; -ms-user-select: none; user-select: none;');
-            outsideElement.innerHTML = 'Click Me, I don\'t clear selection';
-            document.body.appendChild(outsideElement);
 
             selectElementContentsAndFire(editor.elements[0].firstChild);
             jasmine.clock().tick(51);
@@ -151,22 +138,13 @@ describe('Toolbar TestCase', function () {
 
             expect(document.getSelection().rangeCount).toBe(1);
             expect(editor.toolbar.isDisplayed()).toBe(false);
-            tearDown(outsideElement);
         });
     });
 
     describe('Static Toolbars', function () {
-        beforeEach(function () {
-            jasmine.clock().install();
-        });
-
-        afterEach(function () {
-            jasmine.clock().uninstall();
-        });
-
         it('should let the user click outside of the selected area to leave', function () {
             this.el.innerHTML = 'This is my text<span>and this is some other text</span>';
-            var editor = new MediumEditor('.editor', {
+            var editor = this.newMediumEditor('.editor', {
                 staticToolbar: true,
                 standardizeSelectionStart: true,
                 updateOnEmptySelection: true
@@ -185,7 +163,7 @@ describe('Toolbar TestCase', function () {
 
         it('should not throw an error when check selection is called when there is an empty selection', function () {
             this.el.innerHTML = '<b>lorem ipsum</b>';
-            var editor = new MediumEditor('.editor', {
+            var editor = this.newMediumEditor('.editor', {
                 staticToolbar: true,
                 stickyToolbar: true
             });
@@ -200,7 +178,7 @@ describe('Toolbar TestCase', function () {
 
         it('should show and update toolbar buttons when staticToolbar and updateOnEmptySelection options are set to true', function () {
             this.el.innerHTML = '<b>lorem ipsum</b>';
-            var editor = new MediumEditor('.editor', {
+            var editor = this.newMediumEditor('.editor', {
                 staticToolbar: true,
                 stickyToolbar: true,
                 updateOnEmptySelection: true
@@ -217,16 +195,13 @@ describe('Toolbar TestCase', function () {
         it('should be hidden for one medium-editor instance when another medium-editor instance shows its toolbar', function () {
             var editorOne,
                 editorTwo,
-                elTwo = document.createElement('div');
+                elTwo = this.createElement('div', '', '<span id="editor-span-2">lorem ipsum</span>');
 
             elTwo.id = 'editor-div-two';
-            document.body.appendChild(elTwo);
-
             this.el.innerHTML = '<span id="editor-span-1">lorem ipsum</span>';
-            elTwo.innerHTML = '<span id="editor-span-2">lorem ipsum</span>';
 
-            editorOne = new MediumEditor('.editor', { staticToolbar: true });
-            editorTwo = new MediumEditor(document.getElementById('editor-div-two'), { staticToolbar: true });
+            editorOne = this.newMediumEditor('.editor', { staticToolbar: true });
+            editorTwo = this.newMediumEditor(document.getElementById('editor-div-two'), { staticToolbar: true });
 
             selectElementContents(document.getElementById('editor-span-1'));
             fireEvent(this.el, 'focus', {
@@ -255,7 +230,7 @@ describe('Toolbar TestCase', function () {
     describe('Deactive', function () {
         it('should remove select event from elements', function () {
             spyOn(this.el, 'addEventListener');
-            var editor = new MediumEditor('.editor');
+            var editor = this.newMediumEditor('.editor');
             expect(this.el.addEventListener).toHaveBeenCalled();
             spyOn(this.el, 'removeEventListener');
             editor.destroy();
@@ -264,60 +239,42 @@ describe('Toolbar TestCase', function () {
     });
 
     describe('Disable', function () {
-
-        beforeEach(function () {
-            jasmine.clock().install();
-        });
-
-        afterEach(function () {
-            jasmine.clock().uninstall();
-        });
-
         it('should not show the toolbar on elements when option disableToolbar is set to true', function () {
-            var editor = new MediumEditor('.editor', {
+            var editor = this.newMediumEditor('.editor', {
                 disableToolbar: true
             });
-            expect(editor.options.disableToolbar).toEqual(true);
-            expect(document.getElementsByClassName('medium-editor-toolbar-actions').length).toEqual(0);
+            expect(editor.options.disableToolbar).toBe(true);
+            expect(document.getElementsByClassName('medium-editor-toolbar-actions').length).toBe(0);
         });
 
         it('should not create the toolbar if all elements has data attr of disable-toolbar', function () {
             this.el.setAttribute('data-disable-toolbar', 'true');
-            var editor = new MediumEditor('.editor');
-            expect(document.getElementsByClassName('medium-editor-toolbar-actions').length).toEqual(0);
+            var editor = this.newMediumEditor('.editor');
+            expect(document.getElementsByClassName('medium-editor-toolbar-actions').length).toBe(0);
             expect(editor.toolbar).toBeUndefined();
         });
 
         it('should not show the toolbar when one element has a data attr of disable-toolbar set and text is selected', function () {
-            var element = document.createElement('div'),
+            var element = this.createElement('div', 'editor', 'lorem ipsum'),
                 editor = null;
 
-            element.className = 'editor';
             element.setAttribute('data-disable-toolbar', 'true');
-            element.innerHTML = 'lorem ipsum';
-            document.body.appendChild(element);
 
-            editor = new MediumEditor(document.querySelectorAll('.editor'));
+            editor = this.newMediumEditor(document.querySelectorAll('.editor'));
 
-            expect(editor.elements.length).toEqual(2);
+            expect(editor.elements.length).toBe(2);
             expect(editor.toolbar.getToolbarElement().style.display).toBe('');
             selectElementContentsAndFire(element);
             jasmine.clock().tick(51);
 
             expect(editor.toolbar.getToolbarElement().style.display).toBe('');
-            // Remove the new element from the DOM
-            document.body.removeChild(element);
         });
 
         it('should not display toolbar when selected text within an element with contenteditable="false"', function () {
-            var element = document.createElement('div'),
-                editor = null;
-
-            element.className = 'editor';
+            this.createElement('div', 'editor');
             this.el.innerHTML = 'lorem ipsum <div id="cef_el" contenteditable="false">dolor</div>';
-            document.body.appendChild(element);
 
-            editor = new MediumEditor(document.querySelectorAll('.editor'), { delay: 0 });
+            var editor = this.newMediumEditor(document.querySelectorAll('.editor'), { delay: 0 });
 
             selectElementContentsAndFire(document.getElementById('cef_el'));
 
@@ -327,32 +284,23 @@ describe('Toolbar TestCase', function () {
 
         it('should show the toolbar if its text are selected even though one or more elements that has a data attr of disable-toolbar', function () {
             var editor,
-                element = document.createElement('div');
+                element = this.createElement('div', 'editor');
 
-            element.className = 'editor';
             element.setAttribute('data-disable-toolbar', 'true');
             this.el.innerHTML = 'lorem ipsum';
-            document.body.appendChild(element);
-            editor = new MediumEditor(document.querySelectorAll('.editor'));
-            expect(editor.elements.length).toEqual(3);
+            editor = this.newMediumEditor(document.querySelectorAll('.editor'));
+            expect(editor.elements.length).toBe(2);
             expect(editor.toolbar.getToolbarElement().style.display).toBe('');
             selectElementContentsAndFire(this.el, { eventToFire: 'focus' });
 
             expect(editor.toolbar.getToolbarElement().classList.contains('medium-editor-toolbar-active')).toBe(true);
-            // Remove the new element from the DOM
-            document.body.removeChild(element);
-
         });
 
         it('should not try to toggle toolbar when option disabletoolbar is set to true', function () {
-            var element = document.createElement('div'),
-                editor = null;
-
-            element.className = 'editor';
+            this.createElement('div', 'editor');
             this.el.innerHTML = 'lorem ipsum';
-            document.body.appendChild(element);
 
-            editor = new MediumEditor(document.querySelectorAll('.editor'), {
+            var editor = this.newMediumEditor(document.querySelectorAll('.editor'), {
                 disableToolbar: true
             });
 
@@ -360,15 +308,15 @@ describe('Toolbar TestCase', function () {
 
             selectElementContents(this.el);
             editor.checkSelection();
-
-            // Remove the new element from the DOM
-            document.body.removeChild(element);
         });
     });
 
     describe('Scroll', function () {
-        it('should position toolbar if shown', function () {
-            var editor = new MediumEditor('.editor');
+        it('should position static + sticky toolbar', function () {
+            var editor = this.newMediumEditor('.editor', {
+                staticToolbar: true,
+                stickyToolbar: true
+            });
             spyOn(Toolbar.prototype, 'positionToolbarIfShown');
             fireEvent(window, 'scroll');
             expect(editor.toolbar.positionToolbarIfShown).toHaveBeenCalled();
