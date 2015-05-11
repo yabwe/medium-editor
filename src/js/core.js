@@ -1,6 +1,6 @@
 /*global FileReader, Util, ButtonsData, DefaultButton,
  Selection, AnchorExtension, FontSizeExtension, Extension, extensionDefaults,
- Toolbar, AnchorPreview, Events, Placeholders, editorDefaults */
+ Toolbar, AnchorPreview, AutoLinker, Events, Placeholders, editorDefaults */
 
 function MediumEditor(elements, options) {
     'use strict';
@@ -278,6 +278,10 @@ function MediumEditor(elements, options) {
         return shouldAdd;
     }
 
+    function shouldAddDefaultAutoLinker() {
+        return !!this.options.enableAutoLinker;
+    }
+
     function createContentEditable(textarea) {
         var div = this.options.ownerDocument.createElement('div'),
             id = (+new Date()),
@@ -444,6 +448,10 @@ function MediumEditor(elements, options) {
         // Add AnchorPreview as extension if needed
         if (shouldAddDefaultAnchorPreview.call(this)) {
             this.commands.push(initExtension(new AnchorPreview(), 'anchor-preview', this));
+        }
+
+        if (shouldAddDefaultAutoLinker.call(this)) {
+            this.commands.push(initExtension(new AutoLinker(), 'auto-linker', this));
         }
     }
 

@@ -73,6 +73,7 @@ the textarea value to the div HTML content.
 * __allowMultiParagraphSelection__: enables the toolbar when selecting multiple paragraphs/block elements. Default: true
 * __delay__: time in milliseconds to show the toolbar or anchor tag preview. Default: 0
 * __disableAnchorPreview__: enables/disables the anchor preview element, which appears when hovering links and allows the user to edit the link when clicking. If toolbar is diabled (via __disableToolbar__ or `data-disable-toolbar attribute`) the anchor preview is always disabled so this option will be ignored. Default: false
+* __enableAutoLinker__: enables/disables the auto-linker feature, which automatically turns URLs entered into the text field into HTML anchor tags (similar to the functionality of Markdown). Default: false
 * __disableReturn__:  enables/disables the use of the return-key. You can also set specific element behavior by using setting a data-disable-return attribute. Default: false
 * __disableDoubleReturn__:  allows/disallows two (or more) empty new lines. You can also set specific element behavior by using setting a data-disable-double-return attribute. Default: false
 * __disableEditing__: enables/disables adding the contenteditable behavior. Useful for using the toolbar with customized buttons/actions. You can also set specific element behavior by using setting a data-disable-editing attribute. Default: false

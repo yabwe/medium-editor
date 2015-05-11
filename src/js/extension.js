@@ -22,8 +22,8 @@ var Extension;
         //
         //      var ThingTwo = Thing.extend({ foo: "baz" });
         //
-        //      var thingOne = new Thing(); // foo === bar
-        //      var thingTwo = new ThingTwo(); // foo == baz
+        //      var thingOne = new Thing(); // foo === "bar"
+        //      var thingTwo = new ThingTwo(); // foo === "baz"
         //
         //      which seems like some simply shallow copy nonsense
         //      at first, but a lot more is going on there.
@@ -107,7 +107,7 @@ var Extension;
          *
          * 1) Find the parent node containing the current selection
          * 2) Call checkState on the extension, passing the node as an argument
-         * 3) Get tha parent node of the previous node
+         * 3) Get the parent node of the previous node
          * 4) Repeat steps #2 and #3 until we move outside the parent contenteditable
          */
         checkState: null,
@@ -131,7 +131,7 @@ var Extension;
          * If implemented, this function will be called once on each extension
          * when the state of the editor/toolbar is being updated.
          *
-         * If this function returns a non-null value, the exntesion will
+         * If this function returns a non-null value, the extension will
          * be ignored as the code climbs the dom tree.
          *
          * If this function returns true, and the setActive() function is defined
@@ -152,7 +152,7 @@ var Extension;
         /* isAlreadyApplied: [function (node)]
          *
          * If implemented, this function is similar to checkState() in
-         * that it will be calle repeatedly as MediumEditor moves up
+         * that it will be called repeatedly as MediumEditor moves up
          * the DOM to update the editor & toolbar after a state change.
          *
          * NOTE: This function will NOT be called if checkState() has

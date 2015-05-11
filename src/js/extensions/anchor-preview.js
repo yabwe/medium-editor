@@ -16,9 +16,8 @@ var AnchorPreview;
         // put the activeAnchor value in the preview
         previewValueSelector: 'a',
 
-        init: function (instance) {
+        init: function () {
 
-            this.base = instance;
             this.anchorPreview = this.createPreview();
             this.base.options.elementsContainer.appendChild(this.anchorPreview);
 
