@@ -18,6 +18,27 @@ LINK_REGEXP_TEXT =
 (function () {
     'use strict';
 
+    var nodeIteratorDetectsNewNodes = true; // this is the behavior in Chrome, FF, Safari...
+
+    // feature test for the behavior of NodeIterator. In IE11 this didn't behave like the other browsers...
+    (function () {
+        var div = document.createElement('div'),
+            node,
+            it;
+        div.appendChild(document.createTextNode('ab'));
+        div.appendChild(document.createTextNode('c'));
+        it = document.createNodeIterator(div, NodeFilter.SHOW_TEXT, null, false);
+        node = it.nextNode();
+        node.splitText(1);
+        node = it.nextNode();
+        if (node.nodeValue === 'c') {
+            nodeIteratorDetectsNewNodes = false;
+        } else if (node.nodeValue !== 'b') {
+            throw new Error('Unexpected behavior of NodeIterator. Code will not work properly');
+        }
+    }());
+    // end feature test
+
     function assignHttpToProtocolLessUrl(url) {
         if (url.indexOf('://') === -1) {
             return 'http://' + url;
@@ -26,7 +47,7 @@ LINK_REGEXP_TEXT =
         }
     }
 
-    function findChildTextNodes(el) {
+    function findTextNodes(el) {
         var n,
             a = [],
             walk = document.createTreeWalker(el, NodeFilter.SHOW_TEXT, null, false);
@@ -38,7 +59,10 @@ LINK_REGEXP_TEXT =
 
     function sortNodesInDocumentOrder(root, nodes) {
         var lookup = [],
-            it = document.createNodeIterator(root, NodeFilter.SHOW_ELEMENT|NodeFilter.SHOW_TEXT|NodeFilter.SHOW_COMMENT),
+            it = document.createNodeIterator(root,
+                NodeFilter.SHOW_ELEMENT|NodeFilter.SHOW_TEXT|NodeFilter.SHOW_COMMENT,
+                null,
+                false),
             node;
 
         while ((node = it.nextNode()) !== null) {
@@ -71,7 +95,11 @@ LINK_REGEXP_TEXT =
             }
         });
         originalRootChildren.forEach(function (originalRootChild) {
-            allTextNodes = allTextNodes.concat(findChildTextNodes(originalRootChild));
+            if (originalRootChild.nodeType === 3) {
+                allTextNodes = allTextNodes.concat(originalRootChild);
+            } else {
+                allTextNodes = allTextNodes.concat(findTextNodes(originalRootChild));
+            }
         });
         descendants.forEach(function (descendant) {
             // Add text nodes that were direct descendants of the root node.
@@ -285,7 +313,11 @@ LINK_REGEXP_TEXT =
                     currentTextIndex += currentNode.nodeValue.length;
                     if (newNode !== null) {
                         currentTextIndex += newNode.nodeValue.length;
-                        nodeIterator.nextNode(); // Skip the newNode as we'll already have pushed it to the matches
+                        if (nodeIteratorDetectsNewNodes) {
+                            // Skip the newNode as we'll already have pushed it to the matches
+                            // In IE11, the nextNode isn't the newNode so don't skip this.
+                            nodeIterator.nextNode();
+                        }
                     }
                     newNode = null;
                 }
