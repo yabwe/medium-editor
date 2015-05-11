@@ -238,6 +238,8 @@ LINK_REGEXP_TEXT =
 
         init: function () {
             this.base.subscribe('editableKeypress', this.onKeypress.bind(this));
+            // MS IE has it's own auto-URL detect feature but ours is better in some ways. Be consistent.
+            this.base.options.ownerDocument.execCommand('AutoUrlDetect', false, false);
         },
 
         onKeypress: function (keyPressEvent) {
