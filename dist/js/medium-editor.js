@@ -3011,27 +3011,6 @@ LINK_REGEXP_TEXT =
 (function () {
     'use strict';
 
-    var nodeIteratorDetectsNewNodes = true; // this is the behavior in Chrome, FF, Safari...
-
-    // feature test for the behavior of NodeIterator. In IE11 this didn't behave like the other browsers...
-    (function () {
-        var div = document.createElement('div'),
-            node,
-            it;
-        div.appendChild(document.createTextNode('ab'));
-        div.appendChild(document.createTextNode('c'));
-        it = document.createNodeIterator(div, NodeFilter.SHOW_TEXT, null, false);
-        node = it.nextNode();
-        node.splitText(1);
-        node = it.nextNode();
-        if (node.nodeValue === 'c') {
-            nodeIteratorDetectsNewNodes = false;
-        } else if (node.nodeValue !== 'b') {
-            throw new Error('Unexpected behavior of NodeIterator. Code will not work properly');
-        }
-    }());
-    // end feature test
-
     function assignHttpToProtocolLessUrl(url) {
         if (url.indexOf('://') === -1) {
             return 'http://' + url;
@@ -3221,28 +3200,6 @@ LINK_REGEXP_TEXT =
     }
     /* END - based on http://stackoverflow.com/a/6183069 */
 
-    function findDescendantTextNodes(node, document) {
-        var it = document.createNodeIterator(node, NodeFilter.SHOW_TEXT, null, false),
-            nodes = [],
-            currentNode;
-
-        while ((currentNode = it.nextNode()) !== null) {
-            nodes.push(currentNode);
-        }
-        return nodes;
-    }
-
-    function nodesAreAllChildrenOf(nodes, root) {
-        var i,
-            rootChildNodes = Array.prototype.slice.call(root.childNodes, 0);
-        for (i = 0; i < nodes.length; i++) {
-            if (rootChildNodes.indexOf(nodes[i]) === -1) {
-                return false;
-            }
-        }
-        return true;
-    }
-
     AutoLinker = Extension.extend({
         parent: true,
 
@@ -3293,68 +3250,35 @@ LINK_REGEXP_TEXT =
             return linkCreated;
         },
 
+        splitStartNodeIfNeeded: function (currentNode, matchStartIndex, currentTextIndex) {
+            if (matchStartIndex !== currentTextIndex) {
+                return currentNode.splitText(matchStartIndex - currentTextIndex);
+            }
+            return null;
+        },
+
+        splitEndNodeIfNeeded: function (currentNode, newNode, matchEndIndex, currentTextIndex) {
+            var textIndexOfEndOfFarthestNode,
+                endSplitPoint;
+            textIndexOfEndOfFarthestNode = currentTextIndex + (newNode || currentNode).nodeValue.length +
+                    (newNode ? currentNode.nodeValue.length : 0) -
+                    1;
+            endSplitPoint = (newNode || currentNode).nodeValue.length -
+                    (textIndexOfEndOfFarthestNode + 1 - matchEndIndex);
+            if (textIndexOfEndOfFarthestNode >= matchEndIndex &&
+                    currentTextIndex !== textIndexOfEndOfFarthestNode &&
+                    endSplitPoint !== 0) {
+                (newNode || currentNode).splitText(endSplitPoint);
+            }
+        },
+
         performLinkingWithinElement: function (element) {
             var matches = this.findLinkableText(element),
-                matchIndex = 0,
-                currentNode = null,
-                newNode = null,
-                currentTextIndex = 0,
-                matchedNodes = [],
-                startReached = false,
-                commonAncestor = null,
-                nodeIterator = null,
-                linkCreated = false,
-                textIndexOfEndOfFarthestNode;
+                linkCreated = false;
 
-            while (matches.length > matchIndex) {
-                nodeIterator = this.base.options.ownerDocument.createNodeIterator(element, NodeFilter.SHOW_TEXT, null, false);
-                while ((currentNode = nodeIterator.nextNode()) !== null) {
-                    if (!startReached && matches[matchIndex].start < (currentTextIndex + currentNode.nodeValue.length)) {
-                        startReached = true;
-                        // Split the text node if needed to align perfectly with the match
-                        if (matches[matchIndex].start !== currentTextIndex) {
-                            newNode = currentNode.splitText(matches[matchIndex].start - currentTextIndex);
-                        }
-                    }
-                    textIndexOfEndOfFarthestNode = currentTextIndex + (newNode || currentNode).nodeValue.length +
-                            (newNode ? currentNode.nodeValue.length : 0) -
-                            1;
-                    var endSplitPoint = (newNode || currentNode).nodeValue.length -
-                            (textIndexOfEndOfFarthestNode + 1 - matches[matchIndex].end);
-                    if (startReached && textIndexOfEndOfFarthestNode >= matches[matchIndex].end &&
-                            currentTextIndex !== textIndexOfEndOfFarthestNode &&
-                            endSplitPoint !== 0) {
-                        (newNode || currentNode).splitText(endSplitPoint);
-                    }
-                    if (startReached && currentTextIndex === matches[matchIndex].end) {
-                        break; // Found the node(s) corresponding to the link. Break out and move on to the next.
-                    } else if (startReached && currentTextIndex > (matches[matchIndex].end + 1)) {
-                        throw new Error('PerformLinking overshot the target!'); // should never happen...
-                    }
-                    if (startReached) {
-                        matchedNodes.push(newNode || currentNode);
-                    }
-                    currentTextIndex += currentNode.nodeValue.length;
-                    if (newNode !== null) {
-                        currentTextIndex += newNode.nodeValue.length;
-                        if (nodeIteratorDetectsNewNodes) {
-                            // Skip the newNode as we'll already have pushed it to the matches
-                            // In IE11, the nextNode isn't the newNode so don't skip this.
-                            nodeIterator.nextNode();
-                        }
-                    }
-                    newNode = null;
-                }
-
-                linkCreated = this.createLink(matchedNodes, matches[matchIndex].href) || linkCreated;
-
-                matchedNodes = [];
-                currentNode = null;
-                currentTextIndex = 0;
-                startReached = false;
-                commonAncestor = null;
-
-                matchIndex += 1;
+            for (var matchIndex = 0; matchIndex < matches.length; matchIndex++) {
+                linkCreated = this.createLink(this.findOrCreateMatchingTextNodes(element, matches[matchIndex]),
+                    matches[matchIndex].href) || linkCreated;
             }
             return linkCreated;
         },
@@ -3375,6 +3299,44 @@ LINK_REGEXP_TEXT =
             return matches;
         },
 
+        findOrCreateMatchingTextNodes: function (element, match) {
+            var treeWalker = this.base.options.ownerDocument.createTreeWalker(element, NodeFilter.SHOW_TEXT,
+                    null, false),
+                matchedNodes = [],
+                currentTextIndex = 0,
+                startReached = false,
+                currentNode = null,
+                newNode = null;
+
+            while ((currentNode = treeWalker.nextNode()) !== null) {
+                if (!startReached && match.start < (currentTextIndex + currentNode.nodeValue.length)) {
+                    startReached = true;
+                    newNode = this.splitStartNodeIfNeeded(currentNode, match.start, currentTextIndex);
+                }
+                if (startReached) {
+                    this.splitEndNodeIfNeeded(currentNode, newNode, match.end, currentTextIndex);
+                }
+                if (startReached && currentTextIndex === match.end) {
+                    break; // Found the node(s) corresponding to the link. Break out and move on to the next.
+                } else if (startReached && currentTextIndex > (match.end + 1)) {
+                    throw new Error('PerformLinking overshot the target!'); // should never happen...
+                }
+
+                if (startReached) {
+                    matchedNodes.push(newNode || currentNode);
+                }
+
+                currentTextIndex += currentNode.nodeValue.length;
+                if (newNode !== null) {
+                    currentTextIndex += newNode.nodeValue.length;
+                    // Skip the newNode as we'll already have pushed it to the matches
+                    treeWalker.nextNode();
+                }
+                newNode = null;
+            }
+            return matchedNodes;
+        },
+
         createLink: function (textNodes, href) {
             var alreadyLinked = Util.traverseUp(textNodes[0], function (node) {
                 return node.nodeName.toLowerCase() === 'a';
@@ -3386,54 +3348,40 @@ LINK_REGEXP_TEXT =
             // First, check for an existing common root node.
             var candRoot = findCommonRoot(textNodes[0], textNodes[textNodes.length - 1]),
                 document = this.base.options.ownerDocument,
-                i,
                 anchor = document.createElement('a');
             if (candRoot.nodeType === 3) {
                 // Link corresponded to a single text node
                 candRoot.parentNode.insertBefore(anchor, candRoot);
                 anchor.appendChild(candRoot);
-            } else if (findDescendantTextNodes(candRoot, document).length === textNodes.length) {
-                // Link corresponded to all the text nodes inside the candidate root
-                candRoot.appendChild(anchor);
-                while (candRoot.childNodes.length > 1) {
-                    anchor.appendChild(candRoot.childNodes[0]);
-                }
-            } else if (nodesAreAllChildrenOf(textNodes, candRoot)) {
-                // Link text nodes are all inside the candidate root, along with non-linkable nodes
-                if (candRoot.childNodes[candRoot.childNodes.length - 1] === textNodes[textNodes.length - 1]) {
-                    candRoot.appendChild(anchor);
-                } else {
-                    candRoot.insertBefore(anchor, textNodes[0].previousSibling || textNodes[0]);
-                }
-                for (i = 0; i < textNodes.length; i++) {
-                    anchor.appendChild(textNodes[i]);
-                }
             } else {
+                // Link is in at least 2 text nodes. It's possible that they are styled differently.
                 complexify(candRoot, textNodes);
-                var startAncestor = textNodes[0],
-                    endAncestor = textNodes[textNodes.length - 1],
-                    node;
-                while (startAncestor.parentNode !== candRoot) {
-                    startAncestor = startAncestor.parentNode;
-                }
-                while (endAncestor.parentNode !== candRoot) {
-                    endAncestor = endAncestor.parentNode;
-                }
-                anchor = document.createElement('a');
-                node = null;
-
-                var nextSibling;
-                do {
-                    node = (node === null) ? startAncestor : nextSibling;
-                    nextSibling = node.nextSibling;
-                    anchor.appendChild(node);
-                } while (node !== endAncestor);
-                candRoot.insertBefore(anchor, nextSibling);
+                this.insertLinkAfterComplexify(candRoot, textNodes, anchor);
                 simplify(candRoot, textNodes);
             }
 
             anchor.setAttribute('href', assignHttpToProtocolLessUrl(href));
             return true;
+        },
+
+        insertLinkAfterComplexify: function (candRoot, textNodes, anchor) {
+            var startAncestor = textNodes[0],
+                endAncestor = textNodes[textNodes.length - 1],
+                nextSibling,
+                node = null;
+            while (startAncestor.parentNode !== candRoot) {
+                startAncestor = startAncestor.parentNode;
+            }
+            while (endAncestor.parentNode !== candRoot) {
+                endAncestor = endAncestor.parentNode;
+            }
+
+            do {
+                node = (node === null) ? startAncestor : nextSibling;
+                nextSibling = node.nextSibling;
+                anchor.appendChild(node);
+            } while (node !== endAncestor);
+            candRoot.insertBefore(anchor, nextSibling);
         }
 
     });
