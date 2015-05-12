@@ -2999,10 +2999,6 @@ var AnchorPreview;
 
 var AutoLinker,
     AutoLinkerStatics = {},
-    KEY_CODES = {
-        SPACE: 32,
-        ENTER: 13
-    },
     LINK_REGEXP_TEXT;
 
 LINK_REGEXP_TEXT =
@@ -3039,9 +3035,8 @@ LINK_REGEXP_TEXT =
     function assignHttpToProtocolLessUrl(url) {
         if (url.indexOf('://') === -1) {
             return 'http://' + url;
-        } else {
-            return url;
         }
+        return url;
     }
 
     function findTextNodes(el) {
@@ -3074,6 +3069,19 @@ LINK_REGEXP_TEXT =
         });
     }
 
+    /**
+     * Denormalizes the DOM. The intention here is to create a "column" of elements above each individual text node
+     * provided in the descendants argument. For instance, if the original DOM were presented as a DIV, with a SPAN
+     * inside it, and three text nodes in the SPAN, this function will modify the DOM to have a DIV with 3 SPANs
+     * inside, each span containing one of the text nodes.
+     *
+     * The concept is that this preserves the styling of all text elements within the targeted region, while allowing
+     * wrapping the targeted text nodes (and their accompanying SPAN, STRONG, EM, etc. tags) into a new anchor tag.
+     *
+     * The transformations performed by this function are reversed by the "simplify" function, excepting the changes
+     * that might be made in between calling complexify and simplify - that is, the change to add an anchor wrapping
+     * some of the tags.
+     */
     function complexify(root, descendants) {
         var rootChildren = [],
             originalRootChildren = [],
@@ -3140,6 +3148,11 @@ LINK_REGEXP_TEXT =
         });
     }
 
+    /**
+     * Reverses the DOM transformations performed by the "complexify" function above. Adjacent tags with identical
+     * classes and node names will be merged together. This is akin to the Node.normalize function provided by DOM
+     * for text nodes, but applies to HTML tags instead.
+     */
     function simplify(root, descendants) {
         var changesMade,
             descendant,
@@ -3173,38 +3186,38 @@ LINK_REGEXP_TEXT =
     AutoLinkerStatics.simplify = simplify;
 
     /* based on http://stackoverflow.com/a/6183069 */
-    function depth(v) {
-        var d = 0,
-            vv = v;
-        while (vv.parentNode !== null) {
-            vv = vv.parentNode;
-            d++;
+    function depth(inNode) {
+        var theDepth = 0,
+            node = inNode;
+        while (node.parentNode !== null) {
+            node = node.parentNode;
+            theDepth++;
         }
-        return d;
+        return theDepth;
     }
 
-    function findCommonRoot(v, w) {
-        var depthVv = depth(v),
-            depthWw = depth(w),
-            vv = v,
-            ww = w;
+    function findCommonRoot(inNode1, inNode2) {
+        var depth1 = depth(inNode1),
+            depth2 = depth(inNode2),
+            node1 = inNode1,
+            node2 = inNode2;
 
-        while (depthVv !== depthWw) {
-            if (depthVv > depthWw) {
-                vv = vv.parentNode;
-                depthVv -= 1;
+        while (depth1 !== depth2) {
+            if (depth1 > depth2) {
+                node1 = node1.parentNode;
+                depth1 -= 1;
             } else {
-                ww = ww.parentNode;
-                depthWw -= 1;
+                node2 = node2.parentNode;
+                depth2 -= 1;
             }
         }
 
-        while (vv !== ww) {
-            vv = vv.parentNode;
-            ww = ww.parentNode;
+        while (node1 !== node2) {
+            node1 = node1.parentNode;
+            node2 = node2.parentNode;
         }
 
-        return vv;
+        return node1;
     }
     /* END - based on http://stackoverflow.com/a/6183069 */
 
@@ -3234,21 +3247,33 @@ LINK_REGEXP_TEXT =
         parent: true,
 
         init: function () {
+            this.disableEventHandling = false;
             this.base.subscribe('editableKeypress', this.onKeypress.bind(this));
             // MS IE has it's own auto-URL detect feature but ours is better in some ways. Be consistent.
             this.base.options.ownerDocument.execCommand('AutoUrlDetect', false, false);
         },
 
         onKeypress: function (keyPressEvent) {
-            if (keyPressEvent.keyCode === KEY_CODES.SPACE ||
-                    keyPressEvent.keyCode === KEY_CODES.ENTER ||
-                    keyPressEvent.which === KEY_CODES.SPACE) {
+            if (this.disableEventHandling) {
+                return;
+            }
+
+            if (keyPressEvent.keyCode === Util.keyCode.SPACE ||
+                    keyPressEvent.keyCode === Util.keyCode.ENTER ||
+                    keyPressEvent.which === Util.keyCode.SPACE) {
                 clearTimeout(this.performLinkingTimeout);
                 // Saving/restoring the selection in the middle of a keypress doesn't work well...
                 this.performLinkingTimeout = setTimeout(function () {
-                    var sel = this.base.exportSelection();
-                    if (this.performLinking(keyPressEvent.target)) {
-                        this.base.importSelection(sel);
+                    try {
+                        var sel = this.base.exportSelection();
+                        if (this.performLinking(keyPressEvent.target)) {
+                            this.base.importSelection(sel);
+                        }
+                    } catch (e) {
+                        if (window.console) {
+                            window.console.error('Failed to perform linking', e);
+                        }
+                        this.disableEventHandling = true;
                     }
                 }.bind(this), 0);
             }
