@@ -101,7 +101,8 @@ var PasteHandler;
                 dataFormatHTML = 'text/html',
                 dataFormatPlain = 'text/plain',
                 pastedHTML,
-                pastedPlain;
+                pastedPlain,
+                onlyText = false;
 
             if (this.window.clipboardData && event.clipboardData === undefined) {
                 event.clipboardData = this.window.clipboardData;
@@ -124,9 +125,10 @@ var PasteHandler;
 
                 if (!pastedHTML) {
                     pastedHTML = pastedPlain;
+                    onlyText = true;
                 }
 
-                if (this.cleanPastedHTML && pastedHTML) {
+                if (this.cleanPastedHTML && pastedHTML && !onlyText) {
                     return this.cleanPaste(pastedHTML);
                 }
 
