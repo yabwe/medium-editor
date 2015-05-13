@@ -525,7 +525,7 @@ var Events;
     if (!document.body) {
         // When this js is included in the header of a page, document.body is null
         // and feature detection cannot be done by adding elements to it.
-        tempFunction();
+        return tempFunction();
     }
 
     // Create a temporary contenteditable element with an 'oninput' event listener
