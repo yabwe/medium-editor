@@ -733,16 +733,27 @@ var Util;
             return doc.execCommand('formatBlock', false, tagName);
         },
 
-        // TODO: not sure if this should be here
-        setTargetBlank: function (el) {
-            var i;
+        /**
+         * Set target to blank on the given el element
+         *
+         * TODO: not sure if this should be here
+         *
+         * When creating a link (using core -> createLink) the selection returned by Firefox will be the parent of the created link
+         * instead of the created link itself (as it is for Chrome for example), so we retrieve all "a" children to grab the good one by
+         * using `anchorUrl` to ensure that we are adding target="_blank" on the good one.
+         * This isn't a bulletproof solution anyway ..
+         */
+        setTargetBlank: function (el, anchorUrl) {
+            var i, url = anchorUrl || false;
             if (el.tagName.toLowerCase() === 'a') {
                 el.target = '_blank';
             } else {
                 el = el.getElementsByTagName('a');
 
                 for (i = 0; i < el.length; i += 1) {
-                    el[i].target = '_blank';
+                    if (false === url || url === el[i].attributes.href.value) {
+                        el[i].target = '_blank';
+                    }
                 }
             }
         },
@@ -2322,18 +2333,18 @@ var PasteHandler;
                     workEl.innerHTML = workEl.innerHTML.replace(/\n/gi, ' ');
 
                     switch (workEl.tagName.toLowerCase()) {
-                    case 'a':
-                        if (this.targetBlank) {
-                            Util.setTargetBlank(workEl);
-                        }
-                        break;
-                    case 'p':
-                    case 'div':
-                        this.filterCommonBlocks(workEl);
-                        break;
-                    case 'br':
-                        this.filterLineBreak(workEl);
-                        break;
+                        case 'a':
+                            if (this.targetBlank) {
+                                Util.setTargetBlank(workEl);
+                            }
+                            break;
+                        case 'p':
+                        case 'div':
+                            this.filterCommonBlocks(workEl);
+                            break;
+                        case 'br':
+                            this.filterLineBreak(workEl);
+                            break;
                     }
                 }
             } else {
@@ -4682,7 +4693,7 @@ function MediumEditor(elements, options) {
                 this.options.ownerDocument.execCommand('createLink', false, opts.url);
 
                 if (this.options.targetBlank || opts.target === '_blank') {
-                    Util.setTargetBlank(Util.getSelectionStart(this.options.ownerDocument));
+                    Util.setTargetBlank(Util.getSelectionStart(this.options.ownerDocument), opts.url);
                 }
 
                 if (opts.buttonClass) {

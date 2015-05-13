@@ -176,18 +176,18 @@ var PasteHandler;
                     workEl.innerHTML = workEl.innerHTML.replace(/\n/gi, ' ');
 
                     switch (workEl.tagName.toLowerCase()) {
-                    case 'a':
-                        if (this.targetBlank) {
-                            Util.setTargetBlank(workEl);
-                        }
-                        break;
-                    case 'p':
-                    case 'div':
-                        this.filterCommonBlocks(workEl);
-                        break;
-                    case 'br':
-                        this.filterLineBreak(workEl);
-                        break;
+                        case 'a':
+                            if (this.targetBlank) {
+                                Util.setTargetBlank(workEl);
+                            }
+                            break;
+                        case 'p':
+                        case 'div':
+                            this.filterCommonBlocks(workEl);
+                            break;
+                        case 'br':
+                            this.filterLineBreak(workEl);
+                            break;
                     }
                 }
             } else {
