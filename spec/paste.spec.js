@@ -139,6 +139,43 @@ describe('Pasting content', function () {
             }
         });
 
+        it('should add paragraphs to pasted plain-text', function () {
+            var editorEl = this.el,
+                editor = this.newMediumEditor('.editor', {
+                    delay: 200,
+                    paste: {
+                        forcePlainText: false,
+                        cleanPastedHTML: true
+                    }
+                }),
+                pasteHandler = editor.getExtensionByName('paste'),
+
+                // mock event with clipboardData API
+                // test requires creating a function, so can't loop or jslint balks
+                evt = {
+                    preventDefault: function () {
+                        return;
+                    },
+                    clipboardData: {
+                        getData: function (clipboardType) {
+                            if (clipboardType === 'text/plain') {
+                                return 'One\n\nTwo\n\nThree';
+                            }
+                        }
+                    }
+                };
+
+            // move caret to editor
+            editorEl.innerHTML = '<span id="editor-inner">&nbsp</span>';
+
+            selectElementContentsAndFire(editorEl);
+
+            pasteHandler.handlePaste(evt, editorEl);
+            jasmine.clock().tick(100);
+            expect(editorEl.innerHTML).toEqual('<p>One</p><p>Two</p><p>Three</p>');
+
+        });
+
         it('should filter multi-line rich-text pastes when "insertHTML" command is not supported', function () {
             var editor = this.newMediumEditor('.editor', {
                 paste: {

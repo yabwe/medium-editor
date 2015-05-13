@@ -3423,10 +3423,6 @@ var PasteHandler;
                 pastedHTML = event.clipboardData.getData(dataFormatHTML);
                 pastedPlain = event.clipboardData.getData(dataFormatPlain);
 
-                if (!pastedHTML) {
-                    pastedHTML = pastedPlain;
-                }
-
                 if (this.cleanPastedHTML && pastedHTML) {
                     return this.cleanPaste(pastedHTML);
                 }
