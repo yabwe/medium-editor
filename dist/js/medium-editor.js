@@ -2022,6 +2022,12 @@ var Events;
         tempElement,
         existingRanges = [];
 
+    if (!document.body) {
+        // When this js is included in the header of a page, document.body is null
+        // and feature detection cannot be done by adding elements to it.
+        return tempFunction();
+    }
+
     // Create a temporary contenteditable element with an 'oninput' event listener
     tempElement = document.createElement('div');
     tempElement.setAttribute('contenteditable', true);
@@ -2295,7 +2301,8 @@ var PasteHandler;
                 dataFormatHTML = 'text/html',
                 dataFormatPlain = 'text/plain',
                 pastedHTML,
-                pastedPlain;
+                pastedPlain,
+                onlyText = false;
 
             if (this.window.clipboardData && event.clipboardData === undefined) {
                 event.clipboardData = this.window.clipboardData;
@@ -2318,9 +2325,10 @@ var PasteHandler;
 
                 if (!pastedHTML) {
                     pastedHTML = pastedPlain;
+                    onlyText = true;
                 }
 
-                if (this.cleanPastedHTML && pastedHTML) {
+                if (this.cleanPastedHTML && pastedHTML && !onlyText) {
                     return this.cleanPaste(pastedHTML);
                 }
 
