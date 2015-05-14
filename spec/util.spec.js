@@ -1,7 +1,16 @@
-/*global MediumEditor, Util, describe, it, expect, spyOn */
+/*global MediumEditor, Util, describe, it, expect, spyOn,
+         afterEach, beforeEach, setupTestHelpers */
 
 describe('Util', function () {
     'use strict';
+
+    beforeEach(function () {
+        setupTestHelpers.call(this);
+    });
+
+    afterEach(function () {
+        this.cleanupTest();
+    });
 
     describe('Exposure', function () {
 
@@ -96,6 +105,30 @@ describe('Util', function () {
             var obj = {};
             expect(Util.setObject('a.b.c', 10, obj)).toBe(10);
             expect(obj.a.b.c).toBe(10);
+        });
+
+    });
+
+    describe('settargetblank', function () {
+
+        it('sets target blank on a A element from a A element', function () {
+            var el = this.createElement('a', '', 'lorem ipsum');
+            el.attributes.href = 'http://0.0.0.0/bar.html';
+
+            Util.setTargetBlank(el);
+
+            expect(el.target).toBe('_blank');
+        });
+
+        it('sets target blank on a A element from a DIV element', function () {
+            var el = this.createElement('div', '', '<a href="http://1.1.1.1/foo.html">foo</a> <a href="http://0.0.0.0/bar.html">bar</a>');
+
+            Util.setTargetBlank(el, 'http://0.0.0.0/bar.html');
+
+            var nodes = el.getElementsByTagName('a');
+
+            expect(nodes[0].target).not.toBe('_blank');
+            expect(nodes[1].target).toBe('_blank');
         });
 
     });

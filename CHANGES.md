@@ -1,3 +1,8 @@
+4.8.1 / 2015-05-13
+==================
+* Fix error thrown when loading MediumEditor js from head
+
+
 4.8.0 / 2015-05-11
 ==================
 * Expose new 'editableInput' event for monitoring changes to editor
