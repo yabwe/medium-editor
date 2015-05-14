@@ -100,7 +100,7 @@ describe('Initialization TestCase', function () {
                 disableToolbar: false,
                 disableAnchorPreview: false,
                 disablePlaceholders: false,
-                enableAutoLinker: false,
+                autoLink: false,
                 toolbarAlign: 'center',
                 elementsContainer: document.body,
                 imageDragging: true,

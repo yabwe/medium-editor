@@ -279,7 +279,7 @@ function MediumEditor(elements, options) {
     }
 
     function shouldAddDefaultAutoLinker() {
-        return !!this.options.enableAutoLinker;
+        return !!this.options.autoLink;
     }
 
     function createContentEditable(textarea) {

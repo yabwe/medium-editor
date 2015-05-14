@@ -1148,7 +1148,7 @@ var editorDefaults;
         disableAnchorPreview: false,
         disableEditing: false,
         disablePlaceholders: false,
-        enableAutoLinker: false,
+        autoLink: false,
         toolbarAlign: 'center',
         elementsContainer: false,
         imageDragging: true,
@@ -4436,7 +4436,7 @@ function MediumEditor(elements, options) {
     }
 
     function shouldAddDefaultAutoLinker() {
-        return !!this.options.enableAutoLinker;
+        return !!this.options.autoLink;
     }
 
     function createContentEditable(textarea) {

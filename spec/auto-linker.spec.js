@@ -95,7 +95,7 @@ describe('Autolink', function () {
 
             beforeEach(function () {
                 this.editor = this.newMediumEditor('.editor', {
-                    enableAutoLinker: true
+                    autoLink: true
                 });
             });
 

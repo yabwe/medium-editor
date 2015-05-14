@@ -21,7 +21,7 @@ var editorDefaults;
         disableAnchorPreview: false,
         disableEditing: false,
         disablePlaceholders: false,
-        enableAutoLinker: false,
+        autoLink: false,
         toolbarAlign: 'center',
         elementsContainer: false,
         imageDragging: true,
