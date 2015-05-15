@@ -1,84 +1,8 @@
-/*global xdescribe, describe, it, expect, beforeEach, afterEach, AutoLinkerStatics, setupTestHelpers */
+/*global describe, it, expect, beforeEach, afterEach,
+    setupTestHelpers, selectElementContentsAndFire */
 
 describe('Autolink', function () {
     'use strict';
-
-    xdescribe('utility methods', function () {
-        var root,
-            complexify = AutoLinkerStatics.complexify,
-            simplify = AutoLinkerStatics.simplify;
-
-        beforeEach(function () {
-            root = document.createElement('div');
-        });
-
-        describe('complexify', function () {
-            it('should turn one span to two', function () {
-                root.innerHTML = '<span class="a">Hello world</span>';
-                root.childNodes[0].childNodes[0].splitText('Hello '.length);
-                complexify(root, root.childNodes[0].childNodes);
-
-                expect(root.childNodes.length).toBe(2);
-                expect(root.childNodes[0].className).toBe('a');
-                expect(root.childNodes[0].textContent).toBe('Hello ');
-                expect(root.childNodes[1].className).toBe('a');
-                expect(root.childNodes[1].textContent).toBe('world');
-            });
-
-            it('should ignore elements outside the lineage of the descendants', function () {
-                root.innerHTML = '<span class="ignoreMe">Foo</span> ' +
-                        '<span class="a">Hello world</span>' +
-                        ' <span class="ignoreMe2">Bar</span>';
-                root.querySelector('.a').childNodes[0].splitText('Hello '.length);
-                complexify(root, root.querySelector('.a').childNodes);
-
-                expect(root.childNodes.length).toBe(6);
-                var linkSpans = root.querySelectorAll('span.a');
-                expect(linkSpans.length).toBe(2);
-                expect(linkSpans[0].textContent).toBe('Hello ');
-                expect(linkSpans[1].textContent).toBe('world');
-            });
-
-            it('should leave intact text that we don\'t care about', function () {
-                root.innerHTML = '<span class="a"><b>Here is the link: http://www.</b>exa</span>mple.com ';
-                var newNode = root.querySelector('b').firstChild.splitText('Here is the link: '.length);
-                complexify(root, [newNode, root.querySelector('span').lastChild, root.lastChild]);
-
-                expect(root.innerHTML).toBe('<span class="a"><b>Here is the link: </b></span>' +
-                    '<span class="a"><b>http://www.</b></span><span class="a">exa</span>mple.com ');
-            });
-
-            it('should break down bold sections while retaining text order', function () {
-                root.innerHTML = '<b>Here is the link: http://www.</b>exampl<b>e</b>.com ';
-                var newNode = root.querySelector('b').firstChild.splitText('Here is the link: '.length);
-                complexify(root, [newNode, root.childNodes[1], root.childNodes[2].childNodes[0], root.lastChild]);
-                expect(root.innerHTML).toBe('<b>Here is the link: </b><b>http://www.</b>exampl<b>e</b>.com ');
-            });
-        });
-
-        describe('simplify', function () {
-            it('should turn two spans to one', function () {
-                root.innerHTML = '<span class="a">Hello </span><span class="a">world</span>';
-                var textNodes = [root.firstChild.firstChild, root.childNodes[1].firstChild];
-                simplify(root, textNodes);
-                expect(root.childNodes.length).toBe(1);
-                expect(root.childNodes[0].className).toBe('a');
-                expect(root.childNodes[0].textContent).toBe('Hello world');
-            });
-
-            it('should ignore elements outside the lineage of the descendants', function () {
-                var initialHTML = '<span class="ignoreMe"><span class="match">F</span><span class="match">oo</span></span> ' +
-                        '<span class="a">Hello </span><span class="a">world</span>' +
-                        ' <span class="ignoreMe2">B</span><span class="ignoreMe2">ar</span>';
-                root.innerHTML = initialHTML;
-                var spanAs = root.querySelectorAll('span.a'),
-                    textNodes = [spanAs[0].firstChild, spanAs[1].firstChild];
-                simplify(root, textNodes);
-                expect(root.textContent).toBe('Foo Hello world Bar');
-                expect(root.innerHTML).toBe(initialHTML.replace('</span><span class="a">', ''));
-            });
-        });
-    });
 
     describe('integration', function () {
 
@@ -178,6 +102,50 @@ describe('Autolink', function () {
 
                 expect(this.el.innerHTML).toBe('<p><b>Here is the link: </b>' +
                     '<a href="http://www.example.com"><b>http://www.</b>exampl<b>e</b>.com</a> </p>');
+            });
+
+            it('should auto-link text in a really hideous example', function () {
+                this.el.innerHTML = '' +
+                '<span>' +
+                    '<b>Link: http</b>' +
+                    '<i>://</i>' +
+                '</span>' +
+                '<span>' +
+                    '<b>www</b>' +
+                    '<u>.google.com</u>' +
+                '</span>' +
+                '<span>' +
+                    '<b>/wow </b>' +
+                    '<i>impressive</i>' +
+                '</span>';
+
+                selectElementContentsAndFire(this.el.firstChild);
+
+                triggerAutolinking(this.editor, this.el);
+
+                var expectedOutput = '' +
+                '<span>' +
+                    '<b>Link: </b>' +
+                '</span>' +
+                '<a href="http://www.google.com/wow">' +
+                    '<span>' +
+                        '<b>http</b>' +
+                        '<i>://</i>' +
+                    '</span>' +
+                    '<span>' +
+                        '<b>www</b>' +
+                        '<u>.google.com</u>' +
+                    '</span>' +
+                    '<span>' +
+                        '<b>/wow</b>' +
+                    '</span>' +
+                '</a>' +
+                '<span>' +
+                    '<b> </b>' +
+                    '<i>impressive</i>' +
+                '</span>';
+
+                expect(this.el.innerHTML).toBe(expectedOutput);
             });
         });
     });

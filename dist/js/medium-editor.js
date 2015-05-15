@@ -3234,6 +3234,9 @@ LINK_REGEXP_TEXT =
             // (Medium deletes the spaces/returns between P tags so the textContent ends up without paragraph spacing)
             var paragraphs = contenteditable.querySelectorAll('p'),
                 linkCreated = false;
+            if (paragraphs.length === 0) {
+                paragraphs = [contenteditable];
+            }
             for (var i = 0; i < paragraphs.length; i++) {
                 linkCreated = this.performLinkingWithinElement(paragraphs[i]) || linkCreated;
             }
