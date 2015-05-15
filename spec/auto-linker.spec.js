@@ -1,9 +1,9 @@
-/*global describe, it, expect, beforeEach, afterEach, AutoLinkerStatics, setupTestHelpers */
+/*global xdescribe, describe, it, expect, beforeEach, afterEach, AutoLinkerStatics, setupTestHelpers */
 
 describe('Autolink', function () {
     'use strict';
 
-    describe('utility methods', function () {
+    xdescribe('utility methods', function () {
         var root,
             complexify = AutoLinkerStatics.complexify,
             simplify = AutoLinkerStatics.simplify;

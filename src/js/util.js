@@ -423,6 +423,219 @@ var Util;
             parent.removeChild(element);
         },
 
+        moveTextRangeIntoElement: function (startNode, endNode, newElement, tracingOn) {
+            if (!startNode || !endNode) {
+                return null;
+            }
+
+            var rootNode = this.findCommonRoot(startNode, endNode);
+            if (!rootNode) {
+                return null;
+            }
+
+            if (endNode === startNode) {
+                var temp = startNode.parentNode;
+                temp.removeChild(startNode);
+                newElement.appendChild(startNode);
+                temp.appendChild(newElement);
+                return null;
+            }
+
+            // create rootChildren array which includes all the children
+            // we care about
+            var rootChildren = [],
+                firstChild,
+                lastChild,
+                nextNode,
+                currNode,
+                createdNode,
+                currParent,
+                newParent,
+                targetNode,
+                sibling;
+            for (var i = 0; i < rootNode.childNodes.length; i++) {
+                nextNode = rootNode.childNodes[i];
+                if (!firstChild) {
+                    if (Util.isDescendant(nextNode, startNode, true)) {
+                        firstChild = nextNode;
+                    }
+                } else {
+                    if (this.isDescendant(nextNode, endNode, true)) {
+                        lastChild = nextNode;
+                        break;
+                    } else {
+                        rootChildren.push(nextNode);
+                    }
+                }
+            }
+
+            if (tracingOn) {
+                console.log('firstChild: ' + (firstChild.tagName || firstChild.nodeValue));
+                console.log('lastChild: ' + (lastChild.tagName || lastChild.nodeValue));
+                console.log('rootNode: ' + rootNode.tagName);
+                console.log('start: ' + (startNode.innerHTML || startNode.nodeValue));
+                console.log('end: ' + (endNode.innerHTML || endNode.nodeValue));
+            }
+
+            var afterLast = lastChild.nextSibling,
+                fragment = document.createDocumentFragment();
+
+            // build up fragment on startNode side of tree
+            if (firstChild === startNode) {
+                firstChild.parentNode.removeChild(firstChild);
+                fragment.appendChild(firstChild);
+            } else {
+                currNode = startNode;
+                createdNode = null;
+                // loop until we hit the root again
+                while (currNode !== rootNode && currNode.parentNode !== rootNode) {
+                    currParent = currNode.parentNode;
+                    newParent = currParent.cloneNode(false);
+
+                    // Create a new parent element which is a clone of the current parent
+                    if (createdNode) {
+                        newParent.appendChild(createdNode);
+                    }
+                    createdNode = newParent;
+
+                    targetNode = currNode.nextSibling;
+
+                    if (!currNode.hasChildNodes()) {
+                        currNode.parentNode.removeChild(currNode);
+                    } else {
+                        // For the starting node, if it has children, we need to clone and not remove it
+                        currNode = currNode.cloneNode(false);
+                    }
+                    if (currNode.textContent) {
+                        createdNode.appendChild(currNode);
+                    }
+
+                    // Starting with the first sibling of the current node, add it and each of it's siblings
+                    // to the right to the new parent node
+                    while (targetNode) {
+                        sibling = targetNode.nextSibling;
+
+                        targetNode.parentNode.removeChild(targetNode);
+                        if (targetNode.hasChildNodes() || targetNode.textContent) {
+                            createdNode.appendChild(targetNode);
+                        }
+
+                        targetNode = sibling;
+                    }
+
+                    currNode = currParent;
+                }
+                fragment.appendChild(createdNode);
+            }
+
+            // add any elements between firstChild & lastChild
+            rootChildren.forEach(function (element) {
+                element.parentNode.removeChild(element);
+                fragment.appendChild(element);
+            });
+
+            // build up fragment on endNode side of the tree
+            if (lastChild === endNode) {
+                lastChild.parentNode.removeChild(lastChild);
+                fragment.appendChild(lastChild);
+            } else {
+                currNode = endNode;
+                createdNode = null;
+                while (currNode !== rootNode && currNode.parentNode !== rootNode) {
+                    currParent = currNode.parentNode;
+                    newParent = currParent.cloneNode(false);
+
+                    // Create a new parent element which is a clone of the current parent
+                    if (createdNode) {
+                        newParent.appendChild(createdNode);
+                    }
+                    createdNode = newParent;
+
+                    targetNode = currParent.firstChild;
+
+                    while(targetNode !== currNode) {
+                        sibling = targetNode.nextSibling;
+
+                        targetNode.parentNode.removeChild(targetNode);
+                        if (targetNode.hasChildNodes() || targetNode.textContent) {
+                            createdNode.appendChild(targetNode);
+                        }
+
+                        targetNode = sibling;
+                    }
+
+                    if (!currNode.hasChildNodes()) {
+                        currNode.parentNode.removeChild(currNode);
+                    } else {
+                        currNode = currNode.cloneNode(false);
+                    }
+                    if (currNode.textContent) {
+                        createdNode.appendChild(currNode);
+                    }
+
+                    currNode = currParent;
+                }
+                fragment.appendChild(createdNode);
+            }
+
+            // Add fragment into passed in element
+            newElement.appendChild(fragment);
+
+            if (lastChild.parentNode === rootNode) {
+                // If last child is in the root, insert newElement in front of it
+                rootNode.insertBefore(newElement, lastChild);
+            } else if (afterLast) {
+                // If last child was removed, but it had a sibling, insert in front of it
+                rootNode.insertBefore(newElement, afterLast);
+            } else {
+                // lastChild was removed and was the last actual element just append
+                rootNode.appendChild(newElement);
+            }
+        },
+
+        /* based on http://stackoverflow.com/a/6183069 */
+        depthOfNode: function (inNode) {
+            var theDepth = 0,
+                node = inNode;
+            while (node.parentNode !== null) {
+                node = node.parentNode;
+                theDepth++;
+            }
+            return theDepth;
+        },
+
+        findCommonRoot: function (inNode1, inNode2) {
+            var depth1 = this.depthOfNode(inNode1),
+                depth2 = this.depthOfNode(inNode2),
+                node1 = inNode1,
+                node2 = inNode2;
+
+            while (depth1 !== depth2) {
+                if (depth1 > depth2) {
+                    node1 = node1.parentNode;
+                    depth1 -= 1;
+                } else {
+                    node2 = node2.parentNode;
+                    depth2 -= 1;
+                }
+            }
+
+            while (node1 !== node2) {
+                node1 = node1.parentNode;
+                node2 = node2.parentNode;
+            }
+
+            return node1;
+        },
+        /* END - based on http://stackoverflow.com/a/6183069 */
+
+        ensureUrlHasProtocol: function (url) {
+            if (url.indexOf('://') === -1) {
+                return 'http://' + url;
+            }
+            return url;
+        },
+
         warn: function () {
             if (window.console !== undefined && typeof window.console.warn === 'function') {
                 window.console.warn.apply(console, arguments);
