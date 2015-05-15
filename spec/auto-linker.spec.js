@@ -1,5 +1,6 @@
 /*global describe, it, expect, beforeEach, afterEach,
-    setupTestHelpers, selectElementContentsAndFire */
+    setupTestHelpers, selectElementContentsAndFire, fireEvent,
+    Util, jasmine */
 
 describe('Autolink', function () {
     'use strict';
@@ -36,11 +37,11 @@ describe('Autolink', function () {
                 'http://www.example.com/#buzz'
             ];
 
-            function triggerAutolinking(editor, contenteditable) {
-                // Same code as in the setTimeout that AutoLinker sets.
-                editor.saveSelection();
-                editor.commands[editor.commands.length - 1].performLinking(contenteditable);
-                editor.restoreSelection();
+            function triggerAutolinking(element) {
+                fireEvent(element, 'keypress', {
+                    keyCode: Util.keyCode.SPACE
+                });
+                jasmine.clock().tick(1);
             }
 
             function generateLinkTest(link, href) {
@@ -53,7 +54,7 @@ describe('Autolink', function () {
                     newRange.setEnd(this.el.firstChild.childNodes[0], link.length + 1);
                     selection.addRange(newRange);
 
-                    triggerAutolinking(this.editor, this.el);
+                    triggerAutolinking(this.el);
 
                     var anchors = this.el.getElementsByTagName('a');
                     expect(anchors.length).toBe(1);
@@ -83,7 +84,7 @@ describe('Autolink', function () {
                 newRange.setEnd(this.el.firstChild.lastChild, this.el.firstChild.lastChild.nodeValue.length);
                 selection.addRange(newRange);
 
-                triggerAutolinking(this.editor, this.el);
+                triggerAutolinking(this.el);
 
                 expect(this.el.innerHTML).toBe('<p><span class="a"><b>Here is the link: </b></span>' +
                     '<a href="http://www.example.com"><span class="a"><b>http://www.</b>exa</span>mple.com</a> </p>');
@@ -98,7 +99,7 @@ describe('Autolink', function () {
                 newRange.setEnd(this.el.firstChild.lastChild, this.el.firstChild.lastChild.nodeValue.length);
                 selection.addRange(newRange);
 
-                triggerAutolinking(this.editor, this.el);
+                triggerAutolinking(this.el);
 
                 expect(this.el.innerHTML).toBe('<p><b>Here is the link: </b>' +
                     '<a href="http://www.example.com"><b>http://www.</b>exampl<b>e</b>.com</a> </p>');
@@ -121,7 +122,7 @@ describe('Autolink', function () {
 
                 selectElementContentsAndFire(this.el.firstChild);
 
-                triggerAutolinking(this.editor, this.el);
+                triggerAutolinking(this.el);
 
                 var expectedOutput = '' +
                 '<span>' +
