@@ -423,7 +423,7 @@ var Util;
             parent.removeChild(element);
         },
 
-        moveTextRangeIntoElement: function (startNode, endNode, newElement, tracingOn) {
+        moveTextRangeIntoElement: function (startNode, endNode, newElement) {
             if (!startNode || !endNode) {
                 return null;
             }
@@ -467,14 +467,6 @@ var Util;
                         rootChildren.push(nextNode);
                     }
                 }
-            }
-
-            if (tracingOn) {
-                console.log('firstChild: ' + (firstChild.tagName || firstChild.nodeValue));
-                console.log('lastChild: ' + (lastChild.tagName || lastChild.nodeValue));
-                console.log('rootNode: ' + rootNode.tagName);
-                console.log('start: ' + (startNode.innerHTML || startNode.nodeValue));
-                console.log('end: ' + (endNode.innerHTML || endNode.nodeValue));
             }
 
             var afterLast = lastChild.nextSibling,

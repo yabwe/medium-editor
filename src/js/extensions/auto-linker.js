@@ -159,7 +159,7 @@ LINK_REGEXP_TEXT =
             }
 
             var anchor = document.createElement('a');
-            Util.moveTextRangeIntoElement(textNodes[0], textNodes[textNodes.length - 1], anchor, this.base.tracingOn);
+            Util.moveTextRangeIntoElement(textNodes[0], textNodes[textNodes.length - 1], anchor);
             anchor.setAttribute('href', Util.ensureUrlHasProtocol(href));
             return true;
         }
