@@ -159,4 +159,58 @@ describe('Util', function () {
         });
 
     });
+
+    describe('splitOffDOMTree', function () {
+        /* start:
+         *
+         *         <div>
+         *      /    |   \
+         *  <span> <span> <span>
+         *   / \    / \    / \
+         *  1   2  3   4  5   6
+         *
+         * result:
+         *
+         *     <div>            <div>'
+         *      / \              / \
+         * <span> <span>   <span>' <span>
+         *   / \    |        |      / \
+         *  1   2   3        4     5   6
+         */
+        it('should split a complex tree correctly when splitting off right part of tree', function () {
+            var el = this.createElement('div', '',
+                '<span><b>1</b><i>2</i></span><span><b>3</b><u>4</u></span><span><b>5</b><i>6</i></span>'),
+                splitOn = el.querySelector('u').firstChild,
+                result = Util.splitOffDOMTree(el, splitOn);
+
+            expect(el.outerHTML).toBe('<div class=""><span><b>1</b><i>2</i></span><span><b>3</b></span></div>');
+            expect(result.outerHTML).toBe('<div class=""><span><u>4</u></span><span><b>5</b><i>6</i></span></div>');
+        });
+
+        /* start:
+         *
+         *         <div>
+         *      /    |   \
+         *  <span> <span> <span>
+         *   / \    / \    / \
+         *  1   2  3   4  5   6
+         *
+         * result:
+         *
+         *     <div>'      <div>
+         *      / \          |
+         * <span> <span>   <span>
+         *   /\     /\       /\
+         *  1  2   3  4     5  6
+         */
+        it('should split a complex tree correctly when splitting off left part of tree', function () {
+            var el = this.createElement('div', '',
+                '<span><b>1</b><i>2</i></span><span><b>3</b><u>4</u></span><span><b>5</b><i>6</i></span>'),
+                splitOn = el.querySelector('u').firstChild,
+                result = Util.splitOffDOMTree(el, splitOn, true);
+
+            expect(el.outerHTML).toBe('<div class=""><span><b>5</b><i>6</i></span></div>');
+            expect(result.outerHTML).toBe('<div class=""><span><b>1</b><i>2</i></span><span><b>3</b><u>4</u></span></div>');
+        });
+    });
 });

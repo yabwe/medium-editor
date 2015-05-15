@@ -423,6 +423,100 @@ var Util;
             parent.removeChild(element);
         },
 
+        /* splitDOMTree
+         *
+         * Given a root element some descendant element, split the root element
+         * into its own element containing the descendant element and all elements
+         * on the left or right side of the descendant ('right' is default)
+         *
+         * example:
+         *
+         *         <div>
+         *      /    |   \
+         *  <span> <span> <span>
+         *   / \    / \    / \
+         *  1   2  3   4  5   6
+         *
+         *  If I wanted to split this tree given the <div> as the root and "4" as the leaf
+         *  the result would be (the prime ' marks indicates nodes that are created as clones):
+         *
+         *   SPLITTING OFF 'RIGHT' TREE       SPLITTING OFF 'LEFT' TREE
+         *
+         *     <div>            <div>'              <div>'      <div>
+         *      / \              / \                 / \          |
+         * <span> <span>   <span>' <span>       <span> <span>   <span>
+         *   / \    |        |      / \           /\     /\       /\
+         *  1   2   3        4     5   6         1  2   3  4     5  6
+         *
+         *  The above example represents splitting off the 'right' or 'left' part of a tree, where
+         *  the <div>' would be returned as an element not appended to the DOM, and the <div>
+         *  would remain in place where it was
+         *
+        */
+        splitOffDOMTree: function (rootNode, leafNode, splitLeft) {
+            var splitOnNode = leafNode,
+                createdNode = null,
+                splitRight = !splitLeft;
+
+            // loop until we hit the root
+            while (splitOnNode !== rootNode) {
+                var currParent = splitOnNode.parentNode,
+                    newParent = currParent.cloneNode(false),
+                    targetNode = (splitRight ? splitOnNode : currParent.firstChild),
+                    appendLast;
+
+                // Create a new parent element which is a clone of the current parent
+                if (createdNode) {
+                    if (splitRight) {
+                        // If we're splitting right, add previous created element before siblings
+                        newParent.appendChild(createdNode);
+                    } else {
+                        // If we're splitting left, add previous created element last
+                        appendLast = createdNode;
+                    }
+                }
+                createdNode = newParent;
+
+                while (targetNode) {
+                    var sibling = targetNode.nextSibling;
+                    // Special handling for the 'splitNode'
+                    if (targetNode === splitOnNode) {
+                        if (!targetNode.hasChildNodes()) {
+                            targetNode.parentNode.removeChild(targetNode);
+                        } else {
+                            // For the node we're splitting on, if it has children, we need to clone it
+                            // and not just move it
+                            targetNode = targetNode.cloneNode(false);
+                        }
+                        // If the resulting split node has content, add it
+                        if (targetNode.textContent) {
+                            createdNode.appendChild(targetNode);
+                        }
+
+                        targetNode = (splitRight ? sibling : null);
+                    } else {
+                        // For general case, just remove the element and only
+                        // add it to the split tree if it contains something
+                        targetNode.parentNode.removeChild(targetNode);
+                        if (targetNode.hasChildNodes() || targetNode.textContent) {
+                            createdNode.appendChild(targetNode);
+                        }
+
+                        targetNode = sibling;
+                    }
+                }
+
+                // If we had an element we wanted to append at the end, do that now
+                if (appendLast) {
+                    createdNode.appendChild(appendLast);
+                }
+
+                splitOnNode = currParent;
+            }
+
+            return createdNode;
+        },
+
         moveTextRangeIntoElement: function (startNode, endNode, newElement) {
             if (!startNode || !endNode) {
                 return null;
@@ -446,13 +540,7 @@ var Util;
             var rootChildren = [],
                 firstChild,
                 lastChild,
-                nextNode,
-                currNode,
-                createdNode,
-                currParent,
-                newParent,
-                targetNode,
-                sibling;
+                nextNode;
             for (var i = 0; i < rootNode.childNodes.length; i++) {
                 nextNode = rootNode.childNodes[i];
                 if (!firstChild) {
@@ -477,47 +565,7 @@ var Util;
                 firstChild.parentNode.removeChild(firstChild);
                 fragment.appendChild(firstChild);
             } else {
-                currNode = startNode;
-                createdNode = null;
-                // loop until we hit the root again
-                while (currNode !== rootNode && currNode.parentNode !== rootNode) {
-                    currParent = currNode.parentNode;
-                    newParent = currParent.cloneNode(false);
-
-                    // Create a new parent element which is a clone of the current parent
-                    if (createdNode) {
-                        newParent.appendChild(createdNode);
-                    }
-                    createdNode = newParent;
-
-                    targetNode = currNode.nextSibling;
-
-                    if (!currNode.hasChildNodes()) {
-                        currNode.parentNode.removeChild(currNode);
-                    } else {
-                        // For the starting node, if it has children, we need to clone and not remove it
-                        currNode = currNode.cloneNode(false);
-                    }
-                    if (currNode.textContent) {
-                        createdNode.appendChild(currNode);
-                    }
-
-                    // Starting with the first sibling of the current node, add it and each of it's siblings
-                    // to the right to the new parent node
-                    while (targetNode) {
-                        sibling = targetNode.nextSibling;
-
-                        targetNode.parentNode.removeChild(targetNode);
-                        if (targetNode.hasChildNodes() || targetNode.textContent) {
-                            createdNode.appendChild(targetNode);
-                        }
-
-                        targetNode = sibling;
-                    }
-
-                    currNode = currParent;
-                }
-                fragment.appendChild(createdNode);
+                fragment.appendChild(this.splitOffDOMTree(firstChild, startNode));
             }
 
             // add any elements between firstChild & lastChild
@@ -531,43 +579,7 @@ var Util;
                 lastChild.parentNode.removeChild(lastChild);
                 fragment.appendChild(lastChild);
             } else {
-                currNode = endNode;
-                createdNode = null;
-                while (currNode !== rootNode && currNode.parentNode !== rootNode) {
-                    currParent = currNode.parentNode;
-                    newParent = currParent.cloneNode(false);
-
-                    // Create a new parent element which is a clone of the current parent
-                    if (createdNode) {
-                        newParent.appendChild(createdNode);
-                    }
-                    createdNode = newParent;
-
-                    targetNode = currParent.firstChild;
-
-                    while(targetNode !== currNode) {
-                        sibling = targetNode.nextSibling;
-
-                        targetNode.parentNode.removeChild(targetNode);
-                        if (targetNode.hasChildNodes() || targetNode.textContent) {
-                            createdNode.appendChild(targetNode);
-                        }
-
-                        targetNode = sibling;
-                    }
-
-                    if (!currNode.hasChildNodes()) {
-                        currNode.parentNode.removeChild(currNode);
-                    } else {
-                        currNode = currNode.cloneNode(false);
-                    }
-                    if (currNode.textContent) {
-                        createdNode.appendChild(currNode);
-                    }
-
-                    currNode = currParent;
-                }
-                fragment.appendChild(createdNode);
+                fragment.appendChild(this.splitOffDOMTree(lastChild, endNode, true));
             }
 
             // Add fragment into passed in element
