@@ -821,6 +821,223 @@ var Util;
             parent.removeChild(element);
         },
 
+        /* splitDOMTree
+         *
+         * Given a root element some descendant element, split the root element
+         * into its own element containing the descendant element and all elements
+         * on the left or right side of the descendant ('right' is default)
+         *
+         * example:
+         *
+         *         <div>
+         *      /    |   \
+         *  <span> <span> <span>
+         *   / \    / \    / \
+         *  1   2  3   4  5   6
+         *
+         *  If I wanted to split this tree given the <div> as the root and "4" as the leaf
+         *  the result would be (the prime ' marks indicates nodes that are created as clones):
+         *
+         *   SPLITTING OFF 'RIGHT' TREE       SPLITTING OFF 'LEFT' TREE
+         *
+         *     <div>            <div>'              <div>'      <div>
+         *      / \              / \                 / \          |
+         * <span> <span>   <span>' <span>       <span> <span>   <span>
+         *   / \    |        |      / \           /\     /\       /\
+         *  1   2   3        4     5   6         1  2   3  4     5  6
+         *
+         *  The above example represents splitting off the 'right' or 'left' part of a tree, where
+         *  the <div>' would be returned as an element not appended to the DOM, and the <div>
+         *  would remain in place where it was
+         *
+        */
+        splitOffDOMTree: function (rootNode, leafNode, splitLeft) {
+            var splitOnNode = leafNode,
+                createdNode = null,
+                splitRight = !splitLeft;
+
+            // loop until we hit the root
+            while (splitOnNode !== rootNode) {
+                var currParent = splitOnNode.parentNode,
+                    newParent = currParent.cloneNode(false),
+                    targetNode = (splitRight ? splitOnNode : currParent.firstChild),
+                    appendLast;
+
+                // Create a new parent element which is a clone of the current parent
+                if (createdNode) {
+                    if (splitRight) {
+                        // If we're splitting right, add previous created element before siblings
+                        newParent.appendChild(createdNode);
+                    } else {
+                        // If we're splitting left, add previous created element last
+                        appendLast = createdNode;
+                    }
+                }
+                createdNode = newParent;
+
+                while (targetNode) {
+                    var sibling = targetNode.nextSibling;
+                    // Special handling for the 'splitNode'
+                    if (targetNode === splitOnNode) {
+                        if (!targetNode.hasChildNodes()) {
+                            targetNode.parentNode.removeChild(targetNode);
+                        } else {
+                            // For the node we're splitting on, if it has children, we need to clone it
+                            // and not just move it
+                            targetNode = targetNode.cloneNode(false);
+                        }
+                        // If the resulting split node has content, add it
+                        if (targetNode.textContent) {
+                            createdNode.appendChild(targetNode);
+                        }
+
+                        targetNode = (splitRight ? sibling : null);
+                    } else {
+                        // For general case, just remove the element and only
+                        // add it to the split tree if it contains something
+                        targetNode.parentNode.removeChild(targetNode);
+                        if (targetNode.hasChildNodes() || targetNode.textContent) {
+                            createdNode.appendChild(targetNode);
+                        }
+
+                        targetNode = sibling;
+                    }
+                }
+
+                // If we had an element we wanted to append at the end, do that now
+                if (appendLast) {
+                    createdNode.appendChild(appendLast);
+                }
+
+                splitOnNode = currParent;
+            }
+
+            return createdNode;
+        },
+
+        moveTextRangeIntoElement: function (startNode, endNode, newElement) {
+            if (!startNode || !endNode) {
+                return null;
+            }
+
+            var rootNode = this.findCommonRoot(startNode, endNode);
+            if (!rootNode) {
+                return null;
+            }
+
+            if (endNode === startNode) {
+                var temp = startNode.parentNode;
+                temp.removeChild(startNode);
+                newElement.appendChild(startNode);
+                temp.appendChild(newElement);
+                return null;
+            }
+
+            // create rootChildren array which includes all the children
+            // we care about
+            var rootChildren = [],
+                firstChild,
+                lastChild,
+                nextNode;
+            for (var i = 0; i < rootNode.childNodes.length; i++) {
+                nextNode = rootNode.childNodes[i];
+                if (!firstChild) {
+                    if (Util.isDescendant(nextNode, startNode, true)) {
+                        firstChild = nextNode;
+                    }
+                } else {
+                    if (this.isDescendant(nextNode, endNode, true)) {
+                        lastChild = nextNode;
+                        break;
+                    } else {
+                        rootChildren.push(nextNode);
+                    }
+                }
+            }
+
+            var afterLast = lastChild.nextSibling,
+                fragment = document.createDocumentFragment();
+
+            // build up fragment on startNode side of tree
+            if (firstChild === startNode) {
+                firstChild.parentNode.removeChild(firstChild);
+                fragment.appendChild(firstChild);
+            } else {
+                fragment.appendChild(this.splitOffDOMTree(firstChild, startNode));
+            }
+
+            // add any elements between firstChild & lastChild
+            rootChildren.forEach(function (element) {
+                element.parentNode.removeChild(element);
+                fragment.appendChild(element);
+            });
+
+            // build up fragment on endNode side of the tree
+            if (lastChild === endNode) {
+                lastChild.parentNode.removeChild(lastChild);
+                fragment.appendChild(lastChild);
+            } else {
+                fragment.appendChild(this.splitOffDOMTree(lastChild, endNode, true));
+            }
+
+            // Add fragment into passed in element
+            newElement.appendChild(fragment);
+
+            if (lastChild.parentNode === rootNode) {
+                // If last child is in the root, insert newElement in front of it
+                rootNode.insertBefore(newElement, lastChild);
+            } else if (afterLast) {
+                // If last child was removed, but it had a sibling, insert in front of it
+                rootNode.insertBefore(newElement, afterLast);
+            } else {
+                // lastChild was removed and was the last actual element just append
+                rootNode.appendChild(newElement);
+            }
+        },
+
+        /* based on http://stackoverflow.com/a/6183069 */
+        depthOfNode: function (inNode) {
+            var theDepth = 0,
+                node = inNode;
+            while (node.parentNode !== null) {
+                node = node.parentNode;
+                theDepth++;
+            }
+            return theDepth;
+        },
+
+        findCommonRoot: function (inNode1, inNode2) {
+            var depth1 = this.depthOfNode(inNode1),
+                depth2 = this.depthOfNode(inNode2),
+                node1 = inNode1,
+                node2 = inNode2;
+
+            while (depth1 !== depth2) {
+                if (depth1 > depth2) {
+                    node1 = node1.parentNode;
+                    depth1 -= 1;
+                } else {
+                    node2 = node2.parentNode;
+                    depth2 -= 1;
+                }
+            }
+
+            while (node1 !== node2) {
+                node1 = node1.parentNode;
+                node2 = node2.parentNode;
+            }
+
+            return node1;
+        },
+        /* END - based on http://stackoverflow.com/a/6183069 */
+
+        ensureUrlHasProtocol: function (url) {
+            if (url.indexOf('://') === -1) {
+                return 'http://' + url;
+            }
+            return url;
+        },
+
         warn: function () {
             if (window.console !== undefined && typeof window.console.warn === 'function') {
                 window.console.warn.apply(console, arguments);
@@ -2961,7 +3178,6 @@ var AnchorPreview;
 }());
 
 var AutoLinker,
-    AutoLinkerStatics = {},
     LINK_REGEXP_TEXT;
 
 LINK_REGEXP_TEXT =
@@ -2973,195 +3189,6 @@ LINK_REGEXP_TEXT =
 
 (function () {
     'use strict';
-
-    function assignHttpToProtocolLessUrl(url) {
-        if (url.indexOf('://') === -1) {
-            return 'http://' + url;
-        }
-        return url;
-    }
-
-    function findTextNodes(el) {
-        var n,
-            a = [],
-            walk = document.createTreeWalker(el, NodeFilter.SHOW_TEXT, null, false);
-        while(n = walk.nextNode()) {
-            a.push(n);
-        }
-        return a;
-    }
-
-    function sortNodesInDocumentOrder(root, nodes) {
-        var lookup = [],
-            it = document.createNodeIterator(root,
-                NodeFilter.SHOW_ELEMENT|NodeFilter.SHOW_TEXT|NodeFilter.SHOW_COMMENT,
-                null,
-                false),
-            node;
-
-        while ((node = it.nextNode()) !== null) {
-            lookup.push(node);
-        }
-
-        nodes.sort(function (a, b) {
-            var aIndex = lookup.indexOf(a),
-                bIndex = lookup.indexOf(b);
-
-            return aIndex - bIndex;
-        });
-    }
-
-    /**
-     * Denormalizes the DOM. The intention here is to create a "column" of elements above each individual text node
-     * provided in the descendants argument. For instance, if the original DOM were presented as a DIV, with a SPAN
-     * inside it, and three text nodes in the SPAN, this function will modify the DOM to have a DIV with 3 SPANs
-     * inside, each span containing one of the text nodes.
-     *
-     * The concept is that this preserves the styling of all text elements within the targeted region, while allowing
-     * wrapping the targeted text nodes (and their accompanying SPAN, STRONG, EM, etc. tags) into a new anchor tag.
-     *
-     * The transformations performed by this function are reversed by the "simplify" function, excepting the changes
-     * that might be made in between calling complexify and simplify - that is, the change to add an anchor wrapping
-     * some of the tags.
-     */
-    function complexify(root, descendants) {
-        var rootChildren = [],
-            originalRootChildren = [],
-            insertBeforeTarget,
-            allTextNodes = [];
-        descendants = Array.prototype.slice.call(descendants, 0);
-
-        descendants.forEach(function (descendant) {
-            var node = descendant;
-            while (node.parentNode !== root) {
-                node = node.parentNode;
-            }
-
-            if (originalRootChildren.indexOf(node) === -1) {
-                originalRootChildren.push(node);
-            }
-        });
-        originalRootChildren.forEach(function (originalRootChild) {
-            if (originalRootChild.nodeType === 3) {
-                allTextNodes = allTextNodes.concat(originalRootChild);
-            } else {
-                allTextNodes = allTextNodes.concat(findTextNodes(originalRootChild));
-            }
-        });
-        descendants.forEach(function (descendant) {
-            // Add text nodes that were direct descendants of the root node.
-            if (allTextNodes.indexOf(descendant) === -1) {
-                allTextNodes.push(descendant);
-            }
-        });
-        sortNodesInDocumentOrder(root, allTextNodes);
-
-        allTextNodes.forEach(function (descendant) {
-            var node = descendant,
-                ancestors = [],
-                newLineage = [];
-            while (node !== root) {
-                ancestors.unshift(node);
-                node = node.parentNode;
-            }
-
-            ancestors.forEach(function (ancestor) {
-                var nodeToAppend;
-                if (ancestor.nodeType === 3) {
-                    nodeToAppend = ancestor;
-                } else {
-                    nodeToAppend = ancestor.cloneNode(false);
-                }
-                if (newLineage.length) {
-                    newLineage[newLineage.length - 1].appendChild(nodeToAppend);
-                }
-                newLineage.push(nodeToAppend);
-            });
-
-            rootChildren.push(newLineage[0]);
-        });
-
-        insertBeforeTarget = originalRootChildren[originalRootChildren.length - 1].nextSibling;
-        originalRootChildren.forEach(function (rootChild) {
-            root.removeChild(rootChild);
-        });
-        rootChildren.forEach(function (rootChild) {
-            root.insertBefore(rootChild, insertBeforeTarget);
-        });
-    }
-
-    /**
-     * Reverses the DOM transformations performed by the "complexify" function above. Adjacent tags with identical
-     * classes and node names will be merged together. This is akin to the Node.normalize function provided by DOM
-     * for text nodes, but applies to HTML tags instead.
-     */
-    function simplify(root, descendants) {
-        var changesMade,
-            descendant,
-            i;
-        do {
-            changesMade = 0;
-            for (i = 0; i < descendants.length; i++) {
-                descendant = descendants[i];
-                var node = descendant.parentNode;
-                while (node !== root) {
-                    if (node.nextSibling &&
-                            node.nextSibling.nodeName === node.nodeName &&
-                            node.nextSibling.className === node.className &&
-                            node.nextSibling.id === node.id &&
-                            (!node.getAttribute ||
-                            node.nextSibling.getAttribute('style') === node.getAttribute('style'))) {
-                        while (node.nextSibling.childNodes.length !== 0) {
-                            node.appendChild(node.nextSibling.firstChild);
-                        }
-                        node.parentNode.removeChild(node.nextSibling);
-                        changesMade += 1;
-                    }
-                    node = node.parentNode;
-                }
-            }
-        } while (changesMade !== 0);
-    }
-
-    // Export for unit test.
-    AutoLinkerStatics.complexify = complexify;
-    AutoLinkerStatics.simplify = simplify;
-
-    /* based on http://stackoverflow.com/a/6183069 */
-    function depth(inNode) {
-        var theDepth = 0,
-            node = inNode;
-        while (node.parentNode !== null) {
-            node = node.parentNode;
-            theDepth++;
-        }
-        return theDepth;
-    }
-
-    function findCommonRoot(inNode1, inNode2) {
-        var depth1 = depth(inNode1),
-            depth2 = depth(inNode2),
-            node1 = inNode1,
-            node2 = inNode2;
-
-        while (depth1 !== depth2) {
-            if (depth1 > depth2) {
-                node1 = node1.parentNode;
-                depth1 -= 1;
-            } else {
-                node2 = node2.parentNode;
-                depth2 -= 1;
-            }
-        }
-
-        while (node1 !== node2) {
-            node1 = node1.parentNode;
-            node2 = node2.parentNode;
-        }
-
-        return node1;
-    }
-    /* END - based on http://stackoverflow.com/a/6183069 */
 
     AutoLinker = Extension.extend({
         parent: true,
@@ -3308,45 +3335,11 @@ LINK_REGEXP_TEXT =
                 return false;
             }
 
-            // First, check for an existing common root node.
-            var candRoot = findCommonRoot(textNodes[0], textNodes[textNodes.length - 1]),
-                document = this.base.options.ownerDocument,
-                anchor = document.createElement('a');
-            if (candRoot.nodeType === 3) {
-                // Link corresponded to a single text node
-                candRoot.parentNode.insertBefore(anchor, candRoot);
-                anchor.appendChild(candRoot);
-            } else {
-                // Link is in at least 2 text nodes. It's possible that they are styled differently.
-                complexify(candRoot, textNodes);
-                this.insertLinkAfterComplexify(candRoot, textNodes, anchor);
-                simplify(candRoot, textNodes);
-            }
-
-            anchor.setAttribute('href', assignHttpToProtocolLessUrl(href));
+            var anchor = document.createElement('a');
+            Util.moveTextRangeIntoElement(textNodes[0], textNodes[textNodes.length - 1], anchor);
+            anchor.setAttribute('href', Util.ensureUrlHasProtocol(href));
             return true;
-        },
-
-        insertLinkAfterComplexify: function (candRoot, textNodes, anchor) {
-            var startAncestor = textNodes[0],
-                endAncestor = textNodes[textNodes.length - 1],
-                nextSibling,
-                node = null;
-            while (startAncestor.parentNode !== candRoot) {
-                startAncestor = startAncestor.parentNode;
-            }
-            while (endAncestor.parentNode !== candRoot) {
-                endAncestor = endAncestor.parentNode;
-            }
-
-            do {
-                node = (node === null) ? startAncestor : nextSibling;
-                nextSibling = node.nextSibling;
-                anchor.appendChild(node);
-            } while (node !== endAncestor);
-            candRoot.insertBefore(anchor, nextSibling);
         }
-
     });
 }());
 var FontSizeExtension;
