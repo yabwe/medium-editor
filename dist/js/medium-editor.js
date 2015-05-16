@@ -821,6 +821,230 @@ var Util;
             parent.removeChild(element);
         },
 
+        /* splitDOMTree
+         *
+         * Given a root element some descendant element, split the root element
+         * into its own element containing the descendant element and all elements
+         * on the left or right side of the descendant ('right' is default)
+         *
+         * example:
+         *
+         *         <div>
+         *      /    |   \
+         *  <span> <span> <span>
+         *   / \    / \    / \
+         *  1   2  3   4  5   6
+         *
+         *  If I wanted to split this tree given the <div> as the root and "4" as the leaf
+         *  the result would be (the prime ' marks indicates nodes that are created as clones):
+         *
+         *   SPLITTING OFF 'RIGHT' TREE       SPLITTING OFF 'LEFT' TREE
+         *
+         *     <div>            <div>'              <div>'      <div>
+         *      / \              / \                 / \          |
+         * <span> <span>   <span>' <span>       <span> <span>   <span>
+         *   / \    |        |      / \           /\     /\       /\
+         *  1   2   3        4     5   6         1  2   3  4     5  6
+         *
+         *  The above example represents splitting off the 'right' or 'left' part of a tree, where
+         *  the <div>' would be returned as an element not appended to the DOM, and the <div>
+         *  would remain in place where it was
+         *
+        */
+        splitOffDOMTree: function (rootNode, leafNode, splitLeft) {
+            var splitOnNode = leafNode,
+                createdNode = null,
+                splitRight = !splitLeft;
+
+            // loop until we hit the root
+            while (splitOnNode !== rootNode) {
+                var currParent = splitOnNode.parentNode,
+                    newParent = currParent.cloneNode(false),
+                    targetNode = (splitRight ? splitOnNode : currParent.firstChild),
+                    appendLast;
+
+                // Create a new parent element which is a clone of the current parent
+                if (createdNode) {
+                    if (splitRight) {
+                        // If we're splitting right, add previous created element before siblings
+                        newParent.appendChild(createdNode);
+                    } else {
+                        // If we're splitting left, add previous created element last
+                        appendLast = createdNode;
+                    }
+                }
+                createdNode = newParent;
+
+                while (targetNode) {
+                    var sibling = targetNode.nextSibling;
+                    // Special handling for the 'splitNode'
+                    if (targetNode === splitOnNode) {
+                        if (!targetNode.hasChildNodes()) {
+                            targetNode.parentNode.removeChild(targetNode);
+                        } else {
+                            // For the node we're splitting on, if it has children, we need to clone it
+                            // and not just move it
+                            targetNode = targetNode.cloneNode(false);
+                        }
+                        // If the resulting split node has content, add it
+                        if (targetNode.textContent) {
+                            createdNode.appendChild(targetNode);
+                        }
+
+                        targetNode = (splitRight ? sibling : null);
+                    } else {
+                        // For general case, just remove the element and only
+                        // add it to the split tree if it contains something
+                        targetNode.parentNode.removeChild(targetNode);
+                        if (targetNode.hasChildNodes() || targetNode.textContent) {
+                            createdNode.appendChild(targetNode);
+                        }
+
+                        targetNode = sibling;
+                    }
+                }
+
+                // If we had an element we wanted to append at the end, do that now
+                if (appendLast) {
+                    createdNode.appendChild(appendLast);
+                }
+
+                splitOnNode = currParent;
+            }
+
+            return createdNode;
+        },
+
+        moveTextRangeIntoElement: function (startNode, endNode, newElement) {
+            if (!startNode || !endNode) {
+                return false;
+            }
+
+            var rootNode = this.findCommonRoot(startNode, endNode);
+            if (!rootNode) {
+                return false;
+            }
+
+            if (endNode === startNode) {
+                var temp = startNode.parentNode,
+                    sibling = startNode.nextSibling;
+                temp.removeChild(startNode);
+                newElement.appendChild(startNode);
+                if (sibling) {
+                    temp.insertBefore(newElement, sibling);
+                } else {
+                    temp.appendChild(newElement);
+                }
+                return newElement.hasChildNodes();
+            }
+
+            // create rootChildren array which includes all the children
+            // we care about
+            var rootChildren = [],
+                firstChild,
+                lastChild,
+                nextNode;
+            for (var i = 0; i < rootNode.childNodes.length; i++) {
+                nextNode = rootNode.childNodes[i];
+                if (!firstChild) {
+                    if (Util.isDescendant(nextNode, startNode, true)) {
+                        firstChild = nextNode;
+                    }
+                } else {
+                    if (this.isDescendant(nextNode, endNode, true)) {
+                        lastChild = nextNode;
+                        break;
+                    } else {
+                        rootChildren.push(nextNode);
+                    }
+                }
+            }
+
+            var afterLast = lastChild.nextSibling,
+                fragment = document.createDocumentFragment();
+
+            // build up fragment on startNode side of tree
+            if (firstChild === startNode) {
+                firstChild.parentNode.removeChild(firstChild);
+                fragment.appendChild(firstChild);
+            } else {
+                fragment.appendChild(this.splitOffDOMTree(firstChild, startNode));
+            }
+
+            // add any elements between firstChild & lastChild
+            rootChildren.forEach(function (element) {
+                element.parentNode.removeChild(element);
+                fragment.appendChild(element);
+            });
+
+            // build up fragment on endNode side of the tree
+            if (lastChild === endNode) {
+                lastChild.parentNode.removeChild(lastChild);
+                fragment.appendChild(lastChild);
+            } else {
+                fragment.appendChild(this.splitOffDOMTree(lastChild, endNode, true));
+            }
+
+            // Add fragment into passed in element
+            newElement.appendChild(fragment);
+
+            if (lastChild.parentNode === rootNode) {
+                // If last child is in the root, insert newElement in front of it
+                rootNode.insertBefore(newElement, lastChild);
+            } else if (afterLast) {
+                // If last child was removed, but it had a sibling, insert in front of it
+                rootNode.insertBefore(newElement, afterLast);
+            } else {
+                // lastChild was removed and was the last actual element just append
+                rootNode.appendChild(newElement);
+            }
+
+            return newElement.hasChildNodes();
+        },
+
+        /* based on http://stackoverflow.com/a/6183069 */
+        depthOfNode: function (inNode) {
+            var theDepth = 0,
+                node = inNode;
+            while (node.parentNode !== null) {
+                node = node.parentNode;
+                theDepth++;
+            }
+            return theDepth;
+        },
+
+        findCommonRoot: function (inNode1, inNode2) {
+            var depth1 = this.depthOfNode(inNode1),
+                depth2 = this.depthOfNode(inNode2),
+                node1 = inNode1,
+                node2 = inNode2;
+
+            while (depth1 !== depth2) {
+                if (depth1 > depth2) {
+                    node1 = node1.parentNode;
+                    depth1 -= 1;
+                } else {
+                    node2 = node2.parentNode;
+                    depth2 -= 1;
+                }
+            }
+
+            while (node1 !== node2) {
+                node1 = node1.parentNode;
+                node2 = node2.parentNode;
+            }
+
+            return node1;
+        },
+        /* END - based on http://stackoverflow.com/a/6183069 */
+
+        ensureUrlHasProtocol: function (url) {
+            if (url.indexOf('://') === -1) {
+                return 'http://' + url;
+            }
+            return url;
+        },
+
         warn: function () {
             if (window.console !== undefined && typeof window.console.warn === 'function') {
                 window.console.warn.apply(console, arguments);
@@ -1148,6 +1372,7 @@ var editorDefaults;
         disableAnchorPreview: false,
         disableEditing: false,
         disablePlaceholders: false,
+        autoLink: false,
         toolbarAlign: 'center',
         elementsContainer: false,
         imageDragging: true,
@@ -1200,8 +1425,8 @@ var Extension;
         //
         //      var ThingTwo = Thing.extend({ foo: "baz" });
         //
-        //      var thingOne = new Thing(); // foo === bar
-        //      var thingTwo = new ThingTwo(); // foo == baz
+        //      var thingOne = new Thing(); // foo === "bar"
+        //      var thingTwo = new ThingTwo(); // foo === "baz"
         //
         //      which seems like some simply shallow copy nonsense
         //      at first, but a lot more is going on there.
@@ -1285,7 +1510,7 @@ var Extension;
          *
          * 1) Find the parent node containing the current selection
          * 2) Call checkState on the extension, passing the node as an argument
-         * 3) Get tha parent node of the previous node
+         * 3) Get the parent node of the previous node
          * 4) Repeat steps #2 and #3 until we move outside the parent contenteditable
          */
         checkState: null,
@@ -1309,7 +1534,7 @@ var Extension;
          * If implemented, this function will be called once on each extension
          * when the state of the editor/toolbar is being updated.
          *
-         * If this function returns a non-null value, the exntesion will
+         * If this function returns a non-null value, the extension will
          * be ignored as the code climbs the dom tree.
          *
          * If this function returns true, and the setActive() function is defined
@@ -1330,7 +1555,7 @@ var Extension;
         /* isAlreadyApplied: [function (node)]
          *
          * If implemented, this function is similar to checkState() in
-         * that it will be calle repeatedly as MediumEditor moves up
+         * that it will be called repeatedly as MediumEditor moves up
          * the DOM to update the editor & toolbar after a state change.
          *
          * NOTE: This function will NOT be called if checkState() has
@@ -2741,9 +2966,8 @@ var AnchorPreview;
         // put the activeAnchor value in the preview
         previewValueSelector: 'a',
 
-        init: function (instance) {
+        init: function () {
 
-            this.base = instance;
             this.anchorPreview = this.createPreview();
             this.base.options.elementsContainer.appendChild(this.anchorPreview);
 
@@ -2960,6 +3184,174 @@ var AnchorPreview;
     };
 }());
 
+var AutoLinker,
+    LINK_REGEXP_TEXT;
+
+LINK_REGEXP_TEXT =
+    '(' +
+    // Version of Gruber URL Regexp optimized for JS: http://stackoverflow.com/a/17733640
+    '((?:[a-z][\\w-]+:(?:\\\/{1,3}|[a-z0-9%])|www\\d{0,3}[.]|[a-z0-9.\\-]+[.][a-z]{2,4}\\\/)\\S+(?:[^\\s`!\\[\\]{};:\'\".,?\u00AB\u00BB\u201C\u201D\u2018\u2019]))' +
+    // Addition to above Regexp to support bare domains with common non-i18n TLDs and without www prefix:
+    ')|([a-z0-9\\-]+\\.(com|net|org|edu|gov|mil|aero|asia|biz|cat|coop|info|int|jobs|mobi|museum|name|post|pro|tel|travel|xxx|ac|ad|ae|af|ag|ai|al|am|an|ao|aq|ar|as|at|au|aw|ax|az|ba|bb|bd|be|bf|bg|bh|bi|bj|bm|bn|bo|br|bs|bt|bv|bw|by|bz|ca|cc|cd|cf|cg|ch|ci|ck|cl|cm|cn|co|cr|cs|cu|cv|cx|cy|cz|dd|de|dj|dk|dm|do|dz|ec|ee|eg|eh|er|es|et|eu|fi|fj|fk|fm|fo|fr|ga|gb|gd|ge|gf|gg|gh|gi|gl|gm|gn|gp|gq|gr|gs|gt|gu|gw|gy|hk|hm|hn|hr|ht|hu|id|ie|il|im|in|io|iq|ir|is|it|je|jm|jo|jp|ke|kg|kh|ki|km|kn|kp|kr|kw|ky|kz|la|lb|lc|li|lk|lr|ls|lt|lu|lv|ly|ma|mc|md|me|mg|mh|mk|ml|mm|mn|mo|mp|mq|mr|ms|mt|mu|mv|mw|mx|my|mz|na|nc|ne|nf|ng|ni|nl|no|np|nr|nu|nz|om|pa|pe|pf|pg|ph|pk|pl|pm|pn|pr|ps|pt|pw|py|qa|re|ro|rs|ru|rw|sa|sb|sc|sd|se|sg|sh|si|sj| Ja|sk|sl|sm|sn|so|sr|ss|st|su|sv|sx|sy|sz|tc|td|tf|tg|th|tj|tk|tl|tm|tn|to|tp|tr|tt|tv|tw|tz|ua|ug|uk|us|uy|uz|va|vc|ve|vg|vi|vn|vu|wf|ws|ye|yt|yu|za|zm|zw))';
+
+(function () {
+    'use strict';
+
+    AutoLinker = Extension.extend({
+        parent: true,
+
+        init: function () {
+            this.disableEventHandling = false;
+            this.base.subscribe('editableKeypress', this.onKeypress.bind(this));
+            // MS IE has it's own auto-URL detect feature but ours is better in some ways. Be consistent.
+            this.base.options.ownerDocument.execCommand('AutoUrlDetect', false, false);
+        },
+
+        onKeypress: function (keyPressEvent) {
+            if (this.disableEventHandling) {
+                return;
+            }
+
+            if (keyPressEvent.keyCode === Util.keyCode.SPACE ||
+                    keyPressEvent.keyCode === Util.keyCode.ENTER ||
+                    keyPressEvent.which === Util.keyCode.SPACE) {
+                clearTimeout(this.performLinkingTimeout);
+                // Saving/restoring the selection in the middle of a keypress doesn't work well...
+                this.performLinkingTimeout = setTimeout(function () {
+                    try {
+                        var sel = this.base.exportSelection();
+                        if (this.performLinking(keyPressEvent.target)) {
+                            this.base.importSelection(sel);
+                        }
+                    } catch (e) {
+                        if (window.console) {
+                            window.console.error('Failed to perform linking', e);
+                        }
+                        this.disableEventHandling = true;
+                    }
+                }.bind(this), 0);
+            }
+        },
+
+        performLinking: function (contenteditable) {
+            // Perform linking on a paragraph level basis as otherwise the detection can wrongly find the end
+            // of one paragraph and the beginning of another paragraph to constitute a link, such as a paragraph ending
+            // "link." and the next paragraph beginning with "my" is interpreted into "link.my" and the code tries to create
+            // a link across paragraphs - which doesn't work and is terrible.
+            // (Medium deletes the spaces/returns between P tags so the textContent ends up without paragraph spacing)
+            var paragraphs = contenteditable.querySelectorAll('p'),
+                linkCreated = false;
+            if (paragraphs.length === 0) {
+                paragraphs = [contenteditable];
+            }
+            for (var i = 0; i < paragraphs.length; i++) {
+                linkCreated = this.performLinkingWithinElement(paragraphs[i]) || linkCreated;
+            }
+            return linkCreated;
+        },
+
+        splitStartNodeIfNeeded: function (currentNode, matchStartIndex, currentTextIndex) {
+            if (matchStartIndex !== currentTextIndex) {
+                return currentNode.splitText(matchStartIndex - currentTextIndex);
+            }
+            return null;
+        },
+
+        splitEndNodeIfNeeded: function (currentNode, newNode, matchEndIndex, currentTextIndex) {
+            var textIndexOfEndOfFarthestNode,
+                endSplitPoint;
+            textIndexOfEndOfFarthestNode = currentTextIndex + (newNode || currentNode).nodeValue.length +
+                    (newNode ? currentNode.nodeValue.length : 0) -
+                    1;
+            endSplitPoint = (newNode || currentNode).nodeValue.length -
+                    (textIndexOfEndOfFarthestNode + 1 - matchEndIndex);
+            if (textIndexOfEndOfFarthestNode >= matchEndIndex &&
+                    currentTextIndex !== textIndexOfEndOfFarthestNode &&
+                    endSplitPoint !== 0) {
+                (newNode || currentNode).splitText(endSplitPoint);
+            }
+        },
+
+        performLinkingWithinElement: function (element) {
+            var matches = this.findLinkableText(element),
+                linkCreated = false;
+
+            for (var matchIndex = 0; matchIndex < matches.length; matchIndex++) {
+                linkCreated = this.createLink(this.findOrCreateMatchingTextNodes(element, matches[matchIndex]),
+                    matches[matchIndex].href) || linkCreated;
+            }
+            return linkCreated;
+        },
+
+        findLinkableText: function (contenteditable) {
+            var linkRegExp = new RegExp(LINK_REGEXP_TEXT, 'gi'),
+                textContent = contenteditable.textContent,
+                match = null,
+                matches = [];
+
+            while ((match = linkRegExp.exec(textContent)) !== null) {
+                matches.push({
+                    href: match[0],
+                    start: match.index,
+                    end: match.index + match[0].length
+                });
+            }
+            return matches;
+        },
+
+        findOrCreateMatchingTextNodes: function (element, match) {
+            var treeWalker = this.base.options.ownerDocument.createTreeWalker(element, NodeFilter.SHOW_TEXT,
+                    null, false),
+                matchedNodes = [],
+                currentTextIndex = 0,
+                startReached = false,
+                currentNode = null,
+                newNode = null;
+
+            while ((currentNode = treeWalker.nextNode()) !== null) {
+                if (!startReached && match.start < (currentTextIndex + currentNode.nodeValue.length)) {
+                    startReached = true;
+                    newNode = this.splitStartNodeIfNeeded(currentNode, match.start, currentTextIndex);
+                }
+                if (startReached) {
+                    this.splitEndNodeIfNeeded(currentNode, newNode, match.end, currentTextIndex);
+                }
+                if (startReached && currentTextIndex === match.end) {
+                    break; // Found the node(s) corresponding to the link. Break out and move on to the next.
+                } else if (startReached && currentTextIndex > (match.end + 1)) {
+                    throw new Error('PerformLinking overshot the target!'); // should never happen...
+                }
+
+                if (startReached) {
+                    matchedNodes.push(newNode || currentNode);
+                }
+
+                currentTextIndex += currentNode.nodeValue.length;
+                if (newNode !== null) {
+                    currentTextIndex += newNode.nodeValue.length;
+                    // Skip the newNode as we'll already have pushed it to the matches
+                    treeWalker.nextNode();
+                }
+                newNode = null;
+            }
+            return matchedNodes;
+        },
+
+        createLink: function (textNodes, href) {
+            var alreadyLinked = Util.traverseUp(textNodes[0], function (node) {
+                return node.nodeName.toLowerCase() === 'a';
+            });
+            if (alreadyLinked) {
+                return false;
+            }
+
+            var anchor = document.createElement('a');
+            Util.moveTextRangeIntoElement(textNodes[0], textNodes[textNodes.length - 1], anchor);
+            anchor.setAttribute('href', Util.ensureUrlHasProtocol(href));
+            return true;
+        }
+    });
+}());
 var FontSizeExtension;
 
 (function () {
@@ -3765,6 +4157,7 @@ var extensionDefaults;
     // for now this is empty because nothing interally uses an Extension default.
     // as they are converted, provide them here.
     extensionDefaults = {
+        autoLink: AutoLinker,
         paste: PasteHandler
     };
 })();
@@ -4045,6 +4438,10 @@ function MediumEditor(elements, options) {
         return shouldAdd;
     }
 
+    function shouldAddDefaultAutoLinker() {
+        return !!this.options.autoLink;
+    }
+
     function createContentEditable(textarea) {
         var div = this.options.ownerDocument.createElement('div'),
             id = (+new Date()),
@@ -4212,6 +4609,10 @@ function MediumEditor(elements, options) {
         // Add AnchorPreview as extension if needed
         if (shouldAddDefaultAnchorPreview.call(this)) {
             this.commands.push(initExtension(new AnchorPreview(), 'anchor-preview', this));
+        }
+
+        if (shouldAddDefaultAutoLinker.call(this)) {
+            this.commands.push(initExtension(new AutoLinker(), 'auto-link', this));
         }
     }
 

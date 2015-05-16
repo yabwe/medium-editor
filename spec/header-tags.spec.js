@@ -1,4 +1,4 @@
-/*global describe, it, expect, afterEach,
+/*global describe, it, expect, afterEach, Util,
     beforeEach, fireEvent, setupTestHelpers */
 
 describe('Protect Header Tags TestCase', function () {
@@ -28,7 +28,9 @@ describe('Protect Header Tags TestCase', function () {
             sel.addRange(range);
 
             // hit return
-            fireEvent(editor.elements[0], 'keypress', 13);
+            fireEvent(editor.elements[0], 'keypress', {
+                keyCode: Util.keyCode.ENTER
+            });
 
             el = document.getElementById('header');
             expect(el).toBeDefined();
@@ -47,7 +49,9 @@ describe('Protect Header Tags TestCase', function () {
             sel.addRange(range);
 
             // hit return
-            fireEvent(editor.elements[0], 'keypress', 13);
+            fireEvent(editor.elements[0], 'keypress', {
+                keyCode: Util.keyCode.ENTER
+            });
 
             el = document.getElementById('header');
             expect(el.previousElementSibling.tagName).toBe('P');
@@ -67,7 +71,9 @@ describe('Protect Header Tags TestCase', function () {
             sel.addRange(range);
 
             // hit backspace
-            fireEvent(editor.elements[0].querySelector(el.tagName.toLowerCase()), 'keydown', { keyCode: 8 });
+            fireEvent(editor.elements[0].querySelector(el.tagName.toLowerCase()), 'keydown', {
+                keyCode: Util.keyCode.BACKSPACE
+            });
 
             el = document.getElementById('header');
             expect(el).toBeDefined();
