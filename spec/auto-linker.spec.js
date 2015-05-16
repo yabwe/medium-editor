@@ -1,6 +1,6 @@
 /*global describe, it, expect, beforeEach, afterEach,
     setupTestHelpers, selectElementContentsAndFire, fireEvent,
-    Util, jasmine */
+    Util, jasmine, spyOn, MediumEditor */
 
 describe('Autolink', function () {
     'use strict';
@@ -75,6 +75,30 @@ describe('Autolink', function () {
                     generateLinkTest(noProtocolLink, link));
             });
 
+            it('should auto-link text on its own', function () {
+                this.el.innerHTML = 'http://www.example.com';
+
+                selectElementContentsAndFire(this.el);
+                triggerAutolinking(this.el);
+                expect(this.el.innerHTML).toBe('<a href="http://www.example.com">http://www.example.com</a>');
+            });
+
+            it('should auto-link link within basic text', function () {
+                this.el.innerHTML = 'Text with http://www.example.com inside!';
+
+                selectElementContentsAndFire(this.el);
+                triggerAutolinking(this.el);
+                expect(this.el.innerHTML).toBe('Text with <a href="http://www.example.com">http://www.example.com</a> inside!');
+            });
+
+            it('should auto-link basic text within a parent element', function () {
+                this.el.innerHTML = '<span>Text with http://www.example.com inside!</span>';
+
+                selectElementContentsAndFire(this.el);
+                triggerAutolinking(this.el);
+                expect(this.el.innerHTML).toBe('<span>Text with <a href="http://www.example.com">http://www.example.com</a> inside!</span>');
+            });
+
             it('should auto-link text that is partially styled and preserve the SPAN and B tags', function () {
                 var selection = window.getSelection(),
                     newRange = document.createRange();
@@ -147,6 +171,32 @@ describe('Autolink', function () {
                 '</span>';
 
                 expect(this.el.innerHTML).toBe(expectedOutput);
+            });
+
+            it('should not auto-link text inside links', function () {
+                this.el.innerHTML = 'Click this http://www.example.com link';
+
+                selectElementContentsAndFire(this.el.firstChild);
+
+                triggerAutolinking(this.el);
+                expect(this.el.innerHTML).toBe('Click this <a href="http://www.example.com">http://www.example.com</a> link');
+
+                triggerAutolinking(this.el);
+                expect(this.el.innerHTML).toBe('Click this <a href="http://www.example.com">http://www.example.com</a> link');
+            });
+
+            it('should stop attempting to auto-link on keypress if an error is encountered', function () {
+                var spy = spyOn(MediumEditor.extensions.autoLinker.prototype, 'performLinking').and.throwError('DOM ERROR');
+
+                this.el.innerHTML = '<span><a href="http://www.google.com>http://www.google.com</a></span>';
+
+                // This will cause an error
+                triggerAutolinking(this.el);
+                expect(spy.calls.count()).toBe(1);
+
+                // The previous error should prevent performLiking from being called again
+                triggerAutolinking(this.el);
+                expect(spy.calls.count()).toBe(1);
             });
         });
     });

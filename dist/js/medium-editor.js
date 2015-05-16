@@ -917,20 +917,25 @@ var Util;
 
         moveTextRangeIntoElement: function (startNode, endNode, newElement) {
             if (!startNode || !endNode) {
-                return null;
+                return false;
             }
 
             var rootNode = this.findCommonRoot(startNode, endNode);
             if (!rootNode) {
-                return null;
+                return false;
             }
 
             if (endNode === startNode) {
-                var temp = startNode.parentNode;
+                var temp = startNode.parentNode,
+                    sibling = startNode.nextSibling;
                 temp.removeChild(startNode);
                 newElement.appendChild(startNode);
-                temp.appendChild(newElement);
-                return null;
+                if (sibling) {
+                    temp.insertBefore(newElement, sibling);
+                } else {
+                    temp.appendChild(newElement);
+                }
+                return newElement.hasChildNodes();
             }
 
             // create rootChildren array which includes all the children
@@ -993,6 +998,8 @@ var Util;
                 // lastChild was removed and was the last actual element just append
                 rootNode.appendChild(newElement);
             }
+
+            return newElement.hasChildNodes();
         },
 
         /* based on http://stackoverflow.com/a/6183069 */

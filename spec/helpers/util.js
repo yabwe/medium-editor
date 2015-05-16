@@ -8,7 +8,9 @@ function setupTestHelpers() {
     this.createElement = function (tag, className, html, dontAppend) {
         var el = document.createElement(tag);
         el.innerHTML = html || '';
-        el.className = className;
+        if (className) {
+            el.className = className;
+        }
         this.elements.push(el);
         if (!dontAppend) {
             document.body.appendChild(el);

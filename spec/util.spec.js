@@ -183,8 +183,8 @@ describe('Util', function () {
                 splitOn = el.querySelector('u').firstChild,
                 result = Util.splitOffDOMTree(el, splitOn);
 
-            expect(el.outerHTML).toBe('<div class=""><span><b>1</b><i>2</i></span><span><b>3</b></span></div>');
-            expect(result.outerHTML).toBe('<div class=""><span><u>4</u></span><span><b>5</b><i>6</i></span></div>');
+            expect(el.outerHTML).toBe('<div><span><b>1</b><i>2</i></span><span><b>3</b></span></div>');
+            expect(result.outerHTML).toBe('<div><span><u>4</u></span><span><b>5</b><i>6</i></span></div>');
         });
 
         /* start:
@@ -209,8 +209,53 @@ describe('Util', function () {
                 splitOn = el.querySelector('u').firstChild,
                 result = Util.splitOffDOMTree(el, splitOn, true);
 
-            expect(el.outerHTML).toBe('<div class=""><span><b>5</b><i>6</i></span></div>');
-            expect(result.outerHTML).toBe('<div class=""><span><b>1</b><i>2</i></span><span><b>3</b><u>4</u></span></div>');
+            expect(el.outerHTML).toBe('<div><span><b>5</b><i>6</i></span></div>');
+            expect(result.outerHTML).toBe('<div><span><b>1</b><i>2</i></span><span><b>3</b><u>4</u></span></div>');
+        });
+    });
+
+    describe('moveTextRangeIntoElement', function () {
+        it('should return false and bail if no elements are passed', function () {
+            expect(Util.moveTextRangeIntoElement(null, null)).toBe(false);
+        });
+
+        it('should return false and bail if elemenets do not share a root', function () {
+            var el = this.createElement('div', '', 'text'),
+                elTwo = this.createElement('div', '', 'more text', true),
+                temp = this.createElement('div', '');
+            expect(Util.moveTextRangeIntoElement(el, elTwo, temp)).toBe(false);
+            expect(temp.innerHTML).toBe('');
+        });
+
+        it('should create a parent element that spans multiple root elements', function () {
+            var el = this.createElement('div', '',
+                    '<span>Link = http</span>' +
+                    '<span>://</span>' +
+                    '<span>www.exam</span>' +
+                    '<span>ple.com</span>' +
+                    '<span>:443/</span>' +
+                    '<span>path/to</span>' +
+                    '<span>somewhere#</span>' +
+                    '<span>index notLink</span>'),
+                firstText = el.firstChild.firstChild.splitText('Link = '.length),
+                lastText = el.lastChild.firstChild,
+                para = this.createElement('p', '');
+            lastText.splitText('index'.length);
+            Util.moveTextRangeIntoElement(firstText, lastText, para);
+            expect(el.innerHTML).toBe(
+                '<span>Link = </span>' +
+                '<p>' +
+                    '<span>http</span>' +
+                    '<span>://</span>' +
+                    '<span>www.exam</span>' +
+                    '<span>ple.com</span>' +
+                    '<span>:443/</span>' +
+                    '<span>path/to</span>' +
+                    '<span>somewhere#</span>' +
+                    '<span>index</span>' +
+                '</p>' +
+                '<span> notLink</span>'
+            );
         });
     });
 });
