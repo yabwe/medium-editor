@@ -4457,6 +4457,10 @@ function MediumEditor(elements, options) {
     }
 
     function shouldAddDefaultAutoLinker() {
+        if (this.options.extensions['auto-link']) {
+            return false;
+        }
+
         return !!this.options.autoLink;
     }
 
