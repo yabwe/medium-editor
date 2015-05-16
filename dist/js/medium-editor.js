@@ -4157,7 +4157,7 @@ var extensionDefaults;
     // for now this is empty because nothing interally uses an Extension default.
     // as they are converted, provide them here.
     extensionDefaults = {
-        autoLinker: AutoLinker,
+        autoLink: AutoLinker,
         paste: PasteHandler
     };
 })();
@@ -4612,7 +4612,7 @@ function MediumEditor(elements, options) {
         }
 
         if (shouldAddDefaultAutoLinker.call(this)) {
-            this.commands.push(initExtension(new AutoLinker(), 'auto-linker', this));
+            this.commands.push(initExtension(new AutoLinker(), 'auto-link', this));
         }
     }
 

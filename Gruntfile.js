@@ -23,7 +23,7 @@ module.exports = function (grunt) {
             'src/js/paste.js',
             'src/js/extensions/anchor.js',
             'src/js/extensions/anchor-preview.js',
-            'src/js/extensions/auto-linker.js',
+            'src/js/extensions/auto-link.js',
             'src/js/extensions/fontsize.js',
             'src/js/toolbar.js',
             'src/js/placeholders.js',

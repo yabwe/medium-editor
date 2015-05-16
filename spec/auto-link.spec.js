@@ -186,7 +186,7 @@ describe('Autolink', function () {
             });
 
             it('should stop attempting to auto-link on keypress if an error is encountered', function () {
-                var spy = spyOn(MediumEditor.extensions.autoLinker.prototype, 'performLinking').and.throwError('DOM ERROR');
+                var spy = spyOn(MediumEditor.extensions.autoLink.prototype, 'performLinking').and.throwError('DOM ERROR');
 
                 this.el.innerHTML = '<span><a href="http://www.google.com>http://www.google.com</a></span>';
 

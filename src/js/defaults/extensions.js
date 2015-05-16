@@ -5,7 +5,7 @@ var extensionDefaults;
     // for now this is empty because nothing interally uses an Extension default.
     // as they are converted, provide them here.
     extensionDefaults = {
-        autoLinker: AutoLinker,
+        autoLink: AutoLinker,
         paste: PasteHandler
     };
 })();
