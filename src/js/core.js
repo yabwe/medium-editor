@@ -1,6 +1,6 @@
 /*global Util, ButtonsData, DefaultButton,
  Selection, AnchorExtension, FontSizeExtension, Extension, extensionDefaults,
- Toolbar, AnchorPreview, AutoLinker, ImageDragging,
+ Toolbar, AnchorPreview, AutoLink, ImageDragging,
  Events, Placeholders, editorDefaults */
 
 function MediumEditor(elements, options) {
@@ -414,7 +414,7 @@ function MediumEditor(elements, options) {
         }
 
         if (shouldAddDefaultAutoLink.call(this)) {
-            this.commands.push(initExtension(new AutoLinker(), 'auto-link', this));
+            this.commands.push(initExtension(new AutoLink(), 'auto-link', this));
         }
 
         if (shouldAddDefaultImageDragging.call(this)) {

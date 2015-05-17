@@ -1,6 +1,6 @@
 /*global Extension, Util */
 
-var AutoLinker,
+var AutoLink,
     LINK_REGEXP_TEXT;
 
 LINK_REGEXP_TEXT =
@@ -13,7 +13,7 @@ LINK_REGEXP_TEXT =
 (function () {
     'use strict';
 
-    AutoLinker = Extension.extend({
+    AutoLink = Extension.extend({
         parent: true,
 
         init: function () {

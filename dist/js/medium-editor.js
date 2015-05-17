@@ -2884,7 +2884,7 @@ var AnchorPreview;
     };
 }());
 
-var AutoLinker,
+var AutoLink,
     LINK_REGEXP_TEXT;
 
 LINK_REGEXP_TEXT =
@@ -2897,7 +2897,7 @@ LINK_REGEXP_TEXT =
 (function () {
     'use strict';
 
-    AutoLinker = Extension.extend({
+    AutoLink = Extension.extend({
         parent: true,
 
         init: function () {
@@ -4219,7 +4219,7 @@ var extensionDefaults;
     // for now this is empty because nothing interally uses an Extension default.
     // as they are converted, provide them here.
     extensionDefaults = {
-        autoLink: AutoLinker,
+        autoLink: AutoLink,
         imageDragging: ImageDragging,
         paste: PasteHandler
     };
@@ -4636,7 +4636,7 @@ function MediumEditor(elements, options) {
         }
 
         if (shouldAddDefaultAutoLink.call(this)) {
-            this.commands.push(initExtension(new AutoLinker(), 'auto-link', this));
+            this.commands.push(initExtension(new AutoLink(), 'auto-link', this));
         }
 
         if (shouldAddDefaultImageDragging.call(this)) {
