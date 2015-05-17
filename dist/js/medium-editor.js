@@ -2381,306 +2381,6 @@ var DefaultButton;
     };
 }());
 
-var PasteHandler;
-
-(function () {
-    'use strict';
-    /*jslint regexp: true*/
-    /*
-        jslint does not allow character negation, because the negation
-        will not match any unicode characters. In the regexes in this
-        block, negation is used specifically to match the end of an html
-        tag, and in fact unicode characters *should* be allowed.
-    */
-    function createReplacements() {
-        return [
-
-            // replace two bogus tags that begin pastes from google docs
-            [new RegExp(/<[^>]*docs-internal-guid[^>]*>/gi), ''],
-            [new RegExp(/<\/b>(<br[^>]*>)?$/gi), ''],
-
-             // un-html spaces and newlines inserted by OS X
-            [new RegExp(/<span class="Apple-converted-space">\s+<\/span>/g), ' '],
-            [new RegExp(/<br class="Apple-interchange-newline">/g), '<br>'],
-
-            // replace google docs italics+bold with a span to be replaced once the html is inserted
-            [new RegExp(/<span[^>]*(font-style:italic;font-weight:bold|font-weight:bold;font-style:italic)[^>]*>/gi), '<span class="replace-with italic bold">'],
-
-            // replace google docs italics with a span to be replaced once the html is inserted
-            [new RegExp(/<span[^>]*font-style:italic[^>]*>/gi), '<span class="replace-with italic">'],
-
-            //[replace google docs bolds with a span to be replaced once the html is inserted
-            [new RegExp(/<span[^>]*font-weight:bold[^>]*>/gi), '<span class="replace-with bold">'],
-
-             // replace manually entered b/i/a tags with real ones
-            [new RegExp(/&lt;(\/?)(i|b|a)&gt;/gi), '<$1$2>'],
-
-             // replace manually a tags with real ones, converting smart-quotes from google docs
-            [new RegExp(/&lt;a(?:(?!href).)+href=(?:&quot;|&rdquo;|&ldquo;|"|“|”)(((?!&quot;|&rdquo;|&ldquo;|"|“|”).)*)(?:&quot;|&rdquo;|&ldquo;|"|“|”)(?:(?!&gt;).)*&gt;/gi), '<a href="$1">'],
-
-            // Newlines between paragraphs in html have no syntactic value,
-            // but then have a tendency to accidentally become additional paragraphs down the line
-            [new RegExp(/<\/p>\n+/gi), '</p>'],
-            [new RegExp(/\n+<p/gi), '<p'],
-
-            // Microsoft Word makes these odd tags, like <o:p></o:p>
-            [new RegExp(/<\/?o:[a-z]*>/gi), '']
-        ];
-    }
-    /*jslint regexp: false*/
-
-    PasteHandler = Extension.extend({
-
-        /* Paste Options */
-
-        /* forcePlainText: [boolean]
-         * Forces pasting as plain text.
-         */
-        forcePlainText: true,
-
-        /* cleanPastedHTML: [boolean]
-         * cleans pasted content from different sources, like google docs etc.
-         */
-        cleanPastedHTML: false,
-
-        /* cleanReplacements: [Array]
-         * custom pairs (2 element arrays) of RegExp and replacement text to use during paste when
-         * __forcePlainText__ or __cleanPastedHTML__ are `true` OR when calling `cleanPaste(text)` helper method.
-         */
-        cleanReplacements: [],
-
-        /* cleanAttrs:: [Array]
-         * list of element attributes to remove during paste when __cleanPastedHTML__ is `true` or when
-         * calling `cleanPaste(text)` or `pasteHTML(html, options)` helper methods.
-         */
-        cleanAttrs: ['class', 'style', 'dir'],
-
-        /* cleanTags: [Array]
-         * list of element tag names to remove during paste when __cleanPastedHTML__ is `true` or when
-         * calling `cleanPaste(text)` or `pasteHTML(html, options)` helper methods.
-         */
-        cleanTags: ['meta'],
-
-        /* ----- internal options needed from base ----- */
-        'window': window,
-        'document': document,
-        targetBlank: false,
-        disableReturn: false,
-
-        // Need a reference to MediumEditor (this.base)
-        parent: true,
-
-        init: function () {
-            if (this.forcePlainText || this.cleanPastedHTML) {
-                this.base.subscribe('editablePaste', this.handlePaste.bind(this));
-            }
-        },
-
-        handlePaste: function (event, element) {
-            var paragraphs,
-                html = '',
-                p,
-                dataFormatHTML = 'text/html',
-                dataFormatPlain = 'text/plain',
-                pastedHTML,
-                pastedPlain;
-
-            if (this.window.clipboardData && event.clipboardData === undefined) {
-                event.clipboardData = this.window.clipboardData;
-                // If window.clipboardData exists, but event.clipboardData doesn't exist,
-                // we're probably in IE. IE only has two possibilities for clipboard
-                // data format: 'Text' and 'URL'.
-                //
-                // Of the two, we want 'Text':
-                dataFormatHTML = 'Text';
-                dataFormatPlain = 'Text';
-            }
-
-            if (event.clipboardData &&
-                    event.clipboardData.getData &&
-                    !event.defaultPrevented) {
-                event.preventDefault();
-
-                pastedHTML = event.clipboardData.getData(dataFormatHTML);
-                pastedPlain = event.clipboardData.getData(dataFormatPlain);
-
-                if (!pastedHTML) {
-                    pastedHTML = pastedPlain;
-                }
-
-                if (this.cleanPastedHTML && pastedHTML) {
-                    return this.cleanPaste(pastedHTML);
-                }
-
-                if (!(this.disableReturn || element.getAttribute('data-disable-return'))) {
-                    paragraphs = pastedPlain.split(/[\r\n]+/g);
-                    // If there are no \r\n in data, don't wrap in <p>
-                    if (paragraphs.length > 1) {
-                        for (p = 0; p < paragraphs.length; p += 1) {
-                            if (paragraphs[p] !== '') {
-                                html += '<p>' + Util.htmlEntities(paragraphs[p]) + '</p>';
-                            }
-                        }
-                    } else {
-                        html = Util.htmlEntities(paragraphs[0]);
-                    }
-                } else {
-                    html = Util.htmlEntities(pastedPlain);
-                }
-                Util.insertHTMLCommand(this.document, html);
-            }
-        },
-
-        cleanPaste: function (text) {
-            var i, elList, workEl,
-                el = Selection.getSelectionElement(this.window),
-                multiline = /<p|<br|<div/.test(text),
-                replacements = createReplacements().concat(this.cleanReplacements || []);
-
-            for (i = 0; i < replacements.length; i += 1) {
-                text = text.replace(replacements[i][0], replacements[i][1]);
-            }
-
-            if (multiline) {
-                // double br's aren't converted to p tags, but we want paragraphs.
-                elList = text.split('<br><br>');
-
-                this.pasteHTML('<p>' + elList.join('</p><p>') + '</p>');
-
-                try {
-                    this.document.execCommand('insertText', false, '\n');
-                } catch (ignore) { }
-
-                // block element cleanup
-                elList = el.querySelectorAll('a,p,div,br');
-                for (i = 0; i < elList.length; i += 1) {
-                    workEl = elList[i];
-
-                    // Microsoft Word replaces some spaces with newlines.
-                    // While newlines between block elements are meaningless, newlines within
-                    // elements are sometimes actually spaces.
-                    workEl.innerHTML = workEl.innerHTML.replace(/\n/gi, ' ');
-
-                    switch (workEl.tagName.toLowerCase()) {
-                        case 'a':
-                            if (this.targetBlank) {
-                                Util.setTargetBlank(workEl);
-                            }
-                            break;
-                        case 'p':
-                        case 'div':
-                            this.filterCommonBlocks(workEl);
-                            break;
-                        case 'br':
-                            this.filterLineBreak(workEl);
-                            break;
-                    }
-                }
-            } else {
-                this.pasteHTML(text);
-            }
-        },
-
-        pasteHTML: function (html, options) {
-            options = Util.defaults({}, options, {
-                cleanAttrs: this.cleanAttrs,
-                cleanTags: this.cleanTags
-            });
-
-            var elList, workEl, i, fragmentBody, pasteBlock = this.document.createDocumentFragment();
-
-            pasteBlock.appendChild(this.document.createElement('body'));
-
-            fragmentBody = pasteBlock.querySelector('body');
-            fragmentBody.innerHTML = html;
-
-            this.cleanupSpans(fragmentBody);
-
-            elList = fragmentBody.querySelectorAll('*');
-
-            for (i = 0; i < elList.length; i += 1) {
-                workEl = elList[i];
-                Util.cleanupAttrs(workEl, options.cleanAttrs);
-                Util.cleanupTags(workEl, options.cleanTags);
-            }
-
-            Util.insertHTMLCommand(this.document, fragmentBody.innerHTML.replace(/&nbsp;/g, ' '));
-        },
-
-        isCommonBlock: function (el) {
-            return (el && (el.tagName.toLowerCase() === 'p' || el.tagName.toLowerCase() === 'div'));
-        },
-
-        filterCommonBlocks: function (el) {
-            if (/^\s*$/.test(el.textContent) && el.parentNode) {
-                el.parentNode.removeChild(el);
-            }
-        },
-
-        filterLineBreak: function (el) {
-
-            if (this.isCommonBlock(el.previousElementSibling)) {
-                // remove stray br's following common block elements
-                this.removeWithParent(el);
-            } else if (this.isCommonBlock(el.parentNode) && (el.parentNode.firstChild === el || el.parentNode.lastChild === el)) {
-                // remove br's just inside open or close tags of a div/p
-                this.removeWithParent(el);
-            } else if (el.parentNode && el.parentNode.childElementCount === 1 && el.parentNode.textContent === '') {
-                // and br's that are the only child of elements other than div/p
-                this.removeWithParent(el);
-            }
-        },
-
-        // remove an element, including its parent, if it is the only element within its parent
-        removeWithParent: function (el) {
-            if (el && el.parentNode) {
-                if (el.parentNode.parentNode && el.parentNode.childElementCount === 1) {
-                    el.parentNode.parentNode.removeChild(el.parentNode);
-                } else {
-                    el.parentNode.removeChild(el);
-                }
-            }
-        },
-
-        cleanupSpans: function (containerEl) {
-            var i,
-                el,
-                newEl,
-                spans = containerEl.querySelectorAll('.replace-with'),
-                isCEF = function (el) {
-                    return (el && el.nodeName !== '#text' && el.getAttribute('contenteditable') === 'false');
-                };
-
-            for (i = 0; i < spans.length; i += 1) {
-                el = spans[i];
-                newEl = this.document.createElement(el.classList.contains('bold') ? 'b' : 'i');
-
-                if (el.classList.contains('bold') && el.classList.contains('italic')) {
-                    // add an i tag as well if this has both italics and bold
-                    newEl.innerHTML = '<i>' + el.innerHTML + '</i>';
-                } else {
-                    newEl.innerHTML = el.innerHTML;
-                }
-                el.parentNode.replaceChild(newEl, el);
-            }
-
-            spans = containerEl.querySelectorAll('span');
-            for (i = 0; i < spans.length; i += 1) {
-                el = spans[i];
-
-                // bail if span is in contenteditable = false
-                if (Util.traverseUp(el, isCEF)) {
-                    return false;
-                }
-
-                // remove empty spans, replace others with their contents
-                Util.unwrap(el, this.document);
-            }
-        }
-    });
-
-}());
-
 var AnchorExtension;
 
 (function () {
@@ -3352,6 +3052,68 @@ LINK_REGEXP_TEXT =
         }
     });
 }());
+var ImageDragging;
+
+(function () {
+    'use strict';
+
+    ImageDragging = Extension.extend({
+        // Need a reference to MediumEditor (this.base)
+        parent: true,
+
+        init: function () {
+            this.base.subscribe('editableDrag', this.handleDrag.bind(this));
+            this.base.subscribe('editableDrop', this.handleDrop.bind(this));
+        },
+
+        handleDrag: function (event) {
+            var className = 'medium-editor-dragover';
+            event.preventDefault();
+            event.dataTransfer.dropEffect = 'copy';
+
+            if (event.type === 'dragover') {
+                event.target.classList.add(className);
+            } else if (event.type === 'dragleave') {
+                event.target.classList.remove(className);
+            }
+        },
+
+        handleDrop: function (event) {
+            var className = 'medium-editor-dragover',
+                files;
+            event.preventDefault();
+            event.stopPropagation();
+
+            // IE9 does not support the File API, so prevent file from opening in a new window
+            // but also don't try to actually get the file
+            if (event.dataTransfer.files) {
+                files = Array.prototype.slice.call(event.dataTransfer.files, 0);
+                files.some(function (file) {
+                    if (file.type.match('image')) {
+                        var fileReader, id;
+                        fileReader = new FileReader();
+                        fileReader.readAsDataURL(file);
+
+                        id = 'medium-img-' + (+new Date());
+                        Util.insertHTMLCommand(this.base.options.ownerDocument, '<img class="medium-image-loading" id="' + id + '" />');
+
+                        fileReader.onload = function () {
+                            var img = this.base.options.ownerDocument.getElementById(id);
+                            if (img) {
+                                img.removeAttribute('id');
+                                img.removeAttribute('class');
+                                img.src = fileReader.result;
+                            }
+                        }.bind(this);
+                    }
+                }.bind(this));
+            }
+            event.target.classList.remove(className);
+        }
+    });
+
+}());
+
 var FontSizeExtension;
 
 (function () {
@@ -3536,6 +3298,306 @@ var FontSizeExtension;
     };
 
     FontSizeExtension = Util.derives(DefaultButton, FontSizeDerived);
+}());
+
+var PasteHandler;
+
+(function () {
+    'use strict';
+    /*jslint regexp: true*/
+    /*
+        jslint does not allow character negation, because the negation
+        will not match any unicode characters. In the regexes in this
+        block, negation is used specifically to match the end of an html
+        tag, and in fact unicode characters *should* be allowed.
+    */
+    function createReplacements() {
+        return [
+
+            // replace two bogus tags that begin pastes from google docs
+            [new RegExp(/<[^>]*docs-internal-guid[^>]*>/gi), ''],
+            [new RegExp(/<\/b>(<br[^>]*>)?$/gi), ''],
+
+             // un-html spaces and newlines inserted by OS X
+            [new RegExp(/<span class="Apple-converted-space">\s+<\/span>/g), ' '],
+            [new RegExp(/<br class="Apple-interchange-newline">/g), '<br>'],
+
+            // replace google docs italics+bold with a span to be replaced once the html is inserted
+            [new RegExp(/<span[^>]*(font-style:italic;font-weight:bold|font-weight:bold;font-style:italic)[^>]*>/gi), '<span class="replace-with italic bold">'],
+
+            // replace google docs italics with a span to be replaced once the html is inserted
+            [new RegExp(/<span[^>]*font-style:italic[^>]*>/gi), '<span class="replace-with italic">'],
+
+            //[replace google docs bolds with a span to be replaced once the html is inserted
+            [new RegExp(/<span[^>]*font-weight:bold[^>]*>/gi), '<span class="replace-with bold">'],
+
+             // replace manually entered b/i/a tags with real ones
+            [new RegExp(/&lt;(\/?)(i|b|a)&gt;/gi), '<$1$2>'],
+
+             // replace manually a tags with real ones, converting smart-quotes from google docs
+            [new RegExp(/&lt;a(?:(?!href).)+href=(?:&quot;|&rdquo;|&ldquo;|"|“|”)(((?!&quot;|&rdquo;|&ldquo;|"|“|”).)*)(?:&quot;|&rdquo;|&ldquo;|"|“|”)(?:(?!&gt;).)*&gt;/gi), '<a href="$1">'],
+
+            // Newlines between paragraphs in html have no syntactic value,
+            // but then have a tendency to accidentally become additional paragraphs down the line
+            [new RegExp(/<\/p>\n+/gi), '</p>'],
+            [new RegExp(/\n+<p/gi), '<p'],
+
+            // Microsoft Word makes these odd tags, like <o:p></o:p>
+            [new RegExp(/<\/?o:[a-z]*>/gi), '']
+        ];
+    }
+    /*jslint regexp: false*/
+
+    PasteHandler = Extension.extend({
+
+        /* Paste Options */
+
+        /* forcePlainText: [boolean]
+         * Forces pasting as plain text.
+         */
+        forcePlainText: true,
+
+        /* cleanPastedHTML: [boolean]
+         * cleans pasted content from different sources, like google docs etc.
+         */
+        cleanPastedHTML: false,
+
+        /* cleanReplacements: [Array]
+         * custom pairs (2 element arrays) of RegExp and replacement text to use during paste when
+         * __forcePlainText__ or __cleanPastedHTML__ are `true` OR when calling `cleanPaste(text)` helper method.
+         */
+        cleanReplacements: [],
+
+        /* cleanAttrs:: [Array]
+         * list of element attributes to remove during paste when __cleanPastedHTML__ is `true` or when
+         * calling `cleanPaste(text)` or `pasteHTML(html, options)` helper methods.
+         */
+        cleanAttrs: ['class', 'style', 'dir'],
+
+        /* cleanTags: [Array]
+         * list of element tag names to remove during paste when __cleanPastedHTML__ is `true` or when
+         * calling `cleanPaste(text)` or `pasteHTML(html, options)` helper methods.
+         */
+        cleanTags: ['meta'],
+
+        /* ----- internal options needed from base ----- */
+        'window': window,
+        'document': document,
+        targetBlank: false,
+        disableReturn: false,
+
+        // Need a reference to MediumEditor (this.base)
+        parent: true,
+
+        init: function () {
+            if (this.forcePlainText || this.cleanPastedHTML) {
+                this.base.subscribe('editablePaste', this.handlePaste.bind(this));
+            }
+        },
+
+        handlePaste: function (event, element) {
+            var paragraphs,
+                html = '',
+                p,
+                dataFormatHTML = 'text/html',
+                dataFormatPlain = 'text/plain',
+                pastedHTML,
+                pastedPlain;
+
+            if (this.window.clipboardData && event.clipboardData === undefined) {
+                event.clipboardData = this.window.clipboardData;
+                // If window.clipboardData exists, but event.clipboardData doesn't exist,
+                // we're probably in IE. IE only has two possibilities for clipboard
+                // data format: 'Text' and 'URL'.
+                //
+                // Of the two, we want 'Text':
+                dataFormatHTML = 'Text';
+                dataFormatPlain = 'Text';
+            }
+
+            if (event.clipboardData &&
+                    event.clipboardData.getData &&
+                    !event.defaultPrevented) {
+                event.preventDefault();
+
+                pastedHTML = event.clipboardData.getData(dataFormatHTML);
+                pastedPlain = event.clipboardData.getData(dataFormatPlain);
+
+                if (!pastedHTML) {
+                    pastedHTML = pastedPlain;
+                }
+
+                if (this.cleanPastedHTML && pastedHTML) {
+                    return this.cleanPaste(pastedHTML);
+                }
+
+                if (!(this.disableReturn || element.getAttribute('data-disable-return'))) {
+                    paragraphs = pastedPlain.split(/[\r\n]+/g);
+                    // If there are no \r\n in data, don't wrap in <p>
+                    if (paragraphs.length > 1) {
+                        for (p = 0; p < paragraphs.length; p += 1) {
+                            if (paragraphs[p] !== '') {
+                                html += '<p>' + Util.htmlEntities(paragraphs[p]) + '</p>';
+                            }
+                        }
+                    } else {
+                        html = Util.htmlEntities(paragraphs[0]);
+                    }
+                } else {
+                    html = Util.htmlEntities(pastedPlain);
+                }
+                Util.insertHTMLCommand(this.document, html);
+            }
+        },
+
+        cleanPaste: function (text) {
+            var i, elList, workEl,
+                el = Selection.getSelectionElement(this.window),
+                multiline = /<p|<br|<div/.test(text),
+                replacements = createReplacements().concat(this.cleanReplacements || []);
+
+            for (i = 0; i < replacements.length; i += 1) {
+                text = text.replace(replacements[i][0], replacements[i][1]);
+            }
+
+            if (multiline) {
+                // double br's aren't converted to p tags, but we want paragraphs.
+                elList = text.split('<br><br>');
+
+                this.pasteHTML('<p>' + elList.join('</p><p>') + '</p>');
+
+                try {
+                    this.document.execCommand('insertText', false, '\n');
+                } catch (ignore) { }
+
+                // block element cleanup
+                elList = el.querySelectorAll('a,p,div,br');
+                for (i = 0; i < elList.length; i += 1) {
+                    workEl = elList[i];
+
+                    // Microsoft Word replaces some spaces with newlines.
+                    // While newlines between block elements are meaningless, newlines within
+                    // elements are sometimes actually spaces.
+                    workEl.innerHTML = workEl.innerHTML.replace(/\n/gi, ' ');
+
+                    switch (workEl.tagName.toLowerCase()) {
+                        case 'a':
+                            if (this.targetBlank) {
+                                Util.setTargetBlank(workEl);
+                            }
+                            break;
+                        case 'p':
+                        case 'div':
+                            this.filterCommonBlocks(workEl);
+                            break;
+                        case 'br':
+                            this.filterLineBreak(workEl);
+                            break;
+                    }
+                }
+            } else {
+                this.pasteHTML(text);
+            }
+        },
+
+        pasteHTML: function (html, options) {
+            options = Util.defaults({}, options, {
+                cleanAttrs: this.cleanAttrs,
+                cleanTags: this.cleanTags
+            });
+
+            var elList, workEl, i, fragmentBody, pasteBlock = this.document.createDocumentFragment();
+
+            pasteBlock.appendChild(this.document.createElement('body'));
+
+            fragmentBody = pasteBlock.querySelector('body');
+            fragmentBody.innerHTML = html;
+
+            this.cleanupSpans(fragmentBody);
+
+            elList = fragmentBody.querySelectorAll('*');
+
+            for (i = 0; i < elList.length; i += 1) {
+                workEl = elList[i];
+                Util.cleanupAttrs(workEl, options.cleanAttrs);
+                Util.cleanupTags(workEl, options.cleanTags);
+            }
+
+            Util.insertHTMLCommand(this.document, fragmentBody.innerHTML.replace(/&nbsp;/g, ' '));
+        },
+
+        isCommonBlock: function (el) {
+            return (el && (el.tagName.toLowerCase() === 'p' || el.tagName.toLowerCase() === 'div'));
+        },
+
+        filterCommonBlocks: function (el) {
+            if (/^\s*$/.test(el.textContent) && el.parentNode) {
+                el.parentNode.removeChild(el);
+            }
+        },
+
+        filterLineBreak: function (el) {
+
+            if (this.isCommonBlock(el.previousElementSibling)) {
+                // remove stray br's following common block elements
+                this.removeWithParent(el);
+            } else if (this.isCommonBlock(el.parentNode) && (el.parentNode.firstChild === el || el.parentNode.lastChild === el)) {
+                // remove br's just inside open or close tags of a div/p
+                this.removeWithParent(el);
+            } else if (el.parentNode && el.parentNode.childElementCount === 1 && el.parentNode.textContent === '') {
+                // and br's that are the only child of elements other than div/p
+                this.removeWithParent(el);
+            }
+        },
+
+        // remove an element, including its parent, if it is the only element within its parent
+        removeWithParent: function (el) {
+            if (el && el.parentNode) {
+                if (el.parentNode.parentNode && el.parentNode.childElementCount === 1) {
+                    el.parentNode.parentNode.removeChild(el.parentNode);
+                } else {
+                    el.parentNode.removeChild(el);
+                }
+            }
+        },
+
+        cleanupSpans: function (containerEl) {
+            var i,
+                el,
+                newEl,
+                spans = containerEl.querySelectorAll('.replace-with'),
+                isCEF = function (el) {
+                    return (el && el.nodeName !== '#text' && el.getAttribute('contenteditable') === 'false');
+                };
+
+            for (i = 0; i < spans.length; i += 1) {
+                el = spans[i];
+                newEl = this.document.createElement(el.classList.contains('bold') ? 'b' : 'i');
+
+                if (el.classList.contains('bold') && el.classList.contains('italic')) {
+                    // add an i tag as well if this has both italics and bold
+                    newEl.innerHTML = '<i>' + el.innerHTML + '</i>';
+                } else {
+                    newEl.innerHTML = el.innerHTML;
+                }
+                el.parentNode.replaceChild(newEl, el);
+            }
+
+            spans = containerEl.querySelectorAll('span');
+            for (i = 0; i < spans.length; i += 1) {
+                el = spans[i];
+
+                // bail if span is in contenteditable = false
+                if (Util.traverseUp(el, isCEF)) {
+                    return false;
+                }
+
+                // remove empty spans, replace others with their contents
+                Util.unwrap(el, this.document);
+            }
+        }
+    });
+
 }());
 
 var Toolbar;
@@ -4158,6 +4220,7 @@ var extensionDefaults;
     // as they are converted, provide them here.
     extensionDefaults = {
         autoLink: AutoLinker,
+        imageDragging: ImageDragging,
         paste: PasteHandler
     };
 })();
@@ -4299,51 +4362,6 @@ function MediumEditor(elements, options) {
         }
     }
 
-    function handleDrag(event) {
-        var className = 'medium-editor-dragover';
-        event.preventDefault();
-        event.dataTransfer.dropEffect = 'copy';
-
-        if (event.type === 'dragover') {
-            event.target.classList.add(className);
-        } else if (event.type === 'dragleave') {
-            event.target.classList.remove(className);
-        }
-    }
-
-    function handleDrop(event) {
-        var className = 'medium-editor-dragover',
-            files;
-        event.preventDefault();
-        event.stopPropagation();
-
-        // IE9 does not support the File API, so prevent file from opening in a new window
-        // but also don't try to actually get the file
-        if (event.dataTransfer.files) {
-            files = Array.prototype.slice.call(event.dataTransfer.files, 0);
-            files.some(function (file) {
-                if (file.type.match('image')) {
-                    var fileReader, id;
-                    fileReader = new FileReader();
-                    fileReader.readAsDataURL(file);
-
-                    id = 'medium-img-' + (+new Date());
-                    Util.insertHTMLCommand(this.options.ownerDocument, '<img class="medium-image-loading" id="' + id + '" />');
-
-                    fileReader.onload = function () {
-                        var img = this.options.ownerDocument.getElementById(id);
-                        if (img) {
-                            img.removeAttribute('id');
-                            img.removeAttribute('class');
-                            img.src = fileReader.result;
-                        }
-                    }.bind(this);
-                }
-            }.bind(this));
-        }
-        event.target.classList.remove(className);
-    }
-
     function handleKeyup(event) {
         var node = Util.getSelectionStart(this.options.ownerDocument),
             tagName;
@@ -4438,8 +4456,20 @@ function MediumEditor(elements, options) {
         return shouldAdd;
     }
 
-    function shouldAddDefaultAutoLinker() {
+    function shouldAddDefaultAutoLink() {
+        if (this.options.extensions['auto-link']) {
+            return false;
+        }
+
         return !!this.options.autoLink;
+    }
+
+    function shouldAddDefaultImageDragging() {
+        if (this.options.extensions['image-dragging']) {
+            return false;
+        }
+
+        return !!this.options.imageDragging;
     }
 
     function createContentEditable(textarea) {
@@ -4547,12 +4577,6 @@ function MediumEditor(elements, options) {
                 }
             }, this);
         }
-
-        // drag and drop of images
-        if (this.options.imageDragging) {
-            this.subscribe('editableDrag', handleDrag.bind(this));
-            this.subscribe('editableDrop', handleDrop.bind(this));
-        }
     }
 
     function initPasteHandler(options) {
@@ -4611,8 +4635,12 @@ function MediumEditor(elements, options) {
             this.commands.push(initExtension(new AnchorPreview(), 'anchor-preview', this));
         }
 
-        if (shouldAddDefaultAutoLinker.call(this)) {
+        if (shouldAddDefaultAutoLink.call(this)) {
             this.commands.push(initExtension(new AutoLinker(), 'auto-link', this));
+        }
+
+        if (shouldAddDefaultImageDragging.call(this)) {
+            this.commands.push(initExtension(new ImageDragging(), 'image-dragging', this));
         }
     }
 

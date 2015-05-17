@@ -1,4 +1,4 @@
-/*global PasteHandler, AutoLinker */
+/*global PasteHandler, AutoLinker, ImageDragging */
 
 var extensionDefaults;
 (function () {
@@ -6,6 +6,7 @@ var extensionDefaults;
     // as they are converted, provide them here.
     extensionDefaults = {
         autoLink: AutoLinker,
+        imageDragging: ImageDragging,
         paste: PasteHandler
     };
 })();
