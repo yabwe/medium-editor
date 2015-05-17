@@ -234,7 +234,7 @@ function MediumEditor(elements, options) {
         return shouldAdd;
     }
 
-    function shouldAddDefaultAutoLinker() {
+    function shouldAddDefaultAutoLink() {
         if (this.options.extensions['auto-link']) {
             return false;
         }
@@ -413,7 +413,7 @@ function MediumEditor(elements, options) {
             this.commands.push(initExtension(new AnchorPreview(), 'anchor-preview', this));
         }
 
-        if (shouldAddDefaultAutoLinker.call(this)) {
+        if (shouldAddDefaultAutoLink.call(this)) {
             this.commands.push(initExtension(new AutoLinker(), 'auto-link', this));
         }
 
