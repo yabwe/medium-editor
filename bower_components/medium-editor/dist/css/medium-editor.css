@@ -120,10 +120,16 @@
       font-size: 12px;
       font-family: 'Menlo', monospace; }
 
-.medium-editor-anchor-preview a {
-  display: inline-block;
-  margin: 5px 5px 5px 10px;
-  color: #fff; }
+.medium-editor-anchor-preview {
+  max-width: 280px;
+  word-break: break-all;
+  word-wrap: break-word;
+  text-align: center;
+  line-height: 1.4; }
+  .medium-editor-anchor-preview a {
+    display: inline-block;
+    margin: 5px 5px 5px 10px;
+    color: #fff; }
 
 .medium-editor-toolbar-active, .medium-editor-anchor-preview-active {
   visibility: visible; }

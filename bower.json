@@ -35,6 +35,6 @@
     "CHANGES.md"
   ],
   "dependencies": {
-    "medium-editor": "4.6.0"
+    "medium-editor": "^4.6.0"
   }
 }
