@@ -90,13 +90,18 @@ $medium_editor_z_index: 2000 !default;
 }
 
 .medium-editor-anchor-preview {
+    max-width: 280px;
+    word-break: break-all;
+    word-wrap: break-word;
+    text-align: center;
+    line-height: 1.4;
+
     a {
         display: inline-block;
         margin: 5px 5px 5px 10px;
         color: #fff;
     }
 }
-
 
 .medium-editor-toolbar-active, .medium-editor-anchor-preview-active {
     visibility: visible;
