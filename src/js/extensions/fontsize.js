@@ -6,6 +6,7 @@ var FontSizeExtension;
     'use strict';
 
     function FontSizeDerived() {
+        Util.deprecated('MediumEditor.statics.FontSizeExtension', 'MediumEditor.extensions.fontSize', 'v5.0.0');
         this.parent = true;
         this.options = {
             name: 'fontsize',

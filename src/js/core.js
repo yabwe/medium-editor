@@ -385,10 +385,10 @@ function MediumEditor(elements, options) {
                 ext = initExtension(extensions[buttonName], buttonName, this);
                 this.commands.push(ext);
             } else if (buttonName === 'anchor') {
-                ext = initExtension(new MediumEditor.extensions.anchorForm(), buttonName, this);
+                ext = initExtension(new MediumEditor.extensions.anchor(), buttonName, this);
                 this.commands.push(ext);
             } else if (buttonName === 'fontsize') {
-                ext = initExtension(new MediumEditor.extensions.fontsizeForm(), buttonName, this);
+                ext = initExtension(new MediumEditor.extensions.fontSize(), buttonName, this);
                 this.commands.push(ext);
             } else if (ButtonsData.hasOwnProperty(buttonName)) {
                 ext = initExtension(new Button(ButtonsData[buttonName]), buttonName, this);

@@ -6,6 +6,7 @@ var AnchorExtension;
     'use strict';
 
     function AnchorDerived() {
+        Util.deprecated('MediumEditor.statics.AnchorExtension', 'MediumEditor.extensions.anchor', 'v5.0.0');
         this.parent = true;
         this.options = {
             name: 'anchor',

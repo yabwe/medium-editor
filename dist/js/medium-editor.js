@@ -2251,6 +2251,8 @@ var DefaultButton;
     'use strict';
 
     DefaultButton = function (options, instance) {
+        Util.deprecated('MediumEditor.statics.DefaultButton', 'MediumEditor.extensions.button', 'v5.0.0');
+
         this.options = options;
         this.name = options.name;
         this.init(instance);
@@ -2816,6 +2818,7 @@ var AnchorExtension;
     'use strict';
 
     function AnchorDerived() {
+        Util.deprecated('MediumEditor.statics.AnchorExtension', 'MediumEditor.extensions.anchor', 'v5.0.0');
         this.parent = true;
         this.options = {
             name: 'anchor',
@@ -3725,6 +3728,7 @@ var FontSizeExtension;
     'use strict';
 
     function FontSizeDerived() {
+        Util.deprecated('MediumEditor.statics.FontSizeExtension', 'MediumEditor.extensions.fontSize', 'v5.0.0');
         this.parent = true;
         this.options = {
             name: 'fontsize',
@@ -4819,9 +4823,12 @@ var extensionDefaults;
     'use strict';
 
     extensionDefaults = {
-        anchorForm: AnchorForm,
+        button: Button,
+        form: FormExtension,
+
+        anchor: AnchorForm,
         autoLink: AutoLink,
-        fontsizeForm: FontSizeForm,
+        fontSize: FontSizeForm,
         imageDragging: ImageDragging,
         paste: PasteHandler
     };
@@ -5209,10 +5216,10 @@ function MediumEditor(elements, options) {
                 ext = initExtension(extensions[buttonName], buttonName, this);
                 this.commands.push(ext);
             } else if (buttonName === 'anchor') {
-                ext = initExtension(new MediumEditor.extensions.anchorForm(), buttonName, this);
+                ext = initExtension(new MediumEditor.extensions.anchor(), buttonName, this);
                 this.commands.push(ext);
             } else if (buttonName === 'fontsize') {
-                ext = initExtension(new MediumEditor.extensions.fontsizeForm(), buttonName, this);
+                ext = initExtension(new MediumEditor.extensions.fontSize(), buttonName, this);
                 this.commands.push(ext);
             } else if (ButtonsData.hasOwnProperty(buttonName)) {
                 ext = initExtension(new Button(ButtonsData[buttonName]), buttonName, this);
