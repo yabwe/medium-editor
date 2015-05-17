@@ -34,7 +34,7 @@ var AnchorForm;
         },
 
         // Called when user hits the defined shortcut (CTRL / COMMAND + K)
-        // Overrides DefaultButton.handleKeydown
+        // Overrides Button.handleKeydown
         handleKeydown: function (evt) {
             var key = String.fromCharCode(evt.which || evt.keyCode).toLowerCase();
 

@@ -2595,7 +2595,7 @@ var AnchorForm;
         },
 
         // Called when user hits the defined shortcut (CTRL / COMMAND + K)
-        // Overrides DefaultButton.handleKeydown
+        // Overrides Button.handleKeydown
         handleKeydown: function (evt) {
             var key = String.fromCharCode(evt.which || evt.keyCode).toLowerCase();
 
@@ -5302,7 +5302,7 @@ function MediumEditor(elements, options) {
     // deprecate
     MediumEditor.statics = {
         ButtonsData: ButtonsData,
-        DefaultButton: Button,
+        DefaultButton: DefaultButton,
         AnchorExtension: AnchorExtension,
         FontSizeExtension: FontSizeExtension,
         Toolbar: Toolbar,

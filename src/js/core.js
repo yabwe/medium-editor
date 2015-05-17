@@ -1,4 +1,4 @@
-/*global Util, ButtonsData, Button, Selection,
+/*global Util, ButtonsData, Button, Selection, DefaultButton,
  AnchorExtension, FontSizeExtension, Extension, extensionDefaults,
  Toolbar, AnchorPreview, AutoLink, ImageDragging,
  Events, Placeholders, editorDefaults */
@@ -478,7 +478,7 @@ function MediumEditor(elements, options) {
     // deprecate
     MediumEditor.statics = {
         ButtonsData: ButtonsData,
-        DefaultButton: Button,
+        DefaultButton: DefaultButton,
         AnchorExtension: AnchorExtension,
         FontSizeExtension: FontSizeExtension,
         Toolbar: Toolbar,
