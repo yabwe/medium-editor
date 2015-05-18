@@ -800,12 +800,25 @@ var Util;
             return false;
         },
 
-        cleanListDOM: function (element) {
-            if (element.tagName.toLowerCase() === 'li') {
-                var list = element.parentElement;
-                if (list.parentElement.tagName.toLowerCase() === 'p') { // yes we need to clean up
-                    this.unwrapElement(list.parentElement);
-                }
+        cleanListDOM: function (ownerDocument, element) {
+            if (element.tagName.toLowerCase() !== 'li') {
+                return;
+            }
+
+            var range, sel,
+                list = element.parentElement;
+
+            if (list.parentElement.tagName.toLowerCase() === 'p') { // yes we need to clean up
+                this.unwrapElement(list.parentElement);
+
+                // move cursor at the end of the text inside the list
+                // for some unknown reason, the cursor is moved to end of the "visual" line
+                range = ownerDocument.createRange();
+                sel = ownerDocument.getSelection();
+                range.setStart(element.firstChild, element.firstChild.textContent.length);
+                range.collapse(true);
+                sel.removeAllRanges();
+                sel.addRange(range);
             }
         },
 
@@ -4328,6 +4341,7 @@ function MediumEditor(elements, options) {
                 // parent also does not have a sibling
                 !node.parentElement.previousElementSibling &&
                 // is not the only li in a list
+                node.nextElementSibling &&
                 node.nextElementSibling.tagName.toLowerCase() === 'li') {
             // backspacing in an empty first list element in the first list (with more elements) ex:
             //  <ul><li>[CURSOR]</li><li>List Item 2</li></ul>
@@ -4936,7 +4950,7 @@ function MediumEditor(elements, options) {
 
             // do some DOM clean-up for known browser issues after the action
             if (action === 'insertunorderedlist' || action === 'insertorderedlist') {
-                Util.cleanListDOM(this.getSelectedParentElement());
+                Util.cleanListDOM(this.options.ownerDocument, this.getSelectedParentElement());
             }
 
             this.checkSelection();

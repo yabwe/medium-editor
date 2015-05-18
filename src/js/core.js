@@ -111,6 +111,7 @@ function MediumEditor(elements, options) {
                 // parent also does not have a sibling
                 !node.parentElement.previousElementSibling &&
                 // is not the only li in a list
+                node.nextElementSibling &&
                 node.nextElementSibling.tagName.toLowerCase() === 'li') {
             // backspacing in an empty first list element in the first list (with more elements) ex:
             //  <ul><li>[CURSOR]</li><li>List Item 2</li></ul>
@@ -719,7 +720,7 @@ function MediumEditor(elements, options) {
 
             // do some DOM clean-up for known browser issues after the action
             if (action === 'insertunorderedlist' || action === 'insertorderedlist') {
-                Util.cleanListDOM(this.getSelectedParentElement());
+                Util.cleanListDOM(this.options.ownerDocument, this.getSelectedParentElement());
             }
 
             this.checkSelection();

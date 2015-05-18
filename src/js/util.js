@@ -402,12 +402,25 @@ var Util;
             return false;
         },
 
-        cleanListDOM: function (element) {
-            if (element.tagName.toLowerCase() === 'li') {
-                var list = element.parentElement;
-                if (list.parentElement.tagName.toLowerCase() === 'p') { // yes we need to clean up
-                    this.unwrapElement(list.parentElement);
-                }
+        cleanListDOM: function (ownerDocument, element) {
+            if (element.tagName.toLowerCase() !== 'li') {
+                return;
+            }
+
+            var range, sel,
+                list = element.parentElement;
+
+            if (list.parentElement.tagName.toLowerCase() === 'p') { // yes we need to clean up
+                this.unwrapElement(list.parentElement);
+
+                // move cursor at the end of the text inside the list
+                // for some unknown reason, the cursor is moved to end of the "visual" line
+                range = ownerDocument.createRange();
+                sel = ownerDocument.getSelection();
+                range.setStart(element.firstChild, element.firstChild.textContent.length);
+                range.collapse(true);
+                sel.removeAllRanges();
+                sel.addRange(range);
             }
         },
 
