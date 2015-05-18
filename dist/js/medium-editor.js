@@ -4174,9 +4174,8 @@ var Placeholders;
         },
 
         updatePlaceholder: function (el) {
-            if (!(el.querySelector('img')) &&
-                    !(el.querySelector('blockquote')) &&
-                    el.textContent.replace(/^\s+|\s+$/g, '') === '') {
+            // if one of these element ('img, blockquote, ul, ol') are found inside the given element, we won't display the placeholder
+            if (!(el.querySelector('img, blockquote, ul, ol')) && el.textContent.replace(/^\s+|\s+$/g, '') === '') {
                 this.showPlaceholder(el);
             } else {
                 this.hidePlaceholder(el);

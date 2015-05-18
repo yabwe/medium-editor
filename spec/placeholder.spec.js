@@ -30,6 +30,18 @@ describe('Placeholder TestCase', function () {
         expect(editor.elements[0].className).not.toContain('medium-editor-placeholder');
     });
 
+    it('should not set a placeholder for elements with unorderedlist', function () {
+        this.el.innerHTML = '<ul><li></li></ul>';
+        var editor = this.newMediumEditor('.editor');
+        expect(editor.elements[0].className).not.toContain('medium-editor-placeholder');
+    });
+
+    it('should not set a placeholder for elements with orderedlist', function () {
+        this.el.innerHTML = '<ol><li></li></ol>';
+        var editor = this.newMediumEditor('.editor');
+        expect(editor.elements[0].className).not.toContain('medium-editor-placeholder');
+    });
+
     it('should set placeholder for elements with empty children', function () {
         this.el.innerHTML = '<p><br></p><div class="empty"></div>';
         var editor = this.newMediumEditor('.editor');
