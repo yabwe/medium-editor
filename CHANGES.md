@@ -1,3 +1,11 @@
+4.9.0 / 2015-05-18
+==================
+* New auto-link support for detecting urls and converting them to links
+* Fix target _blank issue for links in Firefox
+* Don't show placeholders for empty lists
+* Allow for overriding image drag and drop via extension
+
+
 4.8.1 / 2015-05-13
 ==================
 * Fix error thrown when loading MediumEditor js from head

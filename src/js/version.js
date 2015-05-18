@@ -11,5 +11,5 @@ MediumEditor.version = (function (major, minor, revision) {
     };
 }).apply(this, ({
     // grunt-bump looks for this:
-    'version': '4.8.1'
+    'version': '4.9.0'
 }).version.split('.'));
