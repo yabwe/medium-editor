@@ -1,11 +1,15 @@
 /*global Util */
 
+/* istanbul ignore next */
 var DefaultButton;
 
+/* istanbul ignore next */
 (function () {
     'use strict';
 
     DefaultButton = function (options, instance) {
+        Util.deprecated('MediumEditor.statics.DefaultButton', 'MediumEditor.extensions.button', 'v5.0.0');
+
         this.options = options;
         this.name = options.name;
         this.init(instance);

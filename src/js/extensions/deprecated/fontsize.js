@@ -1,19 +1,32 @@
-var FontSizeForm;
+/*global Util, DefaultButton, Selection */
+
+/* istanbul ignore next */
+var FontSizeExtension;
+
+/* istanbul ignore next */
 (function () {
     'use strict';
 
-    /*global FormExtension, Selection */
+    function FontSizeDerived() {
+        Util.deprecated('MediumEditor.statics.FontSizeExtension', 'MediumEditor.extensions.fontSize', 'v5.0.0');
+        this.parent = true;
+        this.options = {
+            name: 'fontsize',
+            action: 'fontSize',
+            aria: 'increase/decrease font size',
+            contentDefault: '&#xB1;', // ±
+            contentFA: '<i class="fa fa-text-height"></i>'
+        };
+        this.name = 'fontsize';
+        this.hasForm = true;
+    }
 
-    FontSizeForm = FormExtension.extend({
+    FontSizeDerived.prototype = {
 
-        name: 'fontsize',
-        action: 'fontSize',
-        aria: 'increase/decrease font size',
-        contentDefault: '&#xB1;', // ±
-        contentFA: '<i class="fa fa-text-height"></i>',
+        // Button and Extension handling
 
         // Called when the button the toolbar is clicked
-        // Overrides ButtonExtension.handleClick
+        // Overrides DefaultButton.handleClick
         handleClick: function (evt) {
             evt.preventDefault();
             evt.stopPropagation();
@@ -171,5 +184,7 @@ var FontSizeForm;
             event.preventDefault();
             this.doFormCancel();
         }
-    });
+    };
+
+    FontSizeExtension = Util.derives(DefaultButton, FontSizeDerived);
 }());
