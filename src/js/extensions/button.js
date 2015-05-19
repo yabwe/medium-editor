@@ -6,8 +6,6 @@ var Button;
 
     Button = Extension.extend({
 
-        parent: true,
-
         init: function () {
             this.button = this.createButton();
             this.base.on(this.button, 'click', this.handleClick.bind(this));
