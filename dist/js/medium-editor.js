@@ -816,6 +816,12 @@ var Util;
             }
         },
 
+        unwrapElement: function (element) {
+            this.deprecated('unwrapElement', 'unwrap', 'v5.0.0');
+
+            this.unwrap(element, element.ownerDocument);
+        },
+
         /* splitDOMTree
          *
          * Given a root element some descendant element, split the root element
