@@ -19,8 +19,44 @@ LINK_REGEXP_TEXT =
         init: function () {
             this.disableEventHandling = false;
             this.base.subscribe('editableKeypress', this.onKeypress.bind(this));
+            this.base.subscribe('editableUnlink', this.onUnlink.bind(this));
             // MS IE has it's own auto-URL detect feature but ours is better in some ways. Be consistent.
             this.base.options.ownerDocument.execCommand('AutoUrlDetect', false, false);
+        },
+
+        onUnlink: function () {
+            var sel = this.base.options.contentWindow.getSelection().getRangeAt(0),
+                startNode = sel.startContainer.nodeType !== 3 ? sel.startContainer.childNodes[sel.startOffset] :
+                                                                sel.startContainer,
+                endNode = sel.endContainer.nodeType !== 3 ? sel.endContainer.childNodes[sel.endOffset] :
+                                                            sel.endContainer,
+                autoCreatedLink;
+
+            if (startNode.nodeName.toLowerCase() === 'a') {
+                autoCreatedLink = startNode;
+            } else if (endNode && endNode.nodeName.toLowerCase() === 'a') {
+                autoCreatedLink = endNode;
+            } else {
+                autoCreatedLink = Util.traverseUp(startNode, function (node) {
+                    return node.nodeName.toLowerCase() === 'a' && node.getAttribute('data-auto-link') === 'true';
+                });
+                if (endNode) {
+                    autoCreatedLink = autoCreatedLink || Util.traverseUp(endNode, function (node) {
+                        return node.nodeName.toLowerCase() === 'a' && node.getAttribute('data-auto-link') === 'true';
+                    });
+                }
+            }
+
+            if (autoCreatedLink) {
+                var savedSel = this.base.exportSelection(),
+                    span = this.base.options.ownerDocument.createElement('span');
+                span.setAttribute('data-auto-link', 'false');
+                while (autoCreatedLink.childNodes.length !== 0) {
+                    span.appendChild(autoCreatedLink.firstChild);
+                }
+                autoCreatedLink.appendChild(span);
+                this.base.importSelection(savedSel);
+            }
         },
 
         onKeypress: function (keyPressEvent) {
@@ -167,10 +203,20 @@ LINK_REGEXP_TEXT =
             if (alreadyLinked) {
                 return false;
             }
+            var shouldNotLink = false;
+            for (var i = 0; i < textNodes.length && shouldNotLink === false; i++) {
+                shouldNotLink = !!Util.traverseUp(textNodes[i], function (node) {
+                    return node.getAttribute && node.getAttribute('data-auto-link') === 'false';
+                });
+            }
+            if (shouldNotLink) {
+                return false;
+            }
 
             var anchor = document.createElement('a');
             Util.moveTextRangeIntoElement(textNodes[0], textNodes[textNodes.length - 1], anchor);
             anchor.setAttribute('href', Util.ensureUrlHasProtocol(href));
+            anchor.setAttribute('data-auto-link', 'true');
             return true;
         }
     });
