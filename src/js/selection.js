@@ -135,6 +135,27 @@ var Selection;
             range.selectNodeContents(node);
             sel.removeAllRanges();
             sel.addRange(range);
+        },
+
+        /**
+         * Move cursor to the given node with the given offset.
+         *
+         * @param  {DomDocument} doc     Current document
+         * @param  {DomElement}  node    Element where to jump
+         * @param  {integer}     offset  Where in the element should we jump, 0 by default
+         */
+        moveCursor: function (doc, node, offset) {
+            var range, sel,
+                startOffset = offset || 0;
+
+            range = doc.createRange();
+            sel = doc.getSelection();
+
+            range.setStart(node, startOffset);
+            range.collapse(true);
+
+            sel.removeAllRanges();
+            sel.addRange(range);
         }
     };
 }());

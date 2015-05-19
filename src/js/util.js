@@ -1,4 +1,4 @@
-/*global NodeFilter, console*/
+/*global NodeFilter, console, Selection*/
 
 var Util;
 
@@ -407,20 +407,14 @@ var Util;
                 return;
             }
 
-            var range, sel,
-                list = element.parentElement;
+            var list = element.parentElement;
 
             if (list.parentElement.tagName.toLowerCase() === 'p') { // yes we need to clean up
                 this.unwrap(list.parentElement, ownerDocument);
 
                 // move cursor at the end of the text inside the list
                 // for some unknown reason, the cursor is moved to end of the "visual" line
-                range = ownerDocument.createRange();
-                sel = ownerDocument.getSelection();
-                range.setStart(element.firstChild, element.firstChild.textContent.length);
-                range.collapse(true);
-                sel.removeAllRanges();
-                sel.addRange(range);
+                Selection.moveCursor(ownerDocument, element.firstChild, element.firstChild.textContent.length);
             }
         },
 

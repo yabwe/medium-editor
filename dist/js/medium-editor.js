@@ -805,20 +805,14 @@ var Util;
                 return;
             }
 
-            var range, sel,
-                list = element.parentElement;
+            var list = element.parentElement;
 
             if (list.parentElement.tagName.toLowerCase() === 'p') { // yes we need to clean up
                 this.unwrap(list.parentElement, ownerDocument);
 
                 // move cursor at the end of the text inside the list
                 // for some unknown reason, the cursor is moved to end of the "visual" line
-                range = ownerDocument.createRange();
-                sel = ownerDocument.getSelection();
-                range.setStart(element.firstChild, element.firstChild.textContent.length);
-                range.collapse(true);
-                sel.removeAllRanges();
-                sel.addRange(range);
+                Selection.moveCursor(ownerDocument, element.firstChild, element.firstChild.textContent.length);
             }
         },
 
@@ -1731,6 +1725,27 @@ var Selection;
                 sel = doc.getSelection();
 
             range.selectNodeContents(node);
+            sel.removeAllRanges();
+            sel.addRange(range);
+        },
+
+        /**
+         * Move cursor to the given node with the given offset.
+         *
+         * @param  {DomDocument} doc     Current document
+         * @param  {DomElement}  node    Element where to jump
+         * @param  {integer}     offset  Where in the element should we jump, 0 by default
+         */
+        moveCursor: function (doc, node, offset) {
+            var range, sel,
+                startOffset = offset || 0;
+
+            range = doc.createRange();
+            sel = doc.getSelection();
+
+            range.setStart(node, startOffset);
+            range.collapse(true);
+
             sel.removeAllRanges();
             sel.addRange(range);
         }
@@ -4266,7 +4281,7 @@ function MediumEditor(elements, options) {
     }
 
     function handleBlockDeleteKeydowns(event) {
-        var range, sel, p, node = Util.getSelectionStart(this.options.ownerDocument),
+        var p, node = Util.getSelectionStart(this.options.ownerDocument),
             tagName = node.tagName.toLowerCase(),
             isEmpty = /^(\s+|<br\/?>)?$/i,
             isHeader = /h\d/i;
@@ -4308,14 +4323,7 @@ function MediumEditor(elements, options) {
             // Instead, delete the paragraph node and move the cursor to the begining of the h1
 
             // remove node and move cursor to start of header
-            range = this.options.ownerDocument.createRange();
-            sel = this.options.ownerDocument.getSelection();
-
-            range.setStart(node.nextElementSibling, 0);
-            range.collapse(true);
-
-            sel.removeAllRanges();
-            sel.addRange(range);
+            Selection.moveCursor(this.options.ownerDocument, node.nextElementSibling);
 
             node.previousElementSibling.parentNode.removeChild(node);
 
@@ -4345,12 +4353,7 @@ function MediumEditor(elements, options) {
             node.parentElement.parentElement.insertBefore(p, node.parentElement);
 
             // move the cursor into the new paragraph
-            range = this.options.ownerDocument.createRange();
-            sel = this.options.ownerDocument.getSelection();
-            range.setStart(p, 0);
-            range.collapse(true);
-            sel.removeAllRanges();
-            sel.addRange(range);
+            Selection.moveCursor(this.options.ownerDocument, p);
 
             // remove the list element
             node.parentElement.removeChild(node);

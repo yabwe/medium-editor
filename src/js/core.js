@@ -48,7 +48,7 @@ function MediumEditor(elements, options) {
     }
 
     function handleBlockDeleteKeydowns(event) {
-        var range, sel, p, node = Util.getSelectionStart(this.options.ownerDocument),
+        var p, node = Util.getSelectionStart(this.options.ownerDocument),
             tagName = node.tagName.toLowerCase(),
             isEmpty = /^(\s+|<br\/?>)?$/i,
             isHeader = /h\d/i;
@@ -90,14 +90,7 @@ function MediumEditor(elements, options) {
             // Instead, delete the paragraph node and move the cursor to the begining of the h1
 
             // remove node and move cursor to start of header
-            range = this.options.ownerDocument.createRange();
-            sel = this.options.ownerDocument.getSelection();
-
-            range.setStart(node.nextElementSibling, 0);
-            range.collapse(true);
-
-            sel.removeAllRanges();
-            sel.addRange(range);
+            Selection.moveCursor(this.options.ownerDocument, node.nextElementSibling);
 
             node.previousElementSibling.parentNode.removeChild(node);
 
@@ -127,12 +120,7 @@ function MediumEditor(elements, options) {
             node.parentElement.parentElement.insertBefore(p, node.parentElement);
 
             // move the cursor into the new paragraph
-            range = this.options.ownerDocument.createRange();
-            sel = this.options.ownerDocument.getSelection();
-            range.setStart(p, 0);
-            range.collapse(true);
-            sel.removeAllRanges();
-            sel.addRange(range);
+            Selection.moveCursor(this.options.ownerDocument, p);
 
             // remove the list element
             node.parentElement.removeChild(node);
