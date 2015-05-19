@@ -117,13 +117,7 @@ describe('Initialization TestCase', function () {
                 activeButtonClass: 'medium-editor-button-active',
                 firstButtonClass: 'medium-editor-button-first',
                 lastButtonClass: 'medium-editor-button-last',
-                spellcheck: true,
-                paste: {
-                    forcePlainText: true,
-                    cleanPastedHTML: false,
-                    cleanAttrs: ['class', 'style', 'dir'],
-                    cleanTags: ['meta']
-                }
+                spellcheck: true
             },
                 editor = this.newMediumEditor('.editor');
             expect(Object.keys(editor.options).length).toBe(Object.keys(defaultOptions).length);
@@ -140,6 +134,10 @@ describe('Initialization TestCase', function () {
                 anchor: {
                     placeholderText: 'test',
                     targetCheckboxText: 'new window?'
+                },
+                paste: {
+                    forcePlainText: false,
+                    cleanPastedHTML: true
                 }
             },
                 editor = this.newMediumEditor('.editor', options);

@@ -448,19 +448,7 @@ function MediumEditor(elements, options) {
                 }
             });
         }
-
-        var nestedMerges = ['paste'],
-            tempOpts = Util.extend({}, options);
-
-        nestedMerges.forEach(function (toMerge) {
-            if (!tempOpts[toMerge]) {
-                tempOpts[toMerge] = defaults[toMerge];
-            } else {
-                tempOpts[toMerge] = Util.defaults({}, tempOpts[toMerge], defaults[toMerge]);
-            }
-        });
-
-        return Util.defaults(tempOpts, defaults);
+        return Util.defaults({}, options, defaults);
     }
 
     function execActionInternal(action, opts) {

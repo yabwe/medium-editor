@@ -33,15 +33,7 @@ var editorDefaults;
         activeButtonClass: 'medium-editor-button-active',
         firstButtonClass: 'medium-editor-button-first',
         lastButtonClass: 'medium-editor-button-last',
-        spellcheck: true,
-
-        paste: {
-            forcePlainText: true,
-            cleanPastedHTML: false,
-            cleanAttrs: ['class', 'style', 'dir'],
-            cleanTags: ['meta']
-        }
-
+        spellcheck: true
     };
 
 })();
