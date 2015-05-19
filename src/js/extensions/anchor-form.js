@@ -1,38 +1,21 @@
-/*global Util, Selection, DefaultButton */
-
-/* istanbul ignore next */
-var AnchorExtension;
-
-/* istanbul ignore next */
+var AnchorForm;
 (function () {
     'use strict';
 
-    function AnchorDerived() {
-        Util.deprecated('MediumEditor.statics.AnchorExtension', 'MediumEditor.extensions.anchor', 'v5.0.0');
-        this.parent = true;
-        this.options = {
-            name: 'anchor',
-            action: 'createLink',
-            aria: 'link',
-            tagNames: ['a'],
-            contentDefault: '<b>#</b>',
-            contentFA: '<i class="fa fa-link"></i>',
-            key: 'k'
-        };
-        this.name = 'anchor';
-        this.hasForm = true;
-    }
+    /*global Util, Selection, FormExtension */
 
-    AnchorDerived.prototype = {
+    AnchorForm = FormExtension.extend({
 
-        // Button and Extension handling
-
-        // labels for the anchor-edit form buttons
-        formSaveLabel: '&#10003;',
-        formCloseLabel: '&times;',
+        name: 'anchor',
+        action: 'createLink',
+        aria: 'link',
+        tagNames: ['a'],
+        contentDefault: '<b>#</b>',
+        contentFA: '<i class="fa fa-link"></i>',
+        key: 'k',
 
         // Called when the button the toolbar is clicked
-        // Overrides DefaultButton.handleClick
+        // Overrides ButtonExtension.handleClick
         handleClick: function (evt) {
             evt.preventDefault();
             evt.stopPropagation();
@@ -51,14 +34,11 @@ var AnchorExtension;
         },
 
         // Called when user hits the defined shortcut (CTRL / COMMAND + K)
-        // Overrides DefaultButton.handleKeydown
+        // Overrides Button.handleKeydown
         handleKeydown: function (evt) {
             var key = String.fromCharCode(evt.which || evt.keyCode).toLowerCase();
 
-            if (this.options.key === key && Util.isMetaCtrlKey(evt)) {
-                evt.preventDefault();
-                evt.stopPropagation();
-
+            if (this.key === key && Util.isMetaCtrlKey(evt)) {
                 this.handleClick(evt);
             }
         },
@@ -266,8 +246,5 @@ var AnchorExtension;
             event.preventDefault();
             this.doFormCancel();
         }
-    };
-
-    AnchorExtension = Util.derives(DefaultButton, AnchorDerived);
-
+    });
 }());
