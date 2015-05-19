@@ -809,7 +809,7 @@ var Util;
                 list = element.parentElement;
 
             if (list.parentElement.tagName.toLowerCase() === 'p') { // yes we need to clean up
-                this.unwrapElement(list.parentElement);
+                this.unwrap(list.parentElement, ownerDocument);
 
                 // move cursor at the end of the text inside the list
                 // for some unknown reason, the cursor is moved to end of the "visual" line
@@ -820,18 +820,6 @@ var Util;
                 sel.removeAllRanges();
                 sel.addRange(range);
             }
-        },
-
-        unwrapElement: function (element) {
-            var parent = element.parentNode,
-                current = element.firstChild,
-                next;
-            do {
-                next = current.nextSibling;
-                parent.insertBefore(current, element);
-                current = next;
-            } while (current);
-            parent.removeChild(element);
         },
 
         /* splitDOMTree
