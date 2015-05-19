@@ -26,15 +26,23 @@ describe('Autolink', function () {
 
             var links = [
                 'http://www.royal.gov.uk',
+                'http://www.bbc.co.uk',
                 'http://mountaindew.com',
                 'http://coca-cola.com',
                 'http://example.com',
+                'http://wwww.example.com', // with more "w"s it's still a valid subdomain
                 'http://www.example.com',
                 'http://www.example.com/foo/bar',
                 'http://www.example.com?foo=bar',
                 'http://www.example.com/baz?foo=bar',
                 'http://www.example.com/baz?foo=bar#buzz',
                 'http://www.example.com/#buzz'
+            ],
+                notLinks = [
+                'http:google.com',
+                'http:/example.com',
+                'app.can',
+                'sadasda.sdfasf.sdfas'
             ];
 
             function triggerAutolinking(element) {
@@ -73,6 +81,26 @@ describe('Autolink', function () {
                 var noProtocolLink = link.slice('http://'.length);
                 it('should auto-link "' + noProtocolLink + '" when typed in',
                     generateLinkTest(noProtocolLink, link));
+            });
+
+            function generateNotLinkTest(link) {
+                return function () {
+                    var selection = window.getSelection(),
+                        newRange = document.createRange();
+                    this.el.innerHTML = '<p>' + link + ' </p>';
+                    selection.removeAllRanges();
+                    newRange.setStart(this.el.firstChild.childNodes[0], link.length + 1);
+                    newRange.setEnd(this.el.firstChild.childNodes[0], link.length + 1);
+                    selection.addRange(newRange);
+
+                    triggerAutolinking(this.el);
+                    var anchors = this.el.getElementsByTagName('a');
+                    expect(anchors.length).toBe(0);
+                };
+            }
+
+            notLinks.forEach(function (link) {
+                it('should not auto-link "' + link + '" when typed in', generateNotLinkTest(link));
             });
 
             it('should auto-link text on its own', function () {
