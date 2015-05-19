@@ -113,23 +113,23 @@ var editor = new MediumEditor('.editable', {
     buttons: ['bold', 'italic', 'underline', 'anchor'],
     anchor: {
         // These are the default options for anchor form, if nothing is passed this is what it used
-        placeholderText: 'Paste or type a link',
-        targetCheckbox: false,
-        targetCheckboxText: 'Open in new window',
         customClassOption: null,
         customClassOptionText: 'Button',
-        checkLinkFormat: false
+        linkValidation: false,
+        placeholderText: 'Paste or type a link',
+        targetCheckbox: false,
+        targetCheckboxText: 'Open in new window'
     }
 }
 })
 ```
 
+* __customClassOption__: custom class name the user can optionally have added to their created links (ie 'button').  If passed as a non-empty string, a checkbox will be displayed allowing the user to choose whether to have the class added to the created link or not. Default: null
+* __customClassOptionText__: text to be shown in the checkbox when the __customClassOption__ is being used. Default: `'Button'`
+* __linkValidation__: enables/disables check for common URL protocols on anchor links. Default: false
 * __placeholderText__: text to be shown as placeholder of the anchor input. Default: _Paste or type a link_
 * __targetCheckbox__: enables/disables displaying a "Open in new window" checkbox, which when checked changes the `target` attribute of the created link. Default: false
 * __targetCheckboxText__: text to be shown in the checkbox enabled via the __targetCheckbox__ option. Default: _Open in new window_
-* __customClassOption__: custom class name the user can optionally have added to their created links (ie 'button').  If passed as a non-empty string, a checkbox will be displayed allowing the user to choose whether to have the class added to the created link or not. Default: null
-* __customClassOptionText__: text to be shown in the checkbox when the __customClassOption__ is being used. Default: `'Button'`
-* __checkLinkFormat__: enables/disables check for common URL protocols on anchor links. Default: false
 
 ### Paste Options
 Options for paste are passed as an object that is a member of the outer options object. Example:

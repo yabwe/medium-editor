@@ -35,22 +35,6 @@ var editorDefaults;
         lastButtonClass: 'medium-editor-button-last',
         spellcheck: true,
 
-        anchorInputPlaceholder: 'Paste or type a link',
-        anchorInputCheckboxLabel: 'Open in new window',
-        anchorTarget: false,
-        anchorButton: false,
-        anchorButtonClass: 'btn',
-        checkLinkFormat: false,
-
-        anchor: {
-            placeholderText: 'Paste or type a link', // anchorInputPlaceholder
-            targetCheckbox: false, // anchorTarget
-            targetCheckboxText: 'Open in new window', // anchorInputCheckboxLabel
-            customClassOption: null, // anchorButton & anchorButtonClass -> 'btn'
-            customClassOptionText: 'Button', // New Option
-            checkLinkFormat: false
-        },
-
         paste: {
             forcePlainText: true,
             cleanPastedHTML: false,

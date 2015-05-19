@@ -89,8 +89,6 @@ describe('Initialization TestCase', function () {
     describe('With a valid element', function () {
         it('should have a default set of options', function () {
             var defaultOptions = {
-                anchorInputPlaceholder: 'Paste or type a link',
-                anchorInputCheckboxLabel: 'Open in new window',
                 delay: 0,
                 diffLeft: 0,
                 diffTop: -10,
@@ -114,24 +112,12 @@ describe('Initialization TestCase', function () {
                 buttons: ['bold', 'italic', 'underline', 'anchor', 'header1', 'header2', 'quote'],
                 buttonLabels: false,
                 targetBlank: false,
-                anchorTarget: false,
-                anchorButton: false,
-                anchorButtonClass: 'btn',
                 anchorPreviewHideDelay: 500,
-                checkLinkFormat: false,
                 extensions: {},
                 activeButtonClass: 'medium-editor-button-active',
                 firstButtonClass: 'medium-editor-button-first',
                 lastButtonClass: 'medium-editor-button-last',
                 spellcheck: true,
-                anchor: {
-                    placeholderText: 'Paste or type a link',
-                    targetCheckbox: false,
-                    targetCheckboxText: 'Open in new window',
-                    customClassOption: null,
-                    customClassOptionText: 'Button',
-                    checkLinkFormat: false
-                },
                 paste: {
                     forcePlainText: true,
                     cleanPastedHTML: false,
@@ -146,13 +132,15 @@ describe('Initialization TestCase', function () {
 
         it('should accept custom options values', function () {
             var options = {
-                anchorInputPlaceholder: 'test',
-                anchorInputCheckboxLabel: 'new window?',
                 diffLeft: 10,
                 diffTop: 5,
                 firstHeader: 'h2',
                 secondHeader: 'h3',
-                delay: 300
+                delay: 300,
+                anchor: {
+                    placeholderText: 'test',
+                    targetCheckboxText: 'new window?'
+                }
             },
                 editor = this.newMediumEditor('.editor', options);
             Object.keys(options).forEach(function (customOption) {

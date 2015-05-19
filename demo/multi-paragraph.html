@@ -27,12 +27,14 @@
     <script src="../dist/js/medium-editor.js"></script>
     <script>
         var editor = new MediumEditor('.editable', {
-            anchorInputPlaceholder: 'Type a link',
             allowMultiParagraphSelection: false,
             diffTop: -12,
             firstHeader: 'h1',
             secondHeader: 'h2',
-            delay: 0
+            delay: 0,
+            anchor: {
+                placeholderText: 'Type a link'
+            }
         });
 
     </script>

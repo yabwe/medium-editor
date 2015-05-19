@@ -11,7 +11,7 @@ var FormExtension;
      */
     FormExtension = Button.extend({
 
-        // default labels for the anchor-edit form buttons
+        // default labels for the form buttons
         formSaveLabel: '&#10003;',
         formCloseLabel: '&times;',
 

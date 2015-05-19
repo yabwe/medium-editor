@@ -1,5 +1,5 @@
 /*global Util, ButtonsData, Button,
- Selection, AnchorForm, FontSizeForm, Extension, extensionDefaults,
+ Selection, FontSizeForm, Extension, extensionDefaults,
  Toolbar, AnchorPreview, AutoLink, ImageDragging,
  Events, Placeholders, editorDefaults,
  DefaultButton, AnchorExtension, FontSizeExtension */
@@ -347,6 +347,23 @@ function MediumEditor(elements, options) {
         }
     }
 
+    function initAnchorForm(options) {
+        // Backwards compatability
+        var defaultsBC = {
+            customClassOption: this.options.anchorButton ? (this.options.anchorButtonClass || 'btn') : undefined, // deprecated
+            linkValidation: this.options.checkLinkFormat, //deprecated
+            placeholderText: this.options.anchorInputPlaceholder, // deprecated
+            targetCheckbox: this.options.anchorTarget, // deprecated
+            targetCheckboxText: this.options.anchorInputCheckboxLabel, // deprecated
+            'window': this.options.contentWindow,
+            'document': this.options.ownerDocument
+        };
+
+        return new MediumEditor.extensions.anchor(
+            Util.extend({}, options, defaultsBC)
+        );
+    }
+
     function initPasteHandler(options) {
         // Backwards compatability
         var defaultsBC = {
@@ -375,7 +392,7 @@ function MediumEditor(elements, options) {
                 ext = initExtension(extensions[buttonName], buttonName, this);
                 this.commands.push(ext);
             } else if (buttonName === 'anchor') {
-                ext = initExtension(new AnchorForm(), buttonName, this);
+                ext = initExtension(initAnchorForm.call(this, this.options.anchor), 'anchor', this);
                 this.commands.push(ext);
             } else if (buttonName === 'fontsize') {
                 ext = initExtension(new FontSizeForm(), buttonName, this);
@@ -413,10 +430,19 @@ function MediumEditor(elements, options) {
     }
 
     function mergeOptions(defaults, options) {
+        var deprecatedProperties = [
+            ['forcePlainText', 'paste.forcePlainText'],
+            ['cleanPastedHTML', 'paste.cleanPastedHTML'],
+            ['anchorInputPlaceholder', 'anchor.placeholderText'],
+            ['checkLinkFormat', 'anchor.linkValidation'],
+            ['anchorButton', 'anchor.customClassOption'],
+            ['anchorButtonClass', 'anchor.customClassOption'],
+            ['anchorTarget', 'anchor.targetCheckbox'],
+            ['anchorInputCheckboxLabel', 'anchor.targetCheckboxText']
+        ];
         // warn about using deprecated properties
         if (options) {
-            [['forcePlainText', 'paste.forcePlainText'],
-             ['cleanPastedHTML', 'paste.cleanPastedHTML']].forEach(function (pair) {
+            deprecatedProperties.forEach(function (pair) {
                 if (options.hasOwnProperty(pair[0]) && options[pair[0]] !== undefined) {
                     Util.deprecated(pair[0], pair[1], 'v5.0.0');
                 }
