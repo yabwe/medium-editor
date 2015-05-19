@@ -124,6 +124,14 @@ describe('Initialization TestCase', function () {
                 firstButtonClass: 'medium-editor-button-first',
                 lastButtonClass: 'medium-editor-button-last',
                 spellcheck: true,
+                anchor: {
+                    placeholderText: 'Paste or type a link',
+                    targetCheckbox: false,
+                    targetCheckboxText: 'Open in new window',
+                    customClassOption: null,
+                    customClassOptionText: 'Button',
+                    checkLinkFormat: false
+                },
                 paste: {
                     forcePlainText: true,
                     cleanPastedHTML: false,
