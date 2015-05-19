@@ -1,7 +1,8 @@
 /*global Util, ButtonsData, Button,
  Selection, AnchorForm, FontSizeForm, Extension, extensionDefaults,
  Toolbar, AnchorPreview, AutoLink, ImageDragging,
- Events, Placeholders, editorDefaults */
+ Events, Placeholders, editorDefaults,
+ DefaultButton, AnchorExtension, FontSizeExtension */
 
 function MediumEditor(elements, options) {
     'use strict';
@@ -467,6 +468,9 @@ function MediumEditor(elements, options) {
     // deprecate
     MediumEditor.statics = {
         ButtonsData: ButtonsData,
+        DefaultButton: DefaultButton,
+        AnchorExtension: AnchorExtension,
+        FontSizeExtension: FontSizeExtension,
         Toolbar: Toolbar,
         AnchorPreview: AnchorPreview
     };
