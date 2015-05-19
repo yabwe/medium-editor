@@ -1,5 +1,5 @@
-/*global Util, ButtonsData, DefaultButton,
- Selection, AnchorExtension, FontSizeExtension, Extension, extensionDefaults,
+/*global Util, ButtonsData, Button,
+ Selection, AnchorForm, FontSizeForm, Extension, extensionDefaults,
  Toolbar, AnchorPreview, AutoLink, ImageDragging,
  Events, Placeholders, editorDefaults */
 
@@ -374,13 +374,13 @@ function MediumEditor(elements, options) {
                 ext = initExtension(extensions[buttonName], buttonName, this);
                 this.commands.push(ext);
             } else if (buttonName === 'anchor') {
-                ext = initExtension(new AnchorExtension(), buttonName, this);
+                ext = initExtension(new AnchorForm(), buttonName, this);
                 this.commands.push(ext);
             } else if (buttonName === 'fontsize') {
-                ext = initExtension(new FontSizeExtension(), buttonName, this);
+                ext = initExtension(new FontSizeForm(), buttonName, this);
                 this.commands.push(ext);
             } else if (ButtonsData.hasOwnProperty(buttonName)) {
-                ext = new DefaultButton(ButtonsData[buttonName], this);
+                ext = initExtension(new Button(ButtonsData[buttonName]), buttonName, this);
                 this.commands.push(ext);
             }
         }, this);
@@ -467,9 +467,6 @@ function MediumEditor(elements, options) {
     // deprecate
     MediumEditor.statics = {
         ButtonsData: ButtonsData,
-        DefaultButton: DefaultButton,
-        AnchorExtension: AnchorExtension,
-        FontSizeExtension: FontSizeExtension,
         Toolbar: Toolbar,
         AnchorPreview: AnchorPreview
     };

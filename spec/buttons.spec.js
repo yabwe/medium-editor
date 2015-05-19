@@ -1,4 +1,4 @@
-/*global MediumEditor, describe, it, expect, spyOn,
+/*global MediumEditor, describe, it, expect, spyOn, AnchorForm,
          afterEach, beforeEach, jasmine, fireEvent, setupTestHelpers,
          selectElementContentsAndFire, isOldIE, isIE */
 
@@ -502,7 +502,7 @@ describe('Buttons TestCase', function () {
         });
 
         it('button should call the anchorExtension.showForm() method', function () {
-            spyOn(MediumEditor.statics.AnchorExtension.prototype, 'showForm');
+            spyOn(AnchorForm.prototype, 'showForm');
             var button,
                 editor = this.newMediumEditor('.editor');
             selectElementContentsAndFire(editor.elements[0]);
