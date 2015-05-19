@@ -2245,8 +2245,10 @@ var Events;
     };
 }());
 
+/* istanbul ignore next */
 var DefaultButton;
 
+/* istanbul ignore next */
 (function () {
     'use strict';
 
@@ -2812,8 +2814,10 @@ var AnchorForm;
     });
 }());
 
+/* istanbul ignore next */
 var AnchorExtension;
 
+/* istanbul ignore next */
 (function () {
     'use strict';
 
@@ -3722,8 +3726,10 @@ var FontSizeForm;
     });
 }());
 
+/* istanbul ignore next */
 var FontSizeExtension;
 
+/* istanbul ignore next */
 (function () {
     'use strict';
 

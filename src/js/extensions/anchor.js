@@ -1,7 +1,9 @@
 /*global Util, Selection, DefaultButton */
 
+/* istanbul ignore next */
 var AnchorExtension;
 
+/* istanbul ignore next */
 (function () {
     'use strict';
 

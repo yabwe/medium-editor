@@ -1,7 +1,9 @@
 /*global Util, DefaultButton, Selection */
 
+/* istanbul ignore next */
 var FontSizeExtension;
 
+/* istanbul ignore next */
 (function () {
     'use strict';
 

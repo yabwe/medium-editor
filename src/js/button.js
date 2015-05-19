@@ -1,7 +1,9 @@
 /*global Util */
 
+/* istanbul ignore next */
 var DefaultButton;
 
+/* istanbul ignore next */
 (function () {
     'use strict';
 
