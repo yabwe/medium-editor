@@ -1,7 +1,7 @@
 /*global describe, it, expect, spyOn,
     fireEvent, afterEach, beforeEach, selectElementContents,
-    setupTestHelpers, placeCursorInsideElement, isFirefox, Util,
-    selectElementContentsAndFire */
+    setupTestHelpers, placeCursorInsideElement, isFirefox, isIE,
+    Util, selectElementContentsAndFire */
 
 describe('Content TestCase', function () {
     'use strict';
@@ -18,12 +18,24 @@ describe('Content TestCase', function () {
     it('should removing paragraphs when a list is inserted inside of it', function () {
         this.el.innerHTML = '<p>lorem ipsum<ul><li>dolor</li></ul></p>';
         var editor = this.newMediumEditor('.editor', {
-            buttons: ['orderedlist']
-        }),
-            target = editor.elements[0].querySelector('p');
+                buttons: ['orderedlist']
+            }),
+            target = editor.elements[0].querySelector('p'),
+            range, sel;
         selectElementContentsAndFire(target);
         fireEvent(editor.toolbar.getToolbarElement().querySelector('[data-action="insertorderedlist"]'), 'click');
         expect(this.el.innerHTML).toMatch(/^<ol><li>lorem ipsum(<br>)?<\/li><\/ol><ul><li>dolor<\/li><\/ul>?/);
+
+        // for Chrome & Safari we manually moved the caret so let's check it
+        if (!isFirefox() && !isIE()) {
+            // ensure the cursor is positioned right after the text
+            sel = document.getSelection();
+            expect(sel.rangeCount).toBe(1);
+
+            range = sel.getRangeAt(0);
+            expect(range.endOffset).toBe('lorem ipsum'.length);
+            expect(range.startOffset).toBe('lorem ipsum'.length);
+        }
     });
 
     describe('when the tab key is pressed', function () {

@@ -800,25 +800,26 @@ var Util;
             return false;
         },
 
-        cleanListDOM: function (element) {
-            if (element.tagName.toLowerCase() === 'li') {
-                var list = element.parentElement;
-                if (list.parentElement.tagName.toLowerCase() === 'p') { // yes we need to clean up
-                    this.unwrapElement(list.parentElement);
-                }
+        cleanListDOM: function (ownerDocument, element) {
+            if (element.tagName.toLowerCase() !== 'li') {
+                return;
+            }
+
+            var list = element.parentElement;
+
+            if (list.parentElement.tagName.toLowerCase() === 'p') { // yes we need to clean up
+                this.unwrap(list.parentElement, ownerDocument);
+
+                // move cursor at the end of the text inside the list
+                // for some unknown reason, the cursor is moved to end of the "visual" line
+                Selection.moveCursor(ownerDocument, element.firstChild, element.firstChild.textContent.length);
             }
         },
 
         unwrapElement: function (element) {
-            var parent = element.parentNode,
-                current = element.firstChild,
-                next;
-            do {
-                next = current.nextSibling;
-                parent.insertBefore(current, element);
-                current = next;
-            } while (current);
-            parent.removeChild(element);
+            this.deprecated('unwrapElement', 'unwrap', 'v5.0.0');
+
+            this.unwrap(element, element.ownerDocument);
         },
 
         /* splitDOMTree
@@ -1730,6 +1731,27 @@ var Selection;
                 sel = doc.getSelection();
 
             range.selectNodeContents(node);
+            sel.removeAllRanges();
+            sel.addRange(range);
+        },
+
+        /**
+         * Move cursor to the given node with the given offset.
+         *
+         * @param  {DomDocument} doc     Current document
+         * @param  {DomElement}  node    Element where to jump
+         * @param  {integer}     offset  Where in the element should we jump, 0 by default
+         */
+        moveCursor: function (doc, node, offset) {
+            var range, sel,
+                startOffset = offset || 0;
+
+            range = doc.createRange();
+            sel = doc.getSelection();
+
+            range.setStart(node, startOffset);
+            range.collapse(true);
+
             sel.removeAllRanges();
             sel.addRange(range);
         }
@@ -4265,7 +4287,7 @@ function MediumEditor(elements, options) {
     }
 
     function handleBlockDeleteKeydowns(event) {
-        var range, sel, p, node = Util.getSelectionStart(this.options.ownerDocument),
+        var p, node = Util.getSelectionStart(this.options.ownerDocument),
             tagName = node.tagName.toLowerCase(),
             isEmpty = /^(\s+|<br\/?>)?$/i,
             isHeader = /h\d/i;
@@ -4307,14 +4329,7 @@ function MediumEditor(elements, options) {
             // Instead, delete the paragraph node and move the cursor to the begining of the h1
 
             // remove node and move cursor to start of header
-            range = this.options.ownerDocument.createRange();
-            sel = this.options.ownerDocument.getSelection();
-
-            range.setStart(node.nextElementSibling, 0);
-            range.collapse(true);
-
-            sel.removeAllRanges();
-            sel.addRange(range);
+            Selection.moveCursor(this.options.ownerDocument, node.nextElementSibling);
 
             node.previousElementSibling.parentNode.removeChild(node);
 
@@ -4328,6 +4343,7 @@ function MediumEditor(elements, options) {
                 // parent also does not have a sibling
                 !node.parentElement.previousElementSibling &&
                 // is not the only li in a list
+                node.nextElementSibling &&
                 node.nextElementSibling.tagName.toLowerCase() === 'li') {
             // backspacing in an empty first list element in the first list (with more elements) ex:
             //  <ul><li>[CURSOR]</li><li>List Item 2</li></ul>
@@ -4343,12 +4359,7 @@ function MediumEditor(elements, options) {
             node.parentElement.parentElement.insertBefore(p, node.parentElement);
 
             // move the cursor into the new paragraph
-            range = this.options.ownerDocument.createRange();
-            sel = this.options.ownerDocument.getSelection();
-            range.setStart(p, 0);
-            range.collapse(true);
-            sel.removeAllRanges();
-            sel.addRange(range);
+            Selection.moveCursor(this.options.ownerDocument, p);
 
             // remove the list element
             node.parentElement.removeChild(node);
@@ -4936,7 +4947,7 @@ function MediumEditor(elements, options) {
 
             // do some DOM clean-up for known browser issues after the action
             if (action === 'insertunorderedlist' || action === 'insertorderedlist') {
-                Util.cleanListDOM(this.getSelectedParentElement());
+                Util.cleanListDOM(this.options.ownerDocument, this.getSelectedParentElement());
             }
 
             this.checkSelection();
