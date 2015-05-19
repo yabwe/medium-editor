@@ -1,7 +1,7 @@
 /*global describe, it, expect, spyOn,
     fireEvent, afterEach, beforeEach, selectElementContents,
-    setupTestHelpers, placeCursorInsideElement, isFirefox, Util,
-    selectElementContentsAndFire */
+    setupTestHelpers, placeCursorInsideElement, isFirefox, isIE,
+    Util, selectElementContentsAndFire */
 
 describe('Content TestCase', function () {
     'use strict';
@@ -26,13 +26,16 @@ describe('Content TestCase', function () {
         fireEvent(editor.toolbar.getToolbarElement().querySelector('[data-action="insertorderedlist"]'), 'click');
         expect(this.el.innerHTML).toMatch(/^<ol><li>lorem ipsum(<br>)?<\/li><\/ol><ul><li>dolor<\/li><\/ul>?/);
 
-        // ensure the cursor is positioned right after the text
-        sel = document.getSelection();
-        expect(sel.rangeCount).toBe(1);
+        // for Chrome & Safari we manually moved the caret so let's check it
+        if (!isFirefox() && !isIE()) {
+            // ensure the cursor is positioned right after the text
+            sel = document.getSelection();
+            expect(sel.rangeCount).toBe(1);
 
-        range = sel.getRangeAt(0);
-        expect(range.endOffset).toBe('lorem ipsum'.length);
-        expect(range.startOffset).toBe('lorem ipsum'.length);
+            range = sel.getRangeAt(0);
+            expect(range.endOffset).toBe('lorem ipsum'.length);
+            expect(range.startOffset).toBe('lorem ipsum'.length);
+        }
     });
 
     describe('when the tab key is pressed', function () {
