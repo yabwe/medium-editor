@@ -14,7 +14,7 @@ MediumEditor has been written using vanilla JavaScript, no additional frameworks
 
 [![NPM info](https://nodei.co/npm/medium-editor.png?downloads=true)](https://www.npmjs.com/package/medium-editor)
 
-[![Travis build status](http://img.shields.io/travis/daviferreira/medium-editor.svg?style=flat-square)](https://travis-ci.org/daviferreira/medium-editor)
+[![Travis build status](http://img.shields.io/travis/daviferreira/medium-editor/master.svg?style=flat-square)](https://travis-ci.org/daviferreira/medium-editor)
 [![dependencies](http://img.shields.io/david/daviferreira/medium-editor.svg?style=flat-square)](https://david-dm.org/daviferreira/medium-editor)
 [![devDependency Status](http://img.shields.io/david/dev/daviferreira/medium-editor.svg?style=flat-square)](https://david-dm.org/daviferreira/medium-editor#info=devDependencies)
 [![Coverage Status](http://img.shields.io/coveralls/daviferreira/medium-editor.svg?style=flat-square)](https://coveralls.io/r/daviferreira/medium-editor?branch=master)
