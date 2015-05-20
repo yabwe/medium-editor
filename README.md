@@ -72,9 +72,7 @@ MediumEditor also supports textarea. If you provide a textarea element, the scri
 
 ### Core options
 * __allowMultiParagraphSelection__: enables the toolbar when selecting multiple paragraphs/block elements. Default: true
-* __anchorPreviewHideDelay__: time in milliseconds to show the anchor tag preview after the mouse has left the anchor tag. Default: 500
 * __delay__: time in milliseconds to show the toolbar or anchor tag preview. Default: 0
-* __disableAnchorPreview__: enables/disables the anchor preview element, which appears when hovering links and allows the user to edit the link when clicking. If toolbar is diabled (via __disableToolbar__ or `data-disable-toolbar attribute`) the anchor preview is always disabled so this option will be ignored. Default: false
 * __autoLink__: enables/disables the auto-link feature, which automatically turns URLs entered into the text field into HTML anchor tags (similar to the functionality of Markdown). Default: false
 * __disableReturn__:  enables/disables the use of the return-key. You can also set specific element behavior by using setting a data-disable-return attribute. Default: false
 * __disableDoubleReturn__:  allows/disallows two (or more) empty new lines. You can also set specific element behavior by using setting a data-disable-double-return attribute. Default: false
@@ -106,12 +104,47 @@ MediumEditor also supports textarea. If you provide a textarea element, the scri
 * __toolbarAlign__: `left`|`center`|`right` - when using the __staticToolbar__ option, this aligns the static toolbar relative to the medium-editor element. Default: `center`
 * __updateOnEmptySelection__: update the state of the toolbar buttons even when the selection is collapse (there is no selection, just a cursor). Default: false
 
+### Anchor Preview options
+
+The anchor preview is a built-in extension which automatically displays a 'tooltip' when the user is hovering over a link in the editor.  The tooltip will display the `href` of the link, and when click, will open the anchor editing form in the toolbar.
+
+Options for the anchor preview 'tooltip' are passed as an object that is a member of the outer options object. Example:
+```javascript
+var editor = new MediumEditor('.editable', {
+    buttons: ['bold', 'italic', 'underline'],
+    anchorPreview: {
+        // These are the default options for anchor form, if nothing is passed this is what it used
+        hideDelay: 500,
+        previewValueSelector: 'a'
+    }
+}
+});
+```
+
+* __hideDelay__: time in milliseconds to show the anchor tag preview after the mouse has left the anchor tag. Default: 500
+* __previewValueSelector__: the default selector to locate where to put the activeAnchor value in the preview. You should only need to override this if you've modified the way in which the anchor-preview extension renders. Default: `'a'`
+
+* __disableAnchorPreview__: enables/disables the anchor preview element, which appears when hovering links and allows the user to edit the link when clicking. If toolbar is diabled (via __disableToolbar__ or `data-disable-toolbar attribute`) the anchor preview is always disabled so this option will be ignored. Default: false
+
+To disable the anchor preview, set the value of the `anchorPreview` option to `false`:
+```javascript
+var editor = new MediumEditor('.editable', {
+    anchorPreview: false
+});
+```
+##### NOTE:
+* If the toolbar is disabled (via __disableToolbar__ or `data-disable-toolbar attribute`) the anchor-preview is automatically disabled.
+* If the anchor editing form is not enabled, clicking on the anchor-preview will not allow the href of the link to be edited
+
 ### Anchor Form options
-Options for the anchor form are passed as an object that is a member of the outer options object: Example:
+
+The anchor form is a built-in button extension which allows the user to add/edit/remove links from within the editor.  When 'anchor' is passed in as a button in the list of buttons, this extension will be enabled and can be triggered by clicking the corresponding button in the toolbar.
+
+Options for the anchor form are passed as an object that is a member of the outer options object. Example:
 ```javascript
 var editor = new MediumEditor('.editable', {
     buttons: ['bold', 'italic', 'underline', 'anchor'],
-    anchor: {
+    anchorPreview: {
         // These are the default options for anchor form, if nothing is passed this is what it used
         customClassOption: null,
         customClassOptionText: 'Button',
@@ -121,7 +154,7 @@ var editor = new MediumEditor('.editable', {
         targetCheckboxText: 'Open in new window'
     }
 }
-})
+});
 ```
 
 * __customClassOption__: custom class name the user can optionally have added to their created links (ie 'button').  If passed as a non-empty string, a checkbox will be displayed allowing the user to choose whether to have the class added to the created link or not. Default: null
@@ -132,7 +165,10 @@ var editor = new MediumEditor('.editable', {
 * __targetCheckboxText__: text to be shown in the checkbox enabled via the __targetCheckbox__ option. Default: `'Open in new window'`
 
 ### Paste Options
-Options for paste are passed as an object that is a member of the outer options object. Example:
+
+The paste handler is a built-in extension which attempts to filter the content when the user pastes.  How the paste handler filters is configurable via specific options.
+
+Options for paste handling are passed as an object that is a member of the outer options object. Example:
 ```javascript
 var editor = new MediumEditor('.editable', {
     buttons: ['bold', 'italic', 'quote'],
