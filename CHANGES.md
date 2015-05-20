@@ -1,3 +1,14 @@
+4.10.0 / 2015-05-20
+==================
+* Fix paste issue with plain-text containing multiple paragraphs
+* Fix issue with incorrect cursor positon after creating a list
+* Fix disabledDoubleReturn option within a sentence
+* Allow for nested contenteditables
+* New style of passing options for anchor-preview and anchor
+* Introduce extensions.button + extensions.form as extendable base extensions
+* Convert anchor, fontsize, and anchor-preview to updated extensions model
+
+
 4.9.0 / 2015-05-18
 ==================
 * New auto-link support for detecting urls and converting them to links
