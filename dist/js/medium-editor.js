@@ -1603,9 +1603,19 @@ var Selection;
         },
 
         selectionInContentEditableFalse: function (contentWindow) {
-            return this.findMatchingSelectionParent(function (el) {
-                return (el && el.nodeName !== '#text' && el.getAttribute('contenteditable') === 'false');
-            }, contentWindow);
+            // determine if the current selection is exclusively inside
+            // a contenteditable="false", though treat the case of an
+            // explicit contenteditable="true" inside a "false" as false.
+            var sawtrue,
+                sawfalse = this.findMatchingSelectionParent(function (el) {
+                    var ce = el && el.getAttribute('contenteditable');
+                    if (ce === 'true') {
+                        sawtrue = true;
+                    }
+                    return el.nodeName !== '#text' && ce === 'false';
+                }, contentWindow);
+
+            return !sawtrue && sawfalse;
         },
 
         // http://stackoverflow.com/questions/4176923/html-of-selected-text
