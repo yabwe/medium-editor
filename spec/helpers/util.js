@@ -90,7 +90,34 @@ function dataURItoBlob(dataURI) {
 }
 
 // keyCode, ctrlKey, target, relatedTarget, shiftKey
-function fireEvent(element, event, options) {
+function fireEvent(element, eventName, options) {
+    var evt = prepareEvent(
+        element,
+        eventName,
+        options
+    );
+
+    return firePreparedEvent(evt, element, eventName);
+}
+
+/**
+ * prepareEvent works with firePreparedEvent.
+ *
+ * It allows test to:
+ *     - create the event
+ *     - spy a method on this event
+ *     - fire the event
+ *
+ * Example:
+ *     var p = document.querySelector('p');
+ *     var evt = prepareEvent(p, 'keydown', { keyCode: Util.keyCode.ENTER });
+ *     spyOn(evt, 'preventDefault').and.callThrough();
+ *     firePreparedEvent(evt, p, 'keydown');
+ *     expect(evt.preventDefault).toHaveBeenCalled();
+ *
+ * You can see a live example for tests related to `disableDoubleReturn`
+ */
+function prepareEvent (element, eventName, options) {
     var evt;
 
     options = options || {};
@@ -98,7 +125,7 @@ function fireEvent(element, event, options) {
     if (document.createEvent) {
         // dispatch for firefox + others
         evt = document.createEvent('HTMLEvents');
-        evt.initEvent(event, true, true); // event type,bubbling,cancelable
+        evt.initEvent(eventName, true, true); // event type,bubbling,cancelable
 
         evt.currentTarget = options.currentTarget ? options.currentTarget : element;
 
@@ -127,7 +154,7 @@ function fireEvent(element, event, options) {
             evt.shiftKey = true;
         }
 
-        if (event.indexOf('drag') !== -1 || event === 'drop') {
+        if (eventName.indexOf('drag') !== -1 || eventName === 'drop') {
             evt.dataTransfer = {
                 dropEffect: ''
             };
@@ -135,12 +162,23 @@ function fireEvent(element, event, options) {
                 evt.dataTransfer.files = [dataURItoBlob('data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7')];
             }
         }
-        return !element.dispatchEvent(evt);
+    } else {
+        // dispatch for IE
+        evt = document.createEventObject();
     }
 
-    // dispatch for IE
-    evt = document.createEventObject();
-    return element.fireEvent('on' + event, evt);
+    return evt;
+}
+
+/**
+ * @see prepareEvent
+ */
+function firePreparedEvent (event, element, eventName) {
+    if (document.createEvent) {
+        return !element.dispatchEvent(event);
+    }
+
+    return element.fireEvent('on' + eventName, event);
 }
 
 function placeCursorInsideElement(el, index) {

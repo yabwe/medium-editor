@@ -1,7 +1,7 @@
 /*global describe, it, expect, spyOn,
-    fireEvent, afterEach, beforeEach, selectElementContents,
-    setupTestHelpers, placeCursorInsideElement, isFirefox, isIE,
-    Util, selectElementContentsAndFire */
+    fireEvent, prepareEvent, firePreparedEvent, afterEach, beforeEach,
+    selectElementContents, setupTestHelpers, placeCursorInsideElement,
+    isFirefox, isIE, Util, selectElementContentsAndFire */
 
 describe('Content TestCase', function () {
     'use strict';
@@ -81,26 +81,100 @@ describe('Content TestCase', function () {
     describe('when the enter key is pressed', function () {
         it('should prevent new lines from being inserted when disableReturn options is true', function () {
             this.el.innerHTML = 'lorem ipsum';
-            var editor = this.newMediumEditor('.editor', {
-                disableReturn: true
-            });
-            selectElementContents(editor.elements[0]);
-            fireEvent(editor.elements[0], 'keydown', {
+
+            var editor = this.newMediumEditor('.editor', { disableReturn: true }),
+                evt;
+
+            placeCursorInsideElement(editor.elements[0], 0);
+
+            evt = prepareEvent(editor.elements[0], 'keydown', {
                 keyCode: Util.keyCode.ENTER
             });
-            expect(this.el.innerHTML).toBe('lorem ipsum');
+
+            spyOn(evt, 'preventDefault').and.callThrough();
+
+            firePreparedEvent(evt, editor.elements[0], 'keydown');
+
+            expect(evt.preventDefault).toHaveBeenCalled();
+        });
+
+        it('should prevent new lines from being inserted when data-disable-return is defined', function () {
+            this.el.innerHTML = 'lorem ipsum';
+            this.el.setAttribute('data-disable-return', true);
+
+            var editor = this.newMediumEditor('.editor'),
+                evt;
+
+            placeCursorInsideElement(editor.elements[0], 0);
+
+            evt = prepareEvent(editor.elements[0], 'keydown', {
+                keyCode: Util.keyCode.ENTER
+            });
+
+            spyOn(evt, 'preventDefault').and.callThrough();
+
+            firePreparedEvent(evt, editor.elements[0], 'keydown');
+
+            expect(evt.preventDefault).toHaveBeenCalled();
         });
 
         it('should prevent consecutive new lines from being inserted when disableDoubleReturn is true', function () {
-            this.el.innerHTML = '<br> ';
-            var editor = this.newMediumEditor('.editor', {
-                disableDoubleReturn: true
-            });
-            selectElementContents(editor.elements[0]);
-            fireEvent(editor.elements[0], 'keydown', {
+            this.el.innerHTML = '<p><br></p>';
+            var editor = this.newMediumEditor('.editor', { disableDoubleReturn: true }),
+                p = editor.elements[0].querySelector('p'),
+                evt;
+
+            placeCursorInsideElement(p, 0);
+
+            evt = prepareEvent(p, 'keydown', {
                 keyCode: Util.keyCode.ENTER
             });
-            expect(this.el.innerHTML).toBe('<br> ');
+
+            spyOn(evt, 'preventDefault').and.callThrough();
+
+            firePreparedEvent(evt, p, 'keydown');
+
+            expect(evt.preventDefault).toHaveBeenCalled();
+        });
+
+        it('should prevent consecutive new lines from being inserted when data-disable-double-return is defined', function () {
+            this.el.innerHTML = '<p><br></p>';
+            this.el.setAttribute('data-disable-return', true);
+
+            var editor = this.newMediumEditor('.editor'),
+                p = editor.elements[0].querySelector('p'),
+                evt;
+
+            placeCursorInsideElement(p, 0);
+
+            evt = prepareEvent(p, 'keydown', {
+                keyCode: Util.keyCode.ENTER
+            });
+
+            spyOn(evt, 'preventDefault').and.callThrough();
+
+            firePreparedEvent(evt, p, 'keydown');
+
+            expect(evt.preventDefault).toHaveBeenCalled();
+        });
+
+        it('should prevent consecutive new lines from being inserted inside a sentence when disableDoubleReturn is true', function () {
+            this.el.innerHTML = '<p>hello</p><p><br></p><p>word</p>';
+            var editor = this.newMediumEditor('.editor', { disableDoubleReturn: true }),
+                p = editor.elements[0].getElementsByTagName('p')[2],
+                evt;
+
+            placeCursorInsideElement(p, 0);
+
+            evt = prepareEvent(p, 'keydown', {
+                keyCode: Util.keyCode.ENTER
+            });
+
+            spyOn(evt, 'preventDefault').and.callThrough();
+
+            firePreparedEvent(evt, p, 'keydown');
+
+            expect(evt.preventDefault).toHaveBeenCalled();
         });
 
         it('should call formatBlock when inside a non-header and non-anchor', function () {
