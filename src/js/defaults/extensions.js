@@ -1,6 +1,7 @@
 /*global Button, FormExtension,
     AnchorForm, AnchorPreview, AutoLink,
-    FontSizeForm, ImageDragging, PasteHandler */
+    FontSizeForm, ImageDragging, PasteHandler,
+    Placeholder */
 
 var extensionDefaults;
 (function () {
@@ -15,6 +16,7 @@ var extensionDefaults;
         autoLink: AutoLink,
         fontSize: FontSizeForm,
         imageDragging: ImageDragging,
-        paste: PasteHandler
+        paste: PasteHandler,
+        placeholder: Placeholder
     };
 })();

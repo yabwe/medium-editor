@@ -1,19 +1,31 @@
-var Placeholders;
+var Placeholder;
 
 (function () {
     'use strict';
 
-    Placeholders = function (instance) {
-        this.base = instance;
+    /*global Extension */
 
-        this.initPlaceholders();
-        this.attachEventHandlers();
-    };
+    Placeholder = Extension.extend({
+        name: 'placeholder',
+        parent: true,
 
-    Placeholders.prototype = {
+        /* Placeholder Options */
+
+        /* text: [string]
+         * Text to display in the placeholder
+         */
+        text: 'Type your text',
+
+        init: function () {
+            this.initPlaceholders();
+            this.attachEventHandlers();
+        },
 
         initPlaceholders: function () {
             this.base.elements.forEach(function (el) {
+                if (!el.getAttribute('data-placeholder')) {
+                    el.setAttribute('data-placeholder', this.text);
+                }
                 this.updatePlaceholder(el);
             }, this);
         },
@@ -66,6 +78,5 @@ var Placeholders;
             // Update all placeholders
             this.initPlaceholders();
         }
-    };
-
+    });
 }());
