@@ -1,5 +1,6 @@
 /*global MediumEditor, describe, it,  expect, spyOn, AnchorForm,
-    afterEach, beforeEach, jasmine, fireEvent, setupTestHelpers */
+    afterEach, beforeEach, jasmine, fireEvent, setupTestHelpers,
+    AnchorPreview */
 
 describe('Anchor Preview TestCase', function () {
     'use strict';
@@ -29,7 +30,7 @@ describe('Anchor Preview TestCase', function () {
                 nextRange;
 
             // show preview
-            spyOn(MediumEditor.statics.AnchorPreview.prototype, 'showPreview').and.callThrough();
+            spyOn(AnchorPreview.prototype, 'showPreview').and.callThrough();
             fireEvent(document.getElementById('test-link'), 'mouseover');
 
             // preview shows only after delay
@@ -64,7 +65,7 @@ describe('Anchor Preview TestCase', function () {
             anchorPreview = editor.getExtensionByName('anchor-preview');
 
             // show preview
-            spyOn(MediumEditor.statics.AnchorPreview.prototype, 'showPreview').and.callThrough();
+            spyOn(AnchorPreview.prototype, 'showPreview').and.callThrough();
             fireEvent(document.getElementById('test-markup-link'), 'mouseover');
 
             // preview shows only after delay
@@ -135,7 +136,7 @@ describe('Anchor Preview TestCase', function () {
                 anchorPreview = editor.getExtensionByName('anchor-preview');
 
             // show preview
-            spyOn(MediumEditor.statics.AnchorPreview.prototype, 'showPreview').and.callThrough();
+            spyOn(AnchorPreview.prototype, 'showPreview').and.callThrough();
             fireEvent(document.getElementById('test-empty-link'), 'mouseover');
 
             // preview shows only after delay
@@ -143,7 +144,17 @@ describe('Anchor Preview TestCase', function () {
             expect(anchorPreview.showPreview).not.toHaveBeenCalled();
         });
 
-        it('should not be present when disableAnchorPreview option is passed', function () {
+        it('should not be present when anchorPreview option is set to false', function () {
+            var editor = this.newMediumEditor('.editor', {
+                anchorPreview: false
+            }),
+                anchorPreview = editor.getExtensionByName('anchor-preview');
+
+            expect(anchorPreview).toBeUndefined();
+            expect(document.querySelector('.medium-editor-anchor-preview')).toBeNull();
+        });
+
+        it('should not be present when deprecated disableAnchorPreview option is passed', function () {
             var editor = this.newMediumEditor('.editor', {
                 disableAnchorPreview: true
             }),
@@ -167,7 +178,7 @@ describe('Anchor Preview TestCase', function () {
             var editor = this.newMediumEditor('.editor'),
                 anchorPreview = editor.getExtensionByName('anchor-preview');
 
-            spyOn(MediumEditor.statics.AnchorPreview.prototype, 'deactivate').and.callThrough();
+            spyOn(AnchorPreview.prototype, 'deactivate').and.callThrough();
             expect(document.querySelector('.medium-editor-anchor-preview')).not.toBeNull();
             expect(document.querySelector('.medium-editor-anchor-preview-active')).toBeNull();
 

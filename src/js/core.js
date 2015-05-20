@@ -1,7 +1,7 @@
 /*global Util, ButtonsData, Button,
  Selection, FontSizeForm, Extension, extensionDefaults,
- Toolbar, AnchorPreview, AutoLink, ImageDragging,
- Events, Placeholders, editorDefaults,
+ Toolbar, AutoLink, ImageDragging, Events, Placeholders,
+ editorDefaults,
  DefaultButton, AnchorExtension, FontSizeExtension, AnchorPreviewDeprecated */
 
 function MediumEditor(elements, options) {

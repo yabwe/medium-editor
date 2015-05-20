@@ -124,8 +124,6 @@ var editor = new MediumEditor('.editable', {
 * __hideDelay__: time in milliseconds to show the anchor tag preview after the mouse has left the anchor tag. Default: 500
 * __previewValueSelector__: the default selector to locate where to put the activeAnchor value in the preview. You should only need to override this if you've modified the way in which the anchor-preview extension renders. Default: `'a'`
 
-* __disableAnchorPreview__: enables/disables the anchor preview element, which appears when hovering links and allows the user to edit the link when clicking. If toolbar is diabled (via __disableToolbar__ or `data-disable-toolbar attribute`) the anchor preview is always disabled so this option will be ignored. Default: false
-
 To disable the anchor preview, set the value of the `anchorPreview` option to `false`:
 ```javascript
 var editor = new MediumEditor('.editable', {

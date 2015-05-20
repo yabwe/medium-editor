@@ -1,5 +1,6 @@
 /*global MediumEditor, describe, it, expect, spyOn,
-    AnchorForm, afterEach, beforeEach, setupTestHelpers, _ */
+    AnchorForm, afterEach, beforeEach, setupTestHelpers, _,
+    AnchorPreview */
 
 describe('Initialization TestCase', function () {
     'use strict';
@@ -96,7 +97,6 @@ describe('Initialization TestCase', function () {
                 disableDoubleReturn: false,
                 disableEditing: false,
                 disableToolbar: false,
-                disableAnchorPreview: false,
                 disablePlaceholders: false,
                 autoLink: false,
                 toolbarAlign: 'center',
@@ -112,7 +112,6 @@ describe('Initialization TestCase', function () {
                 buttons: ['bold', 'italic', 'underline', 'anchor', 'header1', 'header2', 'quote'],
                 buttonLabels: false,
                 targetBlank: false,
-                anchorPreviewHideDelay: 500,
                 extensions: {},
                 activeButtonClass: 'medium-editor-button-active',
                 firstButtonClass: 'medium-editor-button-first',
@@ -150,7 +149,7 @@ describe('Initialization TestCase', function () {
             spyOn(MediumEditor.prototype, 'setup').and.callThrough();
             spyOn(MediumEditor.statics.Toolbar.prototype, 'createToolbar').and.callThrough();
             spyOn(AnchorForm.prototype, 'createForm').and.callThrough();
-            spyOn(MediumEditor.statics.AnchorPreview.prototype, 'createPreview').and.callThrough();
+            spyOn(AnchorPreview.prototype, 'createPreview').and.callThrough();
             var editor = this.newMediumEditor('.editor'),
                 anchorExtension = editor.getExtensionByName('anchor'),
                 anchorPreview = editor.getExtensionByName('anchor-preview');
