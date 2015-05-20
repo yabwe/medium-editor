@@ -73,7 +73,9 @@ LINK_REGEXP_TEXT =
                     try {
                         var sel = this.base.exportSelection();
                         if (this.performLinking(keyPressEvent.target)) {
-                            this.base.importSelection(sel);
+                            // pass true for favorLaterSelectionAnchor - this is needed for links at the end of a
+                            // paragraph in MS IE, or MS IE causes the link to be deleted right after adding it.
+                            this.base.importSelection(sel, true);
                         }
                     } catch (e) {
                         if (window.console) {

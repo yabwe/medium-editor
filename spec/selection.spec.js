@@ -1,7 +1,7 @@
 /*global MediumEditor, describe, it, expect, spyOn,
          afterEach, beforeEach, fireEvent,
          jasmine, selectElementContents, setupTestHelpers,
-         selectElementContentsAndFire, Selection */
+         selectElementContentsAndFire, Selection, placeCursorInsideElement */
 
 describe('Selection TestCase', function () {
     'use strict';
@@ -38,6 +38,29 @@ describe('Selection TestCase', function () {
 
             editor.importSelection(exportedSelection);
             expect(exportedSelection).toEqual(editor.exportSelection());
+        });
+
+        it('should import an exported selection outside any anchor tag', function () {
+            this.el.innerHTML = '<p id=1>Hello world: <a href="#">http://www.example.com</a></p><p id=2><br></p>';
+            var editor = this.newMediumEditor('.editor', {
+                buttons: ['italic', 'underline', 'strikethrough']
+            }),
+                link = editor.elements[0].getElementsByTagName('a')[0];
+
+            placeCursorInsideElement(link.childNodes[0], link.childNodes[0].nodeValue.length);
+
+            var exportedSelection = editor.exportSelection();
+            editor.importSelection(exportedSelection, true);
+            var range = window.getSelection().getRangeAt(0),
+                node = range.startContainer;
+            // Even though we set the range to use the P tag as the start container, Safari normalizes the range
+            // down to the text node. Setting the range to use the P tag for the start is necessary to support
+            // MSIE, where it removes the link when the cursor is placed at the end of the text node in the anchor.
+            while (node.nodeName.toLowerCase() !== 'p') {
+                node = node.parentNode;
+            }
+            expect(node.nodeName.toLowerCase()).toBe('p');
+            expect(node.getAttribute('id')).toBe('1');
         });
 
         it('should have an index in the exported selection when it is in the second contenteditable', function () {
