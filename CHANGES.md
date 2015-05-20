@@ -1,4 +1,4 @@
-4.10.0 / 2015-05-20
+4.10.1 / 2015-05-20
 ==================
 * Fix paste issue with plain-text containing multiple paragraphs
 * Fix issue with incorrect cursor positon after creating a list
