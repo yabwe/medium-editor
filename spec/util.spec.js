@@ -133,6 +133,34 @@ describe('Util', function () {
 
     });
 
+    describe('addClassToAnchors', function () {
+
+        it('add class to anchors on a A element from a A element', function () {
+            var el = this.createElement('a', '', 'lorem ipsum');
+            el.attributes.href = 'http://0.0.0.0/bar.html';
+
+            Util.addClassToAnchors(el, 'firstclass');
+
+            expect(el.classList.length).toBe(1);
+            expect(el.classList.contains('firstclass')).toBe(true);
+        });
+
+        it('add class to anchors on a A element from a DIV element', function () {
+            var el = this.createElement('div', '', '<a href="http://1.1.1.1/foo.html">foo</a> <a href="http://0.0.0.0/bar.html">bar</a>');
+
+            Util.addClassToAnchors(el, 'firstclass');
+
+            var nodes = el.getElementsByTagName('a');
+
+            expect(nodes[0].classList.length).toBe(1);
+            expect(nodes[1].classList.length).toBe(1);
+
+            expect(nodes[0].classList.contains('firstclass')).toBe(true);
+            expect(nodes[1].classList.contains('firstclass')).toBe(true);
+        });
+
+    });
+
     describe('warn', function () {
 
         it('exists', function () {
