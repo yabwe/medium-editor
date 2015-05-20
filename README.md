@@ -72,6 +72,7 @@ MediumEditor also supports textarea. If you provide a textarea element, the scri
 
 ### Core options
 * __allowMultiParagraphSelection__: enables the toolbar when selecting multiple paragraphs/block elements. Default: true
+* __anchorPreviewHideDelay__: time in milliseconds to show the anchor tag preview after the mouse has left the anchor tag. Default: 500
 * __delay__: time in milliseconds to show the toolbar or anchor tag preview. Default: 0
 * __disableAnchorPreview__: enables/disables the anchor preview element, which appears when hovering links and allows the user to edit the link when clicking. If toolbar is diabled (via __disableToolbar__ or `data-disable-toolbar attribute`) the anchor preview is always disabled so this option will be ignored. Default: false
 * __autoLink__: enables/disables the auto-link feature, which automatically turns URLs entered into the text field into HTML anchor tags (similar to the functionality of Markdown). Default: false
@@ -87,6 +88,7 @@ MediumEditor also supports textarea. If you provide a textarea element, the scri
 * __secondHeader__: HTML tag to be used as second header. Default: h4
 * __spellcheck__: Enable/disable native contentEditable automatic spellcheck. Default: true
 * __standardizeSelectionStart__: Standardizes how the beginning of a range is decided between browsers whenever the selected text is analyzed for updating toolbar buttons status
+* __targetBlank__: enables/disables target="\_blank" for anchor tags. Default: false
 
 ### Toolbar options
 * __activeButtonClass__: CSS class added to active buttons in the toolbar. Default: 'medium-editor-button-active'
@@ -104,15 +106,30 @@ MediumEditor also supports textarea. If you provide a textarea element, the scri
 * __toolbarAlign__: `left`|`center`|`right` - when using the __staticToolbar__ option, this aligns the static toolbar relative to the medium-editor element. Default: `center`
 * __updateOnEmptySelection__: update the state of the toolbar buttons even when the selection is collapse (there is no selection, just a cursor). Default: false
 
-### Anchor form options
-* __anchorButton__: enables/disables displaying a checkbox for whether the user wants the link to be displayed as a "button". If checkbox is checked, the created link will have __anchorButtonClass__ added to the class list. Default: false
-* __anchorButtonClass__: class to add to anchor tags, when __anchorButton__ is set to true. Default: btn
-* __anchorTarget__: enables/disables displaying a "Open in new window" checkbox, which when checked changes the `target` attribute of the created link. Default: false
-* __anchorInputCheckboxLabel__: text to be shown in the checkbox enabled via the __anchorTarget__ option. Default: _Open in new window_
-* __anchorInputPlaceholder__: text to be shown as placeholder of the anchor input. Default: _Paste or type a link_
-* __anchorPreviewHideDelay__: time in milliseconds to show the anchor tag preview after the mouse has left the anchor tag. Default: 500
-* __checkLinkFormat__: enables/disables check for common URL protocols on anchor links. Default: false
-* __targetBlank__: enables/disables target="\_blank" for anchor tags. Default: false
+### Anchor Form options
+Options for the anchor form are passed as an object that is a member of the outer options object: Example:
+```javascript
+var editor = new MediumEditor('.editable', {
+    buttons: ['bold', 'italic', 'underline', 'anchor'],
+    anchor: {
+        // These are the default options for anchor form, if nothing is passed this is what it used
+        customClassOption: null,
+        customClassOptionText: 'Button',
+        linkValidation: false,
+        placeholderText: 'Paste or type a link',
+        targetCheckbox: false,
+        targetCheckboxText: 'Open in new window'
+    }
+}
+})
+```
+
+* __customClassOption__: custom class name the user can optionally have added to their created links (ie 'button').  If passed as a non-empty string, a checkbox will be displayed allowing the user to choose whether to have the class added to the created link or not. Default: null
+* __customClassOptionText__: text to be shown in the checkbox when the __customClassOption__ is being used. Default: `'Button'`
+* __linkValidation__: enables/disables check for common URL protocols on anchor links. Default: false
+* __placeholderText__: text to be shown as placeholder of the anchor input. Default: `'Paste or type a link'`
+* __targetCheckbox__: enables/disables displaying a "Open in new window" checkbox, which when checked changes the `target` attribute of the created link. Default: false
+* __targetCheckboxText__: text to be shown in the checkbox enabled via the __targetCheckbox__ option. Default: `'Open in new window'`
 
 ### Paste Options
 Options for paste are passed as an object that is a member of the outer options object. Example:
@@ -140,7 +157,6 @@ var editor = new MediumEditor('.editable', {
 
 ```javascript
 var editor = new MediumEditor('.editable', {
-    anchorInputPlaceholder: 'Type a link',
     buttons: ['bold', 'italic', 'quote'],
     diffLeft: 25,
     diffTop: 10,
@@ -148,6 +164,11 @@ var editor = new MediumEditor('.editable', {
     secondHeader: 'h2',
     delay: 1000,
     targetBlank: true,
+    anchor: {
+        placeholderText: 'Type a link',
+        customClassOption: 'btn',
+        customClassOptionText: 'Create Button'
+    },
     paste: {
         cleanPastedHTML: true,
         cleanAttrs: ['style', 'dir'],

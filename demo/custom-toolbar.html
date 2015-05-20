@@ -28,7 +28,9 @@
         var editor = new MediumEditor('.editable', {
                 buttons: ['bold', 'italic', 'underline', 'strikethrough', 'quote', 'anchor', 'image', 'justifyLeft', 'justifyCenter', 'justifyRight', 'justifyFull', 'superscript', 'subscript', 'orderedlist', 'unorderedlist', 'pre', 'removeFormat', 'outdent', 'indent', 'header1', 'header2'],
                 buttonLabels: 'fontawesome',
-                anchorTarget: true,
+                anchor: {
+                    targetCheckbox: true
+                }
             });
         var editor2 = new MediumEditor('.secondEditable', {
                 buttons: ['bold', 'italic', 'underline', 'anchor'],

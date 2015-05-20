@@ -6,6 +6,46 @@ var AnchorForm;
 
     AnchorForm = FormExtension.extend({
 
+        /* Anchor Form Options */
+
+        /* customClassOption: [string]  (previously options.anchorButton + options.anchorButtonClass)
+         * Custom class name the user can optionally have added to their created links (ie 'button').
+         * If passed as a non-empty string, a checkbox will be displayed allowing the user to choose
+         * whether to have the class added to the created link or not.
+         */
+        customClassOption: null,
+
+        /* customClassOptionText: [string]
+         * text to be shown in the checkbox when the __customClassOption__ is being used.
+         */
+        customClassOptionText: 'Button',
+
+        /* linkValidation: [boolean]  (previously options.checkLinkFormat)
+         * enables/disables check for common URL protocols on anchor links.
+         */
+        linkValidation: false,
+
+        /* placeholderText: [string]  (previously options.anchorInputPlaceholder)
+         * text to be shown as placeholder of the anchor input.
+         */
+        placeholderText: 'Paste or type a link',
+
+        /* targetCheckbox: [boolean]  (previously options.anchorTarget)
+         * enables/disables displaying a "Open in new window" checkbox, which when checked
+         * changes the `target` attribute of the created link.
+         */
+        targetCheckbox: false,
+
+        /* targetCheckboxText: [string]  (previously options.anchorInputCheckboxLabel)
+         * text to be shown in the checkbox enabled via the __targetCheckbox__ option.
+         */
+        targetCheckboxText: 'Open in new window',
+
+        /* ----- internal options needed from base ----- */
+        'window': window,
+        'document': document,
+
+        // Options for the Button base class
         name: 'anchor',
         action: 'createLink',
         aria: 'link',
@@ -20,7 +60,7 @@ var AnchorForm;
             evt.preventDefault();
             evt.stopPropagation();
 
-            var selectedParentElement = Selection.getSelectedParentElement(Util.getSelectionRange(this.base.options.ownerDocument));
+            var selectedParentElement = Selection.getSelectedParentElement(Util.getSelectionRange(this.document));
             if (selectedParentElement.tagName &&
                     selectedParentElement.tagName.toLowerCase() === 'a') {
                 return this.base.execAction('unlink');
@@ -54,7 +94,7 @@ var AnchorForm;
         getTemplate: function () {
 
             var template = [
-                '<input type="text" class="medium-editor-toolbar-input" placeholder="', this.base.options.anchorInputPlaceholder, '">'
+                '<input type="text" class="medium-editor-toolbar-input" placeholder="', this.placeholderText, '">'
             ];
 
             template.push(
@@ -70,23 +110,25 @@ var AnchorForm;
             // both of these options are slightly moot with the ability to
             // override the various form buildup/serialize functions.
 
-            if (this.base.options.anchorTarget) {
-                // fixme: ideally, this options.anchorInputCheckboxLabel would be a formLabel too,
+            if (this.targetCheckbox) {
+                // fixme: ideally, this targetCheckboxText would be a formLabel too,
                 // figure out how to deprecate? also consider `fa-` icon default implcations.
                 template.push(
                     '<input type="checkbox" class="medium-editor-toolbar-anchor-target">',
                     '<label>',
-                    this.base.options.anchorInputCheckboxLabel,
+                    this.targetCheckboxText,
                     '</label>'
                 );
             }
 
-            if (this.base.options.anchorButton) {
+            if (this.customClassOption) {
                 // fixme: expose this `Button` text as a formLabel property, too
                 // and provide similar access to a `fa-` icon default.
                 template.push(
                     '<input type="checkbox" class="medium-editor-toolbar-anchor-button">',
-                    '<label>Button</label>'
+                    '<label>',
+                    this.customClassOptionText,
+                    '</label>'
                 );
             }
 
@@ -139,7 +181,7 @@ var AnchorForm;
                     url: this.getInput().value
                 };
 
-            if (this.base.options.checkLinkFormat) {
+            if (this.linkValidation) {
                 opts.url = this.checkLinkFormat(opts.url);
             }
 
@@ -150,7 +192,7 @@ var AnchorForm;
             }
 
             if (buttonCheckbox && buttonCheckbox.checked) {
-                opts.buttonClass = this.base.options.anchorButtonClass;
+                opts.buttonClass = this.customClassOption;
             }
 
             return opts;
@@ -199,7 +241,7 @@ var AnchorForm;
         },
 
         createForm: function () {
-            var doc = this.base.options.ownerDocument,
+            var doc = this.document,
                 form = doc.createElement('div');
 
             // Anchor Form (div)

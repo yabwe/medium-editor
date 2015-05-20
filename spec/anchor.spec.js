@@ -84,9 +84,26 @@ describe('Anchor Button TestCase', function () {
             });
             expect(editor.elements[0].querySelector('a')).toBeNull();
         });
-        it('should add http:// if need be and checkLinkFormat option is set to true', function () {
+        it('should add http:// if need be and linkValidation option is set to true', function () {
             var editor = this.newMediumEditor('.editor', {
-                checkLinkFormat: true
+                anchor: {
+                    linkValidation: true
+                }
+            }),
+                link,
+                anchorExtension = editor.getExtensionByName('anchor');
+
+            selectElementContentsAndFire(editor.elements[0]);
+            anchorExtension.showForm('test.com');
+            fireEvent(anchorExtension.getForm().querySelector('a.medium-editor-toolbar-save'), 'click');
+
+            link = editor.elements[0].querySelector('a');
+            expect(link).not.toBeNull();
+            expect(link.href).toBe('http://test.com/');
+        });
+        it('should add http:// if need be and deprecated checkLinkFormat option is set to true', function () {
+            var editor = this.newMediumEditor('.editor', {
+                checkLinkFormat: true // deprecated
             }),
                 link,
                 anchorExtension = editor.getExtensionByName('anchor');
@@ -101,7 +118,9 @@ describe('Anchor Button TestCase', function () {
         });
         it('should not change protocol when a valid one is included', function () {
             var editor = this.newMediumEditor('.editor', {
-                checkLinkFormat: true
+                anchor: {
+                    linkValidation: true
+                }
             }),
                 validUrl = 'mailto:test.com',
                 link,
@@ -117,7 +136,30 @@ describe('Anchor Button TestCase', function () {
         });
         it('should add target="_blank" when "open in a new window" checkbox is checked', function () {
             var editor = this.newMediumEditor('.editor', {
-                anchorTarget: true
+                anchor: {
+                    targetCheckbox: true
+                }
+            }),
+                anchorExtension = editor.getExtensionByName('anchor'),
+                targetCheckbox,
+                link;
+
+            selectElementContentsAndFire(editor.elements[0]);
+            anchorExtension.showForm('http://test.com');
+            expect(anchorExtension.isDisplayed()).toBe(true);
+            targetCheckbox = anchorExtension.getForm().querySelector('input.medium-editor-toolbar-anchor-target');
+            expect().not.toBeNull(targetCheckbox);
+            targetCheckbox.checked = true;
+            fireEvent(anchorExtension.getForm().querySelector('a.medium-editor-toolbar-save'), 'click');
+            expect(anchorExtension.isDisplayed()).toBe(false);
+
+            link = editor.elements[0].querySelector('a');
+            expect(link).not.toBeNull();
+            expect(link.target).toBe('_blank');
+        });
+        it('should add target="_blank" when "open in a new window" checkbox is enabled via deprecated anchorTarget option and checked', function () {
+            var editor = this.newMediumEditor('.editor', {
+                anchorTarget: true // deprecated
             }),
                 anchorExtension = editor.getExtensionByName('anchor'),
                 targetCheckbox,
@@ -152,6 +194,46 @@ describe('Anchor Button TestCase', function () {
             expect(link.target).toBe('_blank');
         });
         it('should create a button when user selects this option and presses enter', function () {
+            spyOn(MediumEditor.prototype, 'createLink').and.callThrough();
+            var editor = this.newMediumEditor('.editor', {
+                anchor: {
+                    customClassOption: 'btn btn-default'
+                }
+            }),
+                save,
+                input,
+                button,
+                link,
+                opts,
+                anchorExtension = editor.getExtensionByName('anchor');
+
+            selectElementContents(editor.elements[0]);
+            save = editor.toolbar.getToolbarElement().querySelector('[data-action="createLink"]');
+            fireEvent(save, 'click');
+
+            input = anchorExtension.getInput();
+            input.value = 'test';
+
+            button = anchorExtension.getForm().querySelector('input.medium-editor-toolbar-anchor-button');
+            button.setAttribute('type', 'checkbox');
+            button.checked = true;
+
+            fireEvent(input, 'keyup', {
+                keyCode: Util.keyCode.ENTER
+            });
+            opts = {
+                url: 'test',
+                target: '_self',
+                buttonClass: 'btn btn-default'
+            };
+            expect(editor.createLink).toHaveBeenCalledWith(opts);
+
+            link = editor.elements[0].querySelector('a');
+            expect(link).not.toBeNull();
+            expect(link.classList.contains('btn')).toBe(true);
+            expect(link.classList.contains('btn-default')).toBe(true);
+        });
+        it('should create a button when deprecated anchorButton + anchorButtonClass options are used', function () {
             spyOn(MediumEditor.prototype, 'createLink').and.callThrough();
             var editor = this.newMediumEditor('.editor', {
                 anchorButton: true,
