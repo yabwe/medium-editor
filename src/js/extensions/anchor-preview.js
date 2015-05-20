@@ -1,25 +1,39 @@
-/*global Util*/
-
 var AnchorPreview;
-
 (function () {
     'use strict';
 
-    AnchorPreview = function () {
-        this.parent = true;
-        this.name = 'anchor-preview';
-    };
+    /*global Util, Extension */
 
-    AnchorPreview.prototype = {
+    AnchorPreview = Extension.extend({
+        name: 'anchor-preview',
+        parent: true,
 
-        // the default selector to locate where to
-        // put the activeAnchor value in the preview
+        // Anchor Preview Options
+
+        /* hideDelay: [number]  (previously options.anchorPreviewHideDelay)
+         * time in milliseconds to show the anchor tag preview after the mouse has left the anchor tag.
+         */
+        hideDelay: 500,
+
+        /* previewValueSelector: [string]
+         * the default selector to locate where to put the activeAnchor value in the preview
+         */
         previewValueSelector: 'a',
 
-        init: function () {
+        /* ----- internal options needed from base ----- */
+        'window': window,
+        'document': document,
+        diffLeft: 0,
+        diffTop: -10,
+        elementsContainer: false,
 
+        init: function () {
             this.anchorPreview = this.createPreview();
-            this.base.options.elementsContainer.appendChild(this.anchorPreview);
+
+            if (!this.elementsContainer) {
+                this.elementsContainer = this.document.body;
+            }
+            this.elementsContainer.appendChild(this.anchorPreview);
 
             this.attachToEditables();
         },
@@ -29,7 +43,7 @@ var AnchorPreview;
         },
 
         createPreview: function () {
-            var el = this.base.options.ownerDocument.createElement('div');
+            var el = this.document.createElement('div');
 
             el.id = 'medium-editor-anchor-preview-' + this.base.id;
             el.className = 'medium-editor-anchor-preview';
@@ -94,13 +108,13 @@ var AnchorPreview;
                 defaultLeft;
 
             halfOffsetWidth = this.anchorPreview.offsetWidth / 2;
-            defaultLeft = this.base.options.diffLeft - halfOffsetWidth;
+            defaultLeft = this.diffLeft - halfOffsetWidth;
 
-            this.anchorPreview.style.top = Math.round(buttonHeight + boundary.bottom - this.base.options.diffTop + this.base.options.contentWindow.pageYOffset - this.anchorPreview.offsetHeight) + 'px';
+            this.anchorPreview.style.top = Math.round(buttonHeight + boundary.bottom - this.diffTop + this.window.pageYOffset - this.anchorPreview.offsetHeight) + 'px';
             if (middleBoundary < halfOffsetWidth) {
                 this.anchorPreview.style.left = defaultLeft + halfOffsetWidth + 'px';
-            } else if ((this.base.options.contentWindow.innerWidth - middleBoundary) < halfOffsetWidth) {
-                this.anchorPreview.style.left = this.base.options.contentWindow.innerWidth + defaultLeft - halfOffsetWidth + 'px';
+            } else if ((this.window.innerWidth - middleBoundary) < halfOffsetWidth) {
+                this.anchorPreview.style.left = this.window.innerWidth + defaultLeft - halfOffsetWidth + 'px';
             } else {
                 this.anchorPreview.style.left = defaultLeft + middleBoundary + 'px';
             }
@@ -119,8 +133,8 @@ var AnchorPreview;
 
                 this.base.selectElement(this.activeAnchor);
 
-                // Using setTimeout + options.delay because:
-                // We may actually be displaying the anchor form, which should be controlled by options.delay
+                // Using setTimeout + delay because:
+                // We may actually be displaying the anchor form, which should be controlled by delay
                 this.base.delay(function () {
                     if (activeAnchor) {
                         anchorExtension.showForm(activeAnchor.attributes.href.value);
@@ -165,7 +179,7 @@ var AnchorPreview;
 
                 this.instanceHandleAnchorMouseout = this.handleAnchorMouseout.bind(this);
                 this.base.on(this.anchorToPreview, 'mouseout', this.instanceHandleAnchorMouseout);
-                // Using setTimeout + options.delay because:
+                // Using setTimeout + delay because:
                 // - We're going to show the anchor preview according to the configured delay
                 //   if the mouse has not left the anchor tag in that time
                 this.base.delay(function () {
@@ -193,7 +207,7 @@ var AnchorPreview;
                 return true;
             }
             var durr = (new Date()).getTime() - this.lastOver;
-            if (durr > this.base.options.anchorPreviewHideDelay) {
+            if (durr > this.hideDelay) {
                 // hide the preview 1/2 second after mouse leaves the link
                 this.detachPreviewHandlers();
             }
@@ -231,5 +245,5 @@ var AnchorPreview;
             this.base.on(this.activeAnchor, 'mouseover', this.instanceHandlePreviewMouseover);
             this.base.on(this.activeAnchor, 'mouseout', this.instanceHandlePreviewMouseout);
         }
-    };
+    });
 }());

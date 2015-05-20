@@ -204,8 +204,13 @@ function MediumEditor(elements, options) {
         var i,
             shouldAdd = false;
 
+        // TODO: deprecated
         // If anchor-preview is disabled, don't add
         if (this.options.disableAnchorPreview) {
+            return false;
+        }
+        // If anchor-preview is disabled, don't add
+        if (this.options.anchorPreview === false) {
             return false;
         }
         // If anchor-preview extension has been overriden, don't add
@@ -350,6 +355,17 @@ function MediumEditor(elements, options) {
         }
     }
 
+    function initAnchorPreview(options) {
+        // Backwards compatability
+        var defaultsBC = {
+            hideDelay: this.options.anchorPreviewHideDelay // deprecated
+        };
+
+        return new MediumEditor.extensions.anchorPreview(
+            Util.extend({}, options, defaultsBC)
+        );
+    }
+
     function initAnchorForm(options) {
         // Backwards compatability
         var defaultsBC = {
@@ -420,7 +436,7 @@ function MediumEditor(elements, options) {
 
         // Add AnchorPreview as extension if needed
         if (shouldAddDefaultAnchorPreview.call(this)) {
-            this.commands.push(initExtension(new AnchorPreview(), 'anchor-preview', this));
+            this.commands.push(initExtension(initAnchorPreview.call(this, this.options.anchorPreview), 'anchor-preview', this));
         }
 
         if (shouldAddDefaultAutoLink.call(this)) {
@@ -441,7 +457,9 @@ function MediumEditor(elements, options) {
             ['anchorButton', 'anchor.customClassOption'],
             ['anchorButtonClass', 'anchor.customClassOption'],
             ['anchorTarget', 'anchor.targetCheckbox'],
-            ['anchorInputCheckboxLabel', 'anchor.targetCheckboxText']
+            ['anchorInputCheckboxLabel', 'anchor.targetCheckboxText'],
+            ['anchorPreviewHideDelay', 'anchorPreview.hideDelay'],
+            ['disableAnchorPreview', 'anchorPreview: false']
         ];
         // warn about using deprecated properties
         if (options) {
