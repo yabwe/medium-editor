@@ -6,7 +6,6 @@ var editorDefaults;
     editorDefaults = {
 
         allowMultiParagraphSelection: true,
-        anchorPreviewHideDelay: 500,
         buttons: ['bold', 'italic', 'underline', 'anchor', 'header1', 'header2', 'quote'],
         buttonLabels: false,
         delay: 0,
@@ -15,7 +14,6 @@ var editorDefaults;
         disableReturn: false,
         disableDoubleReturn: false,
         disableToolbar: false,
-        disableAnchorPreview: false,
         disableEditing: false,
         disablePlaceholders: false,
         autoLink: false,

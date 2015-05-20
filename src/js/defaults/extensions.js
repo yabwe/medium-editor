@@ -1,5 +1,6 @@
 /*global Button, FormExtension,
-    AnchorForm, AutoLink, FontSizeForm, ImageDragging, PasteHandler */
+    AnchorForm, AnchorPreview, AutoLink,
+    FontSizeForm, ImageDragging, PasteHandler */
 
 var extensionDefaults;
 (function () {
@@ -10,6 +11,7 @@ var extensionDefaults;
         form: FormExtension,
 
         anchor: AnchorForm,
+        anchorPreview: AnchorPreview,
         autoLink: AutoLink,
         fontSize: FontSizeForm,
         imageDragging: ImageDragging,

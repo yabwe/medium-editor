@@ -1,8 +1,8 @@
 /*global Util, ButtonsData, Button,
  Selection, FontSizeForm, Extension, extensionDefaults,
- Toolbar, AnchorPreview, AutoLink, ImageDragging,
- Events, Placeholders, editorDefaults,
- DefaultButton, AnchorExtension, FontSizeExtension */
+ Toolbar, AutoLink, ImageDragging, Events, Placeholders,
+ editorDefaults,
+ DefaultButton, AnchorExtension, FontSizeExtension, AnchorPreviewDeprecated */
 
 function MediumEditor(elements, options) {
     'use strict';
@@ -204,8 +204,13 @@ function MediumEditor(elements, options) {
         var i,
             shouldAdd = false;
 
+        // TODO: deprecated
         // If anchor-preview is disabled, don't add
         if (this.options.disableAnchorPreview) {
+            return false;
+        }
+        // If anchor-preview is disabled, don't add
+        if (this.options.anchorPreview === false) {
             return false;
         }
         // If anchor-preview extension has been overriden, don't add
@@ -350,6 +355,22 @@ function MediumEditor(elements, options) {
         }
     }
 
+    function initAnchorPreview(options) {
+        // Backwards compatability
+        var defaultsBC = {
+            hideDelay: this.options.anchorPreviewHideDelay, // deprecated
+            'window': this.options.contentWindow,
+            'document': this.options.ownerDocument,
+            diffLeft: this.options.diffLeft,
+            diffTop: this.options.diffTop,
+            elementsContainer: this.options.elementsContainer
+        };
+
+        return new MediumEditor.extensions.anchorPreview(
+            Util.extend({}, options, defaultsBC)
+        );
+    }
+
     function initAnchorForm(options) {
         // Backwards compatability
         var defaultsBC = {
@@ -420,7 +441,7 @@ function MediumEditor(elements, options) {
 
         // Add AnchorPreview as extension if needed
         if (shouldAddDefaultAnchorPreview.call(this)) {
-            this.commands.push(initExtension(new AnchorPreview(), 'anchor-preview', this));
+            this.commands.push(initExtension(initAnchorPreview.call(this, this.options.anchorPreview), 'anchor-preview', this));
         }
 
         if (shouldAddDefaultAutoLink.call(this)) {
@@ -441,7 +462,9 @@ function MediumEditor(elements, options) {
             ['anchorButton', 'anchor.customClassOption'],
             ['anchorButtonClass', 'anchor.customClassOption'],
             ['anchorTarget', 'anchor.targetCheckbox'],
-            ['anchorInputCheckboxLabel', 'anchor.targetCheckboxText']
+            ['anchorInputCheckboxLabel', 'anchor.targetCheckboxText'],
+            ['anchorPreviewHideDelay', 'anchorPreview.hideDelay'],
+            ['disableAnchorPreview', 'anchorPreview: false']
         ];
         // warn about using deprecated properties
         if (options) {
@@ -489,7 +512,7 @@ function MediumEditor(elements, options) {
         AnchorExtension: AnchorExtension,
         FontSizeExtension: FontSizeExtension,
         Toolbar: Toolbar,
-        AnchorPreview: AnchorPreview
+        AnchorPreview: AnchorPreviewDeprecated
     };
 
     MediumEditor.Extension = Extension;

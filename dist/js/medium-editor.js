@@ -1358,7 +1358,6 @@ var editorDefaults;
     editorDefaults = {
 
         allowMultiParagraphSelection: true,
-        anchorPreviewHideDelay: 500,
         buttons: ['bold', 'italic', 'underline', 'anchor', 'header1', 'header2', 'quote'],
         buttonLabels: false,
         delay: 0,
@@ -1367,7 +1366,6 @@ var editorDefaults;
         disableReturn: false,
         disableDoubleReturn: false,
         disableToolbar: false,
-        disableAnchorPreview: false,
         disableEditing: false,
         disablePlaceholders: false,
         autoLink: false,
@@ -2658,6 +2656,243 @@ var AnchorExtension;
 
 }());
 /* istanbul ignore next */
+var AnchorPreviewDeprecated;
+
+/* istanbul ignore next */
+(function () {
+    'use strict';
+
+    AnchorPreviewDeprecated = function () {
+        Util.deprecated('MediumEditor.statics.AnchorPreview', 'MediumEditor.extensions.anchorPreview', 'v5.0.0');
+        this.parent = true;
+        this.name = 'anchor-preview';
+    };
+
+    AnchorPreviewDeprecated.prototype = {
+
+        // the default selector to locate where to
+        // put the activeAnchor value in the preview
+        previewValueSelector: 'a',
+
+        init: function () {
+
+            this.anchorPreview = this.createPreview();
+            this.base.options.elementsContainer.appendChild(this.anchorPreview);
+
+            this.attachToEditables();
+        },
+
+        getPreviewElement: function () {
+            return this.anchorPreview;
+        },
+
+        createPreview: function () {
+            var el = this.base.options.ownerDocument.createElement('div');
+
+            el.id = 'medium-editor-anchor-preview-' + this.base.id;
+            el.className = 'medium-editor-anchor-preview';
+            el.innerHTML = this.getTemplate();
+
+            this.base.on(el, 'click', this.handleClick.bind(this));
+
+            return el;
+        },
+
+        getTemplate: function () {
+            return '<div class="medium-editor-toolbar-anchor-preview" id="medium-editor-toolbar-anchor-preview">' +
+                '    <a class="medium-editor-toolbar-anchor-preview-inner"></a>' +
+                '</div>';
+        },
+
+        deactivate: function () {
+            if (this.anchorPreview) {
+                if (this.anchorPreview.parentNode) {
+                    this.anchorPreview.parentNode.removeChild(this.anchorPreview);
+                }
+                delete this.anchorPreview;
+            }
+        },
+
+        hidePreview: function () {
+            this.anchorPreview.classList.remove('medium-editor-anchor-preview-active');
+            this.activeAnchor = null;
+        },
+
+        showPreview: function (anchorEl) {
+            if (this.anchorPreview.classList.contains('medium-editor-anchor-preview-active') ||
+                    anchorEl.getAttribute('data-disable-preview')) {
+                return true;
+            }
+
+            if (this.previewValueSelector) {
+                this.anchorPreview.querySelector(this.previewValueSelector).textContent = anchorEl.attributes.href.value;
+                this.anchorPreview.querySelector(this.previewValueSelector).href = anchorEl.attributes.href.value;
+            }
+
+            this.anchorPreview.classList.add('medium-toolbar-arrow-over');
+            this.anchorPreview.classList.remove('medium-toolbar-arrow-under');
+
+            if (!this.anchorPreview.classList.contains('medium-editor-anchor-preview-active')) {
+                this.anchorPreview.classList.add('medium-editor-anchor-preview-active');
+            }
+
+            this.activeAnchor = anchorEl;
+
+            this.positionPreview();
+            this.attachPreviewHandlers();
+
+            return this;
+        },
+
+        positionPreview: function () {
+            var buttonHeight = this.anchorPreview.offsetHeight,
+                boundary = this.activeAnchor.getBoundingClientRect(),
+                middleBoundary = (boundary.left + boundary.right) / 2,
+                halfOffsetWidth,
+                defaultLeft;
+
+            halfOffsetWidth = this.anchorPreview.offsetWidth / 2;
+            defaultLeft = this.base.options.diffLeft - halfOffsetWidth;
+
+            this.anchorPreview.style.top = Math.round(buttonHeight + boundary.bottom - this.base.options.diffTop + this.base.options.contentWindow.pageYOffset - this.anchorPreview.offsetHeight) + 'px';
+            if (middleBoundary < halfOffsetWidth) {
+                this.anchorPreview.style.left = defaultLeft + halfOffsetWidth + 'px';
+            } else if ((this.base.options.contentWindow.innerWidth - middleBoundary) < halfOffsetWidth) {
+                this.anchorPreview.style.left = this.base.options.contentWindow.innerWidth + defaultLeft - halfOffsetWidth + 'px';
+            } else {
+                this.anchorPreview.style.left = defaultLeft + middleBoundary + 'px';
+            }
+        },
+
+        attachToEditables: function () {
+            this.base.subscribe('editableMouseover', this.handleEditableMouseover.bind(this));
+        },
+
+        handleClick: function (event) {
+            var anchorExtension = this.base.getExtensionByName('anchor'),
+                activeAnchor = this.activeAnchor;
+
+            if (anchorExtension && activeAnchor) {
+                event.preventDefault();
+
+                this.base.selectElement(this.activeAnchor);
+
+                // Using setTimeout + options.delay because:
+                // We may actually be displaying the anchor form, which should be controlled by options.delay
+                this.base.delay(function () {
+                    if (activeAnchor) {
+                        anchorExtension.showForm(activeAnchor.attributes.href.value);
+                        activeAnchor = null;
+                    }
+                }.bind(this));
+            }
+
+            this.hidePreview();
+        },
+
+        handleAnchorMouseout: function () {
+            this.anchorToPreview = null;
+            this.base.off(this.activeAnchor, 'mouseout', this.instanceHandleAnchorMouseout);
+            this.instanceHandleAnchorMouseout = null;
+        },
+
+        handleEditableMouseover: function (event) {
+            var target = Util.getClosestTag(event.target, 'a');
+
+            if (target) {
+
+                // Detect empty href attributes
+                // The browser will make href="" or href="#top"
+                // into absolute urls when accessed as event.targed.href, so check the html
+                if (!/href=["']\S+["']/.test(target.outerHTML) || /href=["']#\S+["']/.test(target.outerHTML)) {
+                    return true;
+                }
+
+                // only show when hovering on anchors
+                if (this.base.toolbar && this.base.toolbar.isDisplayed()) {
+                    // only show when toolbar is not present
+                    return true;
+                }
+
+                // detach handler for other anchor in case we hovered multiple anchors quickly
+                if (this.activeAnchor && this.activeAnchor !== target) {
+                    this.detachPreviewHandlers();
+                }
+
+                this.anchorToPreview = target;
+
+                this.instanceHandleAnchorMouseout = this.handleAnchorMouseout.bind(this);
+                this.base.on(this.anchorToPreview, 'mouseout', this.instanceHandleAnchorMouseout);
+                // Using setTimeout + options.delay because:
+                // - We're going to show the anchor preview according to the configured delay
+                //   if the mouse has not left the anchor tag in that time
+                this.base.delay(function () {
+                    if (this.anchorToPreview) {
+                        //this.activeAnchor = this.anchorToPreview;
+                        this.showPreview(this.anchorToPreview);
+                    }
+                }.bind(this));
+            }
+        },
+
+        handlePreviewMouseover: function () {
+            this.lastOver = (new Date()).getTime();
+            this.hovering = true;
+        },
+
+        handlePreviewMouseout: function (event) {
+            if (!event.relatedTarget || !/anchor-preview/.test(event.relatedTarget.className)) {
+                this.hovering = false;
+            }
+        },
+
+        updatePreview: function () {
+            if (this.hovering) {
+                return true;
+            }
+            var durr = (new Date()).getTime() - this.lastOver;
+            if (durr > this.base.options.anchorPreviewHideDelay) {
+                // hide the preview 1/2 second after mouse leaves the link
+                this.detachPreviewHandlers();
+            }
+        },
+
+        detachPreviewHandlers: function () {
+            // cleanup
+            clearInterval(this.intervalTimer);
+            if (this.instanceHandlePreviewMouseover) {
+                this.base.off(this.anchorPreview, 'mouseover', this.instanceHandlePreviewMouseover);
+                this.base.off(this.anchorPreview, 'mouseout', this.instanceHandlePreviewMouseout);
+                if (this.activeAnchor) {
+                    this.base.off(this.activeAnchor, 'mouseover', this.instanceHandlePreviewMouseover);
+                    this.base.off(this.activeAnchor, 'mouseout', this.instanceHandlePreviewMouseout);
+                }
+            }
+
+            this.hidePreview();
+
+            this.hovering = this.instanceHandlePreviewMouseover = this.instanceHandlePreviewMouseout = null;
+        },
+
+        // TODO: break up method and extract out handlers
+        attachPreviewHandlers: function () {
+            this.lastOver = (new Date()).getTime();
+            this.hovering = true;
+
+            this.instanceHandlePreviewMouseover = this.handlePreviewMouseover.bind(this);
+            this.instanceHandlePreviewMouseout = this.handlePreviewMouseout.bind(this);
+
+            this.intervalTimer = setInterval(this.updatePreview.bind(this), 200);
+
+            this.base.on(this.anchorPreview, 'mouseover', this.instanceHandlePreviewMouseover);
+            this.base.on(this.anchorPreview, 'mouseout', this.instanceHandlePreviewMouseout);
+            this.base.on(this.activeAnchor, 'mouseover', this.instanceHandlePreviewMouseover);
+            this.base.on(this.activeAnchor, 'mouseout', this.instanceHandlePreviewMouseout);
+        }
+    };
+}());
+
+/* istanbul ignore next */
 var FontSizeExtension;
 
 /* istanbul ignore next */
@@ -3320,25 +3555,41 @@ var AnchorForm;
     });
 }());
 var AnchorPreview;
-
 (function () {
     'use strict';
 
-    AnchorPreview = function () {
-        this.parent = true;
-        this.name = 'anchor-preview';
-    };
+    /*global Util, Extension */
 
-    AnchorPreview.prototype = {
+    AnchorPreview = Extension.extend({
+        name: 'anchor-preview',
+        parent: true,
 
-        // the default selector to locate where to
-        // put the activeAnchor value in the preview
+        // Anchor Preview Options
+
+        /* hideDelay: [number]  (previously options.anchorPreviewHideDelay)
+         * time in milliseconds to show the anchor tag preview after the mouse has left the anchor tag.
+         */
+        hideDelay: 500,
+
+        /* previewValueSelector: [string]
+         * the default selector to locate where to put the activeAnchor value in the preview
+         */
         previewValueSelector: 'a',
 
-        init: function () {
+        /* ----- internal options needed from base ----- */
+        'window': window,
+        'document': document,
+        diffLeft: 0,
+        diffTop: -10,
+        elementsContainer: false,
 
+        init: function () {
             this.anchorPreview = this.createPreview();
-            this.base.options.elementsContainer.appendChild(this.anchorPreview);
+
+            if (!this.elementsContainer) {
+                this.elementsContainer = this.document.body;
+            }
+            this.elementsContainer.appendChild(this.anchorPreview);
 
             this.attachToEditables();
         },
@@ -3348,7 +3599,7 @@ var AnchorPreview;
         },
 
         createPreview: function () {
-            var el = this.base.options.ownerDocument.createElement('div');
+            var el = this.document.createElement('div');
 
             el.id = 'medium-editor-anchor-preview-' + this.base.id;
             el.className = 'medium-editor-anchor-preview';
@@ -3413,13 +3664,13 @@ var AnchorPreview;
                 defaultLeft;
 
             halfOffsetWidth = this.anchorPreview.offsetWidth / 2;
-            defaultLeft = this.base.options.diffLeft - halfOffsetWidth;
+            defaultLeft = this.diffLeft - halfOffsetWidth;
 
-            this.anchorPreview.style.top = Math.round(buttonHeight + boundary.bottom - this.base.options.diffTop + this.base.options.contentWindow.pageYOffset - this.anchorPreview.offsetHeight) + 'px';
+            this.anchorPreview.style.top = Math.round(buttonHeight + boundary.bottom - this.diffTop + this.window.pageYOffset - this.anchorPreview.offsetHeight) + 'px';
             if (middleBoundary < halfOffsetWidth) {
                 this.anchorPreview.style.left = defaultLeft + halfOffsetWidth + 'px';
-            } else if ((this.base.options.contentWindow.innerWidth - middleBoundary) < halfOffsetWidth) {
-                this.anchorPreview.style.left = this.base.options.contentWindow.innerWidth + defaultLeft - halfOffsetWidth + 'px';
+            } else if ((this.window.innerWidth - middleBoundary) < halfOffsetWidth) {
+                this.anchorPreview.style.left = this.window.innerWidth + defaultLeft - halfOffsetWidth + 'px';
             } else {
                 this.anchorPreview.style.left = defaultLeft + middleBoundary + 'px';
             }
@@ -3438,8 +3689,8 @@ var AnchorPreview;
 
                 this.base.selectElement(this.activeAnchor);
 
-                // Using setTimeout + options.delay because:
-                // We may actually be displaying the anchor form, which should be controlled by options.delay
+                // Using setTimeout + delay because:
+                // We may actually be displaying the anchor form, which should be controlled by delay
                 this.base.delay(function () {
                     if (activeAnchor) {
                         anchorExtension.showForm(activeAnchor.attributes.href.value);
@@ -3484,7 +3735,7 @@ var AnchorPreview;
 
                 this.instanceHandleAnchorMouseout = this.handleAnchorMouseout.bind(this);
                 this.base.on(this.anchorToPreview, 'mouseout', this.instanceHandleAnchorMouseout);
-                // Using setTimeout + options.delay because:
+                // Using setTimeout + delay because:
                 // - We're going to show the anchor preview according to the configured delay
                 //   if the mouse has not left the anchor tag in that time
                 this.base.delay(function () {
@@ -3512,7 +3763,7 @@ var AnchorPreview;
                 return true;
             }
             var durr = (new Date()).getTime() - this.lastOver;
-            if (durr > this.base.options.anchorPreviewHideDelay) {
+            if (durr > this.hideDelay) {
                 // hide the preview 1/2 second after mouse leaves the link
                 this.detachPreviewHandlers();
             }
@@ -3550,7 +3801,7 @@ var AnchorPreview;
             this.base.on(this.activeAnchor, 'mouseover', this.instanceHandlePreviewMouseover);
             this.base.on(this.activeAnchor, 'mouseout', this.instanceHandlePreviewMouseout);
         }
-    };
+    });
 }());
 
 var AutoLink,
@@ -4876,6 +5127,7 @@ var extensionDefaults;
         form: FormExtension,
 
         anchor: AnchorForm,
+        anchorPreview: AnchorPreview,
         autoLink: AutoLink,
         fontSize: FontSizeForm,
         imageDragging: ImageDragging,
@@ -5083,8 +5335,13 @@ function MediumEditor(elements, options) {
         var i,
             shouldAdd = false;
 
+        // TODO: deprecated
         // If anchor-preview is disabled, don't add
         if (this.options.disableAnchorPreview) {
+            return false;
+        }
+        // If anchor-preview is disabled, don't add
+        if (this.options.anchorPreview === false) {
             return false;
         }
         // If anchor-preview extension has been overriden, don't add
@@ -5229,6 +5486,22 @@ function MediumEditor(elements, options) {
         }
     }
 
+    function initAnchorPreview(options) {
+        // Backwards compatability
+        var defaultsBC = {
+            hideDelay: this.options.anchorPreviewHideDelay, // deprecated
+            'window': this.options.contentWindow,
+            'document': this.options.ownerDocument,
+            diffLeft: this.options.diffLeft,
+            diffTop: this.options.diffTop,
+            elementsContainer: this.options.elementsContainer
+        };
+
+        return new MediumEditor.extensions.anchorPreview(
+            Util.extend({}, options, defaultsBC)
+        );
+    }
+
     function initAnchorForm(options) {
         // Backwards compatability
         var defaultsBC = {
@@ -5299,7 +5572,7 @@ function MediumEditor(elements, options) {
 
         // Add AnchorPreview as extension if needed
         if (shouldAddDefaultAnchorPreview.call(this)) {
-            this.commands.push(initExtension(new AnchorPreview(), 'anchor-preview', this));
+            this.commands.push(initExtension(initAnchorPreview.call(this, this.options.anchorPreview), 'anchor-preview', this));
         }
 
         if (shouldAddDefaultAutoLink.call(this)) {
@@ -5320,7 +5593,9 @@ function MediumEditor(elements, options) {
             ['anchorButton', 'anchor.customClassOption'],
             ['anchorButtonClass', 'anchor.customClassOption'],
             ['anchorTarget', 'anchor.targetCheckbox'],
-            ['anchorInputCheckboxLabel', 'anchor.targetCheckboxText']
+            ['anchorInputCheckboxLabel', 'anchor.targetCheckboxText'],
+            ['anchorPreviewHideDelay', 'anchorPreview.hideDelay'],
+            ['disableAnchorPreview', 'anchorPreview: false']
         ];
         // warn about using deprecated properties
         if (options) {
@@ -5368,7 +5643,7 @@ function MediumEditor(elements, options) {
         AnchorExtension: AnchorExtension,
         FontSizeExtension: FontSizeExtension,
         Toolbar: Toolbar,
-        AnchorPreview: AnchorPreview
+        AnchorPreview: AnchorPreviewDeprecated
     };
 
     MediumEditor.Extension = Extension;
