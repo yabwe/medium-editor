@@ -91,56 +91,13 @@ function dataURItoBlob(dataURI) {
 
 // keyCode, ctrlKey, target, relatedTarget, shiftKey
 function fireEvent(element, eventName, options) {
-    var evt;
+    var evt = prepareEvent(
+        element,
+        eventName,
+        options
+    );
 
-    options = options || {};
-
-    if (document.createEvent) {
-        // dispatch for firefox + others
-        evt = document.createEvent('HTMLEvents');
-        evt.initEvent(eventName, true, true); // event type,bubbling,cancelable
-
-        evt.currentTarget = options.currentTarget ? options.currentTarget : element;
-
-        if (options.keyCode) {
-            evt.keyCode = options.keyCode;
-            evt.which = options.keyCode;
-        }
-
-        if (options.ctrlKey) {
-            evt.ctrlKey = true;
-        }
-
-        if (options.metaKey) {
-            evt.metaKey = true;
-        }
-
-        if (options.target) {
-            evt.target = options.target;
-        }
-
-        if (options.relatedTarget) {
-            evt.relatedTarget = options.relatedTarget;
-        }
-
-        if (options.shiftKey) {
-            evt.shiftKey = true;
-        }
-
-        if (eventName.indexOf('drag') !== -1 || eventName === 'drop') {
-            evt.dataTransfer = {
-                dropEffect: ''
-            };
-            if (!isIE9()) {
-                evt.dataTransfer.files = [dataURItoBlob('data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7')];
-            }
-        }
-        return !element.dispatchEvent(evt);
-    }
-
-    // dispatch for IE
-    evt = document.createEventObject();
-    return element.fireEvent('on' + eventName, evt);
+    return firePreparedEvent(evt, element, eventName);
 }
 
 /**
