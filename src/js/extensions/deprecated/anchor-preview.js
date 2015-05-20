@@ -8,6 +8,7 @@ var AnchorPreviewDeprecated;
     'use strict';
 
     AnchorPreviewDeprecated = function () {
+        Util.deprecated('MediumEditor.statics.AnchorPreview', 'MediumEditor.extensions.anchorPreview', 'v5.0.0');
         this.parent = true;
         this.name = 'anchor-preview';
     };

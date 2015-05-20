@@ -207,7 +207,11 @@ var editor = new MediumEditor('.editable', {
         cleanPastedHTML: true,
         cleanAttrs: ['style', 'dir'],
         cleanTags: ['label', 'meta']
+    },
+    anchorPreview: {
+        hideDelay: 300
     }
+}
 });
 ```
 
