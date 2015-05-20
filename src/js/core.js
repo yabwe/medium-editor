@@ -2,7 +2,7 @@
  Selection, FontSizeForm, Extension, extensionDefaults,
  Toolbar, AnchorPreview, AutoLink, ImageDragging,
  Events, Placeholders, editorDefaults,
- DefaultButton, AnchorExtension, FontSizeExtension */
+ DefaultButton, AnchorExtension, FontSizeExtension, AnchorPreviewDeprecated */
 
 function MediumEditor(elements, options) {
     'use strict';
@@ -507,7 +507,7 @@ function MediumEditor(elements, options) {
         AnchorExtension: AnchorExtension,
         FontSizeExtension: FontSizeExtension,
         Toolbar: Toolbar,
-        AnchorPreview: AnchorPreview
+        AnchorPreview: AnchorPreviewDeprecated
     };
 
     MediumEditor.Extension = Extension;

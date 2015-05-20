@@ -21,6 +21,7 @@ module.exports = function (grunt) {
             'src/js/events.js',
             'src/js/extensions/deprecated/button.js',
             'src/js/extensions/deprecated/anchor.js',
+            'src/js/extensions/deprecated/anchor-preview.js',
             'src/js/extensions/deprecated/fontsize.js',
             'src/js/extensions/button.js',
             'src/js/extensions/form.js',
