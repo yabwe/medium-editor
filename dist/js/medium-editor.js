@@ -1367,7 +1367,6 @@ var editorDefaults;
         disableDoubleReturn: false,
         disableToolbar: false,
         disableEditing: false,
-        disablePlaceholders: false,
         autoLink: false,
         toolbarAlign: 'center',
         elementsContainer: false,
@@ -1376,7 +1375,6 @@ var editorDefaults;
         contentWindow: window,
         ownerDocument: document,
         firstHeader: 'h3',
-        placeholder: 'Type your text',
         secondHeader: 'h4',
         targetBlank: false,
         extensions: {},
@@ -4515,6 +4513,89 @@ var PasteHandler;
 
 }());
 
+var Placeholder;
+
+(function () {
+    'use strict';
+
+    /*global Extension */
+
+    Placeholder = Extension.extend({
+        name: 'placeholder',
+        parent: true,
+
+        /* Placeholder Options */
+
+        /* text: [string]
+         * Text to display in the placeholder
+         */
+        text: 'Type your text',
+
+        init: function () {
+            this.initPlaceholders();
+            this.attachEventHandlers();
+        },
+
+        initPlaceholders: function () {
+            this.base.elements.forEach(function (el) {
+                if (!el.getAttribute('data-placeholder')) {
+                    el.setAttribute('data-placeholder', this.text);
+                }
+                this.updatePlaceholder(el);
+            }, this);
+        },
+
+        showPlaceholder: function (el) {
+            if (el) {
+                el.classList.add('medium-editor-placeholder');
+            }
+        },
+
+        hidePlaceholder: function (el) {
+            if (el) {
+                el.classList.remove('medium-editor-placeholder');
+            }
+        },
+
+        updatePlaceholder: function (el) {
+            // if one of these element ('img, blockquote, ul, ol') are found inside the given element, we won't display the placeholder
+            if (!(el.querySelector('img, blockquote, ul, ol')) && el.textContent.replace(/^\s+|\s+$/g, '') === '') {
+                this.showPlaceholder(el);
+            } else {
+                this.hidePlaceholder(el);
+            }
+        },
+
+        attachEventHandlers: function () {
+            // Custom events
+            this.base.subscribe('blur', this.handleExternalInteraction.bind(this));
+
+            // Check placeholder on blur
+            this.base.subscribe('editableBlur', this.handleBlur.bind(this));
+
+            // Events where we always hide the placeholder
+            this.base.subscribe('editableClick', this.handleHidePlaceholderEvent.bind(this));
+            this.base.subscribe('editableKeypress', this.handleHidePlaceholderEvent.bind(this));
+            this.base.subscribe('editablePaste', this.handleHidePlaceholderEvent.bind(this));
+        },
+
+        handleHidePlaceholderEvent: function (event, element) {
+            // Events where we hide the placeholder
+            this.hidePlaceholder(element);
+        },
+
+        handleBlur: function (event, element) {
+            // Update placeholder for element that lost focus
+            this.updatePlaceholder(element);
+        },
+
+        handleExternalInteraction: function () {
+            // Update all placeholders
+            this.initPlaceholders();
+        }
+    });
+}());
+
 var Toolbar;
 
 (function () {
@@ -5056,78 +5137,6 @@ var Toolbar;
     };
 }());
 
-var Placeholders;
-
-(function () {
-    'use strict';
-
-    Placeholders = function (instance) {
-        this.base = instance;
-
-        this.initPlaceholders();
-        this.attachEventHandlers();
-    };
-
-    Placeholders.prototype = {
-
-        initPlaceholders: function () {
-            this.base.elements.forEach(function (el) {
-                this.updatePlaceholder(el);
-            }, this);
-        },
-
-        showPlaceholder: function (el) {
-            if (el) {
-                el.classList.add('medium-editor-placeholder');
-            }
-        },
-
-        hidePlaceholder: function (el) {
-            if (el) {
-                el.classList.remove('medium-editor-placeholder');
-            }
-        },
-
-        updatePlaceholder: function (el) {
-            // if one of these element ('img, blockquote, ul, ol') are found inside the given element, we won't display the placeholder
-            if (!(el.querySelector('img, blockquote, ul, ol')) && el.textContent.replace(/^\s+|\s+$/g, '') === '') {
-                this.showPlaceholder(el);
-            } else {
-                this.hidePlaceholder(el);
-            }
-        },
-
-        attachEventHandlers: function () {
-            // Custom events
-            this.base.subscribe('blur', this.handleExternalInteraction.bind(this));
-
-            // Check placeholder on blur
-            this.base.subscribe('editableBlur', this.handleBlur.bind(this));
-
-            // Events where we always hide the placeholder
-            this.base.subscribe('editableClick', this.handleHidePlaceholderEvent.bind(this));
-            this.base.subscribe('editableKeypress', this.handleHidePlaceholderEvent.bind(this));
-            this.base.subscribe('editablePaste', this.handleHidePlaceholderEvent.bind(this));
-        },
-
-        handleHidePlaceholderEvent: function (event, element) {
-            // Events where we hide the placeholder
-            this.hidePlaceholder(element);
-        },
-
-        handleBlur: function (event, element) {
-            // Update placeholder for element that lost focus
-            this.updatePlaceholder(element);
-        },
-
-        handleExternalInteraction: function () {
-            // Update all placeholders
-            this.initPlaceholders();
-        }
-    };
-
-}());
-
 var extensionDefaults;
 (function () {
     // for now this is empty because nothing interally uses an Extension default.
@@ -5141,7 +5150,8 @@ var extensionDefaults;
         autoLink: AutoLink,
         fontSize: FontSizeForm,
         imageDragging: ImageDragging,
-        paste: PasteHandler
+        paste: PasteHandler,
+        placeholder: Placeholder
     };
 })();
 
@@ -5373,12 +5383,25 @@ function MediumEditor(elements, options) {
         return shouldAdd;
     }
 
+    function shouldAddDefaultPlaceholder() {
+        if (this.options.extensions['placeholder']) {
+            return false;
+        }
+
+        // TODO: deprecated
+        if (this.options.disablePlaceholders) {
+            return false;
+        }
+
+        return this.options.placeholder !== false;
+    }
+
     function shouldAddDefaultAutoLink() {
         if (this.options.extensions['auto-link']) {
             return false;
         }
 
-        return !!this.options.autoLink;
+        return this.options.autoLink !== false;
     }
 
     function shouldAddDefaultImageDragging() {
@@ -5386,7 +5409,7 @@ function MediumEditor(elements, options) {
             return false;
         }
 
-        return !!this.options.imageDragging;
+        return this.options.imageDragging !== false;
     }
 
     function createContentEditable(textarea) {
@@ -5427,9 +5450,6 @@ function MediumEditor(elements, options) {
             if (!this.options.disableEditing && !element.getAttribute('data-disable-editing')) {
                 element.setAttribute('contentEditable', true);
                 element.setAttribute('spellcheck', this.options.spellcheck);
-            }
-            if (!element.getAttribute('data-placeholder')) {
-                element.setAttribute('data-placeholder', this.options.placeholder);
             }
             element.setAttribute('data-medium-element', true);
             element.setAttribute('role', 'textbox');
@@ -5494,6 +5514,19 @@ function MediumEditor(elements, options) {
                 }
             }, this);
         }
+    }
+
+    function initPlaceholder(options) {
+        // Backwards compatability
+        var defaultsBC = {
+            text: (typeof this.options.placeholder === 'string') ? this.options.placeholder : undefined, // deprecated
+            'window': this.options.contentWindow,
+            'document': this.options.ownerDocument
+        };
+
+        return new MediumEditor.extensions.placeholder(
+            Util.extend({}, options, defaultsBC)
+        );
     }
 
     function initAnchorPreview(options) {
@@ -5592,6 +5625,11 @@ function MediumEditor(elements, options) {
         if (shouldAddDefaultImageDragging.call(this)) {
             this.commands.push(initExtension(new ImageDragging(), 'image-dragging', this));
         }
+
+        if (shouldAddDefaultPlaceholder.call(this)) {
+            var placeholderOpts = (typeof this.options.placeholder === 'string') ? {} : this.options.placeholder;
+            this.commands.push(initExtension(initPlaceholder.call(this, placeholderOpts), 'placeholder', this));
+        }
     }
 
     function mergeOptions(defaults, options) {
@@ -5605,7 +5643,8 @@ function MediumEditor(elements, options) {
             ['anchorTarget', 'anchor.targetCheckbox'],
             ['anchorInputCheckboxLabel', 'anchor.targetCheckboxText'],
             ['anchorPreviewHideDelay', 'anchorPreview.hideDelay'],
-            ['disableAnchorPreview', 'anchorPreview: false']
+            ['disableAnchorPreview', 'anchorPreview: false'],
+            ['disablePlaceholders', 'placeholder: false']
         ];
         // warn about using deprecated properties
         if (options) {
@@ -5614,6 +5653,10 @@ function MediumEditor(elements, options) {
                     Util.deprecated(pair[0], pair[1], 'v5.0.0');
                 }
             });
+
+            if (options.hasOwnProperty('placeholder') && typeof options.placeholder === 'string') {
+                Util.deprecated('placeholder', 'placeholder.text', 'v5.0.0');
+            }
         }
         return Util.defaults({}, options, defaults);
     }
@@ -5702,10 +5745,6 @@ function MediumEditor(elements, options) {
             initCommands.call(this);
             initToolbar.call(this);
             attachHandlers.call(this);
-
-            if (!this.options.disablePlaceholders) {
-                this.placeholders = new Placeholders(this);
-            }
         },
 
         destroy: function () {
