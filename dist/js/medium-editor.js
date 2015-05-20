@@ -5489,7 +5489,12 @@ function MediumEditor(elements, options) {
     function initAnchorPreview(options) {
         // Backwards compatability
         var defaultsBC = {
-            hideDelay: this.options.anchorPreviewHideDelay // deprecated
+            hideDelay: this.options.anchorPreviewHideDelay, // deprecated
+            'window': this.options.contentWindow,
+            'document': this.options.ownerDocument,
+            diffLeft: this.options.diffLeft,
+            diffTop: this.options.diffTop,
+            elementsContainer: this.options.elementsContainer
         };
 
         return new MediumEditor.extensions.anchorPreview(

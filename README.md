@@ -142,7 +142,7 @@ Options for the anchor form are passed as an object that is a member of the oute
 ```javascript
 var editor = new MediumEditor('.editable', {
     buttons: ['bold', 'italic', 'underline', 'anchor'],
-    anchorPreview: {
+    anchor: {
         // These are the default options for anchor form, if nothing is passed this is what it used
         customClassOption: null,
         customClassOptionText: 'Button',
