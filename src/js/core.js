@@ -953,45 +953,12 @@ function MediumEditor(elements, options) {
 
             // If the selection is right at the ending edge of a link, put it outside the anchor tag instead of inside.
             if (favorLaterSelectionAnchor) {
-                range = this.importSelectionMoveCursorPastAnchor(selectionState, range);
+                range = Selection.importSelectionMoveCursorPastAnchor(selectionState, range);
             }
 
             sel = this.options.contentWindow.getSelection();
             sel.removeAllRanges();
             sel.addRange(range);
-        },
-
-        // Utility method called from importSelection only
-        importSelectionMoveCursorPastAnchor: function (selectionState, range) {
-            var nodeInsideAnchorTagFunction = function (node) {
-                return node.nodeName.toLowerCase() === 'a';
-            };
-            if (selectionState.start === selectionState.end &&
-                    range.startContainer.nodeType === 3 &&
-                    range.startOffset === range.startContainer.nodeValue.length &&
-                    Util.traverseUp(range.startContainer, nodeInsideAnchorTagFunction)) {
-                var prevNode = range.startContainer,
-                    currentNode = range.startContainer.parentNode;
-                while (currentNode !== null && currentNode.nodeName.toLowerCase() !== 'a') {
-                    if (currentNode.childNodes[currentNode.childNodes.length - 1] !== prevNode) {
-                        currentNode = null;
-                    } else {
-                        prevNode = currentNode;
-                        currentNode = currentNode.parentNode;
-                    }
-                }
-                if (currentNode !== null && currentNode.nodeName.toLowerCase() === 'a') {
-                    var currentNodeIndex = null;
-                    for (var i = 0; currentNodeIndex === null && i < currentNode.parentNode.childNodes.length; i++) {
-                        if (currentNode.parentNode.childNodes[i] === currentNode) {
-                            currentNodeIndex = i;
-                        }
-                    }
-                    range.setStart(currentNode.parentNode, currentNodeIndex + 1);
-                    range.collapse(true);
-                }
-            }
-            return range;
         },
 
         restoreSelection: function () {
