@@ -194,7 +194,8 @@ describe('Content TestCase', function () {
             this.el.innerHTML = '<p>lorem ipsum</p>';
 
             var editor = this.newMediumEditor('.editor'),
-                p = editor.elements[0].querySelector('p');
+                p = editor.elements[0].querySelector('p'),
+                isSafari = isSafari();
 
             spyOn(document, 'execCommand').and.callThrough();
 
@@ -202,8 +203,8 @@ describe('Content TestCase', function () {
 
             fireEvent(p, 'keyup', {
                 keyCode: Util.keyCode.ENTER,
-                ctrlKey: (isSafari() ? true : false),
-                shiftKey: (!isSafari() ? true : false)
+                ctrlKey: isSafari,
+                shiftKey: !isSafari
             });
 
             expect(document.execCommand).not.toHaveBeenCalledWith('formatBlock', false, 'p');
