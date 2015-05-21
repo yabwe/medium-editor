@@ -1,7 +1,7 @@
 /*global describe, it, expect, spyOn,
     fireEvent, prepareEvent, firePreparedEvent, afterEach, beforeEach,
     selectElementContents, setupTestHelpers, placeCursorInsideElement,
-    isFirefox, isIE, Util, selectElementContentsAndFire */
+    isFirefox, isIE, isSafari, Util, selectElementContentsAndFire */
 
 describe('Content TestCase', function () {
     'use strict';
