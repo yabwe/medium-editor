@@ -530,10 +530,6 @@ function MediumEditor(elements, options) {
             return this.createLink(opts);
         }
 
-        if (action === 'unlink') {
-            this.events.triggerCustomEvent('editableUnlink');
-        }
-
         if (action === 'image') {
             return this.options.ownerDocument.execCommand('insertImage', false, this.options.contentWindow.getSelection());
         }

@@ -220,10 +220,6 @@ var Events;
                 this.setupListener('externalInteraction');
                 this.listeners[name] = true;
                 break;
-            case 'editableUnlink':
-                // Custom event fired from MediumEditor core code.
-                this.listeners[name] = true;
-                break;
             case 'editableInput':
                 // setup cache for knowing when the content has changed
                 this.contentCache = [];

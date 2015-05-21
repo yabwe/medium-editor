@@ -68,7 +68,7 @@ describe('Autolink', function () {
                     expect(anchors.length).toBe(1);
                     expect('href: ' + anchors[0].getAttribute('href')).toBe('href: ' + href);
                     expect('Text content: ' + anchors[0].textContent).toBe('Text content: ' + link);
-                    expect(anchors[0].getAttribute('data-auto-link')).toBe('true');
+                    expect(anchors[0].firstChild.getAttribute('data-auto-link')).toBe('true');
                 };
             }
 
@@ -112,7 +112,7 @@ describe('Autolink', function () {
                 var links = this.el.getElementsByTagName('a');
                 expect(links.length).toBe(1);
                 expect(links[0].getAttribute('href')).toBe('http://www.example.com');
-                expect(links[0].getAttribute('data-auto-link')).toBe('true');
+                expect(links[0].firstChild.getAttribute('data-auto-link')).toBe('true');
                 expect(links[0].textContent).toBe('http://www.example.com');
             });
 
@@ -141,7 +141,7 @@ describe('Autolink', function () {
                 expect(this.el.firstChild.getElementsByTagName('a').length).toBe(1);
                 expect(links[0].getAttribute('href')).toBe('http://www.example.com');
                 expect(links[0].textContent).toBe('http://www.example.com');
-                expect(links[0].getAttribute('data-auto-link')).toBe('true');
+                expect(links[0].firstChild.getAttribute('data-auto-link')).toBe('true');
             });
 
             it('should auto-link text that is partially styled and preserve the SPAN and B tags', function () {
@@ -159,9 +159,10 @@ describe('Autolink', function () {
 
                 var links = this.el.getElementsByTagName('a');
                 expect(links.length).toBe(1);
-                expect(links[0].innerHTML).toBe('<span class="a"><b>http://www.</b>exa</span>mple.com');
+                expect(links[0].innerHTML).toBe('<span data-auto-link="true">' +
+                    '<span class="a"><b>http://www.</b>exa</span>mple.com</span>');
                 expect(links[0].getAttribute('href')).toBe('http://www.example.com');
-                expect(links[0].getAttribute('data-auto-link')).toBe('true');
+                expect(links[0].firstChild.getAttribute('data-auto-link')).toBe('true');
                 expect(this.el.firstChild.lastChild.nodeValue).toBe(' ');
             });
 
@@ -179,9 +180,10 @@ describe('Autolink', function () {
                 expect(this.el.innerHTML.indexOf('<p><b>Here is the link: </b>')).toBe(0);
                 var links = this.el.getElementsByTagName('a');
                 expect(links.length).toBe(1);
-                expect(links[0].innerHTML).toBe('<b>http://www.</b>exampl<b>e</b>.com');
+                expect(links[0].innerHTML).toBe('<span data-auto-link="true">' +
+                    '<b>http://www.</b>exampl<b>e</b>.com</span>');
                 expect(links[0].getAttribute('href')).toBe('http://www.example.com');
-                expect(links[0].getAttribute('data-auto-link')).toBe('true');
+                expect(links[0].firstChild.getAttribute('data-auto-link')).toBe('true');
                 expect(this.el.firstChild.lastChild.nodeValue).toBe(' ');
             });
 
@@ -206,24 +208,25 @@ describe('Autolink', function () {
 
                 var links = this.el.getElementsByTagName('a');
                 expect(links.length).toBe(1);
-                expect(links[0].getAttribute('data-auto-link')).toBe('true');
-                links[0].removeAttribute('data-auto-link');
+                expect(links[0].firstChild.getAttribute('data-auto-link')).toBe('true');
 
                 var expectedOutput = '' +
                 '<span>' +
                     '<b>Link: </b>' +
                 '</span>' +
                 '<a href="http://www.google.com/wow">' +
-                    '<span>' +
-                        '<b>http</b>' +
-                        '<i>://</i>' +
-                    '</span>' +
-                    '<span>' +
-                        '<b>www</b>' +
-                        '<u>.google.com</u>' +
-                    '</span>' +
-                    '<span>' +
-                        '<b>/wow</b>' +
+                    '<span data-auto-link="true">' +
+                        '<span>' +
+                            '<b>http</b>' +
+                            '<i>://</i>' +
+                        '</span>' +
+                        '<span>' +
+                            '<b>www</b>' +
+                            '<u>.google.com</u>' +
+                        '</span>' +
+                        '<span>' +
+                            '<b>/wow</b>' +
+                        '</span>' +
                     '</span>' +
                 '</a>' +
                 '<span>' +
@@ -243,29 +246,17 @@ describe('Autolink', function () {
                 var links = this.el.getElementsByTagName('a');
                 expect(links.length).toBe(1);
                 expect(links[0].getAttribute('href')).toBe('http://www.example.com');
-                expect(links[0].getAttribute('data-auto-link')).toBe('true');
+                expect(links[0].firstChild.getAttribute('data-auto-link')).toBe('true');
 
                 triggerAutolinking(this.el);
                 links = this.el.getElementsByTagName('a');
                 expect(links.length).toBe(1);
                 expect(links[0].getAttribute('href')).toBe('http://www.example.com');
-                expect(links[0].getAttribute('data-auto-link')).toBe('true');
+                expect(links[0].firstChild.getAttribute('data-auto-link')).toBe('true');
             });
 
-            it('should wrap a former link in a span with data-auto-link=false when it is unlinked', function () {
-                this.el.innerHTML = 'Click this <a href="http://www.example.com/" data-auto-link="true">http://www.example.com</span> link';
-
-                selectElementContentsAndFire(this.el.getElementsByTagName('a')[0]);
-                this.editor.execAction('unlink');
-
-                expect(this.el.getElementsByTagName('a').length).toBe(0);
-                var spans = this.el.getElementsByTagName('span');
-                expect(spans.length).toBe(1);
-                expect(spans[0].getAttribute('data-auto-link')).toBe('false');
-            });
-
-            it('should not auto-link text inside a span with data-auto-link=false', function () {
-                this.el.innerHTML = 'Click this <span data-auto-link="false">http://www.example.com</span> link';
+            it('should not auto-link text inside a span with data-auto-link=true', function () {
+                this.el.innerHTML = 'Click this <span data-auto-link="true">http://www.example.com</span> link';
 
                 selectElementContentsAndFire(this.el.firstChild);
 
@@ -273,8 +264,8 @@ describe('Autolink', function () {
                 expect(this.el.getElementsByTagName('a').length).toBe(0, 'should not create a link');
             });
 
-            it('should not auto-link text containing a span with data-auto-link=false', function () {
-                this.el.innerHTML = 'Click this <span data-auto-link="false">http://www.example.com</span>foo/bar/baz link';
+            it('should not auto-link text containing a span with data-auto-link=true', function () {
+                this.el.innerHTML = 'Click this <span data-auto-link="true">http://www.example.com</span>foo/bar/baz link';
 
                 selectElementContentsAndFire(this.el.firstChild);
 
