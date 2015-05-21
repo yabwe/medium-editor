@@ -189,6 +189,26 @@ describe('Content TestCase', function () {
             expect(document.execCommand).toHaveBeenCalledWith('formatBlock', false, 'p');
             expect(this.el.innerHTML).toBe('<p>lorem ipsum</p>');
         });
+        
+        it('with ctrl key (Safari) or with shift key (other browsers), should insert a line break', function () {
+            this.el.innerHTML = '<p>lorem ipsum</p>';
+
+            var editor = this.newMediumEditor('.editor'),
+                p = editor.elements[0].querySelector('p');
+
+            spyOn(document, 'execCommand').and.callThrough();
+
+            placeCursorInsideElement(p, 0);
+
+            fireEvent(p, 'keyup', {
+                keyCode: Util.keyCode.ENTER,
+                ctrlKey: (isSafari() ? true : false),
+                shiftKey: (!isSafari() ? true : false)
+            });
+
+            expect(document.execCommand).not.toHaveBeenCalledWith('formatBlock', false, 'p');
+            expect(this.el.innerHTML).toBe('<p><br>lorem ipsum</p>');
+        });
     });
 
     describe('should unlink anchors', function () {
