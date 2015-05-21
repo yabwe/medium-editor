@@ -150,7 +150,7 @@ function MediumEditor(elements, options) {
             // For anchor tags, unlink
             if (tagName === 'a') {
                 this.options.ownerDocument.execCommand('unlink', false, null);
-            } else if (!event.shiftKey) {
+            } else if (!event.shiftKey && !event.ctrlKey) {
                 // only format block if this is not a header tag
                 if (!/h\d/.test(tagName)) {
                     this.options.ownerDocument.execCommand('formatBlock', false, 'p');
