@@ -3980,16 +3980,12 @@ LINK_REGEXP_TEXT =
         },
 
         createLink: function (textNodes, href) {
-            var alreadyLinked = Util.traverseUp(textNodes[0], function (node) {
-                return node.nodeName.toLowerCase() === 'a';
-            });
-            if (alreadyLinked) {
-                return false;
-            }
             var shouldNotLink = false;
             for (var i = 0; i < textNodes.length && shouldNotLink === false; i++) {
+                // Do not link if the text node is either inside an anchor or inside span[data-auto-link]
                 shouldNotLink = !!Util.traverseUp(textNodes[i], function (node) {
-                    return node.getAttribute && node.getAttribute('data-auto-link') === 'true';
+                    return node.nodeName.toLowerCase() === 'a' ||
+                        (node.getAttribute && node.getAttribute('data-auto-link') === 'true');
                 });
             }
             if (shouldNotLink) {
