@@ -3835,6 +3835,7 @@ LINK_REGEXP_TEXT =
         init: function () {
             this.disableEventHandling = false;
             this.base.subscribe('editableKeypress', this.onKeypress.bind(this));
+            this.base.subscribe('editableBlur', this.onBlur.bind(this));
             this.base.subscribe('editableUnlink', this.onUnlink.bind(this));
             // MS IE has it's own auto-URL detect feature but ours is better in some ways. Be consistent.
             this.base.options.ownerDocument.execCommand('AutoUrlDetect', false, false);
@@ -3873,6 +3874,10 @@ LINK_REGEXP_TEXT =
                 autoCreatedLink.appendChild(span);
                 this.base.importSelection(savedSel);
             }
+        },
+
+        onBlur: function (blurEvent, editable) {
+            this.performLinking(editable);
         },
 
         onKeypress: function (keyPressEvent) {
