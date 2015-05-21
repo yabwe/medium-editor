@@ -1,3 +1,14 @@
+4.10.2 / 2015-05-21
+==================
+* Auto-Link Fixes
+  * Don't auto-link text after it is manually unlinked
+  * Trigger auto-linking when focus is lost (ie Tab key)
+  * Fix issue where link appears and immediately disappears when hitting Enter in IE11
+  * Fix issue where hostname with more than three w's only auto-links final three w's in the name
+  * Fix issue where valid urls were not auto-linked
+  * Fix issue where some text was auto-linked when it shouldn't be
+
+
 4.10.1 / 2015-05-20
 ==================
 * Fix paste issue with plain-text containing multiple paragraphs
