@@ -189,7 +189,7 @@ describe('Content TestCase', function () {
             expect(document.execCommand).toHaveBeenCalledWith('formatBlock', false, 'p');
             expect(this.el.innerHTML).toBe('<p>lorem ipsum</p>');
         });
-        
+
         it('with ctrl key (Safari) or with shift key (other browsers), should insert a line break', function () {
             this.el.innerHTML = '<p>lorem ipsum</p>';
 
