@@ -1,5 +1,6 @@
 /*global describe, it, expect,
-    afterEach, beforeEach, fireEvent, setupTestHelpers */
+    afterEach, beforeEach, fireEvent, setupTestHelpers,
+    Placeholder */
 
 describe('Placeholder TestCase', function () {
     'use strict';
@@ -93,16 +94,16 @@ describe('Placeholder TestCase', function () {
             match = regex.exec(placeholder);
         if (match) {
             // In firefox, getComputedStyle().getPropertyValue('content') can return attr() instead of what attr() evaluates to
-            expect(match[1]).toEqual('data-placeholder');
+            expect(match[1]).toBe('data-placeholder');
         } else {
-            expect(placeholder).toEqual('\'' + expectedValue + '\'');
+            expect(placeholder).toBe('\'' + expectedValue + '\'');
         }
     }
     /*jslint regexp: false*/
 
     it('should add the default placeholder text when data-placeholder is not present', function () {
         var editor = this.newMediumEditor('.editor');
-        validatePlaceholderContent(editor.elements[0], editor.options.placeholder);
+        validatePlaceholderContent(editor.elements[0], Placeholder.prototype.text);
     });
 
     it('should use the data-placeholder when it is present', function () {
@@ -113,17 +114,42 @@ describe('Placeholder TestCase', function () {
         validatePlaceholderContent(editor.elements[0], placeholderText);
     });
 
-    it('should not set placeholder for empty elements when disablePlaceholders is set to true', function () {
+    it('should use custom placeholder text when passed as a deprecated option', function () {
+        var placeholderText = 'Custom placeholder',
+            editor = this.newMediumEditor('.editor', {
+            placeholder: placeholderText
+        });
+        validatePlaceholderContent(editor.elements[0], placeholderText);
+    });
+
+    it('should use custom placeholder text when passed as the placeholder.text option', function () {
+        var placeholderText = 'Custom placeholder',
+            editor = this.newMediumEditor('.editor', {
+            placeholder: {
+                text: placeholderText
+            }
+        });
+        validatePlaceholderContent(editor.elements[0], placeholderText);
+    });
+
+    it('should not set placeholder for empty elements when deprecated disablePlaceholders is set to true', function () {
         var editor = this.newMediumEditor('.editor', {
             disablePlaceholders: true
         });
         expect(editor.elements[0].className).not.toContain('medium-editor-placeholder');
     });
 
-    it('should not add a placeholder to empty elements on blur when disablePlaceholders is set to true', function () {
+    it('should not set placeholder for empty elements when placeholder is set to false', function () {
+        var editor = this.newMediumEditor('.editor', {
+            placeholder: false
+        });
+        expect(editor.elements[0].className).not.toContain('medium-editor-placeholder');
+    });
+
+    it('should not add a placeholder to empty elements on blur when placeholder is set to false', function () {
         this.el.innerHTML = 'some text';
         var editor = this.newMediumEditor('.editor', {
-            disablePlaceholders: true
+            placeholder: false
         });
         expect(editor.elements[0].className).not.toContain('medium-editor-placeholder');
         editor.elements[0].innerHTML = '';

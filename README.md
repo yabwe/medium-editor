@@ -73,16 +73,12 @@ MediumEditor also supports textarea. If you provide a textarea element, the scri
 ### Core options
 * __allowMultiParagraphSelection__: enables the toolbar when selecting multiple paragraphs/block elements. Default: true
 * __delay__: time in milliseconds to show the toolbar or anchor tag preview. Default: 0
-* __autoLink__: enables/disables the auto-link feature, which automatically turns URLs entered into the text field into HTML anchor tags (similar to the functionality of Markdown). Default: false
 * __disableReturn__:  enables/disables the use of the return-key. You can also set specific element behavior by using setting a data-disable-return attribute. Default: false
 * __disableDoubleReturn__:  allows/disallows two (or more) empty new lines. You can also set specific element behavior by using setting a data-disable-double-return attribute. Default: false
 * __disableEditing__: enables/disables adding the contenteditable behavior. Useful for using the toolbar with customized buttons/actions. You can also set specific element behavior by using setting a data-disable-editing attribute. Default: false
-* __disablePlaceholders__: enables/disables support for __placeholder__, including DOM element creation and attaching event handlers.  When disabled, medium-editor will ignore the __placeholder__ option and not show placeholder text. Default: false
 * __elementsContainer__: specifies a DOM node to contain MediumEditor's toolbar and anchor preview elements. Default: document.body
 * __extensions__: extension to use (see [Custom Buttons and Extensions](https://github.com/daviferreira/medium-editor/wiki/Custom-Buttons-and-Extensions)) for more. Default: {}
 * __firstHeader__: HTML tag to be used as first header. Default: h3
-* __imageDragging__: Allows image drag and drop into the editor. Default: true
-* __placeholder__: Defines the default placeholder for empty contenteditables when __disablePlaceholders__ is not set to true. You can overwrite it by setting a data-placeholder attribute on your elements. Default: 'Type your text'
 * __secondHeader__: HTML tag to be used as second header. Default: h4
 * __spellcheck__: Enable/disable native contentEditable automatic spellcheck. Default: true
 * __standardizeSelectionStart__: Standardizes how the beginning of a range is decided between browsers whenever the selected text is analyzed for updating toolbar buttons status
@@ -113,7 +109,8 @@ Options for the anchor preview 'tooltip' are passed as an object that is a membe
 var editor = new MediumEditor('.editable', {
     buttons: ['bold', 'italic', 'underline'],
     anchorPreview: {
-        // These are the default options for anchor form, if nothing is passed this is what it used
+        /* These are the default options for anchor preview,
+           if nothing is passed this is what it used */
         hideDelay: 500,
         previewValueSelector: 'a'
     }
@@ -134,6 +131,31 @@ var editor = new MediumEditor('.editable', {
 * If the toolbar is disabled (via __disableToolbar__ or `data-disable-toolbar attribute`) the anchor-preview is automatically disabled.
 * If the anchor editing form is not enabled, clicking on the anchor-preview will not allow the href of the link to be edited
 
+### Placeholder Options
+
+The placeholder handler is a built-in extension which displays placeholder text when the editor is empty.
+
+Options for placeholder are passed as an object that is a member of the outer options object. Example:
+```javascript
+var editor = new MediumEditor('.editable', {
+    buttons: ['bold', 'italic', 'quote'],
+    placeholder: {
+        /* This example includes the default options for placeholder,
+           if nothing is passed this is what it used */
+        text: 'Type your text'
+    }
+});
+```
+
+* __text__: Defines the default placeholder for empty contenteditables when __placeholder__ is not set to false. You can overwrite it by setting a `data-placeholder` attribute on the editor elements. Default: 'Type your text'
+
+To disable the placeholder, set the value of the `placeholder` option to `false`:
+```javascript
+var editor = new MediumEditor('.editable', {
+    placeholder: false
+});
+```
+
 ### Anchor Form options
 
 The anchor form is a built-in button extension which allows the user to add/edit/remove links from within the editor.  When 'anchor' is passed in as a button in the list of buttons, this extension will be enabled and can be triggered by clicking the corresponding button in the toolbar.
@@ -143,7 +165,8 @@ Options for the anchor form are passed as an object that is a member of the oute
 var editor = new MediumEditor('.editable', {
     buttons: ['bold', 'italic', 'underline', 'anchor'],
     anchor: {
-        // These are the default options for anchor form, if nothing is passed this is what it used
+        /* These are the default options for anchor form,
+           if nothing is passed this is what it used */
         customClassOption: null,
         customClassOptionText: 'Button',
         linkValidation: false,
@@ -171,7 +194,8 @@ Options for paste handling are passed as an object that is a member of the outer
 var editor = new MediumEditor('.editable', {
     buttons: ['bold', 'italic', 'quote'],
     paste: {
-        // This example includes the default options for paste, if nothing is passed this is what it used
+        /* This example includes the default options for paste,
+           if nothing is passed this is what it used */
         forcePlainText: true,
         cleanPastedHTML: false,
         cleanReplacements: [],
@@ -186,6 +210,29 @@ var editor = new MediumEditor('.editable', {
 * __cleanReplacements__: custom pairs (2 element arrays) of RegExp and replacement text to use during paste when __forcePlainText__ or __cleanPastedHTML__ are `true` OR when calling `cleanPaste(text)` helper method. Default: []
 * __cleanAttrs__: list of element attributes to remove during paste when __cleanPastedHTML__ is `true` or when calling `cleanPaste(text)` or `pasteHTML(html,options)` helper methods. Default: ['class', 'style', 'dir']
 * __cleanTags__: list of element tag names to remove during paste when __cleanPastedHTML__ is `true` or when calling `cleanPaste(text)` or `pasteHTML(html,options)` helper methods. Default: ['meta']
+
+### Auto Link Options
+
+The auto-link handler is a built-in extension which automatically turns URLs entered into the text field into HTML anchor tags (similar to the functionality of Markdown).  This feature is OFF by default.
+
+To enable built-in auto-link support, set the value of the `autoLink` option to `true':
+
+```javascript
+var editor = new MediumEditor('.editable', {
+    autoLink: true
+});
+```
+
+### Image Dragging Options
+
+The image dragging handler is a built-in extenson for handling dragging & dropping images into the contenteditable.  This feature is ON by default.
+
+To disable built-in image dragging, set the value of the `imageDragging` option to `false`:
+```javascript
+var editor = new MediumEditor('.editable', {
+    imageDragging: false
+});
+```
 
 ### Options Example:
 
@@ -210,8 +257,10 @@ var editor = new MediumEditor('.editable', {
     },
     anchorPreview: {
         hideDelay: 300
+    },
+    placeholder: {
+        text: 'Click to edit'
     }
-}
 });
 ```
 

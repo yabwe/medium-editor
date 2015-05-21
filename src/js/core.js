@@ -1,7 +1,6 @@
 /*global Util, ButtonsData, Button,
  Selection, FontSizeForm, Extension, extensionDefaults,
- Toolbar, AutoLink, ImageDragging, Events, Placeholders,
- editorDefaults,
+ Toolbar, AutoLink, ImageDragging, Events, editorDefaults,
  DefaultButton, AnchorExtension, FontSizeExtension, AnchorPreviewDeprecated */
 
 function MediumEditor(elements, options) {
@@ -232,12 +231,25 @@ function MediumEditor(elements, options) {
         return shouldAdd;
     }
 
+    function shouldAddDefaultPlaceholder() {
+        if (this.options.extensions['placeholder']) {
+            return false;
+        }
+
+        // TODO: deprecated
+        if (this.options.disablePlaceholders) {
+            return false;
+        }
+
+        return this.options.placeholder !== false;
+    }
+
     function shouldAddDefaultAutoLink() {
         if (this.options.extensions['auto-link']) {
             return false;
         }
 
-        return !!this.options.autoLink;
+        return this.options.autoLink !== false;
     }
 
     function shouldAddDefaultImageDragging() {
@@ -245,7 +257,7 @@ function MediumEditor(elements, options) {
             return false;
         }
 
-        return !!this.options.imageDragging;
+        return this.options.imageDragging !== false;
     }
 
     function createContentEditable(textarea) {
@@ -286,9 +298,6 @@ function MediumEditor(elements, options) {
             if (!this.options.disableEditing && !element.getAttribute('data-disable-editing')) {
                 element.setAttribute('contentEditable', true);
                 element.setAttribute('spellcheck', this.options.spellcheck);
-            }
-            if (!element.getAttribute('data-placeholder')) {
-                element.setAttribute('data-placeholder', this.options.placeholder);
             }
             element.setAttribute('data-medium-element', true);
             element.setAttribute('role', 'textbox');
@@ -353,6 +362,19 @@ function MediumEditor(elements, options) {
                 }
             }, this);
         }
+    }
+
+    function initPlaceholder(options) {
+        // Backwards compatability
+        var defaultsBC = {
+            text: (typeof this.options.placeholder === 'string') ? this.options.placeholder : undefined, // deprecated
+            'window': this.options.contentWindow,
+            'document': this.options.ownerDocument
+        };
+
+        return new MediumEditor.extensions.placeholder(
+            Util.extend({}, options, defaultsBC)
+        );
     }
 
     function initAnchorPreview(options) {
@@ -451,6 +473,11 @@ function MediumEditor(elements, options) {
         if (shouldAddDefaultImageDragging.call(this)) {
             this.commands.push(initExtension(new ImageDragging(), 'image-dragging', this));
         }
+
+        if (shouldAddDefaultPlaceholder.call(this)) {
+            var placeholderOpts = (typeof this.options.placeholder === 'string') ? {} : this.options.placeholder;
+            this.commands.push(initExtension(initPlaceholder.call(this, placeholderOpts), 'placeholder', this));
+        }
     }
 
     function mergeOptions(defaults, options) {
@@ -464,7 +491,8 @@ function MediumEditor(elements, options) {
             ['anchorTarget', 'anchor.targetCheckbox'],
             ['anchorInputCheckboxLabel', 'anchor.targetCheckboxText'],
             ['anchorPreviewHideDelay', 'anchorPreview.hideDelay'],
-            ['disableAnchorPreview', 'anchorPreview: false']
+            ['disableAnchorPreview', 'anchorPreview: false'],
+            ['disablePlaceholders', 'placeholder: false']
         ];
         // warn about using deprecated properties
         if (options) {
@@ -473,6 +501,10 @@ function MediumEditor(elements, options) {
                     Util.deprecated(pair[0], pair[1], 'v5.0.0');
                 }
             });
+
+            if (options.hasOwnProperty('placeholder') && typeof options.placeholder === 'string') {
+                Util.deprecated('placeholder', 'placeholder.text', 'v5.0.0');
+            }
         }
         return Util.defaults({}, options, defaults);
     }
@@ -561,10 +593,6 @@ function MediumEditor(elements, options) {
             initCommands.call(this);
             initToolbar.call(this);
             attachHandlers.call(this);
-
-            if (!this.options.disablePlaceholders) {
-                this.placeholders = new Placeholders(this);
-            }
         },
 
         destroy: function () {
