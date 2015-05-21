@@ -221,7 +221,7 @@ var Events;
                 this.listeners[name] = true;
                 break;
             case 'editableUnlink':
-                // Custom event fired from MediumEDitor core code.
+                // Custom event fired from MediumEditor core code.
                 this.listeners[name] = true;
                 break;
             case 'editableInput':

@@ -898,6 +898,12 @@ function MediumEditor(elements, options) {
         // http://stackoverflow.com/questions/17678843/cant-restore-selection-after-html-modify-even-if-its-the-same-html
         // Tim Down
         // TODO: move to selection.js and clean up old methods there
+        //
+        // {object} inSelectionState - the selection to import
+        // {boolean} [favorLaterSelectionAnchor] - defaults to false. If true, import the cursor immediately
+        //      subsequent to an anchor tag if it would otherwise be placed right at the trailing edge inside the
+        //      anchor. This cursor positioning, even though visually equivalent to the user, can affect behavior
+        //      in MS IE.
         importSelection: function (inSelectionState, favorLaterSelectionAnchor) {
             if (!inSelectionState) {
                 return;
