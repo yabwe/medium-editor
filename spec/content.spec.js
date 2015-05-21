@@ -1,7 +1,7 @@
 /*global describe, it, expect, spyOn,
     fireEvent, prepareEvent, firePreparedEvent, afterEach, beforeEach,
     selectElementContents, setupTestHelpers, placeCursorInsideElement,
-    isFirefox, isIE, isSafari, Util, selectElementContentsAndFire */
+    isFirefox, isIE, Util, selectElementContentsAndFire */
 
 describe('Content TestCase', function () {
     'use strict';
@@ -190,12 +190,11 @@ describe('Content TestCase', function () {
             expect(this.el.innerHTML).toBe('<p>lorem ipsum</p>');
         });
 
-        it('with ctrl key (Safari) or with shift key (other browsers), should insert a line break', function () {
+        it('with ctrl key, should not call formatBlock', function () {
             this.el.innerHTML = '<p>lorem ipsum</p>';
 
             var editor = this.newMediumEditor('.editor'),
-                p = editor.elements[0].querySelector('p'),
-                s = isSafari();
+                p = editor.elements[0].querySelector('p');
 
             spyOn(document, 'execCommand').and.callThrough();
 
@@ -203,12 +202,10 @@ describe('Content TestCase', function () {
 
             fireEvent(p, 'keyup', {
                 keyCode: Util.keyCode.ENTER,
-                ctrlKey: s,
-                shiftKey: !s
+                ctrlKey: true
             });
 
             expect(document.execCommand).not.toHaveBeenCalledWith('formatBlock', false, 'p');
-            expect(this.el.innerHTML).toBe('<p><br>lorem ipsum</p>');
         });
     });
 
