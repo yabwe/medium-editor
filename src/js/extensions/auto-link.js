@@ -180,15 +180,13 @@ LINK_REGEXP_TEXT =
                 return false;
             }
 
-            var anchor = document.createElement('a');
-            Util.moveTextRangeIntoElement(textNodes[0], textNodes[textNodes.length - 1], anchor);
-            anchor.setAttribute('href', Util.ensureUrlHasProtocol(href));
-            var span = document.createElement('span');
+            var anchor = document.createElement('a'),
+                span = document.createElement('span');
+            Util.moveTextRangeIntoElement(textNodes[0], textNodes[textNodes.length - 1], span);
             span.setAttribute('data-auto-link', 'true');
-            anchor.insertBefore(span, anchor.firstChild);
-            while (anchor.childNodes.length > 1) {
-                anchor.firstChild.appendChild(anchor.childNodes[1]);
-            }
+            anchor.setAttribute('href', Util.ensureUrlHasProtocol(href));
+            span.parentNode.insertBefore(anchor, span);
+            anchor.appendChild(span);
             return true;
         }
     });
