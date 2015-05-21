@@ -195,7 +195,7 @@ describe('Content TestCase', function () {
 
             var editor = this.newMediumEditor('.editor'),
                 p = editor.elements[0].querySelector('p'),
-                isSafari = isSafari();
+                s = isSafari();
 
             spyOn(document, 'execCommand').and.callThrough();
 
@@ -203,8 +203,8 @@ describe('Content TestCase', function () {
 
             fireEvent(p, 'keyup', {
                 keyCode: Util.keyCode.ENTER,
-                ctrlKey: isSafari,
-                shiftKey: !isSafari
+                ctrlKey: s,
+                shiftKey: !s
             });
 
             expect(document.execCommand).not.toHaveBeenCalledWith('formatBlock', false, 'p');
