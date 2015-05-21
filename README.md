@@ -259,7 +259,7 @@ var editor = new MediumEditor('.editable', {
         hideDelay: 300
     },
     placeholder: {
-        'Click to edit'
+        text: 'Click to edit'
     }
 });
 ```
