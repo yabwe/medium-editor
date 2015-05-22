@@ -271,21 +271,6 @@ var Events;
                     }.bind(this));
                     this.listeners[name] = true;
                     break;
-                case 'editableKeyupEnter':
-                    // Detecting keyup for ENTER on the contenteditables
-                    this.setupListener('editableKeyup');
-                    this.listeners[name] = true;
-                    break;
-                case 'editableKeyupTab':
-                    // Detecting keyup for TAB on the contenteditable
-                    this.setupListener('editableKeyup');
-                    this.listeners[name] = true;
-                    break;
-                case 'editableKeyupDelete':
-                    // Detecting keyup for DELETE/BACKSPACE on the contenteditables
-                    this.setupListener('editableKeyup');
-                    this.listeners[name] = true;
-                    break;
                 case 'editableKeydown':
                     // Detecting keydown on the contenteditables
                     this.base.elements.forEach(function (element) {
@@ -491,19 +476,6 @@ var Events;
 
         handleKeyup: function (event) {
             this.triggerCustomEvent('editableKeyup', event, event.currentTarget);
-
-            switch (event.which) {
-                case Util.keyCode.ENTER:
-                    this.triggerCustomEvent('editableKeyupEnter', event, event.currentTarget);
-                    break;
-                case Util.keyCode.TAB:
-                    this.triggerCustomEvent('editableKeyupTab', event, event.currentTarget);
-                    break;
-                case Util.keyCode.DELETE:
-                case Util.keyCode.BACKSPACE:
-                    this.triggerCustomEvent('editableKeyupDelete', event, event.currentTarget);
-                    break;
-            }
         },
 
         handleMouseover: function (event) {

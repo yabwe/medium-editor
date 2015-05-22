@@ -67,7 +67,7 @@ var Placeholder;
             if (this.hideOnClick) {
                 this.base.subscribe('editableClick', this.handleHidePlaceholderEvent.bind(this));
             } else {
-                this.base.subscribe('editableKeyupDelete', this.handleBlur.bind(this));
+                this.base.subscribe('editableKeyup', this.handleBlur.bind(this));
             }
 
             // Events where we always hide the placeholder
