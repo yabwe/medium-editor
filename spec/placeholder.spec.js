@@ -1,4 +1,4 @@
-/*global describe, it, expect,
+/*global describe, it, expect, Util,
     afterEach, beforeEach, fireEvent, setupTestHelpers,
     Placeholder */
 
@@ -66,6 +66,21 @@ describe('Placeholder TestCase', function () {
         this.el.innerHTML = '<p>lorem</p><p id="target">ipsum</p><p>dolor</p>';
         fireEvent(document.getElementById('target'), 'click');
         expect(editor.elements[0].className).not.toContain('medium-editor-placeholder');
+    });
+
+    it('should NOT remove the placeholder on click', function () {
+        var editor = this.newMediumEditor('.editor', { placeholder: { hideOnClick: false }});
+        expect(editor.elements[0].className).toContain('medium-editor-placeholder');
+        fireEvent(editor.elements[0], 'click');
+        expect(editor.elements[0].className).toContain('medium-editor-placeholder');
+        fireEvent(editor.elements[0], 'blur');
+        expect(editor.elements[0].className).toContain('medium-editor-placeholder');
+        this.el.innerHTML = '<p>lorem</p><p id="target">ipsum</p><p>dolor</p>';
+        fireEvent(document.getElementById('target'), 'keypress');
+        expect(editor.elements[0].className).not.toContain('medium-editor-placeholder');
+        this.el.innerHTML = '';
+        fireEvent(editor.elements[0], 'keyup', { keyCode: Util.keyCode.DELETE });
+        expect(editor.elements[0].className).toContain('medium-editor-placeholder');
     });
 
     it('should add a placeholder to empty elements on blur', function () {

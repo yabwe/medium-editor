@@ -16,6 +16,11 @@ var Placeholder;
          */
         text: 'Type your text',
 
+        /* hideOnClick: [boolean]
+         * Should we hide the placeholder on click (true) or when user starts typing (false)
+         */
+        hideOnClick: true,
+
         init: function () {
             this.initPlaceholders();
             this.attachEventHandlers();
@@ -58,8 +63,14 @@ var Placeholder;
             // Check placeholder on blur
             this.base.subscribe('editableBlur', this.handleBlur.bind(this));
 
+            // if we don't want the placeholder to be removed on click but when user start typing
+            if (this.hideOnClick) {
+                this.base.subscribe('editableClick', this.handleHidePlaceholderEvent.bind(this));
+            } else {
+                this.base.subscribe('editableKeyup', this.handleBlur.bind(this));
+            }
+
             // Events where we always hide the placeholder
-            this.base.subscribe('editableClick', this.handleHidePlaceholderEvent.bind(this));
             this.base.subscribe('editableKeypress', this.handleHidePlaceholderEvent.bind(this));
             this.base.subscribe('editablePaste', this.handleHidePlaceholderEvent.bind(this));
         },
