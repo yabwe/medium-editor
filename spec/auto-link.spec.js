@@ -36,13 +36,19 @@ describe('Autolink', function () {
                 'http://www.example.com?foo=bar',
                 'http://www.example.com/baz?foo=bar',
                 'http://www.example.com/baz?foo=bar#buzz',
-                'http://www.example.com/#buzz'
+                'http://www.example.com/#buzz',
+                'http://about.museum',
+                'http://getty.art.museum/visit/center/art.html',
+                'http://en.wikipedia.org/wiki/List_of_diplomatic_missions_of_China'
             ],
                 notLinks = [
                 'http:google.com',
                 'http:/example.com',
                 'app.can',
-                'sadasda.sdfasf.sdfas'
+                'sadasda.sdfasf.sdfas',
+                'www.example.combasic',
+                // Our algorithm assumes that '.' is punctuation, not part of the URL.
+                'en.wikipedia.org/wiki/Embassy_of_China_in_Washington,_D.C.'
             ];
 
             function triggerAutolinking(element) {
@@ -96,7 +102,7 @@ describe('Autolink', function () {
 
                     triggerAutolinking(this.el);
                     var anchors = this.el.getElementsByTagName('a');
-                    expect(anchors.length).toBe(0);
+                    expect(anchors.length).toBe(0, '# of anchors');
                 };
             }
 
