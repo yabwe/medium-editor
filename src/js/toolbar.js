@@ -113,9 +113,6 @@ var Toolbar;
 
         attachEventHandlers: function () {
 
-            this.base.events.defineCustomEvent('showToolbar');
-            this.base.events.defineCustomEvent('hideToolbar');
-
             // MediumEditor custom events for when user beings and ends interaction with a contenteditable and its elements
             this.base.subscribe('blur', this.handleBlur.bind(this));
             this.base.subscribe('focus', this.handleFocus.bind(this));
@@ -198,7 +195,6 @@ var Toolbar;
                 this.base.events.triggerCustomEvent('showToolbar', {}, {});
 
                 if (typeof this.options.onShowToolbar === 'function') {
-                    Util.deprecated('onShowToolbar', 'the showToolbar event instead');
                     this.options.onShowToolbar();
                 }
             }
@@ -217,7 +213,6 @@ var Toolbar;
                 });
 
                 if (typeof this.options.onHideToolbar === 'function') {
-                    Util.deprecated('onHideToolbar', 'the hideToolbar event instead');
                     this.options.onHideToolbar();
                 }
             }

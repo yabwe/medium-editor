@@ -106,7 +106,34 @@ describe('Toolbar TestCase', function () {
             expect(callback).toHaveBeenCalled();
         });
 
-        // @deprecated
+        it('should be possible to listen to toolbar events from extensions', function () {
+            var TestExtension = function () {},
+                callbackShow = jasmine.createSpy('show'),
+                callbackHide = jasmine.createSpy('hide');
+
+            TestExtension.prototype.parent = true;
+            TestExtension.prototype.init = function () {
+                this.base.subscribe('showToolbar', callbackShow);
+                this.base.subscribe('hideToolbar', callbackHide);
+            };
+
+            var editor = this.newMediumEditor('.editor', {
+                extensions: { 'testExtension': new TestExtension() }
+            });
+
+            this.el.innerHTML = 'specOnShowToolbarTest';
+
+            selectElementContentsAndFire(this.el, { eventToFire: 'focus' });
+            expect(callbackShow).toHaveBeenCalled();
+
+            // Remove selection and call check selection, which should make the toolbar be hidden
+            jasmine.clock().tick(1);
+            window.getSelection().removeAllRanges();
+            editor.checkSelection();
+
+            expect(callbackHide).toHaveBeenCalled();
+        });
+
         it('should call onShowToolbar when toolbar is shown and onHideToolbar when toolbar is hidden', function () {
             var editor,
                 temp = {

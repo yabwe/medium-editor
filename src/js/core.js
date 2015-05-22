@@ -1,7 +1,7 @@
 /*global Util, ButtonsData, Button,
  Selection, FontSizeForm, Extension, extensionDefaults,
  Toolbar, AutoLink, ImageDragging, Events, editorDefaults,
- DefaultButton, AnchorExtension, FontSizeExtension, AnchorPreviewDeprecated */
+ DefaultButton, AnchorExtension, FontSizeExtension, AnchorPreviewDeprecated*/
 
 function MediumEditor(elements, options) {
     'use strict';
@@ -432,6 +432,12 @@ function MediumEditor(elements, options) {
             ext,
             name;
         this.commands = [];
+
+        // add toolbar custom events to the list of known events by the editor
+        // we need to have this for the initialization of extensions
+        // initToolbar is called after initCommands
+        this.events.defineCustomEvent('showToolbar');
+        this.events.defineCustomEvent('hideToolbar');
 
         buttons.forEach(function (buttonName) {
             if (extensions[buttonName]) {
