@@ -1,4 +1,4 @@
-/*global Util */
+/*global Util*/
 
 var Events;
 
@@ -70,6 +70,10 @@ var Events;
                 this.customEvents[event].splice(index, 1);
                 // TODO: If array is empty, should detach internal listeners via destoryListener()
             }
+        },
+
+        defineCustomEvent: function (event) {
+            this.listeners[event] = true;
         },
 
         indexOfCustomListener: function (event, listener) {

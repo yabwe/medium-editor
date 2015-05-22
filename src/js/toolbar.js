@@ -1,4 +1,4 @@
-/*global Util, Selection */
+/*global Util, Selection*/
 
 var Toolbar;
 
@@ -113,6 +113,9 @@ var Toolbar;
 
         attachEventHandlers: function () {
 
+            this.base.events.defineCustomEvent('showToolbar');
+            this.base.events.defineCustomEvent('hideToolbar');
+
             // MediumEditor custom events for when user beings and ends interaction with a contenteditable and its elements
             this.base.subscribe('blur', this.handleBlur.bind(this));
             this.base.subscribe('focus', this.handleFocus.bind(this));
@@ -192,7 +195,10 @@ var Toolbar;
             clearTimeout(this.hideTimeout);
             if (!this.isDisplayed()) {
                 this.getToolbarElement().classList.add('medium-editor-toolbar-active');
+                this.base.events.triggerCustomEvent('showToolbar', {}, {});
+
                 if (typeof this.options.onShowToolbar === 'function') {
+                    Util.deprecated('onShowToolbar', 'the showToolbar event instead');
                     this.options.onShowToolbar();
                 }
             }
@@ -200,14 +206,18 @@ var Toolbar;
 
         hideToolbar: function () {
             if (this.isDisplayed()) {
+                this.getToolbarElement().classList.remove('medium-editor-toolbar-active');
+                this.base.events.triggerCustomEvent('hideToolbar', {}, {});
+
                 this.base.commands.forEach(function (extension) {
                     if (typeof extension.onHide === 'function') {
+                        Util.deprecated('onHideToolbar', 'the hideToolbar event instead');
                         extension.onHide();
                     }
                 });
 
-                this.getToolbarElement().classList.remove('medium-editor-toolbar-active');
                 if (typeof this.options.onHideToolbar === 'function') {
+                    Util.deprecated('onHideToolbar', 'the hideToolbar event instead');
                     this.options.onHideToolbar();
                 }
             }

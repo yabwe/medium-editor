@@ -1,7 +1,7 @@
 /*global MediumEditor, describe, it, expect, spyOn,
     afterEach, beforeEach, selectElementContents,
     fireEvent, setupTestHelpers, jasmine, selectElementContentsAndFire,
-    placeCursorInsideElement, Toolbar */
+    placeCursorInsideElement, Toolbar*/
 
 describe('Toolbar TestCase', function () {
     'use strict';
@@ -75,7 +75,39 @@ describe('Toolbar TestCase', function () {
             expect(editor.toolbar.getToolbarElement().querySelector('button[data-action="bold"]').classList.contains('medium-editor-button-active')).toBe(true);
         });
 
-        it('should call onShowToolbar when toolbar is shwon and onHideToolbar when toolbar is hidden', function () {
+        it('should trigger the showToolbar custom event when toolbar is shown', function () {
+            var editor = this.newMediumEditor('.editor'),
+                callback = jasmine.createSpy();
+
+            this.el.innerHTML = 'specOnShowToolbarTest';
+
+            editor.subscribe('showToolbar', callback);
+
+            selectElementContentsAndFire(this.el, { eventToFire: 'focus' });
+
+            expect(callback).toHaveBeenCalled();
+        });
+
+        it('should trigger the hideToolbar custom event when toolbar is hidden', function () {
+            var editor = this.newMediumEditor('.editor'),
+                callback = jasmine.createSpy();
+
+            this.el.innerHTML = 'specOnShowToolbarTest';
+
+            editor.subscribe('hideToolbar', callback);
+
+            selectElementContentsAndFire(this.el, { eventToFire: 'focus' });
+
+            // Remove selection and call check selection, which should make the toolbar be hidden
+            jasmine.clock().tick(1);
+            window.getSelection().removeAllRanges();
+            editor.checkSelection();
+
+            expect(callback).toHaveBeenCalled();
+        });
+
+        // @deprecated
+        it('should call onShowToolbar when toolbar is shown and onHideToolbar when toolbar is hidden', function () {
             var editor,
                 temp = {
                     onShow: function () {},
