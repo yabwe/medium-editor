@@ -192,7 +192,7 @@ var Toolbar;
             clearTimeout(this.hideTimeout);
             if (!this.isDisplayed()) {
                 this.getToolbarElement().classList.add('medium-editor-toolbar-active');
-                this.base.events.triggerCustomEvent('showToolbar', {}, this.getFocusedElement());
+                this.base.events.triggerCustomEvent('showToolbar', {}, this.base.getFocusedElement());
 
                 if (typeof this.options.onShowToolbar === 'function') {
                     this.options.onShowToolbar();
@@ -203,7 +203,7 @@ var Toolbar;
         hideToolbar: function () {
             if (this.isDisplayed()) {
                 this.getToolbarElement().classList.remove('medium-editor-toolbar-active');
-                this.base.events.triggerCustomEvent('hideToolbar', {}, this.getFocusedElement());
+                this.base.events.triggerCustomEvent('hideToolbar', {}, this.base.getFocusedElement());
 
                 this.base.commands.forEach(function (extension) {
                     if (typeof extension.onHide === 'function') {
@@ -308,7 +308,7 @@ var Toolbar;
 
                 // If no editable has focus OR selection is inside contenteditable = false
                 // hide toolbar
-                if (!this.getFocusedElement() ||
+                if (!this.base.getFocusedElement() ||
                         Selection.selectionInContentEditableFalse(this.options.contentWindow)) {
                     this.hideToolbar();
                     return;
@@ -341,15 +341,6 @@ var Toolbar;
                     this.showAndUpdateToolbar();
                 }
             }
-        },
-
-        getFocusedElement: function () {
-            for (var i = 0; i < this.base.elements.length; i += 1) {
-                if (this.base.elements[i].getAttribute('data-medium-focused')) {
-                    return this.base.elements[i];
-                }
-            }
-            return null;
         },
 
         // Updating the toolbar
@@ -433,7 +424,7 @@ var Toolbar;
         },
 
         setToolbarPosition: function () {
-            var container = this.getFocusedElement(),
+            var container = this.base.getFocusedElement(),
                 selection = this.options.contentWindow.getSelection(),
                 anchorPreview;
 
