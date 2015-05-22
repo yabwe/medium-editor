@@ -35,6 +35,15 @@ Run in your console: `npm install medium-editor`
 
 `bower install medium-editor`
 
+**Via CDNJS**
+
+[CDNJS hosts this library](https://cdnjs.com/libraries/medium-editor) and you can load it from CDN this way:
+
+```html
+<script src="https://cdnjs.cloudflare.com/ajax/libs/medium-editor/4.10.1/medium-editor.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/medium-editor/4.10.1/medium-editor.min.css" type="text/css" media="screen" charset="utf-8">
+```
+
 **Manual installation:**
 
 Download the [latest release](https://github.com/daviferreira/medium-editor/releases) and attach medium editor's stylesheets to your page:
