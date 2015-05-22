@@ -85,7 +85,7 @@ describe('Toolbar TestCase', function () {
 
             selectElementContentsAndFire(this.el, { eventToFire: 'focus' });
 
-            expect(callback).toHaveBeenCalled();
+            expect(callback).toHaveBeenCalledWith({}, this.el);
         });
 
         it('should trigger the hideToolbar custom event when toolbar is hidden', function () {
@@ -103,7 +103,7 @@ describe('Toolbar TestCase', function () {
             window.getSelection().removeAllRanges();
             editor.checkSelection();
 
-            expect(callback).toHaveBeenCalled();
+            expect(callback).toHaveBeenCalledWith({}, this.el);
         });
 
         it('should be possible to listen to toolbar events from extensions', function () {
@@ -124,14 +124,14 @@ describe('Toolbar TestCase', function () {
             this.el.innerHTML = 'specOnShowToolbarTest';
 
             selectElementContentsAndFire(this.el, { eventToFire: 'focus' });
-            expect(callbackShow).toHaveBeenCalled();
+            expect(callbackShow).toHaveBeenCalledWith({}, this.el);
 
             // Remove selection and call check selection, which should make the toolbar be hidden
             jasmine.clock().tick(1);
             window.getSelection().removeAllRanges();
             editor.checkSelection();
 
-            expect(callbackHide).toHaveBeenCalled();
+            expect(callbackHide).toHaveBeenCalledWith({}, this.el);
         });
 
         it('should call onShowToolbar when toolbar is shown and onHideToolbar when toolbar is hidden', function () {
