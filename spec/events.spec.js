@@ -319,4 +319,39 @@ describe('Events TestCase', function () {
             Events.prototype.InputEventOnContenteditableSupported = originalInputSupport;
         });
     });
+
+    describe('Setup some listeners', function () {
+        var links = [
+            'externalInteraction',
+            'blur',
+            'focus',
+            'editableInput',
+            'editableClick',
+            'editableBlur',
+            'editableKeypress',
+            'editableKeyup',
+            'editableKeyupEnter',
+            'editableKeyupTab',
+            'editableKeyupDelete',
+            'editableKeydown',
+            'editableKeydownEnter',
+            'editableKeydownTab',
+            'editableKeydownDelete',
+            'editableMouseover',
+            'editableDrag',
+            'editableDrop',
+            'editablePaste'
+        ];
+
+        links.forEach(function (listener) {
+            it('should setup "' + listener + '" listener', function () {
+                var editor = this.newMediumEditor('.editor'),
+                    events = new Events(editor);
+
+                events.setupListener(listener);
+
+                expect(events.listeners[listener]).toBe(true);
+            });
+        });
+    });
 });

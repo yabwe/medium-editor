@@ -1832,7 +1832,7 @@ var Events;
         // custom events
         attachCustomEvent: function (event, listener) {
             this.setupListener(event);
-            // If we don't suppot this custom event, don't do anything
+            // If we don't support this custom event, don't do anything
             if (this.listeners[event]) {
                 if (!this.customEvents[event]) {
                     this.customEvents[event] = [];
@@ -1973,7 +1973,6 @@ var Events;
         },
 
         // Listening to browser events to emit events medium-editor cares about
-
         setupListener: function (name) {
             if (this.listeners[name]) {
                 return;
