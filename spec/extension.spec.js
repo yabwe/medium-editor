@@ -1,19 +1,17 @@
 /*global MediumEditor, describe, it, expect, spyOn,
-         afterEach, beforeEach, selectElementContents,
-         jasmine, fireEvent, tearDown*/
+    afterEach, beforeEach, jasmine, setupTestHelpers,
+    selectElementContentsAndFire, Extension */
 
 describe('Extensions TestCase', function () {
     'use strict';
 
     beforeEach(function () {
-        this.el = document.createElement('div');
-        this.el.className = 'editor';
-        this.el.innerHTML = 'lorem ipsum';
-        document.body.appendChild(this.el);
+        setupTestHelpers.call(this);
+        this.el = this.createElement('div', 'editor', 'lore ipsum');
     });
 
     afterEach(function () {
-        tearDown(this.el);
+        this.cleanupTest();
     });
 
     describe('Editor', function () {
@@ -23,7 +21,7 @@ describe('Extensions TestCase', function () {
                 'extension1': {},
                 'extension2': {}
             },
-                editor = new MediumEditor('.editor', {
+                editor = this.newMediumEditor('.editor', {
                     extensions: extensions
                 });
             expect(editor.options.extensions).toBe(extensions);
@@ -36,15 +34,15 @@ describe('Extensions TestCase', function () {
             },
                 ext1 = new Extension(),
                 ext2 = new Extension(),
-                editor = new MediumEditor('.editor', {
+                editor = this.newMediumEditor('.editor', {
                     extensions: {
                         'one': ext1,
                         'two': ext2
                     }
                 });
 
-            Extension.prototype.aMethod = function (param) {
-
+            Extension.prototype.aMethod = function () {
+                // just a stub function
             };
 
             spyOn(ext1, 'aMethod');
@@ -73,7 +71,7 @@ describe('Extensions TestCase', function () {
             ext1 = new ExtensionOne();
             ext2 = new ExtensionTwo();
 
-            editor = new MediumEditor('.editor', {
+            editor = this.newMediumEditor('.editor', {
                 extensions: {
                     'one': ext1,
                     'two': ext2
@@ -82,8 +80,54 @@ describe('Extensions TestCase', function () {
 
             expect(ext1.me instanceof MediumEditor).toBeTruthy();
             expect(ext2.me instanceof MediumEditor).toBeTruthy();
-            editor.deactivate();
         });
+    });
+
+    describe('Core Extension', function () {
+
+        it('exists', function () {
+            expect(MediumEditor.Extension).toBeTruthy();
+            expect(MediumEditor.Extension).toBe(Extension);
+        });
+
+        it('provides an .extend method', function () {
+
+            expect(Extension.extend).toBeTruthy();
+            var Extended = Extension.extend({
+                foo: 'bar'
+            });
+            expect(Extended.prototype.foo).toBe('bar');
+            expect(Extended.extend).toBe(Extension.extend);
+        });
+
+        it('can be passed as an extension', function () {
+
+            var Sub, editor, e1, e2;
+
+            Sub = Extension.extend({
+                parent: true,
+                y: 10
+            });
+
+            e1 = new Sub();
+            e2 = new Sub({ y: 20 });
+
+            spyOn(e1, 'init');
+
+            editor = this.newMediumEditor('.editor', {
+                extensions: {
+                    'foo': e1,
+                    'bar': e2
+                }
+            });
+
+            expect(e1.y).toBe(10);
+            expect(e2.y).toBe(20);
+
+            expect(e1.init).toHaveBeenCalledWith(editor);
+
+        });
+
     });
 
     describe('Button integration', function () {
@@ -94,7 +138,8 @@ describe('Extensions TestCase', function () {
                 button.className = 'extension-button';
                 button.innerText = 'XXX';
                 return button;
-            }
+            },
+            checkState: function () {}
         },
             ExtensionWithString = {
                 getButton: function () {
@@ -102,37 +147,52 @@ describe('Extensions TestCase', function () {
                 }
             },
             ExtensionWithNoButton = function () {
-                this.init = function (me) {};
+                this.init = function () {};
             };
 
         it('should include extensions button into toolbar', function () {
-            var editor = new MediumEditor('.editor', {
+            var editor = this.newMediumEditor('.editor', {
                 buttons: ['dummy'],
                 extensions: {
                     'dummy': ExtensionWithElement
                 }
             });
-            expect(editor.toolbar.querySelectorAll('.extension-button').length).toBe(1);
+            expect(editor.toolbar.getToolbarElement().querySelectorAll('.extension-button').length).toBe(1);
+        });
+
+        it('should call checkState on extensions when toolbar selection updates', function () {
+            var editor = this.newMediumEditor('.editor', {
+                    buttons: ['dummy'],
+                    extensions: {
+                        'dummy': ExtensionWithElement
+                    }
+                });
+            selectElementContentsAndFire(editor.elements[0].firstChild);
+            spyOn(ExtensionWithElement, 'checkState').and.callThrough();
+            editor.checkSelection();
+            jasmine.clock().tick(51);
+            expect(ExtensionWithElement.checkState.calls.count()).toEqual(1);
+            jasmine.clock().uninstall();
         });
 
         it('should include extensions button by string into the toolbar', function () {
-            var editor = new MediumEditor('.editor', {
+            var editor = this.newMediumEditor('.editor', {
                 buttons: ['dummy'],
                 extensions: {
                     'dummy': ExtensionWithString
                 }
             });
-            expect(editor.toolbar.querySelectorAll('.extension-button').length).toBe(1);
+            expect(editor.toolbar.getToolbarElement().querySelectorAll('.extension-button').length).toBe(1);
         });
 
         it('should not include extensions button into toolbar that are not in "buttons"', function () {
-            var editor = new MediumEditor('.editor', {
+            var editor = this.newMediumEditor('.editor', {
                 buttons: ['bold'],
                 extensions: {
                     'dummy': ExtensionWithElement
                 }
             });
-            expect(editor.toolbar.querySelectorAll('.extension-button').length).toBe(0);
+            expect(editor.toolbar.getToolbarElement().querySelectorAll('.extension-button').length).toBe(0);
         });
 
         it('should not include buttons into the toolbar when an overriding extension is present', function () {
@@ -140,17 +200,17 @@ describe('Extensions TestCase', function () {
                 editor;
 
             spyOn(ext, 'init');
-            editor = new MediumEditor('.editor', {
+            editor = this.newMediumEditor('.editor', {
                 buttons: ['bold', 'italic'],
                 extensions: {
                     'bold': ext
                 }
             });
 
-            expect(editor.toolbar.querySelectorAll('button[data-action="italic"]').length).toBe(1);
-            expect(editor.toolbar.querySelectorAll('button[data-action="bold"]').length).toBe(0);
+            expect(editor.toolbar.getToolbarElement().querySelectorAll('button').length).toBe(1);
+            expect(editor.toolbar.getToolbarElement().querySelectorAll('button[data-action="italic"]').length).toBe(1);
+            expect(editor.toolbar.getToolbarElement().querySelectorAll('button[data-action="bold"]').length).toBe(0);
             expect(ext.init).toHaveBeenCalled();
-            expect(editor.commands.length).toBe(2);
         });
     });
 
@@ -163,7 +223,7 @@ describe('Extensions TestCase', function () {
             extTwo = new ExtensionTwo();
 
         it('should check if extension class has parent attribute', function () {
-            var editor = new MediumEditor('.editor', {
+            var editor = this.newMediumEditor('.editor', {
                 extensions: {
                     'one': extOne,
                     'two': extTwo
@@ -176,7 +236,7 @@ describe('Extensions TestCase', function () {
         });
 
         it('should set the base attribute to be an instance of editor', function () {
-            var editor = new MediumEditor('.editor', {
+            var editor = this.newMediumEditor('.editor', {
                 extensions: {
                     'one': extOne,
                     'two': extTwo
@@ -189,7 +249,7 @@ describe('Extensions TestCase', function () {
         });
 
         it('should set the name of the extension', function () {
-            var editor = new MediumEditor('.editor', {
+            this.newMediumEditor('.editor', {
                 extensions: {
                     'one': extOne,
                     'two': extTwo
@@ -198,7 +258,6 @@ describe('Extensions TestCase', function () {
 
             expect(extOne.name).toBe('one');
             expect(extTwo.name).toBe('two');
-            editor.deactivate();
         });
     });
 });

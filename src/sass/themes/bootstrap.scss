@@ -1,9 +1,11 @@
-$medium_editor_bgcolor:       #428bca;
-$medium_editor_border_color:  #357ebd;
-$medium_editor_button_size:   60px;
-$medium_editor_hover_color:   #3276b1;
-$medium_editor_link_color:    #fff;
-$medium_editor_border_radius: 4px;
+$medium_editor_bgcolor:                     #428bca !default;
+$medium_editor_border_color:                #357ebd !default;
+$medium_editor_button_size:                 60px !default;
+$medium_editor_button_active_text_color:    #fff !default;
+$medium_editor_hover_color:                 #3276b1 !default;
+$medium_editor_link_color:                  #fff !default;
+$medium_editor_border_radius:               4px !default;
+$medium_editor_placeholder_color:           #fff !default;
 
 .medium-toolbar-arrow-under:after {
     top: $medium_editor_button_size;
@@ -18,7 +20,6 @@ $medium_editor_border_radius: 4px;
     border: 1px solid $medium_editor_border_color;
     background-color: $medium_editor_bgcolor;
     border-radius: $medium_editor_border_radius;
-    transition: top .075s ease-out,left .075s ease-out;
 
     li {
         button {
@@ -32,7 +33,7 @@ $medium_editor_border_radius: 4px;
             transition: background-color .2s ease-in, color .2s ease-in;
             &:hover {
                 background-color: $medium_editor_hover_color;
-                color: #fff;
+                color: $medium_editor_button_active_text_color;
             }
         }
 
@@ -49,7 +50,7 @@ $medium_editor_border_radius: 4px;
 
         .medium-editor-button-active {
             background-color: $medium_editor_hover_color;
-            color: #fff;
+            color: $medium_editor_button_active_text_color;
         }
     }
 }
@@ -63,21 +64,22 @@ $medium_editor_border_radius: 4px;
         height: $medium_editor_button_size;
         background: $medium_editor_bgcolor;
         color: $medium_editor_link_color;
+
         &::-webkit-input-placeholder {
-           color: #fff;
-           color: rgba(#fff, .8);
+           color: $medium_editor_placeholder_color;
+           color: rgba($medium_editor_placeholder_color, .8);
         }
         &:-moz-placeholder { /* Firefox 18- */
-           color: #fff;
-           color: rgba(#fff, .8);
+           color: $medium_editor_placeholder_color;
+           color: rgba($medium_editor_placeholder_color, .8);
         }
         &::-moz-placeholder {  /* Firefox 19+ */
-           color: #fff;
-           color: rgba(#fff, .8);
+           color: $medium_editor_placeholder_color;
+           color: rgba($medium_editor_placeholder_color, .8);
         }
         &:-ms-input-placeholder {
-           color: #fff;
-           color: rgba(#fff, .8);
+           color: $medium_editor_placeholder_color;
+           color: rgba($medium_editor_placeholder_color, .8);
         }
     }
 

@@ -8,9 +8,7 @@
 .medium-editor-toolbar {
   border: 1px solid #357ebd;
   background-color: #428bca;
-  border-radius: 4px;
-  -webkit-transition: top 0.075s ease-out, left 0.075s ease-out;
-          transition: top 0.075s ease-out, left 0.075s ease-out; }
+  border-radius: 4px; }
   .medium-editor-toolbar li button {
     min-width: 60px;
     height: 60px;

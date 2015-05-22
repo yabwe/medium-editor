@@ -1,45 +1,54 @@
 /*global MediumEditor, describe, it, expect,
          afterEach, beforeEach, fireEvent, spyOn,
-         selectElementContentsAndFire, jasmine, tearDown,
-         console, xit*/
+         selectElementContentsAndFire, jasmine, setupTestHelpers */
 
 describe('Resize TestCase', function () {
     'use strict';
 
     beforeEach(function () {
-        jasmine.clock().install();
-        this.el = document.createElement('div');
-        this.el.className = 'editor';
-        this.el.innerHTML = 'test content';
-        document.body.appendChild(this.el);
+        setupTestHelpers.call(this);
+        this.el = this.createElement('div', 'editor', 'test content');
     });
 
     afterEach(function () {
-        tearDown(this.el);
-        jasmine.clock().uninstall();
+        this.cleanupTest();
     });
 
     it('should reset toolbar position on window resize', function () {
-        var editor = new MediumEditor('.editor');
+        var editor = this.newMediumEditor('.editor');
         selectElementContentsAndFire(editor.elements[0]);
-        jasmine.clock().tick(101);
-        expect(editor.toolbar.className.indexOf('active') > -1).toBe(true);
-        spyOn(editor, 'setToolbarPosition');
+        jasmine.clock().tick(1);
+        expect(editor.toolbar.getToolbarElement().className.indexOf('active') > -1).toBe(true);
+        spyOn(MediumEditor.statics.Toolbar.prototype, 'setToolbarPosition');
         fireEvent(window, 'resize');
-        jasmine.clock().tick(101);
-        expect(editor.setToolbarPosition).toHaveBeenCalled();
-        editor.deactivate();
+        jasmine.clock().tick(1);
+        expect(editor.toolbar.setToolbarPosition).toHaveBeenCalled();
+        editor.destroy();
     });
 
-    // I believe some other test is breaking this one, it passes when runs alone
-    // it is calling setToolbar even with no text selected
-    xit('should not call setToolbarPosition when toolbar is not visible', function () {
-        var editor = new MediumEditor('.editor');
-        spyOn(editor, 'setToolbarPosition');
+    it('should not call setToolbarPosition when toolbar is not visible', function () {
+        var editor = this.newMediumEditor('.editor');
+        spyOn(editor.toolbar, 'setToolbarPosition').and.callThrough();
         fireEvent(window, 'resize');
-        jasmine.clock().tick(101);
-        expect(editor.toolbar.className.indexOf('active')).toBe(-1);
-        expect(editor.setToolbarPosition).not.toHaveBeenCalled();
+        jasmine.clock().tick(1);
+        expect(editor.toolbar.getToolbarElement().className.indexOf('active')).toBe(-1);
+        expect(editor.toolbar.setToolbarPosition).not.toHaveBeenCalled();
     });
 
+    it('should throttle multiple calls to position toolbar', function () {
+        var editor = this.newMediumEditor('.editor'),
+            tickTime = 60,
+            totalTicks;
+
+        selectElementContentsAndFire(editor.elements[0]);
+        jasmine.clock().tick(1);
+        expect(editor.toolbar.getToolbarElement().className.indexOf('active') > -1).toBe(true);
+
+        spyOn(editor.toolbar, 'setToolbarPosition').and.callThrough();
+        for (totalTicks = 0; totalTicks < tickTime; totalTicks += 10) {
+            fireEvent(window, 'resize');
+            jasmine.clock().tick(10);
+        }
+        expect(editor.toolbar.setToolbarPosition.calls.count()).toBeLessThan(3);
+    });
 });

@@ -1,7 +1,32 @@
+# faster builds on new travis setup not using sudo
+sudo: false
+
+# cache vendor dirs
+cache:
+    directories:
+        - node_modules
+
 language: node_js
-node_js:
-  - 0.10
+
 notifications:
     email: false
+    webhooks:
+        urls:
+            - https://webhooks.gitter.im/e/0913a4ced1f3322b4c40
+        on_success: change  # options: [always|never|change] default: always
+        on_failure: always  # options: [always|never|change] default: always
+        on_start: false     # default: false
+
 before_script:
     - npm install -g grunt-cli
+
+script:
+    - npm run test:ci
+
+addons:
+    sauce_connect: true
+
+env:
+    global:
+        - secure: uSn+psGGU4v96aLw3egOywFLaZ1nAjwzbwpn/yUWXanPllHi7LZIe4tY41GfrE4CmD+brAQFRPkuxUnk5uOdtnwLPo5eSg/NAWEIVws2/UnPisr63YopB/LTLP9NqcUklZ8IsE3gcXrhMZWJBm5wfXj9pO+182zp6XHzID1yDAE=
+        - secure: On1IPA/AVPSJitzCK8XfYuYRJDi2/jNEP2Wux8S2L/AvmAQ0tUQN7ivxgoyZUb9Bez6OkxfFSDBsrIR3p7MiSIIZSPOD55/QiJyUtmH25WuIcrjyytaCEvNv2OeCNwS2EGQe0ToxdwRCCqBPJRLJTMyuvlnSkAKmKPPfdXjcCOM=

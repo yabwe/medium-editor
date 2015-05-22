@@ -1,6 +1,26 @@
 @import "clearfix";
 @import "pop-upwards";
 
+$medium_editor_z_index: 2000 !default;
+
+.data-medium-element {
+    sup {
+        vertical-align: super;
+    }
+
+    sub {
+        vertical-align: sub;
+    }
+
+    img {
+        max-width: 100%;
+    }
+}
+
+.medium-editor-hidden {
+    display: none;
+}
+
 %medium-toolbar-arrow {
     position: absolute;
     left: 50%;
@@ -27,7 +47,7 @@
     position: absolute;
     top: 0;
     left: 0;
-    z-index: 2000;
+    z-index: $medium_editor_z_index;
     visibility: hidden;
     font-size: 16px;
     font-family: HelveticaNeue, Helvetica, Arial, sans-serif;
@@ -51,6 +71,9 @@
             line-height: 1.33;
             text-decoration: none;
             box-sizing: border-box;
+            &:focus {
+                outline: none;
+            }
         }
 
         .medium-editor-action-underline {
@@ -67,15 +90,18 @@
 }
 
 .medium-editor-anchor-preview {
-    i {
+    max-width: 280px;
+    word-break: break-all;
+    word-wrap: break-word;
+    text-align: center;
+    line-height: 1.4;
+
+    a {
         display: inline-block;
         margin: 5px 5px 5px 10px;
-        text-decoration: underline;
-        font-style: normal;
-        cursor: pointer;
+        color: #fff;
     }
 }
-
 
 .medium-editor-toolbar-active, .medium-editor-anchor-preview-active {
     visibility: visible;
@@ -86,9 +112,8 @@
     top: 1px;
 }
 
-.stalker-toolbar {
+.medium-editor-toolbar-active.stalker-toolbar {
     animation: pop-upwards 160ms forwards linear;
-    transition: top .075s ease-out, left .075s ease-out;
 }
 
 .medium-editor-action-bold {

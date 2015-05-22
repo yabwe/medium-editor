@@ -1,7 +1,9 @@
-$medium_editor_bgcolor:       #57ad68;
-$medium_editor_border_color:  #fff;
-$medium_editor_button_size:   60px;
-$medium_editor_link_color:    #fff;
+$medium_editor_bgcolor:                     #57ad68 !default;
+$medium_editor_border_color:                #fff !default;
+$medium_editor_button_size:                 60px !default;
+$medium_editor_button_active_text_color:    #fff !default;
+$medium_editor_link_color:                  #fff !default;
+$medium_editor_placeholder_color:           #fff !default;
 
 .medium-toolbar-arrow-under:after {
     top: $medium_editor_button_size;
@@ -29,13 +31,13 @@ $medium_editor_link_color:    #fff;
             transition: background-color .2s ease-in, color .2s ease-in;
             &:hover {
                 background-color: darken($medium_editor_bgcolor, 20);
-                color: #fff;
+                color: $medium_editor_button_active_text_color;
             }
         }
 
         .medium-editor-button-active {
             background-color: darken($medium_editor_bgcolor, 30);
-            color: #fff;
+            color: $medium_editor_button_active_text_color;
         }
 
         .medium-editor-button-last {
@@ -51,23 +53,23 @@ $medium_editor_link_color:    #fff;
         color: $medium_editor_link_color;
 
         &::-webkit-input-placeholder {
-           color: #fff;
-           color: rgba(#fff, .8);
+           color: $medium_editor_placeholder_color;
+           color: rgba($medium_editor_placeholder_color, .8);
         }
 
         &:-moz-placeholder { /* Firefox 18- */
-           color: #fff;
-           color: rgba(#fff, .8);
+           color: $medium_editor_placeholder_color;
+           color: rgba($medium_editor_placeholder_color, .8);
         }
 
         &::-moz-placeholder {  /* Firefox 19+ */
-           color: #fff;
-           color: rgba(#fff, .8);
+           color: $medium_editor_placeholder_color;
+           color: rgba($medium_editor_placeholder_color, .8);
         }
 
         &:-ms-input-placeholder {
-           color: #fff;
-           color: rgba(#fff, .8);
+           color: $medium_editor_placeholder-color;
+           color: rgba($medium_editor_placeholder_color, .8);
         }
     }
 
