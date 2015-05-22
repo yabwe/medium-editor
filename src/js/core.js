@@ -436,8 +436,9 @@ function MediumEditor(elements, options) {
         // add toolbar custom events to the list of known events by the editor
         // we need to have this for the initialization of extensions
         // initToolbar is called after initCommands
-        this.events.defineCustomEvent('showToolbar');
-        this.events.defineCustomEvent('hideToolbar');
+        // add toolbar custom events to the list of known events by the editor
+        this.createEvent('showToolbar');
+        this.createEvent('hideToolbar');
 
         buttons.forEach(function (buttonName) {
             if (extensions[buttonName]) {
@@ -655,6 +656,14 @@ function MediumEditor(elements, options) {
 
         unsubscribe: function (event, listener) {
             this.events.detachCustomEvent(event, listener);
+        },
+
+        createEvent: function (event) {
+            this.events.defineCustomEvent(event);
+        },
+
+        trigger: function (name, data, editable) {
+            this.events.triggerCustomEvent(name, data, editable);
         },
 
         delay: function (fn) {

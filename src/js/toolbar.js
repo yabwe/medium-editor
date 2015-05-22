@@ -8,6 +8,7 @@ var Toolbar;
     Toolbar = function Toolbar(instance) {
         this.base = instance;
         this.options = instance.options;
+
         this.initThrottledMethods();
     };
 
@@ -192,7 +193,7 @@ var Toolbar;
             clearTimeout(this.hideTimeout);
             if (!this.isDisplayed()) {
                 this.getToolbarElement().classList.add('medium-editor-toolbar-active');
-                this.base.events.triggerCustomEvent('showToolbar', {}, this.base.getFocusedElement());
+                this.base.trigger('showToolbar', {}, this.base.getFocusedElement());
 
                 if (typeof this.options.onShowToolbar === 'function') {
                     this.options.onShowToolbar();
@@ -203,7 +204,7 @@ var Toolbar;
         hideToolbar: function () {
             if (this.isDisplayed()) {
                 this.getToolbarElement().classList.remove('medium-editor-toolbar-active');
-                this.base.events.triggerCustomEvent('hideToolbar', {}, this.base.getFocusedElement());
+                this.base.trigger('hideToolbar', {}, this.base.getFocusedElement());
 
                 this.base.commands.forEach(function (extension) {
                     if (typeof extension.onHide === 'function') {
