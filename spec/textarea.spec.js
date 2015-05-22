@@ -53,4 +53,11 @@ describe('Textarea TestCase', function () {
         var editor = this.newMediumEditor('.editor');
         expect(editor.elements[0].className).toBe('editor test-class test-class-2');
     });
+
+    it('should cleanup after destroy', function () {
+        var editor = this.newMediumEditor('.editor');
+        expect(this.el.classList.contains('medium-editor-hidden')).toBe(true);
+        editor.destroy();
+        expect(this.el.classList.contains('medium-editor-hidden')).toBe(false);
+    });
 });
