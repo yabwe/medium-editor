@@ -207,7 +207,7 @@ var Toolbar;
 
                 this.base.commands.forEach(function (extension) {
                     if (typeof extension.onHide === 'function') {
-                        Util.deprecated('onHideToolbar', 'the hideToolbar event instead');
+                        Util.deprecated('onHide', 'the hideToolbar event instead');
                         extension.onHide();
                     }
                 });
