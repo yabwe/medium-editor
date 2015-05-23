@@ -344,6 +344,11 @@ var Toolbar;
             }
         },
 
+        // leaving here backward compatibility / statics
+        getFocusedElement: function () {
+            return this.base.getFocusedElement();
+        },
+
         // Updating the toolbar
 
         showAndUpdateToolbar: function () {
