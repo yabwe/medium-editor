@@ -1563,16 +1563,10 @@ var Extension;
          * or the combination of queryCommandState(), isAlreadyApplied(node),
          * isActive(), and setActive()
          */
-        setInactive: null,
-
-        /* onHide: [function ()]
-         *
-         * If implemented, this function is called each time the
-         * toolbar is hidden
-         */
-        onHide: null
+        setInactive: null
     };
 })();
+
 var Selection;
 
 (function () {
@@ -1847,6 +1841,10 @@ var Events;
                 this.customEvents[event].splice(index, 1);
                 // TODO: If array is empty, should detach internal listeners via destoryListener()
             }
+        },
+
+        defineCustomEvent: function (event) {
+            this.listeners[event] = true;
         },
 
         indexOfCustomListener: function (event, listener) {
@@ -4670,6 +4668,7 @@ var Toolbar;
     Toolbar = function Toolbar(instance) {
         this.base = instance;
         this.options = instance.options;
+
         this.initThrottledMethods();
     };
 
@@ -4854,7 +4853,10 @@ var Toolbar;
             clearTimeout(this.hideTimeout);
             if (!this.isDisplayed()) {
                 this.getToolbarElement().classList.add('medium-editor-toolbar-active');
+                this.base.trigger('showToolbar', {}, this.base.getFocusedElement());
+
                 if (typeof this.options.onShowToolbar === 'function') {
+                    Util.deprecated('onShowToolbar', 'the showToolbar custom event', 'v5.0.0');
                     this.options.onShowToolbar();
                 }
             }
@@ -4862,14 +4864,18 @@ var Toolbar;
 
         hideToolbar: function () {
             if (this.isDisplayed()) {
+                this.getToolbarElement().classList.remove('medium-editor-toolbar-active');
+                this.base.trigger('hideToolbar', {}, this.base.getFocusedElement());
+
                 this.base.commands.forEach(function (extension) {
                     if (typeof extension.onHide === 'function') {
+                        Util.deprecated('onHide', 'the hideToolbar custom event', 'v5.0.0');
                         extension.onHide();
                     }
                 });
 
-                this.getToolbarElement().classList.remove('medium-editor-toolbar-active');
                 if (typeof this.options.onHideToolbar === 'function') {
+                    Util.deprecated('onHideToolbar', 'the hideToolbar custom event', 'v5.0.0');
                     this.options.onHideToolbar();
                 }
             }
@@ -4965,7 +4971,7 @@ var Toolbar;
 
                 // If no editable has focus OR selection is inside contenteditable = false
                 // hide toolbar
-                if (!this.getFocusedElement() ||
+                if (!this.base.getFocusedElement() ||
                         Selection.selectionInContentEditableFalse(this.options.contentWindow)) {
                     this.hideToolbar();
                     return;
@@ -5000,13 +5006,9 @@ var Toolbar;
             }
         },
 
+        // leaving here backward compatibility / statics
         getFocusedElement: function () {
-            for (var i = 0; i < this.base.elements.length; i += 1) {
-                if (this.base.elements[i].getAttribute('data-medium-focused')) {
-                    return this.base.elements[i];
-                }
-            }
-            return null;
+            return this.base.getFocusedElement();
         },
 
         // Updating the toolbar
@@ -5090,7 +5092,7 @@ var Toolbar;
         },
 
         setToolbarPosition: function () {
-            var container = this.getFocusedElement(),
+            var container = this.base.getFocusedElement(),
                 selection = this.options.contentWindow.getSelection(),
                 anchorPreview;
 
@@ -5651,6 +5653,13 @@ function MediumEditor(elements, options) {
             name;
         this.commands = [];
 
+        // add toolbar custom events to the list of known events by the editor
+        // we need to have this for the initialization of extensions
+        // initToolbar is called after initCommands
+        // add toolbar custom events to the list of known events by the editor
+        this.createEvent('showToolbar');
+        this.createEvent('hideToolbar');
+
         buttons.forEach(function (buttonName) {
             if (extensions[buttonName]) {
                 ext = initExtension(extensions[buttonName], buttonName, this);
@@ -5710,7 +5719,9 @@ function MediumEditor(elements, options) {
             ['anchorInputCheckboxLabel', 'anchor.targetCheckboxText'],
             ['anchorPreviewHideDelay', 'anchorPreview.hideDelay'],
             ['disableAnchorPreview', 'anchorPreview: false'],
-            ['disablePlaceholders', 'placeholder: false']
+            ['disablePlaceholders', 'placeholder: false'],
+            ['onShowToolbar', 'showToolbar custom event'],
+            ['onHideToolbar', 'hideToolbar custom event']
         ];
         // warn about using deprecated properties
         if (options) {
@@ -5867,6 +5878,14 @@ function MediumEditor(elements, options) {
 
         unsubscribe: function (event, listener) {
             this.events.detachCustomEvent(event, listener);
+        },
+
+        createEvent: function (event) {
+            this.events.defineCustomEvent(event);
+        },
+
+        trigger: function (name, data, editable) {
+            this.events.triggerCustomEvent(name, data, editable);
         },
 
         delay: function (fn) {

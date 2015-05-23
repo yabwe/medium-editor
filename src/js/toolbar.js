@@ -196,6 +196,7 @@ var Toolbar;
                 this.base.trigger('showToolbar', {}, this.base.getFocusedElement());
 
                 if (typeof this.options.onShowToolbar === 'function') {
+                    Util.deprecated('onShowToolbar', 'the showToolbar custom event', 'v5.0.0');
                     this.options.onShowToolbar();
                 }
             }
@@ -208,12 +209,13 @@ var Toolbar;
 
                 this.base.commands.forEach(function (extension) {
                     if (typeof extension.onHide === 'function') {
-                        Util.deprecated('onHide', 'the hideToolbar event instead');
+                        Util.deprecated('onHide', 'the hideToolbar custom event', 'v5.0.0');
                         extension.onHide();
                     }
                 });
 
                 if (typeof this.options.onHideToolbar === 'function') {
+                    Util.deprecated('onHideToolbar', 'the hideToolbar custom event', 'v5.0.0');
                     this.options.onHideToolbar();
                 }
             }
