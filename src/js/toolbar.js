@@ -1,4 +1,4 @@
-/*global Util, Selection */
+/*global Util, Selection*/
 
 var Toolbar;
 
@@ -8,6 +8,7 @@ var Toolbar;
     Toolbar = function Toolbar(instance) {
         this.base = instance;
         this.options = instance.options;
+
         this.initThrottledMethods();
     };
 
@@ -192,6 +193,8 @@ var Toolbar;
             clearTimeout(this.hideTimeout);
             if (!this.isDisplayed()) {
                 this.getToolbarElement().classList.add('medium-editor-toolbar-active');
+                this.base.trigger('showToolbar', {}, this.base.getFocusedElement());
+
                 if (typeof this.options.onShowToolbar === 'function') {
                     this.options.onShowToolbar();
                 }
@@ -200,13 +203,16 @@ var Toolbar;
 
         hideToolbar: function () {
             if (this.isDisplayed()) {
+                this.getToolbarElement().classList.remove('medium-editor-toolbar-active');
+                this.base.trigger('hideToolbar', {}, this.base.getFocusedElement());
+
                 this.base.commands.forEach(function (extension) {
                     if (typeof extension.onHide === 'function') {
+                        Util.deprecated('onHide', 'the hideToolbar event instead');
                         extension.onHide();
                     }
                 });
 
-                this.getToolbarElement().classList.remove('medium-editor-toolbar-active');
                 if (typeof this.options.onHideToolbar === 'function') {
                     this.options.onHideToolbar();
                 }
@@ -303,7 +309,7 @@ var Toolbar;
 
                 // If no editable has focus OR selection is inside contenteditable = false
                 // hide toolbar
-                if (!this.getFocusedElement() ||
+                if (!this.base.getFocusedElement() ||
                         Selection.selectionInContentEditableFalse(this.options.contentWindow)) {
                     this.hideToolbar();
                     return;
@@ -338,13 +344,9 @@ var Toolbar;
             }
         },
 
+        // leaving here backward compatibility / statics
         getFocusedElement: function () {
-            for (var i = 0; i < this.base.elements.length; i += 1) {
-                if (this.base.elements[i].getAttribute('data-medium-focused')) {
-                    return this.base.elements[i];
-                }
-            }
-            return null;
+            return this.base.getFocusedElement();
         },
 
         // Updating the toolbar
@@ -428,7 +430,7 @@ var Toolbar;
         },
 
         setToolbarPosition: function () {
-            var container = this.getFocusedElement(),
+            var container = this.base.getFocusedElement(),
                 selection = this.options.contentWindow.getSelection(),
                 anchorPreview;
 

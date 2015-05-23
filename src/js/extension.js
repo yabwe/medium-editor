@@ -177,13 +177,6 @@ var Extension;
          * or the combination of queryCommandState(), isAlreadyApplied(node),
          * isActive(), and setActive()
          */
-        setInactive: null,
-
-        /* onHide: [function ()]
-         *
-         * If implemented, this function is called each time the
-         * toolbar is hidden
-         */
-        onHide: null
+        setInactive: null
     };
 })();
