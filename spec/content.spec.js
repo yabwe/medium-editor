@@ -189,6 +189,24 @@ describe('Content TestCase', function () {
             expect(document.execCommand).toHaveBeenCalledWith('formatBlock', false, 'p');
             expect(this.el.innerHTML).toBe('<p>lorem ipsum</p>');
         });
+
+        it('with ctrl key, should not call formatBlock', function () {
+            this.el.innerHTML = '<p>lorem ipsum</p>';
+
+            var editor = this.newMediumEditor('.editor'),
+                p = editor.elements[0].querySelector('p');
+
+            spyOn(document, 'execCommand').and.callThrough();
+
+            placeCursorInsideElement(p, 0);
+
+            fireEvent(p, 'keyup', {
+                keyCode: Util.keyCode.ENTER,
+                ctrlKey: true
+            });
+
+            expect(document.execCommand).not.toHaveBeenCalledWith('formatBlock', false, 'p');
+        });
     });
 
     describe('should unlink anchors', function () {
