@@ -54,8 +54,7 @@ describe('Anchor Button TestCase', function () {
         it('should create a link when user presses enter', function () {
             spyOn(MediumEditor.prototype, 'createLink').and.callThrough();
             var editor = this.newMediumEditor('.editor'),
-                button,
-                input;
+                button, input;
 
             selectElementContents(editor.elements[0]);
             button = editor.toolbar.getToolbarElement().querySelector('[data-action="createLink"]');
@@ -66,6 +65,7 @@ describe('Anchor Button TestCase', function () {
                 keyCode: Util.keyCode.ENTER
             });
             expect(editor.createLink).toHaveBeenCalled();
+            expect(this.el.innerHTML).toBe('<a href="test">lorem ipsum</a>');
         });
 
         it('shouldn\'t create a link when user presses enter without value', function () {
