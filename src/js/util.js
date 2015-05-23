@@ -685,7 +685,8 @@ var Util;
             }, this);
         },
 
-        getClosestTag: function (el, tag) { // get the closest parent
+        // get the closest parent
+        getClosestTag: function (el, tag) {
             return Util.traverseUp(el, function (element) {
                 return element.tagName.toLowerCase() === tag.toLowerCase();
             });
