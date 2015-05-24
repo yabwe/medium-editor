@@ -14,7 +14,6 @@ LINK_REGEXP_TEXT =
     'use strict';
 
     AutoLink = Extension.extend({
-        parent: true,
 
         init: function () {
             this.disableEventHandling = false;

@@ -187,10 +187,17 @@ function MediumEditor(elements, options) {
     }
 
     function initExtension(extension, name, instance) {
-        if (extension.parent) {
+        if (typeof extension.parent !== 'undefined') {
+            Util.warn('Extension .parent property has been deprecated.  ' +
+                'The .base property for extensions will always be set to MediumEditor in version 5.0.0');
+        }
+        // TODO: Deprecated (Remove .parent check in v5.0.0)
+        if (extension.parent !== false &&
+            extension.base === undefined) {
             extension.base = instance;
         }
         if (typeof extension.init === 'function') {
+            // Passing instance into init() will be deprecated in v5.0.0
             extension.init(instance);
         }
         if (!extension.name) {

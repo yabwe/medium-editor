@@ -105,7 +105,6 @@ describe('Extensions TestCase', function () {
             var Sub, editor, e1, e2;
 
             Sub = Extension.extend({
-                parent: true,
                 y: 10
             });
 
@@ -215,49 +214,64 @@ describe('Extensions TestCase', function () {
     });
 
     describe('Set data in extensions', function () {
-        var ExtensionOne = function () {
-                this.parent = true;
-            },
-            ExtensionTwo = function () {},
-            extOne = new ExtensionOne(),
-            extTwo = new ExtensionTwo();
-
-        it('should check if extension class has parent attribute', function () {
-            var editor = this.newMediumEditor('.editor', {
-                extensions: {
-                    'one': extOne,
-                    'two': extTwo
-                }
-            });
-
-            expect(editor instanceof MediumEditor).toBeTruthy();
-            expect(extOne.parent).toBeTruthy();
-            expect(extTwo.parent).toBeUndefined();
-        });
-
-        it('should set the base attribute to be an instance of editor', function () {
-            var editor = this.newMediumEditor('.editor', {
-                extensions: {
-                    'one': extOne,
-                    'two': extTwo
-                }
-            });
+        it('should set the base property to an instance of MediumEditor', function () {
+            var extOne = new MediumEditor.Extension(),
+                editor = this.newMediumEditor('.editor', {
+                    extensions: {
+                        'one': extOne
+                    }
+                });
 
             expect(editor instanceof MediumEditor).toBeTruthy();
             expect(extOne.base instanceof MediumEditor).toBeTruthy();
-            expect(extTwo.base).toBeUndefined();
         });
 
-        it('should set the name of the extension', function () {
-            this.newMediumEditor('.editor', {
-                extensions: {
-                    'one': extOne,
-                    'two': extTwo
-                }
-            });
+        it('should not set the base property when deprecated parent attribute is set to false', function () {
+            var TempExtension = MediumEditor.Extension.extend({
+                    parent: false
+                }),
+                editor = this.newMediumEditor('.editor', {
+                    extensions: {
+                        'temp': new TempExtension()
+                    }
+                });
+
+            expect(editor instanceof MediumEditor).toBeTruthy();
+            expect(editor.getExtensionByName('temp').base).toBeUndefined();
+        });
+
+        it('should not override the base or name properties of an extension if overriden', function () {
+            var TempExtension = MediumEditor.Extension.extend({
+                    name: 'tempExtension',
+                    base: 'something'
+                }),
+                editor = this.newMediumEditor('.editor', {
+                    extensions: {
+                        'one': new TempExtension()
+                    }
+                });
+
+            expect(editor.getExtensionByName('one')).toBeUndefined();
+            expect(editor.getExtensionByName('tempExtension').base).toBe('something');
+        });
+
+        it('should set the name of property of extensions', function () {
+            var ExtensionOne = function () {},
+                ExtensionTwo = function () {},
+                extOne = new ExtensionOne(),
+                extTwo = new ExtensionTwo(),
+                editor = this.newMediumEditor('.editor', {
+                    extensions: {
+                        'one': extOne,
+                        'two': extTwo
+                    }
+                });
 
             expect(extOne.name).toBe('one');
             expect(extTwo.name).toBe('two');
+
+            expect(editor.getExtensionByName('one')).toBe(extOne);
+            expect(editor.getExtensionByName('two')).toBe(extTwo);
         });
     });
 });

@@ -6,7 +6,6 @@ var AnchorPreview;
 
     AnchorPreview = Extension.extend({
         name: 'anchor-preview',
-        parent: true,
 
         // Anchor Preview Options
 
