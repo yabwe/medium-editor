@@ -5,8 +5,6 @@ var ImageDragging;
     'use strict';
 
     ImageDragging = Extension.extend({
-        // Need a reference to MediumEditor (this.base)
-        parent: true,
 
         init: function () {
             this.base.subscribe('editableDrag', this.handleDrag.bind(this));

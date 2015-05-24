@@ -7,7 +7,6 @@ var Placeholder;
 
     Placeholder = Extension.extend({
         name: 'placeholder',
-        parent: true,
 
         /* Placeholder Options */
 

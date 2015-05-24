@@ -1,9 +1,8 @@
-/* global Util */
-
 var Extension;
-
 (function () {
     'use strict';
+
+    /* global Util */
 
     Extension = function (options) {
         Util.extend(this, options);
@@ -70,29 +69,21 @@ var Extension;
     };
 
     Extension.prototype = {
-        init: function (/* instance */) {
-            // called when properly decorated and used.
-            // has a .base value pointing to the editor
-            // owning us. has been given a .name if no
-            // name present
-        },
-
-        /* parent: [boolean]
+        /* init: [function]
          *
-         * Setting this to false will prevent MediumEditor
-         * from setting the .base property.
-         * If left as true, the .base property of the extension
-         * will be assigned a reference to the
-         * MediumEditor instance that is using the extension
+         * Called by MediumEditor during initialization.
+         * The .base property will already have been set to
+         * current instance of MediumEditor when this is called.
+         * All helper methods will exist as well
          */
-        parent: true,
+        init: function () {},
 
         /* base: [MediumEditor instance]
          *
-         * If .parent is set to true, this will be set to the
-         * current MediumEditor instance before init() is called
+         * If not overriden, this will be set to the current instance
+         * of MediumEditor, before the init method is called
          */
-        base: null,
+        base: undefined,
 
         /* name: [string]
          *
@@ -101,7 +92,7 @@ var Extension;
          * used when passing the extension into MediumEditor via the
          * 'extensions' option
          */
-        name: null,
+        name: undefined,
 
         /* checkState: [function (node)]
          *
@@ -114,7 +105,7 @@ var Extension;
          * 3) Get the parent node of the previous node
          * 4) Repeat steps #2 and #3 until we move outside the parent contenteditable
          */
-        checkState: null,
+        checkState: undefined,
 
         /* As alternatives to checkState, these functions provide a more structured
          * path to updating the state of an extension (usually a button) whenever
@@ -132,7 +123,7 @@ var Extension;
          * If this function returns true, and the setActive() function is defined
          * setActive() will be called
          */
-        queryCommandState: null,
+        queryCommandState: undefined,
 
         /* isActive: [function ()]
          *
@@ -142,7 +133,7 @@ var Extension;
          * but only if queryCommandState() or isAlreadyApplied() functions
          * are implemented, and when called, return true.
          */
-        isActive: null,
+        isActive: undefined,
 
         /* isAlreadyApplied: [function (node)]
          *
@@ -155,7 +146,7 @@ var Extension;
          * queryCommandState() is implemented and returns a non-null
          * value when called
          */
-        isAlreadyApplied: null,
+        isAlreadyApplied: undefined,
 
         /* setActive: [function ()]
          *
@@ -165,7 +156,7 @@ var Extension;
          * only if queryCommandState() or isAlreadyApplied(node) return
          * true when called
          */
-        setActive: null,
+        setActive: undefined,
 
         /* setInactive: [function ()]
          *
@@ -177,6 +168,6 @@ var Extension;
          * or the combination of queryCommandState(), isAlreadyApplied(node),
          * isActive(), and setActive()
          */
-        setInactive: null
+        setInactive: undefined
     };
 })();

@@ -111,7 +111,6 @@ describe('Toolbar TestCase', function () {
                 callbackShow = jasmine.createSpy('show'),
                 callbackHide = jasmine.createSpy('hide');
 
-            TestExtension.prototype.parent = true;
             TestExtension.prototype.init = function () {
                 this.base.subscribe('showToolbar', callbackShow);
                 this.base.subscribe('hideToolbar', callbackHide);
