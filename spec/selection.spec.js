@@ -180,4 +180,60 @@ describe('Selection TestCase', function () {
         });
     });
 
+    describe('getSelectedElements', function () {
+        it('no selected elements on empty selection', function () {
+            var elements = Selection.getSelectedElements(document);
+
+            expect(elements.length).toBe(0);
+        });
+
+        it('should select element from selection', function () {
+            this.el.innerHTML = 'lorem <i>ipsum</i> dolor';
+            var editor = this.newMediumEditor('.editor'),
+                elements;
+
+            selectElementContents(editor.elements[0].querySelector('i'));
+            elements = Selection.getSelectedElements(document);
+
+            expect(elements.length).toBe(1);
+            expect(elements[0].tagName.toLowerCase()).toBe('i');
+            expect(elements[0].innerHTML).toBe('ipsum');
+        });
+
+        it('should select first element when selection is global (ie: all the editor)', function () {
+            this.el.innerHTML = 'lorem <i>ipsum</i> dolor';
+            var elements;
+
+            selectElementContents(this.el);
+            elements = Selection.getSelectedElements(document);
+
+            expect(elements.length).toBe(1);
+            expect(elements[0].tagName.toLowerCase()).toBe('i');
+            expect(elements[0].innerHTML).toBe('ipsum');
+        });
+    });
+
+    describe('getSelectedParentElement', function () {
+        it('should return null on bad range', function () {
+            expect(Selection.getSelectedParentElement(null)).toBe(null);
+            expect(Selection.getSelectedParentElement(false)).toBe(null);
+        });
+
+        it('should select the document', function () {
+            this.el.innerHTML = '<p>lorem <i>ipsum</i> dolor <span>hello</span> <b>you</b> </p>';
+            var range = document.createRange(),
+                sel = window.getSelection(),
+                element;
+
+            range.setStart(document, 0);
+            range.setEnd(this.el.querySelector('b').firstChild, 2);
+
+            sel.removeAllRanges();
+            sel.addRange(range);
+
+            element = Selection.getSelectedParentElement(range);
+
+            expect(element).toBe(document);
+        });
+    });
 });

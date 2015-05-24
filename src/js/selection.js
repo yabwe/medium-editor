@@ -131,15 +131,22 @@ var Selection;
         },
 
         getSelectedParentElement: function (range) {
-            var selectedParentElement = null;
-            if (this.rangeSelectsSingleNode(range) && range.startContainer.childNodes[range.startOffset].nodeType !== 3) {
-                selectedParentElement = range.startContainer.childNodes[range.startOffset];
-            } else if (range.startContainer.nodeType === 3) {
-                selectedParentElement = range.startContainer.parentNode;
-            } else {
-                selectedParentElement = range.startContainer;
+            if (!range) {
+                return null;
             }
-            return selectedParentElement;
+
+            // Selection encompasses a single element
+            if (this.rangeSelectsSingleNode(range) && range.startContainer.childNodes[range.startOffset].nodeType !== 3) {
+                return range.startContainer.childNodes[range.startOffset];
+            }
+
+            // Selection range starts inside a text node, so get its parent
+            if (range.startContainer.nodeType === 3) {
+                return range.startContainer.parentNode;
+            }
+
+            // Selection starts inside an element
+            return range.startContainer;
         },
 
         getSelectedElements: function (doc) {
@@ -148,8 +155,7 @@ var Selection;
                 toRet,
                 currNode;
 
-            if (!selection.rangeCount ||
-                    !selection.getRangeAt(0).commonAncestorContainer) {
+            if (!selection.rangeCount || !selection.getRangeAt(0).commonAncestorContainer) {
                 return [];
             }
 
