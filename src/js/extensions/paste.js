@@ -85,9 +85,6 @@ var PasteHandler;
         targetBlank: false,
         disableReturn: false,
 
-        // Need a reference to MediumEditor (this.base)
-        parent: true,
-
         init: function () {
             if (this.forcePlainText || this.cleanPastedHTML) {
                 this.base.subscribe('editablePaste', this.handlePaste.bind(this));
