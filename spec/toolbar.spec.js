@@ -107,19 +107,18 @@ describe('Toolbar TestCase', function () {
         });
 
         it('should be possible to listen to toolbar events from extensions', function () {
-            var TestExtension = function () {},
-                callbackShow = jasmine.createSpy('show'),
-                callbackHide = jasmine.createSpy('hide');
-
-            TestExtension.prototype.parent = true;
-            TestExtension.prototype.init = function () {
-                this.base.subscribe('showToolbar', callbackShow);
-                this.base.subscribe('hideToolbar', callbackHide);
-            };
-
-            var editor = this.newMediumEditor('.editor', {
-                extensions: { 'testExtension': new TestExtension() }
-            });
+            var callbackShow = jasmine.createSpy('show'),
+                callbackHide = jasmine.createSpy('hide'),
+                TestExtension = MediumEditor.Extension.extend({
+                    parent: true,
+                    init: function () {
+                        this.base.subscribe('showToolbar', callbackShow);
+                        this.base.subscribe('hideToolbar', callbackHide);
+                    }
+                }),
+                editor = this.newMediumEditor('.editor', {
+                    extensions: { 'testExtension': new TestExtension() }
+                });
 
             this.el.innerHTML = 'specOnShowToolbarTest';
 
@@ -134,7 +133,7 @@ describe('Toolbar TestCase', function () {
             expect(callbackHide).toHaveBeenCalledWith({}, this.el);
         });
 
-        it('should call onShowToolbar when toolbar is shown and onHideToolbar when toolbar is hidden', function () {
+        it('should call deprecated onShowToolbar option when toolbar is shown and deprecated onHideToolbar option when toolbar is hidden', function () {
             var editor,
                 temp = {
                     onShow: function () {},

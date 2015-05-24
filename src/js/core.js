@@ -499,7 +499,9 @@ function MediumEditor(elements, options) {
             ['anchorInputCheckboxLabel', 'anchor.targetCheckboxText'],
             ['anchorPreviewHideDelay', 'anchorPreview.hideDelay'],
             ['disableAnchorPreview', 'anchorPreview: false'],
-            ['disablePlaceholders', 'placeholder: false']
+            ['disablePlaceholders', 'placeholder: false'],
+            ['onShowToolbar', 'showToolbar custom event'],
+            ['onHideToolbar', 'hideToolbar custom event']
         ];
         // warn about using deprecated properties
         if (options) {

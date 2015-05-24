@@ -102,8 +102,6 @@ MediumEditor also supports textarea. If you provide a textarea element, the scri
 * __disableToolbar__: enables/disables the toolbar, adding only the contenteditable behavior. You can also set specific element behavior by using setting a `data-disable-toolbar` attribute. Default: false
 * __firstButtonClass__: CSS class added to the first button in the toolbar. Default: 'medium-editor-button-first'
 * __lastButtonClass__: CSS class added to the last button in the toolbar. Default: 'medium-editor-button-last'
-* __onShowToolbar__: optional callback that will be called each time the toolbar is actually shown for this instance of medium-editor.
-* __onHideToolbar__: optional callback that will be called each time the toolbar is actually hidden for this instance of medium-editor.
 * __staticToolbar__: enable/disable the toolbar always displaying in the same location relative to the medium-editor element. Default: false
 * __stickyToolbar__: enable/disable the toolbar "sticking" to the medium-editor element when the page is being scrolled. Default: false
 * __toolbarAlign__: `left`|`center`|`right` - when using the __staticToolbar__ option, this aligns the static toolbar relative to the medium-editor element. Default: `center`
