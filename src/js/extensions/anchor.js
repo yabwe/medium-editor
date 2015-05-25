@@ -227,16 +227,16 @@ var AnchorForm;
                 input = form.querySelector('.medium-editor-toolbar-input');
 
             // Handle clicks on the form itself
-            this.base.on(form, 'click', this.handleFormClick.bind(this));
+            this.on(form, 'click', this.handleFormClick.bind(this));
 
             // Handle typing in the textbox
-            this.base.on(input, 'keyup', this.handleTextboxKeyup.bind(this));
+            this.on(input, 'keyup', this.handleTextboxKeyup.bind(this));
 
             // Handle close button clicks
-            this.base.on(close, 'click', this.handleCloseClick.bind(this));
+            this.on(close, 'click', this.handleCloseClick.bind(this));
 
             // Handle save button clicks (capture)
-            this.base.on(save, 'click', this.handleSaveClick.bind(this), true);
+            this.on(save, 'click', this.handleSaveClick.bind(this), true);
 
         },
 

@@ -97,7 +97,7 @@ var FontSizeForm;
             form.id = 'medium-editor-toolbar-form-fontsize-' + this.base.id;
 
             // Handle clicks on the form itself
-            this.base.on(form, 'click', this.handleFormClick.bind(this));
+            this.on(form, 'click', this.handleFormClick.bind(this));
 
             // Add font size slider
             input.setAttribute('type', 'range');
@@ -107,7 +107,7 @@ var FontSizeForm;
             form.appendChild(input);
 
             // Handle typing in the textbox
-            this.base.on(input, 'change', this.handleSliderChange.bind(this));
+            this.on(input, 'change', this.handleSliderChange.bind(this));
 
             // Add save buton
             save.setAttribute('href', '#');
@@ -118,7 +118,7 @@ var FontSizeForm;
             form.appendChild(save);
 
             // Handle save button clicks (capture)
-            this.base.on(save, 'click', this.handleSaveClick.bind(this), true);
+            this.on(save, 'click', this.handleSaveClick.bind(this), true);
 
             // Add close button
             close.setAttribute('href', '#');
@@ -129,7 +129,7 @@ var FontSizeForm;
             form.appendChild(close);
 
             // Handle close button clicks
-            this.base.on(close, 'click', this.handleCloseClick.bind(this));
+            this.on(close, 'click', this.handleCloseClick.bind(this));
 
             return form;
         },

@@ -162,6 +162,31 @@ describe('Extensions TestCase', function () {
 
     });
 
+    describe('All extensions', function () {
+        it('should get helper methods to call into base instance methods', function () {
+            var noop = function () {},
+                helpers = {
+                    'on': [document, 'click', noop, false],
+                    'off': [document, 'click', noop, false]
+                },
+                tempExtension = new MediumEditor.Extension(),
+                editor = this.newMediumEditor('.editor', {
+                    extensions: {
+                        'temp-extension': tempExtension
+                    }
+                });
+
+            Object.keys(helpers).forEach(function (helper) {
+                spyOn(editor, helper).and.callThrough();
+            });
+
+            Object.keys(helpers).forEach(function (helper) {
+                tempExtension[helper].apply(tempExtension, helpers[helper]);
+                expect((editor[helper]).calls.count()).toBe(1);
+            });
+        });
+    });
+
     describe('Button integration', function () {
 
         var ExtensionWithElement = {

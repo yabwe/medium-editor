@@ -4,6 +4,11 @@ var Extension;
 
     /* global Util */
 
+    var passThroughHelpers = [
+        'on',
+        'off'
+    ];
+
     Extension = function (options) {
         Util.extend(this, options);
     };
@@ -195,4 +200,11 @@ var Extension;
          */
         'document': undefined
     };
+
+    passThroughHelpers.forEach(function (helper) {
+        var methodName = helper;
+        Extension.prototype[methodName] = function () {
+            return this.base[methodName].apply(this.base, arguments);
+        };
+    });
 })();

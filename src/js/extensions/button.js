@@ -8,7 +8,7 @@ var Button;
 
         init: function () {
             this.button = this.createButton();
-            this.base.on(this.button, 'click', this.handleClick.bind(this));
+            this.on(this.button, 'click', this.handleClick.bind(this));
             if (this.key) {
                 this.base.subscribe('editableKeydown', this.handleKeydown.bind(this));
             }
