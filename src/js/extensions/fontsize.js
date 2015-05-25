@@ -57,8 +57,8 @@ var FontSizeForm;
             input.focus();
         },
 
-        // Called by core when tearing down medium-editor (deactivate)
-        deactivate: function () {
+        // Called by core when tearing down medium-editor (destroy)
+        destroy: function () {
             if (!this.form) {
                 return false;
             }
@@ -68,6 +68,11 @@ var FontSizeForm;
             }
 
             delete this.form;
+        },
+
+        // TODO: deprecate
+        deactivate: function () {
+            Util.deprecatedMethod.call(this, 'deactivate', 'destroy', arguments, 'v5.0.0');
         },
 
         // core methods

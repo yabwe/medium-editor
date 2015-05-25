@@ -76,13 +76,18 @@ var Toolbar;
             return ul;
         },
 
-        deactivate: function () {
+        destroy: function () {
             if (this.toolbar) {
                 if (this.toolbar.parentNode) {
                     this.toolbar.parentNode.removeChild(this.toolbar);
                 }
                 delete this.toolbar;
             }
+        },
+
+        // TODO: deprecate
+        deactivate: function () {
+            Util.deprecatedMethod.call(this, 'deactivate', 'destroy', arguments, 'v5.0.0');
         },
 
         // Toolbar accessors

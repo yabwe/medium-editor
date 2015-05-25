@@ -57,13 +57,18 @@ var AnchorPreview;
                 '</div>';
         },
 
-        deactivate: function () {
+        destroy: function () {
             if (this.anchorPreview) {
                 if (this.anchorPreview.parentNode) {
                     this.anchorPreview.parentNode.removeChild(this.anchorPreview);
                 }
                 delete this.anchorPreview;
             }
+        },
+
+        // TODO: deprecate
+        deactivate: function () {
+            Util.deprecatedMethod.call(this, 'deactivate', 'destroy', arguments, 'v5.0.0');
         },
 
         hidePreview: function () {

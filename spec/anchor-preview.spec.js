@@ -178,7 +178,7 @@ describe('Anchor Preview TestCase', function () {
             var editor = this.newMediumEditor('.editor'),
                 anchorPreview = editor.getExtensionByName('anchor-preview');
 
-            spyOn(AnchorPreview.prototype, 'deactivate').and.callThrough();
+            spyOn(AnchorPreview.prototype, 'destroy').and.callThrough();
             expect(document.querySelector('.medium-editor-anchor-preview')).not.toBeNull();
             expect(document.querySelector('.medium-editor-anchor-preview-active')).toBeNull();
 
@@ -190,7 +190,7 @@ describe('Anchor Preview TestCase', function () {
 
             // destroy
             editor.destroy();
-            expect(anchorPreview.deactivate).toHaveBeenCalled();
+            expect(anchorPreview.destroy).toHaveBeenCalled();
             expect(document.querySelector('.medium-editor-anchor-preview-active')).toBeNull();
             expect(document.querySelector('.medium-editor-anchor-preview')).toBeNull();
         });
