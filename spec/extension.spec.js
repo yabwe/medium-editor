@@ -82,6 +82,66 @@ describe('Extensions TestCase', function () {
             expect(ext2.me instanceof MediumEditor).toBeTruthy();
         });
 
+        it('should set the base property to an instance of MediumEditor', function () {
+            var extOne = new MediumEditor.Extension(),
+                editor = this.newMediumEditor('.editor', {
+                    extensions: {
+                        'one': extOne
+                    }
+                });
+
+            expect(editor instanceof MediumEditor).toBeTruthy();
+            expect(extOne.base instanceof MediumEditor).toBeTruthy();
+        });
+
+        it('should not set the base property when deprecated parent attribute is set to false', function () {
+            var TempExtension = MediumEditor.Extension.extend({
+                    parent: false
+                }),
+                editor = this.newMediumEditor('.editor', {
+                    extensions: {
+                        'temp': new TempExtension()
+                    }
+                });
+
+            expect(editor instanceof MediumEditor).toBeTruthy();
+            expect(editor.getExtensionByName('temp').base).toBeUndefined();
+        });
+
+        it('should not override the base or name properties of an extension if overriden', function () {
+            var TempExtension = MediumEditor.Extension.extend({
+                    name: 'tempExtension',
+                    base: 'something'
+                }),
+                editor = this.newMediumEditor('.editor', {
+                    extensions: {
+                        'one': new TempExtension()
+                    }
+                });
+
+            expect(editor.getExtensionByName('one')).toBeUndefined();
+            expect(editor.getExtensionByName('tempExtension').base).toBe('something');
+        });
+
+        it('should set the name of property of extensions', function () {
+            var ExtensionOne = function () {},
+                ExtensionTwo = function () {},
+                extOne = new ExtensionOne(),
+                extTwo = new ExtensionTwo(),
+                editor = this.newMediumEditor('.editor', {
+                    extensions: {
+                        'one': extOne,
+                        'two': extTwo
+                    }
+                });
+
+            expect(extOne.name).toBe('one');
+            expect(extTwo.name).toBe('two');
+
+            expect(editor.getExtensionByName('one')).toBe(extOne);
+            expect(editor.getExtensionByName('two')).toBe(extTwo);
+        });
+
         it('should set window and document properties on each extension', function () {
             var TempExtension = MediumEditor.Extension.extend({}),
                 extInstance = new TempExtension(),
@@ -269,68 +329,6 @@ describe('Extensions TestCase', function () {
             expect(editor.toolbar.getToolbarElement().querySelectorAll('button[data-action="italic"]').length).toBe(1);
             expect(editor.toolbar.getToolbarElement().querySelectorAll('button[data-action="bold"]').length).toBe(0);
             expect(ext.init).toHaveBeenCalled();
-        });
-    });
-
-    describe('Set data in extensions', function () {
-        it('should set the base property to an instance of MediumEditor', function () {
-            var extOne = new MediumEditor.Extension(),
-                editor = this.newMediumEditor('.editor', {
-                    extensions: {
-                        'one': extOne
-                    }
-                });
-
-            expect(editor instanceof MediumEditor).toBeTruthy();
-            expect(extOne.base instanceof MediumEditor).toBeTruthy();
-        });
-
-        it('should not set the base property when deprecated parent attribute is set to false', function () {
-            var TempExtension = MediumEditor.Extension.extend({
-                    parent: false
-                }),
-                editor = this.newMediumEditor('.editor', {
-                    extensions: {
-                        'temp': new TempExtension()
-                    }
-                });
-
-            expect(editor instanceof MediumEditor).toBeTruthy();
-            expect(editor.getExtensionByName('temp').base).toBeUndefined();
-        });
-
-        it('should not override the base or name properties of an extension if overriden', function () {
-            var TempExtension = MediumEditor.Extension.extend({
-                    name: 'tempExtension',
-                    base: 'something'
-                }),
-                editor = this.newMediumEditor('.editor', {
-                    extensions: {
-                        'one': new TempExtension()
-                    }
-                });
-
-            expect(editor.getExtensionByName('one')).toBeUndefined();
-            expect(editor.getExtensionByName('tempExtension').base).toBe('something');
-        });
-
-        it('should set the name of property of extensions', function () {
-            var ExtensionOne = function () {},
-                ExtensionTwo = function () {},
-                extOne = new ExtensionOne(),
-                extTwo = new ExtensionTwo(),
-                editor = this.newMediumEditor('.editor', {
-                    extensions: {
-                        'one': extOne,
-                        'two': extTwo
-                    }
-                });
-
-            expect(extOne.name).toBe('one');
-            expect(extTwo.name).toBe('two');
-
-            expect(editor.getExtensionByName('one')).toBe(extOne);
-            expect(editor.getExtensionByName('two')).toBe(extTwo);
         });
     });
 });
