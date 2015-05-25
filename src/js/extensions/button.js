@@ -34,7 +34,7 @@ var Button;
             return (typeof this.tagNames === 'function') ? this.tagNames(this.base.options) : this.tagNames;
         },
         createButton: function () {
-            var button = this.base.options.ownerDocument.createElement('button'),
+            var button = this.document.createElement('button'),
                 content = this.contentDefault,
                 ariaLabel = this.getAria();
             button.classList.add('medium-editor-action');
@@ -112,7 +112,7 @@ var Button;
 
             if (!isMatch && this.style) {
                 styleVals = this.style.value.split('|');
-                computedStyle = this.base.options.contentWindow.getComputedStyle(node, null).getPropertyValue(this.style.prop);
+                computedStyle = this.window.getComputedStyle(node, null).getPropertyValue(this.style.prop);
                 styleVals.forEach(function (val) {
                     if (!this.knownState) {
                         isMatch = (computedStyle.indexOf(val) !== -1);

@@ -20,7 +20,7 @@ LINK_REGEXP_TEXT =
             this.base.subscribe('editableKeypress', this.onKeypress.bind(this));
             this.base.subscribe('editableBlur', this.onBlur.bind(this));
             // MS IE has it's own auto-URL detect feature but ours is better in some ways. Be consistent.
-            this.base.options.ownerDocument.execCommand('AutoUrlDetect', false, false);
+            this.document.execCommand('AutoUrlDetect', false, false);
         },
 
         onBlur: function (blurEvent, editable) {
@@ -129,7 +129,7 @@ LINK_REGEXP_TEXT =
         },
 
         findOrCreateMatchingTextNodes: function (element, match) {
-            var treeWalker = this.base.options.ownerDocument.createTreeWalker(element, NodeFilter.SHOW_TEXT,
+            var treeWalker = this.document.createTreeWalker(element, NodeFilter.SHOW_TEXT,
                     null, false),
                 matchedNodes = [],
                 currentTextIndex = 0,
@@ -179,8 +179,8 @@ LINK_REGEXP_TEXT =
                 return false;
             }
 
-            var anchor = document.createElement('a'),
-                span = document.createElement('span');
+            var anchor = this.document.createElement('a'),
+                span = this.document.createElement('span');
             Util.moveTextRangeIntoElement(textNodes[0], textNodes[textNodes.length - 1], span);
             span.setAttribute('data-auto-link', 'true');
             anchor.setAttribute('href', Util.ensureUrlHasProtocol(href));

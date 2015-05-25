@@ -168,6 +168,31 @@ var Extension;
          * or the combination of queryCommandState(), isAlreadyApplied(node),
          * isActive(), and setActive()
          */
-        setInactive: undefined
+        setInactive: undefined,
+
+        /************************ Helpers ************************
+         * The following are helpers that are either set by MediumEditor
+         * during initialization, or are helper methods which either
+         * route calls to the MediumEditor instance or provide common
+         * functionality for all extensions
+         *********************************************************/
+
+        /* window: [Window]
+         *
+         * If not overriden, this will be set to the window object
+         * to be used by MediumEditor and its extensions.  This is
+         * passed via the 'contentWindow' option to MediumEditor
+         * and is the global 'window' object by default
+         */
+        'window': undefined,
+
+        /* document: [Document]
+         *
+         * If not overriden, this will be set to the document object
+         * to be used by MediumEditor and its extensions. This is
+         * passed via the 'ownerDocument' optin to MediumEditor
+         * and is the global 'document' object by default
+         */
+        'document': undefined
     };
 })();
