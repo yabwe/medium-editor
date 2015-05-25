@@ -17,7 +17,7 @@ describe('Anchor Button TestCase', function () {
 
     describe('Anchor Form', function () {
         it('should not hide the toolbar when mouseup fires inside the anchor form', function () {
-            var editor = this.newMediumEditor('.editor'),
+            var editor = this.newMediumEditor('.editor', { buttonLabels: 'fontawesome' }),
                 anchorExtension = editor.getExtensionByName('anchor');
 
             selectElementContentsAndFire(editor.elements[0]);
