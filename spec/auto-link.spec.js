@@ -5,6 +5,59 @@
 describe('Autolink', function () {
     'use strict';
 
+    describe('extension', function () {
+
+        beforeEach(function () {
+            setupTestHelpers.call(this);
+            this.el = this.createElement('div', 'editor', '');
+        });
+
+        afterEach(function () {
+            this.cleanupTest();
+        });
+
+        it('should turn off browser auto-link during initialization', function () {
+            var autoUrlDetectTurnedOn = true,
+                origExecCommand = document.execCommand;
+            spyOn(document, 'execCommand').and.callFake(function (command, showUi, val) {
+                if (command === 'AutoUrlDetect') {
+                    autoUrlDetectTurnedOn = val;
+                }
+                return origExecCommand.apply(document, arguments);
+            });
+            this.newMediumEditor('.editor', {
+                autoLink: true
+            });
+            expect(autoUrlDetectTurnedOn).toBe(false);
+        });
+
+        it('should reset browser auto-link (if supported) during destroy', function () {
+            var autoUrlDetectTurnedOn = true,
+                origExecCommand = document.execCommand,
+                origQCS = document.queryCommandSupported;
+            spyOn(document, 'execCommand').and.callFake(function (command, showUi, val) {
+                if (command === 'AutoUrlDetect') {
+                    autoUrlDetectTurnedOn = val;
+                }
+                return origExecCommand.apply(document, arguments);
+            });
+            spyOn(document, 'queryCommandSupported').and.callFake(function (command) {
+                if (command === 'AutoUrlDetect') {
+                    return true;
+                }
+                return origQCS.apply(document, arguments);
+            });
+
+            var editor = this.newMediumEditor('.editor', {
+                autoLink: true
+            });
+
+            expect(autoUrlDetectTurnedOn).toBe(false);
+            editor.destroy();
+            expect(autoUrlDetectTurnedOn).toBe(true);
+        });
+    });
+
     describe('integration', function () {
 
         beforeEach(function () {

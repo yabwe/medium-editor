@@ -38,6 +38,13 @@ LINK_REGEXP_TEXT =
             this.document.execCommand('AutoUrlDetect', false, false);
         },
 
+        destroy: function () {
+            // Turn AutoUrlDetect back on
+            if (this.document.queryCommandSupported('AutoUrlDetect')) {
+                this.document.execCommand('AutoUrlDetect', false, true);
+            }
+        },
+
         onBlur: function (blurEvent, editable) {
             this.performLinking(editable);
         },
