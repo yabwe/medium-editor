@@ -4,16 +4,6 @@ var Extension;
 
     /* global Util */
 
-    var passThroughHelpers = [
-        // general helpers
-        'execAction',
-
-        // event handling
-        'on',
-        'off',
-        'subscribe'
-    ];
-
     Extension = function (options) {
         Util.extend(this, options);
     };
@@ -234,10 +224,27 @@ var Extension;
         }
     };
 
-    passThroughHelpers.forEach(function (helper) {
-        var methodName = helper;
-        Extension.prototype[methodName] = function () {
-            return this.base[methodName].apply(this.base, arguments);
+    /* List of method names to add to the prototype of Extension
+     * Each of these methods will be defined as helpers that
+     * just call directly into the MediumEditor instance.
+     *
+     * example for 'on' method:
+     * Extension.prototype.on = function () {
+     *     return this.base.on.apply(this.base, arguments);
+     * }
+     */
+    [
+        // general helpers
+        'execAction',
+
+        // event handling
+        'on',
+        'off',
+        'subscribe'
+
+    ].forEach(function (helper) {
+        Extension.prototype[helper] = function () {
+            return this.base[helper].apply(this.base, arguments);
         };
     });
 })();
