@@ -4,6 +4,16 @@ var Extension;
 
     /* global Util */
 
+    var passThroughHelpers = [
+        // general helpers
+        'execAction',
+
+        // event handling
+        'on',
+        'off',
+        'subscribe'
+    ];
+
     Extension = function (options) {
         Util.extend(this, options);
     };
