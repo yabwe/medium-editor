@@ -10,7 +10,7 @@ var Button;
             this.button = this.createButton();
             this.on(this.button, 'click', this.handleClick.bind(this));
             if (this.key) {
-                this.base.subscribe('editableKeydown', this.handleKeydown.bind(this));
+                this.subscribe('editableKeydown', this.handleKeydown.bind(this));
             }
         },
 

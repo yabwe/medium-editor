@@ -57,21 +57,21 @@ var Placeholder;
 
         attachEventHandlers: function () {
             // Custom events
-            this.base.subscribe('blur', this.handleExternalInteraction.bind(this));
+            this.subscribe('blur', this.handleExternalInteraction.bind(this));
 
             // Check placeholder on blur
-            this.base.subscribe('editableBlur', this.handleBlur.bind(this));
+            this.subscribe('editableBlur', this.handleBlur.bind(this));
 
             // if we don't want the placeholder to be removed on click but when user start typing
             if (this.hideOnClick) {
-                this.base.subscribe('editableClick', this.handleHidePlaceholderEvent.bind(this));
+                this.subscribe('editableClick', this.handleHidePlaceholderEvent.bind(this));
             } else {
-                this.base.subscribe('editableKeyup', this.handleBlur.bind(this));
+                this.subscribe('editableKeyup', this.handleBlur.bind(this));
             }
 
             // Events where we always hide the placeholder
-            this.base.subscribe('editableKeypress', this.handleHidePlaceholderEvent.bind(this));
-            this.base.subscribe('editablePaste', this.handleHidePlaceholderEvent.bind(this));
+            this.subscribe('editableKeypress', this.handleHidePlaceholderEvent.bind(this));
+            this.subscribe('editablePaste', this.handleHidePlaceholderEvent.bind(this));
         },
 
         handleHidePlaceholderEvent: function (event, element) {

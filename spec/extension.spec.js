@@ -167,7 +167,8 @@ describe('Extensions TestCase', function () {
             var noop = function () {},
                 helpers = {
                     'on': [document, 'click', noop, false],
-                    'off': [document, 'click', noop, false]
+                    'off': [document, 'click', noop, false],
+                    'subscribe': ['editableClick', noop]
                 },
                 tempExtension = new MediumEditor.Extension(),
                 editor = this.newMediumEditor('.editor', {

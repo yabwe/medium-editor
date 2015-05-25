@@ -87,7 +87,7 @@ var PasteHandler;
 
         init: function () {
             if (this.forcePlainText || this.cleanPastedHTML) {
-                this.base.subscribe('editablePaste', this.handlePaste.bind(this));
+                this.subscribe('editablePaste', this.handlePaste.bind(this));
             }
         },
 

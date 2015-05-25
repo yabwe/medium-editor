@@ -120,7 +120,7 @@ var AnchorPreview;
         },
 
         attachToEditables: function () {
-            this.base.subscribe('editableMouseover', this.handleEditableMouseover.bind(this));
+            this.subscribe('editableMouseover', this.handleEditableMouseover.bind(this));
         },
 
         handleClick: function (event) {

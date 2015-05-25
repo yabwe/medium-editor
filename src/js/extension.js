@@ -6,7 +6,8 @@ var Extension;
 
     var passThroughHelpers = [
         'on',
-        'off'
+        'off',
+        'subscribe'
     ];
 
     Extension = function (options) {
