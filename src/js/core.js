@@ -17,7 +17,7 @@ function MediumEditor(elements, options) {
         if (this.options.disableReturn || element.getAttribute('data-disable-return')) {
             event.preventDefault();
         } else if (this.options.disableDoubleReturn || element.getAttribute('data-disable-double-return')) {
-            var node = Util.getSelectionStart(this.options.ownerDocument);
+            var node = Selection.getSelectionStart(this.options.ownerDocument);
 
             // if current text selection is empty OR previous sibling text is empty
             if ((node && node.textContent.trim() === '') ||
@@ -29,7 +29,7 @@ function MediumEditor(elements, options) {
 
     function handleTabKeydown(event) {
         // Override tab only for pre nodes
-        var node = Util.getSelectionStart(this.options.ownerDocument),
+        var node = Selection.getSelectionStart(this.options.ownerDocument),
             tag = node && node.tagName.toLowerCase();
 
         if (tag === 'pre') {
@@ -51,7 +51,7 @@ function MediumEditor(elements, options) {
     }
 
     function handleBlockDeleteKeydowns(event) {
-        var p, node = Util.getSelectionStart(this.options.ownerDocument),
+        var p, node = Selection.getSelectionStart(this.options.ownerDocument),
             tagName = node.tagName.toLowerCase(),
             isEmpty = /^(\s+|<br\/?>)?$/i,
             isHeader = /h\d/i;
@@ -133,7 +133,7 @@ function MediumEditor(elements, options) {
     }
 
     function handleKeyup(event) {
-        var node = Util.getSelectionStart(this.options.ownerDocument),
+        var node = Selection.getSelectionStart(this.options.ownerDocument),
             tagName;
 
         if (!node) {
@@ -988,11 +988,11 @@ function MediumEditor(elements, options) {
                 this.options.ownerDocument.execCommand('createLink', false, opts.url);
 
                 if (this.options.targetBlank || opts.target === '_blank') {
-                    Util.setTargetBlank(Util.getSelectionStart(this.options.ownerDocument), opts.url);
+                    Util.setTargetBlank(Selection.getSelectionStart(this.options.ownerDocument), opts.url);
                 }
 
                 if (opts.buttonClass) {
-                    Util.addClassToAnchors(Util.getSelectionStart(this.options.ownerDocument), opts.buttonClass);
+                    Util.addClassToAnchors(Selection.getSelectionStart(this.options.ownerDocument), opts.buttonClass);
                 }
             }
 

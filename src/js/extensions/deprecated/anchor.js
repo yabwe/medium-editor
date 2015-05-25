@@ -37,7 +37,7 @@ var AnchorExtension;
             evt.preventDefault();
             evt.stopPropagation();
 
-            var selectedParentElement = Selection.getSelectedParentElement(Util.getSelectionRange(this.base.options.ownerDocument));
+            var selectedParentElement = Selection.getSelectedParentElement(Selection.getSelectionRange(this.base.options.ownerDocument));
             if (selectedParentElement.tagName &&
                     selectedParentElement.tagName.toLowerCase() === 'a') {
                 return this.base.execAction('unlink');

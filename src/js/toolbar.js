@@ -370,7 +370,7 @@ var Toolbar;
         checkActiveButtons: function () {
             var manualStateChecks = [],
                 queryState = null,
-                selectionRange = Util.getSelectionRange(this.options.ownerDocument),
+                selectionRange = Selection.getSelectionRange(this.options.ownerDocument),
                 parentNode,
                 updateExtensionState = function (extension) {
                     if (typeof extension.checkState === 'function') {
