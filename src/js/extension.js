@@ -5,6 +5,10 @@ var Extension;
     /* global Util */
 
     var passThroughHelpers = [
+        // general helpers
+        'execAction',
+
+        // event handling
         'on',
         'off',
         'subscribe'

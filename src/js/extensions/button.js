@@ -64,7 +64,7 @@ var Button;
 
                 action = this.getAction();
                 if (action) {
-                    this.base.execAction(action);
+                    this.execAction(action);
                 }
             }
         },
@@ -75,7 +75,7 @@ var Button;
             var action = this.getAction();
 
             if (action) {
-                this.base.execAction(action);
+                this.execAction(action);
             }
         },
         isActive: function () {

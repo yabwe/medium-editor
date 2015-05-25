@@ -63,7 +63,7 @@ var AnchorForm;
             var selectedParentElement = Selection.getSelectedParentElement(Selection.getSelectionRange(this.document));
             if (selectedParentElement.tagName &&
                     selectedParentElement.tagName.toLowerCase() === 'a') {
-                return this.base.execAction('unlink');
+                return this.execAction('unlink');
             }
 
             if (!this.isDisplayed()) {

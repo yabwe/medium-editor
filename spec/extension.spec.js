@@ -228,7 +228,8 @@ describe('Extensions TestCase', function () {
                 helpers = {
                     'on': [document, 'click', noop, false],
                     'off': [document, 'click', noop, false],
-                    'subscribe': ['editableClick', noop]
+                    'subscribe': ['editableClick', noop],
+                    'execAction': ['bold']
                 },
                 tempExtension = new MediumEditor.Extension(),
                 editor = this.newMediumEditor('.editor', {
@@ -238,7 +239,7 @@ describe('Extensions TestCase', function () {
                 });
 
             Object.keys(helpers).forEach(function (helper) {
-                spyOn(editor, helper).and.callThrough();
+                spyOn(editor, helper);
             });
 
             Object.keys(helpers).forEach(function (helper) {
