@@ -155,7 +155,7 @@ var Selection;
                 toRet,
                 currNode;
 
-            if (!selection.rangeCount || !selection.getRangeAt(0).commonAncestorContainer) {
+            if (!selection.rangeCount || selection.isCollapsed || !selection.getRangeAt(0).commonAncestorContainer) {
                 return [];
             }
 

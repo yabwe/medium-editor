@@ -192,7 +192,7 @@ describe('Selection TestCase', function () {
             var editor = this.newMediumEditor('.editor'),
                 elements;
 
-            selectElementContents(editor.elements[0].querySelector('i'));
+            selectElementContents(editor.elements[0].querySelector('i').firstChild);
             elements = Selection.getSelectedElements(document);
 
             expect(elements.length).toBe(1);
