@@ -53,7 +53,7 @@ describe('Extensions TestCase', function () {
             expect(ext2.aMethod).toHaveBeenCalledWith('theParam');
         });
 
-        it('should call init (and pass the instance of itself) on extensions if the method exists', function () {
+        it('should call init (and pass the deprecated instance of itself) on extensions if the method exists', function () {
             var ExtensionOne = function () {
                 this.init = function (me) {
                     this.me = me;
@@ -80,6 +80,39 @@ describe('Extensions TestCase', function () {
 
             expect(ext1.me instanceof MediumEditor).toBeTruthy();
             expect(ext2.me instanceof MediumEditor).toBeTruthy();
+        });
+
+        it('should set window and document properties on each extension', function () {
+            var TempExtension = MediumEditor.Extension.extend({}),
+                extInstance = new TempExtension(),
+                fakeDocument = {
+                    body: document.body,
+                    documentElement: document.documentElement,
+                    querySelectorAll: function () {
+                        return document.querySelectorAll.apply(document, arguments);
+                    },
+                    createElement: function () {
+                        return document.createElement.apply(document, arguments);
+                    }
+                },
+                fakeWindow = {
+                    addEventListener: function () {
+                        return window.addEventListener.apply(window, arguments);
+                    },
+                    removeEventListener: function () {
+                        return window.removeEventListener.apply(window, arguments);
+                    }
+                };
+            this.newMediumEditor('.editor', {
+                ownerDocument: fakeDocument,
+                contentWindow: fakeWindow,
+                extensions: {
+                    'temp-extension': extInstance
+                }
+            });
+
+            expect(extInstance.window).toBe(fakeWindow);
+            expect(extInstance.document).toBe(fakeDocument);
         });
     });
 

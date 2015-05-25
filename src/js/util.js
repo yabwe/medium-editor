@@ -564,7 +564,7 @@ var Util;
             }
 
             var afterLast = lastChild.nextSibling,
-                fragment = document.createDocumentFragment();
+                fragment = rootNode.ownerDocument.createDocumentFragment();
 
             // build up fragment on startNode side of tree
             if (firstChild === startNode) {

@@ -40,10 +40,10 @@ var ImageDragging;
                         fileReader.readAsDataURL(file);
 
                         id = 'medium-img-' + (+new Date());
-                        Util.insertHTMLCommand(this.base.options.ownerDocument, '<img class="medium-image-loading" id="' + id + '" />');
+                        Util.insertHTMLCommand(this.document, '<img class="medium-image-loading" id="' + id + '" />');
 
                         fileReader.onload = function () {
-                            var img = this.base.options.ownerDocument.getElementById(id);
+                            var img = this.document.getElementById(id);
                             if (img) {
                                 img.removeAttribute('id');
                                 img.removeAttribute('class');

@@ -20,7 +20,7 @@ var FontSizeForm;
 
             if (!this.isDisplayed()) {
                 // Get fontsize of current selection (convert to string since IE returns this as number)
-                var fontSize = this.base.options.ownerDocument.queryCommandValue('fontSize') + '';
+                var fontSize = this.document.queryCommandValue('fontSize') + '';
                 this.showForm(fontSize);
             }
 
@@ -86,7 +86,7 @@ var FontSizeForm;
         // form creation and event handling
 
         createForm: function () {
-            var doc = this.base.options.ownerDocument,
+            var doc = this.document,
                 form = doc.createElement('div'),
                 input = doc.createElement('input'),
                 close = doc.createElement('a'),
@@ -139,7 +139,7 @@ var FontSizeForm;
         },
 
         clearFontSize: function () {
-            Selection.getSelectedElements(this.base.options.ownerDocument).forEach(function (el) {
+            Selection.getSelectedElements(this.document).forEach(function (el) {
                 if (el.tagName === 'FONT' && el.hasAttribute('size')) {
                     el.removeAttribute('size');
                 }

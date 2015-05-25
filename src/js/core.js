@@ -1,7 +1,7 @@
-/*global Util, ButtonsData, Button,
- Selection, FontSizeForm, Extension, extensionDefaults,
- Toolbar, AutoLink, ImageDragging, Events, editorDefaults,
- DefaultButton, AnchorExtension, FontSizeExtension, AnchorPreviewDeprecated*/
+/*global Util, ButtonsData, Selection, Extension,
+    extensionDefaults, Toolbar, Events, editorDefaults,
+    DefaultButton, AnchorExtension, FontSizeExtension,
+    AnchorPreviewDeprecated*/
 
 function MediumEditor(elements, options) {
     'use strict';
@@ -186,20 +186,38 @@ function MediumEditor(elements, options) {
         }, this);
     }
 
+    function setExtensionDefaults(extension, defaults) {
+        Object.keys(defaults).forEach(function (prop) {
+            if (extension[prop] === undefined) {
+                extension[prop] = defaults[prop];
+            }
+        });
+        return extension;
+    }
+
     function initExtension(extension, name, instance) {
         if (typeof extension.parent !== 'undefined') {
             Util.warn('Extension .parent property has been deprecated.  ' +
                 'The .base property for extensions will always be set to MediumEditor in version 5.0.0');
         }
+        var extensionDefaults = {
+            'window': instance.options.contentWindow,
+            'document': instance.options.ownerDocument
+        };
         // TODO: Deprecated (Remove .parent check in v5.0.0)
-        if (extension.parent !== false &&
-            extension.base === undefined) {
-            extension.base = instance;
+        if (extension.parent !== false) {
+            extensionDefaults.base = instance;
         }
+        // Add default options into the extension
+        extension = setExtensionDefaults(extension, extensionDefaults);
+
+        // Call init on the extension
         if (typeof extension.init === 'function') {
             // Passing instance into init() will be deprecated in v5.0.0
             extension.init(instance);
         }
+
+        // Set extension name (if not already set)
         if (!extension.name) {
             extension.name = name;
         }
@@ -374,9 +392,7 @@ function MediumEditor(elements, options) {
     function initPlaceholder(options) {
         // Backwards compatability
         var defaultsBC = {
-            text: (typeof this.options.placeholder === 'string') ? this.options.placeholder : undefined, // deprecated
-            'window': this.options.contentWindow,
-            'document': this.options.ownerDocument
+            text: (typeof this.options.placeholder === 'string') ? this.options.placeholder : undefined // deprecated
         };
 
         return new MediumEditor.extensions.placeholder(
@@ -388,8 +404,6 @@ function MediumEditor(elements, options) {
         // Backwards compatability
         var defaultsBC = {
             hideDelay: this.options.anchorPreviewHideDelay, // deprecated
-            'window': this.options.contentWindow,
-            'document': this.options.ownerDocument,
             diffLeft: this.options.diffLeft,
             diffTop: this.options.diffTop,
             elementsContainer: this.options.elementsContainer
@@ -407,9 +421,7 @@ function MediumEditor(elements, options) {
             linkValidation: this.options.checkLinkFormat, //deprecated
             placeholderText: this.options.anchorInputPlaceholder, // deprecated
             targetCheckbox: this.options.anchorTarget, // deprecated
-            targetCheckboxText: this.options.anchorInputCheckboxLabel, // deprecated
-            'window': this.options.contentWindow,
-            'document': this.options.ownerDocument
+            targetCheckboxText: this.options.anchorInputCheckboxLabel // deprecated
         };
 
         return new MediumEditor.extensions.anchor(
@@ -423,9 +435,7 @@ function MediumEditor(elements, options) {
             forcePlainText: this.options.forcePlainText, // deprecated
             cleanPastedHTML: this.options.cleanPastedHTML, // deprecated
             disableReturn: this.options.disableReturn,
-            targetBlank: this.options.targetBlank,
-            'window': this.options.contentWindow,
-            'document': this.options.ownerDocument
+            targetBlank: this.options.targetBlank
         };
 
         return new MediumEditor.extensions.paste(
@@ -455,10 +465,10 @@ function MediumEditor(elements, options) {
                 ext = initExtension(initAnchorForm.call(this, this.options.anchor), 'anchor', this);
                 this.commands.push(ext);
             } else if (buttonName === 'fontsize') {
-                ext = initExtension(new FontSizeForm(), buttonName, this);
+                ext = initExtension(new MediumEditor.extensions.fontSize(), buttonName, this);
                 this.commands.push(ext);
             } else if (ButtonsData.hasOwnProperty(buttonName)) {
-                ext = initExtension(new Button(ButtonsData[buttonName]), buttonName, this);
+                ext = initExtension(new MediumEditor.extensions.button(ButtonsData[buttonName]), buttonName, this);
                 this.commands.push(ext);
             }
         }, this);
@@ -481,11 +491,11 @@ function MediumEditor(elements, options) {
         }
 
         if (shouldAddDefaultAutoLink.call(this)) {
-            this.commands.push(initExtension(new AutoLink(), 'auto-link', this));
+            this.commands.push(initExtension(new MediumEditor.extensions.autoLink(), 'auto-link', this));
         }
 
         if (shouldAddDefaultImageDragging.call(this)) {
-            this.commands.push(initExtension(new ImageDragging(), 'image-dragging', this));
+            this.commands.push(initExtension(new MediumEditor.extensions.imageDragging(), 'image-dragging', this));
         }
 
         if (shouldAddDefaultPlaceholder.call(this)) {
