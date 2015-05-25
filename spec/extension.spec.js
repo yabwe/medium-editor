@@ -247,6 +247,38 @@ describe('Extensions TestCase', function () {
                 expect((editor[helper]).calls.count()).toBe(1);
             });
         });
+
+        it('should be able to access the editor id via getEditorId()', function () {
+            var tempExtension = new MediumEditor.Extension(),
+                editor = this.newMediumEditor('.editor', {
+                    extensions: {
+                        'temp-extension': tempExtension
+                    }
+                });
+            expect(tempExtension.getEditorId()).toBe(editor.id);
+        });
+
+        it('should be able to access elements in this editor via getEditorElements()', function () {
+            var tempExtension = new MediumEditor.Extension(),
+                editor = this.newMediumEditor('.editor', {
+                    extensions: {
+                        'temp-extension': tempExtension
+                    }
+                });
+            expect(tempExtension.getEditorElements()).toBe(editor.elements);
+        });
+
+        it('should be able to access editor options via getEditorOption()', function () {
+            var tempExtension = new MediumEditor.Extension(),
+                editor = this.newMediumEditor('.editor', {
+                    disableReturn: true,
+                    extensions: {
+                        'temp-extension': tempExtension
+                    }
+                });
+            expect(tempExtension.getEditorOption('disableReturn')).toBe(true);
+            expect(tempExtension.getEditorOption('spellcheck')).toBe(editor.options.spellcheck);
+        });
     });
 
     describe('Button integration', function () {
