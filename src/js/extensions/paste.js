@@ -80,10 +80,8 @@ var PasteHandler;
         cleanTags: ['meta'],
 
         /* ----- internal options needed from base ----- */
-        'window': window,
-        'document': document,
-        targetBlank: false,
-        disableReturn: false,
+        targetBlank: false, // deprecated (should use .getEditorOption() instead)
+        disableReturn: false, // deprecated (should use .getEditorOption() instead)
 
         init: function () {
             if (this.forcePlainText || this.cleanPastedHTML) {

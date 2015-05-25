@@ -26,7 +26,7 @@ var Placeholder;
         },
 
         initPlaceholders: function () {
-            this.base.elements.forEach(function (el) {
+            this.getEditorElements().forEach(function (el) {
                 if (!el.getAttribute('data-placeholder')) {
                     el.setAttribute('data-placeholder', this.text);
                 }

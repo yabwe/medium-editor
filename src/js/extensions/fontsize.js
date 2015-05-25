@@ -94,7 +94,7 @@ var FontSizeForm;
 
             // Font Size Form (div)
             form.className = 'medium-editor-toolbar-form';
-            form.id = 'medium-editor-toolbar-form-fontsize-' + this.base.id;
+            form.id = 'medium-editor-toolbar-form-fontsize-' + this.getEditorId();
 
             // Handle clicks on the form itself
             this.on(form, 'click', this.handleFormClick.bind(this));
@@ -112,7 +112,7 @@ var FontSizeForm;
             // Add save buton
             save.setAttribute('href', '#');
             save.className = 'medium-editor-toobar-save';
-            save.innerHTML = this.base.options.buttonLabels === 'fontawesome' ?
+            save.innerHTML = this.getEditorOption('buttonLabels') === 'fontawesome' ?
                              '<i class="fa fa-check"></i>' :
                              '&#10003;';
             form.appendChild(save);
@@ -123,7 +123,7 @@ var FontSizeForm;
             // Add close button
             close.setAttribute('href', '#');
             close.className = 'medium-editor-toobar-close';
-            close.innerHTML = this.base.options.buttonLabels === 'fontawesome' ?
+            close.innerHTML = this.getEditorOption('buttonLabels') === 'fontawesome' ?
                               '<i class="fa fa-times"></i>' :
                               '&times;';
             form.appendChild(close);

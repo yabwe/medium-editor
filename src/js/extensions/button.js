@@ -36,7 +36,8 @@ var Button;
         createButton: function () {
             var button = this.document.createElement('button'),
                 content = this.contentDefault,
-                ariaLabel = this.getAria();
+                ariaLabel = this.getAria(),
+                buttonLabels = this.getEditorOption('buttonLabels');
             button.classList.add('medium-editor-action');
             button.classList.add('medium-editor-action-' + this.name);
             button.setAttribute('data-action', this.getAction());
@@ -44,11 +45,11 @@ var Button;
                 button.setAttribute('title', ariaLabel);
                 button.setAttribute('aria-label', ariaLabel);
             }
-            if (this.base.options.buttonLabels) {
-                if (this.base.options.buttonLabels === 'fontawesome' && this.contentFA) {
+            if (buttonLabels) {
+                if (buttonLabels === 'fontawesome' && this.contentFA) {
                     content = this.contentFA;
-                } else if (typeof this.base.options.buttonLabels === 'object' && this.base.options.buttonLabels[this.name]) {
-                    content = this.base.options.buttonLabels[this.name];
+                } else if (typeof buttonLabels === 'object' && buttonLabels[this.name]) {
+                    content = buttonLabels[this.name];
                 }
             }
             button.innerHTML = content;
@@ -79,14 +80,14 @@ var Button;
             }
         },
         isActive: function () {
-            return this.button.classList.contains(this.base.options.activeButtonClass);
+            return this.button.classList.contains(this.getEditorOption('activeButtonClass'));
         },
         setInactive: function () {
-            this.button.classList.remove(this.base.options.activeButtonClass);
+            this.button.classList.remove(this.getEditorOption('activeButtonClass'));
             delete this.knownState;
         },
         setActive: function () {
-            this.button.classList.add(this.base.options.activeButtonClass);
+            this.button.classList.add(this.getEditorOption('activeButtonClass'));
             delete this.knownState;
         },
         queryCommandState: function () {

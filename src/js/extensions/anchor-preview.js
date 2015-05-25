@@ -20,11 +20,9 @@ var AnchorPreview;
         previewValueSelector: 'a',
 
         /* ----- internal options needed from base ----- */
-        'window': window,
-        'document': document,
-        diffLeft: 0,
-        diffTop: -10,
-        elementsContainer: false,
+        diffLeft: 0, // deprecated (should use .getEditorOption() instead)
+        diffTop: -10, // deprecated (should use .getEditorOption() instead)
+        elementsContainer: false, // deprecated (should use .getEditorOption() instead)
 
         init: function () {
             this.anchorPreview = this.createPreview();
@@ -44,7 +42,7 @@ var AnchorPreview;
         createPreview: function () {
             var el = this.document.createElement('div');
 
-            el.id = 'medium-editor-anchor-preview-' + this.base.id;
+            el.id = 'medium-editor-anchor-preview-' + this.getEditorId();
             el.className = 'medium-editor-anchor-preview';
             el.innerHTML = this.getTemplate();
 
