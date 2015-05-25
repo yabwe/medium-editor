@@ -34,6 +34,14 @@ var Placeholder;
             }, this);
         },
 
+        destroy: function () {
+            this.getEditorElements().forEach(function (el) {
+                if (el.getAttribute('data-placeholder') === this.text) {
+                    el.removeAttribute('data-placeholder');
+                }
+            }, this);
+        },
+
         showPlaceholder: function (el) {
             if (el) {
                 el.classList.add('medium-editor-placeholder');

@@ -121,6 +121,27 @@ describe('Placeholder TestCase', function () {
         validatePlaceholderContent(editor.elements[0], Placeholder.prototype.text);
     });
 
+    it('should remove the added data-placeholder attribute when destroyed', function () {
+        expect(this.el.hasAttribute('data-placeholder')).toBe(false);
+
+        var editor = this.newMediumEditor('.editor');
+        expect(this.el.getAttribute('data-placeholder')).toBe(Placeholder.prototype.text);
+
+        editor.destroy();
+        expect(this.el.hasAttribute('data-placeholder')).toBe(false);
+    });
+
+    it('should not remove custom data-placeholder attribute when destroyed', function () {
+        var placeholderText = 'Custom placeholder';
+        this.el.setAttribute('data-placeholder', placeholderText);
+
+        var editor = this.newMediumEditor('.editor');
+        expect(this.el.getAttribute('data-placeholder')).toBe(placeholderText);
+
+        editor.destroy();
+        expect(this.el.getAttribute('data-placeholder')).toBe(placeholderText);
+    });
+
     it('should use the data-placeholder when it is present', function () {
         var editor,
             placeholderText = 'Custom placeholder';

@@ -68,7 +68,7 @@ var Events;
             var index = this.indexOfCustomListener(event, listener);
             if (index !== -1) {
                 this.customEvents[event].splice(index, 1);
-                // TODO: If array is empty, should detach internal listeners via destoryListener()
+                // TODO: If array is empty, should detach internal listeners via destroyListener()
             }
         },
 

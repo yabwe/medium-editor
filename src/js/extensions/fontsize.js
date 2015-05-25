@@ -2,7 +2,7 @@ var FontSizeForm;
 (function () {
     'use strict';
 
-    /*global FormExtension, Selection */
+    /*global FormExtension, Selection, Util */
 
     FontSizeForm = FormExtension.extend({
 
