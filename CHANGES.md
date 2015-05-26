@@ -1,3 +1,14 @@
+4.11.0 / 2015-05-26
+==================
+* Add hideToolbar and showToolbar custom events
+* Add hideOnClick option for placeholder extension
+* Fix issue with linebreaks in Safari
+* Fix issue with calling setup again after destroy
+* Add support for CDN hosting
+* Pass window and document to each extension
+* Deprecate .parent property of extensions
+
+
 4.10.2 / 2015-05-21
 ==================
 * Auto-Link Fixes

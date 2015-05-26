@@ -962,7 +962,7 @@ var Util;
             }
 
             var afterLast = lastChild.nextSibling,
-                fragment = document.createDocumentFragment();
+                fragment = rootNode.ownerDocument.createDocumentFragment();
 
             // build up fragment on startNode side of tree
             if (firstChild === startNode) {
@@ -1387,9 +1387,10 @@ var editorDefaults;
 })();
 
 var Extension;
-
 (function () {
     'use strict';
+
+    /* global Util */
 
     Extension = function (options) {
         Util.extend(this, options);
@@ -1456,29 +1457,21 @@ var Extension;
     };
 
     Extension.prototype = {
-        init: function (/* instance */) {
-            // called when properly decorated and used.
-            // has a .base value pointing to the editor
-            // owning us. has been given a .name if no
-            // name present
-        },
-
-        /* parent: [boolean]
+        /* init: [function]
          *
-         * Setting this to false will prevent MediumEditor
-         * from setting the .base property.
-         * If left as true, the .base property of the extension
-         * will be assigned a reference to the
-         * MediumEditor instance that is using the extension
+         * Called by MediumEditor during initialization.
+         * The .base property will already have been set to
+         * current instance of MediumEditor when this is called.
+         * All helper methods will exist as well
          */
-        parent: true,
+        init: function () {},
 
         /* base: [MediumEditor instance]
          *
-         * If .parent is set to true, this will be set to the
-         * current MediumEditor instance before init() is called
+         * If not overriden, this will be set to the current instance
+         * of MediumEditor, before the init method is called
          */
-        base: null,
+        base: undefined,
 
         /* name: [string]
          *
@@ -1487,7 +1480,7 @@ var Extension;
          * used when passing the extension into MediumEditor via the
          * 'extensions' option
          */
-        name: null,
+        name: undefined,
 
         /* checkState: [function (node)]
          *
@@ -1500,7 +1493,7 @@ var Extension;
          * 3) Get the parent node of the previous node
          * 4) Repeat steps #2 and #3 until we move outside the parent contenteditable
          */
-        checkState: null,
+        checkState: undefined,
 
         /* As alternatives to checkState, these functions provide a more structured
          * path to updating the state of an extension (usually a button) whenever
@@ -1518,7 +1511,7 @@ var Extension;
          * If this function returns true, and the setActive() function is defined
          * setActive() will be called
          */
-        queryCommandState: null,
+        queryCommandState: undefined,
 
         /* isActive: [function ()]
          *
@@ -1528,7 +1521,7 @@ var Extension;
          * but only if queryCommandState() or isAlreadyApplied() functions
          * are implemented, and when called, return true.
          */
-        isActive: null,
+        isActive: undefined,
 
         /* isAlreadyApplied: [function (node)]
          *
@@ -1541,7 +1534,7 @@ var Extension;
          * queryCommandState() is implemented and returns a non-null
          * value when called
          */
-        isAlreadyApplied: null,
+        isAlreadyApplied: undefined,
 
         /* setActive: [function ()]
          *
@@ -1551,7 +1544,7 @@ var Extension;
          * only if queryCommandState() or isAlreadyApplied(node) return
          * true when called
          */
-        setActive: null,
+        setActive: undefined,
 
         /* setInactive: [function ()]
          *
@@ -1563,7 +1556,32 @@ var Extension;
          * or the combination of queryCommandState(), isAlreadyApplied(node),
          * isActive(), and setActive()
          */
-        setInactive: null
+        setInactive: undefined,
+
+        /************************ Helpers ************************
+         * The following are helpers that are either set by MediumEditor
+         * during initialization, or are helper methods which either
+         * route calls to the MediumEditor instance or provide common
+         * functionality for all extensions
+         *********************************************************/
+
+        /* window: [Window]
+         *
+         * If not overriden, this will be set to the window object
+         * to be used by MediumEditor and its extensions.  This is
+         * passed via the 'contentWindow' option to MediumEditor
+         * and is the global 'window' object by default
+         */
+        'window': undefined,
+
+        /* document: [Document]
+         *
+         * If not overriden, this will be set to the document object
+         * to be used by MediumEditor and its extensions. This is
+         * passed via the 'ownerDocument' optin to MediumEditor
+         * and is the global 'document' object by default
+         */
+        'document': undefined
     };
 })();
 
@@ -3154,7 +3172,7 @@ var Button;
             return (typeof this.tagNames === 'function') ? this.tagNames(this.base.options) : this.tagNames;
         },
         createButton: function () {
-            var button = this.base.options.ownerDocument.createElement('button'),
+            var button = this.document.createElement('button'),
                 content = this.contentDefault,
                 ariaLabel = this.getAria();
             button.classList.add('medium-editor-action');
@@ -3232,7 +3250,7 @@ var Button;
 
             if (!isMatch && this.style) {
                 styleVals = this.style.value.split('|');
-                computedStyle = this.base.options.contentWindow.getComputedStyle(node, null).getPropertyValue(this.style.prop);
+                computedStyle = this.window.getComputedStyle(node, null).getPropertyValue(this.style.prop);
                 styleVals.forEach(function (val) {
                     if (!this.knownState) {
                         isMatch = (computedStyle.indexOf(val) !== -1);
@@ -3600,7 +3618,6 @@ var AnchorPreview;
 
     AnchorPreview = Extension.extend({
         name: 'anchor-preview',
-        parent: true,
 
         // Anchor Preview Options
 
@@ -3856,14 +3873,13 @@ LINK_REGEXP_TEXT =
     'use strict';
 
     AutoLink = Extension.extend({
-        parent: true,
 
         init: function () {
             this.disableEventHandling = false;
             this.base.subscribe('editableKeypress', this.onKeypress.bind(this));
             this.base.subscribe('editableBlur', this.onBlur.bind(this));
             // MS IE has it's own auto-URL detect feature but ours is better in some ways. Be consistent.
-            this.base.options.ownerDocument.execCommand('AutoUrlDetect', false, false);
+            this.document.execCommand('AutoUrlDetect', false, false);
         },
 
         onBlur: function (blurEvent, editable) {
@@ -3972,7 +3988,7 @@ LINK_REGEXP_TEXT =
         },
 
         findOrCreateMatchingTextNodes: function (element, match) {
-            var treeWalker = this.base.options.ownerDocument.createTreeWalker(element, NodeFilter.SHOW_TEXT,
+            var treeWalker = this.document.createTreeWalker(element, NodeFilter.SHOW_TEXT,
                     null, false),
                 matchedNodes = [],
                 currentTextIndex = 0,
@@ -4022,8 +4038,8 @@ LINK_REGEXP_TEXT =
                 return false;
             }
 
-            var anchor = document.createElement('a'),
-                span = document.createElement('span');
+            var anchor = this.document.createElement('a'),
+                span = this.document.createElement('span');
             Util.moveTextRangeIntoElement(textNodes[0], textNodes[textNodes.length - 1], span);
             span.setAttribute('data-auto-link', 'true');
             anchor.setAttribute('href', Util.ensureUrlHasProtocol(href));
@@ -4039,8 +4055,6 @@ var ImageDragging;
     'use strict';
 
     ImageDragging = Extension.extend({
-        // Need a reference to MediumEditor (this.base)
-        parent: true,
 
         init: function () {
             this.base.subscribe('editableDrag', this.handleDrag.bind(this));
@@ -4076,10 +4090,10 @@ var ImageDragging;
                         fileReader.readAsDataURL(file);
 
                         id = 'medium-img-' + (+new Date());
-                        Util.insertHTMLCommand(this.base.options.ownerDocument, '<img class="medium-image-loading" id="' + id + '" />');
+                        Util.insertHTMLCommand(this.document, '<img class="medium-image-loading" id="' + id + '" />');
 
                         fileReader.onload = function () {
-                            var img = this.base.options.ownerDocument.getElementById(id);
+                            var img = this.document.getElementById(id);
                             if (img) {
                                 img.removeAttribute('id');
                                 img.removeAttribute('class');
@@ -4117,7 +4131,7 @@ var FontSizeForm;
 
             if (!this.isDisplayed()) {
                 // Get fontsize of current selection (convert to string since IE returns this as number)
-                var fontSize = this.base.options.ownerDocument.queryCommandValue('fontSize') + '';
+                var fontSize = this.document.queryCommandValue('fontSize') + '';
                 this.showForm(fontSize);
             }
 
@@ -4183,7 +4197,7 @@ var FontSizeForm;
         // form creation and event handling
 
         createForm: function () {
-            var doc = this.base.options.ownerDocument,
+            var doc = this.document,
                 form = doc.createElement('div'),
                 input = doc.createElement('input'),
                 close = doc.createElement('a'),
@@ -4236,7 +4250,7 @@ var FontSizeForm;
         },
 
         clearFontSize: function () {
-            Selection.getSelectedElements(this.base.options.ownerDocument).forEach(function (el) {
+            Selection.getSelectedElements(this.document).forEach(function (el) {
                 if (el.tagName === 'FONT' && el.hasAttribute('size')) {
                     el.removeAttribute('size');
                 }
@@ -4355,9 +4369,6 @@ var PasteHandler;
         'document': document,
         targetBlank: false,
         disableReturn: false,
-
-        // Need a reference to MediumEditor (this.base)
-        parent: true,
 
         init: function () {
             if (this.forcePlainText || this.cleanPastedHTML) {
@@ -4575,7 +4586,6 @@ var Placeholder;
 
     Placeholder = Extension.extend({
         name: 'placeholder',
-        parent: true,
 
         /* Placeholder Options */
 
@@ -5406,13 +5416,38 @@ function MediumEditor(elements, options) {
         }, this);
     }
 
+    function setExtensionDefaults(extension, defaults) {
+        Object.keys(defaults).forEach(function (prop) {
+            if (extension[prop] === undefined) {
+                extension[prop] = defaults[prop];
+            }
+        });
+        return extension;
+    }
+
     function initExtension(extension, name, instance) {
-        if (extension.parent) {
-            extension.base = instance;
+        if (typeof extension.parent !== 'undefined') {
+            Util.warn('Extension .parent property has been deprecated.  ' +
+                'The .base property for extensions will always be set to MediumEditor in version 5.0.0');
         }
+        var extensionDefaults = {
+            'window': instance.options.contentWindow,
+            'document': instance.options.ownerDocument
+        };
+        // TODO: Deprecated (Remove .parent check in v5.0.0)
+        if (extension.parent !== false) {
+            extensionDefaults.base = instance;
+        }
+        // Add default options into the extension
+        extension = setExtensionDefaults(extension, extensionDefaults);
+
+        // Call init on the extension
         if (typeof extension.init === 'function') {
+            // Passing instance into init() will be deprecated in v5.0.0
             extension.init(instance);
         }
+
+        // Set extension name (if not already set)
         if (!extension.name) {
             extension.name = name;
         }
@@ -5587,9 +5622,7 @@ function MediumEditor(elements, options) {
     function initPlaceholder(options) {
         // Backwards compatability
         var defaultsBC = {
-            text: (typeof this.options.placeholder === 'string') ? this.options.placeholder : undefined, // deprecated
-            'window': this.options.contentWindow,
-            'document': this.options.ownerDocument
+            text: (typeof this.options.placeholder === 'string') ? this.options.placeholder : undefined // deprecated
         };
 
         return new MediumEditor.extensions.placeholder(
@@ -5601,8 +5634,6 @@ function MediumEditor(elements, options) {
         // Backwards compatability
         var defaultsBC = {
             hideDelay: this.options.anchorPreviewHideDelay, // deprecated
-            'window': this.options.contentWindow,
-            'document': this.options.ownerDocument,
             diffLeft: this.options.diffLeft,
             diffTop: this.options.diffTop,
             elementsContainer: this.options.elementsContainer
@@ -5620,9 +5651,7 @@ function MediumEditor(elements, options) {
             linkValidation: this.options.checkLinkFormat, //deprecated
             placeholderText: this.options.anchorInputPlaceholder, // deprecated
             targetCheckbox: this.options.anchorTarget, // deprecated
-            targetCheckboxText: this.options.anchorInputCheckboxLabel, // deprecated
-            'window': this.options.contentWindow,
-            'document': this.options.ownerDocument
+            targetCheckboxText: this.options.anchorInputCheckboxLabel // deprecated
         };
 
         return new MediumEditor.extensions.anchor(
@@ -5636,9 +5665,7 @@ function MediumEditor(elements, options) {
             forcePlainText: this.options.forcePlainText, // deprecated
             cleanPastedHTML: this.options.cleanPastedHTML, // deprecated
             disableReturn: this.options.disableReturn,
-            targetBlank: this.options.targetBlank,
-            'window': this.options.contentWindow,
-            'document': this.options.ownerDocument
+            targetBlank: this.options.targetBlank
         };
 
         return new MediumEditor.extensions.paste(
@@ -5668,10 +5695,10 @@ function MediumEditor(elements, options) {
                 ext = initExtension(initAnchorForm.call(this, this.options.anchor), 'anchor', this);
                 this.commands.push(ext);
             } else if (buttonName === 'fontsize') {
-                ext = initExtension(new FontSizeForm(), buttonName, this);
+                ext = initExtension(new MediumEditor.extensions.fontSize(), buttonName, this);
                 this.commands.push(ext);
             } else if (ButtonsData.hasOwnProperty(buttonName)) {
-                ext = initExtension(new Button(ButtonsData[buttonName]), buttonName, this);
+                ext = initExtension(new MediumEditor.extensions.button(ButtonsData[buttonName]), buttonName, this);
                 this.commands.push(ext);
             }
         }, this);
@@ -5694,11 +5721,11 @@ function MediumEditor(elements, options) {
         }
 
         if (shouldAddDefaultAutoLink.call(this)) {
-            this.commands.push(initExtension(new AutoLink(), 'auto-link', this));
+            this.commands.push(initExtension(new MediumEditor.extensions.autoLink(), 'auto-link', this));
         }
 
         if (shouldAddDefaultImageDragging.call(this)) {
-            this.commands.push(initExtension(new ImageDragging(), 'image-dragging', this));
+            this.commands.push(initExtension(new MediumEditor.extensions.imageDragging(), 'image-dragging', this));
         }
 
         if (shouldAddDefaultPlaceholder.call(this)) {
@@ -5791,10 +5818,7 @@ function MediumEditor(elements, options) {
             var uniqueId = 1;
 
             this.options = mergeOptions.call(this, this.defaults, options);
-            createElementsArray.call(this, elements);
-            if (this.elements.length === 0) {
-                return;
-            }
+            this.origElements = elements;
 
             if (!this.options.elementsContainer) {
                 this.options.elementsContainer = this.options.ownerDocument.body;
@@ -5811,6 +5835,11 @@ function MediumEditor(elements, options) {
 
         setup: function () {
             if (this.isActive) {
+                return;
+            }
+
+            createElementsArray.call(this, this.origElements);
+            if (this.elements.length === 0) {
                 return;
             }
 
@@ -6258,7 +6287,7 @@ MediumEditor.version = (function (major, minor, revision) {
     };
 }).apply(this, ({
     // grunt-bump looks for this:
-    'version': '4.10.2'
+    'version': '4.11.0'
 }).version.split('.'));
 
     return MediumEditor;
