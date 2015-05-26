@@ -24,6 +24,12 @@ LINK_REGEXP_TEXT =
 
     var KNOWN_TLDS_REGEXP = new RegExp('^(' + KNOWN_TLDS_FRAGMENT + ')$', 'i');
 
+    function nodeIsNotInsideAnchorTag(node) {
+        return !Util.traverseUp(node, function (node) {
+            return node.nodeName.toLowerCase() === 'a';
+        });
+    }
+
     AutoLink = Extension.extend({
 
         init: function () {
@@ -73,14 +79,15 @@ LINK_REGEXP_TEXT =
             // a link across paragraphs - which doesn't work and is terrible.
             // (Medium deletes the spaces/returns between P tags so the textContent ends up without paragraph spacing)
             var paragraphs = contenteditable.querySelectorAll('p'),
-                linkCreated = false;
+                documentModified = false;
             if (paragraphs.length === 0) {
                 paragraphs = [contenteditable];
             }
             for (var i = 0; i < paragraphs.length; i++) {
-                linkCreated = this.performLinkingWithinElement(paragraphs[i]) || linkCreated;
+                documentModified = this.removeObsoleteAutoLinkSpans(paragraphs[i]) || documentModified;
+                documentModified = this.performLinkingWithinElement(paragraphs[i]) || documentModified;
             }
-            return linkCreated;
+            return documentModified;
         },
 
         splitStartNodeIfNeeded: function (currentNode, matchStartIndex, currentTextIndex) {
@@ -103,6 +110,28 @@ LINK_REGEXP_TEXT =
                     endSplitPoint !== 0) {
                 (newNode || currentNode).splitText(endSplitPoint);
             }
+        },
+
+        removeObsoleteAutoLinkSpans: function (element) {
+            var spans = element.querySelectorAll('span[data-auto-link="true"]'),
+                documentModified = false;
+
+            for (var i = 0; i < spans.length; i++) {
+                var textContent = spans[i].textContent;
+                if (textContent.indexOf('://') === -1) {
+                    textContent = Util.ensureUrlHasProtocol(textContent);
+                }
+                if (spans[i].getAttribute('data-href') !== textContent && nodeIsNotInsideAnchorTag(spans[i])) {
+                    documentModified = true;
+                    // Some editing has happened to the span, so just remove it entirely. The user can put it back
+                    // around just the href content if they need to prevent it from linking
+                    while (spans[i].childNodes.length > 0) {
+                        spans[i].parentNode.insertBefore(spans[i].firstChild, spans[i]);
+                    }
+                    spans[i].parentNode.removeChild(spans[i]);
+                }
+            }
+            return documentModified;
         },
 
         performLinkingWithinElement: function (element) {
@@ -195,11 +224,13 @@ LINK_REGEXP_TEXT =
                 return false;
             }
 
-            var anchor = this.document.createElement('a'),
-                span = this.document.createElement('span');
+            var anchor = document.createElement('a'),
+                span = document.createElement('span'),
+                hrefWithProtocol = Util.ensureUrlHasProtocol(href);
             Util.moveTextRangeIntoElement(textNodes[0], textNodes[textNodes.length - 1], span);
             span.setAttribute('data-auto-link', 'true');
-            anchor.setAttribute('href', Util.ensureUrlHasProtocol(href));
+            span.setAttribute('data-href', hrefWithProtocol);
+            anchor.setAttribute('href', hrefWithProtocol);
             span.parentNode.insertBefore(anchor, span);
             anchor.appendChild(span);
             return true;
