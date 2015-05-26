@@ -113,7 +113,6 @@ var Toolbar;
         },
 
         attachEventHandlers: function () {
-
             // MediumEditor custom events for when user beings and ends interaction with a contenteditable and its elements
             this.base.subscribe('blur', this.handleBlur.bind(this));
             this.base.subscribe('focus', this.handleFocus.bind(this));
@@ -373,7 +372,7 @@ var Toolbar;
         checkActiveButtons: function () {
             var manualStateChecks = [],
                 queryState = null,
-                selectionRange = Util.getSelectionRange(this.options.ownerDocument),
+                selectionRange = Selection.getSelectionRange(this.options.ownerDocument),
                 parentNode,
                 updateExtensionState = function (extension) {
                     if (typeof extension.checkState === 'function') {
@@ -444,7 +443,6 @@ var Toolbar;
             if (this.options.staticToolbar) {
                 this.showToolbar();
                 this.positionStaticToolbar(container);
-
             } else if (!selection.isCollapsed) {
                 this.showToolbar();
                 this.positionToolbar(selection);
@@ -493,12 +491,18 @@ var Toolbar;
                 toolbarElement.style.top = containerTop - toolbarHeight + 'px';
             }
 
-            if (this.options.toolbarAlign === 'left') {
-                targetLeft = containerRect.left;
-            } else if (this.options.toolbarAlign === 'center') {
-                targetLeft = containerCenter - halfOffsetWidth;
-            } else if (this.options.toolbarAlign === 'right') {
-                targetLeft = containerRect.right - toolbarWidth;
+            switch (this.options.toolbarAlign) {
+                case 'left':
+                    targetLeft = containerRect.left;
+                    break;
+
+                case 'right':
+                    targetLeft = containerRect.right - toolbarWidth;
+                    break;
+
+                case 'center':
+                    targetLeft = containerCenter - halfOffsetWidth;
+                    break;
             }
 
             if (targetLeft < 0) {

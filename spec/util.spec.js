@@ -13,7 +13,6 @@ describe('Util', function () {
     });
 
     describe('Exposure', function () {
-
         it('is exposed on the MediumEditor ctor', function () {
             expect(MediumEditor.util).toBeTruthy();
             expect(MediumEditor.util).toEqual(Util);
@@ -41,11 +40,16 @@ describe('Util', function () {
                 result = MediumEditor.util.defaults({}, objOne, objTwo, objThree, objFour);
             expect(result).toEqual({ one: 'one', three: 'three', five: 'six' });
         });
+
+        it('should overwrite nothing without args', function () {
+            var result = MediumEditor.util.defaults();
+
+            expect(result).toEqual({});
+        });
     });
 
     describe('Deprecated', function () {
         it('should warn when a method is deprecated', function () {
-
             var testObj = {
                 newMethod: function () {}
             };
@@ -59,7 +63,6 @@ describe('Util', function () {
         });
 
         it('should warn when an option is deprecated', function () {
-
             spyOn(Util, 'warn').and.callThrough();
             Util.deprecated('oldOption', 'sub.newOption');
             expect(Util.warn).toHaveBeenCalledWith(
@@ -77,10 +80,11 @@ describe('Util', function () {
     });
 
     describe('getobject', function () {
-
         it('should get nested objects', function () {
             var obj = { a: { b: { c: { d: 10 } } } };
             expect(Util.getObject('a.b.c.d', false, obj)).toBe(10);
+            expect(Util.getObject('a.b.c.d', false, false)).toBe(undefined);
+            expect(Util.getObject(false, false, obj)).toBe(obj);
             expect(Util.getObject('a.b.c', false, obj)).toEqual({ d: 10 });
             expect(Util.getObject('a', false, obj)).toEqual({ b: { c: { d: 10 } } });
         });
@@ -96,21 +100,22 @@ describe('Util', function () {
             expect(Util.getObject('a.b.c.d.e.f.g', false, obj)).toBe(undefined);
             expect(obj.a).toBe(undefined);
         });
-
     });
 
     describe('setobject', function () {
-
         it('sets returns the value', function () {
             var obj = {};
             expect(Util.setObject('a.b.c', 10, obj)).toBe(10);
             expect(obj.a.b.c).toBe(10);
         });
 
+        it('sets returns undefined because of empty string', function () {
+            var obj = {};
+            expect(Util.setObject('', 10, obj)).toBe(undefined);
+        });
     });
 
     describe('settargetblank', function () {
-
         it('sets target blank on a A element from a A element', function () {
             var el = this.createElement('a', '', 'lorem ipsum');
             el.attributes.href = 'http://0.0.0.0/bar.html';
@@ -130,7 +135,32 @@ describe('Util', function () {
             expect(nodes[0].target).not.toBe('_blank');
             expect(nodes[1].target).toBe('_blank');
         });
+    });
 
+    describe('addClassToAnchors', function () {
+        it('add class to anchors on a A element from a A element', function () {
+            var el = this.createElement('a', '', 'lorem ipsum');
+            el.attributes.href = 'http://0.0.0.0/bar.html';
+
+            Util.addClassToAnchors(el, 'firstclass');
+
+            expect(el.classList.length).toBe(1);
+            expect(el.classList.contains('firstclass')).toBe(true);
+        });
+
+        it('add class to anchors on a A element from a DIV element', function () {
+            var el = this.createElement('div', '', '<a href="http://1.1.1.1/foo.html">foo</a> <a href="http://0.0.0.0/bar.html">bar</a>');
+
+            Util.addClassToAnchors(el, 'firstclass');
+
+            var nodes = el.getElementsByTagName('a');
+
+            expect(nodes[0].classList.length).toBe(1);
+            expect(nodes[1].classList.length).toBe(1);
+
+            expect(nodes[0].classList.contains('firstclass')).toBe(true);
+            expect(nodes[1].classList.contains('firstclass')).toBe(true);
+        });
     });
 
     describe('warn', function () {
@@ -256,6 +286,60 @@ describe('Util', function () {
                 '</p>' +
                 '<span> notLink</span>'
             );
+        });
+    });
+
+    describe('getClosestTag', function () {
+        it('should get closed tag', function () {
+            var el = this.createElement('div', '', '<span>my <b>text</b></span>'),
+                tag = el.querySelector('b').firstChild,
+                closestTag = Util.getClosestTag(tag, 'span');
+
+            expect(closestTag.tagName.toLowerCase()).toBe('span');
+        });
+
+        it('should not get closed tag with data-medium-element', function () {
+            var el = this.createElement('div', '', '<p>youpi<span data-medium-element="true">my <b>text</b></span></p>'),
+                tag = el.querySelector('b').firstChild,
+                closestTag = Util.getClosestTag(tag, 'p');
+
+            expect(closestTag).toBe(false);
+        });
+
+        it('should not get closed tag from empty element', function () {
+            var closestTag = Util.getClosestTag(false, 'span');
+
+            expect(closestTag).toBe(false);
+        });
+    });
+
+    describe('isListItem', function () {
+        it('should be a list item but inside a ul', function () {
+            var el = this.createElement('ul', '', '<li>test</li>'),
+                result = Util.isListItem(el);
+
+            expect(result).toBe(false);
+        });
+
+        it('should be a list item', function () {
+            var el = this.createElement('ul', '', '<li>test</li>'),
+                li = el.querySelector('li'),
+                result = Util.isListItem(li);
+
+            expect(result).toBe(true);
+        });
+
+        it('should not be a list item', function () {
+            var result = Util.isListItem(false);
+
+            expect(result).toBe(false);
+        });
+
+        it('should not be a list item', function () {
+            var el = this.createElement('p', '', '<b>test</b>'),
+                result = Util.isListItem(el);
+
+            expect(result).toBe(false);
         });
     });
 });

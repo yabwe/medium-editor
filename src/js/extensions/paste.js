@@ -173,11 +173,6 @@ var PasteHandler;
                     workEl.innerHTML = workEl.innerHTML.replace(/\n/gi, ' ');
 
                     switch (workEl.tagName.toLowerCase()) {
-                        case 'a':
-                            if (this.targetBlank) {
-                                Util.setTargetBlank(workEl);
-                            }
-                            break;
                         case 'p':
                         case 'div':
                             this.filterCommonBlocks(workEl);
@@ -211,6 +206,11 @@ var PasteHandler;
 
             for (i = 0; i < elList.length; i += 1) {
                 workEl = elList[i];
+
+                if ('a' === workEl.tagName.toLowerCase() && this.targetBlank) {
+                    Util.setTargetBlank(workEl);
+                }
+
                 Util.cleanupAttrs(workEl, options.cleanAttrs);
                 Util.cleanupTags(workEl, options.cleanTags);
             }
@@ -229,7 +229,6 @@ var PasteHandler;
         },
 
         filterLineBreak: function (el) {
-
             if (this.isCommonBlock(el.previousElementSibling)) {
                 // remove stray br's following common block elements
                 this.removeWithParent(el);
@@ -289,5 +288,4 @@ var PasteHandler;
             }
         }
     });
-
 }());

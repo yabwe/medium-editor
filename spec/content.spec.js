@@ -139,7 +139,7 @@ describe('Content TestCase', function () {
 
         it('should prevent consecutive new lines from being inserted when data-disable-double-return is defined', function () {
             this.el.innerHTML = '<p><br></p>';
-            this.el.setAttribute('data-disable-return', true);
+            this.el.setAttribute('data-disable-double-return', true);
 
             var editor = this.newMediumEditor('.editor'),
                 p = editor.elements[0].querySelector('p'),

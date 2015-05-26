@@ -243,7 +243,7 @@ describe('Toolbar TestCase', function () {
             });
 
             selectElementContentsAndFire(this.el.querySelector('b'));
-            window.getSelection().getRangeAt(0).collapse(false);
+            window.getSelection().removeAllRanges();
             editor.checkSelection();
             jasmine.clock().tick(1); // checkSelection delay
             expect(editor.toolbar.getToolbarElement().classList.contains('medium-editor-toolbar-active')).toBe(true);
@@ -378,6 +378,59 @@ describe('Toolbar TestCase', function () {
             spyOn(Toolbar.prototype, 'positionToolbarIfShown');
             fireEvent(window, 'scroll');
             expect(editor.toolbar.positionToolbarIfShown).toHaveBeenCalled();
+        });
+    });
+
+    describe('Static & sticky toolbar position', function () {
+        it('should position static + sticky toolbar on the left', function () {
+            this.el.innerHTML = '<b>lorem ipsum</b>';
+            var editor = this.newMediumEditor('.editor', {
+                staticToolbar: true,
+                stickyToolbar: true,
+                toolbarAlign: 'left'
+            }),
+            toolbar = editor.toolbar.getToolbarElement();
+
+            selectElementContentsAndFire(this.el.querySelector('b'));
+            window.getSelection().getRangeAt(0).collapse(false);
+            editor.checkSelection();
+            jasmine.clock().tick(1); // checkSelection delay
+
+            expect(toolbar.style.left).not.toBe('');
+        });
+
+        it('should position static + sticky toolbar on the right', function () {
+            this.el.innerHTML = '<b>lorem ipsum</b>';
+            var editor = this.newMediumEditor('.editor', {
+                staticToolbar: true,
+                stickyToolbar: true,
+                toolbarAlign: 'right'
+            }),
+            toolbar = editor.toolbar.getToolbarElement();
+
+            selectElementContentsAndFire(this.el.querySelector('b'));
+            window.getSelection().getRangeAt(0).collapse(false);
+            editor.checkSelection();
+            jasmine.clock().tick(1); // checkSelection delay
+
+            expect(toolbar.style.left).not.toBe('');
+        });
+
+        it('should position static + sticky toolbar on the center', function () {
+            this.el.innerHTML = '<b>lorem ipsum</b>';
+            var editor = this.newMediumEditor('.editor', {
+                staticToolbar: true,
+                stickyToolbar: true,
+                toolbarAlign: 'center'
+            }),
+            toolbar = editor.toolbar.getToolbarElement();
+
+            selectElementContentsAndFire(this.el.querySelector('b'));
+            window.getSelection().getRangeAt(0).collapse(false);
+            editor.checkSelection();
+            jasmine.clock().tick(1); // checkSelection delay
+
+            expect(toolbar.style.left).not.toBe('');
         });
     });
 });

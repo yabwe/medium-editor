@@ -51,9 +51,10 @@ describe('Autolink', function () {
                 'en.wikipedia.org/wiki/Embassy_of_China_in_Washington,_D.C.'
             ];
 
-            function triggerAutolinking(element) {
+            function triggerAutolinking(element, key) {
+                var keyPressed = key || Util.keyCode.SPACE;
                 fireEvent(element, 'keypress', {
-                    keyCode: Util.keyCode.SPACE
+                    keyCode: keyPressed
                 });
                 jasmine.clock().tick(1);
             }
@@ -120,6 +121,45 @@ describe('Autolink', function () {
                 expect(links[0].getAttribute('href')).toBe('http://www.example.com');
                 expect(links[0].firstChild.getAttribute('data-auto-link')).toBe('true');
                 expect(links[0].textContent).toBe('http://www.example.com');
+            });
+
+            it('should auto-link text on all SPACE or ENTER', function () {
+                var links;
+                this.el.innerHTML = 'http://www.example.enter';
+
+                selectElementContentsAndFire(this.el);
+                triggerAutolinking(this.el, Util.keyCode.ENTER);
+                links = this.el.getElementsByTagName('a');
+                expect(links.length).toBe(1);
+                expect(links[0].getAttribute('href')).toBe('http://www.example.enter');
+                expect(links[0].firstChild.getAttribute('data-auto-link')).toBe('true');
+                expect(links[0].textContent).toBe('http://www.example.enter');
+
+                this.el.innerHTML = 'http://www.example.space';
+
+                selectElementContentsAndFire(this.el);
+                triggerAutolinking(this.el, Util.keyCode.SPACE);
+                links = this.el.getElementsByTagName('a');
+                expect(links.length).toBe(1);
+                expect(links[0].getAttribute('href')).toBe('http://www.example.space');
+                expect(links[0].firstChild.getAttribute('data-auto-link')).toBe('true');
+                expect(links[0].textContent).toBe('http://www.example.space');
+            });
+
+            it('should auto-link text on blur', function () {
+                var links;
+                this.el.innerHTML = 'http://www.example.blur';
+
+                selectElementContentsAndFire(this.el);
+
+                fireEvent(this.el, 'blur');
+                jasmine.clock().tick(1);
+
+                links = this.el.getElementsByTagName('a');
+                expect(links.length).toBe(1);
+                expect(links[0].getAttribute('href')).toBe('http://www.example.blur');
+                expect(links[0].firstChild.getAttribute('data-auto-link')).toBe('true');
+                expect(links[0].textContent).toBe('http://www.example.blur');
             });
 
             it('should auto-link link within basic text', function () {
