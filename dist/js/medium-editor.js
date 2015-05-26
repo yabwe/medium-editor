@@ -4083,8 +4083,8 @@ LINK_REGEXP_TEXT =
                 return false;
             }
 
-            var anchor = document.createElement('a'),
-                span = document.createElement('span'),
+            var anchor = this.document.createElement('a'),
+                span = this.document.createElement('span'),
                 hrefWithProtocol = Util.ensureUrlHasProtocol(href);
             Util.moveTextRangeIntoElement(textNodes[0], textNodes[textNodes.length - 1], span);
             span.setAttribute('data-auto-link', 'true');
