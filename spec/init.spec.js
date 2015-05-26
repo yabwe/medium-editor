@@ -33,8 +33,8 @@ describe('Initialization TestCase', function () {
         it('should do nothing when selector does not return any elements', function () {
             spyOn(MediumEditor.prototype, 'setup');
             var editor = this.newMediumEditor('.test');
-            expect(editor.id).toBe(undefined);
-            expect(editor.setup).not.toHaveBeenCalled();
+            expect(editor.isActive).toBeFalsy();
+            expect(editor.events).toBeUndefined();
             expect(editor.toolbar).toBeUndefined();
             expect(editor.getExtensionByName('anchor')).toBeUndefined();
             expect(editor.getExtensionByName('anchor-preview')).toBeUndefined();
@@ -84,6 +84,15 @@ describe('Initialization TestCase', function () {
             expect(editor.elements).not.toBe(null);
             expect(editor.elements.length).toBe(0);
             editor.destroy();
+        });
+
+        it('should be available after destroying and calling setup again', function () {
+            var editor = this.newMediumEditor('.editor');
+            expect(editor.elements.length).toBe(1);
+            editor.destroy();
+            expect(editor.elements.length).toBe(0);
+            editor.setup();
+            expect(editor.elements.length).toBe(1);
         });
     });
 

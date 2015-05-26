@@ -588,10 +588,7 @@ function MediumEditor(elements, options) {
             var uniqueId = 1;
 
             this.options = mergeOptions.call(this, this.defaults, options);
-            createElementsArray.call(this, elements);
-            if (this.elements.length === 0) {
-                return;
-            }
+            this.origElements = elements;
 
             if (!this.options.elementsContainer) {
                 this.options.elementsContainer = this.options.ownerDocument.body;
@@ -608,6 +605,11 @@ function MediumEditor(elements, options) {
 
         setup: function () {
             if (this.isActive) {
+                return;
+            }
+
+            createElementsArray.call(this, this.origElements);
+            if (this.elements.length === 0) {
                 return;
             }
 
