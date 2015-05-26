@@ -1,3 +1,9 @@
+4.11.1 / 2015-05-26
+==================
+* Fix issue with auto-linked text after manually unlinking
+* Fix some incorrect TLDs for auto-link
+
+
 4.11.0 / 2015-05-26
 ==================
 * Add hideToolbar and showToolbar custom events
