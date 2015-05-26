@@ -3860,17 +3860,32 @@ var AnchorPreview;
 }());
 
 var AutoLink,
+    KNOWN_TLDS_FRAGMENT,
     LINK_REGEXP_TEXT;
 
+KNOWN_TLDS_FRAGMENT = 'com|net|org|edu|gov|mil|aero|asia|biz|cat|coop|info|int|jobs|mobi|museum|name|post|pro|tel|travel|' +
+    'xxx|ac|ad|ae|af|ag|ai|al|am|an|ao|aq|ar|as|at|au|aw|ax|az|ba|bb|bd|be|bf|bg|bh|bi|bj|bm|bn|bo|br|bs|bt|bv|bw|by|' +
+    'bz|ca|cc|cd|cf|cg|ch|ci|ck|cl|cm|cn|co|cr|cs|cu|cv|cx|cy|cz|dd|de|dj|dk|dm|do|dz|ec|ee|eg|eh|er|es|et|eu|fi|fj|' +
+    'fk|fm|fo|fr|ga|gb|gd|ge|gf|gg|gh|gi|gl|gm|gn|gp|gq|gr|gs|gt|gu|gw|gy|hk|hm|hn|hr|ht|hu|id|ie|il|im|in|io|iq|ir|' +
+    'is|it|je|jm|jo|jp|ke|kg|kh|ki|km|kn|kp|kr|kw|ky|kz|la|lb|lc|li|lk|lr|ls|lt|lu|lv|ly|ma|mc|md|me|mg|mh|mk|ml|mm|' +
+    'mn|mo|mp|mq|mr|ms|mt|mu|mv|mw|mx|my|mz|na|nc|ne|nf|ng|ni|nl|no|np|nr|nu|nz|om|pa|pe|pf|pg|ph|pk|pl|pm|pn|pr|ps|' +
+    'pt|pw|py|qa|re|ro|rs|ru|rw|sa|sb|sc|sd|se|sg|sh|si|sj|ja|sk|sl|sm|sn|so|sr|ss|st|su|sv|sx|sy|sz|tc|td|tf|tg|th|' +
+    'tj|tk|tl|tm|tn|to|tp|tr|tt|tv|tw|tz|ua|ug|uk|us|uy|uz|va|vc|ve|vg|vi|vn|vu|wf|ws|ye|yt|yu|za|zm|zw';
 LINK_REGEXP_TEXT =
     '(' +
     // Version of Gruber URL Regexp optimized for JS: http://stackoverflow.com/a/17733640
-    '((?:(https?://|ftps?://|nntp://)|www\\d{0,3}[.]|[a-z0-9.\\-]+[.][a-z]{2,4}\\\/)\\S+(?:[^\\s`!\\[\\]{};:\'\".,?\u00AB\u00BB\u201C\u201D\u2018\u2019]))' +
+    '((?:(https?://|ftps?://|nntp://)|www\\d{0,3}[.]|[a-z0-9.\\-]+[.](' + KNOWN_TLDS_FRAGMENT + ')\\\/)\\S+(?:[^\\s`!\\[\\]{};:\'\".,?\u00AB\u00BB\u201C\u201D\u2018\u2019]))' +
     // Addition to above Regexp to support bare domains/one level subdomains with common non-i18n TLDs and without www prefix:
-    ')|(([a-z0-9\\-]+\\.)?[a-z0-9\\-]+\\.(com|net|org|edu|gov|mil|aero|asia|biz|cat|coop|info|int|jobs|mobi|museum|name|post|pro|tel|travel|xxx|ac|ad|ae|af|ag|ai|al|am|an|ao|aq|ar|as|at|au|aw|ax|az|ba|bb|bd|be|bf|bg|bh|bi|bj|bm|bn|bo|br|bs|bt|bv|bw|by|bz|ca|cc|cd|cf|cg|ch|ci|ck|cl|cm|cn|co|cr|cs|cu|cv|cx|cy|cz|dd|de|dj|dk|dm|do|dz|ec|ee|eg|eh|er|es|et|eu|fi|fj|fk|fm|fo|fr|ga|gb|gd|ge|gf|gg|gh|gi|gl|gm|gn|gp|gq|gr|gs|gt|gu|gw|gy|hk|hm|hn|hr|ht|hu|id|ie|il|im|in|io|iq|ir|is|it|je|jm|jo|jp|ke|kg|kh|ki|km|kn|kp|kr|kw|ky|kz|la|lb|lc|li|lk|lr|ls|lt|lu|lv|ly|ma|mc|md|me|mg|mh|mk|ml|mm|mn|mo|mp|mq|mr|ms|mt|mu|mv|mw|mx|my|mz|na|nc|ne|nf|ng|ni|nl|no|np|nr|nu|nz|om|pa|pe|pf|pg|ph|pk|pl|pm|pn|pr|ps|pt|pw|py|qa|re|ro|rs|ru|rw|sa|sb|sc|sd|se|sg|sh|si|sj| Ja|sk|sl|sm|sn|so|sr|ss|st|su|sv|sx|sy|sz|tc|td|tf|tg|th|tj|tk|tl|tm|tn|to|tp|tr|tt|tv|tw|tz|ua|ug|uk|us|uy|uz|va|vc|ve|vg|vi|vn|vu|wf|ws|ye|yt|yu|za|zm|zw))';
+    ')|(([a-z0-9\\-]+\\.)?[a-z0-9\\-]+\\.(' + KNOWN_TLDS_FRAGMENT + '))';
 
 (function () {
     'use strict';
+
+    var KNOWN_TLDS_REGEXP = new RegExp('^(' + KNOWN_TLDS_FRAGMENT + ')$', 'i');
+
+    function nodeIsNotInsideAnchorTag(node) {
+        return !Util.getClosestTag(node, 'a');
+    }
 
     AutoLink = Extension.extend({
 
@@ -3921,14 +3936,15 @@ LINK_REGEXP_TEXT =
             // a link across paragraphs - which doesn't work and is terrible.
             // (Medium deletes the spaces/returns between P tags so the textContent ends up without paragraph spacing)
             var paragraphs = contenteditable.querySelectorAll('p'),
-                linkCreated = false;
+                documentModified = false;
             if (paragraphs.length === 0) {
                 paragraphs = [contenteditable];
             }
             for (var i = 0; i < paragraphs.length; i++) {
-                linkCreated = this.performLinkingWithinElement(paragraphs[i]) || linkCreated;
+                documentModified = this.removeObsoleteAutoLinkSpans(paragraphs[i]) || documentModified;
+                documentModified = this.performLinkingWithinElement(paragraphs[i]) || documentModified;
             }
-            return linkCreated;
+            return documentModified;
         },
 
         splitStartNodeIfNeeded: function (currentNode, matchStartIndex, currentTextIndex) {
@@ -3953,6 +3969,28 @@ LINK_REGEXP_TEXT =
             }
         },
 
+        removeObsoleteAutoLinkSpans: function (element) {
+            var spans = element.querySelectorAll('span[data-auto-link="true"]'),
+                documentModified = false;
+
+            for (var i = 0; i < spans.length; i++) {
+                var textContent = spans[i].textContent;
+                if (textContent.indexOf('://') === -1) {
+                    textContent = Util.ensureUrlHasProtocol(textContent);
+                }
+                if (spans[i].getAttribute('data-href') !== textContent && nodeIsNotInsideAnchorTag(spans[i])) {
+                    documentModified = true;
+                    // Some editing has happened to the span, so just remove it entirely. The user can put it back
+                    // around just the href content if they need to prevent it from linking
+                    while (spans[i].childNodes.length > 0) {
+                        spans[i].parentNode.insertBefore(spans[i].firstChild, spans[i]);
+                    }
+                    spans[i].parentNode.removeChild(spans[i]);
+                }
+            }
+            return documentModified;
+        },
+
         performLinkingWithinElement: function (element) {
             var matches = this.findLinkableText(element),
                 linkCreated = false;
@@ -3973,10 +4011,15 @@ LINK_REGEXP_TEXT =
                 matches = [];
 
             while ((match = linkRegExp.exec(textContent)) !== null) {
-                var matchEnd = match.index + match[0].length;
+                var matchOk = true,
+                    matchEnd = match.index + match[0].length;
                 // If the regexp detected something as a link that has text immediately preceding/following it, bail out.
-                if ((match.index === 0 || whitespaceChars.indexOf(textContent[match.index - 1]) !== -1) &&
-                    (matchEnd === textContent.length || whitespaceChars.indexOf(textContent[matchEnd]) !== -1)) {
+                matchOk = (match.index === 0 || whitespaceChars.indexOf(textContent[match.index - 1]) !== -1) &&
+                    (matchEnd === textContent.length || whitespaceChars.indexOf(textContent[matchEnd]) !== -1);
+                // If the regexp detected a bare domain that doesn't use one of our expected TLDs, bail out.
+                matchOk = matchOk && (match[0].indexOf('/') !== -1 ||
+                    KNOWN_TLDS_REGEXP.test(match[0].split('.').pop().split('?').shift()));
+                if (matchOk) {
                     matches.push({
                         href: match[0],
                         start: match.index,
@@ -4039,10 +4082,12 @@ LINK_REGEXP_TEXT =
             }
 
             var anchor = this.document.createElement('a'),
-                span = this.document.createElement('span');
+                span = this.document.createElement('span'),
+                hrefWithProtocol = Util.ensureUrlHasProtocol(href);
             Util.moveTextRangeIntoElement(textNodes[0], textNodes[textNodes.length - 1], span);
             span.setAttribute('data-auto-link', 'true');
-            anchor.setAttribute('href', Util.ensureUrlHasProtocol(href));
+            span.setAttribute('data-href', hrefWithProtocol);
+            anchor.setAttribute('href', hrefWithProtocol);
             span.parentNode.insertBefore(anchor, span);
             anchor.appendChild(span);
             return true;
