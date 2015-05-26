@@ -25,9 +25,7 @@ LINK_REGEXP_TEXT =
     var KNOWN_TLDS_REGEXP = new RegExp('^(' + KNOWN_TLDS_FRAGMENT + ')$', 'i');
 
     function nodeIsNotInsideAnchorTag(node) {
-        return !Util.traverseUp(node, function (node) {
-            return node.nodeName.toLowerCase() === 'a';
-        });
+        return !Util.getClosestTag(node, 'a');
     }
 
     AutoLink = Extension.extend({
