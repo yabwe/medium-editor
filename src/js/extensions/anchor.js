@@ -201,7 +201,7 @@ var AnchorForm;
 
         completeFormSave: function (opts) {
             this.base.restoreSelection();
-            this.base.execAction(this.action, opts);
+            this.execAction(this.action, opts);
             this.base.checkSelection();
         },
 
