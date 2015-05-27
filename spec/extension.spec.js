@@ -174,6 +174,36 @@ describe('Extensions TestCase', function () {
             expect(extInstance.window).toBe(fakeWindow);
             expect(extInstance.document).toBe(fakeDocument);
         });
+
+        it('should call destroy on extensions when being destroyed', function () {
+            var TempExtension = MediumEditor.Extension.extend({
+                    destroy: function () {}
+                }),
+                extInstance = new TempExtension();
+            spyOn(extInstance, 'destroy');
+            var editor = this.newMediumEditor('.editor', {
+                extensions: {
+                    'temp-extension': extInstance
+                }
+            });
+            editor.destroy();
+            expect(extInstance.destroy).toHaveBeenCalled();
+        });
+
+        it('should call deprecated deactivate on extensions when being destroyed if destroy is not implemented', function () {
+            var TempExtension = MediumEditor.Extension.extend({
+                    deactivate: function () {}
+                }),
+                extInstance = new TempExtension();
+            spyOn(extInstance, 'deactivate');
+            var editor = this.newMediumEditor('.editor', {
+                extensions: {
+                    'temp-extension': extInstance
+                }
+            });
+            editor.destroy();
+            expect(extInstance.deactivate).toHaveBeenCalled();
+        });
     });
 
     describe('Core Extension', function () {
