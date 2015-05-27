@@ -404,9 +404,9 @@ function MediumEditor(elements, options) {
         // Backwards compatability
         var defaultsBC = {
             hideDelay: this.options.anchorPreviewHideDelay, // deprecated
-            diffLeft: this.options.diffLeft,
-            diffTop: this.options.diffTop,
-            elementsContainer: this.options.elementsContainer
+            diffLeft: this.options.diffLeft, // deprecated (should use .getEditorOption() instead)
+            diffTop: this.options.diffTop, // deprecated (should use .getEditorOption() instead)
+            elementsContainer: this.options.elementsContainer // deprecated (should use .getEditorOption() instead)
         };
 
         return new MediumEditor.extensions.anchorPreview(
@@ -434,8 +434,8 @@ function MediumEditor(elements, options) {
         var defaultsBC = {
             forcePlainText: this.options.forcePlainText, // deprecated
             cleanPastedHTML: this.options.cleanPastedHTML, // deprecated
-            disableReturn: this.options.disableReturn,
-            targetBlank: this.options.targetBlank
+            disableReturn: this.options.disableReturn, // deprecated (should use .getEditorOption() instead)
+            targetBlank: this.options.targetBlank // deprecated (should use .getEditorOption() instead)
         };
 
         return new MediumEditor.extensions.paste(

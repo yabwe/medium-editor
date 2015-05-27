@@ -41,10 +41,6 @@ var AnchorForm;
          */
         targetCheckboxText: 'Open in new window',
 
-        /* ----- internal options needed from base ----- */
-        'window': window,
-        'document': document,
-
         // Options for the Button base class
         name: 'anchor',
         action: 'createLink',
@@ -63,7 +59,7 @@ var AnchorForm;
             var selectedParentElement = Selection.getSelectedParentElement(Selection.getSelectionRange(this.document));
             if (selectedParentElement.tagName &&
                     selectedParentElement.tagName.toLowerCase() === 'a') {
-                return this.base.execAction('unlink');
+                return this.execAction('unlink');
             }
 
             if (!this.isDisplayed()) {
@@ -99,12 +95,12 @@ var AnchorForm;
 
             template.push(
                 '<a href="#" class="medium-editor-toolbar-save">',
-                this.base.options.buttonLabels === 'fontawesome' ? '<i class="fa fa-check"></i>' : this.formSaveLabel,
+                this.getEditorOption('buttonLabels') === 'fontawesome' ? '<i class="fa fa-check"></i>' : this.formSaveLabel,
                 '</a>'
             );
 
             template.push('<a href="#" class="medium-editor-toolbar-close">',
-                this.base.options.buttonLabels === 'fontawesome' ? '<i class="fa fa-times"></i>' : this.formCloseLabel,
+                this.getEditorOption('buttonLabels') === 'fontawesome' ? '<i class="fa fa-times"></i>' : this.formCloseLabel,
                 '</a>');
 
             // both of these options are slightly moot with the ability to
@@ -205,7 +201,7 @@ var AnchorForm;
 
         completeFormSave: function (opts) {
             this.base.restoreSelection();
-            this.base.execAction(this.action, opts);
+            this.execAction(this.action, opts);
             this.base.checkSelection();
         },
 
@@ -227,16 +223,16 @@ var AnchorForm;
                 input = form.querySelector('.medium-editor-toolbar-input');
 
             // Handle clicks on the form itself
-            this.base.on(form, 'click', this.handleFormClick.bind(this));
+            this.on(form, 'click', this.handleFormClick.bind(this));
 
             // Handle typing in the textbox
-            this.base.on(input, 'keyup', this.handleTextboxKeyup.bind(this));
+            this.on(input, 'keyup', this.handleTextboxKeyup.bind(this));
 
             // Handle close button clicks
-            this.base.on(close, 'click', this.handleCloseClick.bind(this));
+            this.on(close, 'click', this.handleCloseClick.bind(this));
 
             // Handle save button clicks (capture)
-            this.base.on(save, 'click', this.handleSaveClick.bind(this), true);
+            this.on(save, 'click', this.handleSaveClick.bind(this), true);
 
         },
 
@@ -246,7 +242,7 @@ var AnchorForm;
 
             // Anchor Form (div)
             form.className = 'medium-editor-toolbar-form';
-            form.id = 'medium-editor-toolbar-form-anchor-' + this.base.id;
+            form.id = 'medium-editor-toolbar-form-anchor-' + this.getEditorId();
             form.innerHTML = this.getTemplate();
             this.attachFormEvents(form);
 

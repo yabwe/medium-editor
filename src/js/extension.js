@@ -193,6 +193,58 @@ var Extension;
          * passed via the 'ownerDocument' optin to MediumEditor
          * and is the global 'document' object by default
          */
-        'document': undefined
+        'document': undefined,
+
+        /* getEditorElements: [function ()]
+         *
+         * Helper function which returns an array containing
+         * all the contenteditable elements for this instance
+         * of MediumEditor
+         */
+        getEditorElements: function () {
+            return this.base.elements;
+        },
+
+        /* getEditorId: [function ()]
+         *
+         * Helper function which returns a unique identifier
+         * for this instance of MediumEditor
+         */
+        getEditorId: function () {
+            return this.base.id;
+        },
+
+        /* getEditorOptions: [function (option)]
+         *
+         * Helper function which returns the value of an option
+         * used to initialize this instance of MediumEditor
+         */
+        getEditorOption: function (option) {
+            return this.base.options[option];
+        }
     };
+
+    /* List of method names to add to the prototype of Extension
+     * Each of these methods will be defined as helpers that
+     * just call directly into the MediumEditor instance.
+     *
+     * example for 'on' method:
+     * Extension.prototype.on = function () {
+     *     return this.base.on.apply(this.base, arguments);
+     * }
+     */
+    [
+        // general helpers
+        'execAction',
+
+        // event handling
+        'on',
+        'off',
+        'subscribe'
+
+    ].forEach(function (helper) {
+        Extension.prototype[helper] = function () {
+            return this.base[helper].apply(this.base, arguments);
+        };
+    });
 })();

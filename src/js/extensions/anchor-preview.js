@@ -20,11 +20,9 @@ var AnchorPreview;
         previewValueSelector: 'a',
 
         /* ----- internal options needed from base ----- */
-        'window': window,
-        'document': document,
-        diffLeft: 0,
-        diffTop: -10,
-        elementsContainer: false,
+        diffLeft: 0, // deprecated (should use .getEditorOption() instead)
+        diffTop: -10, // deprecated (should use .getEditorOption() instead)
+        elementsContainer: false, // deprecated (should use .getEditorOption() instead)
 
         init: function () {
             this.anchorPreview = this.createPreview();
@@ -44,11 +42,11 @@ var AnchorPreview;
         createPreview: function () {
             var el = this.document.createElement('div');
 
-            el.id = 'medium-editor-anchor-preview-' + this.base.id;
+            el.id = 'medium-editor-anchor-preview-' + this.getEditorId();
             el.className = 'medium-editor-anchor-preview';
             el.innerHTML = this.getTemplate();
 
-            this.base.on(el, 'click', this.handleClick.bind(this));
+            this.on(el, 'click', this.handleClick.bind(this));
 
             return el;
         },
@@ -120,7 +118,7 @@ var AnchorPreview;
         },
 
         attachToEditables: function () {
-            this.base.subscribe('editableMouseover', this.handleEditableMouseover.bind(this));
+            this.subscribe('editableMouseover', this.handleEditableMouseover.bind(this));
         },
 
         handleClick: function (event) {
@@ -147,7 +145,7 @@ var AnchorPreview;
 
         handleAnchorMouseout: function () {
             this.anchorToPreview = null;
-            this.base.off(this.activeAnchor, 'mouseout', this.instanceHandleAnchorMouseout);
+            this.off(this.activeAnchor, 'mouseout', this.instanceHandleAnchorMouseout);
             this.instanceHandleAnchorMouseout = null;
         },
 
@@ -177,7 +175,7 @@ var AnchorPreview;
                 this.anchorToPreview = target;
 
                 this.instanceHandleAnchorMouseout = this.handleAnchorMouseout.bind(this);
-                this.base.on(this.anchorToPreview, 'mouseout', this.instanceHandleAnchorMouseout);
+                this.on(this.anchorToPreview, 'mouseout', this.instanceHandleAnchorMouseout);
                 // Using setTimeout + delay because:
                 // - We're going to show the anchor preview according to the configured delay
                 //   if the mouse has not left the anchor tag in that time
@@ -216,11 +214,11 @@ var AnchorPreview;
             // cleanup
             clearInterval(this.intervalTimer);
             if (this.instanceHandlePreviewMouseover) {
-                this.base.off(this.anchorPreview, 'mouseover', this.instanceHandlePreviewMouseover);
-                this.base.off(this.anchorPreview, 'mouseout', this.instanceHandlePreviewMouseout);
+                this.off(this.anchorPreview, 'mouseover', this.instanceHandlePreviewMouseover);
+                this.off(this.anchorPreview, 'mouseout', this.instanceHandlePreviewMouseout);
                 if (this.activeAnchor) {
-                    this.base.off(this.activeAnchor, 'mouseover', this.instanceHandlePreviewMouseover);
-                    this.base.off(this.activeAnchor, 'mouseout', this.instanceHandlePreviewMouseout);
+                    this.off(this.activeAnchor, 'mouseover', this.instanceHandlePreviewMouseover);
+                    this.off(this.activeAnchor, 'mouseout', this.instanceHandlePreviewMouseout);
                 }
             }
 
@@ -239,10 +237,10 @@ var AnchorPreview;
 
             this.intervalTimer = setInterval(this.updatePreview.bind(this), 200);
 
-            this.base.on(this.anchorPreview, 'mouseover', this.instanceHandlePreviewMouseover);
-            this.base.on(this.anchorPreview, 'mouseout', this.instanceHandlePreviewMouseout);
-            this.base.on(this.activeAnchor, 'mouseover', this.instanceHandlePreviewMouseover);
-            this.base.on(this.activeAnchor, 'mouseout', this.instanceHandlePreviewMouseout);
+            this.on(this.anchorPreview, 'mouseover', this.instanceHandlePreviewMouseover);
+            this.on(this.anchorPreview, 'mouseout', this.instanceHandlePreviewMouseout);
+            this.on(this.activeAnchor, 'mouseover', this.instanceHandlePreviewMouseover);
+            this.on(this.activeAnchor, 'mouseout', this.instanceHandlePreviewMouseout);
         }
     });
 }());
