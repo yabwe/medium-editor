@@ -1,6 +1,6 @@
 {
   "name": "medium-editor",
-  "version": "4.8.1",
+  "version": "4.11.1",
   "homepage": "http://daviferreira.github.io/medium-editor/",
   "authors": [
     "Davi Ferreira <hi@daviferreira.com>",
@@ -36,11 +36,11 @@
     "README.md",
     "CHANGES.md"
   ],
-  "_release": "4.8.1",
+  "_release": "4.11.1",
   "_resolution": {
     "type": "version",
-    "tag": "4.8.1",
-    "commit": "083566af431fd99173437e876f77e76512efba80"
+    "tag": "4.11.1",
+    "commit": "91633089fbb7367e96894173c9fddd5fb370dff5"
   },
   "_source": "git://github.com/daviferreira/medium-editor.git",
   "_target": "^4.6.0",

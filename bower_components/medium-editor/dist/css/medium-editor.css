@@ -11,22 +11,18 @@
     -webkit-transform: matrix(0.97, 0, 0, 1, 0, 12);
             transform: matrix(0.97, 0, 0, 1, 0, 12);
     opacity: 0; }
-
   20% {
     -webkit-transform: matrix(0.99, 0, 0, 1, 0, 2);
             transform: matrix(0.99, 0, 0, 1, 0, 2);
     opacity: .7; }
-
   40% {
     -webkit-transform: matrix(1, 0, 0, 1, 0, -1);
             transform: matrix(1, 0, 0, 1, 0, -1);
     opacity: 1; }
-
   70% {
     -webkit-transform: matrix(1, 0, 0, 1, 0, 0);
             transform: matrix(1, 0, 0, 1, 0, 0);
     opacity: 1; }
-
   100% {
     -webkit-transform: matrix(1, 0, 0, 1, 0, 0);
             transform: matrix(1, 0, 0, 1, 0, 0);
@@ -37,22 +33,18 @@
     -webkit-transform: matrix(0.97, 0, 0, 1, 0, 12);
             transform: matrix(0.97, 0, 0, 1, 0, 12);
     opacity: 0; }
-
   20% {
     -webkit-transform: matrix(0.99, 0, 0, 1, 0, 2);
             transform: matrix(0.99, 0, 0, 1, 0, 2);
     opacity: .7; }
-
   40% {
     -webkit-transform: matrix(1, 0, 0, 1, 0, -1);
             transform: matrix(1, 0, 0, 1, 0, -1);
     opacity: 1; }
-
   70% {
     -webkit-transform: matrix(1, 0, 0, 1, 0, 0);
             transform: matrix(1, 0, 0, 1, 0, 0);
     opacity: 1; }
-
   100% {
     -webkit-transform: matrix(1, 0, 0, 1, 0, 0);
             transform: matrix(1, 0, 0, 1, 0, 0);
@@ -60,8 +52,10 @@
 
 .data-medium-element sup {
   vertical-align: super; }
+
 .data-medium-element sub {
   vertical-align: sub; }
+
 .data-medium-element img {
   max-width: 100%; }
 
@@ -150,7 +144,8 @@
 
 .medium-editor-toolbar-form {
   display: none; }
-  .medium-editor-toolbar-form input, .medium-editor-toolbar-form a {
+  .medium-editor-toolbar-form input,
+  .medium-editor-toolbar-form a {
     font-family: HelveticaNeue, Helvetica, Arial, sans-serif; }
   .medium-editor-toolbar-form .medium-editor-toolbar-input, .medium-editor-toolbar-form label {
     margin: 0;
@@ -199,7 +194,6 @@
   0% {
     -webkit-transform: scale(0);
             transform: scale(0); }
-
   100% {
     -webkit-transform: scale(1);
             transform: scale(1);
@@ -209,7 +203,6 @@
   0% {
     -webkit-transform: scale(0);
             transform: scale(0); }
-
   100% {
     -webkit-transform: scale(1);
             transform: scale(1);
