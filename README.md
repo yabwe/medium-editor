@@ -386,7 +386,7 @@ The source files are located inside the __src__ directory.  Be sure to make chan
 2. Create your feature branch (`git checkout -b my-new-feature`)
 3. Test your changes to the best of your ability.
 4. Update the documentation to reflect your changes if they add or changes current functionality.
-5. Commit your changes (`git commit -am 'Added some feature'`)
+5. Commit your changes (`git commit -am 'Added some feature'`) **without files from the _dist_ directory**.
 6. Push to the branch (`git push origin my-new-feature`)
 7. Create new Pull Request
 
