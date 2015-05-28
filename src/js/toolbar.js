@@ -309,39 +309,41 @@ var Toolbar;
         },
 
         checkState: function () {
-            if (!this.base.preventSelectionUpdates) {
-                // If no editable has focus OR selection is inside contenteditable = false
-                // hide toolbar
-                if (!this.base.getFocusedElement() ||
-                        Selection.selectionInContentEditableFalse(this.options.contentWindow)) {
-                    return this.hideToolbar();
-                }
-
-                // If there's no selection element, selection element doesn't belong to this editor
-                // or toolbar is disabled for this selection element
-                // hide toolbar
-                var selectionElement = Selection.getSelectionElement(this.options.contentWindow);
-                if (!selectionElement ||
-                        this.base.elements.indexOf(selectionElement) === -1 ||
-                        selectionElement.getAttribute('data-disable-toolbar')) {
-                    return this.hideToolbar();
-                }
-
-                // Now we know there's a focused editable with a selection
-
-                // If the updateOnEmptySelection option is true, show the toolbar
-                if (this.options.updateOnEmptySelection && this.options.staticToolbar) {
-                    return this.showAndUpdateToolbar();
-                }
-
-                // If we don't have a 'valid' selection -> hide toolbar
-                if (this.options.contentWindow.getSelection().toString().trim() === '' ||
-                    (this.options.allowMultiParagraphSelection === false && this.multipleBlockElementsSelected())) {
-                    return this.hideToolbar();
-                }
-
-                this.showAndUpdateToolbar();
+            if (this.base.preventSelectionUpdates) {
+                return;
             }
+
+            // If no editable has focus OR selection is inside contenteditable = false
+            // hide toolbar
+            if (!this.base.getFocusedElement() ||
+                    Selection.selectionInContentEditableFalse(this.options.contentWindow)) {
+                return this.hideToolbar();
+            }
+
+            // If there's no selection element, selection element doesn't belong to this editor
+            // or toolbar is disabled for this selection element
+            // hide toolbar
+            var selectionElement = Selection.getSelectionElement(this.options.contentWindow);
+            if (!selectionElement ||
+                    this.base.elements.indexOf(selectionElement) === -1 ||
+                    selectionElement.getAttribute('data-disable-toolbar')) {
+                return this.hideToolbar();
+            }
+
+            // Now we know there's a focused editable with a selection
+
+            // If the updateOnEmptySelection option is true, show the toolbar
+            if (this.options.updateOnEmptySelection && this.options.staticToolbar) {
+                return this.showAndUpdateToolbar();
+            }
+
+            // If we don't have a 'valid' selection -> hide toolbar
+            if (this.options.contentWindow.getSelection().toString().trim() === '' ||
+                (this.options.allowMultiParagraphSelection === false && this.multipleBlockElementsSelected())) {
+                return this.hideToolbar();
+            }
+
+            this.showAndUpdateToolbar();
         },
 
         // leaving here backward compatibility / statics

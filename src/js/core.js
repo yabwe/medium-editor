@@ -581,7 +581,6 @@ function MediumEditor(elements, options) {
     MediumEditor.selection = Selection;
 
     MediumEditor.prototype = {
-
         defaults: editorDefaults,
 
         // NOT DOCUMENTED - exposed for backwards compatability

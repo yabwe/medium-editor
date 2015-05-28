@@ -162,17 +162,19 @@ var Events;
             var wrapper = function (aCommandName, aShowDefaultUI, aValueArgument) {
                 var result = doc.execCommand.orig.apply(this, arguments);
 
-                if (doc.execCommand.listeners) {
-                    var args = Array.prototype.slice.call(arguments);
-                    doc.execCommand.listeners.forEach(function (listener) {
-                        listener({
-                            command: aCommandName,
-                            value: aValueArgument,
-                            args: args,
-                            result: result
-                        });
-                    });
+                if (!doc.execCommand.listeners) {
+                    return result;
                 }
+
+                var args = Array.prototype.slice.call(arguments);
+                doc.execCommand.listeners.forEach(function (listener) {
+                    listener({
+                        command: aCommandName,
+                        value: aValueArgument,
+                        args: args,
+                        result: result
+                    });
+                });
 
                 return result;
             };
@@ -406,8 +408,7 @@ var Events;
             // to document, since this is where the event is handled
             // However, currentTarget will have an 'activeElement' property
             // which will point to whatever element has focus.
-            if (event.currentTarget &&
-                event.currentTarget.activeElement) {
+            if (event.currentTarget && event.currentTarget.activeElement) {
                 var activeElement = event.currentTarget.activeElement,
                     currentTarget;
                 // We can look at the 'activeElement' to determine if the selectionchange has
