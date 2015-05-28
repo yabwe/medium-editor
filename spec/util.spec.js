@@ -344,7 +344,7 @@ describe('Util', function () {
     });
 
     describe('isKey', function () {
-        it('should return the key from the event', function () {
+        it('should return true no matter how the key associated to the event is defined', function () {
             var event;
 
             event = {
@@ -359,14 +359,35 @@ describe('Util', function () {
                 keyCode: 13,
                 charCode: null
             };
-            expect(Util.isKey(event, [13, 12])).toBeTruthy();
+            expect(Util.isKey(event, 13)).toBeTruthy();
 
             event = {
                 which: null,
                 keyCode: null,
                 charCode: 13
             };
+            expect(Util.isKey(event, 13)).toBeTruthy();
+        });
+
+        it('should return true when a key associated to event is listed to one we are looking for', function () {
+            var event = {
+                which: 13
+            };
+
+            expect(Util.isKey(event, 13)).toBeTruthy();
+            expect(Util.isKey(event, [13])).toBeTruthy();
+            expect(Util.isKey(event, [13, 12])).toBeTruthy();
+            expect(Util.isKey(event, [12, 13])).toBeTruthy();
+        });
+
+        it('should return false when a key associated to event is NOT listed to one we are looking for', function () {
+            var event = {
+                which: 13
+            };
+
+            expect(Util.isKey(event, 65)).toBeFalsy();
             expect(Util.isKey(event, [65])).toBeFalsy();
+            expect(Util.isKey(event, [65, 66])).toBeFalsy();
         });
     });
 });
