@@ -56,20 +56,20 @@ function MediumEditor(elements, options) {
             isEmpty = /^(\s+|<br\/?>)?$/i,
             isHeader = /h\d/i;
 
-        if ((event.which === Util.keyCode.BACKSPACE || event.which === Util.keyCode.ENTER) &&
+        if (Util.isKey(event, [Util.keyCode.BACKSPACE, Util.keyCode.ENTER]) &&
                 // has a preceeding sibling
                 node.previousElementSibling &&
                 // in a header
                 isHeader.test(tagName) &&
                 // at the very end of the block
                 Selection.getCaretOffsets(node).left === 0) {
-            if (event.which === Util.keyCode.BACKSPACE && isEmpty.test(node.previousElementSibling.innerHTML)) {
+            if (Util.isKey(event, Util.keyCode.BACKSPACE) && isEmpty.test(node.previousElementSibling.innerHTML)) {
                 // backspacing the begining of a header into an empty previous element will
                 // change the tagName of the current node to prevent one
                 // instead delete previous node and cancel the event.
                 node.previousElementSibling.parentNode.removeChild(node.previousElementSibling);
                 event.preventDefault();
-            } else if (event.which === Util.keyCode.ENTER) {
+            } else if (Util.isKey(event, Util.keyCode.ENTER)) {
                 // hitting return in the begining of a header will create empty header elements before the current one
                 // instead, make "<p><br></p>" element, which are what happens if you hit return in an empty paragraph
                 p = this.options.ownerDocument.createElement('p');
@@ -77,7 +77,7 @@ function MediumEditor(elements, options) {
                 node.previousElementSibling.parentNode.insertBefore(p, node);
                 event.preventDefault();
             }
-        } else if (event.which === Util.keyCode.DELETE &&
+        } else if (Util.isKey(event, Util.keyCode.DELETE) &&
                     // between two sibling elements
                     node.nextElementSibling &&
                     node.previousElementSibling &&
@@ -98,7 +98,7 @@ function MediumEditor(elements, options) {
             node.previousElementSibling.parentNode.removeChild(node);
 
             event.preventDefault();
-        } else if (event.which === Util.keyCode.BACKSPACE &&
+        } else if (Util.isKey(event, Util.keyCode.BACKSPACE) &&
                 tagName === 'li' &&
                 // hitting backspace inside an empty li
                 isEmpty.test(node.innerHTML) &&
@@ -144,7 +144,7 @@ function MediumEditor(elements, options) {
             this.options.ownerDocument.execCommand('formatBlock', false, 'p');
         }
 
-        if (event.which === Util.keyCode.ENTER && !Util.isListItem(node)) {
+        if (Util.isKey(event, Util.keyCode.ENTER) && !Util.isListItem(node)) {
             tagName = node.tagName.toLowerCase();
             // For anchor tags, unlink
             if (tagName === 'a') {

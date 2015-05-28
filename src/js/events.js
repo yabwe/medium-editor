@@ -500,17 +500,16 @@ var Events;
         handleKeydown: function (event) {
             this.triggerCustomEvent('editableKeydown', event, event.currentTarget);
 
-            switch (event.which) {
-                case Util.keyCode.ENTER:
-                    this.triggerCustomEvent('editableKeydownEnter', event, event.currentTarget);
-                    break;
-                case Util.keyCode.TAB:
-                    this.triggerCustomEvent('editableKeydownTab', event, event.currentTarget);
-                    break;
-                case Util.keyCode.DELETE:
-                case Util.keyCode.BACKSPACE:
-                    this.triggerCustomEvent('editableKeydownDelete', event, event.currentTarget);
-                    break;
+            if (Util.isKey(event, Util.keyCode.ENTER)) {
+                return this.triggerCustomEvent('editableKeydownEnter', event, event.currentTarget);
+            }
+
+            if (Util.isKey(event, Util.keyCode.TAB)) {
+                return this.triggerCustomEvent('editableKeydownTab', event, event.currentTarget);
+            }
+
+            if (Util.isKey(event, [Util.keyCode.DELETE, Util.keyCode.BACKSPACE])) {
+                return this.triggerCustomEvent('editableKeydownDelete', event, event.currentTarget);
             }
         }
     };
