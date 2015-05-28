@@ -51,9 +51,9 @@ var AnchorForm;
 
         // Called when the button the toolbar is clicked
         // Overrides ButtonExtension.handleClick
-        handleClick: function (evt) {
-            evt.preventDefault();
-            evt.stopPropagation();
+        handleClick: function (event) {
+            event.preventDefault();
+            event.stopPropagation();
 
             var selectedParentElement = Selection.getSelectedParentElement(Selection.getSelectionRange(this.document));
             if (selectedParentElement.tagName &&
@@ -70,11 +70,9 @@ var AnchorForm;
 
         // Called when user hits the defined shortcut (CTRL / COMMAND + K)
         // Overrides Button.handleKeydown
-        handleKeydown: function (evt) {
-            var key = String.fromCharCode(evt.which || evt.keyCode).toLowerCase();
-
-            if (this.key === key && Util.isMetaCtrlKey(evt)) {
-                this.handleClick(evt);
+        handleKeydown: function (event) {
+            if (Util.isKey(event, this.key.charCodeAt(0)) && Util.isMetaCtrlKey(event)) {
+                this.handleClick(event);
             }
         },
 

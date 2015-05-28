@@ -59,13 +59,12 @@ var Button;
             return button;
         },
 
-        handleKeydown: function (evt) {
-            var key = String.fromCharCode(evt.which || evt.keyCode).toLowerCase(),
-                action;
+        handleKeydown: function (event) {
+            var action;
 
-            if (this.key === key && Util.isMetaCtrlKey(evt)) {
-                evt.preventDefault();
-                evt.stopPropagation();
+            if (Util.isKey(event, this.key.charCodeAt(0)) && Util.isMetaCtrlKey(event)) {
+                event.preventDefault();
+                event.stopPropagation();
 
                 action = this.getAction();
                 if (action) {
@@ -74,9 +73,9 @@ var Button;
             }
         },
 
-        handleClick: function (evt) {
-            evt.preventDefault();
-            evt.stopPropagation();
+        handleClick: function (event) {
+            event.preventDefault();
+            event.stopPropagation();
 
             var action = this.getAction();
 
