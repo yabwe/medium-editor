@@ -107,6 +107,15 @@ var Extension;
          */
         checkState: undefined,
 
+        /* destroy: [function ()]
+         *
+         * This method should remove any created html, custom event handlers
+         * or any other cleanup tasks that should be performed.
+         * If implemented, this function will be called when MediumEditor's
+         * destroy method has been called.
+         */
+        destroy: undefined,
+
         /* As alternatives to checkState, these functions provide a more structured
          * path to updating the state of an extension (usually a button) whenever
          * the state of the editor & toolbar are updated.
