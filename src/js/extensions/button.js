@@ -5,7 +5,6 @@ var Button;
     /*global Util, Extension */
 
     Button = Extension.extend({
-
         init: function () {
             this.button = this.createButton();
             this.on(this.button, 'click', this.handleClick.bind(this));
@@ -24,15 +23,19 @@ var Button;
         getButton: function () {
             return this.button;
         },
+
         getAction: function () {
             return (typeof this.action === 'function') ? this.action(this.base.options) : this.action;
         },
+
         getAria: function () {
             return (typeof this.aria === 'function') ? this.aria(this.base.options) : this.aria;
         },
+
         getTagNames: function () {
             return (typeof this.tagNames === 'function') ? this.tagNames(this.base.options) : this.tagNames;
         },
+
         createButton: function () {
             var button = this.document.createElement('button'),
                 content = this.contentDefault,
@@ -55,6 +58,7 @@ var Button;
             button.innerHTML = content;
             return button;
         },
+
         handleKeydown: function (evt) {
             var key = String.fromCharCode(evt.which || evt.keyCode).toLowerCase(),
                 action;
@@ -69,6 +73,7 @@ var Button;
                 }
             }
         },
+
         handleClick: function (evt) {
             evt.preventDefault();
             evt.stopPropagation();
@@ -79,17 +84,21 @@ var Button;
                 this.execAction(action);
             }
         },
+
         isActive: function () {
             return this.button.classList.contains(this.getEditorOption('activeButtonClass'));
         },
+
         setInactive: function () {
             this.button.classList.remove(this.getEditorOption('activeButtonClass'));
             delete this.knownState;
         },
+
         setActive: function () {
             this.button.classList.add(this.getEditorOption('activeButtonClass'));
             delete this.knownState;
         },
+
         queryCommandState: function () {
             var queryState = null;
             if (this.useQueryState) {
@@ -97,6 +106,7 @@ var Button;
             }
             return queryState;
         },
+
         isAlreadyApplied: function (node) {
             var isMatch = false,
                 tagNames = this.getTagNames(),

@@ -532,6 +532,7 @@ function MediumEditor(elements, options) {
                 Util.deprecated('placeholder', 'placeholder.text', 'v5.0.0');
             }
         }
+
         return Util.defaults({}, options, defaults);
     }
 

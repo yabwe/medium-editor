@@ -14,7 +14,6 @@ var Events;
     };
 
     Events.prototype = {
-
         InputEventOnContenteditableSupported: !Util.isIE,
 
         // Helpers for event handling

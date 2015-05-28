@@ -29,7 +29,6 @@ LINK_REGEXP_TEXT =
     }
 
     AutoLink = Extension.extend({
-
         init: function () {
             this.disableEventHandling = false;
             this.subscribe('editableKeypress', this.onKeypress.bind(this));
@@ -161,6 +160,7 @@ LINK_REGEXP_TEXT =
                 // If the regexp detected a bare domain that doesn't use one of our expected TLDs, bail out.
                 matchOk = matchOk && (match[0].indexOf('/') !== -1 ||
                     KNOWN_TLDS_REGEXP.test(match[0].split('.').pop().split('?').shift()));
+
                 if (matchOk) {
                     matches.push({
                         href: match[0],
@@ -173,8 +173,7 @@ LINK_REGEXP_TEXT =
         },
 
         findOrCreateMatchingTextNodes: function (element, match) {
-            var treeWalker = this.document.createTreeWalker(element, NodeFilter.SHOW_TEXT,
-                    null, false),
+            var treeWalker = this.document.createTreeWalker(element, NodeFilter.SHOW_TEXT, null, false),
                 matchedNodes = [],
                 currentTextIndex = 0,
                 startReached = false,

@@ -13,7 +13,6 @@ var Toolbar;
     };
 
     Toolbar.prototype = {
-
         // Toolbar creation/deletion
 
         createToolbar: function () {
@@ -305,15 +304,12 @@ var Toolbar;
         },
 
         checkState: function () {
-
             if (!this.base.preventSelectionUpdates) {
-
                 // If no editable has focus OR selection is inside contenteditable = false
                 // hide toolbar
                 if (!this.base.getFocusedElement() ||
                         Selection.selectionInContentEditableFalse(this.options.contentWindow)) {
-                    this.hideToolbar();
-                    return;
+                    return this.hideToolbar();
                 }
 
                 // If there's no selection element, selection element doesn't belong to this editor
@@ -323,25 +319,23 @@ var Toolbar;
                 if (!selectionElement ||
                         this.base.elements.indexOf(selectionElement) === -1 ||
                         selectionElement.getAttribute('data-disable-toolbar')) {
-                    this.hideToolbar();
-                    return;
+                    return this.hideToolbar();
                 }
 
                 // Now we know there's a focused editable with a selection
 
                 // If the updateOnEmptySelection option is true, show the toolbar
                 if (this.options.updateOnEmptySelection && this.options.staticToolbar) {
-                    this.showAndUpdateToolbar();
-                    return;
+                    return this.showAndUpdateToolbar();
                 }
 
                 // If we don't have a 'valid' selection -> hide toolbar
                 if (this.options.contentWindow.getSelection().toString().trim() === '' ||
                     (this.options.allowMultiParagraphSelection === false && this.multipleBlockElementsSelected())) {
-                    this.hideToolbar();
-                } else {
-                    this.showAndUpdateToolbar();
+                    return this.hideToolbar();
                 }
+
+                this.showAndUpdateToolbar();
             }
         },
 
@@ -366,6 +360,7 @@ var Toolbar;
                     extension.setInactive();
                 }
             }.bind(this));
+
             this.checkActiveButtons();
         },
 
@@ -538,6 +533,7 @@ var Toolbar;
                 toolbarElement.classList.remove('medium-toolbar-arrow-over');
                 toolbarElement.style.top = boundary.top + this.options.diffTop + this.options.contentWindow.pageYOffset - toolbarHeight + 'px';
             }
+
             if (middleBoundary < halfOffsetWidth) {
                 toolbarElement.style.left = defaultLeft + halfOffsetWidth + 'px';
             } else if ((windowWidth - middleBoundary) < halfOffsetWidth) {
