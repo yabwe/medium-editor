@@ -26,6 +26,15 @@ body {
     text-transform: uppercase;
 }
 
+#version {
+    width: 300px;
+    margin: 0px auto;
+    font-size: small;
+    color: #333;
+    font-style: italic;
+    text-align: center;
+}
+
 #container {
     width: 960px;
     margin: 90px auto;
@@ -111,4 +120,12 @@ blockquote {
     display: inline-block;
     width: 30%;
     margin: 10px 1%;
+}
+
+.github-link {
+    z-index: 100;
+    position: absolute;
+    top: 0;
+    right: 0;
+    border: 0;
 }
