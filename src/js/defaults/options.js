@@ -1,10 +1,8 @@
 var editorDefaults;
 (function () {
-
     // summary: The default options hash used by the Editor
 
     editorDefaults = {
-
         allowMultiParagraphSelection: true,
         buttons: ['bold', 'italic', 'underline', 'anchor', 'header1', 'header2', 'quote'],
         buttonLabels: false,
@@ -31,5 +29,4 @@ var editorDefaults;
         lastButtonClass: 'medium-editor-button-last',
         spellcheck: true
     };
-
 })();

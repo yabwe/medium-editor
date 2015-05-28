@@ -84,7 +84,6 @@ var FontSizeForm;
         },
 
         // form creation and event handling
-
         createForm: function () {
             var doc = this.document,
                 form = doc.createElement('div'),

@@ -5,7 +5,6 @@ var ImageDragging;
     'use strict';
 
     ImageDragging = Extension.extend({
-
         init: function () {
             this.subscribe('editableDrag', this.handleDrag.bind(this));
             this.subscribe('editableDrop', this.handleDrop.bind(this));
@@ -56,5 +55,4 @@ var ImageDragging;
             event.target.classList.remove(className);
         }
     });
-
 }());

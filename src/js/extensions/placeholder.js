@@ -49,10 +49,10 @@ var Placeholder;
         updatePlaceholder: function (el) {
             // if one of these element ('img, blockquote, ul, ol') are found inside the given element, we won't display the placeholder
             if (!(el.querySelector('img, blockquote, ul, ol')) && el.textContent.replace(/^\s+|\s+$/g, '') === '') {
-                this.showPlaceholder(el);
-            } else {
-                this.hidePlaceholder(el);
+                return this.showPlaceholder(el);
             }
+
+            this.hidePlaceholder(el);
         },
 
         attachEventHandlers: function () {

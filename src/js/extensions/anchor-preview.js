@@ -152,40 +152,41 @@ var AnchorPreview;
         handleEditableMouseover: function (event) {
             var target = Util.getClosestTag(event.target, 'a');
 
-            if (target) {
-
-                // Detect empty href attributes
-                // The browser will make href="" or href="#top"
-                // into absolute urls when accessed as event.targed.href, so check the html
-                if (!/href=["']\S+["']/.test(target.outerHTML) || /href=["']#\S+["']/.test(target.outerHTML)) {
-                    return true;
-                }
-
-                // only show when hovering on anchors
-                if (this.base.toolbar && this.base.toolbar.isDisplayed()) {
-                    // only show when toolbar is not present
-                    return true;
-                }
-
-                // detach handler for other anchor in case we hovered multiple anchors quickly
-                if (this.activeAnchor && this.activeAnchor !== target) {
-                    this.detachPreviewHandlers();
-                }
-
-                this.anchorToPreview = target;
-
-                this.instanceHandleAnchorMouseout = this.handleAnchorMouseout.bind(this);
-                this.on(this.anchorToPreview, 'mouseout', this.instanceHandleAnchorMouseout);
-                // Using setTimeout + delay because:
-                // - We're going to show the anchor preview according to the configured delay
-                //   if the mouse has not left the anchor tag in that time
-                this.base.delay(function () {
-                    if (this.anchorToPreview) {
-                        //this.activeAnchor = this.anchorToPreview;
-                        this.showPreview(this.anchorToPreview);
-                    }
-                }.bind(this));
+            if (false === target) {
+                return;
             }
+
+            // Detect empty href attributes
+            // The browser will make href="" or href="#top"
+            // into absolute urls when accessed as event.targed.href, so check the html
+            if (!/href=["']\S+["']/.test(target.outerHTML) || /href=["']#\S+["']/.test(target.outerHTML)) {
+                return true;
+            }
+
+            // only show when hovering on anchors
+            if (this.base.toolbar && this.base.toolbar.isDisplayed()) {
+                // only show when toolbar is not present
+                return true;
+            }
+
+            // detach handler for other anchor in case we hovered multiple anchors quickly
+            if (this.activeAnchor && this.activeAnchor !== target) {
+                this.detachPreviewHandlers();
+            }
+
+            this.anchorToPreview = target;
+
+            this.instanceHandleAnchorMouseout = this.handleAnchorMouseout.bind(this);
+            this.on(this.anchorToPreview, 'mouseout', this.instanceHandleAnchorMouseout);
+            // Using setTimeout + delay because:
+            // - We're going to show the anchor preview according to the configured delay
+            //   if the mouse has not left the anchor tag in that time
+            this.base.delay(function () {
+                if (this.anchorToPreview) {
+                    //this.activeAnchor = this.anchorToPreview;
+                    this.showPreview(this.anchorToPreview);
+                }
+            }.bind(this));
         },
 
         handlePreviewMouseover: function () {

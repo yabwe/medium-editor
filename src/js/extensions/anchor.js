@@ -5,7 +5,6 @@ var AnchorForm;
     /*global Util, Selection, FormExtension */
 
     AnchorForm = FormExtension.extend({
-
         /* Anchor Form Options */
 
         /* customClassOption: [string]  (previously options.anchorButton + options.anchorButtonClass)
@@ -88,7 +87,6 @@ var AnchorForm;
         },
 
         getTemplate: function () {
-
             var template = [
                 '<input type="text" class="medium-editor-toolbar-input" placeholder="', this.placeholderText, '">'
             ];
@@ -181,10 +179,9 @@ var AnchorForm;
                 opts.url = this.checkLinkFormat(opts.url);
             }
 
+            opts.target = '_self';
             if (targetCheckbox && targetCheckbox.checked) {
                 opts.target = '_blank';
-            } else {
-                opts.target = '_self';
             }
 
             if (buttonCheckbox && buttonCheckbox.checked) {
@@ -216,7 +213,6 @@ var AnchorForm;
         },
 
         // form creation and event handling
-
         attachFormEvents: function (form) {
             var close = form.querySelector('.medium-editor-toolbar-close'),
                 save = form.querySelector('.medium-editor-toolbar-save'),
