@@ -42,6 +42,18 @@ describe('Events TestCase', function () {
         });
     });
 
+    describe('Custom Events', function () {
+        it('should be attachable and triggerable if they are not built-in events', function () {
+            var editor = this.newMediumEditor('.editor'),
+                spy = jasmine.createSpy('handler'),
+                tempData = { temp: 'data' };
+            editor.subscribe('myIncredibleEvent', spy);
+            expect(spy).not.toHaveBeenCalled();
+            editor.trigger('myIncredibleEvent', tempData, editor.elements[0]);
+            expect(spy).toHaveBeenCalledWith(tempData, editor.elements[0]);
+        });
+    });
+
     describe('Custom Focus/Blur Listener', function () {
         it('should be called and passed the editable element when the editable gets focus', function () {
             var editor = this.newMediumEditor('.editor'),

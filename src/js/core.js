@@ -450,14 +450,6 @@ function MediumEditor(elements, options) {
             name;
         this.commands = [];
 
-        // add toolbar custom events to the list of known events by the editor
-        // we need to have this for the initialization of extensions
-        // initToolbar is called after initCommands
-        // add toolbar custom events to the list of known events by the editor
-        this.createEvent('showToolbar');
-        this.createEvent('hideToolbar');
-        this.createEvent('positionToolbar');
-
         buttons.forEach(function (buttonName) {
             if (extensions[buttonName]) {
                 ext = initExtension(extensions[buttonName], buttonName, this);
@@ -688,8 +680,9 @@ function MediumEditor(elements, options) {
             this.events.detachCustomEvent(event, listener);
         },
 
-        createEvent: function (event) {
-            this.events.defineCustomEvent(event);
+        createEvent: function () {
+            Util.warn('.createEvent() has been deprecated and is no longer needed. ' +
+                'You can attach and trigger custom events without calling this method.  This will be removed in v5.0.0');
         },
 
         trigger: function (name, data, editable) {
