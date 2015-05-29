@@ -62,7 +62,7 @@ var Button;
         handleKeydown: function (event) {
             var action;
 
-            if (Util.isKey(event, this.key.charCodeAt(0)) && Util.isMetaCtrlKey(event)) {
+            if (Util.isKey(event, this.key.charCodeAt(0)) && Util.isMetaCtrlKey(event) && !event.shiftKey) {
                 event.preventDefault();
                 event.stopPropagation();
 
