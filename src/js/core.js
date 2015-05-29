@@ -456,6 +456,7 @@ function MediumEditor(elements, options) {
         // add toolbar custom events to the list of known events by the editor
         this.createEvent('showToolbar');
         this.createEvent('hideToolbar');
+        this.createEvent('positionToolbar');
 
         buttons.forEach(function (buttonName) {
             if (extensions[buttonName]) {

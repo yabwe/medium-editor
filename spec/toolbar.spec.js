@@ -88,6 +88,37 @@ describe('Toolbar TestCase', function () {
             expect(callback).toHaveBeenCalledWith({}, this.el);
         });
 
+        it('should trigger positionToolbar custom event when toolbar is moved', function () {
+            var editor = this.newMediumEditor('.editor'),
+                callback = jasmine.createSpy();
+
+            this.el.innerHTML = 'specOnUpdateToolbarTest';
+            editor.subscribe('positionToolbar', callback);
+
+            selectElementContentsAndFire(this.el, { eventToFire: 'focus' });
+
+            expect(callback).toHaveBeenCalledWith({}, this.el);
+
+        });
+
+        it('should trigger positionToolbar before position called', function () {
+            var editor = this.newMediumEditor('.editor'),
+                temp = {
+                    update: function () {
+                        expect(editor.toolbar.positionToolbar).not.toHaveBeenCalled();
+                    }
+                };
+
+            spyOn(editor.toolbar, 'positionToolbar').and.callThrough();
+            spyOn(temp, 'update').and.callThrough();
+            this.el.innerHTML = 'position sanity check';
+            editor.subscribe('positionToolbar', temp.update);
+            selectElementContentsAndFire(this.el, { eventToFire: 'focus' });
+
+            expect(temp.update).toHaveBeenCalled();
+            expect(editor.toolbar.positionToolbar).toHaveBeenCalled();
+        });
+
         it('should trigger the hideToolbar custom event when toolbar is hidden', function () {
             var editor = this.newMediumEditor('.editor'),
                 callback = jasmine.createSpy();
