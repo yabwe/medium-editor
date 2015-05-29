@@ -646,6 +646,11 @@ function MediumEditor(elements, options) {
             }
 
             this.elements.forEach(function (element) {
+                // Reset elements content, fix for issue where after editor destroyed the red underlines on spelling errors are left
+                if (this.options.spellcheck) {
+                    element.innerHTML = element.innerHTML;
+                }
+
                 element.removeAttribute('contentEditable');
                 element.removeAttribute('spellcheck');
                 element.removeAttribute('data-medium-element');
