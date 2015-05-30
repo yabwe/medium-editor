@@ -1,0 +1,13 @@
+.medium-editor-dragover {
+    background: #ddd;
+}
+
+.medium-editor-image-loading {
+    width: 40px;
+    height: 40px;
+    background-color: #333;
+    display: inline-block;
+
+    border-radius: 100%;
+    animation: medium-editor-image-loading 1s infinite ease-in-out;
+}

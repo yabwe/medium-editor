@@ -1,0 +1,24 @@
+.medium-editor-anchor-preview {
+    max-width: 280px;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: $z-toolbar;
+    visibility: hidden;
+    font-size: 16px;
+    font-family: $font-sans-serif;
+    word-break: break-all;
+    word-wrap: break-word;
+    text-align: center;
+    line-height: 1.4;
+
+    a {
+        display: inline-block;
+        margin: 5px 5px 5px 10px;
+        color: #fff;
+    }
+}
+
+.medium-editor-anchor-preview-active {
+    visibility: visible;
+}

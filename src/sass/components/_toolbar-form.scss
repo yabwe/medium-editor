@@ -1,0 +1,36 @@
+.medium-editor-toolbar-form {
+    display: none;
+
+    input,
+    a {
+        font-family: $font-sans-serif;
+    }
+
+    .medium-editor-toolbar-input, label {
+        margin: 0;
+        padding: 6px;
+        width: 316px;
+        border: none;
+        font-size: 14px;
+        box-sizing: border-box;
+        &:focus {
+            outline: 0;
+            border: none;
+            box-shadow: none;
+            appearance: none;
+        }
+    }
+
+    label {
+        display: block;
+
+    }
+
+    a {
+        display: inline-block;
+        margin: 0 10px;
+        text-decoration: none;
+        font-weight: bolder;
+        font-size: 24px;
+    }
+}
