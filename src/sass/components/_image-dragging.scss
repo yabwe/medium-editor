@@ -3,11 +3,10 @@
 }
 
 .medium-editor-image-loading {
-    width: 40px;
-    height: 40px;
-    background-color: #333;
-    display: inline-block;
-
-    border-radius: 100%;
     animation: medium-editor-image-loading 1s infinite ease-in-out;
+    background-color: #333;
+    border-radius: 100%;
+    display: inline-block;
+    height: 40px;
+    width: 40px;
 }

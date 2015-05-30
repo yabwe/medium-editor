@@ -10,16 +10,16 @@
 
 // contenteditable rules
 [data-medium-editor-element] {
-    sup {
-        vertical-align: super;
+    img {
+        max-width: 100%;
     }
 
     sub {
         vertical-align: sub;
     }
 
-    img {
-        max-width: 100%;
+    sup {
+        vertical-align: super;
     }
 }
 
