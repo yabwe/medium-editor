@@ -1,6 +1,6 @@
 ﻿# MediumEditor
 
-[![Join the chat at https://gitter.im/daviferreira/medium-editor](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/daviferreira/medium-editor?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+[![Join the chat at https://gitter.im/yabwe/medium-editor](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/yabwe/medium-editor?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 This is a clone of [medium.com](https://medium.com) inline editor toolbar.
 
@@ -14,16 +14,16 @@ MediumEditor has been written using vanilla JavaScript, no additional frameworks
 
 [![NPM info](https://nodei.co/npm/medium-editor.png?downloads=true)](https://www.npmjs.com/package/medium-editor)
 
-[![Travis build status](http://img.shields.io/travis/daviferreira/medium-editor/master.svg?style=flat-square)](https://travis-ci.org/daviferreira/medium-editor)
-[![dependencies](http://img.shields.io/david/daviferreira/medium-editor.svg?style=flat-square)](https://david-dm.org/daviferreira/medium-editor)
-[![devDependency Status](http://img.shields.io/david/dev/daviferreira/medium-editor.svg?style=flat-square)](https://david-dm.org/daviferreira/medium-editor#info=devDependencies)
-[![Coverage Status](http://img.shields.io/coveralls/daviferreira/medium-editor.svg?style=flat-square)](https://coveralls.io/r/daviferreira/medium-editor?branch=master)
+[![Travis build status](http://img.shields.io/travis/yabwe/medium-editor/master.svg?style=flat-square)](https://travis-ci.org/yabwe/medium-editor)
+[![dependencies](http://img.shields.io/david/yabwe/medium-editor.svg?style=flat-square)](https://david-dm.org/yabwe/medium-editor)
+[![devDependency Status](http://img.shields.io/david/dev/yabwe/medium-editor.svg?style=flat-square)](https://david-dm.org/yabwe/medium-editor#info=devDependencies)
+[![Coverage Status](http://img.shields.io/coveralls/yabwe/medium-editor.svg?style=flat-square)](https://coveralls.io/r/yabwe/medium-editor?branch=master)
 
 # Basic usage
 
-![screenshot](https://raw.github.com/daviferreira/medium-editor/master/demo/img/medium-editor.jpg)
+![screenshot](https://raw.github.com/yabwe/medium-editor/master/demo/img/medium-editor.jpg)
 
-__demo__: [http://daviferreira.github.io/medium-editor/](http://daviferreira.github.io/medium-editor/)
+__demo__: [http://yabwe.github.io/medium-editor/](http://yabwe.github.io/medium-editor/)
 
 ### Installation
 
@@ -46,7 +46,7 @@ Run in your console: `npm install medium-editor`
 
 **Manual installation:**
 
-Download the [latest release](https://github.com/daviferreira/medium-editor/releases) and attach medium editor's stylesheets to your page:
+Download the [latest release](https://github.com/yabwe/medium-editor/releases) and attach medium editor's stylesheets to your page:
 
 ```html
 <link rel="stylesheet" href="css/medium-editor.css"> <!-- Core -->
@@ -86,7 +86,7 @@ MediumEditor also supports textarea. If you provide a textarea element, the scri
 * __disableDoubleReturn__:  allows/disallows two (or more) empty new lines. You can also set specific element behavior by using setting a data-disable-double-return attribute. Default: false
 * __disableEditing__: enables/disables adding the contenteditable behavior. Useful for using the toolbar with customized buttons/actions. You can also set specific element behavior by using setting a data-disable-editing attribute. Default: false
 * __elementsContainer__: specifies a DOM node to contain MediumEditor's toolbar and anchor preview elements. Default: document.body
-* __extensions__: extension to use (see [Custom Buttons and Extensions](https://github.com/daviferreira/medium-editor/wiki/Custom-Buttons-and-Extensions)) for more. Default: {}
+* __extensions__: extension to use (see [Custom Buttons and Extensions](https://github.com/yabwe/medium-editor/wiki/Custom-Buttons-and-Extensions)) for more. Default: {}
 * __firstHeader__: HTML tag to be used as first header. Default: h3
 * __secondHeader__: HTML tag to be used as second header. Default: h4
 * __spellcheck__: Enable/disable native contentEditable automatic spellcheck. Default: true
@@ -293,7 +293,7 @@ Medium Editor, by default, will show only the buttons listed above to avoid a hu
 
 ## Themes
 
-Check out the Wiki page for a list of available themes: [https://github.com/daviferreira/medium-editor/wiki/Themes](https://github.com/daviferreira/medium-editor/wiki/Themes)
+Check out the Wiki page for a list of available themes: [https://github.com/yabwe/medium-editor/wiki/Themes](https://github.com/yabwe/medium-editor/wiki/Themes)
 
 ## API
 
@@ -351,9 +351,9 @@ So, to properly support the `editableInput` event in Internet Explorer, MediumEd
 
 ## Extensions & Plugins
 
-Check the [documentation](https://github.com/daviferreira/medium-editor/wiki/Custom-Buttons-and-Extensions) in order to learn how to develop extensions for MediumEditor.
+Check the [documentation](https://github.com/yabwe/medium-editor/wiki/Custom-Buttons-and-Extensions) in order to learn how to develop extensions for MediumEditor.
 
-A list of existing extensions and plugins, such as [Images and Media embeds](http://orthes.github.io/medium-editor-insert-plugin/), [Tables](https://github.com/daviferreira/medium-editor-tables) and [Markdown](https://github.com/IonicaBizau/medium-editor-markdown) can be found [here](https://github.com/daviferreira/medium-editor/wiki/Extensions-Plugins).
+A list of existing extensions and plugins, such as [Images and Media embeds](http://orthes.github.io/medium-editor-insert-plugin/), [Tables](https://github.com/yabwe/medium-editor-tables) and [Markdown](https://github.com/IonicaBizau/medium-editor-markdown) can be found [here](https://github.com/yabwe/medium-editor/wiki/Extensions-Plugins).
 
 ## Development
 
@@ -380,7 +380,7 @@ The source files are located inside the __src__ directory.  Be sure to make chan
 
 ## Contributing
 
-[Kill some bugs :)](https://github.com/daviferreira/medium-editor/issues?q=is%3Aopen+is%3Aissue+label%3Abug)
+[Kill some bugs :)](https://github.com/yabwe/medium-editor/issues?q=is%3Aopen+is%3Aissue+label%3Abug)
 
 1. Fork it
 2. Create your feature branch (`git checkout -b my-new-feature`)
@@ -408,12 +408,12 @@ We use [EditorConfig](http://EditorConfig.org) to maintain consistent coding sty
 
 ### Easy First Bugs
 
-Looking for something simple for a first contribution? Try fixing an [easy first bug](https://github.com/daviferreira/medium-editor/issues?q=is%3Aopen+is%3Aissue+label%3A%22easy+first+bug%22)!
+Looking for something simple for a first contribution? Try fixing an [easy first bug](https://github.com/yabwe/medium-editor/issues?q=is%3Aopen+is%3Aissue+label%3A%22easy+first+bug%22)!
 
 ## Contributors (100+ and counting!)
 
-[https://github.com/daviferreira/medium-editor/graphs/contributors](https://github.com/daviferreira/medium-editor/graphs/contributors)
+[https://github.com/yabwe/medium-editor/graphs/contributors](https://github.com/yabwe/medium-editor/graphs/contributors)
 
 ## License
 
-MIT: https://github.com/daviferreira/medium-editor/blob/master/LICENSE
+MIT: https://github.com/yabwe/medium-editor/blob/master/LICENSE
