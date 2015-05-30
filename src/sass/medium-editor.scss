@@ -3,7 +3,8 @@
 @import "animations/pop-upwards";
 @import "util/clearfix";
 
-.data-medium-editor-element {
+// contenteditable rules
+[data-medium-editor-element] {
     sup {
         vertical-align: super;
     }
