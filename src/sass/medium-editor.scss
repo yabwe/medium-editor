@@ -1,8 +1,7 @@
+@import "settings";
 @import "animations/image-loading";
 @import "animations/pop-upwards";
 @import "util/clearfix";
-
-$medium_editor_z_index: 2000 !default;
 
 .data-medium-element {
     sup {
@@ -30,7 +29,7 @@ $medium_editor_z_index: 2000 !default;
     width: 0;
     height: 0;
     border-style: solid;
-    content: "";
+    content: '';
 }
 
 .medium-toolbar-arrow-under:after {
@@ -48,10 +47,10 @@ $medium_editor_z_index: 2000 !default;
     position: absolute;
     top: 0;
     left: 0;
-    z-index: $medium_editor_z_index;
+    z-index: $z-toolbar;
     visibility: hidden;
     font-size: 16px;
-    font-family: HelveticaNeue, Helvetica, Arial, sans-serif;
+    font-family: $font-sans-serif;
 
     ul {
         margin: 0;
@@ -85,7 +84,7 @@ $medium_editor_z_index: 2000 !default;
             padding: 15px 0;
             font-weight: 100;
             font-size: 12px;
-            font-family: 'Menlo', monospace;
+            font-family: $font-fixed;
         }
     }
 }
@@ -134,7 +133,7 @@ $medium_editor_z_index: 2000 !default;
 
     input,
     a {
-        font-family: HelveticaNeue, Helvetica, Arial, sans-serif;
+        font-family: $font-sans-serif;
     }
 
     .medium-editor-toolbar-input, label {
