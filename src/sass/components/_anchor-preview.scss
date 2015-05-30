@@ -1,21 +1,21 @@
 .medium-editor-anchor-preview {
+    font-family: $font-sans-serif;
+    font-size: 16px;
+    left: 0;
+    line-height: 1.4;
     max-width: 280px;
     position: absolute;
+    text-align: center;
     top: 0;
-    left: 0;
-    z-index: $z-toolbar;
-    visibility: hidden;
-    font-size: 16px;
-    font-family: $font-sans-serif;
     word-break: break-all;
     word-wrap: break-word;
-    text-align: center;
-    line-height: 1.4;
+    visibility: hidden;
+    z-index: $z-toolbar;
 
     a {
+        color: #fff;
         display: inline-block;
         margin: 5px 5px 5px 10px;
-        color: #fff;
     }
 }
 
