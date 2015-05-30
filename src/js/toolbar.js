@@ -49,7 +49,7 @@ var Toolbar;
                 extension;
 
             ul.id = 'medium-editor-toolbar-actions' + this.base.id;
-            ul.className = 'medium-editor-toolbar-actions clearfix';
+            ul.className = 'medium-editor-toolbar-actions';
             ul.style.display = 'block';
 
             this.base.options.buttons.forEach(function (button) {
