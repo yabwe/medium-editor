@@ -1,5 +1,6 @@
+@import "animations/image-loading";
+@import "animations/pop-upwards";
 @import "util/clearfix";
-@import "pop-upwards";
 
 $medium_editor_z_index: 2000 !default;
 
@@ -113,7 +114,7 @@ $medium_editor_z_index: 2000 !default;
 }
 
 .medium-editor-toolbar-active.stalker-toolbar {
-    animation: pop-upwards 160ms forwards linear;
+    animation: medium-editor-pop-upwards 160ms forwards linear;
 }
 
 .medium-editor-action-bold {
@@ -182,22 +183,12 @@ $medium_editor_z_index: 2000 !default;
     background: #ddd;
 }
 
-.medium-image-loading {
+.medium-editor-image-loading {
     width: 40px;
     height: 40px;
     background-color: #333;
     display: inline-block;
 
     border-radius: 100%;
-    animation: medium-image-loading-animation 1.0s infinite ease-in-out;
-}
-
-@keyframes medium-image-loading-animation {
-    0% {
-        transform: scale(0.0)
-    }
-    100% {
-        transform: scale(1.0);
-        opacity: 0;
-    }
+    animation: medium-editor-image-loading 1s infinite ease-in-out;
 }
