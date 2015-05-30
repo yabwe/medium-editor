@@ -24,7 +24,7 @@ var Toolbar;
             if (this.options.staticToolbar) {
                 toolbar.className += ' static-toolbar';
             } else {
-                toolbar.className += ' stalker-toolbar';
+                toolbar.className += ' medium-editor-stalker-toolbar';
             }
 
             toolbar.appendChild(this.createToolbarButtons());
@@ -478,16 +478,16 @@ var Toolbar;
                 // If it's beyond the height of the editor, position it at the bottom of the editor
                 if (scrollTop > (containerTop + container.offsetHeight - toolbarHeight)) {
                     toolbarElement.style.top = (containerTop + container.offsetHeight - toolbarHeight) + 'px';
-                    toolbarElement.classList.remove('sticky-toolbar');
+                    toolbarElement.classList.remove('medium-editor-sticky-toolbar');
 
                 // Stick the toolbar to the top of the window
                 } else if (scrollTop > (containerTop - toolbarHeight)) {
-                    toolbarElement.classList.add('sticky-toolbar');
+                    toolbarElement.classList.add('medium-editor-sticky-toolbar');
                     toolbarElement.style.top = '0px';
 
                 // Normal static toolbar position
                 } else {
-                    toolbarElement.classList.remove('sticky-toolbar');
+                    toolbarElement.classList.remove('medium-editor-sticky-toolbar');
                     toolbarElement.style.top = containerTop - toolbarHeight + 'px';
                 }
             } else {
