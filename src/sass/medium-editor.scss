@@ -1,4 +1,4 @@
-@import "clearfix";
+@import "util/clearfix";
 @import "pop-upwards";
 
 $medium_editor_z_index: 2000 !default;
@@ -122,6 +122,10 @@ $medium_editor_z_index: 2000 !default;
 
 .medium-editor-action-italic {
     font-style: italic;
+}
+
+.medium-editor-toolbar-actions {
+    @extend %clearfix;
 }
 
 .medium-editor-toolbar-form {

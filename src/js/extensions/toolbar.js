@@ -119,7 +119,7 @@ var Toolbar;
                 extension;
 
             ul.id = 'medium-editor-toolbar-actions' + this.getEditorId();
-            ul.className = 'medium-editor-toolbar-actions clearfix';
+            ul.className = 'medium-editor-toolbar-actions';
             ul.style.display = 'block';
 
             this.buttons.forEach(function (button) {
