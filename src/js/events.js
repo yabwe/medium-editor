@@ -54,13 +54,10 @@ var Events;
         // custom events
         attachCustomEvent: function (event, listener) {
             this.setupListener(event);
-            // If we don't support this custom event, don't do anything
-            if (this.listeners[event]) {
-                if (!this.customEvents[event]) {
-                    this.customEvents[event] = [];
-                }
-                this.customEvents[event].push(listener);
+            if (!this.customEvents[event]) {
+                this.customEvents[event] = [];
             }
+            this.customEvents[event].push(listener);
         },
 
         detachCustomEvent: function (event, listener) {
@@ -69,10 +66,6 @@ var Events;
                 this.customEvents[event].splice(index, 1);
                 // TODO: If array is empty, should detach internal listeners via destroyListener()
             }
-        },
-
-        defineCustomEvent: function (event) {
-            this.listeners[event] = true;
         },
 
         indexOfCustomListener: function (event, listener) {
@@ -212,17 +205,14 @@ var Events;
                     this.attachDOMEvent(this.options.ownerDocument.body, 'mousedown', this.handleBodyMousedown.bind(this), true);
                     this.attachDOMEvent(this.options.ownerDocument.body, 'click', this.handleBodyClick.bind(this), true);
                     this.attachDOMEvent(this.options.ownerDocument.body, 'focus', this.handleBodyFocus.bind(this), true);
-                    this.listeners[name] = true;
                     break;
                 case 'blur':
                     // Detecting when focus is lost
                     this.setupListener('externalInteraction');
-                    this.listeners[name] = true;
                     break;
                 case 'focus':
                     // Detecting when focus moves into some part of MediumEditor
                     this.setupListener('externalInteraction');
-                    this.listeners[name] = true;
                     break;
                 case 'editableInput':
                     // setup cache for knowing when the content has changed
@@ -245,65 +235,54 @@ var Events;
                         // Listen to calls to execCommand
                         this.attachToExecCommand();
                     }
-
-                    this.listeners[name] = true;
                     break;
                 case 'editableClick':
                     // Detecting click in the contenteditables
                     this.base.elements.forEach(function (element) {
                         this.attachDOMEvent(element, 'click', this.handleClick.bind(this));
                     }.bind(this));
-                    this.listeners[name] = true;
                     break;
                 case 'editableBlur':
                     // Detecting blur in the contenteditables
                     this.base.elements.forEach(function (element) {
                         this.attachDOMEvent(element, 'blur', this.handleBlur.bind(this));
                     }.bind(this));
-                    this.listeners[name] = true;
                     break;
                 case 'editableKeypress':
                     // Detecting keypress in the contenteditables
                     this.base.elements.forEach(function (element) {
                         this.attachDOMEvent(element, 'keypress', this.handleKeypress.bind(this));
                     }.bind(this));
-                    this.listeners[name] = true;
                     break;
                 case 'editableKeyup':
                     // Detecting keyup in the contenteditables
                     this.base.elements.forEach(function (element) {
                         this.attachDOMEvent(element, 'keyup', this.handleKeyup.bind(this));
                     }.bind(this));
-                    this.listeners[name] = true;
                     break;
                 case 'editableKeydown':
                     // Detecting keydown on the contenteditables
                     this.base.elements.forEach(function (element) {
                         this.attachDOMEvent(element, 'keydown', this.handleKeydown.bind(this));
                     }.bind(this));
-                    this.listeners[name] = true;
                     break;
                 case 'editableKeydownEnter':
                     // Detecting keydown for ENTER on the contenteditables
                     this.setupListener('editableKeydown');
-                    this.listeners[name] = true;
                     break;
                 case 'editableKeydownTab':
                     // Detecting keydown for TAB on the contenteditable
                     this.setupListener('editableKeydown');
-                    this.listeners[name] = true;
                     break;
                 case 'editableKeydownDelete':
                     // Detecting keydown for DELETE/BACKSPACE on the contenteditables
                     this.setupListener('editableKeydown');
-                    this.listeners[name] = true;
                     break;
                 case 'editableMouseover':
                     // Detecting mouseover on the contenteditables
                     this.base.elements.forEach(function (element) {
                         this.attachDOMEvent(element, 'mouseover', this.handleMouseover.bind(this));
                     }, this);
-                    this.listeners[name] = true;
                     break;
                 case 'editableDrag':
                     // Detecting dragover and dragleave on the contenteditables
@@ -311,23 +290,21 @@ var Events;
                         this.attachDOMEvent(element, 'dragover', this.handleDragging.bind(this));
                         this.attachDOMEvent(element, 'dragleave', this.handleDragging.bind(this));
                     }, this);
-                    this.listeners[name] = true;
                     break;
                 case 'editableDrop':
                     // Detecting drop on the contenteditables
                     this.base.elements.forEach(function (element) {
                         this.attachDOMEvent(element, 'drop', this.handleDrop.bind(this));
                     }, this);
-                    this.listeners[name] = true;
                     break;
                 case 'editablePaste':
                     // Detecting paste on the contenteditables
                     this.base.elements.forEach(function (element) {
                         this.attachDOMEvent(element, 'paste', this.handlePaste.bind(this));
                     }, this);
-                    this.listeners[name] = true;
                     break;
             }
+            this.listeners[name] = true;
         },
 
         focusElement: function (element) {
