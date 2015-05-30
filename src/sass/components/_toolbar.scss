@@ -72,12 +72,12 @@
     visibility: visible;
 }
 
-.sticky-toolbar {
+.medium-editor-sticky-toolbar {
     position: fixed;
     top: 1px;
 }
 
-.medium-editor-toolbar-active.stalker-toolbar {
+.medium-editor-toolbar-active.medium-editor-stalker-toolbar {
     animation: medium-editor-pop-upwards 160ms forwards linear;
 }
 
