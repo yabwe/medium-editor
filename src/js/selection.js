@@ -22,7 +22,7 @@ var Selection;
 
         getSelectionElement: function (contentWindow) {
             return this.findMatchingSelectionParent(function (el) {
-                return el.getAttribute('data-medium-element');
+                return el.getAttribute('data-medium-editor-element');
             }, contentWindow);
         },
 
