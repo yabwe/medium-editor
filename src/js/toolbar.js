@@ -5,7 +5,7 @@ var Toolbar;
 (function () {
     'use strict';
 
-    Toolbar = function Toolbar(instance) {
+    Toolbar = function (instance) {
         this.base = instance;
         this.options = instance.options;
 
