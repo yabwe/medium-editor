@@ -99,7 +99,7 @@ describe('Setup/Destroy TestCase', function () {
             expect(editor.checkSelection).not.toHaveBeenCalled();
         });
 
-        // regression test for https://github.com/daviferreira/medium-editor/issues/390
+        // regression test for https://github.com/yabwe/medium-editor/issues/390
         it('should work with multiple elements of the same class', function () {
             var editor,
                 el,
@@ -137,7 +137,7 @@ describe('Setup/Destroy TestCase', function () {
             });
         });
 
-        // regression test for https://github.com/daviferreira/medium-editor/issues/197
+        // regression test for https://github.com/yabwe/medium-editor/issues/197
         it('should not crash when destroy immediately after a mouse click', function () {
             var editor = this.newMediumEditor('.editor');
             // selected some content and let the toolbar appear
