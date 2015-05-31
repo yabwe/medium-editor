@@ -485,6 +485,9 @@ function MediumEditor(elements, options) {
 
         if (isToolbarEnabled.call(this)) {
             this.commands.push(initExtension(initToolbar.call(this, this.options), 'toolbar', this));
+
+            // TODO: Deprecate
+            this.toolbar = this.getExtensionByName('toolbar');
         }
     }
 
