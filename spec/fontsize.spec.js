@@ -140,13 +140,14 @@ describe('Font Size Button TestCase', function () {
         it('should destroy the font size extension and remove the form', function () {
             spyOn(FontSizeForm.prototype, 'destroy').and.callThrough();
             var editor = this.newMediumEditor('.editor', this.mediumOpts),
-                fontSizeExtension = editor.getExtensionByName('fontsize');
+                fontSizeExtension = editor.getExtensionByName('fontsize'),
+                form = fontSizeExtension.getForm();
 
-            expect(document.getElementById('medium-editor-toolbar-form-fontsize-1')).toBeTruthy();
+            expect(MediumEditor.util.isDescendant(document.body, form)).toBe(true);
             editor.destroy();
 
             expect(fontSizeExtension.destroy).toHaveBeenCalled();
-            expect(document.getElementById('medium-editor-toolbar-form-fontsize-1')).not.toBeTruthy();
+            expect(MediumEditor.util.isDescendant(document.body, form)).toBe(false);
         });
     });
 });

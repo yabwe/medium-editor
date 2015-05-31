@@ -158,6 +158,38 @@ function MediumEditor(elements, options) {
 
     // Internal helper methods which shouldn't be exposed externally
 
+    function addToEditors(win) {
+        if (!win._mediumEditors) {
+            // To avoid breaking users who are assuming that the unique id on
+            // medium-editor elements will start at 1, inserting a 'null' in the
+            // array so the unique-id can always map to the index of the editor instance
+            win._mediumEditors = [null];
+        }
+
+        if (this.id) {
+            // If this already has a unique id, re-use it
+            win._mediumEditors[this.id] = this;
+        } else {
+            this.id = win._mediumEditors.length;
+            win._mediumEditors.push(this);
+        }
+    }
+
+    function removeFromEditors(win) {
+        if (!win._mediumEditors || !win._mediumEditors[this.id]) {
+            return;
+        }
+
+        /* Setting the instance to null in the array instead of deleting it allows:
+         * 1) Each instance to preserve its own unique-id, even after being destroyed
+         *    and initialized again
+         * 2) The unique-id to always correspond to an index in the array of medium-editor
+         *    instances. Thus, we will be able to look at a contenteditable, and determine
+         *    which instance it belongs to, by indexing into the global array.
+         */
+        win._mediumEditors[this.id] = null;
+    }
+
     function createElementsArray(selector) {
         if (!selector) {
             selector = [];
@@ -503,20 +535,12 @@ function MediumEditor(elements, options) {
 
         // NOT DOCUMENTED - exposed for backwards compatability
         init: function (elements, options) {
-            var uniqueId = 1;
-
             this.options = mergeOptions.call(this, this.defaults, options);
             this.origElements = elements;
 
             if (!this.options.elementsContainer) {
                 this.options.elementsContainer = this.options.ownerDocument.body;
             }
-
-            while (this.options.elementsContainer.querySelector('#medium-editor-toolbar-' + uniqueId)) {
-                uniqueId = uniqueId + 1;
-            }
-
-            this.id = uniqueId;
 
             return this.setup();
         },
@@ -527,12 +551,15 @@ function MediumEditor(elements, options) {
             }
 
             createElementsArray.call(this, this.origElements);
+
             if (this.elements.length === 0) {
                 return;
             }
 
-            this.events = new Events(this);
             this.isActive = true;
+            addToEditors.call(this, this.options.contentWindow);
+
+            this.events = new Events(this);
 
             // Call initialization helpers
             initElements.call(this);
@@ -584,6 +611,7 @@ function MediumEditor(elements, options) {
             this.elements = [];
 
             this.events.destroy();
+            removeFromEditors.call(this, this.options.contentWindow);
         },
 
         on: function (target, event, listener, useCapture) {

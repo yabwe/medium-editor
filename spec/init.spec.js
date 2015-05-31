@@ -160,7 +160,6 @@ describe('Initialization TestCase', function () {
             var editor = this.newMediumEditor('.editor'),
                 anchorExtension = editor.getExtensionByName('anchor'),
                 anchorPreview = editor.getExtensionByName('anchor-preview');
-            expect(editor.id).toBe(1);
             expect(editor.setup).toHaveBeenCalled();
             expect(editor.toolbar).not.toBeUndefined();
             expect(editor.toolbar.createToolbar).toHaveBeenCalled();
@@ -172,15 +171,17 @@ describe('Initialization TestCase', function () {
 
         it('should set the ID according to the numbers of editors instantiated', function () {
             var editor1 = this.newMediumEditor('.editor'),
+                firstId = editor1.id,
                 editor2 = this.newMediumEditor('.editor'),
                 editor3 = this.newMediumEditor('.editor');
-            expect(editor1.id).toBe(1);
-            expect(editor2.id).toBe(2);
-            expect(editor3.id).toBe(3);
+
+            expect(editor2.id).toBe(firstId + 1);
+            expect(editor3.id).toBe(firstId + 2);
         });
 
-        it('should not reset ID when destroy and then re-initialized', function () {
+        it('should not reset id when destroyed and then re-initialized', function () {
             var editor1 = this.newMediumEditor('.editor'),
+                origId = editor1.id,
                 editor2;
 
             this.createElement('div', 'editor-two');
@@ -189,6 +190,7 @@ describe('Initialization TestCase', function () {
             editor1.init('.editor');
 
             expect(editor1.id).not.toEqual(editor2.id);
+            expect(editor1.id).toBe(origId);
         });
 
         it('should use document.body as element container when no container element is specified', function () {
