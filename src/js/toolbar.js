@@ -25,9 +25,9 @@ var Toolbar;
         // Toolbar creation/deletion
 
         createToolbar: function () {
-            var toolbar = this.base.options.ownerDocument.createElement('div');
+            var toolbar = this.document.createElement('div');
 
-            toolbar.id = 'medium-editor-toolbar-' + this.base.id;
+            toolbar.id = 'medium-editor-toolbar-' + this.getEditorId();
             toolbar.className = 'medium-editor-toolbar';
 
             if (this.options.staticToolbar) {
@@ -51,13 +51,13 @@ var Toolbar;
         },
 
         createToolbarButtons: function () {
-            var ul = this.base.options.ownerDocument.createElement('ul'),
+            var ul = this.document.createElement('ul'),
                 li,
                 btn,
                 buttons,
                 extension;
 
-            ul.id = 'medium-editor-toolbar-actions' + this.base.id;
+            ul.id = 'medium-editor-toolbar-actions' + this.getEditorId();
             ul.className = 'medium-editor-toolbar-actions clearfix';
             ul.style.display = 'block';
 
@@ -65,7 +65,7 @@ var Toolbar;
                 extension = this.base.getExtensionByName(button);
                 if (typeof extension.getButton === 'function') {
                     btn = extension.getButton(this.base);
-                    li = this.base.options.ownerDocument.createElement('li');
+                    li = this.document.createElement('li');
                     if (Util.isElement(btn)) {
                         li.appendChild(btn);
                     } else {
@@ -122,24 +122,24 @@ var Toolbar;
 
         attachEventHandlers: function () {
             // MediumEditor custom events for when user beings and ends interaction with a contenteditable and its elements
-            this.base.subscribe('blur', this.handleBlur.bind(this));
-            this.base.subscribe('focus', this.handleFocus.bind(this));
+            this.subscribe('blur', this.handleBlur.bind(this));
+            this.subscribe('focus', this.handleFocus.bind(this));
 
             // Updating the state of the toolbar as things change
-            this.base.subscribe('editableClick', this.handleEditableClick.bind(this));
-            this.base.subscribe('editableKeyup', this.handleEditableKeyup.bind(this));
+            this.subscribe('editableClick', this.handleEditableClick.bind(this));
+            this.subscribe('editableKeyup', this.handleEditableKeyup.bind(this));
 
             // Handle mouseup on document for updating the selection in the toolbar
-            this.base.on(this.options.ownerDocument.documentElement, 'mouseup', this.handleDocumentMouseup.bind(this));
+            this.on(this.document.documentElement, 'mouseup', this.handleDocumentMouseup.bind(this));
 
             // Add a scroll event for sticky toolbar
             if (this.options.staticToolbar && this.options.stickyToolbar) {
                 // On scroll (capture), re-position the toolbar
-                this.base.on(this.options.contentWindow, 'scroll', this.handleWindowScroll.bind(this), true);
+                this.on(this.window, 'scroll', this.handleWindowScroll.bind(this), true);
             }
 
             // On resize, re-position the toolbar
-            this.base.on(this.options.contentWindow, 'resize', this.handleWindowResize.bind(this));
+            this.on(this.window, 'resize', this.handleWindowResize.bind(this));
         },
 
         handleWindowScroll: function () {
@@ -200,14 +200,14 @@ var Toolbar;
             clearTimeout(this.hideTimeout);
             if (!this.isDisplayed()) {
                 this.getToolbarElement().classList.add('medium-editor-toolbar-active');
-                this.base.trigger('showToolbar', {}, this.base.getFocusedElement());
+                this.trigger('showToolbar', {}, this.base.getFocusedElement());
             }
         },
 
         hideToolbar: function () {
             if (this.isDisplayed()) {
                 this.getToolbarElement().classList.remove('medium-editor-toolbar-active');
-                this.base.trigger('hideToolbar', {}, this.base.getFocusedElement());
+                this.trigger('hideToolbar', {}, this.base.getFocusedElement());
             }
         },
 
@@ -257,7 +257,7 @@ var Toolbar;
         },
 
         modifySelection: function () {
-            var selection = this.options.contentWindow.getSelection(),
+            var selection = this.window.getSelection(),
                 selectionRange = selection.getRangeAt(0);
 
             /*
@@ -279,13 +279,13 @@ var Toolbar;
             if (this.options.standardizeSelectionStart &&
                     selectionRange.startContainer.nodeValue &&
                     (selectionRange.startOffset === selectionRange.startContainer.nodeValue.length)) {
-                var adjacentNode = Util.findAdjacentTextNodeWithContent(Selection.getSelectionElement(this.options.contentWindow), selectionRange.startContainer, this.options.ownerDocument);
+                var adjacentNode = Util.findAdjacentTextNodeWithContent(Selection.getSelectionElement(this.window), selectionRange.startContainer, this.document);
                 if (adjacentNode) {
                     var offset = 0;
                     while (adjacentNode.nodeValue.substr(offset, 1).trim().length === 0) {
                         offset = offset + 1;
                     }
-                    var newRange = this.options.ownerDocument.createRange();
+                    var newRange = this.document.createRange();
                     newRange.setStart(adjacentNode, offset);
                     newRange.setEnd(selectionRange.endContainer, selectionRange.endOffset);
                     selection.removeAllRanges();
@@ -303,16 +303,16 @@ var Toolbar;
             // If no editable has focus OR selection is inside contenteditable = false
             // hide toolbar
             if (!this.base.getFocusedElement() ||
-                    Selection.selectionInContentEditableFalse(this.options.contentWindow)) {
+                    Selection.selectionInContentEditableFalse(this.window)) {
                 return this.hideToolbar();
             }
 
             // If there's no selection element, selection element doesn't belong to this editor
             // or toolbar is disabled for this selection element
             // hide toolbar
-            var selectionElement = Selection.getSelectionElement(this.options.contentWindow);
+            var selectionElement = Selection.getSelectionElement(this.window);
             if (!selectionElement ||
-                    this.base.elements.indexOf(selectionElement) === -1 ||
+                    this.getEditorElements().indexOf(selectionElement) === -1 ||
                     selectionElement.getAttribute('data-disable-toolbar')) {
                 return this.hideToolbar();
             }
@@ -325,7 +325,7 @@ var Toolbar;
             }
 
             // If we don't have a 'valid' selection -> hide toolbar
-            if (this.options.contentWindow.getSelection().toString().trim() === '' ||
+            if (this.window.getSelection().toString().trim() === '' ||
                 (this.options.allowMultiParagraphSelection === false && this.multipleBlockElementsSelected())) {
                 return this.hideToolbar();
             }
@@ -338,7 +338,7 @@ var Toolbar;
         showAndUpdateToolbar: function () {
             this.modifySelection();
             this.setToolbarButtonStates();
-            this.base.trigger('positionToolbar', {}, this.base.getFocusedElement());
+            this.trigger('positionToolbar', {}, this.base.getFocusedElement());
             this.showToolbarDefaultActions();
             this.setToolbarPosition();
         },
@@ -357,7 +357,7 @@ var Toolbar;
         checkActiveButtons: function () {
             var manualStateChecks = [],
                 queryState = null,
-                selectionRange = Selection.getSelectionRange(this.options.ownerDocument),
+                selectionRange = Selection.getSelectionRange(this.document),
                 parentNode,
                 updateExtensionState = function (extension) {
                     if (typeof extension.checkState === 'function') {
@@ -400,7 +400,7 @@ var Toolbar;
                 manualStateChecks.forEach(updateExtensionState);
 
                 // we can abort the search upwards if we leave the contentEditable element
-                if (this.base.elements.indexOf(parentNode) !== -1) {
+                if (this.getEditorElements().indexOf(parentNode) !== -1) {
                     break;
                 }
                 parentNode = parentNode.parentNode;
@@ -417,7 +417,7 @@ var Toolbar;
 
         setToolbarPosition: function () {
             var container = this.base.getFocusedElement(),
-                selection = this.options.contentWindow.getSelection(),
+                selection = this.window.getSelection(),
                 anchorPreview;
 
             // If there isn't a valid selection, bail
@@ -445,8 +445,8 @@ var Toolbar;
             this.getToolbarElement().style.left = '0';
 
             // document.documentElement for IE 9
-            var scrollTop = (this.options.ownerDocument.documentElement && this.options.ownerDocument.documentElement.scrollTop) || this.options.ownerDocument.body.scrollTop,
-                windowWidth = this.options.contentWindow.innerWidth,
+            var scrollTop = (this.document.documentElement && this.document.documentElement.scrollTop) || this.document.body.scrollTop,
+                windowWidth = this.window.innerWidth,
                 toolbarElement = this.getToolbarElement(),
                 containerRect = container.getBoundingClientRect(),
                 containerTop = containerRect.top + scrollTop,
@@ -503,7 +503,7 @@ var Toolbar;
             // position the toolbar at left 0, so we can get the real width of the toolbar
             this.getToolbarElement().style.left = '0';
 
-            var windowWidth = this.options.contentWindow.innerWidth,
+            var windowWidth = this.window.innerWidth,
                 range = selection.getRangeAt(0),
                 boundary = range.getBoundingClientRect(),
                 middleBoundary = (boundary.left + boundary.right) / 2,
@@ -517,11 +517,11 @@ var Toolbar;
             if (boundary.top < buttonHeight) {
                 toolbarElement.classList.add('medium-toolbar-arrow-over');
                 toolbarElement.classList.remove('medium-toolbar-arrow-under');
-                toolbarElement.style.top = buttonHeight + boundary.bottom - this.options.diffTop + this.options.contentWindow.pageYOffset - toolbarHeight + 'px';
+                toolbarElement.style.top = buttonHeight + boundary.bottom - this.options.diffTop + this.window.pageYOffset - toolbarHeight + 'px';
             } else {
                 toolbarElement.classList.add('medium-toolbar-arrow-under');
                 toolbarElement.classList.remove('medium-toolbar-arrow-over');
-                toolbarElement.style.top = boundary.top + this.options.diffTop + this.options.contentWindow.pageYOffset - toolbarHeight + 'px';
+                toolbarElement.style.top = boundary.top + this.options.diffTop + this.window.pageYOffset - toolbarHeight + 'px';
             }
 
             if (middleBoundary < halfOffsetWidth) {

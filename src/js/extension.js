@@ -249,7 +249,8 @@ var Extension;
         // event handling
         'on',
         'off',
-        'subscribe'
+        'subscribe',
+        'trigger'
 
     ].forEach(function (helper) {
         Extension.prototype[helper] = function () {

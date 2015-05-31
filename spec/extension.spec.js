@@ -250,7 +250,8 @@ describe('Extensions TestCase', function () {
                     'on': [document, 'click', noop, false],
                     'off': [document, 'click', noop, false],
                     'subscribe': ['editableClick', noop],
-                    'execAction': ['bold']
+                    'execAction': ['bold'],
+                    'trigger': ['someEvent', noop, this.el]
                 },
                 tempExtension = new MediumEditor.Extension(),
                 editor = this.newMediumEditor('.editor', {
