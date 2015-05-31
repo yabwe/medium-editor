@@ -1,18 +1,17 @@
-/*global Util, Selection*/
-
 var Toolbar;
-
 (function () {
     'use strict';
 
-    Toolbar = function (instance) {
-        this.base = instance;
-        this.options = instance.options;
+    /*global Util, Selection, Extension */
 
-        this.initThrottledMethods();
-    };
+    Toolbar = Extension.extend({
+        name: 'toolbar',
 
-    Toolbar.prototype = {
+        init: function () {
+            this.initThrottledMethods();
+            this.base.options.elementsContainer.appendChild(this.getToolbarElement());
+        },
+
         // Toolbar creation/deletion
 
         createToolbar: function () {
@@ -370,6 +369,11 @@ var Toolbar;
 
             // Loop through all commands
             this.base.commands.forEach(function (command) {
+                // Toolbar is an extension, so skip it
+                if (command.name === 'toolbar') {
+                    return;
+                }
+
                 // For those commands where we can use document.queryCommandState(), do so
                 if (typeof command.queryCommandState === 'function') {
                     queryState = command.queryCommandState();
@@ -523,5 +527,5 @@ var Toolbar;
                 toolbarElement.style.left = defaultLeft + middleBoundary + 'px';
             }
         }
-    };
+    });
 }());

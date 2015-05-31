@@ -142,9 +142,9 @@ var AnchorForm;
             var input = this.getInput();
 
             this.base.saveSelection();
-            this.base.hideToolbarDefaultActions();
+            this.hideToolbarDefaultActions();
             this.getForm().style.display = 'block';
-            this.base.setToolbarPosition();
+            this.setToolbarPosition();
 
             input.value = linkValue || '';
             input.focus();

@@ -247,10 +247,25 @@ function MediumEditor(elements, options) {
         return extension;
     }
 
-    function shouldAddDefaultAnchorPreview() {
-        var i,
-            shouldAdd = false;
+    function isToolbarEnabled() {
+        // TODO: deprecated
+        // If toolbar is disabled, don't add it
+        if (this.options.disableToolbar) {
+            return false;
+        }
 
+        // If any of the elements don't have the toolbar disabled
+        // We need a toolbar
+        if(this.elements.every(function (element) {
+                return !!element.getAttribute('data-disable-toolbar');
+            })) {
+            return false;
+        }
+
+        return true;
+    }
+
+    function shouldAddDefaultAnchorPreview() {
         // If anchor-preview is disabled, don't add
         if (this.options.anchorPreview === false) {
             return false;
@@ -260,18 +275,11 @@ function MediumEditor(elements, options) {
             return false;
         }
         // If toolbar is disabled, don't add
-        if (this.options.disableToolbar) {
+        if (!isToolbarEnabled.call(this)) {
             return false;
         }
-        // If all elements have 'data-disable-toolbar' attribute, don't add
-        for (i = 0; i < this.elements.length; i += 1) {
-            if (!this.elements[i].getAttribute('data-disable-toolbar')) {
-                shouldAdd = true;
-                break;
-            }
-        }
 
-        return shouldAdd;
+        return true;
     }
 
     function shouldAddDefaultPlaceholder() {
@@ -354,21 +362,6 @@ function MediumEditor(elements, options) {
         }, this);
     }
 
-    function initToolbar() {
-        if (this.toolbar || this.options.disableToolbar) {
-            return false;
-        }
-
-        var addToolbar = this.elements.some(function (element) {
-            return !element.getAttribute('data-disable-toolbar');
-        });
-
-        if (addToolbar) {
-            this.toolbar = new Toolbar(this);
-            this.options.elementsContainer.appendChild(this.toolbar.getToolbarElement());
-        }
-    }
-
     function attachHandlers() {
         var i;
 
@@ -400,6 +393,14 @@ function MediumEditor(elements, options) {
                 }
             }, this);
         }
+    }
+
+    function initToolbar() {
+        if (this.options.extensions['toolbar']) {
+            return this.options.extensions['toolbar'];
+        }
+
+        return new MediumEditor.extensions.toolbar({ options: this.options });
     }
 
     function initPlaceholder(options) {
@@ -450,7 +451,10 @@ function MediumEditor(elements, options) {
         }, this);
 
         for (name in extensions) {
-            if (extensions.hasOwnProperty(name) && buttons.indexOf(name) === -1) {
+            if (name !== 'toolbar' &&
+                extensions.hasOwnProperty(name) &&
+                buttons.indexOf(name) === -1) {
+
                 ext = initExtension(extensions[name], name, this);
                 this.commands.push(ext);
             }
@@ -477,6 +481,10 @@ function MediumEditor(elements, options) {
         if (shouldAddDefaultPlaceholder.call(this)) {
             var placeholderOpts = (typeof this.options.placeholder === 'string') ? {} : this.options.placeholder;
             this.commands.push(initExtension(initPlaceholder.call(this, placeholderOpts), 'placeholder', this));
+        }
+
+        if (isToolbarEnabled.call(this)) {
+            this.commands.push(initExtension(initToolbar.call(this, this.options), 'toolbar', this));
         }
     }
 
@@ -564,7 +572,6 @@ function MediumEditor(elements, options) {
             // Call initialization helpers
             initElements.call(this);
             initCommands.call(this);
-            initToolbar.call(this);
             attachHandlers.call(this);
         },
 
@@ -580,11 +587,6 @@ function MediumEditor(elements, options) {
                     extension.destroy();
                 }
             }, this);
-
-            if (this.toolbar !== undefined) {
-                this.toolbar.destroy();
-                delete this.toolbar;
-            }
 
             this.elements.forEach(function (element) {
                 // Reset elements content, fix for issue where after editor destroyed the red underlines on spelling errors are left
@@ -708,8 +710,9 @@ function MediumEditor(elements, options) {
 
         // NOT DOCUMENTED - exposed as extension helper and for backwards compatability
         checkSelection: function () {
-            if (this.toolbar) {
-                this.toolbar.checkState();
+            var toolbar = this.getExtensionByName('toolbar');
+            if (toolbar) {
+                toolbar.checkState();
             }
             return this;
         },
@@ -775,17 +778,26 @@ function MediumEditor(elements, options) {
         },
 
         // NOT DOCUMENTED - exposed as extension helper
+        // TODO: Deprecate
         hideToolbarDefaultActions: function () {
-            if (this.toolbar) {
-                this.toolbar.hideToolbarDefaultActions();
+            Util.warn('hideToolbarDefaultActions() is deprecated.  ' +
+                'use the hideToolbarDefaultActions() function of the toolbar extension instead.  This will be removed in v5.0.0');
+
+            var toolbar = this.getExtensionByName('toolbar');
+            if (toolbar) {
+                toolbar.hideToolbarDefaultActions();
             }
             return this;
         },
 
         // NOT DOCUMENTED - exposed as extension helper and for backwards compatability
         setToolbarPosition: function () {
-            if (this.toolbar) {
-                this.toolbar.setToolbarPosition();
+            Util.warn('setToolbarPosition() is deprecated.  ' +
+                'use the setToolbarPosition() function of the toolbar extension instead.  This will be removed in v5.0.0');
+
+            var toolbar = this.getExtensionByName('toolbar');
+            if (toolbar) {
+                toolbar.setToolbarPosition();
             }
         },
 

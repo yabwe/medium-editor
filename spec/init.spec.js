@@ -35,7 +35,7 @@ describe('Initialization TestCase', function () {
             var editor = this.newMediumEditor('.test');
             expect(editor.isActive).toBeFalsy();
             expect(editor.events).toBeUndefined();
-            expect(editor.toolbar).toBeUndefined();
+            expect(editor.getExtensionByName('toolbar')).toBeUndefined();
             expect(editor.getExtensionByName('anchor')).toBeUndefined();
             expect(editor.getExtensionByName('anchor-preview')).toBeUndefined();
         });
@@ -154,15 +154,16 @@ describe('Initialization TestCase', function () {
 
         it('should call the default initialization methods', function () {
             spyOn(MediumEditor.prototype, 'setup').and.callThrough();
-            spyOn(Toolbar.prototype, 'createToolbar').and.callThrough();
+            spyOn(MediumEditor.extensions.toolbar.prototype, 'createToolbar').and.callThrough();
             spyOn(AnchorForm.prototype, 'createForm').and.callThrough();
             spyOn(AnchorPreview.prototype, 'createPreview').and.callThrough();
             var editor = this.newMediumEditor('.editor'),
                 anchorExtension = editor.getExtensionByName('anchor'),
-                anchorPreview = editor.getExtensionByName('anchor-preview');
+                anchorPreview = editor.getExtensionByName('anchor-preview'),
+                toolbar = editor.getExtensionByName('toolbar');
             expect(editor.setup).toHaveBeenCalled();
-            expect(editor.toolbar).not.toBeUndefined();
-            expect(editor.toolbar.createToolbar).toHaveBeenCalled();
+            expect(toolbar).not.toBeUndefined();
+            expect(toolbar.createToolbar).toHaveBeenCalled();
             expect(anchorExtension).not.toBeUndefined();
             expect(anchorExtension.createForm).toHaveBeenCalled();
             expect(anchorPreview).not.toBeUndefined();

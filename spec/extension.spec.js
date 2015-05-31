@@ -330,8 +330,9 @@ describe('Extensions TestCase', function () {
                     extensions: {
                         'dummy': ExtensionWithElement
                     }
-                });
-            expect(editor.toolbar.getToolbarElement().querySelectorAll('.extension-button').length).toBe(1);
+                }),
+                toolbar = editor.getExtensionByName('toolbar');
+            expect(toolbar.getToolbarElement().querySelectorAll('.extension-button').length).toBe(1);
         });
 
         it('should call checkState on extensions when toolbar selection updates', function () {
@@ -355,8 +356,9 @@ describe('Extensions TestCase', function () {
                     extensions: {
                         'dummy': ExtensionWithString
                     }
-                });
-            expect(editor.toolbar.getToolbarElement().querySelectorAll('.extension-button').length).toBe(1);
+                }),
+                toolbar = editor.getExtensionByName('toolbar');
+            expect(toolbar.getToolbarElement().querySelectorAll('.extension-button').length).toBe(1);
         });
 
         it('should not include extensions button into toolbar that are not in "buttons"', function () {
@@ -365,8 +367,9 @@ describe('Extensions TestCase', function () {
                     extensions: {
                         'dummy': ExtensionWithElement
                     }
-                });
-            expect(editor.toolbar.getToolbarElement().querySelectorAll('.extension-button').length).toBe(0);
+                }),
+                toolbar = editor.getExtensionByName('toolbar');
+            expect(toolbar.getToolbarElement().querySelectorAll('.extension-button').length).toBe(0);
         });
 
         it('should not include buttons into the toolbar when an overriding extension is present', function () {
@@ -380,10 +383,11 @@ describe('Extensions TestCase', function () {
                     'bold': ext
                 }
             });
+            var toolbar = editor.getExtensionByName('toolbar');
 
-            expect(editor.toolbar.getToolbarElement().querySelectorAll('button').length).toBe(1);
-            expect(editor.toolbar.getToolbarElement().querySelectorAll('button[data-action="italic"]').length).toBe(1);
-            expect(editor.toolbar.getToolbarElement().querySelectorAll('button[data-action="bold"]').length).toBe(0);
+            expect(toolbar.getToolbarElement().querySelectorAll('button').length).toBe(1);
+            expect(toolbar.getToolbarElement().querySelectorAll('button[data-action="italic"]').length).toBe(1);
+            expect(toolbar.getToolbarElement().querySelectorAll('button[data-action="bold"]').length).toBe(0);
             expect(ext.init).toHaveBeenCalled();
         });
     });

@@ -1,7 +1,7 @@
 /*global Button, FormExtension,
     AnchorForm, AnchorPreview, AutoLink,
     FontSizeForm, ImageDragging, PasteHandler,
-    Placeholder */
+    Placeholder, Toolbar */
 
 var extensionDefaults;
 (function () {
@@ -17,6 +17,7 @@ var extensionDefaults;
         fontSize: FontSizeForm,
         imageDragging: ImageDragging,
         paste: PasteHandler,
-        placeholder: Placeholder
+        placeholder: Placeholder,
+        toolbar: Toolbar
     };
 })();
