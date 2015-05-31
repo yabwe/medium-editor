@@ -486,7 +486,7 @@ function MediumEditor(elements, options) {
         if (isToolbarEnabled.call(this)) {
             this.commands.push(initExtension(initToolbar.call(this, this.options), 'toolbar', this));
 
-            // TODO: Deprecate
+            // TODO: Deprecate (this.toolbar is only around for backwards compatability)
             this.toolbar = this.getExtensionByName('toolbar');
         }
     }
@@ -590,6 +590,11 @@ function MediumEditor(elements, options) {
                     extension.destroy();
                 }
             }, this);
+
+            // TODO: Deprecate (this.toolbar is only around for backwards compatability)
+            if (this.toolbar) {
+                delete this.toolbar;
+            }
 
             this.elements.forEach(function (element) {
                 // Reset elements content, fix for issue where after editor destroyed the red underlines on spelling errors are left
