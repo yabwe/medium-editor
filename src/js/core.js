@@ -767,30 +767,6 @@ function MediumEditor(elements, options) {
             return Selection.getSelectedParentElement(range);
         },
 
-        // NOT DOCUMENTED - exposed as extension helper
-        // TODO: Deprecate
-        hideToolbarDefaultActions: function () {
-            Util.warn('hideToolbarDefaultActions() is deprecated.  ' +
-                'use the hideToolbarDefaultActions() function of the toolbar extension instead.  This will be removed in v5.0.0');
-
-            var toolbar = this.getExtensionByName('toolbar');
-            if (toolbar) {
-                toolbar.hideToolbarDefaultActions();
-            }
-            return this;
-        },
-
-        // NOT DOCUMENTED - exposed as extension helper and for backwards compatability
-        setToolbarPosition: function () {
-            Util.warn('setToolbarPosition() is deprecated.  ' +
-                'use the setToolbarPosition() function of the toolbar extension instead.  This will be removed in v5.0.0');
-
-            var toolbar = this.getExtensionByName('toolbar');
-            if (toolbar) {
-                toolbar.setToolbarPosition();
-            }
-        },
-
         selectAllContents: function () {
             var currNode = Selection.getSelectionElement(this.options.contentWindow);
 
