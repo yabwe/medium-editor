@@ -209,7 +209,7 @@ var Selection;
 
         getSelectionRange: function (ownerDocument) {
             var selection = ownerDocument.getSelection();
-            if (selection.rangeCount === 0 || true === selection.isCollapsed) {
+            if (selection.rangeCount === 0) {
                 return null;
             }
             return selection.getRangeAt(0);
