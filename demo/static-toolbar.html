@@ -46,36 +46,44 @@
     <script src="../dist/js/medium-editor.js"></script>
     <script>
         var editor = new MediumEditor('.editable', {
-                buttons: ['bold', 'italic', 'underline', 'strikethrough', 'quote', 'anchor', 'image', 'justifyLeft', 'justifyCenter', 'justifyRight', 'justifyFull', 'superscript', 'subscript', 'orderedlist', 'unorderedlist', 'pre', 'outdent', 'indent', 'header1', 'header2'],
-                staticToolbar: true,
-                stickyToolbar: true
+                toolbar: {
+                    buttons: ['bold', 'italic', 'underline', 'strikethrough', 'quote', 'anchor', 'image', 'justifyLeft', 'justifyCenter', 'justifyRight', 'justifyFull', 'superscript', 'subscript', 'orderedlist', 'unorderedlist', 'pre', 'outdent', 'indent', 'header1', 'header2'],
+                    static: true,
+                    sticky: true
+                }
             });
 
         var editorColOne = new MediumEditor('#column-one', {
-                buttons: ['bold', 'italic', 'underline', 'strikethrough', 'quote', 'anchor', 'image', 'justifyLeft', 'justifyCenter', 'justifyRight', 'justifyFull', 'superscript', 'subscript', 'orderedlist', 'unorderedlist', 'pre', 'outdent', 'indent', 'header1', 'header2'],
-                buttonLabels: 'fontawesome',
-                stickyToolbar: true,
-                staticToolbar: true,
-                toolbarAlign: 'left',
-                updateOnEmptySelection: true
+                toolbar: {
+                    buttons: ['bold', 'italic', 'underline', 'strikethrough', 'quote', 'anchor', 'image', 'justifyLeft', 'justifyCenter', 'justifyRight', 'justifyFull', 'superscript', 'subscript', 'orderedlist', 'unorderedlist', 'pre', 'outdent', 'indent', 'header1', 'header2'],
+                    sticky: true,
+                    static: true,
+                    align: 'left',
+                    updateOnEmptySelection: true
+                },
+                buttonLabels: 'fontawesome'
             });
 
         var editorColTwo = new MediumEditor('#column-two', {
-                buttons: ['bold', 'italic', 'underline', 'strikethrough', 'quote', 'anchor', 'image', 'justifyLeft', 'justifyCenter', 'justifyRight', 'justifyFull', 'superscript', 'subscript', 'orderedlist', 'unorderedlist', 'pre', 'outdent', 'indent', 'header1', 'header2'],
-                buttonLabels: 'fontawesome',
-                stickyToolbar: true,
-                staticToolbar: true,
-                toolbarAlign: 'center',
-                updateOnEmptySelection: true
+                toolbar: {
+                    buttons: ['bold', 'italic', 'underline', 'strikethrough', 'quote', 'anchor', 'image', 'justifyLeft', 'justifyCenter', 'justifyRight', 'justifyFull', 'superscript', 'subscript', 'orderedlist', 'unorderedlist', 'pre', 'outdent', 'indent', 'header1', 'header2'],
+                    sticky: true,
+                    static: true,
+                    align: 'center',
+                    updateOnEmptySelection: true
+                },
+                buttonLabels: 'fontawesome'
             });
 
         var editorColThree = new MediumEditor('#column-three', {
-                buttons: ['bold', 'italic', 'underline', 'strikethrough', 'quote', 'anchor', 'image', 'justifyLeft', 'justifyCenter', 'justifyRight', 'justifyFull', 'superscript', 'subscript', 'orderedlist', 'unorderedlist', 'pre', 'outdent', 'indent', 'header1', 'header2'],
-                buttonLabels: 'fontawesome',
-                stickyToolbar: true,
-                staticToolbar: true,
-                toolbarAlign: 'right',
-                updateOnEmptySelection: true
+                toolbar: {
+                    buttons: ['bold', 'italic', 'underline', 'strikethrough', 'quote', 'anchor', 'image', 'justifyLeft', 'justifyCenter', 'justifyRight', 'justifyFull', 'superscript', 'subscript', 'orderedlist', 'unorderedlist', 'pre', 'outdent', 'indent', 'header1', 'header2'],
+                    sticky: true,
+                    static: true,
+                    align: 'right',
+                    updateOnEmptySelection: true
+                },
+                buttonLabels: 'fontawesome'
             });
     </script>
 </body>

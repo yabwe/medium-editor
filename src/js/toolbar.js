@@ -7,9 +7,61 @@ var Toolbar;
     Toolbar = Extension.extend({
         name: 'toolbar',
 
+        /* Toolbar Options */
+
+        /* align: ['left'|'center'|'right']
+         * when using the __static__ option, this aligns the static toolbar
+         * relative to the medium-editor element.
+         */
+        align: 'center',
+
+        /* buttons: [Array]
+         * the names of the set of buttons to display on the toolbar.
+         */
+        buttons: ['bold', 'italic', 'underline', 'anchor', 'header1', 'header2', 'quote'],
+
+        /* diffLeft: [Number]
+         * value in pixels to be added to the X axis positioning of the toolbar.
+         */
+        diffLeft: 0,
+
+        /* diffTop: [Number]
+         * value in pixels to be added to the Y axis positioning of the toolbar.
+         */
+        diffTop: -10,
+
+        /* firstButtonClass: [string]
+         * CSS class added to the first button in the toolbar.
+         */
+        firstButtonClass: 'medium-editor-button-first',
+
+        /* lastButtonClass: [string]
+         * CSS class added to the last button in the toolbar.
+         */
+        lastButtonClass: 'medium-editor-button-last',
+
+        /* static: [boolean]
+         * enable/disable the toolbar always displaying in the same location
+         * relative to the medium-editor element.
+         */
+        static: false,
+
+        /* sticky: [boolean]
+         * enable/disable the toolbar "sticking" to the medium-editor element
+         * when the page is being scrolled.
+         */
+        sticky: false,
+
+        /* updateOnEmptySelection: [boolean]
+         * When the __static__ option is true, this enables/disables updating
+         * the state of the toolbar buttons even when the selection is collapsed
+         * (there is no selection, just a cursor).
+         */
+        updateOnEmptySelection: false,
+
         init: function () {
             this.initThrottledMethods();
-            this.base.options.elementsContainer.appendChild(this.getToolbarElement());
+            this.getEditorOption('elementsContainer').appendChild(this.getToolbarElement());
         },
 
         // Helper method to execute method for every extension, but ignoring the toolbar extension
@@ -30,7 +82,7 @@ var Toolbar;
             toolbar.id = 'medium-editor-toolbar-' + this.getEditorId();
             toolbar.className = 'medium-editor-toolbar';
 
-            if (this.options.staticToolbar) {
+            if (this.static) {
                 toolbar.className += ' static-toolbar';
             } else {
                 toolbar.className += ' stalker-toolbar';
@@ -61,7 +113,7 @@ var Toolbar;
             ul.className = 'medium-editor-toolbar-actions clearfix';
             ul.style.display = 'block';
 
-            this.base.options.buttons.forEach(function (button) {
+            this.buttons.forEach(function (button) {
                 extension = this.base.getExtensionByName(button);
                 if (typeof extension.getButton === 'function') {
                     btn = extension.getButton(this.base);
@@ -73,12 +125,12 @@ var Toolbar;
                     }
                     ul.appendChild(li);
                 }
-            }.bind(this));
+            }, this);
 
             buttons = ul.querySelectorAll('button');
             if (buttons.length > 0) {
-                buttons[0].classList.add(this.options.firstButtonClass);
-                buttons[buttons.length - 1].classList.add(this.options.lastButtonClass);
+                buttons[0].classList.add(this.firstButtonClass);
+                buttons[buttons.length - 1].classList.add(this.lastButtonClass);
             }
 
             return ul;
@@ -133,7 +185,7 @@ var Toolbar;
             this.on(this.document.documentElement, 'mouseup', this.handleDocumentMouseup.bind(this));
 
             // Add a scroll event for sticky toolbar
-            if (this.options.staticToolbar && this.options.stickyToolbar) {
+            if (this.static && this.sticky) {
                 // On scroll (capture), re-position the toolbar
                 this.on(this.window, 'scroll', this.handleWindowScroll.bind(this), true);
             }
@@ -249,7 +301,7 @@ var Toolbar;
         // Checks for existance of multiple block elements in the current selection
         multipleBlockElementsSelected: function () {
             /*jslint regexp: true*/
-            var selectionHtml = Selection.getSelectionHtml.call(this).replace(/<[\S]+><\/[\S]+>/gim, ''),
+            var selectionHtml = Selection.getSelectionHtml(this.document).replace(/<[\S]+><\/[\S]+>/gim, ''),
                 hasMultiParagraphs = selectionHtml.match(/<(p|h[1-6]|blockquote)[^>]*>/g);
             /*jslint regexp: false*/
 
@@ -276,7 +328,7 @@ var Toolbar;
             * So, for cases where the selectionRange start is at the end of an element/node, find the next
             * adjacent text node that actually has content in it, and move the selectionRange start there.
             */
-            if (this.options.standardizeSelectionStart &&
+            if (this.getEditorOption('standardizeSelectionStart') &&
                     selectionRange.startContainer.nodeValue &&
                     (selectionRange.startOffset === selectionRange.startContainer.nodeValue.length)) {
                 var adjacentNode = Util.findAdjacentTextNodeWithContent(Selection.getSelectionElement(this.window), selectionRange.startContainer, this.document);
@@ -320,13 +372,13 @@ var Toolbar;
             // Now we know there's a focused editable with a selection
 
             // If the updateOnEmptySelection option is true, show the toolbar
-            if (this.options.updateOnEmptySelection && this.options.staticToolbar) {
+            if (this.updateOnEmptySelection && this.static) {
                 return this.showAndUpdateToolbar();
             }
 
             // If we don't have a 'valid' selection -> hide toolbar
             if (this.window.getSelection().toString().trim() === '' ||
-                (this.options.allowMultiParagraphSelection === false && this.multipleBlockElementsSelected())) {
+                (this.getEditorOption('allowMultiParagraphSelection') === false && this.multipleBlockElementsSelected())) {
                 return this.hideToolbar();
             }
 
@@ -425,7 +477,7 @@ var Toolbar;
                 return this;
             }
 
-            if (this.options.staticToolbar) {
+            if (this.static) {
                 this.showToolbar();
                 this.positionStaticToolbar(container);
             } else if (!selection.isCollapsed) {
@@ -456,7 +508,7 @@ var Toolbar;
                 halfOffsetWidth = toolbarWidth / 2,
                 targetLeft;
 
-            if (this.options.stickyToolbar) {
+            if (this.sticky) {
                 // If it's beyond the height of the editor, position it at the bottom of the editor
                 if (scrollTop > (containerTop + container.offsetHeight - toolbarHeight)) {
                     toolbarElement.style.top = (containerTop + container.offsetHeight - toolbarHeight) + 'px';
@@ -476,7 +528,7 @@ var Toolbar;
                 toolbarElement.style.top = containerTop - toolbarHeight + 'px';
             }
 
-            switch (this.options.toolbarAlign) {
+            switch (this.align) {
                 case 'left':
                     targetLeft = containerRect.left;
                     break;
@@ -512,16 +564,16 @@ var Toolbar;
                 toolbarWidth = toolbarElement.offsetWidth,
                 halfOffsetWidth = toolbarWidth / 2,
                 buttonHeight = 50,
-                defaultLeft = this.options.diffLeft - halfOffsetWidth;
+                defaultLeft = this.diffLeft - halfOffsetWidth;
 
             if (boundary.top < buttonHeight) {
                 toolbarElement.classList.add('medium-toolbar-arrow-over');
                 toolbarElement.classList.remove('medium-toolbar-arrow-under');
-                toolbarElement.style.top = buttonHeight + boundary.bottom - this.options.diffTop + this.window.pageYOffset - toolbarHeight + 'px';
+                toolbarElement.style.top = buttonHeight + boundary.bottom - this.diffTop + this.window.pageYOffset - toolbarHeight + 'px';
             } else {
                 toolbarElement.classList.add('medium-toolbar-arrow-under');
                 toolbarElement.classList.remove('medium-toolbar-arrow-over');
-                toolbarElement.style.top = boundary.top + this.options.diffTop + this.window.pageYOffset - toolbarHeight + 'px';
+                toolbarElement.style.top = boundary.top + this.diffTop + this.window.pageYOffset - toolbarHeight + 'px';
             }
 
             if (middleBoundary < halfOffsetWidth) {

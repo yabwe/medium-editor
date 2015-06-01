@@ -77,14 +77,14 @@ var Selection;
 
         // http://stackoverflow.com/questions/4176923/html-of-selected-text
         // by Tim Down
-        getSelectionHtml: function getSelectionHtml() {
+        getSelectionHtml: function getSelectionHtml(doc) {
             var i,
                 html = '',
-                sel = this.options.contentWindow.getSelection(),
+                sel = doc.getSelection(),
                 len,
                 container;
             if (sel.rangeCount) {
-                container = this.options.ownerDocument.createElement('div');
+                container = doc.createElement('div');
                 for (i = 0, len = sel.rangeCount; i < len; i += 1) {
                     container.appendChild(sel.getRangeAt(i).cloneContents());
                 }

@@ -100,14 +100,10 @@ describe('Initialization TestCase', function () {
         it('should have a default set of options', function () {
             var defaultOptions = {
                 delay: 0,
-                diffLeft: 0,
-                diffTop: -10,
                 disableReturn: false,
                 disableDoubleReturn: false,
                 disableEditing: false,
-                disableToolbar: false,
                 autoLink: false,
-                toolbarAlign: 'center',
                 elementsContainer: document.body,
                 imageDragging: true,
                 standardizeSelectionStart: false,
@@ -116,13 +112,10 @@ describe('Initialization TestCase', function () {
                 firstHeader: 'h3',
                 allowMultiParagraphSelection: true,
                 secondHeader: 'h4',
-                buttons: ['bold', 'italic', 'underline', 'anchor', 'header1', 'header2', 'quote'],
                 buttonLabels: false,
                 targetBlank: false,
                 extensions: {},
                 activeButtonClass: 'medium-editor-button-active',
-                firstButtonClass: 'medium-editor-button-first',
-                lastButtonClass: 'medium-editor-button-last',
                 spellcheck: true
             },
                 editor = this.newMediumEditor('.editor');
@@ -132,11 +125,13 @@ describe('Initialization TestCase', function () {
 
         it('should accept custom options values', function () {
             var options = {
-                diffLeft: 10,
-                diffTop: 5,
                 firstHeader: 'h2',
                 secondHeader: 'h3',
                 delay: 300,
+                toolbar: {
+                    diffLeft: 10,
+                    diffTop: 5
+                },
                 anchor: {
                     placeholderText: 'test',
                     targetCheckboxText: 'new window?'

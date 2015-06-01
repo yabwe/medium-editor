@@ -35,7 +35,9 @@ describe('Toolbar TestCase', function () {
         it('should not create an anchor form element or anchor extension if anchor is not passed as a button', function () {
             expect(document.querySelectorAll('.medium-editor-toolbar-form-anchor').length).toBe(0);
             var editor = this.newMediumEditor('.editor', {
-                    buttons: ['bold', 'italic', 'underline']
+                    toolbar: {
+                        buttons: ['bold', 'italic', 'underline']
+                    }
                 }),
                 toolbar = editor.getExtensionByName('toolbar');
             expect(toolbar.getToolbarElement().querySelectorAll('.medium-editor-toolbar-form-anchor').length).toBe(0);
@@ -207,9 +209,11 @@ describe('Toolbar TestCase', function () {
         it('should let the user click outside of the selected area to leave', function () {
             this.el.innerHTML = 'This is my text<span>and this is some other text</span>';
             var editor = this.newMediumEditor('.editor', {
-                    staticToolbar: true,
-                    standardizeSelectionStart: true,
-                    updateOnEmptySelection: true
+                    toolbar: {
+                        static: true,
+                        updateOnEmptySelection: true
+                    },
+                    standardizeSelectionStart: true
                 }),
                 toolbar = editor.getExtensionByName('toolbar');
 
@@ -227,8 +231,10 @@ describe('Toolbar TestCase', function () {
         it('should not throw an error when check selection is called when there is an empty selection', function () {
             this.el.innerHTML = '<b>lorem ipsum</b>';
             var editor = this.newMediumEditor('.editor', {
-                    staticToolbar: true,
-                    stickyToolbar: true
+                    toolbar: {
+                        static: true,
+                        sticky: true
+                    }
                 }),
                 toolbar = editor.getExtensionByName('toolbar');
 
@@ -240,12 +246,14 @@ describe('Toolbar TestCase', function () {
             expect(toolbar.getToolbarElement().querySelector('[data-action="bold"]').classList.contains('medium-editor-button-active')).toBe(true);
         });
 
-        it('should show and update toolbar buttons when staticToolbar and updateOnEmptySelection options are set to true', function () {
+        it('should show and update toolbar buttons when toolbar is static and updateOnEmptySelection option is set to true', function () {
             this.el.innerHTML = '<b>lorem ipsum</b>';
             var editor = this.newMediumEditor('.editor', {
-                    staticToolbar: true,
-                    stickyToolbar: true,
-                    updateOnEmptySelection: true
+                    toolbar: {
+                        static: true,
+                        sticky: true,
+                        updateOnEmptySelection: true
+                    }
                 }),
                 toolbar = editor.getExtensionByName('toolbar');
 
@@ -265,8 +273,16 @@ describe('Toolbar TestCase', function () {
             elTwo.id = 'editor-div-two';
             this.el.innerHTML = '<span id="editor-span-1">lorem ipsum</span>';
 
-            editorOne = this.newMediumEditor('.editor', { staticToolbar: true });
-            editorTwo = this.newMediumEditor(document.getElementById('editor-div-two'), { staticToolbar: true });
+            editorOne = this.newMediumEditor('.editor', {
+                toolbar: {
+                    static: true
+                }
+            });
+            editorTwo = this.newMediumEditor(document.getElementById('editor-div-two'), {
+                toolbar: {
+                    static: true
+                }
+            });
             var toolbarOne = editorOne.getExtensionByName('toolbar'),
                 toolbarTwo = editorTwo.getExtensionByName('toolbar');
 
@@ -306,11 +322,11 @@ describe('Toolbar TestCase', function () {
     });
 
     describe('Disable', function () {
-        it('should not show the toolbar on elements when option disableToolbar is set to true', function () {
+        it('should not show the toolbar on elements when toolbar option is set to false', function () {
             var editor = this.newMediumEditor('.editor', {
-                disableToolbar: true
+                toolbar: false
             });
-            expect(editor.options.disableToolbar).toBe(true);
+            expect(editor.options.toolbar).toBe(false);
             expect(document.getElementsByClassName('medium-editor-toolbar-actions').length).toBe(0);
         });
 
@@ -366,12 +382,12 @@ describe('Toolbar TestCase', function () {
             expect(toolbar.getToolbarElement().classList.contains('medium-editor-toolbar-active')).toBe(true);
         });
 
-        it('should not try to toggle toolbar when option disabletoolbar is set to true', function () {
+        it('should not try to toggle toolbar when toolbar option is set to false', function () {
             this.createElement('div', 'editor');
             this.el.innerHTML = 'lorem ipsum';
 
             var editor = this.newMediumEditor(document.querySelectorAll('.editor'), {
-                    disableToolbar: true
+                    toolbar: false
                 }),
                 toolbar = editor.getExtensionByName('toolbar');
 
@@ -385,8 +401,10 @@ describe('Toolbar TestCase', function () {
     describe('Scroll', function () {
         it('should position static + sticky toolbar', function () {
             var editor = this.newMediumEditor('.editor', {
-                    staticToolbar: true,
-                    stickyToolbar: true
+                    toolbar: {
+                        static: true,
+                        sticky: true
+                    }
                 }),
                 toolbar = editor.getExtensionByName('toolbar');
             spyOn(Toolbar.prototype, 'positionToolbarIfShown');
@@ -445,9 +463,11 @@ describe('Toolbar TestCase', function () {
         it('should position static + sticky toolbar on the left', function () {
             this.el.innerHTML = '<b>lorem ipsum</b>';
             var editor = this.newMediumEditor('.editor', {
-                    staticToolbar: true,
-                    stickyToolbar: true,
-                    toolbarAlign: 'left'
+                    toolbar: {
+                        static: true,
+                        sticky: true,
+                        align: 'left'
+                    }
                 }),
                 toolbar = editor.getExtensionByName('toolbar').getToolbarElement();
 
@@ -462,9 +482,11 @@ describe('Toolbar TestCase', function () {
         it('should position static + sticky toolbar on the right', function () {
             this.el.innerHTML = '<b>lorem ipsum</b>';
             var editor = this.newMediumEditor('.editor', {
-                    staticToolbar: true,
-                    stickyToolbar: true,
-                    toolbarAlign: 'right'
+                    toolbar: {
+                        static: true,
+                        sticky: true,
+                        align: 'right'
+                    }
                 }),
                 toolbar = editor.getExtensionByName('toolbar').getToolbarElement();
 
@@ -479,9 +501,11 @@ describe('Toolbar TestCase', function () {
         it('should position static + sticky toolbar on the center', function () {
             this.el.innerHTML = '<b>lorem ipsum</b>';
             var editor = this.newMediumEditor('.editor', {
-                    staticToolbar: true,
-                    stickyToolbar: true,
-                    toolbarAlign: 'center'
+                    toolbar: {
+                        static: true,
+                        sticky: true,
+                        align: 'center'
+                    }
                 }),
                 toolbar = editor.getExtensionByName('toolbar').getToolbarElement();
 

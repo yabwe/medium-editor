@@ -128,7 +128,9 @@ describe('Buttons TestCase', function () {
         it('should have aria-label and title attributes set', function () {
             var button,
                 editor = this.newMediumEditor('.editor', {
-                    buttons: allButtons
+                    toolbar: {
+                        buttons: allButtons
+                    }
                 }),
                 toolbar = editor.getExtensionByName('toolbar');
             Object.keys(customLabels).forEach(function (buttonName) {
@@ -142,7 +144,9 @@ describe('Buttons TestCase', function () {
         it('should contain default content if no custom labels are provided', function () {
             var button,
                 editor = this.newMediumEditor('.editor', {
-                    buttons: allButtons
+                    toolbar: {
+                        buttons: allButtons
+                    }
                 }),
                 toolbar = editor.getExtensionByName('toolbar');
             expect(toolbar.getToolbarElement().querySelectorAll('button').length).toBe(allButtons.length);
@@ -161,7 +165,9 @@ describe('Buttons TestCase', function () {
             var action,
                 button,
                 editor = this.newMediumEditor('.editor', {
-                    buttons: allButtons,
+                    toolbar: {
+                        buttons: allButtons
+                    },
                     buttonLabels: 'fontawesome'
                 }),
                 toolbar = editor.getExtensionByName('toolbar');
@@ -184,7 +190,9 @@ describe('Buttons TestCase', function () {
             var action,
                 button,
                 editor = this.newMediumEditor('.editor', {
-                    buttons: allButtons,
+                    toolbar: {
+                        buttons: allButtons
+                    },
                     buttonLabels: customLabels
                 }),
                 toolbar = editor.getExtensionByName('toolbar');
@@ -263,7 +271,9 @@ describe('Buttons TestCase', function () {
     describe('Bold', function () {
         it('button should be active if the selection already has the element', function () {
             var editor = this.newMediumEditor('.editor', {
-                    buttons: ['bold']
+                    toolbar: {
+                        buttons: ['bold']
+                    }
                 }),
                 toolbar = editor.getExtensionByName('toolbar'),
                 button = toolbar.getToolbarElement().querySelector('[data-action="bold"]');
@@ -282,7 +292,9 @@ describe('Buttons TestCase', function () {
 
         it('button should be active if the selection is bold and queryCommandState fails', function () {
             var editor = this.newMediumEditor('.editor', {
-                    buttons: ['bold']
+                    toolbar: {
+                        buttons: ['bold']
+                    }
                 }),
                 toolbar = editor.getExtensionByName('toolbar'),
                 button = toolbar.getToolbarElement().querySelector('[data-action="bold"]');
@@ -299,7 +311,9 @@ describe('Buttons TestCase', function () {
 
         it('button should be active for other cases when text is bold', function () {
             var editor = this.newMediumEditor('.editor', {
-                    buttons: ['bold']
+                    toolbar: {
+                        buttons: ['bold']
+                    }
                 }),
                 toolbar = editor.getExtensionByName('toolbar'),
                 button = toolbar.getToolbarElement().querySelector('[data-action="bold"]');
@@ -332,7 +346,9 @@ describe('Buttons TestCase', function () {
 
         it('button should be active if the selection already has the element', function () {
             var editor = this.newMediumEditor('.editor', {
-                    buttons: ['italic']
+                    toolbar: {
+                        buttons: ['italic']
+                    }
                 }),
                 toolbar = editor.getExtensionByName('toolbar'),
                 button = toolbar.getToolbarElement().querySelector('[data-action="italic"]');
@@ -351,7 +367,9 @@ describe('Buttons TestCase', function () {
 
         it('button should be active if the selection is italic and queryCommandState fails', function () {
             var editor = this.newMediumEditor('.editor', {
-                    buttons: ['italic']
+                    toolbar: {
+                        buttons: ['italic']
+                    }
                 }),
                 toolbar = editor.getExtensionByName('toolbar'),
                 button = toolbar.getToolbarElement().querySelector('[data-action="italic"]');
@@ -368,7 +386,9 @@ describe('Buttons TestCase', function () {
 
         it('button should be active for other cases when text is italic', function () {
             var editor = this.newMediumEditor('.editor', {
-                    buttons: ['italic']
+                    toolbar: {
+                        buttons: ['italic']
+                    }
                 }),
                 toolbar = editor.getExtensionByName('toolbar'),
                 button = toolbar.getToolbarElement().querySelector('[data-action="italic"]');
@@ -388,7 +408,9 @@ describe('Buttons TestCase', function () {
     describe('Underline', function () {
         it('button should be active if the selection already has the element', function () {
             var editor = this.newMediumEditor('.editor', {
-                    buttons: ['underline']
+                    toolbar: {
+                        buttons: ['underline']
+                    }
                 }),
                 toolbar = editor.getExtensionByName('toolbar'),
                 button = toolbar.getToolbarElement().querySelector('[data-action="underline"]');
@@ -404,7 +426,9 @@ describe('Buttons TestCase', function () {
 
         it('button should be active if the selection is underlined and queryCommandState fails', function () {
             var editor = this.newMediumEditor('.editor', {
-                    buttons: ['underline']
+                    toolbar: {
+                        buttons: ['underline']
+                    }
                 }),
                 toolbar = editor.getExtensionByName('toolbar'),
                 button = toolbar.getToolbarElement().querySelector('[data-action="underline"]');
@@ -421,7 +445,9 @@ describe('Buttons TestCase', function () {
 
         it('button should be active for other cases when text is underlined', function () {
             var editor = this.newMediumEditor('.editor', {
-                    buttons: ['underline']
+                    toolbar: {
+                        buttons: ['underline']
+                    }
                 }),
                 toolbar = editor.getExtensionByName('toolbar'),
                 button = toolbar.getToolbarElement().querySelector('[data-action="underline"]');
@@ -441,7 +467,9 @@ describe('Buttons TestCase', function () {
     describe('Strikethrough', function () {
         it('button should be active if the selection already has the element', function () {
             var editor = this.newMediumEditor('.editor', {
-                    buttons: ['strikethrough']
+                    toolbar: {
+                        buttons: ['strikethrough']
+                    }
                 }),
                 toolbar = editor.getExtensionByName('toolbar'),
                 button = toolbar.getToolbarElement().querySelector('[data-action="strikethrough"]');
@@ -457,7 +485,9 @@ describe('Buttons TestCase', function () {
 
         it('button should be active if the selection is strikethrough and queryCommandState fails', function () {
             var editor = this.newMediumEditor('.editor', {
-                    buttons: ['strikethrough']
+                    toolbar: {
+                        buttons: ['strikethrough']
+                    }
                 }),
                 toolbar = editor.getExtensionByName('toolbar'),
                 button = toolbar.getToolbarElement().querySelector('[data-action="strikethrough"]');
@@ -474,7 +504,9 @@ describe('Buttons TestCase', function () {
 
         it('button should be active for other cases when text is strikethrough', function () {
             var editor = this.newMediumEditor('.editor', {
-                    buttons: ['strikethrough']
+                    toolbar: {
+                        buttons: ['strikethrough']
+                    }
                 }),
                 toolbar = editor.getExtensionByName('toolbar'),
                 button = toolbar.getToolbarElement().querySelector('[data-action="strikethrough"]');
@@ -494,7 +526,9 @@ describe('Buttons TestCase', function () {
     describe('Superscript', function () {
         it('button should be active if the selection already has the element', function () {
             var editor = this.newMediumEditor('.editor', {
-                    buttons: ['superscript']
+                    toolbar: {
+                        buttons: ['superscript']
+                    }
                 }),
                 toolbar = editor.getExtensionByName('toolbar'),
                 button = toolbar.getToolbarElement().querySelector('[data-action="superscript"]');
@@ -512,7 +546,9 @@ describe('Buttons TestCase', function () {
     describe('Subscript', function () {
         it('button should be active if the selection already has the element', function () {
             var editor = this.newMediumEditor('.editor', {
-                    buttons: ['subscript']
+                    toolbar: {
+                        buttons: ['subscript']
+                    }
                 }),
                 toolbar = editor.getExtensionByName('toolbar'),
                 button = toolbar.getToolbarElement().querySelector('[data-action="subscript"]');
@@ -530,7 +566,9 @@ describe('Buttons TestCase', function () {
     describe('Anchor', function () {
         it('button should be active if the selection already has the element', function () {
             var editor = this.newMediumEditor('.editor', {
-                    buttons: ['anchor']
+                    toolbar: {
+                        buttons: ['anchor']
+                    }
                 }),
                 toolbar = editor.getExtensionByName('toolbar'),
                 button = toolbar.getToolbarElement().querySelector('[data-action="createLink"]');
@@ -558,7 +596,9 @@ describe('Buttons TestCase', function () {
     describe('Quote', function () {
         it('button should not be active if the selection is not inside a blockquote', function () {
             var editor = this.newMediumEditor('.editor', {
-                    buttons: ['quote']
+                    toolbar: {
+                        buttons: ['quote']
+                    }
                 }),
                 toolbar = editor.getExtensionByName('toolbar'),
                 button = toolbar.getToolbarElement().querySelector('[data-action="append-blockquote"]');
@@ -577,7 +617,9 @@ describe('Buttons TestCase', function () {
         it('should create an image', function () {
             spyOn(document, 'execCommand').and.callThrough();
             var editor = this.newMediumEditor('.editor', {
-                    buttons: ['image']
+                    toolbar: {
+                        buttons: ['image']
+                    }
                 }),
                 toolbar = editor.getExtensionByName('toolbar'),
                 button = toolbar.getToolbarElement().querySelector('[data-action="image"]');
@@ -595,7 +637,9 @@ describe('Buttons TestCase', function () {
     describe('OrderedList', function () {
         it('button should be active if the selection already has the element', function () {
             var editor = this.newMediumEditor('.editor', {
-                    buttons: ['orderedlist', 'unorderedlist']
+                    toolbar: {
+                        buttons: ['orderedlist', 'unorderedlist']
+                    }
                 }),
                 toolbar = editor.getExtensionByName('toolbar'),
                 button = toolbar.getToolbarElement().querySelector('[data-action="insertorderedlist"]');
@@ -616,7 +660,9 @@ describe('Buttons TestCase', function () {
     describe('UnorderedList', function () {
         it('button should be active if the selection already has the element', function () {
             var editor = this.newMediumEditor('.editor', {
-                    buttons: ['unorderedlist', 'orderedlist']
+                    toolbar: {
+                        buttons: ['unorderedlist', 'orderedlist']
+                    }
                 }),
                 toolbar = editor.getExtensionByName('toolbar'),
                 button = toolbar.getToolbarElement().querySelector('[data-action="insertunorderedlist"]');
@@ -637,7 +683,9 @@ describe('Buttons TestCase', function () {
     describe('Pre', function () {
         it('button should be active if the selection already has the element', function () {
             var editor = this.newMediumEditor('.editor', {
-                    buttons: ['pre']
+                    toolbar: {
+                        buttons: ['pre']
+                    }
                 }),
                 toolbar = editor.getExtensionByName('toolbar'),
                 button = toolbar.getToolbarElement().querySelector('[data-action="append-pre"]');
@@ -657,7 +705,9 @@ describe('Buttons TestCase', function () {
             document.body.style.setProperty('text-align', 'center');
             try {
                 var editor = this.newMediumEditor('.editor', {
-                        buttons: ['justifyCenter', 'justifyRight']
+                        toolbar: {
+                            buttons: ['justifyCenter', 'justifyRight']
+                        }
                     }),
                     toolbar = editor.getExtensionByName('toolbar'),
                     rightButton = toolbar.getToolbarElement().querySelector('[data-action="justifyRight"]'),
@@ -682,7 +732,9 @@ describe('Buttons TestCase', function () {
                                 '<p id="justify-para-four" align="center">lorem ipsum</p>' +
                                 '<p id="justify-para-five" align="justify">lorem ipsum</p>';
             var editor = this.newMediumEditor('.editor', {
-                    buttons: ['justifyLeft', 'justifyCenter', 'justifyRight', 'justifyFull']
+                    toolbar: {
+                        buttons: ['justifyLeft', 'justifyCenter', 'justifyRight', 'justifyFull']
+                    }
                 }),
                 toolbar = editor.getExtensionByName('toolbar'),
                 leftButton = toolbar.getToolbarElement().querySelector('[data-action="justifyLeft"]'),
@@ -759,7 +811,9 @@ describe('Buttons TestCase', function () {
 
         it('should unwrap basic things', function () {
             var editor = this.newMediumEditor('.editor', {
-                    buttons: ['removeFormat']
+                    toolbar: {
+                        buttons: ['removeFormat']
+                    }
                 }),
                 toolbar = editor.getExtensionByName('toolbar'),
                 button = toolbar.getToolbarElement().querySelector('[data-action="removeFormat"]');
@@ -789,7 +843,9 @@ describe('Buttons TestCase', function () {
     describe('Header', function () {
         it('buttons should be active if the selection already has the element', function () {
             var editor = this.newMediumEditor('.editor', {
-                    buttons: ['header1', 'header2']
+                    toolbar: {
+                        buttons: ['header1', 'header2']
+                    }
                 }),
                 toolbar = editor.getExtensionByName('toolbar'),
                 buttonOne = toolbar.getToolbarElement().querySelector('[data-action="append-h3"]'),
@@ -811,7 +867,9 @@ describe('Buttons TestCase', function () {
 
         it('buttons should be active if the selection already custom defined element types', function () {
             var editor = this.newMediumEditor('.editor', {
-                    buttons: ['header1', 'header2'],
+                    toolbar: {
+                        buttons: ['header1', 'header2']
+                    },
                     firstHeader: 'h1',
                     secondHeader: 'h5'
                 }),
@@ -838,7 +896,9 @@ describe('Buttons TestCase', function () {
 
         it('buttons should convert between element types and "undo" back to original type', function () {
             var editor = this.newMediumEditor('.editor', {
-                    buttons: ['header1', 'header2'],
+                    toolbar: {
+                        buttons: ['header1', 'header2']
+                    },
                     firstHeader: 'h1'
                 }),
                 toolbar = editor.getExtensionByName('toolbar'),

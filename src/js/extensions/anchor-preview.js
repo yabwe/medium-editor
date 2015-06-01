@@ -93,13 +93,20 @@ var AnchorPreview;
             var buttonHeight = this.anchorPreview.offsetHeight,
                 boundary = this.activeAnchor.getBoundingClientRect(),
                 middleBoundary = (boundary.left + boundary.right) / 2,
+                diffLeft = this.diffLeft,
+                diffTop = this.diffTop,
                 halfOffsetWidth,
                 defaultLeft;
 
             halfOffsetWidth = this.anchorPreview.offsetWidth / 2;
-            defaultLeft = this.getEditorOption('diffLeft') - halfOffsetWidth;
+            var toolbarExtension = this.base.getExtensionByName('toolbar');
+            if (toolbarExtension) {
+                diffLeft = toolbarExtension.diffLeft;
+                diffTop = toolbarExtension.diffTop;
+            }
+            defaultLeft = diffLeft - halfOffsetWidth;
 
-            this.anchorPreview.style.top = Math.round(buttonHeight + boundary.bottom - this.getEditorOption('diffTop') + this.window.pageYOffset - this.anchorPreview.offsetHeight) + 'px';
+            this.anchorPreview.style.top = Math.round(buttonHeight + boundary.bottom - diffTop + this.window.pageYOffset - this.anchorPreview.offsetHeight) + 'px';
             if (middleBoundary < halfOffsetWidth) {
                 this.anchorPreview.style.left = defaultLeft + halfOffsetWidth + 'px';
             } else if ((this.window.innerWidth - middleBoundary) < halfOffsetWidth) {

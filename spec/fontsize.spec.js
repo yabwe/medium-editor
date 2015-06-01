@@ -18,7 +18,11 @@ describe('Font Size Button TestCase', function () {
     beforeEach(function () {
         setupTestHelpers.call(this);
         this.el = this.createElement('div', 'editor', 'lorem ipsum');
-        this.mediumOpts = { buttons: ['fontsize'] };
+        this.mediumOpts = {
+            toolbar: {
+                buttons: ['fontsize']
+            }
+        };
     });
 
     afterEach(function () {
@@ -46,7 +50,12 @@ describe('Font Size Button TestCase', function () {
     describe('Font Size', function () {
         it('should change font size when slider is moved', function () {
             spyOn(document, 'execCommand').and.callThrough();
-            var editor = this.newMediumEditor('.editor', { buttons: ['fontsize'], buttonLabels: 'fontawesome' }),
+            var editor = this.newMediumEditor('.editor', {
+                    toolbar: {
+                        buttons: ['fontsize']
+                    },
+                    buttonLabels: 'fontawesome'
+                }),
                 fontSizeExtension = editor.getExtensionByName('fontsize'),
                 toolbar = editor.getExtensionByName('toolbar'),
                 button,

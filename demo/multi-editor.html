@@ -39,7 +39,9 @@
     <script>
         var editor = new MediumEditor('.editable'),
             editor2 = new MediumEditor('.secondEditable', {
-                buttons: ['bold', 'italic', 'quote', 'pre']
+                toolbar: {
+                    buttons: ['bold', 'italic', 'quote', 'pre']
+                }
             });
     </script>
 

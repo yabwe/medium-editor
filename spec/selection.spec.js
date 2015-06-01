@@ -27,7 +27,9 @@ describe('Selection TestCase', function () {
         it('should be able to import an exported selection', function () {
             this.el.innerHTML = 'lorem <i>ipsum</i> dolor';
             var editor = this.newMediumEditor('.editor', {
-                buttons: ['italic', 'underline', 'strikethrough']
+                toolbar: {
+                    buttons: ['italic', 'underline', 'strikethrough']
+                }
             });
 
             selectElementContents(editor.elements[0].querySelector('i'));
@@ -44,7 +46,9 @@ describe('Selection TestCase', function () {
         it('should import an exported selection outside any anchor tag', function () {
             this.el.innerHTML = '<p id=1>Hello world: <a href="#">http://www.example.com</a></p><p id=2><br></p>';
             var editor = this.newMediumEditor('.editor', {
-                buttons: ['italic', 'underline', 'strikethrough']
+                toolbar: {
+                    buttons: ['italic', 'underline', 'strikethrough']
+                }
             }),
                 link = editor.elements[0].getElementsByTagName('a')[0];
 
@@ -67,7 +71,9 @@ describe('Selection TestCase', function () {
         it('should have an index in the exported selection when it is in the second contenteditable', function () {
             this.createElement('div', 'editor', 'lorem <i>ipsum</i> dolor');
             var editor = this.newMediumEditor('.editor', {
-                buttons: ['italic', 'underline', 'strikethrough']
+                toolbar: {
+                    buttons: ['italic', 'underline', 'strikethrough']
+                }
             });
 
             selectElementContents(editor.elements[1].querySelector('i'));
@@ -82,7 +88,9 @@ describe('Selection TestCase', function () {
             this.el.innerHTML = 'lorem <i>ipsum</i> dolor';
 
             var editor = this.newMediumEditor('.editor', {
-                    buttons: ['italic', 'underline', 'strikethrough']
+                    toolbar: {
+                        buttons: ['italic', 'underline', 'strikethrough']
+                    }
                 }),
                 toolbar = editor.getExtensionByName('toolbar'),
                 button,
@@ -177,8 +185,10 @@ describe('Selection TestCase', function () {
             spyOn(MediumEditor.extensions.toolbar.prototype, 'setToolbarButtonStates').and.callThrough();
 
             var editor = this.newMediumEditor('.editor', {
-                updateOnEmptySelection: true,
-                staticToolbar: true
+                toolbar: {
+                    updateOnEmptySelection: true,
+                    static: true
+                }
             });
 
             selectElementContentsAndFire(this.el, { collapse: 'toStart' });

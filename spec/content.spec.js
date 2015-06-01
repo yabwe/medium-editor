@@ -18,7 +18,9 @@ describe('Content TestCase', function () {
     it('should removing paragraphs when a list is inserted inside of it', function () {
         this.el.innerHTML = '<p>lorem ipsum<ul><li>dolor</li></ul></p>';
         var editor = this.newMediumEditor('.editor', {
-                buttons: ['orderedlist']
+                toolbar: {
+                    buttons: ['orderedlist']
+                }
             }),
             target = editor.elements[0].querySelector('p'),
             toolbar = editor.getExtensionByName('toolbar'),

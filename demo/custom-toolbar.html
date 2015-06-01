@@ -26,14 +26,18 @@
     <script src="../dist/js/medium-editor.js"></script>
     <script>
         var editor = new MediumEditor('.editable', {
-                buttons: ['bold', 'italic', 'underline', 'strikethrough', 'quote', 'anchor', 'image', 'justifyLeft', 'justifyCenter', 'justifyRight', 'justifyFull', 'superscript', 'subscript', 'orderedlist', 'unorderedlist', 'pre', 'removeFormat', 'outdent', 'indent', 'header1', 'header2'],
+                toolbar: {
+                    buttons: ['bold', 'italic', 'underline', 'strikethrough', 'quote', 'anchor', 'image', 'justifyLeft', 'justifyCenter', 'justifyRight', 'justifyFull', 'superscript', 'subscript', 'orderedlist', 'unorderedlist', 'pre', 'removeFormat', 'outdent', 'indent', 'header1', 'header2'],
+                },
                 buttonLabels: 'fontawesome',
                 anchor: {
                     targetCheckbox: true
                 }
             });
         var editor2 = new MediumEditor('.secondEditable', {
-                buttons: ['bold', 'italic', 'underline', 'anchor'],
+                toolbar: {
+                    buttons: ['bold', 'italic', 'underline', 'anchor']
+                },
                 buttonLabels: {
                     'bold': 'bold',
                     'italic': '<i>italic</i>',
