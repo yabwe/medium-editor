@@ -1,3 +1,17 @@
+4.12.0 / 2015-06-01
+==================
+* Fix pasting links when targetBlank option is being used
+* Fix for spellcheck option after destroy
+* Fix over-reaching keyboard shortcuts for commands
+* Expose new 'positionToolbar' custom event
+* Add new isKey() helper in util
+* Add cleanup on destroy for auto-link and placeholder extensions
+* Base extension changes
+  * Add getEditorElements(), getEditorId(), and getEditorOption() helpers
+  * Add on(), off(), subscribe(), and execAction() helpers
+  * Introduce destroy() lifecycle method + deprecate deactivate()
+
+
 4.11.1 / 2015-05-26
 ==================
 * Fix issue with auto-linked text after manually unlinking
