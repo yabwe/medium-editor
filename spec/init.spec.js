@@ -1,6 +1,6 @@
 /*global MediumEditor, describe, it, expect, spyOn,
     AnchorForm, afterEach, beforeEach, setupTestHelpers, _,
-    AnchorPreview, Toolbar */
+    AnchorPreview */
 
 describe('Initialization TestCase', function () {
     'use strict';

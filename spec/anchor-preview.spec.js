@@ -1,6 +1,6 @@
 /*global describe, it,  expect, spyOn, AnchorForm,
     afterEach, beforeEach, jasmine, fireEvent, setupTestHelpers,
-    AnchorPreview, Toolbar */
+    AnchorPreview, MediumEditor */
 
 describe('Anchor Preview TestCase', function () {
     'use strict';

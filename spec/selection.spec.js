@@ -2,7 +2,7 @@
          afterEach, beforeEach, fireEvent,
          jasmine, selectElementContents, setupTestHelpers,
          selectElementContentsAndFire, Selection,
-         placeCursorInsideElement, Toolbar */
+         placeCursorInsideElement */
 
 describe('Selection TestCase', function () {
     'use strict';

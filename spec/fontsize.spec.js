@@ -2,7 +2,7 @@
      afterEach, beforeEach, selectElementContents,
      jasmine, fireEvent, setupTestHelpers,
      selectElementContentsAndFire, isIE9, FontSizeForm,
-     Toolbar */
+     MediumEditor */
 
 describe('Font Size Button TestCase', function () {
     'use strict';

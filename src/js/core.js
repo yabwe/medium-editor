@@ -1,5 +1,5 @@
 /*global Util, ButtonsData, Selection, Extension,
-    extensionDefaults, Toolbar, Events, editorDefaults*/
+    extensionDefaults, Events, editorDefaults*/
 
 function MediumEditor(elements, options) {
     'use strict';

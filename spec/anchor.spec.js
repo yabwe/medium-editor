@@ -1,8 +1,7 @@
 /*global MediumEditor, describe, it, expect, spyOn,
      afterEach, beforeEach, selectElementContents,
      jasmine, fireEvent, Util, setupTestHelpers,
-     selectElementContentsAndFire, AnchorForm,
-     Toolbar */
+     selectElementContentsAndFire, AnchorForm */
 
 describe('Anchor Button TestCase', function () {
     'use strict';
