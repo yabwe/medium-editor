@@ -236,7 +236,7 @@ var Util;
                         return current;
                     }
                     // do not traverse upwards past the nearest containing editor
-                    if (current.getAttribute('data-medium-element')) {
+                    if (current.getAttribute('data-medium-editor-element')) {
                         return false;
                     }
                 }
@@ -273,7 +273,7 @@ var Util;
                         (toReplace.nodeType !== 3 && toReplace.innerHTML === range.toString())) {
                     while (toReplace.parentNode &&
                             toReplace.parentNode.childNodes.length === 1 &&
-                            !toReplace.parentNode.getAttribute('data-medium-element')) {
+                            !toReplace.parentNode.getAttribute('data-medium-editor-element')) {
                         toReplace = toReplace.parentNode;
                     }
                     range.selectNode(toReplace);

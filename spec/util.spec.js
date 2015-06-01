@@ -298,8 +298,8 @@ describe('Util', function () {
             expect(closestTag.tagName.toLowerCase()).toBe('span');
         });
 
-        it('should not get closed tag with data-medium-element', function () {
-            var el = this.createElement('div', '', '<p>youpi<span data-medium-element="true">my <b>text</b></span></p>'),
+        it('should not get closed tag with data-medium-editor-element', function () {
+            var el = this.createElement('div', '', '<p>youpi<span data-medium-editor-element="true">my <b>text</b></span></p>'),
                 tag = el.querySelector('b').firstChild,
                 closestTag = Util.getClosestTag(tag, 'p');
 

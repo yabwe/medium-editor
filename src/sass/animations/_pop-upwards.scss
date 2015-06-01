@@ -1,0 +1,20 @@
+@keyframes medium-editor-pop-upwards {
+    0% {
+        opacity: 0;
+        transform: matrix(.97, 0, 0, 1, 0, 12);
+    }
+
+    20% {
+        opacity: .7;
+        transform: matrix(.99, 0, 0, 1, 0, 2);
+    }
+
+    40% {
+        opacity: 1;
+        transform: matrix(1, 0, 0, 1, 0, -1);
+    }
+
+    100% {
+        transform: matrix(1, 0, 0, 1, 0, 0);
+    }
+}
