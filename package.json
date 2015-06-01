@@ -10,6 +10,10 @@
     {
       "name": "Noah Chase",
       "email": "nchase@gmail.com"
+    },
+    {
+      "name": "Jeremy Benoist",
+      "email": "jeremy.benoist@gmail.com"
     }
   ],
   "description": "Medium.com WYSIWYG editor clone.",
@@ -22,7 +26,7 @@
     "url": "https://github.com/yabwe/medium-editor/issues",
     "email": "hi@daviferreira.com"
   },
-  "homepage": "http://daviferreira.github.io/medium-editor/",
+  "homepage": "http://yabwe.github.io/medium-editor/",
   "keywords": [
     "contenteditable",
     "editor",
