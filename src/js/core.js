@@ -248,12 +248,7 @@ function MediumEditor(elements, options) {
     }
 
     function isToolbarEnabled() {
-        // TODO: deprecated
         // If toolbar is disabled, don't add it
-        if (this.options.disableToolbar) {
-            return false;
-        }
-
         if (this.options.toolbar === false) {
             return false;
         }
@@ -404,46 +399,7 @@ function MediumEditor(elements, options) {
             return this.options.extensions['toolbar'];
         }
 
-        // Backwards compatability
-        var defaultsBC = {
-            align: this.options.toolbarAlign, // deprecated
-            buttons: this.options.buttons, // deprecated
-            diffLeft: this.options.diffLeft, // deprecated
-            diffTop: this.options.diffTop, // deprecated
-            firstButtonClass: this.options.firstButtonClass, // deprecated
-            lastButtonClass: this.options.lastButtonClass, // deprecated
-            static: this.options.staticToolbar, // deprecated
-            sticky: this.options.stickyToolbar, // deprecated
-            updateOnEmptySelection: this.options.updateOnEmptySelection // deprecated
-        };
-
-        return new MediumEditor.extensions.toolbar(
-            Util.extend({}, options, defaultsBC)
-        );
-    }
-
-    function initPlaceholder(options) {
-        return new MediumEditor.extensions.placeholder(
-            Util.extend({}, options)
-        );
-    }
-
-    function initAnchorPreview(options) {
-        return new MediumEditor.extensions.anchorPreview(
-            Util.extend({}, options)
-        );
-    }
-
-    function initAnchorForm(options) {
-        return new MediumEditor.extensions.anchor(
-            Util.extend({}, options)
-        );
-    }
-
-    function initPasteHandler(options) {
-        return new MediumEditor.extensions.paste(
-            Util.extend({}, options)
-        );
+        return new MediumEditor.extensions.toolbar(options);
     }
 
     function initCommands() {
@@ -465,7 +421,7 @@ function MediumEditor(elements, options) {
                 ext = initExtension(extensions[buttonName], buttonName, this);
                 this.commands.push(ext);
             } else if (buttonName === 'anchor') {
-                ext = initExtension(initAnchorForm.call(this, this.options.anchor), 'anchor', this);
+                ext = initExtension(new MediumEditor.extensions.anchor(this.options.anchor), 'anchor', this);
                 this.commands.push(ext);
             } else if (buttonName === 'fontsize') {
                 ext = initExtension(new MediumEditor.extensions.fontSize(), buttonName, this);
@@ -488,12 +444,12 @@ function MediumEditor(elements, options) {
 
         // Only add default paste extension if it wasn't overriden
         if (!extensions['paste']) {
-            this.commands.push(initExtension(initPasteHandler.call(this, this.options.paste), 'paste', this));
+            this.commands.push(initExtension(new MediumEditor.extensions.paste(this.options.paste), 'paste', this));
         }
 
         // Add AnchorPreview as extension if needed
         if (shouldAddDefaultAnchorPreview.call(this)) {
-            this.commands.push(initExtension(initAnchorPreview.call(this, this.options.anchorPreview), 'anchor-preview', this));
+            this.commands.push(initExtension(new MediumEditor.extensions.anchorPreview(this.options.anchorPreview), 'anchor-preview', this));
         }
 
         if (shouldAddDefaultAutoLink.call(this)) {
@@ -506,7 +462,7 @@ function MediumEditor(elements, options) {
 
         if (shouldAddDefaultPlaceholder.call(this)) {
             var placeholderOpts = (typeof this.options.placeholder === 'string') ? {} : this.options.placeholder;
-            this.commands.push(initExtension(initPlaceholder.call(this, placeholderOpts), 'placeholder', this));
+            this.commands.push(initExtension(new MediumEditor.extensions.placeholder(placeholderOpts), 'placeholder', this));
         }
 
         if (isToolbarEnabled.call(this)) {
