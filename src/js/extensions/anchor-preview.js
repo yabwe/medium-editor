@@ -175,7 +175,6 @@ var AnchorPreview;
             //   if the mouse has not left the anchor tag in that time
             this.base.delay(function () {
                 if (this.anchorToPreview) {
-                    //this.activeAnchor = this.anchorToPreview;
                     this.showPreview(this.anchorToPreview);
                 }
             }.bind(this));

@@ -185,6 +185,62 @@ describe('Extensions TestCase', function () {
             expect(e1.init).toHaveBeenCalledWith();
             expect(e1.base).toBe(editor);
         });
+
+        it('should not add default extensions', function () {
+            var editor,
+                Preview, Placeholder, AutoLink, ImageDragging,
+                extPreview, extPlaceholder, extAutoLink, extImageDragging;
+
+            Preview = Extension.extend({ name: 'anchor-preview' });
+            Placeholder = Extension.extend({ name: 'placeholder' });
+            AutoLink = Extension.extend({ name: 'auto-link' });
+            ImageDragging = Extension.extend({ name: 'image-dragging' });
+
+            extPreview = new Preview();
+            extPlaceholder = new Placeholder();
+            extAutoLink = new AutoLink();
+            extImageDragging = new ImageDragging();
+
+            editor = this.newMediumEditor('.editor', {
+                extensions: {
+                    'anchor-preview': extPreview,
+                    'placeholder': extPlaceholder,
+                    'auto-link': extAutoLink,
+                    'image-dragging': extImageDragging
+                }
+            });
+
+            expect(editor.getExtensionByName('anchor-preview')).toBe(extPreview);
+            expect(editor.getExtensionByName('placeholder')).toBe(extPlaceholder);
+            expect(editor.getExtensionByName('auto-link')).toBe(extAutoLink);
+            expect(editor.getExtensionByName('image-dragging')).toBe(extImageDragging);
+        });
+
+        it('should call constructor function if it exists', function () {
+            var editor, Sub, SubExtend, e1;
+
+            SubExtend = {
+                name: 'Sub',
+                constructor: function () {
+                    // dummy constructor
+                    return this;
+                }
+            };
+
+            spyOn(SubExtend, 'constructor');
+
+            Sub = Extension.extend(SubExtend);
+
+            e1 = new Sub();
+
+            editor = this.newMediumEditor('.editor', {
+                extensions: {
+                    'sub': e1
+                }
+            });
+
+            expect(SubExtend.constructor).toHaveBeenCalled();
+        });
     });
 
     describe('All extensions', function () {

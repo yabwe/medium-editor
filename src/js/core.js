@@ -425,7 +425,7 @@ function MediumEditor(elements, options) {
         }
 
         // Only add default paste extension if it wasn't overriden
-        if (!this.options.extensions['paste']) {
+        if (!extensions['paste']) {
             this.commands.push(initExtension(initPasteHandler.call(this, this.options.paste), 'paste', this));
         }
 
