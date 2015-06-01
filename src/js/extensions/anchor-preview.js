@@ -19,18 +19,10 @@ var AnchorPreview;
          */
         previewValueSelector: 'a',
 
-        /* ----- internal options needed from base ----- */
-        diffLeft: 0, // deprecated (should use .getEditorOption() instead)
-        diffTop: -10, // deprecated (should use .getEditorOption() instead)
-        elementsContainer: false, // deprecated (should use .getEditorOption() instead)
-
         init: function () {
             this.anchorPreview = this.createPreview();
 
-            if (!this.elementsContainer) {
-                this.elementsContainer = this.document.body;
-            }
-            this.elementsContainer.appendChild(this.anchorPreview);
+            this.getEditorOption('elementsContainer').appendChild(this.anchorPreview);
 
             this.attachToEditables();
         },
@@ -64,11 +56,6 @@ var AnchorPreview;
                 }
                 delete this.anchorPreview;
             }
-        },
-
-        // TODO: deprecate
-        deactivate: function () {
-            Util.deprecatedMethod.call(this, 'deactivate', 'destroy', arguments, 'v5.0.0');
         },
 
         hidePreview: function () {
@@ -110,9 +97,9 @@ var AnchorPreview;
                 defaultLeft;
 
             halfOffsetWidth = this.anchorPreview.offsetWidth / 2;
-            defaultLeft = this.diffLeft - halfOffsetWidth;
+            defaultLeft = this.getEditorOption('diffLeft') - halfOffsetWidth;
 
-            this.anchorPreview.style.top = Math.round(buttonHeight + boundary.bottom - this.diffTop + this.window.pageYOffset - this.anchorPreview.offsetHeight) + 'px';
+            this.anchorPreview.style.top = Math.round(buttonHeight + boundary.bottom - this.getEditorOption('diffTop') + this.window.pageYOffset - this.anchorPreview.offsetHeight) + 'px';
             if (middleBoundary < halfOffsetWidth) {
                 this.anchorPreview.style.left = defaultLeft + halfOffsetWidth + 'px';
             } else if ((this.window.innerWidth - middleBoundary) < halfOffsetWidth) {

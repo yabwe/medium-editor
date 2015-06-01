@@ -1,7 +1,8 @@
 /*global MediumEditor, describe, it, expect, spyOn,
          afterEach, beforeEach, fireEvent,
          jasmine, selectElementContents, setupTestHelpers,
-         selectElementContentsAndFire, Selection, placeCursorInsideElement */
+         selectElementContentsAndFire, Selection,
+         placeCursorInsideElement, Toolbar */
 
 describe('Selection TestCase', function () {
     'use strict';
@@ -106,23 +107,23 @@ describe('Selection TestCase', function () {
 
     describe('CheckSelection', function () {
         it('should check for selection on mouseup event', function () {
-            spyOn(MediumEditor.statics.Toolbar.prototype, 'checkState');
+            spyOn(Toolbar.prototype, 'checkState');
             var editor = this.newMediumEditor('.editor');
             fireEvent(editor.elements[0], 'mouseup');
             expect(editor.toolbar.checkState).toHaveBeenCalled();
         });
 
         it('should check for selection on keyup', function () {
-            spyOn(MediumEditor.statics.Toolbar.prototype, 'checkState');
+            spyOn(Toolbar.prototype, 'checkState');
             var editor = this.newMediumEditor('.editor');
             fireEvent(editor.elements[0], 'keyup');
             expect(editor.toolbar.checkState).toHaveBeenCalled();
         });
 
         it('should hide the toolbar if selection is empty', function () {
-            spyOn(MediumEditor.statics.Toolbar.prototype, 'setToolbarPosition').and.callThrough();
-            spyOn(MediumEditor.statics.Toolbar.prototype, 'setToolbarButtonStates').and.callThrough();
-            spyOn(MediumEditor.statics.Toolbar.prototype, 'showAndUpdateToolbar').and.callThrough();
+            spyOn(Toolbar.prototype, 'setToolbarPosition').and.callThrough();
+            spyOn(Toolbar.prototype, 'setToolbarButtonStates').and.callThrough();
+            spyOn(Toolbar.prototype, 'showAndUpdateToolbar').and.callThrough();
             var editor = this.newMediumEditor('.editor');
             editor.toolbar.getToolbarElement().style.display = 'block';
             editor.toolbar.getToolbarElement().classList.add('medium-editor-toolbar-active');
@@ -154,9 +155,9 @@ describe('Selection TestCase', function () {
         });
 
         it('should update toolbar position and button states when something is selected', function () {
-            spyOn(MediumEditor.statics.Toolbar.prototype, 'setToolbarPosition').and.callThrough();
-            spyOn(MediumEditor.statics.Toolbar.prototype, 'setToolbarButtonStates').and.callThrough();
-            spyOn(MediumEditor.statics.Toolbar.prototype, 'showAndUpdateToolbar').and.callThrough();
+            spyOn(Toolbar.prototype, 'setToolbarPosition').and.callThrough();
+            spyOn(Toolbar.prototype, 'setToolbarButtonStates').and.callThrough();
+            spyOn(Toolbar.prototype, 'showAndUpdateToolbar').and.callThrough();
             var editor = this.newMediumEditor('.editor');
             selectElementContentsAndFire(this.el);
             jasmine.clock().tick(51);
@@ -166,7 +167,7 @@ describe('Selection TestCase', function () {
         });
 
         it('should update button states for static toolbar when updateOnEmptySelection is true and the selection is empty', function () {
-            spyOn(MediumEditor.statics.Toolbar.prototype, 'setToolbarButtonStates').and.callThrough();
+            spyOn(Toolbar.prototype, 'setToolbarButtonStates').and.callThrough();
 
             var editor = this.newMediumEditor('.editor', {
                 updateOnEmptySelection: true,

@@ -1,7 +1,8 @@
-/*global MediumEditor, describe, it, expect, spyOn,
+/*global describe, it, expect, spyOn,
      afterEach, beforeEach, selectElementContents,
      jasmine, fireEvent, setupTestHelpers,
-     selectElementContentsAndFire, isIE9, FontSizeForm */
+     selectElementContentsAndFire, isIE9, FontSizeForm,
+     Toolbar */
 
 describe('Font Size Button TestCase', function () {
     'use strict';
@@ -106,7 +107,7 @@ describe('Font Size Button TestCase', function () {
 
     describe('Cancel', function () {
         it('should close the font size form when user clicks on cancel', function () {
-            spyOn(MediumEditor.statics.Toolbar.prototype, 'showAndUpdateToolbar').and.callThrough();
+            spyOn(Toolbar.prototype, 'showAndUpdateToolbar').and.callThrough();
             var editor = this.newMediumEditor('.editor', this.mediumOpts),
                 fontSizeExtension = editor.getExtensionByName('fontsize'),
                 button,

@@ -1,6 +1,6 @@
-/*global MediumEditor, describe, it,  expect, spyOn, AnchorForm,
+/*global describe, it,  expect, spyOn, AnchorForm,
     afterEach, beforeEach, jasmine, fireEvent, setupTestHelpers,
-    AnchorPreview */
+    AnchorPreview, Toolbar */
 
 describe('Anchor Preview TestCase', function () {
     'use strict';
@@ -48,7 +48,7 @@ describe('Anchor Preview TestCase', function () {
             expect(editor.getExtensionByName('anchor').showForm).toHaveBeenCalled();
 
             // selecting other text should close the toolbar
-            spyOn(MediumEditor.statics.Toolbar.prototype, 'hideToolbar').and.callThrough();
+            spyOn(Toolbar.prototype, 'hideToolbar').and.callThrough();
             nextRange = document.createRange();
             nextRange.selectNodeContents(document.getElementById('another-element'));
             sel.removeAllRanges();
@@ -147,16 +147,6 @@ describe('Anchor Preview TestCase', function () {
         it('should not be present when anchorPreview option is set to false', function () {
             var editor = this.newMediumEditor('.editor', {
                 anchorPreview: false
-            }),
-                anchorPreview = editor.getExtensionByName('anchor-preview');
-
-            expect(anchorPreview).toBeUndefined();
-            expect(document.querySelector('.medium-editor-anchor-preview')).toBeNull();
-        });
-
-        it('should not be present when deprecated disableAnchorPreview option is passed', function () {
-            var editor = this.newMediumEditor('.editor', {
-                disableAnchorPreview: true
             }),
                 anchorPreview = editor.getExtensionByName('anchor-preview');
 

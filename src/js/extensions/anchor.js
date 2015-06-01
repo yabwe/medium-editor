@@ -163,11 +163,6 @@ var AnchorForm;
             delete this.form;
         },
 
-        // TODO: deprecate
-        deactivate: function () {
-            Util.deprecatedMethod.call(this, 'deactivate', 'destroy', arguments, 'v5.0.0');
-        },
-
         // core methods
 
         getFormOpts: function () {

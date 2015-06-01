@@ -300,24 +300,6 @@ var Util;
             }
         },
 
-        getSelectionRange: function (ownerDocument) {
-            this.deprecated('Util.getSelectionRange', 'Selection.getSelectionRange', 'v5.0.0');
-
-            return Selection.getSelectionRange(ownerDocument);
-        },
-
-        getSelectionStart: function (ownerDocument) {
-            this.deprecated('Util.getSelectionStart', 'Selection.getSelectionStart', 'v5.0.0');
-
-            return Selection.getSelectionStart(ownerDocument);
-        },
-
-        getSelectionData: function (el) {
-            this.deprecated('Util.getSelectionData', 'Selection.getSelectionData', 'v5.0.0');
-
-            return Selection.getSelectionData(el);
-        },
-
         execFormatBlock: function (doc, tagName) {
             var selectionData = Selection.getSelectionData(Selection.getSelectionStart(doc));
             // FF handles blockquote differently on formatBlock
@@ -424,12 +406,6 @@ var Util;
                 // for some unknown reason, the cursor is moved to end of the "visual" line
                 Selection.moveCursor(ownerDocument, element.firstChild, element.firstChild.textContent.length);
             }
-        },
-
-        unwrapElement: function (element) {
-            this.deprecated('unwrapElement', 'unwrap', 'v5.0.0');
-
-            this.unwrap(element, element.ownerDocument);
         },
 
         /* splitDOMTree

@@ -24,23 +24,6 @@ describe('Setup/Destroy TestCase', function () {
         expect(editor.isActive).toBe(false);
     });
 
-    describe('activate() and deactivate()', function () {
-        it('should be aliases for setup() and destory() for backwards compatability', function () {
-            var editor = this.newMediumEditor('.editor');
-            expect(editor.isActive).toBe(true);
-
-            spyOn(MediumEditor.prototype, 'destroy').and.callThrough();
-            editor.deactivate();
-            expect(editor.isActive).toBe(false);
-            expect(editor.destroy).toHaveBeenCalled();
-
-            spyOn(MediumEditor.prototype, 'setup').and.callThrough();
-            editor.activate();
-            expect(editor.isActive).toBe(true);
-            expect(editor.setup).toHaveBeenCalled();
-        });
-    });
-
     describe('Setup', function () {
         it('should init the toolbar and editor elements', function () {
             var editor = this.newMediumEditor('.editor');

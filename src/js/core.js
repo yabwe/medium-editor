@@ -1,7 +1,5 @@
 /*global Util, ButtonsData, Selection, Extension,
-    extensionDefaults, Toolbar, Events, editorDefaults,
-    DefaultButton, AnchorExtension, FontSizeExtension,
-    AnchorPreviewDeprecated*/
+    extensionDefaults, Toolbar, Events, editorDefaults*/
 
 function MediumEditor(elements, options) {
     'use strict';
@@ -196,25 +194,18 @@ function MediumEditor(elements, options) {
     }
 
     function initExtension(extension, name, instance) {
-        if (typeof extension.parent !== 'undefined') {
-            Util.warn('Extension .parent property has been deprecated.  ' +
-                'The .base property for extensions will always be set to MediumEditor in version 5.0.0');
-        }
         var extensionDefaults = {
             'window': instance.options.contentWindow,
-            'document': instance.options.ownerDocument
+            'document': instance.options.ownerDocument,
+            'base': instance
         };
-        // TODO: Deprecated (Remove .parent check in v5.0.0)
-        if (extension.parent !== false) {
-            extensionDefaults.base = instance;
-        }
+
         // Add default options into the extension
         extension = setExtensionDefaults(extension, extensionDefaults);
 
         // Call init on the extension
         if (typeof extension.init === 'function') {
-            // Passing instance into init() will be deprecated in v5.0.0
-            extension.init(instance);
+            extension.init();
         }
 
         // Set extension name (if not already set)
@@ -228,11 +219,6 @@ function MediumEditor(elements, options) {
         var i,
             shouldAdd = false;
 
-        // TODO: deprecated
-        // If anchor-preview is disabled, don't add
-        if (this.options.disableAnchorPreview) {
-            return false;
-        }
         // If anchor-preview is disabled, don't add
         if (this.options.anchorPreview === false) {
             return false;
@@ -258,11 +244,6 @@ function MediumEditor(elements, options) {
 
     function shouldAddDefaultPlaceholder() {
         if (this.options.extensions['placeholder']) {
-            return false;
-        }
-
-        // TODO: deprecated
-        if (this.options.disablePlaceholders) {
             return false;
         }
 
@@ -390,56 +371,26 @@ function MediumEditor(elements, options) {
     }
 
     function initPlaceholder(options) {
-        // Backwards compatability
-        var defaultsBC = {
-            text: (typeof this.options.placeholder === 'string') ? this.options.placeholder : undefined // deprecated
-        };
-
         return new MediumEditor.extensions.placeholder(
-            Util.extend({}, options, defaultsBC)
+            Util.extend({}, options)
         );
     }
 
     function initAnchorPreview(options) {
-        // Backwards compatability
-        var defaultsBC = {
-            hideDelay: this.options.anchorPreviewHideDelay, // deprecated
-            diffLeft: this.options.diffLeft, // deprecated (should use .getEditorOption() instead)
-            diffTop: this.options.diffTop, // deprecated (should use .getEditorOption() instead)
-            elementsContainer: this.options.elementsContainer // deprecated (should use .getEditorOption() instead)
-        };
-
         return new MediumEditor.extensions.anchorPreview(
-            Util.extend({}, options, defaultsBC)
+            Util.extend({}, options)
         );
     }
 
     function initAnchorForm(options) {
-        // Backwards compatability
-        var defaultsBC = {
-            customClassOption: this.options.anchorButton ? (this.options.anchorButtonClass || 'btn') : undefined, // deprecated
-            linkValidation: this.options.checkLinkFormat, //deprecated
-            placeholderText: this.options.anchorInputPlaceholder, // deprecated
-            targetCheckbox: this.options.anchorTarget, // deprecated
-            targetCheckboxText: this.options.anchorInputCheckboxLabel // deprecated
-        };
-
         return new MediumEditor.extensions.anchor(
-            Util.extend({}, options, defaultsBC)
+            Util.extend({}, options)
         );
     }
 
     function initPasteHandler(options) {
-        // Backwards compatability
-        var defaultsBC = {
-            forcePlainText: this.options.forcePlainText, // deprecated
-            cleanPastedHTML: this.options.cleanPastedHTML, // deprecated
-            disableReturn: this.options.disableReturn, // deprecated (should use .getEditorOption() instead)
-            targetBlank: this.options.targetBlank // deprecated (should use .getEditorOption() instead)
-        };
-
         return new MediumEditor.extensions.paste(
-            Util.extend({}, options, defaultsBC)
+            Util.extend({}, options)
         );
     }
 
@@ -499,31 +450,15 @@ function MediumEditor(elements, options) {
 
     function mergeOptions(defaults, options) {
         var deprecatedProperties = [
-            ['forcePlainText', 'paste.forcePlainText'],
-            ['cleanPastedHTML', 'paste.cleanPastedHTML'],
-            ['anchorInputPlaceholder', 'anchor.placeholderText'],
-            ['checkLinkFormat', 'anchor.linkValidation'],
-            ['anchorButton', 'anchor.customClassOption'],
-            ['anchorButtonClass', 'anchor.customClassOption'],
-            ['anchorTarget', 'anchor.targetCheckbox'],
-            ['anchorInputCheckboxLabel', 'anchor.targetCheckboxText'],
-            ['anchorPreviewHideDelay', 'anchorPreview.hideDelay'],
-            ['disableAnchorPreview', 'anchorPreview: false'],
-            ['disablePlaceholders', 'placeholder: false'],
-            ['onShowToolbar', 'showToolbar custom event'],
-            ['onHideToolbar', 'hideToolbar custom event']
+            // ['forcePlainText', 'paste.forcePlainText'],
         ];
         // warn about using deprecated properties
         if (options) {
             deprecatedProperties.forEach(function (pair) {
                 if (options.hasOwnProperty(pair[0]) && options[pair[0]] !== undefined) {
-                    Util.deprecated(pair[0], pair[1], 'v5.0.0');
+                    Util.deprecated(pair[0], pair[1], 'v6.0.0');
                 }
             });
-
-            if (options.hasOwnProperty('placeholder') && typeof options.placeholder === 'string') {
-                Util.deprecated('placeholder', 'placeholder.text', 'v5.0.0');
-            }
         }
 
         return Util.defaults({}, options, defaults);
@@ -556,16 +491,6 @@ function MediumEditor(elements, options) {
 
         return this.options.ownerDocument.execCommand(action, false, null);
     }
-
-    // deprecate
-    MediumEditor.statics = {
-        ButtonsData: ButtonsData,
-        DefaultButton: DefaultButton,
-        AnchorExtension: AnchorExtension,
-        FontSizeExtension: FontSizeExtension,
-        Toolbar: Toolbar,
-        AnchorPreview: AnchorPreviewDeprecated
-    };
 
     MediumEditor.Extension = Extension;
 
@@ -626,9 +551,6 @@ function MediumEditor(elements, options) {
             this.commands.forEach(function (extension) {
                 if (typeof extension.destroy === 'function') {
                     extension.destroy();
-                } else if (typeof extension.deactivate === 'function') {
-                    Util.warn('Extension .deactivate() function has been deprecated. Use .destroy() instead. This will be removed in version 5.0.0');
-                    extension.deactivate();
                 }
             }, this);
 
@@ -678,11 +600,6 @@ function MediumEditor(elements, options) {
 
         unsubscribe: function (event, listener) {
             this.events.detachCustomEvent(event, listener);
-        },
-
-        createEvent: function () {
-            Util.warn('.createEvent() has been deprecated and is no longer needed. ' +
-                'You can attach and trigger custom events without calling this method.  This will be removed in v5.0.0');
         },
 
         trigger: function (name, data, editable) {
@@ -1026,16 +943,6 @@ function MediumEditor(elements, options) {
                     this.elements[i].dispatchEvent(customEvent);
                 }
             }
-        },
-
-        // alias for setup - keeping for backwards compatability
-        activate: function () {
-            Util.deprecatedMethod.call(this, 'activate', 'setup', arguments, 'v5.0.0');
-        },
-
-        // alias for destroy - keeping for backwards compatability
-        deactivate: function () {
-            Util.deprecatedMethod.call(this, 'deactivate', 'destroy', arguments, 'v5.0.0');
         },
 
         cleanPaste: function (text) {

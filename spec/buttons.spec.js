@@ -1,6 +1,6 @@
 /*global MediumEditor, describe, it, expect, spyOn, AnchorForm,
          afterEach, beforeEach, jasmine, fireEvent, setupTestHelpers,
-         selectElementContentsAndFire, isOldIE, isIE */
+         selectElementContentsAndFire, isOldIE, isIE, ButtonsData */
 
 describe('Buttons TestCase', function () {
     'use strict';
@@ -94,7 +94,7 @@ describe('Buttons TestCase', function () {
             fontAwesomeLabels = {},
             customLabels = {},
             allButtons = [],
-            buttonsData = MediumEditor.statics.ButtonsData,
+            buttonsData = ButtonsData,
             currButton,
             tempEl;
 

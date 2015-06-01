@@ -78,10 +78,6 @@ var PasteHandler;
          */
         cleanTags: ['meta'],
 
-        /* ----- internal options needed from base ----- */
-        targetBlank: false, // deprecated (should use .getEditorOption() instead)
-        disableReturn: false, // deprecated (should use .getEditorOption() instead)
-
         init: function () {
             if (this.forcePlainText || this.cleanPastedHTML) {
                 this.subscribe('editablePaste', this.handlePaste.bind(this));
@@ -120,7 +116,7 @@ var PasteHandler;
                     return this.cleanPaste(pastedHTML);
                 }
 
-                if (!(this.disableReturn || element.getAttribute('data-disable-return'))) {
+                if (!(this.getEditorOption('disableReturn') || element.getAttribute('data-disable-return'))) {
                     paragraphs = pastedPlain.split(/[\r\n]+/g);
                     // If there are no \r\n in data, don't wrap in <p>
                     if (paragraphs.length > 1) {
@@ -204,7 +200,7 @@ var PasteHandler;
             for (i = 0; i < elList.length; i += 1) {
                 workEl = elList[i];
 
-                if ('a' === workEl.tagName.toLowerCase() && this.targetBlank) {
+                if ('a' === workEl.tagName.toLowerCase() && this.getEditorOption('targetBlank')) {
                     Util.setTargetBlank(workEl);
                 }
 

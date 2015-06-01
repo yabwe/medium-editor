@@ -150,14 +150,6 @@ describe('Placeholder TestCase', function () {
         validatePlaceholderContent(editor.elements[0], placeholderText);
     });
 
-    it('should use custom placeholder text when passed as a deprecated option', function () {
-        var placeholderText = 'Custom placeholder',
-            editor = this.newMediumEditor('.editor', {
-            placeholder: placeholderText
-        });
-        validatePlaceholderContent(editor.elements[0], placeholderText);
-    });
-
     it('should use custom placeholder text when passed as the placeholder.text option', function () {
         var placeholderText = 'Custom placeholder',
             editor = this.newMediumEditor('.editor', {
@@ -166,13 +158,6 @@ describe('Placeholder TestCase', function () {
             }
         });
         validatePlaceholderContent(editor.elements[0], placeholderText);
-    });
-
-    it('should not set placeholder for empty elements when deprecated disablePlaceholders is set to true', function () {
-        var editor = this.newMediumEditor('.editor', {
-            disablePlaceholders: true
-        });
-        expect(editor.elements[0].className).not.toContain('medium-editor-placeholder');
     });
 
     it('should not set placeholder for empty elements when placeholder is set to false', function () {

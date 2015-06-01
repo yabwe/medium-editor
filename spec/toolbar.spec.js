@@ -17,7 +17,7 @@ describe('Toolbar TestCase', function () {
 
     describe('Initialization', function () {
         it('should call the createToolbar method', function () {
-            spyOn(MediumEditor.statics.Toolbar.prototype, 'createToolbar').and.callThrough();
+            spyOn(Toolbar.prototype, 'createToolbar').and.callThrough();
             var editor = this.newMediumEditor('.editor');
             expect(editor.toolbar).not.toBeUndefined();
             expect(editor.toolbar.createToolbar).toHaveBeenCalled();
@@ -162,38 +162,6 @@ describe('Toolbar TestCase', function () {
             editor.checkSelection();
 
             expect(callbackHide).toHaveBeenCalledWith({}, this.el);
-        });
-
-        it('should call deprecated onShowToolbar option when toolbar is shown and deprecated onHideToolbar option when toolbar is hidden', function () {
-            var editor,
-                temp = {
-                    onShow: function () {},
-                    onHide: function () {}
-                };
-
-            spyOn(temp, 'onShow').and.callThrough();
-            spyOn(temp, 'onHide').and.callThrough();
-
-            this.el.innerHTML = 'specOnShowToolbarTest';
-
-            editor = this.newMediumEditor('.editor', {
-                onShowToolbar: temp.onShow,
-                onHideToolbar: temp.onHide
-            });
-
-            selectElementContentsAndFire(this.el, { eventToFire: 'focus' });
-
-            expect(editor.toolbar.getToolbarElement().classList.contains('medium-editor-toolbar-active')).toBe(true);
-            expect(temp.onShow).toHaveBeenCalled();
-            expect(temp.onHide).not.toHaveBeenCalled();
-
-            // Remove selection and call check selection, which should make the toolbar be hidden
-            jasmine.clock().tick(1);
-            window.getSelection().removeAllRanges();
-            editor.checkSelection();
-
-            expect(editor.toolbar.getToolbarElement().classList.contains('medium-editor-toolbar-active')).toBe(false);
-            expect(temp.onHide).toHaveBeenCalled();
         });
 
         it('should not hide when selecting text within editor, but release mouse outside of editor', function () {

@@ -1,6 +1,7 @@
-/*global MediumEditor, describe, it, expect,
+/*global describe, it, expect,
          afterEach, beforeEach, fireEvent, spyOn,
-         selectElementContentsAndFire, jasmine, setupTestHelpers */
+         selectElementContentsAndFire, jasmine,
+         setupTestHelpers, Toolbar */
 
 describe('Resize TestCase', function () {
     'use strict';
@@ -19,7 +20,7 @@ describe('Resize TestCase', function () {
         selectElementContentsAndFire(editor.elements[0]);
         jasmine.clock().tick(1);
         expect(editor.toolbar.getToolbarElement().className.indexOf('active') > -1).toBe(true);
-        spyOn(MediumEditor.statics.Toolbar.prototype, 'setToolbarPosition');
+        spyOn(Toolbar.prototype, 'setToolbarPosition');
         fireEvent(window, 'resize');
         jasmine.clock().tick(1);
         expect(editor.toolbar.setToolbarPosition).toHaveBeenCalled();

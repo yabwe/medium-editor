@@ -1,7 +1,8 @@
 /*global MediumEditor, describe, it, expect, spyOn,
      afterEach, beforeEach, selectElementContents,
      jasmine, fireEvent, Util, setupTestHelpers,
-     selectElementContentsAndFire, AnchorForm */
+     selectElementContentsAndFire, AnchorForm,
+     Toolbar */
 
 describe('Anchor Button TestCase', function () {
     'use strict';
@@ -101,21 +102,6 @@ describe('Anchor Button TestCase', function () {
             expect(link).not.toBeNull();
             expect(link.href).toBe('http://test.com/');
         });
-        it('should add http:// if need be and deprecated checkLinkFormat option is set to true', function () {
-            var editor = this.newMediumEditor('.editor', {
-                checkLinkFormat: true // deprecated
-            }),
-                link,
-                anchorExtension = editor.getExtensionByName('anchor');
-
-            selectElementContentsAndFire(editor.elements[0]);
-            anchorExtension.showForm('test.com');
-            fireEvent(anchorExtension.getForm().querySelector('a.medium-editor-toolbar-save'), 'click');
-
-            link = editor.elements[0].querySelector('a');
-            expect(link).not.toBeNull();
-            expect(link.href).toBe('http://test.com/');
-        });
         it('should not change protocol when a valid one is included', function () {
             var editor = this.newMediumEditor('.editor', {
                 anchor: {
@@ -139,27 +125,6 @@ describe('Anchor Button TestCase', function () {
                 anchor: {
                     targetCheckbox: true
                 }
-            }),
-                anchorExtension = editor.getExtensionByName('anchor'),
-                targetCheckbox,
-                link;
-
-            selectElementContentsAndFire(editor.elements[0]);
-            anchorExtension.showForm('http://test.com');
-            expect(anchorExtension.isDisplayed()).toBe(true);
-            targetCheckbox = anchorExtension.getForm().querySelector('input.medium-editor-toolbar-anchor-target');
-            expect().not.toBeNull(targetCheckbox);
-            targetCheckbox.checked = true;
-            fireEvent(anchorExtension.getForm().querySelector('a.medium-editor-toolbar-save'), 'click');
-            expect(anchorExtension.isDisplayed()).toBe(false);
-
-            link = editor.elements[0].querySelector('a');
-            expect(link).not.toBeNull();
-            expect(link.target).toBe('_blank');
-        });
-        it('should add target="_blank" when "open in a new window" checkbox is enabled via deprecated anchorTarget option and checked', function () {
-            var editor = this.newMediumEditor('.editor', {
-                anchorTarget: true // deprecated
             }),
                 anchorExtension = editor.getExtensionByName('anchor'),
                 targetCheckbox,
@@ -233,50 +198,11 @@ describe('Anchor Button TestCase', function () {
             expect(link.classList.contains('btn')).toBe(true);
             expect(link.classList.contains('btn-default')).toBe(true);
         });
-        it('should create a button when deprecated anchorButton + anchorButtonClass options are used', function () {
-            spyOn(MediumEditor.prototype, 'createLink').and.callThrough();
-            var editor = this.newMediumEditor('.editor', {
-                anchorButton: true,
-                anchorButtonClass: 'btn btn-default'
-            }),
-                save,
-                input,
-                button,
-                link,
-                opts,
-                anchorExtension = editor.getExtensionByName('anchor');
-
-            selectElementContents(editor.elements[0]);
-            save = editor.toolbar.getToolbarElement().querySelector('[data-action="createLink"]');
-            fireEvent(save, 'click');
-
-            input = anchorExtension.getInput();
-            input.value = 'test';
-
-            button = anchorExtension.getForm().querySelector('input.medium-editor-toolbar-anchor-button');
-            button.setAttribute('type', 'checkbox');
-            button.checked = true;
-
-            fireEvent(input, 'keyup', {
-                keyCode: Util.keyCode.ENTER
-            });
-            opts = {
-                url: 'test',
-                target: '_self',
-                buttonClass: 'btn btn-default'
-            };
-            expect(editor.createLink).toHaveBeenCalledWith(opts);
-
-            link = editor.elements[0].querySelector('a');
-            expect(link).not.toBeNull();
-            expect(link.classList.contains('btn')).toBe(true);
-            expect(link.classList.contains('btn-default')).toBe(true);
-        });
     });
 
     describe('Cancel', function () {
         it('should close the link form when user clicks on cancel', function () {
-            spyOn(MediumEditor.statics.Toolbar.prototype, 'showAndUpdateToolbar').and.callThrough();
+            spyOn(Toolbar.prototype, 'showAndUpdateToolbar').and.callThrough();
             var editor = this.newMediumEditor('.editor'),
                 button,
                 cancel,

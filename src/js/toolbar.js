@@ -84,11 +84,6 @@ var Toolbar;
             }
         },
 
-        // TODO: deprecate
-        deactivate: function () {
-            Util.deprecatedMethod.call(this, 'deactivate', 'destroy', arguments, 'v5.0.0');
-        },
-
         // Toolbar accessors
 
         getToolbarElement: function () {
@@ -197,11 +192,6 @@ var Toolbar;
             if (!this.isDisplayed()) {
                 this.getToolbarElement().classList.add('medium-editor-toolbar-active');
                 this.base.trigger('showToolbar', {}, this.base.getFocusedElement());
-
-                if (typeof this.options.onShowToolbar === 'function') {
-                    Util.deprecated('onShowToolbar', 'the showToolbar custom event', 'v5.0.0');
-                    this.options.onShowToolbar();
-                }
             }
         },
 
@@ -209,18 +199,6 @@ var Toolbar;
             if (this.isDisplayed()) {
                 this.getToolbarElement().classList.remove('medium-editor-toolbar-active');
                 this.base.trigger('hideToolbar', {}, this.base.getFocusedElement());
-
-                this.base.commands.forEach(function (extension) {
-                    if (typeof extension.onHide === 'function') {
-                        Util.deprecated('onHide', 'the hideToolbar custom event', 'v5.0.0');
-                        extension.onHide();
-                    }
-                });
-
-                if (typeof this.options.onHideToolbar === 'function') {
-                    Util.deprecated('onHideToolbar', 'the hideToolbar custom event', 'v5.0.0');
-                    this.options.onHideToolbar();
-                }
             }
         },
 
