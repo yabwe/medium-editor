@@ -248,11 +248,6 @@ function MediumEditor(elements, options) {
     }
 
     function isToolbarEnabled() {
-        // If toolbar is disabled, don't add it
-        if (this.options.toolbar === false) {
-            return false;
-        }
-
         // If any of the elements don't have the toolbar disabled
         // We need a toolbar
         if(this.elements.every(function (element) {
@@ -261,55 +256,31 @@ function MediumEditor(elements, options) {
             return false;
         }
 
-        return true;
+        return this.options.toolbar !== false;
     }
 
-    function shouldAddDefaultAnchorPreview() {
-        // If anchor-preview is disabled, don't add
-        if (this.options.anchorPreview === false) {
-            return false;
-        }
-        // If anchor-preview extension has been overriden, don't add
-        if (this.options.extensions['anchor-preview']) {
-            return false;
-        }
+    function isAnchorPreviewEnabled() {
         // If toolbar is disabled, don't add
         if (!isToolbarEnabled.call(this)) {
             return false;
         }
 
-        return true;
+        return this.options.anchorPreview !== false;
     }
 
-    function shouldAddDefaultPlaceholder() {
-        if (this.options.extensions['placeholder']) {
-            return false;
-        }
-
+    function isPlaceholderEnabled() {
         return this.options.placeholder !== false;
     }
 
-    function shouldAddDefaultAutoLink() {
-        if (this.options.extensions['auto-link']) {
-            return false;
-        }
-
+    function isAutoLinkEnabled() {
         return this.options.autoLink !== false;
     }
 
-    function shouldAddDefaultImageDragging() {
-        if (this.options.extensions['image-dragging']) {
-            return false;
-        }
-
+    function isImageDraggingEnabled() {
         return this.options.imageDragging !== false;
     }
 
-    function shouldAddDefaultKeyboardCommads() {
-        if (this.options.extensions['keyboard-commands']) {
-            return false;
-        }
-
+    function isKeyboardCommandsEnabled() {
         return this.options.keyboardCommands !== false;
     }
 
@@ -402,80 +373,41 @@ function MediumEditor(elements, options) {
         }
     }
 
-    function initToolbar(options) {
-        if (this.options.extensions['toolbar']) {
-            return this.options.extensions['toolbar'];
-        }
-
-        return new MediumEditor.extensions.toolbar(options);
-    }
-
     function initExtensions() {
-        var buttons = MediumEditor.extensions.toolbar.prototype.buttons,
-            extensions = this.options.extensions,
-            ext,
-            name;
+
         this.extensions = [];
 
-        if (this.options.toolbar && this.options.toolbar.buttons) {
-            buttons = this.options.toolbar.buttons;
-        }
-
-        buttons.forEach(function (buttonName) {
-            if (extensions[buttonName]) {
-                ext = initExtension(extensions[buttonName], buttonName, this);
-                this.extensions.push(ext);
-            } else if (buttonName === 'anchor') {
-                ext = initExtension(new MediumEditor.extensions.anchor(this.options.anchor), 'anchor', this);
-                this.extensions.push(ext);
-            } else if (buttonName === 'fontsize') {
-                ext = initExtension(new MediumEditor.extensions.fontSize(), buttonName, this);
-                this.extensions.push(ext);
-            } else if (ButtonsData.hasOwnProperty(buttonName)) {
-                ext = initExtension(new MediumEditor.extensions.button(ButtonsData[buttonName]), buttonName, this);
-                this.extensions.push(ext);
+        // Passed in extensions
+        Object.keys(this.options.extensions).forEach(function (name) {
+            // Always save the toolbar extension for last
+            if (name !== 'toolbar' && this.options.extensions[name]) {
+                this.extensions.push(initExtension(this.options.extensions[name], name, this));
             }
         }, this);
 
-        for (name in extensions) {
-            if (name !== 'toolbar' &&
-                extensions.hasOwnProperty(name) &&
-                buttons.indexOf(name) === -1) {
-
-                ext = initExtension(extensions[name], name, this);
-                this.extensions.push(ext);
+        // Built-in extensions
+        var builtIns = {
+            paste: true,
+            anchorPreview: isAnchorPreviewEnabled.call(this),
+            autoLink: isAutoLinkEnabled.call(this),
+            imageDragging: isImageDraggingEnabled.call(this),
+            keyboardCommands: isKeyboardCommandsEnabled.call(this),
+            placeholder: isPlaceholderEnabled.call(this)
+        };
+        Object.keys(builtIns).forEach(function (name) {
+            if (builtIns[name]) {
+                this.addBuiltInExtension(name);
             }
+        }, this);
+
+        // Create toolbar
+        var toolbarExtension = this.options.extensions['toolbar'];
+        if (!toolbarExtension && isToolbarEnabled.call(this)) {
+            toolbarExtension = new MediumEditor.extensions.toolbar(this.options.toolbar);
         }
 
-        // Only add default paste extension if it wasn't overriden
-        if (!extensions['paste']) {
-            this.extensions.push(initExtension(new MediumEditor.extensions.paste(this.options.paste), 'paste', this));
-        }
-
-        // Add AnchorPreview as extension if needed
-        if (shouldAddDefaultAnchorPreview.call(this)) {
-            this.extensions.push(initExtension(new MediumEditor.extensions.anchorPreview(this.options.anchorPreview), 'anchor-preview', this));
-        }
-
-        if (shouldAddDefaultAutoLink.call(this)) {
-            this.extensions.push(initExtension(new MediumEditor.extensions.autoLink(), 'auto-link', this));
-        }
-
-        if (shouldAddDefaultImageDragging.call(this)) {
-            this.extensions.push(initExtension(new MediumEditor.extensions.imageDragging(), 'image-dragging', this));
-        }
-
-        if (shouldAddDefaultKeyboardCommads.call(this)) {
-            this.extensions.push(initExtension(new MediumEditor.extensions.keyboardCommands(this.options.keyboardCommands), 'keyboard-commands', this));
-        }
-
-        if (shouldAddDefaultPlaceholder.call(this)) {
-            var placeholderOpts = (typeof this.options.placeholder === 'string') ? {} : this.options.placeholder;
-            this.extensions.push(initExtension(new MediumEditor.extensions.placeholder(placeholderOpts), 'placeholder', this));
-        }
-
-        if (isToolbarEnabled.call(this)) {
-            this.extensions.push(initExtension(initToolbar.call(this, this.options.toolbar), 'toolbar', this));
+        if (toolbarExtension) {
+            this.extensions.push(initExtension(toolbarExtension, 'toolbar', this));
         }
     }
 
@@ -660,6 +592,51 @@ function MediumEditor(elements, options) {
                     return false;
                 });
             }
+            return extension;
+        },
+
+        addBuiltInExtension: function (name) {
+            var extension = this.getExtensionByName(name);
+            if (extension) {
+                return extension;
+            }
+
+            switch(name) {
+                case 'anchor':
+                    extension = new MediumEditor.extensions.anchor(this.options.anchor);
+                    break;
+                case 'anchorPreview':
+                    extension = new MediumEditor.extensions.anchorPreview(this.options.anchorPreview);
+                    break;
+                case 'autoLink':
+                    extension = new MediumEditor.extensions.autoLink();
+                    break;
+                case 'fontsize':
+                    extension = new MediumEditor.extensions.fontSize();
+                    break;
+                case 'imageDragging':
+                    extension = new MediumEditor.extensions.imageDragging();
+                    break;
+                case 'keyboardCommands':
+                    extension = new MediumEditor.extensions.keyboardCommands(this.options.keyboardCommands);
+                    break;
+                case 'paste':
+                    extension = new MediumEditor.extensions.paste(this.options.paste);
+                    break;
+                case 'placeholder':
+                    extension = new MediumEditor.extensions.placeholder(this.options.placeholder);
+                    break;
+                default:
+                    if (ButtonsData.hasOwnProperty(name)) {
+                        extension = new MediumEditor.extensions.button(ButtonsData[name]);
+                    }
+                    break;
+            }
+
+            if (extension) {
+                this.extensions.push(initExtension(extension, name, this));
+            }
+
             return extension;
         },
 

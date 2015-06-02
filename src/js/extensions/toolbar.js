@@ -117,7 +117,13 @@ var Toolbar;
 
             this.buttons.forEach(function (button) {
                 extension = this.base.getExtensionByName(button);
-                if (typeof extension.getButton === 'function') {
+
+                if (!extension) {
+                    // If button hasn't been passed as an extension, create it
+                    extension = this.base.addBuiltInExtension(button);
+                }
+
+                if (extension && typeof extension.getButton === 'function') {
                     btn = extension.getButton(this.base);
                     li = this.document.createElement('li');
                     if (Util.isElement(btn)) {
