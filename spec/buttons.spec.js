@@ -62,35 +62,6 @@ describe('Buttons TestCase', function () {
             fireEvent(button, 'click');
             expect(editor.execAction).toHaveBeenCalledWith('bold');
         });
-
-        it('should execute the button action on shortcut', function () {
-            spyOn(MediumEditor.prototype, 'execAction');
-            var editor = this.newMediumEditor('.editor'),
-                code = 'b'.charCodeAt(0);
-            selectElementContentsAndFire(editor.elements[0]);
-            jasmine.clock().tick(1);
-            fireEvent(editor.elements[0], 'keydown', {
-                keyCode: code,
-                ctrlKey: true,
-                metaKey: true
-            });
-            expect(editor.execAction).toHaveBeenCalled();
-        });
-
-        it('should not execute the button action when shift key is pressed', function () {
-            spyOn(MediumEditor.prototype, 'execAction');
-            var editor = this.newMediumEditor('.editor'),
-                code = 'b'.charCodeAt(0);
-            selectElementContentsAndFire(editor.elements[0]);
-            jasmine.clock().tick(1);
-            fireEvent(editor.elements[0], 'keydown', {
-                keyCode: code,
-                ctrlKey: true,
-                metaKey: true,
-                shiftKey: true
-            });
-            expect(editor.execAction).not.toHaveBeenCalled();
-        });
     });
 
     describe('Buttons with various labels', function () {
