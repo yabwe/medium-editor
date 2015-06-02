@@ -28,7 +28,7 @@ module.exports = function (grunt) {
             'src/js/extensions/fontsize.js',
             'src/js/extensions/paste.js',
             'src/js/extensions/placeholder.js',
-            'src/js/toolbar.js',
+            'src/js/extensions/toolbar.js',
             'src/js/defaults/options.js',
             'src/js/defaults/extensions.js',
             'src/js/core.js',
