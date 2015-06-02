@@ -1,3 +1,8 @@
+4.12.1 / 2015-06-02
+==================
+* Fix break with updateOnEmptySelection option for static toolbars
+
+
 4.12.0 / 2015-06-01
 ==================
 * Fix pasting links when targetBlank option is being used
