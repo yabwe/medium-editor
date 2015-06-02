@@ -47,8 +47,9 @@ var Toolbar;
         static: false,
 
         /* sticky: [boolean]
-         * enable/disable the toolbar "sticking" to the medium-editor element
-         * when the page is being scrolled.
+         * When the __static__ option is true, this enables/disables the toolbar
+         * "sticking" to the viewport and staying visible on the screen while
+         * the page scrolls.
          */
         sticky: false,
 

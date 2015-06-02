@@ -595,6 +595,9 @@ function MediumEditor(elements, options) {
             return extension;
         },
 
+        /**
+         * NOT DOCUMENTED - exposed as a helper for other extensions to use
+         */
         addBuiltInExtension: function (name) {
             var extension = this.getExtensionByName(name);
             if (extension) {

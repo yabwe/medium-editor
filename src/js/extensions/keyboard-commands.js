@@ -10,8 +10,12 @@ var KeyboardCommands;
         /* KeyboardCommands Options */
 
         /* commands: [Array]
-         * Array of objects describing each command and
-         * the combination of keys that sould trigger it
+         * Array of objects describing each command and the combination of keys that will trigger it
+         * Required for each object:
+         *   command [String] (argument passed to editor.execAction())
+         *   key [String] (keyboard character that triggers this command)
+         *   meta [boolean] (whether the ctrl/meta key has to be active or inactive)
+         *   shift [boolean] (whether the shift key has to be active or inactive)
          */
         commands: [
             {
