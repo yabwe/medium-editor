@@ -1862,7 +1862,7 @@ var Selection;
 
         getSelectionRange: function (ownerDocument) {
             var selection = ownerDocument.getSelection();
-            if (selection.rangeCount === 0 || true === selection.isCollapsed) {
+            if (selection.rangeCount === 0) {
                 return null;
             }
             return selection.getRangeAt(0);
@@ -6445,7 +6445,7 @@ MediumEditor.version = (function (major, minor, revision) {
     };
 }).apply(this, ({
     // grunt-bump looks for this:
-    'version': '4.12.0'
+    'version': '4.12.1'
 }).version.split('.'));
 
     return MediumEditor;
