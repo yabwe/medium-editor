@@ -116,28 +116,32 @@ var editor = new MediumEditor('.editable', {
     toolbar: {
         /* These are the default options for the toolbar,
            if nothing is passed this is what is used */
-        align: 'center',
         buttons: ['bold', 'italic', 'underline', 'anchor', 'header1', 'header2', 'quote'],
         diffLeft: 0,
         diffTop: -10,
         firstButtonClass: 'medium-editor-button-first',
         lastButtonClass: 'medium-editor-button-last',
         static: false,
+
+        /* options which only apply when static is true */
+        align: 'center',
         sticky: false,
         updateOnEmptySelection: false
     }
 });
 ```
 
-* __align__: `left`|`center`|`right` - when using the __static__ option, this aligns the static toolbar relative to the medium-editor element. Default: `center`
 * __buttons__: the set of buttons to display on the toolbar. Default: `['bold', 'italic', 'underline', 'anchor', 'header1', 'header2', 'quote']`
 * __diffLeft__: value in pixels to be added to the X axis positioning of the toolbar. Default: `0`
 * __diffTop__: value in pixels to be added to the Y axis positioning of the toolbar. Default: `-10`
 * __firstButtonClass__: CSS class added to the first button in the toolbar. Default: `'medium-editor-button-first'`
 * __lastButtonClass__: CSS class added to the last button in the toolbar. Default: `'medium-editor-button-last'`
 * __static__: enable/disable the toolbar always displaying in the same location relative to the medium-editor element. Default: `false`
-* __sticky__: When the __static__ option is true, this enables/disables the toolbar "sticking" to the viewport and staying visible on the screen while the page scrolls. Default: `false`
-* __updateOnEmptySelection__: When the __static__ option is true, this enables/disables updating the state of the toolbar buttons even when the selection is collapsed (there is no selection, just a cursor). Default: `false`
+
+##### Options which only apply when the `static` option is being used
+* __align__: `left`|`center`|`right` - When the __static__ option is `true`, this aligns the static toolbar relative to the medium-editor element. Default: `center`
+* __sticky__: When the __static__ option is `true`, this enables/disables the toolbar "sticking" to the viewport and staying visible on the screen while the page scrolls. Default: `false`
+* __updateOnEmptySelection__: When the __static__ option is `true`, this enables/disables updating the state of the toolbar buttons even when the selection is collapsed (there is no selection, just a cursor). Default: `false`
 
 To disable the toolbar (which also disables the anchor-preview extension), set the value of the `toolbar` option to `false`:
 ```javascript

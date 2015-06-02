@@ -10,7 +10,7 @@ var Toolbar;
         /* Toolbar Options */
 
         /* align: ['left'|'center'|'right']
-         * when using the __static__ option, this aligns the static toolbar
+         * When the __static__ option is true, this aligns the static toolbar
          * relative to the medium-editor element.
          */
         align: 'center',
