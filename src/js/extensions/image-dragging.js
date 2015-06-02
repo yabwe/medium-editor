@@ -6,6 +6,8 @@ var ImageDragging;
 
     ImageDragging = Extension.extend({
         init: function () {
+            Extension.prototype.init.apply(this, arguments);
+
             this.subscribe('editableDrag', this.handleDrag.bind(this));
             this.subscribe('editableDrop', this.handleDrop.bind(this));
         },

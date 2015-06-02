@@ -305,6 +305,14 @@ function MediumEditor(elements, options) {
         return this.options.imageDragging !== false;
     }
 
+    function shouldAddDefaultKeyboardCommads() {
+        if (this.options.extensions['keyboard-commands']) {
+            return false;
+        }
+
+        return this.options.keyboardCommands !== false;
+    }
+
     function createContentEditable(textarea) {
         var div = this.options.ownerDocument.createElement('div'),
             id = (+new Date()),
@@ -455,6 +463,10 @@ function MediumEditor(elements, options) {
 
         if (shouldAddDefaultImageDragging.call(this)) {
             this.commands.push(initExtension(new MediumEditor.extensions.imageDragging(), 'image-dragging', this));
+        }
+
+        if (shouldAddDefaultKeyboardCommads.call(this)) {
+            this.commands.push(initExtension(new MediumEditor.extensions.keyboardCommands(this.options.keyboardCommands), 'keyboard-commands', this));
         }
 
         if (shouldAddDefaultPlaceholder.call(this)) {

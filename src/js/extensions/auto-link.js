@@ -30,6 +30,8 @@ LINK_REGEXP_TEXT =
 
     AutoLink = Extension.extend({
         init: function () {
+            Extension.prototype.init.apply(this, arguments);
+
             this.disableEventHandling = false;
             this.subscribe('editableKeypress', this.onKeypress.bind(this));
             this.subscribe('editableBlur', this.onBlur.bind(this));

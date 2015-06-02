@@ -14,8 +14,7 @@ var ButtonsData;
             },
             useQueryState: true,
             contentDefault: '<b>B</b>',
-            contentFA: '<i class="fa fa-bold"></i>',
-            key: 'b'
+            contentFA: '<i class="fa fa-bold"></i>'
         },
         'italic': {
             name: 'italic',
@@ -28,8 +27,7 @@ var ButtonsData;
             },
             useQueryState: true,
             contentDefault: '<b><i>I</i></b>',
-            contentFA: '<i class="fa fa-italic"></i>',
-            key: 'i'
+            contentFA: '<i class="fa fa-italic"></i>'
         },
         'underline': {
             name: 'underline',
@@ -42,8 +40,7 @@ var ButtonsData;
             },
             useQueryState: true,
             contentDefault: '<b><u>U</u></b>',
-            contentFA: '<i class="fa fa-underline"></i>',
-            key: 'u'
+            contentFA: '<i class="fa fa-underline"></i>'
         },
         'strikethrough': {
             name: 'strikethrough',

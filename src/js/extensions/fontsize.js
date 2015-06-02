@@ -12,6 +12,10 @@ var FontSizeForm;
         contentDefault: '&#xB1;', // ±
         contentFA: '<i class="fa fa-text-height"></i>',
 
+        init: function () {
+            FormExtension.prototype.init.apply(this, arguments);
+        },
+
         // Called when the button the toolbar is clicked
         // Overrides ButtonExtension.handleClick
         handleClick: function (evt) {

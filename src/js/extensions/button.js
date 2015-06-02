@@ -2,15 +2,15 @@ var Button;
 (function () {
     'use strict';
 
-    /*global Util, Extension */
+    /*global Extension */
 
     Button = Extension.extend({
+
         init: function () {
+            Extension.prototype.init.apply(this, arguments);
+
             this.button = this.createButton();
             this.on(this.button, 'click', this.handleClick.bind(this));
-            if (this.key) {
-                this.subscribe('editableKeydown', this.handleKeydown.bind(this));
-            }
         },
 
         /* getButton: [function ()]
@@ -57,20 +57,6 @@ var Button;
             }
             button.innerHTML = content;
             return button;
-        },
-
-        handleKeydown: function (event) {
-            var action;
-
-            if (Util.isKey(event, this.key.charCodeAt(0)) && Util.isMetaCtrlKey(event) && !event.shiftKey) {
-                event.preventDefault();
-                event.stopPropagation();
-
-                action = this.getAction();
-                if (action) {
-                    this.execAction(action);
-                }
-            }
         },
 
         handleClick: function (event) {

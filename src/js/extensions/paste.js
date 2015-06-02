@@ -79,6 +79,8 @@ var PasteHandler;
         cleanTags: ['meta'],
 
         init: function () {
+            Extension.prototype.init.apply(this, arguments);
+
             if (this.forcePlainText || this.cleanPastedHTML) {
                 this.subscribe('editablePaste', this.handlePaste.bind(this));
             }

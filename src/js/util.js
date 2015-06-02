@@ -65,7 +65,8 @@ var Util;
             ENTER: 13,
             ESCAPE: 27,
             SPACE: 32,
-            DELETE: 46
+            DELETE: 46,
+            K: 107
         },
 
         /**
@@ -87,12 +88,7 @@ var Util;
          * @see : http://stackoverflow.com/q/4471582/569101
          */
         isKey: function (event, keys) {
-            var keyCode = event.which;
-
-            // getting the key code from event
-            if (null === keyCode) {
-                keyCode = event.charCode !== null ? event.charCode : event.keyCode;
-            }
+            var keyCode = this.getKeyCode(event);
 
             // it's not an array let's just compare strings!
             if (false === Array.isArray(keys)) {
@@ -104,6 +100,17 @@ var Util;
             }
 
             return true;
+        },
+
+        getKeyCode: function (event) {
+            var keyCode = event.which;
+
+            // getting the key code from event
+            if (null === keyCode) {
+                keyCode = event.charCode !== null ? event.charCode : event.keyCode;
+            }
+
+            return keyCode;
         },
 
         parentElements: ['p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'blockquote', 'pre'],

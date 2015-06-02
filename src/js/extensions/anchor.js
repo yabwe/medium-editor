@@ -47,7 +47,12 @@ var AnchorForm;
         tagNames: ['a'],
         contentDefault: '<b>#</b>',
         contentFA: '<i class="fa fa-link"></i>',
-        key: 'k',
+
+        init: function () {
+            FormExtension.prototype.init.apply(this, arguments);
+
+            this.subscribe('editableKeydown', this.handleKeydown.bind(this));
+        },
 
         // Called when the button the toolbar is clicked
         // Overrides ButtonExtension.handleClick
@@ -69,9 +74,8 @@ var AnchorForm;
         },
 
         // Called when user hits the defined shortcut (CTRL / COMMAND + K)
-        // Overrides Button.handleKeydown
         handleKeydown: function (event) {
-            if (Util.isKey(event, this.key.charCodeAt(0)) && Util.isMetaCtrlKey(event)) {
+            if (Util.isKey(event, Util.keyCode.K) && Util.isMetaCtrlKey(event) && !event.shiftKey) {
                 this.handleClick(event);
             }
         },

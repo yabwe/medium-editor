@@ -60,6 +60,8 @@ var Toolbar;
         updateOnEmptySelection: false,
 
         init: function () {
+            Extension.prototype.init.apply(this, arguments);
+
             this.initThrottledMethods();
             this.getEditorOption('elementsContainer').appendChild(this.getToolbarElement());
         },

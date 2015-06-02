@@ -10,6 +10,11 @@ var FormExtension;
      * a 'form' inside the toolbar
      */
     FormExtension = Button.extend({
+
+        init: function () {
+            Button.prototype.init.apply(this, arguments);
+        },
+
         // default labels for the form buttons
         formSaveLabel: '&#10003;',
         formCloseLabel: '&times;',
