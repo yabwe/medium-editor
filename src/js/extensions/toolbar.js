@@ -68,7 +68,7 @@ var Toolbar;
 
         // Helper method to execute method for every extension, but ignoring the toolbar extension
         forEachExtension: function (iterator, context) {
-            return this.base.commands.forEach(function (command) {
+            return this.base.extensions.forEach(function (command) {
                 if (command === this) {
                     return;
                 }

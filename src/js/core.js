@@ -410,12 +410,12 @@ function MediumEditor(elements, options) {
         return new MediumEditor.extensions.toolbar(options);
     }
 
-    function initCommands() {
+    function initExtensions() {
         var buttons = MediumEditor.extensions.toolbar.prototype.buttons,
             extensions = this.options.extensions,
             ext,
             name;
-        this.commands = [];
+        this.extensions = [];
 
         if (this.options.toolbar && this.options.toolbar.buttons) {
             buttons = this.options.toolbar.buttons;
@@ -424,16 +424,16 @@ function MediumEditor(elements, options) {
         buttons.forEach(function (buttonName) {
             if (extensions[buttonName]) {
                 ext = initExtension(extensions[buttonName], buttonName, this);
-                this.commands.push(ext);
+                this.extensions.push(ext);
             } else if (buttonName === 'anchor') {
                 ext = initExtension(new MediumEditor.extensions.anchor(this.options.anchor), 'anchor', this);
-                this.commands.push(ext);
+                this.extensions.push(ext);
             } else if (buttonName === 'fontsize') {
                 ext = initExtension(new MediumEditor.extensions.fontSize(), buttonName, this);
-                this.commands.push(ext);
+                this.extensions.push(ext);
             } else if (ButtonsData.hasOwnProperty(buttonName)) {
                 ext = initExtension(new MediumEditor.extensions.button(ButtonsData[buttonName]), buttonName, this);
-                this.commands.push(ext);
+                this.extensions.push(ext);
             }
         }, this);
 
@@ -443,39 +443,39 @@ function MediumEditor(elements, options) {
                 buttons.indexOf(name) === -1) {
 
                 ext = initExtension(extensions[name], name, this);
-                this.commands.push(ext);
+                this.extensions.push(ext);
             }
         }
 
         // Only add default paste extension if it wasn't overriden
         if (!extensions['paste']) {
-            this.commands.push(initExtension(new MediumEditor.extensions.paste(this.options.paste), 'paste', this));
+            this.extensions.push(initExtension(new MediumEditor.extensions.paste(this.options.paste), 'paste', this));
         }
 
         // Add AnchorPreview as extension if needed
         if (shouldAddDefaultAnchorPreview.call(this)) {
-            this.commands.push(initExtension(new MediumEditor.extensions.anchorPreview(this.options.anchorPreview), 'anchor-preview', this));
+            this.extensions.push(initExtension(new MediumEditor.extensions.anchorPreview(this.options.anchorPreview), 'anchor-preview', this));
         }
 
         if (shouldAddDefaultAutoLink.call(this)) {
-            this.commands.push(initExtension(new MediumEditor.extensions.autoLink(), 'auto-link', this));
+            this.extensions.push(initExtension(new MediumEditor.extensions.autoLink(), 'auto-link', this));
         }
 
         if (shouldAddDefaultImageDragging.call(this)) {
-            this.commands.push(initExtension(new MediumEditor.extensions.imageDragging(), 'image-dragging', this));
+            this.extensions.push(initExtension(new MediumEditor.extensions.imageDragging(), 'image-dragging', this));
         }
 
         if (shouldAddDefaultKeyboardCommads.call(this)) {
-            this.commands.push(initExtension(new MediumEditor.extensions.keyboardCommands(this.options.keyboardCommands), 'keyboard-commands', this));
+            this.extensions.push(initExtension(new MediumEditor.extensions.keyboardCommands(this.options.keyboardCommands), 'keyboard-commands', this));
         }
 
         if (shouldAddDefaultPlaceholder.call(this)) {
             var placeholderOpts = (typeof this.options.placeholder === 'string') ? {} : this.options.placeholder;
-            this.commands.push(initExtension(new MediumEditor.extensions.placeholder(placeholderOpts), 'placeholder', this));
+            this.extensions.push(initExtension(new MediumEditor.extensions.placeholder(placeholderOpts), 'placeholder', this));
         }
 
         if (isToolbarEnabled.call(this)) {
-            this.commands.push(initExtension(initToolbar.call(this, this.options.toolbar), 'toolbar', this));
+            this.extensions.push(initExtension(initToolbar.call(this, this.options.toolbar), 'toolbar', this));
         }
     }
 
@@ -562,7 +562,7 @@ function MediumEditor(elements, options) {
 
             // Call initialization helpers
             initElements.call(this);
-            initCommands.call(this);
+            initExtensions.call(this);
             attachHandlers.call(this);
         },
 
@@ -573,7 +573,7 @@ function MediumEditor(elements, options) {
 
             this.isActive = false;
 
-            this.commands.forEach(function (extension) {
+            this.extensions.forEach(function (extension) {
                 if (typeof extension.destroy === 'function') {
                     extension.destroy();
                 }
@@ -651,8 +651,8 @@ function MediumEditor(elements, options) {
 
         getExtensionByName: function (name) {
             var extension;
-            if (this.commands && this.commands.length) {
-                this.commands.some(function (ext) {
+            if (this.extensions && this.extensions.length) {
+                this.extensions.some(function (ext) {
                     if (ext.name === name) {
                         extension = ext;
                         return true;
