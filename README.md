@@ -103,7 +103,6 @@ MediumEditor also supports textarea. If you provide a textarea element, the scri
 * __firstHeader__: HTML tag to be used as first header. Default: `h3`
 * __secondHeader__: HTML tag to be used as second header. Default: `h4`
 * __spellcheck__: Enable/disable native contentEditable automatic spellcheck. Default: `true`
-* __standardizeSelectionStart__: Standardizes how the beginning of a range is decided between browsers whenever the selected text is analyzed for updating toolbar buttons status. Default: `false`
 * __targetBlank__: enables/disables target="\_blank" for anchor tags. Default: `false`
 
 ### Toolbar options
@@ -121,6 +120,7 @@ var editor = new MediumEditor('.editable', {
         diffTop: -10,
         firstButtonClass: 'medium-editor-button-first',
         lastButtonClass: 'medium-editor-button-last',
+        standardizeSelectionStart: false,
         static: false,
 
         /* options which only apply when static is true */
@@ -136,6 +136,7 @@ var editor = new MediumEditor('.editable', {
 * __diffTop__: value in pixels to be added to the Y axis positioning of the toolbar. Default: `-10`
 * __firstButtonClass__: CSS class added to the first button in the toolbar. Default: `'medium-editor-button-first'`
 * __lastButtonClass__: CSS class added to the last button in the toolbar. Default: `'medium-editor-button-last'`
+* __standardizeSelectionStart__: enables/disables standardizing how the beginning of a range is decided between browsers whenever the selected text is analyzed for updating toolbar buttons status. Default: `false`
 * __static__: enable/disable the toolbar always displaying in the same location relative to the medium-editor element. Default: `false`
 
 ##### Options which only apply when the `static` option is being used

@@ -13,7 +13,6 @@ var editorDefaults;
         autoLink: false,
         elementsContainer: false,
         imageDragging: true,
-        standardizeSelectionStart: false,
         contentWindow: window,
         ownerDocument: document,
         firstHeader: 'h3',

@@ -40,6 +40,12 @@ var Toolbar;
          */
         lastButtonClass: 'medium-editor-button-last',
 
+        /* standardizeSelectionStart: [boolean]
+         * enables/disables standardizing how the beginning of a range is decided
+         * between browsers whenever the selected text is analyzed for updating toolbar buttons status.
+         */
+        standardizeSelectionStart: false,
+
         /* static: [boolean]
          * enable/disable the toolbar always displaying in the same location
          * relative to the medium-editor element.
@@ -337,7 +343,7 @@ var Toolbar;
             * So, for cases where the selectionRange start is at the end of an element/node, find the next
             * adjacent text node that actually has content in it, and move the selectionRange start there.
             */
-            if (this.getEditorOption('standardizeSelectionStart') &&
+            if (this.standardizeSelectionStart &&
                     selectionRange.startContainer.nodeValue &&
                     (selectionRange.startOffset === selectionRange.startContainer.nodeValue.length)) {
                 var adjacentNode = Util.findAdjacentTextNodeWithContent(Selection.getSelectionElement(this.window), selectionRange.startContainer, this.document);

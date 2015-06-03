@@ -211,9 +211,9 @@ describe('Toolbar TestCase', function () {
             var editor = this.newMediumEditor('.editor', {
                     toolbar: {
                         static: true,
-                        updateOnEmptySelection: true
-                    },
-                    standardizeSelectionStart: true
+                        updateOnEmptySelection: true,
+                        standardizeSelectionStart: true
+                    }
                 }),
                 toolbar = editor.getExtensionByName('toolbar');
 
