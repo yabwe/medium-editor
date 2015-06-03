@@ -54,18 +54,20 @@ var KeyboardCommands;
 
         handleKeydown: function (event) {
             var keyCode = Util.getKeyCode(event);
-            if (this.keys[keyCode]) {
-                var isMeta = Util.isMetaCtrlKey(event),
-                    isShift = !!event.shiftKey;
-                this.keys[keyCode].forEach(function (data) {
-                    if (data.meta === isMeta &&
-                        data.shift === isShift) {
-                        event.preventDefault();
-                        event.stopPropagation();
-                        this.execAction(data.command);
-                    }
-                }, this);
+            if (!this.keys[keyCode]) {
+                return;
             }
+
+            var isMeta = Util.isMetaCtrlKey(event),
+                isShift = !!event.shiftKey;
+            this.keys[keyCode].forEach(function (data) {
+                if (data.meta === isMeta &&
+                    data.shift === isShift) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    this.execAction(data.command);
+                }
+            }, this);
         }
     });
 }());

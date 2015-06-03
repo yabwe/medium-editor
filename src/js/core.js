@@ -166,13 +166,12 @@ function MediumEditor(elements, options) {
             win._mediumEditors = [null];
         }
 
-        if (this.id) {
-            // If this already has a unique id, re-use it
-            win._mediumEditors[this.id] = this;
-        } else {
+        // If this already has a unique id, re-use it
+        if (!this.id) {
             this.id = win._mediumEditors.length;
-            win._mediumEditors.push(this);
         }
+
+        win._mediumEditors[this.id] = this;
     }
 
     function removeFromEditors(win) {
@@ -250,7 +249,7 @@ function MediumEditor(elements, options) {
     function isToolbarEnabled() {
         // If any of the elements don't have the toolbar disabled
         // We need a toolbar
-        if(this.elements.every(function (element) {
+        if (this.elements.every(function (element) {
                 return !!element.getAttribute('data-disable-toolbar');
             })) {
             return false;
@@ -400,12 +399,16 @@ function MediumEditor(elements, options) {
             }
         }, this);
 
-        // Create toolbar
+        // Users can pass in a custom toolbar extension
+        // so check for that first and if it's not present
+        // just create the default toolbar
         var toolbarExtension = this.options.extensions['toolbar'];
         if (!toolbarExtension && isToolbarEnabled.call(this)) {
             toolbarExtension = new MediumEditor.extensions.toolbar(this.options.toolbar);
         }
 
+        // If the toolbar is not disabled, so we actually have an extension
+        // initialize it and add it to the extensions array
         if (toolbarExtension) {
             this.extensions.push(initExtension(toolbarExtension, 'toolbar', this));
         }
@@ -604,7 +607,7 @@ function MediumEditor(elements, options) {
                 return extension;
             }
 
-            switch(name) {
+            switch (name) {
                 case 'anchor':
                     extension = new MediumEditor.extensions.anchor(this.options.anchor);
                     break;
@@ -630,6 +633,8 @@ function MediumEditor(elements, options) {
                     extension = new MediumEditor.extensions.placeholder(this.options.placeholder);
                     break;
                 default:
+                    // All of the built-in buttons for MediumEditor are extensions
+                    // so check to see if the extension we're creating is a built-in button
                     if (ButtonsData.hasOwnProperty(name)) {
                         extension = new MediumEditor.extensions.button(ButtonsData[name]);
                     }
