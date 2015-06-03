@@ -105,7 +105,6 @@ describe('Initialization TestCase', function () {
                 disableEditing: false,
                 autoLink: false,
                 elementsContainer: document.body,
-                imageDragging: true,
                 contentWindow: window,
                 ownerDocument: document,
                 firstHeader: 'h3',

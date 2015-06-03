@@ -12,7 +12,6 @@ var editorDefaults;
         disableEditing: false,
         autoLink: false,
         elementsContainer: false,
-        imageDragging: true,
         contentWindow: window,
         ownerDocument: document,
         firstHeader: 'h3',
