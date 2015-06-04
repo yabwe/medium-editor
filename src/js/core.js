@@ -1,4 +1,4 @@
-/*global Util, ButtonsData, Selection, Extension,
+/*global Util, Selection, Extension,
     extensionDefaults, Events, editorDefaults*/
 
 function MediumEditor(elements, options) {
@@ -635,8 +635,8 @@ function MediumEditor(elements, options) {
                 default:
                     // All of the built-in buttons for MediumEditor are extensions
                     // so check to see if the extension we're creating is a built-in button
-                    if (ButtonsData.hasOwnProperty(name)) {
-                        extension = new MediumEditor.extensions.button(ButtonsData[name]);
+                    if (MediumEditor.extensions.button.isBuiltInButton(name)) {
+                        extension = new MediumEditor.extensions.button(name);
                     }
                     break;
             }
