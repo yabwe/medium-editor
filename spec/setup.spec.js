@@ -65,7 +65,7 @@ describe('Setup/Destroy TestCase', function () {
                 fireEvent(document.body, 'blur');
             };
             // Store toolbar, since destroy will remove the reference from the editor
-            toolbar = editor.toolbar;
+            toolbar = editor.getExtensionByName('toolbar');
 
             // fire event (handler executed immediately)
             triggerEvents();
@@ -99,21 +99,22 @@ describe('Setup/Destroy TestCase', function () {
             }
 
             editor = this.newMediumEditor('.editor');
+            var toolbar = editor.getExtensionByName('toolbar');
 
-            spyOn(editor.toolbar, 'hideToolbar').and.callThrough(); // via: handleBlur
+            spyOn(toolbar, 'hideToolbar').and.callThrough(); // via: handleBlur
 
             selectElementContentsAndFire(editor.elements[0], { eventToFire: 'click' });
             jasmine.clock().tick(51);
-            expect(editor.toolbar.hideToolbar).not.toHaveBeenCalled();
+            expect(toolbar.hideToolbar).not.toHaveBeenCalled();
 
             selectElementContentsAndFire(editor.elements[1], { eventToFire: 'click' });
             jasmine.clock().tick(51);
-            expect(editor.toolbar.hideToolbar).not.toHaveBeenCalled();
+            expect(toolbar.hideToolbar).not.toHaveBeenCalled();
 
             selectElementContents(editor.elements[2]);
             selectElementContentsAndFire(editor.elements[2], { eventToFire: 'click' });
             jasmine.clock().tick(51);
-            expect(editor.toolbar.hideToolbar).not.toHaveBeenCalled();
+            expect(toolbar.hideToolbar).not.toHaveBeenCalled();
 
             elements.forEach(function (element) {
                 document.body.removeChild(element);

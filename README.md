@@ -91,32 +91,65 @@ MediumEditor also supports textarea. If you provide a textarea element, the scri
 ## Initialization options
 
 ### Core options
-* __allowMultiParagraphSelection__: enables the toolbar when selecting multiple paragraphs/block elements. Default: true
-* __delay__: time in milliseconds to show the toolbar or anchor tag preview. Default: 0
-* __disableReturn__:  enables/disables the use of the return-key. You can also set specific element behavior by using setting a data-disable-return attribute. Default: false
-* __disableDoubleReturn__:  allows/disallows two (or more) empty new lines. You can also set specific element behavior by using setting a data-disable-double-return attribute. Default: false
-* __disableEditing__: enables/disables adding the contenteditable behavior. Useful for using the toolbar with customized buttons/actions. You can also set specific element behavior by using setting a data-disable-editing attribute. Default: false
-* __elementsContainer__: specifies a DOM node to contain MediumEditor's toolbar and anchor preview elements. Default: document.body
-* __extensions__: extension to use (see [Custom Buttons and Extensions](https://github.com/yabwe/medium-editor/wiki/Custom-Buttons-and-Extensions)) for more. Default: {}
-* __firstHeader__: HTML tag to be used as first header. Default: h3
-* __secondHeader__: HTML tag to be used as second header. Default: h4
-* __spellcheck__: Enable/disable native contentEditable automatic spellcheck. Default: true
-* __standardizeSelectionStart__: Standardizes how the beginning of a range is decided between browsers whenever the selected text is analyzed for updating toolbar buttons status
-* __targetBlank__: enables/disables target="\_blank" for anchor tags. Default: false
+* __activeButtonClass__: CSS class added to active buttons in the toolbar. Default: `'medium-editor-button-active'`
+* __allowMultiParagraphSelection__: enables the toolbar when selecting multiple paragraphs/block elements. Default: `true`
+* __buttonLabels__: type of labels on the buttons. Values: 'fontawesome', `{'bold': '<b>b</b>', 'italic': '<i>i</i>'}`. Default: `false`
+* __delay__: time in milliseconds to show the toolbar or anchor tag preview. Default: `0`
+* __disableReturn__:  enables/disables the use of the return-key. You can also set specific element behavior by using setting a data-disable-return attribute. Default: `false`
+* __disableDoubleReturn__:  allows/disallows two (or more) empty new lines. You can also set specific element behavior by using setting a data-disable-double-return attribute. Default: `false`
+* __disableEditing__: enables/disables adding the contenteditable behavior. Useful for using the toolbar with customized buttons/actions. You can also set specific element behavior by using setting a data-disable-editing attribute. Default: `false`
+* __elementsContainer__: specifies a DOM node to contain MediumEditor's toolbar and anchor preview elements. Default: `document.body`
+* __extensions__: extension to use (see [Custom Buttons and Extensions](https://github.com/yabwe/medium-editor/wiki/Custom-Buttons-and-Extensions)) for more. Default: `{}`
+* __firstHeader__: HTML tag to be used as first header. Default: `h3`
+* __secondHeader__: HTML tag to be used as second header. Default: `h4`
+* __spellcheck__: Enable/disable native contentEditable automatic spellcheck. Default: `true`
+* __targetBlank__: enables/disables target="\_blank" for anchor tags. Default: `false`
 
 ### Toolbar options
-* __activeButtonClass__: CSS class added to active buttons in the toolbar. Default: 'medium-editor-button-active'
+
+The toolbar for MediumEditor is implemented as a built-in extension which automatically displays whenever the user selects some text.  The toolbar can hold any set of defined built-in buttons, but can also hold any custom buttons passed in as extensions.
+
+Options for the toolbar are passed as an object taht is a member of the outer options object. Example:
+```javascript
+var editor = new MediumEditor('.editable', {
+    toolbar: {
+        /* These are the default options for the toolbar,
+           if nothing is passed this is what is used */
+        buttons: ['bold', 'italic', 'underline', 'anchor', 'header1', 'header2', 'quote'],
+        diffLeft: 0,
+        diffTop: -10,
+        firstButtonClass: 'medium-editor-button-first',
+        lastButtonClass: 'medium-editor-button-last',
+        standardizeSelectionStart: false,
+        static: false,
+
+        /* options which only apply when static is true */
+        align: 'center',
+        sticky: false,
+        updateOnEmptySelection: false
+    }
+});
+```
+
 * __buttons__: the set of buttons to display on the toolbar. Default: `['bold', 'italic', 'underline', 'anchor', 'header1', 'header2', 'quote']`
-* __buttonLabels__: type of labels on the buttons. Values: 'fontawesome', `{'bold': '<b>b</b>', 'italic': '<i>i</i>'}`. Default: false
-* __diffLeft__: value in pixels to be added to the X axis positioning of the toolbar. Default: 0
-* __diffTop__: value in pixels to be added to the Y axis positioning of the toolbar. Default: -10
-* __disableToolbar__: enables/disables the toolbar, adding only the contenteditable behavior. You can also set specific element behavior by using setting a `data-disable-toolbar` attribute. Default: false
-* __firstButtonClass__: CSS class added to the first button in the toolbar. Default: 'medium-editor-button-first'
-* __lastButtonClass__: CSS class added to the last button in the toolbar. Default: 'medium-editor-button-last'
-* __staticToolbar__: enable/disable the toolbar always displaying in the same location relative to the medium-editor element. Default: false
-* __stickyToolbar__: enable/disable the toolbar "sticking" to the medium-editor element when the page is being scrolled. Default: false
-* __toolbarAlign__: `left`|`center`|`right` - when using the __staticToolbar__ option, this aligns the static toolbar relative to the medium-editor element. Default: `center`
-* __updateOnEmptySelection__: update the state of the toolbar buttons even when the selection is collapse (there is no selection, just a cursor). Default: false
+* __diffLeft__: value in pixels to be added to the X axis positioning of the toolbar. Default: `0`
+* __diffTop__: value in pixels to be added to the Y axis positioning of the toolbar. Default: `-10`
+* __firstButtonClass__: CSS class added to the first button in the toolbar. Default: `'medium-editor-button-first'`
+* __lastButtonClass__: CSS class added to the last button in the toolbar. Default: `'medium-editor-button-last'`
+* __standardizeSelectionStart__: enables/disables standardizing how the beginning of a range is decided between browsers whenever the selected text is analyzed for updating toolbar buttons status. Default: `false`
+* __static__: enable/disable the toolbar always displaying in the same location relative to the medium-editor element. Default: `false`
+
+##### Options which only apply when the `static` option is being used
+* __align__: `left`|`center`|`right` - When the __static__ option is `true`, this aligns the static toolbar relative to the medium-editor element. Default: `center`
+* __sticky__: When the __static__ option is `true`, this enables/disables the toolbar "sticking" to the viewport and staying visible on the screen while the page scrolls. Default: `false`
+* __updateOnEmptySelection__: When the __static__ option is `true`, this enables/disables updating the state of the toolbar buttons even when the selection is collapsed (there is no selection, just a cursor). Default: `false`
+
+To disable the toolbar (which also disables the anchor-preview extension), set the value of the `toolbar` option to `false`:
+```javascript
+var editor = new MediumEditor('.editable', {
+    toolbar: false
+});
+```
 
 ### Anchor Preview options
 
@@ -125,7 +158,6 @@ The anchor preview is a built-in extension which automatically displays a 'toolt
 Options for the anchor preview 'tooltip' are passed as an object that is a member of the outer options object. Example:
 ```javascript
 var editor = new MediumEditor('.editable', {
-    buttons: ['bold', 'italic', 'underline'],
     anchorPreview: {
         /* These are the default options for anchor preview,
            if nothing is passed this is what it used */
@@ -136,7 +168,7 @@ var editor = new MediumEditor('.editable', {
 });
 ```
 
-* __hideDelay__: time in milliseconds to show the anchor tag preview after the mouse has left the anchor tag. Default: 500
+* __hideDelay__: time in milliseconds to show the anchor tag preview after the mouse has left the anchor tag. Default: `500`
 * __previewValueSelector__: the default selector to locate where to put the activeAnchor value in the preview. You should only need to override this if you've modified the way in which the anchor-preview extension renders. Default: `'a'`
 
 To disable the anchor preview, set the value of the `anchorPreview` option to `false`:
@@ -146,7 +178,7 @@ var editor = new MediumEditor('.editable', {
 });
 ```
 ##### NOTE:
-* If the toolbar is disabled (via __disableToolbar__ or `data-disable-toolbar attribute`) the anchor-preview is automatically disabled.
+* If the toolbar is disabled (via `toolbar: false` option or `data-disable-toolbar` attribute) the anchor-preview is automatically disabled.
 * If the anchor editing form is not enabled, clicking on the anchor-preview will not allow the href of the link to be edited
 
 ### Placeholder Options
@@ -156,7 +188,6 @@ The placeholder handler is a built-in extension which displays placeholder text 
 Options for placeholder are passed as an object that is a member of the outer options object. Example:
 ```javascript
 var editor = new MediumEditor('.editable', {
-    buttons: ['bold', 'italic', 'quote'],
     placeholder: {
         /* This example includes the default options for placeholder,
            if nothing is passed this is what it used */
@@ -165,7 +196,7 @@ var editor = new MediumEditor('.editable', {
 });
 ```
 
-* __text__: Defines the default placeholder for empty contenteditables when __placeholder__ is not set to false. You can overwrite it by setting a `data-placeholder` attribute on the editor elements. Default: 'Type your text'
+* __text__: Defines the default placeholder for empty contenteditables when __placeholder__ is not set to false. You can overwrite it by setting a `data-placeholder` attribute on the editor elements. Default: `'Type your text'`
 
 To disable the placeholder, set the value of the `placeholder` option to `false`:
 ```javascript
@@ -181,7 +212,9 @@ The anchor form is a built-in button extension which allows the user to add/edit
 Options for the anchor form are passed as an object that is a member of the outer options object. Example:
 ```javascript
 var editor = new MediumEditor('.editable', {
-    buttons: ['bold', 'italic', 'underline', 'anchor'],
+    toolbar: {
+        buttons: ['bold', 'italic', 'underline', 'anchor']
+    },
     anchor: {
         /* These are the default options for anchor form,
            if nothing is passed this is what it used */
@@ -196,11 +229,11 @@ var editor = new MediumEditor('.editable', {
 });
 ```
 
-* __customClassOption__: custom class name the user can optionally have added to their created links (ie 'button').  If passed as a non-empty string, a checkbox will be displayed allowing the user to choose whether to have the class added to the created link or not. Default: null
+* __customClassOption__: custom class name the user can optionally have added to their created links (ie 'button').  If passed as a non-empty string, a checkbox will be displayed allowing the user to choose whether to have the class added to the created link or not. Default: `null`
 * __customClassOptionText__: text to be shown in the checkbox when the __customClassOption__ is being used. Default: `'Button'`
-* __linkValidation__: enables/disables check for common URL protocols on anchor links. Default: false
+* __linkValidation__: enables/disables check for common URL protocols on anchor links. Default: `false`
 * __placeholderText__: text to be shown as placeholder of the anchor input. Default: `'Paste or type a link'`
-* __targetCheckbox__: enables/disables displaying a "Open in new window" checkbox, which when checked changes the `target` attribute of the created link. Default: false
+* __targetCheckbox__: enables/disables displaying a "Open in new window" checkbox, which when checked changes the `target` attribute of the created link. Default: `false`
 * __targetCheckboxText__: text to be shown in the checkbox enabled via the __targetCheckbox__ option. Default: `'Open in new window'`
 
 ### Paste Options
@@ -210,7 +243,6 @@ The paste handler is a built-in extension which attempts to filter the content w
 Options for paste handling are passed as an object that is a member of the outer options object. Example:
 ```javascript
 var editor = new MediumEditor('.editable', {
-    buttons: ['bold', 'italic', 'quote'],
     paste: {
         /* This example includes the default options for paste,
            if nothing is passed this is what it used */
@@ -223,17 +255,64 @@ var editor = new MediumEditor('.editable', {
 });
 ```
 
-* __forcePlainText__: Forces pasting as plain text. Default: true
-* __cleanPastedHTML__: cleans pasted content from different sources, like google docs etc. Default: false
-* __cleanReplacements__: custom pairs (2 element arrays) of RegExp and replacement text to use during paste when __forcePlainText__ or __cleanPastedHTML__ are `true` OR when calling `cleanPaste(text)` helper method. Default: []
-* __cleanAttrs__: list of element attributes to remove during paste when __cleanPastedHTML__ is `true` or when calling `cleanPaste(text)` or `pasteHTML(html,options)` helper methods. Default: ['class', 'style', 'dir']
-* __cleanTags__: list of element tag names to remove during paste when __cleanPastedHTML__ is `true` or when calling `cleanPaste(text)` or `pasteHTML(html,options)` helper methods. Default: ['meta']
+* __forcePlainText__: Forces pasting as plain text. Default: `true`
+* __cleanPastedHTML__: cleans pasted content from different sources, like google docs etc. Default: `false`
+* __cleanReplacements__: custom pairs (2 element arrays) of RegExp and replacement text to use during paste when __forcePlainText__ or __cleanPastedHTML__ are `true` OR when calling `cleanPaste(text)` helper method. Default: `[]`
+* __cleanAttrs__: list of element attributes to remove during paste when __cleanPastedHTML__ is `true` or when calling `cleanPaste(text)` or `pasteHTML(html,options)` helper methods. Default: `['class', 'style', 'dir']`
+* __cleanTags__: list of element tag names to remove during paste when __cleanPastedHTML__ is `true` or when calling `cleanPaste(text)` or `pasteHTML(html,options)` helper methods. Default: `['meta']`
+
+### KeyboardCommands Options
+
+The keyboard commands handler is a built-in extension for mapping key-combinations to actions to execute in the editor.
+
+Options for KeyboardCommands are passed as an object that is a member of the outer options object. Example:
+```javascript
+var editor = new MediumEditor('.editable', {
+    keyboardCommands: {
+        /* This example includes the default options for keyboardCommands,
+           if nothing is passed this is what it used */
+        commands: [
+            {
+                command: 'bold',
+                key: 'b',
+                meta: true,
+                shift: false
+            },
+            {
+                command: 'italic',
+                key: 'i',
+                meta: true,
+                shift: false
+            },
+            {
+                command: 'underline',
+                key: 'u',
+                meta: true,
+                shift: false
+            }
+        ],
+    }
+});
+```
+
+* __commands__: Array of objects describing each command and the combination of keys that will trigger it.  Required for each object:
+  * _command_: argument passed to `editor.execAction()` when key-combination is used
+  * _key_: keyboard character that triggers this command
+  * _meta_: whether the ctrl/meta key has to be active or inactive
+  * _shift_: whether the shift key has to be active or inactive
+
+To disable the keyboard commands, set the value of the `keyboardCommands` option to `false`:
+```javascript
+var editor = new MediumEditor('.editable', {
+    keyboardCommands: false
+});
+```
 
 ### Auto Link Options
 
 The auto-link handler is a built-in extension which automatically turns URLs entered into the text field into HTML anchor tags (similar to the functionality of Markdown).  This feature is OFF by default.
 
-To enable built-in auto-link support, set the value of the `autoLink` option to `true':
+To enable built-in auto-link support, set the value of the `autoLink` option to `true`:
 
 ```javascript
 var editor = new MediumEditor('.editable', {
@@ -256,13 +335,15 @@ var editor = new MediumEditor('.editable', {
 
 ```javascript
 var editor = new MediumEditor('.editable', {
-    buttons: ['bold', 'italic', 'quote'],
-    diffLeft: 25,
-    diffTop: 10,
     firstHeader: 'h1',
     secondHeader: 'h2',
     delay: 1000,
     targetBlank: true,
+    toolbar: {
+        buttons: ['bold', 'italic', 'quote'],
+        diffLeft: 25,
+        diffTop: 10,
+    },
     anchor: {
         placeholderText: 'Type a link',
         customClassOption: 'btn',

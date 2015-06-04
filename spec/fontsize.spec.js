@@ -2,7 +2,7 @@
      afterEach, beforeEach, selectElementContents,
      jasmine, fireEvent, setupTestHelpers,
      selectElementContentsAndFire, isIE9, FontSizeForm,
-     Toolbar */
+     MediumEditor */
 
 describe('Font Size Button TestCase', function () {
     'use strict';
@@ -18,7 +18,11 @@ describe('Font Size Button TestCase', function () {
     beforeEach(function () {
         setupTestHelpers.call(this);
         this.el = this.createElement('div', 'editor', 'lorem ipsum');
-        this.mediumOpts = { buttons: ['fontsize'] };
+        this.mediumOpts = {
+            toolbar: {
+                buttons: ['fontsize']
+            }
+        };
     });
 
     afterEach(function () {
@@ -31,12 +35,13 @@ describe('Font Size Button TestCase', function () {
             spyOn(FontSizeForm.prototype, 'showForm').and.callThrough();
             var button,
                 editor = this.newMediumEditor('.editor', this.mediumOpts),
-                fontSizeExtension = editor.getExtensionByName('fontsize');
+                fontSizeExtension = editor.getExtensionByName('fontsize'),
+                toolbar = editor.getExtensionByName('toolbar');
             selectElementContentsAndFire(editor.elements[0]);
             jasmine.clock().tick(1);
-            button = editor.toolbar.getToolbarElement().querySelector('[data-action="fontSize"]');
+            button = toolbar.getToolbarElement().querySelector('[data-action="fontSize"]');
             fireEvent(button, 'click');
-            expect(editor.toolbar.getToolbarActionsElement().style.display).toBe('none');
+            expect(toolbar.getToolbarActionsElement().style.display).toBe('none');
             expect(fontSizeExtension.isDisplayed()).toBe(true);
             expect(fontSizeExtension.showForm).toHaveBeenCalled();
         });
@@ -45,13 +50,19 @@ describe('Font Size Button TestCase', function () {
     describe('Font Size', function () {
         it('should change font size when slider is moved', function () {
             spyOn(document, 'execCommand').and.callThrough();
-            var editor = this.newMediumEditor('.editor', { buttons: ['fontsize'], buttonLabels: 'fontawesome' }),
+            var editor = this.newMediumEditor('.editor', {
+                    toolbar: {
+                        buttons: ['fontsize']
+                    },
+                    buttonLabels: 'fontawesome'
+                }),
                 fontSizeExtension = editor.getExtensionByName('fontsize'),
+                toolbar = editor.getExtensionByName('toolbar'),
                 button,
                 input;
 
             selectElementContentsAndFire(editor.elements[0]);
-            button = editor.toolbar.getToolbarElement().querySelector('[data-action="fontSize"]');
+            button = toolbar.getToolbarElement().querySelector('[data-action="fontSize"]');
             fireEvent(button, 'click');
 
             input = fontSizeExtension.getInput();
@@ -68,10 +79,11 @@ describe('Font Size Button TestCase', function () {
         it('should display current font size when displayed', function () {
             spyOn(FontSizeForm.prototype, 'showForm').and.callThrough();
             var editor = this.newMediumEditor('.editor', this.mediumOpts),
-                fontSizeExtension = editor.getExtensionByName('fontsize');
+                fontSizeExtension = editor.getExtensionByName('fontsize'),
+                toolbar = editor.getExtensionByName('toolbar');
             this.el.innerHTML = '<font size="7">lorem ipsum dolor</font>';
             selectElementContentsAndFire(editor.elements[0].firstChild);
-            fireEvent(editor.toolbar.getToolbarElement().querySelector('[data-action="fontSize"]'), 'click');
+            fireEvent(toolbar.getToolbarElement().querySelector('[data-action="fontSize"]'), 'click');
             expect(fontSizeExtension.showForm).toHaveBeenCalledWith('7');
         });
 
@@ -80,11 +92,12 @@ describe('Font Size Button TestCase', function () {
             spyOn(FontSizeForm.prototype, 'clearFontSize').and.callThrough();
             var editor = this.newMediumEditor('.editor', this.mediumOpts),
                 fontSizeExtension = editor.getExtensionByName('fontsize'),
+                toolbar = editor.getExtensionByName('toolbar'),
                 button,
                 input;
 
             selectElementContentsAndFire(editor.elements[0]);
-            button = editor.toolbar.getToolbarElement().querySelector('[data-action="fontSize"]');
+            button = toolbar.getToolbarElement().querySelector('[data-action="fontSize"]');
             fireEvent(button, 'click');
 
             input = fontSizeExtension.getInput();
@@ -107,15 +120,16 @@ describe('Font Size Button TestCase', function () {
 
     describe('Cancel', function () {
         it('should close the font size form when user clicks on cancel', function () {
-            spyOn(Toolbar.prototype, 'showAndUpdateToolbar').and.callThrough();
+            spyOn(MediumEditor.extensions.toolbar.prototype, 'showAndUpdateToolbar').and.callThrough();
             var editor = this.newMediumEditor('.editor', this.mediumOpts),
                 fontSizeExtension = editor.getExtensionByName('fontsize'),
+                toolbar = editor.getExtensionByName('toolbar'),
                 button,
                 input,
                 cancel;
 
             selectElementContentsAndFire(editor.elements[0]);
-            button = editor.toolbar.getToolbarElement().querySelector('[data-action="fontSize"]');
+            button = toolbar.getToolbarElement().querySelector('[data-action="fontSize"]');
             cancel = fontSizeExtension.getForm().querySelector('a.medium-editor-toobar-close');
 
             fireEvent(button, 'click');
@@ -131,7 +145,7 @@ describe('Font Size Button TestCase', function () {
             } else {
                 expect(input.value).toBe('4');
             }
-            expect(editor.toolbar.showAndUpdateToolbar).toHaveBeenCalled();
+            expect(toolbar.showAndUpdateToolbar).toHaveBeenCalled();
             expect(fontSizeExtension.isDisplayed()).toBe(false);
         });
     });
@@ -140,13 +154,14 @@ describe('Font Size Button TestCase', function () {
         it('should destroy the font size extension and remove the form', function () {
             spyOn(FontSizeForm.prototype, 'destroy').and.callThrough();
             var editor = this.newMediumEditor('.editor', this.mediumOpts),
-                fontSizeExtension = editor.getExtensionByName('fontsize');
+                fontSizeExtension = editor.getExtensionByName('fontsize'),
+                form = fontSizeExtension.getForm();
 
-            expect(document.getElementById('medium-editor-toolbar-form-fontsize-1')).toBeTruthy();
+            expect(MediumEditor.util.isDescendant(document.body, form)).toBe(true);
             editor.destroy();
 
             expect(fontSizeExtension.destroy).toHaveBeenCalled();
-            expect(document.getElementById('medium-editor-toolbar-form-fontsize-1')).not.toBeTruthy();
+            expect(MediumEditor.util.isDescendant(document.body, form)).toBe(false);
         });
     });
 });

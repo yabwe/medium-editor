@@ -1,6 +1,6 @@
 /*global MediumEditor, describe, it, expect, spyOn,
     AnchorForm, afterEach, beforeEach, setupTestHelpers, _,
-    AnchorPreview, Toolbar */
+    AnchorPreview */
 
 describe('Initialization TestCase', function () {
     'use strict';
@@ -35,7 +35,7 @@ describe('Initialization TestCase', function () {
             var editor = this.newMediumEditor('.test');
             expect(editor.isActive).toBeFalsy();
             expect(editor.events).toBeUndefined();
-            expect(editor.toolbar).toBeUndefined();
+            expect(editor.getExtensionByName('toolbar')).toBeUndefined();
             expect(editor.getExtensionByName('anchor')).toBeUndefined();
             expect(editor.getExtensionByName('anchor-preview')).toBeUndefined();
         });
@@ -100,29 +100,20 @@ describe('Initialization TestCase', function () {
         it('should have a default set of options', function () {
             var defaultOptions = {
                 delay: 0,
-                diffLeft: 0,
-                diffTop: -10,
                 disableReturn: false,
                 disableDoubleReturn: false,
                 disableEditing: false,
-                disableToolbar: false,
                 autoLink: false,
-                toolbarAlign: 'center',
                 elementsContainer: document.body,
-                imageDragging: true,
-                standardizeSelectionStart: false,
                 contentWindow: window,
                 ownerDocument: document,
                 firstHeader: 'h3',
                 allowMultiParagraphSelection: true,
                 secondHeader: 'h4',
-                buttons: ['bold', 'italic', 'underline', 'anchor', 'header1', 'header2', 'quote'],
                 buttonLabels: false,
                 targetBlank: false,
                 extensions: {},
                 activeButtonClass: 'medium-editor-button-active',
-                firstButtonClass: 'medium-editor-button-first',
-                lastButtonClass: 'medium-editor-button-last',
                 spellcheck: true
             },
                 editor = this.newMediumEditor('.editor');
@@ -132,11 +123,13 @@ describe('Initialization TestCase', function () {
 
         it('should accept custom options values', function () {
             var options = {
-                diffLeft: 10,
-                diffTop: 5,
                 firstHeader: 'h2',
                 secondHeader: 'h3',
                 delay: 300,
+                toolbar: {
+                    diffLeft: 10,
+                    diffTop: 5
+                },
                 anchor: {
                     placeholderText: 'test',
                     targetCheckboxText: 'new window?'
@@ -154,16 +147,16 @@ describe('Initialization TestCase', function () {
 
         it('should call the default initialization methods', function () {
             spyOn(MediumEditor.prototype, 'setup').and.callThrough();
-            spyOn(Toolbar.prototype, 'createToolbar').and.callThrough();
+            spyOn(MediumEditor.extensions.toolbar.prototype, 'createToolbar').and.callThrough();
             spyOn(AnchorForm.prototype, 'createForm').and.callThrough();
             spyOn(AnchorPreview.prototype, 'createPreview').and.callThrough();
             var editor = this.newMediumEditor('.editor'),
                 anchorExtension = editor.getExtensionByName('anchor'),
-                anchorPreview = editor.getExtensionByName('anchor-preview');
-            expect(editor.id).toBe(1);
+                anchorPreview = editor.getExtensionByName('anchor-preview'),
+                toolbar = editor.getExtensionByName('toolbar');
             expect(editor.setup).toHaveBeenCalled();
-            expect(editor.toolbar).not.toBeUndefined();
-            expect(editor.toolbar.createToolbar).toHaveBeenCalled();
+            expect(toolbar).not.toBeUndefined();
+            expect(toolbar.createToolbar).toHaveBeenCalled();
             expect(anchorExtension).not.toBeUndefined();
             expect(anchorExtension.createForm).toHaveBeenCalled();
             expect(anchorPreview).not.toBeUndefined();
@@ -172,15 +165,17 @@ describe('Initialization TestCase', function () {
 
         it('should set the ID according to the numbers of editors instantiated', function () {
             var editor1 = this.newMediumEditor('.editor'),
+                firstId = editor1.id,
                 editor2 = this.newMediumEditor('.editor'),
                 editor3 = this.newMediumEditor('.editor');
-            expect(editor1.id).toBe(1);
-            expect(editor2.id).toBe(2);
-            expect(editor3.id).toBe(3);
+
+            expect(editor2.id).toBe(firstId + 1);
+            expect(editor3.id).toBe(firstId + 2);
         });
 
-        it('should not reset ID when destroy and then re-initialized', function () {
+        it('should not reset id when destroyed and then re-initialized', function () {
             var editor1 = this.newMediumEditor('.editor'),
+                origId = editor1.id,
                 editor2;
 
             this.createElement('div', 'editor-two');
@@ -189,6 +184,7 @@ describe('Initialization TestCase', function () {
             editor1.init('.editor');
 
             expect(editor1.id).not.toEqual(editor2.id);
+            expect(editor1.id).toBe(origId);
         });
 
         it('should use document.body as element container when no container element is specified', function () {

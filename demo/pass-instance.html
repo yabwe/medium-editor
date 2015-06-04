@@ -39,14 +39,18 @@
         };
 
         var one = new MediumEditor('.one', {
-            buttons: ['extension'],
+            toolbar: {
+                buttons: ['extension'],
+            },
             extensions: {
               extension: new Extension()
             }
         });
 
         var two = new MediumEditor('.two', {
-            buttons: ['extension'],
+            toolbar: {
+                buttons: ['extension'],
+            },
             extensions: {
               extension: new Extension()
             }

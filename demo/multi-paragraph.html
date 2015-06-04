@@ -28,10 +28,12 @@
     <script>
         var editor = new MediumEditor('.editable', {
             allowMultiParagraphSelection: false,
-            diffTop: -12,
             firstHeader: 'h1',
             secondHeader: 'h2',
             delay: 0,
+            toolbar: {
+                diffTop: -12
+            },
             anchor: {
                 placeholderText: 'Type a link'
             }

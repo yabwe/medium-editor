@@ -313,7 +313,8 @@ var Events;
         },
 
         updateFocus: function (target, eventObj) {
-            var toolbarEl = this.base.toolbar ? this.base.toolbar.getToolbarElement() : null,
+            var toolbar = this.base.getExtensionByName('toolbar'),
+                toolbarEl = toolbar ? toolbar.getToolbarElement() : null,
                 anchorPreview = this.base.getExtensionByName('anchor-preview'),
                 previewEl = (anchorPreview && anchorPreview.getPreviewElement) ? anchorPreview.getPreviewElement() : null,
                 hadFocus = this.base.getFocusedElement(),

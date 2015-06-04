@@ -18,12 +18,15 @@ describe('Content TestCase', function () {
     it('should removing paragraphs when a list is inserted inside of it', function () {
         this.el.innerHTML = '<p>lorem ipsum<ul><li>dolor</li></ul></p>';
         var editor = this.newMediumEditor('.editor', {
-                buttons: ['orderedlist']
+                toolbar: {
+                    buttons: ['orderedlist']
+                }
             }),
             target = editor.elements[0].querySelector('p'),
+            toolbar = editor.getExtensionByName('toolbar'),
             range, sel;
         selectElementContentsAndFire(target);
-        fireEvent(editor.toolbar.getToolbarElement().querySelector('[data-action="insertorderedlist"]'), 'click');
+        fireEvent(toolbar.getToolbarElement().querySelector('[data-action="insertorderedlist"]'), 'click');
         expect(this.el.innerHTML).toMatch(/^<ol><li>lorem ipsum(<br>)?<\/li><\/ol><ul><li>dolor<\/li><\/ul>?/);
 
         // for Chrome & Safari we manually moved the caret so let's check it

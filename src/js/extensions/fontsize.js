@@ -12,6 +12,10 @@ var FontSizeForm;
         contentDefault: '&#xB1;', // ±
         contentFA: '<i class="fa fa-text-height"></i>',
 
+        init: function () {
+            FormExtension.prototype.init.apply(this, arguments);
+        },
+
         // Called when the button the toolbar is clicked
         // Overrides ButtonExtension.handleClick
         handleClick: function (evt) {
@@ -49,9 +53,9 @@ var FontSizeForm;
             var input = this.getInput();
 
             this.base.saveSelection();
-            this.base.hideToolbarDefaultActions();
+            this.hideToolbarDefaultActions();
             this.getForm().style.display = 'block';
-            this.base.setToolbarPosition();
+            this.setToolbarPosition();
 
             input.value = fontSize || '';
             input.focus();
