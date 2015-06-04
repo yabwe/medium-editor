@@ -100,16 +100,6 @@ var Util;
             return copyInto.apply(this, args);
         },
 
-        derives: function derives(base, derived) {
-            var origPrototype = derived.prototype;
-            function Proto() { }
-            Proto.prototype = base.prototype;
-            derived.prototype = new Proto();
-            derived.prototype.constructor = base;
-            derived.prototype = copyInto(false, derived.prototype, origPrototype);
-            return derived;
-        },
-
         // Find the next node in the DOM tree that represents any text that is being
         // displayed directly next to the targetNode (passed as an argument)
         // Text that appears directly next to the current node can be:
