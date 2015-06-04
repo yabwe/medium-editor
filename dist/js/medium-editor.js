@@ -439,7 +439,7 @@ var Util;
             ESCAPE: 27,
             SPACE: 32,
             DELETE: 46,
-            K: 107
+            K: 75 // K keycode, and not k
         },
 
         /**
@@ -1152,14 +1152,6 @@ var buttonDefaults;
             contentDefault: '<b>image</b>',
             contentFA: '<i class="fa fa-picture-o"></i>'
         },
-        'quote': {
-            name: 'quote',
-            action: 'append-blockquote',
-            aria: 'blockquote',
-            tagNames: ['blockquote'],
-            contentDefault: '<b>&ldquo;</b>',
-            contentFA: '<i class="fa fa-quote-right"></i>'
-        },
         'orderedlist': {
             name: 'orderedlist',
             action: 'insertorderedlist',
@@ -1177,14 +1169,6 @@ var buttonDefaults;
             useQueryState: true,
             contentDefault: '<b>&bull;</b>',
             contentFA: '<i class="fa fa-list-ul"></i>'
-        },
-        'pre': {
-            name: 'pre',
-            action: 'append-pre',
-            aria: 'preformatted text',
-            tagNames: ['pre'],
-            contentDefault: '<b>0101</b>',
-            contentFA: '<i class="fa fa-code fa-lg"></i>'
         },
         'indent': {
             name: 'indent',
@@ -1250,32 +1234,6 @@ var buttonDefaults;
             contentDefault: '<b>R</b>',
             contentFA: '<i class="fa fa-align-right"></i>'
         },
-        'header1': {
-            name: 'header1',
-            action: function (options) {
-                return 'append-' + options.firstHeader;
-            },
-            aria: function (options) {
-                return options.firstHeader;
-            },
-            tagNames: function (options) {
-                return [options.firstHeader];
-            },
-            contentDefault: '<b>H1</b>'
-        },
-        'header2': {
-            name: 'header2',
-            action: function (options) {
-                return 'append-' + options.secondHeader;
-            },
-            aria: function (options) {
-                return options.secondHeader;
-            },
-            tagNames: function (options) {
-                return [options.secondHeader];
-            },
-            contentDefault: '<b>H2</b>'
-        },
         // Known inline elements that are not removed, or not removed consistantly across browsers:
         // <span>, <label>, <br>
         'removeFormat': {
@@ -1284,6 +1242,73 @@ var buttonDefaults;
             action: 'removeFormat',
             contentDefault: '<b>X</b>',
             contentFA: '<i class="fa fa-eraser"></i>'
+        },
+
+        /***** Buttons for appending block elements (append-<element> action) *****/
+
+        'quote': {
+            name: 'quote',
+            action: 'append-blockquote',
+            aria: 'blockquote',
+            tagNames: ['blockquote'],
+            contentDefault: '<b>&ldquo;</b>',
+            contentFA: '<i class="fa fa-quote-right"></i>'
+        },
+        'pre': {
+            name: 'pre',
+            action: 'append-pre',
+            aria: 'preformatted text',
+            tagNames: ['pre'],
+            contentDefault: '<b>0101</b>',
+            contentFA: '<i class="fa fa-code fa-lg"></i>'
+        },
+        'h1': {
+            name: 'h1',
+            action: 'append-h1',
+            aria: 'header type one',
+            tagNames: ['h1'],
+            contentDefault: '<b>H1</b>',
+            contentFA: '<i class="fa fa-header"><sup>1</sup>'
+        },
+        'h2': {
+            name: 'h2',
+            action: 'append-h2',
+            aria: 'header type two',
+            tagNames: ['h2'],
+            contentDefault: '<b>H2</b>',
+            contentFA: '<i class="fa fa-header"><sup>2</sup>'
+        },
+        'h3': {
+            name: 'h3',
+            action: 'append-h3',
+            aria: 'header type three',
+            tagNames: ['h3'],
+            contentDefault: '<b>H3</b>',
+            contentFA: '<i class="fa fa-header"><sup>3</sup>'
+        },
+        'h4': {
+            name: 'h4',
+            action: 'append-h4',
+            aria: 'header type four',
+            tagNames: ['h4'],
+            contentDefault: '<b>H4</b>',
+            contentFA: '<i class="fa fa-header"><sup>4</sup>'
+        },
+        'h5': {
+            name: 'h5',
+            action: 'append-h5',
+            aria: 'header type five',
+            tagNames: ['h5'],
+            contentDefault: '<b>H5</b>',
+            contentFA: '<i class="fa fa-header"><sup>5</sup>'
+        },
+        'h6': {
+            name: 'h6',
+            action: 'append-h6',
+            aria: 'header type six',
+            tagNames: ['h6'],
+            contentDefault: '<b>H6</b>',
+            contentFA: '<i class="fa fa-header"><sup>6</sup>'
         }
     };
 
@@ -1304,8 +1329,6 @@ var editorDefaults;
         elementsContainer: false,
         contentWindow: window,
         ownerDocument: document,
-        firstHeader: 'h3',
-        secondHeader: 'h4',
         targetBlank: false,
         extensions: {},
         spellcheck: true
@@ -1631,6 +1654,42 @@ var Selection;
                 }
             }
             return range;
+        },
+
+        // Returns 0 unless the cursor is within or preceded by empty paragraphs,
+        // in which case it returns the count of such preceding paragraphs, including
+        // the empty paragraph in which the cursor itself may be embedded.
+        getIndexRelativeToAdjacentEmptyParagraphs: function (doc, root, cursorContainer, cursorOffset) {
+            if (cursorContainer.nodeType === 3 && cursorOffset !== 0) {
+                return 0;
+            }
+
+            var treeWalker = doc.createTreeWalker(root, NodeFilter.SHOW_ELEMENT|NodeFilter.SHOW_TEXT, null, false);
+            if (cursorContainer.nodeType === 3) {
+                treeWalker.currentNode = cursorContainer;
+            } else if (cursorOffset === cursorContainer.childNodes.length) {
+                return 0; // not always accurate but should be close enough
+            } else {
+                treeWalker.currentNode = cursorContainer.childNodes[cursorOffset];
+            }
+
+            var precedingEmptyParagraphsCount = 0,
+                initialNode = treeWalker.currentNode,
+                initialNodeParagraph = Util.getClosestTag(initialNode, 'p');
+            while (treeWalker.currentNode &&
+                    (treeWalker.currentNode.nodeType !== 3 || treeWalker.currentNode === initialNode) &&
+                    !(treeWalker.currentNode.nodeName.toLowerCase() === 'p' &&
+                        treeWalker.currentNode !== initialNodeParagraph &&
+                        treeWalker.currentNode.textContent !== '')) {
+                var previousNode = treeWalker.previousNode();
+                if (previousNode === null) {
+                    break; // break out once we reach the limits of the tree walker
+                } else if (previousNode.nodeName.toLowerCase() === 'p') {
+                    precedingEmptyParagraphsCount += 1;
+                }
+            }
+
+            return precedingEmptyParagraphsCount;
         },
 
         selectionInContentEditableFalse: function (contentWindow) {
@@ -2394,6 +2453,16 @@ var Button;
          */
         contentFA: undefined,
 
+        /* classList: [Array]
+         * An array of classNames (strings) to be added to the button
+         */
+        classList: undefined,
+
+        /* attrs: [object]
+         * A set of key-value pairs to add to the button as custom attributes
+         */
+        attrs: undefined,
+
         /* buttonDefaults: [Object]
          * Set of default config options for all of the built-in MediumEditor buttons
          */
@@ -2446,19 +2515,29 @@ var Button;
                 content = this.contentDefault,
                 ariaLabel = this.getAria(),
                 buttonLabels = this.getEditorOption('buttonLabels');
+            // Add class names
             button.classList.add('medium-editor-action');
             button.classList.add('medium-editor-action-' + this.name);
+            if (this.classList) {
+                this.classList.forEach(function (className) {
+                    button.classList.add(className);
+                });
+            }
+
+            // Add attributes
             button.setAttribute('data-action', this.getAction());
             if (ariaLabel) {
                 button.setAttribute('title', ariaLabel);
                 button.setAttribute('aria-label', ariaLabel);
             }
-            if (buttonLabels) {
-                if (buttonLabels === 'fontawesome' && this.contentFA) {
-                    content = this.contentFA;
-                } else if (typeof buttonLabels === 'object' && buttonLabels[this.name]) {
-                    content = buttonLabels[this.name];
-                }
+            if (this.attrs) {
+                Object.keys(this.attrs).forEach(function (attr) {
+                    button.setAttribute(attr, this.attrs[attr]);
+                }, this);
+            }
+
+            if (buttonLabels === 'fontawesome' && this.contentFA) {
+                content = this.contentFA;
             }
             button.innerHTML = content;
             return button;
@@ -2685,8 +2764,7 @@ var AnchorForm;
             event.stopPropagation();
 
             var selectedParentElement = Selection.getSelectedParentElement(Selection.getSelectionRange(this.document));
-            if (selectedParentElement.tagName &&
-                    selectedParentElement.tagName.toLowerCase() === 'a') {
+            if (selectedParentElement.tagName && selectedParentElement.tagName.toLowerCase() === 'a') {
                 return this.execAction('unlink');
             }
 
@@ -3218,6 +3296,7 @@ LINK_REGEXP_TEXT =
                         if (this.performLinking(keyPressEvent.target)) {
                             // pass true for favorLaterSelectionAnchor - this is needed for links at the end of a
                             // paragraph in MS IE, or MS IE causes the link to be deleted right after adding it.
+                            console.info('importing selection');
                             this.base.importSelection(sel, true);
                         }
                     } catch (e) {
@@ -3243,7 +3322,14 @@ LINK_REGEXP_TEXT =
             }
             for (var i = 0; i < paragraphs.length; i++) {
                 documentModified = this.removeObsoleteAutoLinkSpans(paragraphs[i]) || documentModified;
+                if (documentModified) {
+                    console.info('removeObsoleteAutoLinkSpans modified document');
+                }
+                var oldDocumentModified = documentModified;
                 documentModified = this.performLinkingWithinElement(paragraphs[i]) || documentModified;
+                if (documentModified && !oldDocumentModified) {
+                    console.info('performLinkingWithinElement modified document');
+                }
             }
             return documentModified;
         },
@@ -3477,19 +3563,19 @@ var KeyboardCommands;
         commands: [
             {
                 command: 'bold',
-                key: 'b',
+                key: 'B',
                 meta: true,
                 shift: false
             },
             {
                 command: 'italic',
-                key: 'i',
+                key: 'I',
                 meta: true,
                 shift: false
             },
             {
                 command: 'underline',
-                key: 'u',
+                key: 'U',
                 meta: true,
                 shift: false
             }
@@ -3517,12 +3603,17 @@ var KeyboardCommands;
 
             var isMeta = Util.isMetaCtrlKey(event),
                 isShift = !!event.shiftKey;
+
             this.keys[keyCode].forEach(function (data) {
                 if (data.meta === isMeta &&
                     data.shift === isShift) {
                     event.preventDefault();
                     event.stopPropagation();
-                    this.execAction(data.command);
+
+                    // command can be false so the shortcurt is just disabled
+                    if (false !== data.command) {
+                        this.execAction(data.command);
+                    }
                 }
             }, this);
         }
@@ -4116,7 +4207,7 @@ var Toolbar;
         /* buttons: [Array]
          * the names of the set of buttons to display on the toolbar.
          */
-        buttons: ['bold', 'italic', 'underline', 'anchor', 'header1', 'header2', 'quote'],
+        buttons: ['bold', 'italic', 'underline', 'anchor', 'h2', 'h3', 'quote'],
 
         /* diffLeft: [Number]
          * value in pixels to be added to the X axis positioning of the toolbar.
@@ -4214,19 +4305,26 @@ var Toolbar;
                 li,
                 btn,
                 buttons,
-                extension;
+                extension,
+                buttonName,
+                buttonOpts;
 
             ul.id = 'medium-editor-toolbar-actions' + this.getEditorId();
             ul.className = 'medium-editor-toolbar-actions';
             ul.style.display = 'block';
 
             this.buttons.forEach(function (button) {
-                extension = this.base.getExtensionByName(button);
-
-                if (!extension) {
-                    // If button hasn't been passed as an extension, create it
-                    extension = this.base.addBuiltInExtension(button);
+                if (typeof button === 'string') {
+                    buttonName = button;
+                    buttonOpts = null;
+                } else {
+                    buttonName = button.name;
+                    buttonOpts = button;
                 }
+
+                // If the button already exists as an extension, it'll be returned
+                // othwerise it'll create the default built-in button
+                extension = this.base.addBuiltInExtension(buttonName, buttonOpts);
 
                 if (extension && typeof extension.getButton === 'function') {
                     btn = extension.getButton(this.base);
@@ -5320,15 +5418,17 @@ function MediumEditor(elements, options) {
         /**
          * NOT DOCUMENTED - exposed as a helper for other extensions to use
          */
-        addBuiltInExtension: function (name) {
-            var extension = this.getExtensionByName(name);
+        addBuiltInExtension: function (name, opts) {
+            var extension = this.getExtensionByName(name),
+                merged;
             if (extension) {
                 return extension;
             }
 
             switch (name) {
                 case 'anchor':
-                    extension = new MediumEditor.extensions.anchor(this.options.anchor);
+                    merged = Util.extend({}, this.options.anchor, opts);
+                    extension = new MediumEditor.extensions.anchor(merged);
                     break;
                 case 'anchorPreview':
                     extension = new MediumEditor.extensions.anchorPreview(this.options.anchorPreview);
@@ -5337,7 +5437,7 @@ function MediumEditor(elements, options) {
                     extension = new MediumEditor.extensions.autoLink();
                     break;
                 case 'fontsize':
-                    extension = new MediumEditor.extensions.fontSize();
+                    extension = new MediumEditor.extensions.fontSize(opts);
                     break;
                 case 'imageDragging':
                     extension = new MediumEditor.extensions.imageDragging();
@@ -5355,7 +5455,12 @@ function MediumEditor(elements, options) {
                     // All of the built-in buttons for MediumEditor are extensions
                     // so check to see if the extension we're creating is a built-in button
                     if (MediumEditor.extensions.button.isBuiltInButton(name)) {
-                        extension = new MediumEditor.extensions.button(name);
+                        if (opts) {
+                            merged = Util.defaults({}, opts, MediumEditor.extensions.button.prototype.defaults[name]);
+                            extension = new MediumEditor.extensions.button(merged);
+                        } else {
+                            extension = new MediumEditor.extensions.button(name);
+                        }
                     }
                     break;
             }
@@ -5375,7 +5480,6 @@ function MediumEditor(elements, options) {
             this.preventSelectionUpdates = false;
         },
 
-        // NOT DOCUMENTED - exposed as extension helper and for backwards compatability
         checkSelection: function () {
             var toolbar = this.getExtensionByName('toolbar');
             if (toolbar) {
@@ -5515,6 +5619,14 @@ function MediumEditor(elements, options) {
                         end: start + range.toString().length,
                         editableElementIndex: editableElementIndex
                     };
+                    var emptyParagraphsIndex = Selection.getIndexRelativeToAdjacentEmptyParagraphs(
+                            this.options.ownerDocument,
+                            this.elements[editableElementIndex],
+                            range.startContainer,
+                            range.startOffset);
+                    if (emptyParagraphsIndex !== 0) {
+                        selectionState.emptyParagraphsIndex = emptyParagraphsIndex;
+                    }
                 }
             }
 

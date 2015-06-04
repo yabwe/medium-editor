@@ -802,6 +802,14 @@ function MediumEditor(elements, options) {
                         end: start + range.toString().length,
                         editableElementIndex: editableElementIndex
                     };
+                    var emptyParagraphsIndex = Selection.getIndexRelativeToAdjacentEmptyParagraphs(
+                            this.options.ownerDocument,
+                            this.elements[editableElementIndex],
+                            range.startContainer,
+                            range.startOffset);
+                    if (emptyParagraphsIndex !== 0) {
+                        selectionState.emptyParagraphsIndex = emptyParagraphsIndex;
+                    }
                 }
             }
 
