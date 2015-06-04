@@ -26,29 +26,6 @@ describe('Extensions TestCase', function () {
             expect(editor.options.extensions).toBe(extensions);
         });
 
-        it('should call methods on all extensions with callExtensions is used', function () {
-            var Extension = function () {},
-                ext1 = new Extension(),
-                ext2 = new Extension(),
-                editor = this.newMediumEditor('.editor', {
-                    extensions: {
-                        'one': ext1,
-                        'two': ext2
-                    }
-                });
-
-            Extension.prototype.aMethod = function () {
-                // just a stub function
-            };
-
-            spyOn(ext1, 'aMethod');
-            spyOn(ext2, 'aMethod');
-
-            editor.callExtensions('aMethod', 'theParam');
-            expect(ext1.aMethod).toHaveBeenCalledWith('theParam');
-            expect(ext2.aMethod).toHaveBeenCalledWith('theParam');
-        });
-
         it('should set the base property to an instance of MediumEditor', function () {
             var extOne = new MediumEditor.Extension(),
                 editor = this.newMediumEditor('.editor', {

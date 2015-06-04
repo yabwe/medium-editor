@@ -648,34 +648,6 @@ function MediumEditor(elements, options) {
             return extension;
         },
 
-        /**
-         * NOT DOCUMENTED - exposed for backwards compatability
-         * Helper function to call a method with a number of parameters on all registered extensions.
-         * The function assures that the function exists before calling.
-         *
-         * @param {string} funcName name of the function to call
-         * @param [args] arguments passed into funcName
-         */
-        callExtensions: function (funcName) {
-            if (arguments.length < 1) {
-                return;
-            }
-
-            var args = Array.prototype.slice.call(arguments, 1),
-                ext,
-                name;
-
-            for (name in this.options.extensions) {
-                if (this.options.extensions.hasOwnProperty(name)) {
-                    ext = this.options.extensions[name];
-                    if (ext[funcName] !== undefined) {
-                        ext[funcName].apply(ext, args);
-                    }
-                }
-            }
-            return this;
-        },
-
         stopSelectionUpdates: function () {
             this.preventSelectionUpdates = true;
         },
