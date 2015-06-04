@@ -5,31 +5,6 @@ var Util;
 (function (window) {
     'use strict';
 
-    // Params: Array, Boolean, Object
-    function getProp(parts, create, context) {
-        if (!context) {
-            context = window;
-        }
-
-        try {
-            for (var i = 0; i < parts.length; i++) {
-                var p = parts[i];
-                if (!(p in context)) {
-                    if (create) {
-                        context[p] = {};
-                    } else {
-                        return;
-                    }
-                }
-                context = context[p];
-            }
-            return context;
-        } catch (e) {
-            // 'p in context' throws an exception when context is a number, boolean, etc. rather than an object,
-            // so in that corner case just return undefined (by having no return statement)
-        }
-    }
-
     function copyInto(overwrite, dest) {
         var prop,
             sources = Array.prototype.slice.call(arguments, 2);
@@ -698,22 +673,6 @@ var Util;
             } else {
                 el.parentNode.removeChild(el);
             }
-        },
-
-        setObject: function (name, value, context) {
-            // summary:
-            //      Set a property from a dot-separated string, such as 'A.B.C'
-            var parts = name.split('.'),
-                p = parts.pop(),
-                obj = getProp(parts, true, context);
-            return obj && p ? (obj[p] = value) : undefined; // Object
-        },
-
-        getObject: function (name, create, context) {
-            // summary:
-            //      Get a property from a dot-separated string, such as 'A.B.C'
-            return getProp(name ? name.split('.') : [], create, context); // Object
         }
-
     };
 }(window));
