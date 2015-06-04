@@ -1712,6 +1712,42 @@ var Selection;
             return range;
         },
 
+        // Returns 0 unless the cursor is within or preceded by empty paragraphs,
+        // in which case it returns the count of such preceding paragraphs, including
+        // the empty paragraph in which the cursor itself may be embedded.
+        getIndexRelativeToAdjacentEmptyParagraphs: function (doc, root, cursorContainer, cursorOffset) {
+            if (cursorContainer.nodeType === 3 && cursorOffset !== 0) {
+                return 0;
+            }
+
+            var treeWalker = doc.createTreeWalker(root, NodeFilter.SHOW_ELEMENT|NodeFilter.SHOW_TEXT, null, false);
+            if (cursorContainer.nodeType === 3) {
+                treeWalker.currentNode = cursorContainer;
+            } else if (cursorOffset === cursorContainer.childNodes.length) {
+                return 0; // not always accurate but should be close enough
+            } else {
+                treeWalker.currentNode = cursorContainer.childNodes[cursorOffset];
+            }
+
+            var precedingEmptyParagraphsCount = 0,
+                initialNode = treeWalker.currentNode,
+                initialNodeParagraph = Util.getClosestTag(initialNode, 'p');
+            while (treeWalker.currentNode &&
+                    (treeWalker.currentNode.nodeType !== 3 || treeWalker.currentNode === initialNode) &&
+                    !(treeWalker.currentNode.nodeName.toLowerCase() === 'p' &&
+                        treeWalker.currentNode !== initialNodeParagraph &&
+                        treeWalker.currentNode.textContent !== '')) {
+                var previousNode = treeWalker.previousNode();
+                if (previousNode === null) {
+                    break; // break out once we reach the limits of the tree walker
+                } else if (previousNode.nodeName.toLowerCase() === 'p') {
+                    precedingEmptyParagraphsCount += 1;
+                }
+            }
+
+            return precedingEmptyParagraphsCount;
+        },
+
         selectionInContentEditableFalse: function (contentWindow) {
             // determine if the current selection is exclusively inside
             // a contenteditable="false", though treat the case of an
@@ -1862,7 +1898,7 @@ var Selection;
 
         getSelectionRange: function (ownerDocument) {
             var selection = ownerDocument.getSelection();
-            if (selection.rangeCount === 0 || true === selection.isCollapsed) {
+            if (selection.rangeCount === 0) {
                 return null;
             }
             return selection.getRangeAt(0);
@@ -4015,6 +4051,7 @@ LINK_REGEXP_TEXT =
                         if (this.performLinking(keyPressEvent.target)) {
                             // pass true for favorLaterSelectionAnchor - this is needed for links at the end of a
                             // paragraph in MS IE, or MS IE causes the link to be deleted right after adding it.
+                            console.info('importing selection');
                             this.base.importSelection(sel, true);
                         }
                     } catch (e) {
@@ -4040,7 +4077,14 @@ LINK_REGEXP_TEXT =
             }
             for (var i = 0; i < paragraphs.length; i++) {
                 documentModified = this.removeObsoleteAutoLinkSpans(paragraphs[i]) || documentModified;
+                if (documentModified) {
+                    console.info('removeObsoleteAutoLinkSpans modified document');
+                }
+                var oldDocumentModified = documentModified;
                 documentModified = this.performLinkingWithinElement(paragraphs[i]) || documentModified;
+                if (documentModified && !oldDocumentModified) {
+                    console.info('performLinkingWithinElement modified document');
+                }
             }
             return documentModified;
         },
@@ -6301,6 +6345,14 @@ function MediumEditor(elements, options) {
                         end: start + range.toString().length,
                         editableElementIndex: editableElementIndex
                     };
+                    var emptyParagraphsIndex = Selection.getIndexRelativeToAdjacentEmptyParagraphs(
+                            this.options.ownerDocument,
+                            this.elements[editableElementIndex],
+                            range.startContainer,
+                            range.startOffset);
+                    if (emptyParagraphsIndex !== 0) {
+                        selectionState.emptyParagraphsIndex = emptyParagraphsIndex;
+                    }
                 }
             }
 

@@ -74,6 +74,36 @@ describe('Selection TestCase', function () {
             expect(Object.keys(exportedSelection).sort()).toEqual(['editableElementIndex', 'end', 'start']);
             expect(exportedSelection.editableElementIndex).toEqual(1);
         });
+
+        it('should not export a position indicating the cursor is before an empty paragraph', function () {
+            this.createElement('div', 'editor', '<p><span>www.google.com</span></p><p><br /></p><p>Whatever</p>');
+            var editor = this.newMediumEditor('.editor', {
+                buttons: ['italic', 'underline', 'strikethrough']
+            });
+            placeCursorInsideElement(editor.elements[1].querySelector('span'), 1); // end of first span
+            var exportedSelection = editor.exportSelection();
+            expect(exportedSelection.emptyParagraphsIndex).toEqual(undefined);
+        });
+
+        it('should export a position indicating the cursor is in an empty paragraph', function () {
+            this.createElement('div', 'editor', '<p><span>www.google.com</span></p><p><br /></p><p>Whatever</p>');
+            var editor = this.newMediumEditor('.editor', {
+                buttons: ['italic', 'underline', 'strikethrough']
+            });
+            placeCursorInsideElement(editor.elements[1].getElementsByTagName('p')[1], 0);
+            var exportedSelection = editor.exportSelection();
+            expect(exportedSelection.emptyParagraphsIndex).toEqual(1);
+        });
+
+        it('should export a position indicating the cursor is after an empty paragraph', function () {
+            this.createElement('div', 'editor', '<p><span>www.google.com</span></p><p><br /></p><p>Whatever</p>');
+            var editor = this.newMediumEditor('.editor', {
+                buttons: ['italic', 'underline', 'strikethrough']
+            });
+            placeCursorInsideElement(editor.elements[1].getElementsByTagName('p')[2], 0);
+            var exportedSelection = editor.exportSelection();
+            expect(exportedSelection.emptyParagraphsIndex).toEqual(2);
+        });
     });
 
     describe('Saving Selection', function () {
