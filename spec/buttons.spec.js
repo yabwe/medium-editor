@@ -1,6 +1,6 @@
 /*global MediumEditor, describe, it, expect, spyOn, AnchorForm,
          afterEach, beforeEach, jasmine, fireEvent, setupTestHelpers,
-         selectElementContentsAndFire, isOldIE, isIE, ButtonsData */
+         selectElementContentsAndFire, isOldIE, isIE */
 
 describe('Buttons TestCase', function () {
     'use strict';
@@ -64,12 +64,42 @@ describe('Buttons TestCase', function () {
         });
     });
 
+    describe('Button default config', function () {
+        it('should be accesible via defaults property of the button prototype', function () {
+            expect(MediumEditor.extensions.button.prototype.defaults['bold']).toBeTruthy();
+            expect(MediumEditor.extensions.button.prototype.defaults['anchor']).toBeFalsy();
+        });
+
+        it('should be check-able via static Button.isBuiltInButton() method', function () {
+            expect(MediumEditor.extensions.button.isBuiltInButton('bold')).toBe(true);
+            expect(MediumEditor.extensions.button.isBuiltInButton('anchor')).toBe(false);
+        });
+    });
+
+    describe('Button constructor', function () {
+        it('should accept a set of config options', function () {
+            var italicConfig = MediumEditor.extensions.button.prototype.defaults['italic'],
+                italicButton = new MediumEditor.extensions.button(italicConfig);
+
+            Object.keys(italicConfig).forEach(function (prop) {
+                expect(italicButton[prop]).toBe(italicConfig[prop]);
+            });
+        });
+
+        it('should accept a built-in button name', function () {
+            var italicButtonOne = new MediumEditor.extensions.button(MediumEditor.extensions.button.prototype.defaults['italic']),
+                italicButtonTwo = new MediumEditor.extensions.button('italic');
+
+            expect(italicButtonOne).toEqual(italicButtonTwo);
+        });
+    });
+
     describe('Buttons with various labels', function () {
         var defaultLabels = {},
             fontAwesomeLabels = {},
             customLabels = {},
             allButtons = [],
-            buttonsData = ButtonsData,
+            buttonsData = MediumEditor.extensions.button.prototype.defaults,
             currButton,
             tempEl;
 

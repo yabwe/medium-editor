@@ -1,8 +1,8 @@
-var ButtonsData;
+var buttonDefaults;
 (function () {
     'use strict';
 
-    ButtonsData = {
+    buttonDefaults = {
         'bold': {
             name: 'bold',
             action: 'bold',

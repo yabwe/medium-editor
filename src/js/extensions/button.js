@@ -2,9 +2,98 @@ var Button;
 (function () {
     'use strict';
 
-    /*global Extension */
+    /*global Extension, buttonDefaults */
 
     Button = Extension.extend({
+
+        /* Button Options */
+
+        /* action: [string]
+         * The action argument to pass to MediumEditor.execAction()
+         * when the button is clicked
+         */
+        action: undefined,
+
+        /* aria: [string]
+         * The value to add as the aria-label attribute of the button
+         * element displayed in the toolbar.
+         * This is also used as the tooltip for the button
+         */
+        aria: undefined,
+
+        /* tagNames: [Array]
+         * NOTE: This is not used if useQueryState is set to true.
+         *
+         * Array of element tag names that would indicate that this
+         * button has already been applied. If this action has already
+         * been applied, the button will be displayed as 'active' in the toolbar
+         *
+         * Example:
+         * For 'bold', if the text is ever within a <b> or <strong>
+         * tag that indicates the text is already bold. So the array
+         * of tagNames for bold would be: ['b', 'strong']
+         */
+        tagNames: undefined,
+
+        /* style: [Object]
+         * NOTE: This is not used if useQueryState is set to true.
+         *
+         * A pair of css property & value(s) that indicate that this
+         * button has already been applied. If this action has already
+         * been applied, the button will be displayed as 'active' in the toolbar
+         * Properties of the object:
+         *   prop [String]: name of the css property
+         *   value [String]: value(s) of the css property
+         *                   multiple values can be separated by a '|'
+         *
+         * Example:
+         * For 'bold', if the text is ever within an element with a 'font-weight'
+         * style property set to '700' or 'bold', that indicates the text
+         * is already bold.  So the style object for bold would be:
+         * { prop: 'font-weight', value: '700|bold' }
+         */
+        style: undefined,
+
+        /* useQueryState: [boolean]
+         * Enables/disables whether this button should use the built-in
+         * document.queryCommandState() method to determine whether
+         * the action has already been applied.  If the action has already
+         * been applied, the button will be displayed as 'active' in the toolbar
+         *
+         * Example:
+         * For 'bold', if this is set to true, the code will call:
+         * document.queryCommandState('bold') which will return true if the
+         * browser thinks the text is already bold, and false otherwise
+         */
+        useQueryState: undefined,
+
+        /* contentDefault: [string]
+         * Default innerHTML to put inside the button
+         */
+        contentDefault: undefined,
+
+        /* contentFA: [string]
+         * The innerHTML to use for the content of the button
+         * if the `buttonLabels` option for MediumEditor is set to 'fontawesome'
+         */
+        contentFA: undefined,
+
+        /* buttonDefaults: [Object]
+         * Set of default config options for all of the built-in MediumEditor buttons
+         */
+        defaults: buttonDefaults,
+
+        // The button constructor can optionally accept the name of a built-in button
+        // (ie 'bold', 'italic', etc.)
+        // When the name of a button is passed, it will initialize itself with the
+        // configuration for that button
+        constructor: function (options) {
+            if (Button.isBuiltInButton(options)) {
+                Extension.call(this, this.defaults[options]);
+            } else {
+                Extension.call(this, options);
+            }
+        },
 
         init: function () {
             Extension.prototype.init.apply(this, arguments);
@@ -125,4 +214,8 @@ var Button;
             return isMatch;
         }
     });
+
+    Button.isBuiltInButton = function (name) {
+        return (typeof name === 'string') && Button.prototype.defaults.hasOwnProperty(name);
+    };
 }());
