@@ -218,38 +218,38 @@ describe('Buttons TestCase', function () {
                 toolbar = editor.getExtensionByName('toolbar');
             selectElementContentsAndFire(editor.elements[0]);
             jasmine.clock().tick(1);
-            button = toolbar.getToolbarElement().querySelector('[data-action="append-h3"]');
+            button = toolbar.getToolbarElement().querySelector('[data-action="append-h2"]');
             fireEvent(button, 'click');
             if (isIE()) {
-                expect(document.execCommand).toHaveBeenCalledWith('formatBlock', false, '<h3>');
+                expect(document.execCommand).toHaveBeenCalledWith('formatBlock', false, '<h2>');
             } else {
-                expect(document.execCommand).toHaveBeenCalledWith('formatBlock', false, 'h3');
+                expect(document.execCommand).toHaveBeenCalledWith('formatBlock', false, 'h2');
             }
         });
 
-        it('should create an h3 element when h1 is clicked', function () {
+        it('should create an h2 element when h1 is clicked', function () {
             this.el.innerHTML = '<p><b>lorem ipsum</b></p>';
             var button,
                 editor = this.newMediumEditor('.editor'),
                 toolbar = editor.getExtensionByName('toolbar');
             selectElementContentsAndFire(editor.elements[0]);
             jasmine.clock().tick(1);
-            button = toolbar.getToolbarElement().querySelector('[data-action="append-h3"]');
+            button = toolbar.getToolbarElement().querySelector('[data-action="append-h2"]');
             fireEvent(button, 'click');
             // depending on the styling you have,
-            // IE might strip the <b> out when it applies the H3 here.
+            // IE might strip the <b> out when it applies the H2 here.
             // so, make the <b> match optional in the output:
-            expect(this.el.innerHTML).toMatch(/<h3>(<b>)?lorem ipsum(<\/b>)?<\/h3>/);
+            expect(this.el.innerHTML).toMatch(/<h2>(<b>)?lorem ipsum(<\/b>)?<\/h2>/);
         });
 
         it('should get back to a p element if parent element is the same as the action', function () {
-            this.el.innerHTML = '<h3><b>lorem ipsum</b></h3>';
+            this.el.innerHTML = '<h2><b>lorem ipsum</b></h2>';
             var button,
                 editor = this.newMediumEditor('.editor'),
                 toolbar = editor.getExtensionByName('toolbar');
             selectElementContentsAndFire(editor.elements[0].firstChild);
             jasmine.clock().tick(1);
-            button = toolbar.getToolbarElement().querySelector('[data-action="append-h3"]');
+            button = toolbar.getToolbarElement().querySelector('[data-action="append-h2"]');
             fireEvent(button, 'click');
             expect(this.el.innerHTML).toBe('<p><b>lorem ipsum</b></p>');
         });
@@ -847,27 +847,27 @@ describe('Buttons TestCase', function () {
                     }
                 }),
                 toolbar = editor.getExtensionByName('toolbar'),
-                buttonOne = toolbar.getToolbarElement().querySelector('[data-action="append-h3"]'),
-                buttonTwo = toolbar.getToolbarElement().querySelector('[data-action="append-h4"]'),
-                buttonThree = toolbar.getToolbarElement().querySelector('[data-action="append-h5"]');
+                buttonOne = toolbar.getToolbarElement().querySelector('[data-action="append-h2"]'),
+                buttonTwo = toolbar.getToolbarElement().querySelector('[data-action="append-h3"]'),
+                buttonThree = toolbar.getToolbarElement().querySelector('[data-action="append-h4"]');
 
-            this.el.innerHTML = '<h2>lorem</h2><h3>ipsum</h3><h4>dolor</h4><h5>lorem</h5>';
-            selectElementContentsAndFire(editor.elements[0].querySelector('h2'));
+            this.el.innerHTML = '<h1>lorem</h1><h2>ipsum</h2><h3>dolor</h3><h4>lorem</h4>';
+            selectElementContentsAndFire(editor.elements[0].querySelector('h1'));
             expect(buttonOne.classList.contains('medium-editor-button-active')).toBe(false);
             expect(buttonTwo.classList.contains('medium-editor-button-active')).toBe(false);
             expect(buttonThree.classList.contains('medium-editor-button-active')).toBe(false);
 
-            selectElementContentsAndFire(editor.elements[0].querySelector('h3'), { eventToFire: 'mouseup' });
+            selectElementContentsAndFire(editor.elements[0].querySelector('h2'), { eventToFire: 'mouseup' });
             expect(buttonOne.classList.contains('medium-editor-button-active')).toBe(true);
             expect(buttonTwo.classList.contains('medium-editor-button-active')).toBe(false);
             expect(buttonThree.classList.contains('medium-editor-button-active')).toBe(false);
 
-            selectElementContentsAndFire(editor.elements[0].querySelector('h4'), { eventToFire: 'mouseup' });
+            selectElementContentsAndFire(editor.elements[0].querySelector('h3'), { eventToFire: 'mouseup' });
             expect(buttonOne.classList.contains('medium-editor-button-active')).toBe(false);
             expect(buttonTwo.classList.contains('medium-editor-button-active')).toBe(true);
             expect(buttonThree.classList.contains('medium-editor-button-active')).toBe(false);
 
-            selectElementContentsAndFire(editor.elements[0].querySelector('h5'), { eventToFire: 'mouseup' });
+            selectElementContentsAndFire(editor.elements[0].querySelector('h4'), { eventToFire: 'mouseup' });
             expect(buttonOne.classList.contains('medium-editor-button-active')).toBe(false);
             expect(buttonTwo.classList.contains('medium-editor-button-active')).toBe(false);
             expect(buttonThree.classList.contains('medium-editor-button-active')).toBe(true);

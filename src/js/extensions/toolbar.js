@@ -43,10 +43,10 @@ var Toolbar;
          * to the second header button ('h2') and the last element (index 2) corresponds
          * to the last header button ('h3')
          * NOTE: By Default, medium displays the button as 'h1' but actually creates a
-         * <h3> element.  Thus, the default for medium-editor will also be to create
-         * a <h3> element.
+         * <h2> element.  Thus, the default for medium-editor will also be to create
+         * a <h2> element.
          */
-        headerTags: ['h3', 'h4', 'h5'],
+        headerTags: ['h2', 'h3', 'h4'],
 
         /* lastButtonClass: [string]
          * CSS class added to the last button in the toolbar.
