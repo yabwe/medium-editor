@@ -37,9 +37,14 @@ var Toolbar;
 
         /* headerTags: [Array]
          * the types of html elements to create when the h1, h2, or h3 toolbar
-         * buttons are clicked.
-         * The h1 button corresponds to tne tag at index 0 in the array
-         * The h2 button corresponds to index 1, and h3 to index 2
+         * buttons are clicked.  The first element in the array (index 0) indicates
+         * which element type (tag name) will be used when the first header button
+         * is clicked (the 'H1' button).  The second elemenet (index 1) corresponds
+         * to the second header button ('h2') and the last element (index 2) corresponds
+         * to the last header button ('h3')
+         * NOTE: By Default, medium displays the button as 'h1' but actually creates a
+         * <h3> element.  Thus, the default for medium-editor will also be to create
+         * a <h3> element.
          */
         headerTags: ['h3', 'h4', 'h5'],
 

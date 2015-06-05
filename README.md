@@ -100,8 +100,6 @@ MediumEditor also supports textarea. If you provide a textarea element, the scri
 * __disableEditing__: enables/disables adding the contenteditable behavior. Useful for using the toolbar with customized buttons/actions. You can also set specific element behavior by using setting a data-disable-editing attribute. Default: `false`
 * __elementsContainer__: specifies a DOM node to contain MediumEditor's toolbar and anchor preview elements. Default: `document.body`
 * __extensions__: extension to use (see [Custom Buttons and Extensions](https://github.com/yabwe/medium-editor/wiki/Custom-Buttons-and-Extensions)) for more. Default: `{}`
-* __firstHeader__: HTML tag to be used as first header. Default: `h3`
-* __secondHeader__: HTML tag to be used as second header. Default: `h4`
 * __spellcheck__: Enable/disable native contentEditable automatic spellcheck. Default: `true`
 * __targetBlank__: enables/disables target="\_blank" for anchor tags. Default: `false`
 
@@ -115,10 +113,11 @@ var editor = new MediumEditor('.editable', {
     toolbar: {
         /* These are the default options for the toolbar,
            if nothing is passed this is what is used */
-        buttons: ['bold', 'italic', 'underline', 'anchor', 'header1', 'header2', 'quote'],
+        buttons: ['bold', 'italic', 'underline', 'anchor', 'h1', 'h2', 'quote'],
         diffLeft: 0,
         diffTop: -10,
         firstButtonClass: 'medium-editor-button-first',
+        headerTags: ['h3', 'h4', 'h5'],
         lastButtonClass: 'medium-editor-button-last',
         standardizeSelectionStart: false,
         static: false,
@@ -131,10 +130,11 @@ var editor = new MediumEditor('.editable', {
 });
 ```
 
-* __buttons__: the set of buttons to display on the toolbar. Default: `['bold', 'italic', 'underline', 'anchor', 'header1', 'header2', 'quote']`
+* __buttons__: the set of buttons to display on the toolbar. Default: `['bold', 'italic', 'underline', 'anchor', 'h1', 'h2', 'quote']`
 * __diffLeft__: value in pixels to be added to the X axis positioning of the toolbar. Default: `0`
 * __diffTop__: value in pixels to be added to the Y axis positioning of the toolbar. Default: `-10`
 * __firstButtonClass__: CSS class added to the first button in the toolbar. Default: `'medium-editor-button-first'`
+* __headerTags__: the types of html elements to create when the h1, h2, or h3 toolbar buttons are clicked.  The first element in the array (index 0) indicates which tag name (ie `<h3>`) will be used when the <kbd>H1</kbd> button is clicked.  The second elemenet (index 1) corresponds to the <kbd>H2<kbd> button and the last element (index 2) corresponds to the <kbd>H3</kbd> button. Default: `['h3', 'h4', 'h5']`
 * __lastButtonClass__: CSS class added to the last button in the toolbar. Default: `'medium-editor-button-last'`
 * __standardizeSelectionStart__: enables/disables standardizing how the beginning of a range is decided between browsers whenever the selected text is analyzed for updating toolbar buttons status. Default: `false`
 * __static__: enable/disable the toolbar always displaying in the same location relative to the medium-editor element. Default: `false`
@@ -335,14 +335,13 @@ var editor = new MediumEditor('.editable', {
 
 ```javascript
 var editor = new MediumEditor('.editable', {
-    firstHeader: 'h1',
-    secondHeader: 'h2',
     delay: 1000,
     targetBlank: true,
     toolbar: {
         buttons: ['bold', 'italic', 'quote'],
         diffLeft: 25,
         diffTop: 10,
+        headerTags: ['h1', 'h2']
     },
     anchor: {
         placeholderText: 'Type a link',
@@ -365,22 +364,31 @@ var editor = new MediumEditor('.editable', {
 
 ## Extra buttons
 
-Medium Editor, by default, will show only the buttons listed above to avoid a huge toolbar. There are a few extra buttons you can use:
+Medium Editor, by default, will show only the buttons listed above to avoid a huge toolbar. However, there are some additional built-in buttons which can be used.
 
-* __superscript__
-* __subscript__
-* __strikethrough__
-* __unorderedlist__
-* __orderedlist__
-* __pre__
-* __justifyLeft__
-* __justifyFull__
-* __justifyCenter__
-* __justifyRight__
+#### All bult-in buttons supported by MediumEditor
+
+* __bold__ _(enabled by default)_
+* __h1__ _(enabled by default)_
+* __h2__ _(enabled by default)_
+* __h3__
 * __image__ (this simply converts selected text to an image tag)
 * __indent__ (moves the selected text up one level)
+* __italic__ _(enabled by default)_
+* __justifyCenter__
+* __justifyFull__
+* __justifyLeft__
+* __justifyRight__
+* __orderedlist__
 * __outdent__ (moves the selected text down one level)
+* __pre__
+* __quote__ _(enabled by default)_
 * __removeFormat__ (clears inline style formatting, preserves blocks)
+* __strikethrough__
+* __subscript__
+* __superscript__
+* __underline__ _(enabled by default)_
+* __unorderedlist__
 
 
 ## Themes
