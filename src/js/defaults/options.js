@@ -14,8 +14,6 @@ var editorDefaults;
         elementsContainer: false,
         contentWindow: window,
         ownerDocument: document,
-        firstHeader: 'h3',
-        secondHeader: 'h4',
         targetBlank: false,
         extensions: {},
         spellcheck: true
