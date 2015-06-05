@@ -138,7 +138,7 @@ function MediumEditor(elements, options) {
             return;
         }
 
-        if (node.getAttribute('data-medium-element') && node.children.length === 0) {
+        if (node.getAttribute('data-medium-editor-element') && node.children.length === 0) {
             this.options.ownerDocument.execCommand('formatBlock', false, 'p');
         }
 
@@ -322,7 +322,7 @@ function MediumEditor(elements, options) {
                 element.setAttribute('contentEditable', true);
                 element.setAttribute('spellcheck', this.options.spellcheck);
             }
-            element.setAttribute('data-medium-element', true);
+            element.setAttribute('data-medium-editor-element', true);
             element.setAttribute('role', 'textbox');
             element.setAttribute('aria-multiline', true);
             element.setAttribute('medium-editor-index', index);
@@ -522,7 +522,7 @@ function MediumEditor(elements, options) {
 
                 element.removeAttribute('contentEditable');
                 element.removeAttribute('spellcheck');
-                element.removeAttribute('data-medium-element');
+                element.removeAttribute('data-medium-editor-element');
 
                 // Remove any elements created for textareas
                 if (element.hasAttribute('medium-editor-textarea-id')) {
