@@ -134,7 +134,7 @@ var editor = new MediumEditor('.editable', {
 * __diffLeft__: value in pixels to be added to the X axis positioning of the toolbar. Default: `0`
 * __diffTop__: value in pixels to be added to the Y axis positioning of the toolbar. Default: `-10`
 * __firstButtonClass__: CSS class added to the first button in the toolbar. Default: `'medium-editor-button-first'`
-* __headerTags__: the types of html elements to create when the <kbd>H1</kbd>, <kbd>H2</kbd>, or <kbd>H3</kbd> toolbar buttons are clicked.  The first element in the array (index 0) indicates which tag name (ie `<h3>`) will be used when the <kbd>H1</kbd> button is clicked.  The second element in the array (index 1) corresponds to the <kbd>H2</kbd> button and the last element (index 2) corresponds to the <kbd>H3</kbd> button. Default: `['h2', 'h3', 'h4']`
+* __headerTags__: the types of html elements to create when the <kbd>H1</kbd>, <kbd>H2</kbd>, or <kbd>H3</kbd> toolbar buttons are clicked.  The first element in the array (index 0) indicates which tag name (ie `<h2>`) will be used when the <kbd>H1</kbd> button is clicked.  The second element in the array (index 1) corresponds to the <kbd>H2</kbd> button and the last element (index 2) corresponds to the <kbd>H3</kbd> button. Default: `['h2', 'h3', 'h4']`
 * __lastButtonClass__: CSS class added to the last button in the toolbar. Default: `'medium-editor-button-last'`
 * __standardizeSelectionStart__: enables/disables standardizing how the beginning of a range is decided between browsers whenever the selected text is analyzed for updating toolbar buttons status. Default: `false`
 * __static__: enable/disable the toolbar always displaying in the same location relative to the medium-editor element. Default: `false`
