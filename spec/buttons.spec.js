@@ -76,6 +76,24 @@ describe('Buttons TestCase', function () {
         });
     });
 
+    describe('Button constructor', function () {
+        it('should accept a set of config options', function () {
+            var italicConfig = MediumEditor.extensions.button.prototype.defaults['italic'],
+                italicButton = new MediumEditor.extensions.button(italicConfig);
+
+            Object.keys(italicConfig).forEach(function (prop) {
+                expect(italicButton[prop]).toBe(italicConfig[prop]);
+            });
+        });
+
+        it('should accept a built-in button name', function () {
+            var italicButtonOne = new MediumEditor.extensions.button(MediumEditor.extensions.button.prototype.defaults['italic']),
+                italicButtonTwo = new MediumEditor.extensions.button('italic');
+
+            expect(italicButtonOne).toEqual(italicButtonTwo);
+        });
+    });
+
     describe('Buttons with various labels', function () {
         var defaultLabels = {},
             fontAwesomeLabels = {},
