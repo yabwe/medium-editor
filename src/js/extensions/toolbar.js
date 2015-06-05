@@ -2,7 +2,7 @@ var Toolbar;
 (function () {
     'use strict';
 
-    /*global Util, Selection, Extension, ButtonsData */
+    /*global Util, Selection, Extension, buttonDefaults */
 
     Toolbar = Extension.extend({
         name: 'toolbar',
@@ -93,7 +93,7 @@ var Toolbar;
                             tagNames: [tag],
                             contentDefault: '<b>' + name.toUpperCase() + '</b>'
                         };
-                    ButtonsData[name] = headerConfig;
+                    buttonDefaults[name] = headerConfig;
                 });
             }
 
