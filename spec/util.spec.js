@@ -79,42 +79,6 @@ describe('Util', function () {
         });
     });
 
-    describe('getobject', function () {
-        it('should get nested objects', function () {
-            var obj = { a: { b: { c: { d: 10 } } } };
-            expect(Util.getObject('a.b.c.d', false, obj)).toBe(10);
-            expect(Util.getObject('a.b.c.d', false, false)).toBe(undefined);
-            expect(Util.getObject(false, false, obj)).toBe(obj);
-            expect(Util.getObject('a.b.c', false, obj)).toEqual({ d: 10 });
-            expect(Util.getObject('a', false, obj)).toEqual({ b: { c: { d: 10 } } });
-        });
-
-        it('should create a path if told to', function () {
-            var obj = {};
-            expect(Util.getObject('a.b.c.d', true, obj)).toEqual({});
-            expect(obj.a.b.c.d).toBeTruthy();
-        });
-
-        it('should NOT create a path', function () {
-            var obj = {};
-            expect(Util.getObject('a.b.c.d.e.f.g', false, obj)).toBe(undefined);
-            expect(obj.a).toBe(undefined);
-        });
-    });
-
-    describe('setobject', function () {
-        it('sets returns the value', function () {
-            var obj = {};
-            expect(Util.setObject('a.b.c', 10, obj)).toBe(10);
-            expect(obj.a.b.c).toBe(10);
-        });
-
-        it('sets returns undefined because of empty string', function () {
-            var obj = {};
-            expect(Util.setObject('', 10, obj)).toBe(undefined);
-        });
-    });
-
     describe('settargetblank', function () {
         it('sets target blank on a A element from a A element', function () {
             var el = this.createElement('a', '', 'lorem ipsum');
