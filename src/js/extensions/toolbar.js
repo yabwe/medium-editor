@@ -2,7 +2,7 @@ var Toolbar;
 (function () {
     'use strict';
 
-    /*global Util, Selection, Extension */
+    /*global Util, Selection, Extension, buttonDefaults */
 
     Toolbar = Extension.extend({
         name: 'toolbar',
@@ -18,7 +18,7 @@ var Toolbar;
         /* buttons: [Array]
          * the names of the set of buttons to display on the toolbar.
          */
-        buttons: ['bold', 'italic', 'underline', 'anchor', 'header1', 'header2', 'quote'],
+        buttons: ['bold', 'italic', 'underline', 'anchor', 'h1', 'h2', 'quote'],
 
         /* diffLeft: [Number]
          * value in pixels to be added to the X axis positioning of the toolbar.
@@ -34,6 +34,19 @@ var Toolbar;
          * CSS class added to the first button in the toolbar.
          */
         firstButtonClass: 'medium-editor-button-first',
+
+        /* headerTags: [Array]
+         * the types of html elements to create when the h1, h2, or h3 toolbar
+         * buttons are clicked.  The first element in the array (index 0) indicates
+         * which element type (tag name) will be used when the first header button
+         * is clicked (the 'H1' button).  The second elemenet (index 1) corresponds
+         * to the second header button ('h2') and the last element (index 2) corresponds
+         * to the last header button ('h3')
+         * NOTE: By Default, medium displays the button as 'h1' but actually creates a
+         * <h2> element.  Thus, the default for medium-editor will also be to create
+         * a <h2> element.
+         */
+        headerTags: ['h2', 'h3', 'h4'],
 
         /* lastButtonClass: [string]
          * CSS class added to the last button in the toolbar.
@@ -68,6 +81,21 @@ var Toolbar;
 
         init: function () {
             Extension.prototype.init.apply(this, arguments);
+
+            // Add headers into button defaults
+            if (this.headerTags && this.headerTags.length) {
+                this.headerTags.forEach(function (tag, index) {
+                    var name = 'h' + (index + 1),
+                        headerConfig = {
+                            name: name,
+                            action: 'append-' + tag,
+                            aria: tag,
+                            tagNames: [tag],
+                            contentDefault: '<b>' + name.toUpperCase() + '</b>'
+                        };
+                    buttonDefaults[name] = headerConfig;
+                });
+            }
 
             this.initThrottledMethods();
             this.getEditorOption('elementsContainer').appendChild(this.getToolbarElement());

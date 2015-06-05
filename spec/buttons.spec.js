@@ -104,26 +104,24 @@ describe('Buttons TestCase', function () {
             tempEl;
 
         Object.keys(buttonsData).forEach(function (buttonName) {
-            if (buttonName !== 'header1' && buttonName !== 'header2') {
-                allButtons.push(buttonName);
-                currButton = buttonsData[buttonName];
-                // If the labels contain HTML entities, we need to escape them
-                tempEl = document.createElement('div');
+            allButtons.push(buttonName);
+            currButton = buttonsData[buttonName];
+            // If the labels contain HTML entities, we need to escape them
+            tempEl = document.createElement('div');
 
-                // Default Labels
-                tempEl.innerHTML = currButton.contentDefault;
-                defaultLabels[buttonName] = {
-                    action: currButton.action,
-                    label: tempEl.innerHTML
-                };
+            // Default Labels
+            tempEl.innerHTML = currButton.contentDefault;
+            defaultLabels[buttonName] = {
+                action: currButton.action,
+                label: tempEl.innerHTML
+            };
 
-                // fontawesome labels
-                tempEl.innerHTML = currButton.contentFA;
-                fontAwesomeLabels[buttonName] = tempEl.innerHTML;
+            // fontawesome labels
+            tempEl.innerHTML = currButton.contentFA;
+            fontAwesomeLabels[buttonName] = tempEl.innerHTML;
 
-                // custom labels (using aria label as a test)
-                customLabels[buttonName] = currButton.aria;
-            }
+            // custom labels (using aria label as a test)
+            customLabels[buttonName] = currButton.aria;
         });
 
         it('should have aria-label and title attributes set', function () {
@@ -220,38 +218,38 @@ describe('Buttons TestCase', function () {
                 toolbar = editor.getExtensionByName('toolbar');
             selectElementContentsAndFire(editor.elements[0]);
             jasmine.clock().tick(1);
-            button = toolbar.getToolbarElement().querySelector('[data-action="append-h3"]');
+            button = toolbar.getToolbarElement().querySelector('[data-action="append-h2"]');
             fireEvent(button, 'click');
             if (isIE()) {
-                expect(document.execCommand).toHaveBeenCalledWith('formatBlock', false, '<h3>');
+                expect(document.execCommand).toHaveBeenCalledWith('formatBlock', false, '<h2>');
             } else {
-                expect(document.execCommand).toHaveBeenCalledWith('formatBlock', false, 'h3');
+                expect(document.execCommand).toHaveBeenCalledWith('formatBlock', false, 'h2');
             }
         });
 
-        it('should create an h3 element when header1 is clicked', function () {
+        it('should create an h2 element when h1 is clicked', function () {
             this.el.innerHTML = '<p><b>lorem ipsum</b></p>';
             var button,
                 editor = this.newMediumEditor('.editor'),
                 toolbar = editor.getExtensionByName('toolbar');
             selectElementContentsAndFire(editor.elements[0]);
             jasmine.clock().tick(1);
-            button = toolbar.getToolbarElement().querySelector('[data-action="append-h3"]');
+            button = toolbar.getToolbarElement().querySelector('[data-action="append-h2"]');
             fireEvent(button, 'click');
             // depending on the styling you have,
-            // IE might strip the <b> out when it applies the H3 here.
+            // IE might strip the <b> out when it applies the H2 here.
             // so, make the <b> match optional in the output:
-            expect(this.el.innerHTML).toMatch(/<h3>(<b>)?lorem ipsum(<\/b>)?<\/h3>/);
+            expect(this.el.innerHTML).toMatch(/<h2>(<b>)?lorem ipsum(<\/b>)?<\/h2>/);
         });
 
         it('should get back to a p element if parent element is the same as the action', function () {
-            this.el.innerHTML = '<h3><b>lorem ipsum</b></h3>';
+            this.el.innerHTML = '<h2><b>lorem ipsum</b></h2>';
             var button,
                 editor = this.newMediumEditor('.editor'),
                 toolbar = editor.getExtensionByName('toolbar');
             selectElementContentsAndFire(editor.elements[0].firstChild);
             jasmine.clock().tick(1);
-            button = toolbar.getToolbarElement().querySelector('[data-action="append-h3"]');
+            button = toolbar.getToolbarElement().querySelector('[data-action="append-h2"]');
             fireEvent(button, 'click');
             expect(this.el.innerHTML).toBe('<p><b>lorem ipsum</b></p>');
         });
@@ -845,62 +843,75 @@ describe('Buttons TestCase', function () {
         it('buttons should be active if the selection already has the element', function () {
             var editor = this.newMediumEditor('.editor', {
                     toolbar: {
-                        buttons: ['header1', 'header2']
+                        buttons: ['h1', 'h2', 'h3']
                     }
                 }),
                 toolbar = editor.getExtensionByName('toolbar'),
-                buttonOne = toolbar.getToolbarElement().querySelector('[data-action="append-h3"]'),
-                buttonTwo = toolbar.getToolbarElement().querySelector('[data-action="append-h4"]');
+                buttonOne = toolbar.getToolbarElement().querySelector('[data-action="append-h2"]'),
+                buttonTwo = toolbar.getToolbarElement().querySelector('[data-action="append-h3"]'),
+                buttonThree = toolbar.getToolbarElement().querySelector('[data-action="append-h4"]');
 
-            this.el.innerHTML = '<h2>lorem</h2><h3>ipsum</h3><h4>dolor</h4>';
-            selectElementContentsAndFire(editor.elements[0].querySelector('h2'));
+            this.el.innerHTML = '<h1>lorem</h1><h2>ipsum</h2><h3>dolor</h3><h4>lorem</h4>';
+            selectElementContentsAndFire(editor.elements[0].querySelector('h1'));
             expect(buttonOne.classList.contains('medium-editor-button-active')).toBe(false);
             expect(buttonTwo.classList.contains('medium-editor-button-active')).toBe(false);
+            expect(buttonThree.classList.contains('medium-editor-button-active')).toBe(false);
 
-            selectElementContentsAndFire(editor.elements[0].querySelector('h3'), { eventToFire: 'mouseup' });
+            selectElementContentsAndFire(editor.elements[0].querySelector('h2'), { eventToFire: 'mouseup' });
             expect(buttonOne.classList.contains('medium-editor-button-active')).toBe(true);
             expect(buttonTwo.classList.contains('medium-editor-button-active')).toBe(false);
+            expect(buttonThree.classList.contains('medium-editor-button-active')).toBe(false);
+
+            selectElementContentsAndFire(editor.elements[0].querySelector('h3'), { eventToFire: 'mouseup' });
+            expect(buttonOne.classList.contains('medium-editor-button-active')).toBe(false);
+            expect(buttonTwo.classList.contains('medium-editor-button-active')).toBe(true);
+            expect(buttonThree.classList.contains('medium-editor-button-active')).toBe(false);
 
             selectElementContentsAndFire(editor.elements[0].querySelector('h4'), { eventToFire: 'mouseup' });
             expect(buttonOne.classList.contains('medium-editor-button-active')).toBe(false);
-            expect(buttonTwo.classList.contains('medium-editor-button-active')).toBe(true);
+            expect(buttonTwo.classList.contains('medium-editor-button-active')).toBe(false);
+            expect(buttonThree.classList.contains('medium-editor-button-active')).toBe(true);
         });
 
         it('buttons should be active if the selection already custom defined element types', function () {
             var editor = this.newMediumEditor('.editor', {
                     toolbar: {
-                        buttons: ['header1', 'header2']
-                    },
-                    firstHeader: 'h1',
-                    secondHeader: 'h5'
+                        buttons: ['h1', 'h2', 'h3'],
+                        headerTags: ['h1', 'h4', 'h6']
+                    }
                 }),
                 toolbar = editor.getExtensionByName('toolbar'),
                 buttonOne = toolbar.getToolbarElement().querySelector('[data-action="append-h1"]'),
-                buttonTwo = toolbar.getToolbarElement().querySelector('[data-action="append-h5"]');
+                buttonTwo = toolbar.getToolbarElement().querySelector('[data-action="append-h4"]'),
+                buttonThree = toolbar.getToolbarElement().querySelector('[data-action="append-h6"]');
 
             expect(buttonOne).toBeTruthy();
             expect(buttonTwo).toBeTruthy();
+            expect(buttonThree).toBeTruthy();
 
-            this.el.innerHTML = '<h1>lorem</h1><h3>ipsum</h3><h5>dolor</h5>';
+            this.el.innerHTML = '<h1>lorem</h1><h4>ipsum</h4><h6>dolor</h6>';
             selectElementContentsAndFire(editor.elements[0].querySelector('h1'));
             expect(buttonOne.classList.contains('medium-editor-button-active')).toBe(true);
             expect(buttonTwo.classList.contains('medium-editor-button-active')).toBe(false);
+            expect(buttonThree.classList.contains('medium-editor-button-active')).toBe(false);
 
-            selectElementContentsAndFire(editor.elements[0].querySelector('h3'), { eventToFire: 'mouseup' });
-            expect(buttonOne.classList.contains('medium-editor-button-active')).toBe(false);
-            expect(buttonTwo.classList.contains('medium-editor-button-active')).toBe(false);
-
-            selectElementContentsAndFire(editor.elements[0].querySelector('h5'), { eventToFire: 'mouseup' });
+            selectElementContentsAndFire(editor.elements[0].querySelector('h4'), { eventToFire: 'mouseup' });
             expect(buttonOne.classList.contains('medium-editor-button-active')).toBe(false);
             expect(buttonTwo.classList.contains('medium-editor-button-active')).toBe(true);
+            expect(buttonThree.classList.contains('medium-editor-button-active')).toBe(false);
+
+            selectElementContentsAndFire(editor.elements[0].querySelector('h6'), { eventToFire: 'mouseup' });
+            expect(buttonOne.classList.contains('medium-editor-button-active')).toBe(false);
+            expect(buttonTwo.classList.contains('medium-editor-button-active')).toBe(false);
+            expect(buttonThree.classList.contains('medium-editor-button-active')).toBe(true);
         });
 
         it('buttons should convert between element types and "undo" back to original type', function () {
             var editor = this.newMediumEditor('.editor', {
                     toolbar: {
-                        buttons: ['header1', 'header2']
-                    },
-                    firstHeader: 'h1'
+                        buttons: ['h1', 'h2'],
+                        headerTags: ['h1', 'h4']
+                    }
                 }),
                 toolbar = editor.getExtensionByName('toolbar'),
                 buttonOne = toolbar.getToolbarElement().querySelector('[data-action="append-h1"]'),
