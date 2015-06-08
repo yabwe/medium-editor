@@ -1680,6 +1680,29 @@ var Selection;
         },
 
         // Utility method called from importSelection only
+        moveRangeForwardOverEmptyParagraphs: function (range, countOfParagraphs, document, root) {
+            function filterOnlyParagraphsAndText(node) {
+                if (node.nodeType === 3 || node.nodeName.toLowerCase() === 'p') {
+                    return NodeFilter.FILTER_ACCEPT;
+                } else {
+                    return NodeFilter.FILTER_SKIP;
+                }
+            }
+            var treeWalker = document.createTreeWalker(root, NodeFilter.SHOW_ELEMENT|NodeFilter.SHOW_TEXT,
+                filterOnlyParagraphsAndText, false);
+
+            treeWalker.currentNode = range.startContainer;
+            var prevNode,
+                node;
+            while ((node = treeWalker.nextNode()) && node.nodeType !== 3 && countOfParagraphs > 0) {
+                prevNode = node;
+                countOfParagraphs -= 1;
+            }
+            range.setStart(prevNode, 0);
+            range.collapse();
+        },
+
+        // Utility method called from importSelection only
         importSelectionMoveCursorPastAnchor: function (selectionState, range) {
             var nodeInsideAnchorTagFunction = function (node) {
                 return node.nodeName.toLowerCase() === 'a';
@@ -1730,17 +1753,13 @@ var Selection;
             }
 
             var precedingEmptyParagraphsCount = 0,
+                node,
                 initialNode = treeWalker.currentNode,
                 initialNodeParagraph = Util.getClosestTag(initialNode, 'p');
-            while (treeWalker.currentNode &&
-                    (treeWalker.currentNode.nodeType !== 3 || treeWalker.currentNode === initialNode) &&
-                    !(treeWalker.currentNode.nodeName.toLowerCase() === 'p' &&
-                        treeWalker.currentNode !== initialNodeParagraph &&
-                        treeWalker.currentNode.textContent !== '')) {
-                var previousNode = treeWalker.previousNode();
-                if (previousNode === null) {
-                    break; // break out once we reach the limits of the tree walker
-                } else if (previousNode.nodeName.toLowerCase() === 'p') {
+            while ((node = treeWalker.previousNode()) && (node.nodeType !== 3) &&
+                    !(node.nodeName.toLowerCase() === 'p' && node.textContent !== '' &&
+                        node !== initialNodeParagraph)) {
+                if (node.nodeName.toLowerCase() === 'p') {
                     precedingEmptyParagraphsCount += 1;
                 }
             }
@@ -6345,13 +6364,16 @@ function MediumEditor(elements, options) {
                         end: start + range.toString().length,
                         editableElementIndex: editableElementIndex
                     };
-                    var emptyParagraphsIndex = Selection.getIndexRelativeToAdjacentEmptyParagraphs(
-                            this.options.ownerDocument,
-                            this.elements[editableElementIndex],
-                            range.startContainer,
-                            range.startOffset);
-                    if (emptyParagraphsIndex !== 0) {
-                        selectionState.emptyParagraphsIndex = emptyParagraphsIndex;
+                    // If start = 0 there may still be an empty paragraph before it, but we don't care.
+                    if (start !== 0) {
+                        var emptyParagraphsIndex = Selection.getIndexRelativeToAdjacentEmptyParagraphs(
+                                this.options.ownerDocument,
+                                this.elements[editableElementIndex],
+                                range.startContainer,
+                                range.startOffset);
+                        if (emptyParagraphsIndex !== 0) {
+                            selectionState.emptyParagraphsIndex = emptyParagraphsIndex;
+                        }
                     }
                 }
             }
@@ -6427,11 +6449,15 @@ function MediumEditor(elements, options) {
                 }
             }
 
+            if (inSelectionState.emptyParagraphsIndex && selectionState.end === nextCharIndex) {
+                Selection.moveRangeForwardOverEmptyParagraphs(range, inSelectionState.emptyParagraphsIndex,
+                    this.options.ownerDocument, editableElement);
+            }
+
             // If the selection is right at the ending edge of a link, put it outside the anchor tag instead of inside.
             if (favorLaterSelectionAnchor) {
                 range = Selection.importSelectionMoveCursorPastAnchor(selectionState, range);
             }
-
             sel = this.options.contentWindow.getSelection();
             sel.removeAllRanges();
             sel.addRange(range);
