@@ -27,6 +27,29 @@ var Selection;
         },
 
         // Utility method called from importSelection only
+        moveRangeForwardOverEmptyParagraphs: function (range, countOfParagraphs, document, root) {
+            function filterOnlyParagraphsAndText(node) {
+                if (node.nodeType === 3 || node.nodeName.toLowerCase() === 'p') {
+                    return NodeFilter.FILTER_ACCEPT;
+                } else {
+                    return NodeFilter.FILTER_SKIP;
+                }
+            }
+            var treeWalker = document.createTreeWalker(root, NodeFilter.SHOW_ELEMENT|NodeFilter.SHOW_TEXT,
+                filterOnlyParagraphsAndText, false);
+
+            treeWalker.currentNode = range.startContainer;
+            var prevNode,
+                node;
+            while ((node = treeWalker.nextNode()) && node.nodeType !== 3 && countOfParagraphs > 0) {
+                prevNode = node;
+                countOfParagraphs -= 1;
+            }
+            range.setStart(prevNode, 0);
+            range.collapse();
+        },
+
+        // Utility method called from importSelection only
         importSelectionMoveCursorPastAnchor: function (selectionState, range) {
             var nodeInsideAnchorTagFunction = function (node) {
                 return node.nodeName.toLowerCase() === 'a';
@@ -77,17 +100,13 @@ var Selection;
             }
 
             var precedingEmptyParagraphsCount = 0,
+                node,
                 initialNode = treeWalker.currentNode,
                 initialNodeParagraph = Util.getClosestTag(initialNode, 'p');
-            while (treeWalker.currentNode &&
-                    (treeWalker.currentNode.nodeType !== 3 || treeWalker.currentNode === initialNode) &&
-                    !(treeWalker.currentNode.nodeName.toLowerCase() === 'p' &&
-                        treeWalker.currentNode !== initialNodeParagraph &&
-                        treeWalker.currentNode.textContent !== '')) {
-                var previousNode = treeWalker.previousNode();
-                if (previousNode === null) {
-                    break; // break out once we reach the limits of the tree walker
-                } else if (previousNode.nodeName.toLowerCase() === 'p') {
+            while ((node = treeWalker.previousNode()) && (node.nodeType !== 3) &&
+                    !(node.nodeName.toLowerCase() === 'p' && node.textContent !== '' &&
+                        node !== initialNodeParagraph)) {
+                if (node.nodeName.toLowerCase() === 'p') {
                     precedingEmptyParagraphsCount += 1;
                 }
             }

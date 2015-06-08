@@ -1,9 +1,22 @@
 /*global MediumEditor, describe, it, expect, spyOn, AnchorForm,
+         beforeAll, afterAll,
          afterEach, beforeEach, jasmine, fireEvent, setupTestHelpers,
          selectElementContentsAndFire, isOldIE, isIE */
 
 describe('Buttons TestCase', function () {
     'use strict';
+
+    var textarea;
+    beforeAll(function () {
+        textarea = document.createElement('textarea');
+        textarea.innerHTML = 'Ignore me please, placed here to make create an image test pass in Gecko';
+        document.body.appendChild(textarea);
+        textarea.focus();
+    });
+
+    afterAll(function () {
+        document.body.removeChild(textarea);
+    });
 
     beforeEach(function () {
         setupTestHelpers.call(this);

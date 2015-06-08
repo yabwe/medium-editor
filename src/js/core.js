@@ -802,13 +802,16 @@ function MediumEditor(elements, options) {
                         end: start + range.toString().length,
                         editableElementIndex: editableElementIndex
                     };
-                    var emptyParagraphsIndex = Selection.getIndexRelativeToAdjacentEmptyParagraphs(
-                            this.options.ownerDocument,
-                            this.elements[editableElementIndex],
-                            range.startContainer,
-                            range.startOffset);
-                    if (emptyParagraphsIndex !== 0) {
-                        selectionState.emptyParagraphsIndex = emptyParagraphsIndex;
+                    // If start = 0 there may still be an empty paragraph before it, but we don't care.
+                    if (start !== 0) {
+                        var emptyParagraphsIndex = Selection.getIndexRelativeToAdjacentEmptyParagraphs(
+                                this.options.ownerDocument,
+                                this.elements[editableElementIndex],
+                                range.startContainer,
+                                range.startOffset);
+                        if (emptyParagraphsIndex !== 0) {
+                            selectionState.emptyParagraphsIndex = emptyParagraphsIndex;
+                        }
                     }
                 }
             }
@@ -884,11 +887,15 @@ function MediumEditor(elements, options) {
                 }
             }
 
+            if (inSelectionState.emptyParagraphsIndex && selectionState.end === nextCharIndex) {
+                Selection.moveRangeForwardOverEmptyParagraphs(range, inSelectionState.emptyParagraphsIndex,
+                    this.options.ownerDocument, editableElement);
+            }
+
             // If the selection is right at the ending edge of a link, put it outside the anchor tag instead of inside.
             if (favorLaterSelectionAnchor) {
                 range = Selection.importSelectionMoveCursorPastAnchor(selectionState, range);
             }
-
             sel = this.options.contentWindow.getSelection();
             sel.removeAllRanges();
             sel.addRange(range);

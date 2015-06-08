@@ -1,5 +1,5 @@
 /*global MediumEditor, describe, it, expect, spyOn,
-         afterEach, beforeEach, fireEvent,
+         afterEach, beforeEach, fireEvent, Util,
          jasmine, selectElementContents, setupTestHelpers,
          selectElementContentsAndFire, Selection,
          placeCursorInsideElement */
@@ -110,6 +110,38 @@ describe('Selection TestCase', function () {
             placeCursorInsideElement(editor.elements[1].getElementsByTagName('p')[2], 0);
             var exportedSelection = editor.exportSelection();
             expect(exportedSelection.emptyParagraphsIndex).toEqual(2);
+        });
+
+        it('should import a position with the cursor in an empty paragraph', function () {
+            this.createElement('div', 'editor', '<p><span>www.google.com</span></p><p><br /></p><p>Whatever</p>');
+            var editor = this.newMediumEditor('.editor', {
+                buttons: ['italic', 'underline', 'strikethrough']
+            });
+            editor.importSelection({
+                'start': 14,
+                'end': 14,
+                'editableElementIndex': 1,
+                'emptyParagraphsIndex': 1
+            });
+
+            var startParagraph = Util.getClosestTag(window.getSelection().getRangeAt(0).startContainer, 'p');
+            expect(startParagraph).toBe(editor.elements[1].getElementsByTagName('p')[1], 'empty paragraph');
+        });
+
+        it('should import a position with the cursor after an empty paragraph', function () {
+            this.createElement('div', 'editor', '<p><span>www.google.com</span></p><p><br /></p><p>Whatever</p>');
+            var editor = this.newMediumEditor('.editor', {
+                buttons: ['italic', 'underline', 'strikethrough']
+            });
+            editor.importSelection({
+                'start': 14,
+                'end': 14,
+                'editableElementIndex': 1,
+                'emptyParagraphsIndex': 2
+            });
+
+            var startParagraph = Util.getClosestTag(window.getSelection().getRangeAt(0).startContainer, 'p');
+            expect(startParagraph).toBe(editor.elements[1].getElementsByTagName('p')[2], 'paragraph after empty paragraph');
         });
     });
 
