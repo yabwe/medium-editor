@@ -1,0 +1,373 @@
+<html>
+
+<head>
+    <style>
+    @font-face {
+        font-family: 'medium-icons';
+        src: url("medium-icons.eot");
+        src: url("medium-icons.eot?#iefix") format("embedded-opentype"), url("medium-icons.woff") format("woff"), url("medium-icons.ttf") format("truetype"), url("medium-icons.svg?#medium-icons") format("svg");
+        font-weight: normal;
+        font-style: normal
+    }
+
+    .highlightMenu {
+        position: absolute;
+        z-index: 500;
+        transition: none;
+        top: 0;
+        left: 0
+    }
+
+    .highlightMenu-inner {
+        position: relative;
+        background-image: linear-gradient(to bottom, rgba(49, 49, 47, 0.99), #262625);
+        background-repeat: repeat-x;
+        border-radius: 5px
+    }
+
+    .highlightMenu-inner {
+        position: relative;
+        background-image: linear-gradient(to bottom, rgba(49, 49, 47, 0.99), #262625);
+        background-repeat: repeat-x;
+        border-radius: 5px
+    }
+
+    .buttonSet>.button--highlightMenu {
+        height: 42px;
+        line-height: 42px
+    }
+
+    .button--highlightMenu {
+        display: inline-block;
+        border: 0;
+        color: white;
+        box-sizing: content-box;
+        vertical-align: center
+    }
+
+    .button.button--highlightMenu .icon:before,
+    .button.button--highlightMenu .icon:after {
+        color: #fff
+    }
+
+    .buttonSet .button--highlightMenu:first-child {
+        padding-left: 18px
+    }
+
+    .buttonSet .button--highlightMenu:last-child {
+        padding-right: 18px
+    }
+
+    .button--highlightMenu .icon:before {
+        margin: 0;
+        color: #fff;
+        font-size: 22px;
+        line-height: 42px;
+        text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.15)
+    }
+
+    .button--highlightMenu .svgIcon {
+        margin-top: 8px;
+        fill: #fff
+    }
+
+    .button--highlightMenu.is-active .icon:before {
+        color: #60d778
+    }
+
+    .button--highlightMenu.is-active .svgIcon {
+        fill: #60d778
+    }
+
+    .button--highlightMenu .icon--link:before {
+        position: relative;
+        top: 1px
+    }
+
+    .button--highlightMenu .icon--highlighter:before {
+        top: 0
+    }
+
+    .button--highlightMenuNotes .icon--notes {
+        position: relative
+    }
+
+    .button--highlightMenuNotes .icon--notes:after {
+        color: #262625;
+        position: absolute;
+        left: 0;
+        right: 0;
+        line-height: 40px;
+        text-align: center;
+        font-size: 14px
+    }
+
+    .button.button--highlightMenuNotes .icon--notes:after {
+        color: #262625
+    }
+
+    .browser-firefox .button--highlightMenuNotes .icon--notes:after {
+        top: -16px
+    }
+
+    .button--highlightMenu .icon--tt:before {
+        position: relative;
+        font-size: 19px;
+        top: 3px
+    }
+
+    .button--highlightMenu .icon--dropCap:before {
+        font-size: 25px;
+        position: relative;
+        top: 1px
+    }
+
+    .buttonSet-separator {
+        display: inline-block;
+        vertical-align: middle;
+        width: 1px;
+        margin: 0 6px;
+        height: 24px;
+        background: rgba(255, 255, 255, 0.2)
+    }
+
+    .highlightMenu .highlightMenu-arrowClip {
+        position: absolute;
+        bottom: -10px;
+        left: 50%;
+        clip: rect(10px 20px 20px 0);
+        margin-left: -10px
+    }
+
+    .highlightMenu .highlightMenu-arrowClip .highlightMenu-arrow {
+        display: block;
+        width: 20px;
+        height: 20px;
+        background-color: #262625;
+        -webkit-transform: rotate(45deg) scale(.5);
+        -ms-transform: rotate(45deg) scale(.5);
+        transform: rotate(45deg) scale(.5)
+    }
+
+    .highlightMenu.is-flushTop .highlightMenu-arrowClip {
+        display: none
+    }
+
+    .button--highlightMenuBlockquote {
+        position: relative
+    }
+
+    .button--highlightMenuBlockquote .icon--blockquote:before {
+        width: 7px;
+        display: block;
+        overflow: hidden;
+        margin-right: 8px
+    }
+
+    .button--highlightMenuBlockquote .icon--blockquote:after {
+        position: absolute;
+        font-size: 22px;
+        line-height: 42px;
+        left: 8px;
+        width: 7px;
+        top: 1px;
+        overflow: hidden
+    }
+
+    .browser-firefox .icon--blockquote:before,
+    .browser-firefox .icon--blockquote:after {
+        text-indent: 1px
+    }
+
+    .button--highlightMenuBlockquote.is-blockquoteMode .icon--blockquote:before {
+        color: #60d778
+    }
+
+    .button--highlightMenuBlockquote.is-pullquoteMode .icon--blockquote:before,
+    .button--highlightMenuBlockquote.is-pullquoteMode .icon--blockquote:after {
+        color: #60d778
+    }
+
+    .highlightMenu-linkinput {
+        display: none;
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0
+    }
+
+    .highlightMenu-linkinputField {
+        background: rgba(0, 0, 0, 0);
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        padding: 11px 40px 11px 10px;
+        color: #fff;
+        border: none;
+        outline: none;
+        font-size: 16px;
+        box-sizing: border-box;
+        border-radius: 5px;
+        appearance: none;
+        font-family: "freight-text-pro", Georgia, Cambria, "Times New Roman", Times, serif;
+        letter-spacing: .01rem;
+        font-weight: 400;
+        font-style: normal;
+        text-rendering: optimizeLegibility;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        -moz-font-feature-settings: "liga" on
+    }
+
+    .highlightMenu-linkinput .button--highlightMenu {
+        position: absolute;
+        top: 0;
+        right: 10px;
+        bottom: 4px
+    }
+
+    .highlightMenu--linkMode .buttonSet {
+        visibility: hidden
+    }
+
+    .highlightMenu--linkMode .highlightMenu-linkinput {
+        display: block;
+        -webkit-animation: pop-upwards 180ms forwards linear;
+        animation: pop-upwards 180ms forwards linear
+    }
+
+    .highlightMenu--measure {
+        display: inline-block;
+        visibility: hidden
+    }
+
+    .highlightMenu--active {
+        display: inline-block;
+        visibility: visible;
+        transition: top 75ms ease-out, left 75ms ease-out;
+        -webkit-animation: pop-upwards 180ms forwards linear;
+        animation: pop-upwards 180ms forwards linear
+    }
+
+    .highlightMenu-media .button--highlightMenu .icon:before {
+        font-size: 28px;
+        line-height: 38px
+    }
+
+    .icon {
+        font-family: 'medium-icons';
+        font-weight: normal;
+        font-style: normal;
+        speak: none;
+        text-decoration: none;
+        text-transform: none;
+        text-rendering: optimizeLegibility;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale
+    }
+
+    .icon--h1:before {
+        content: "\f135"
+    }
+
+    .icon--h2:before {
+        content: "\f136"
+    }
+
+    .icon--h3:before {
+        content: "\f137"
+    }
+
+    .icon--alignLeft:before {
+        content: "\f110"
+    }
+
+    .icon--alignCenterThin:before {
+        content: "\f10d"
+    }
+
+    .icon--alignCenter:before {
+        content: "\f10e"
+    }
+
+    .icon--alignLeftThin:before {
+        content: "\f10f"
+    }
+
+    .icon--embed:before {
+        content: "\f124"
+    }
+
+    .icon--italic:before {
+        content: "\f148"
+    }
+
+    .icon--link:before {
+        content: "\f149"
+    }
+
+    .icon--list:before {
+        content: "\f14a"
+    }
+
+    .icon--blockquote:before {
+        content: "\f11a"
+    }
+
+    .icon--bold:before {
+        content: "\f11b"
+    }
+    </style>
+</head>
+
+<body>
+    <div class="highlightMenu">
+        <div class="highlightMenu-inner">
+            <div class="buttonSet buttonSet--highlightMenu">
+                <div class="button button--chromeless button--highlightMenu">
+                    <span class="icon icon--h1"></span>
+                </div>
+                <div class="button button--chromeless button--highlightMenu">
+                    <span class="icon icon--h2"></span>
+                </div>
+                <div class="button button--chromeless button--highlightMenu">
+                    <span class="icon icon--h3"></span>
+                </div>
+                <div class="button button--chromeless button--highlightMenu">
+                    <span class="icon icon--bold"></span>
+                </div>
+                <div class="button button--chromeless button--highlightMenu">
+                    <span class="icon icon--italic"></span>
+                </div>
+                <div class="button button--chromeless button--highlightMenu">
+                    <span class="icon icon--alignLeft"></span>
+                </div>
+                <div class="button button--chromeless button--highlightMenu">
+                    <span class="icon icon--alignCenter"></span>
+                </div>
+                <div class="button button--chromeless button--highlightMenu">
+                    <span class="icon icon--alignLeftThin"></span>
+                </div>
+                <div class="button button--chromeless button--highlightMenu">
+                    <span class="icon icon--alignCenterThin"></span>
+                </div>
+                <div class="button button--chromeless button--highlightMenu">
+                    <span class="icon icon--embed"></span>
+                </div>
+                <div class="button button--chromeless button--highlightMenu">
+                    <span class="icon icon--link"></span>
+                </div>
+                <div class="button button--chromeless button--highlightMenu">
+                    <span class="icon icon--list"></span>
+                </div>
+                <div class="button button--chromeless button--highlightMenu">
+                    <span class="icon icon--blockquote"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
