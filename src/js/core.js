@@ -465,7 +465,7 @@ function MediumEditor(elements, options) {
                 var range = Selection.getSelectionRange(this.options.ownerDocument);
                 if (range !== null) {
                     var parentNode = Selection.getSelectedParentElement(range),
-                        temp = html.replace(reg, "");
+                        temp = html.replace(reg, '');
                     /* Before the action is applied, alle the <br> are removed. */
                     parentNode.innerHTML = temp;
                     /* The action is applied so the markup does not get weird */
