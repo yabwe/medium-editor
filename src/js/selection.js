@@ -46,7 +46,7 @@ var Selection;
                 countOfParagraphs -= 1;
             }
             range.setStart(prevNode, 0);
-            range.collapse();
+            range.collapse(true);
         },
 
         // Utility method called from importSelection only
