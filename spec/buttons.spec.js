@@ -94,6 +94,65 @@ describe('Buttons TestCase', function () {
         });
     });
 
+    describe('Button options', function () {
+        it('should support overriding defaults', function () {
+            this.el.innerHTML = '<h2>lorem</h2><h3>ipsum</h3>';
+            var editor = this.newMediumEditor('.editor', {
+                    toolbar: {
+                        buttons: [
+                            'bold',
+                            {
+                                name: 'h1',
+                                action: 'append-h2',
+                                aria: 'fake h1',
+                                tagNames: ['h2'],
+                                contentDefault: '<b>H1</b>'
+                            },
+                            {
+                                name: 'h2',
+                                getAction: function () {
+                                    return 'append-h3';
+                                },
+                                getAria: function () {
+                                    return 'fake h2';
+                                },
+                                getTagNames: function () {
+                                    return ['h3'];
+                                },
+                                contentDefault: '<b>H2</b>'
+                            }
+                        ]
+                    }
+                }),
+                headerOneButton = editor.getExtensionByName('h1'),
+                headerTwoButton = editor.getExtensionByName('h2'),
+                toolbar = editor.getExtensionByName('toolbar');
+
+            expect(toolbar.getToolbarElement().querySelectorAll('button').length).toBe(3);
+
+            var button = toolbar.getToolbarElement().querySelector('.medium-editor-action-h1'),
+                buttonTwo = toolbar.getToolbarElement().querySelector('.medium-editor-action-h2');
+            expect(button).toBe(headerOneButton.getButton());
+            expect(button.getAttribute('aria-label')).toBe('fake h1');
+            expect(button.getAttribute('title')).toBe('fake h1');
+            expect(button.innerHTML).toBe('<b>H1</b>');
+
+            selectElementContentsAndFire(editor.elements[0].querySelector('h2').firstChild);
+            jasmine.clock().tick(1);
+            expect(button.classList.contains('medium-editor-button-active')).toBe(true);
+            expect(buttonTwo.classList.contains('medium-editor-button-active')).toBe(false);
+
+            expect(buttonTwo).toBe(headerTwoButton.getButton());
+            expect(buttonTwo.getAttribute('aria-label')).toBe('fake h2');
+            expect(buttonTwo.getAttribute('title')).toBe('fake h2');
+            expect(buttonTwo.innerHTML).toBe('<b>H2</b>');
+
+            selectElementContentsAndFire(editor.elements[0].querySelector('h3'), { eventToFire: 'mouseup' });
+            expect(button.classList.contains('medium-editor-button-active')).toBe(false);
+            expect(buttonTwo.classList.contains('medium-editor-button-active')).toBe(true);
+        });
+    });
+
     describe('Buttons with various labels', function () {
         var defaultLabels = {},
             fontAwesomeLabels = {},
