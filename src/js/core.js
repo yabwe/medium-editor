@@ -761,7 +761,6 @@ function MediumEditor(elements, options) {
             this.preventSelectionUpdates = false;
         },
 
-        // NOT DOCUMENTED - exposed as extension helper and for backwards compatability
         checkSelection: function () {
             if (this.toolbar) {
                 this.toolbar.checkState();
