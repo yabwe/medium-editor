@@ -94,14 +94,14 @@ MediumEditor also supports textarea. If you provide a textarea element, the scri
 * __activeButtonClass__: CSS class added to active buttons in the toolbar. Default: `'medium-editor-button-active'`
 * __allowMultiParagraphSelection__: enables the toolbar when selecting multiple paragraphs/block elements. Default: `true`
 * __buttonLabels__: type of labels on the buttons. Values: 'fontawesome', `{'bold': '<b>b</b>', 'italic': '<i>i</i>'}`. Default: `false`
+#### NOTE:
+Using `'fontawesome'` as the buttonLabels requires version 4.1.0 of the fontawesome css to be on the page to ensure all icons will be displayed correctly
 * __delay__: time in milliseconds to show the toolbar or anchor tag preview. Default: `0`
 * __disableReturn__:  enables/disables the use of the return-key. You can also set specific element behavior by using setting a data-disable-return attribute. Default: `false`
 * __disableDoubleReturn__:  allows/disallows two (or more) empty new lines. You can also set specific element behavior by using setting a data-disable-double-return attribute. Default: `false`
 * __disableEditing__: enables/disables adding the contenteditable behavior. Useful for using the toolbar with customized buttons/actions. You can also set specific element behavior by using setting a data-disable-editing attribute. Default: `false`
 * __elementsContainer__: specifies a DOM node to contain MediumEditor's toolbar and anchor preview elements. Default: `document.body`
 * __extensions__: extension to use (see [Custom Buttons and Extensions](https://github.com/yabwe/medium-editor/wiki/Custom-Buttons-and-Extensions)) for more. Default: `{}`
-* __firstHeader__: HTML tag to be used as first header. Default: `h3`
-* __secondHeader__: HTML tag to be used as second header. Default: `h4`
 * __spellcheck__: Enable/disable native contentEditable automatic spellcheck. Default: `true`
 * __targetBlank__: enables/disables target="\_blank" for anchor tags. Default: `false`
 
@@ -115,7 +115,7 @@ var editor = new MediumEditor('.editable', {
     toolbar: {
         /* These are the default options for the toolbar,
            if nothing is passed this is what is used */
-        buttons: ['bold', 'italic', 'underline', 'anchor', 'header1', 'header2', 'quote'],
+        buttons: ['bold', 'italic', 'underline', 'anchor', 'h2', 'h3', 'quote'],
         diffLeft: 0,
         diffTop: -10,
         firstButtonClass: 'medium-editor-button-first',
@@ -131,7 +131,7 @@ var editor = new MediumEditor('.editable', {
 });
 ```
 
-* __buttons__: the set of buttons to display on the toolbar. Default: `['bold', 'italic', 'underline', 'anchor', 'header1', 'header2', 'quote']`
+* __buttons__: the set of buttons to display on the toolbar. Default: `['bold', 'italic', 'underline', 'anchor', 'h2', 'h3', 'quote']`
 * __diffLeft__: value in pixels to be added to the X axis positioning of the toolbar. Default: `0`
 * __diffTop__: value in pixels to be added to the Y axis positioning of the toolbar. Default: `-10`
 * __firstButtonClass__: CSS class added to the first button in the toolbar. Default: `'medium-editor-button-first'`
@@ -335,8 +335,6 @@ var editor = new MediumEditor('.editable', {
 
 ```javascript
 var editor = new MediumEditor('.editable', {
-    firstHeader: 'h1',
-    secondHeader: 'h2',
     delay: 1000,
     targetBlank: true,
     toolbar: {
