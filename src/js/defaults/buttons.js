@@ -242,14 +242,6 @@ var buttonDefaults;
             tagNames: ['h6'],
             contentDefault: '<b>H6</b>',
             contentFA: '<i class="fa fa-header"><sup>6</sup>'
-        },
-        'p': {
-            name: 'p',
-            action: 'append-p',
-            aria: 'paragraph',
-            tagNames: ['p'],
-            contentDefault: '<b>&para;</b>',
-            contentFA: '<i class="fa fa-paragraph">'
         }
     };
 
