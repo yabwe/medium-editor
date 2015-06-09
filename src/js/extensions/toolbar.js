@@ -18,7 +18,7 @@ var Toolbar;
         /* buttons: [Array]
          * the names of the set of buttons to display on the toolbar.
          */
-        buttons: ['bold', 'italic', 'underline', 'anchor', 'header1', 'header2', 'quote'],
+        buttons: ['bold', 'italic', 'underline', 'anchor', 'h2', 'h3', 'quote'],
 
         /* diffLeft: [Number]
          * value in pixels to be added to the X axis positioning of the toolbar.
@@ -116,19 +116,26 @@ var Toolbar;
                 li,
                 btn,
                 buttons,
-                extension;
+                extension,
+                buttonName,
+                buttonOpts;
 
             ul.id = 'medium-editor-toolbar-actions' + this.getEditorId();
             ul.className = 'medium-editor-toolbar-actions';
             ul.style.display = 'block';
 
             this.buttons.forEach(function (button) {
-                extension = this.base.getExtensionByName(button);
-
-                if (!extension) {
-                    // If button hasn't been passed as an extension, create it
-                    extension = this.base.addBuiltInExtension(button);
+                if (typeof button === 'string') {
+                    buttonName = button;
+                    buttonOpts = null;
+                } else {
+                    buttonName = button.name;
+                    buttonOpts = button;
                 }
+
+                // If the button already exists as an extension, it'll be returned
+                // othwerise it'll create the default built-in button
+                extension = this.base.addBuiltInExtension(buttonName, buttonOpts);
 
                 if (extension && typeof extension.getButton === 'function') {
                     btn = extension.getButton(this.base);

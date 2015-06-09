@@ -601,7 +601,7 @@ function MediumEditor(elements, options) {
         /**
          * NOT DOCUMENTED - exposed as a helper for other extensions to use
          */
-        addBuiltInExtension: function (name) {
+        addBuiltInExtension: function (name, opts) {
             var extension = this.getExtensionByName(name);
             if (extension) {
                 return extension;
@@ -636,7 +636,12 @@ function MediumEditor(elements, options) {
                     // All of the built-in buttons for MediumEditor are extensions
                     // so check to see if the extension we're creating is a built-in button
                     if (MediumEditor.extensions.button.isBuiltInButton(name)) {
-                        extension = new MediumEditor.extensions.button(name);
+                        if (opts) {
+                            var merged = Util.defaults({}, opts, MediumEditor.extensions.button.prototype.defaults[name]);
+                            extension = new MediumEditor.extensions.button(merged);
+                        } else {
+                            extension = new MediumEditor.extensions.button(name);
+                        }
                     }
                     break;
             }

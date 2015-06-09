@@ -104,26 +104,24 @@ describe('Buttons TestCase', function () {
             tempEl;
 
         Object.keys(buttonsData).forEach(function (buttonName) {
-            if (buttonName !== 'header1' && buttonName !== 'header2') {
-                allButtons.push(buttonName);
-                currButton = buttonsData[buttonName];
-                // If the labels contain HTML entities, we need to escape them
-                tempEl = document.createElement('div');
+            allButtons.push(buttonName);
+            currButton = buttonsData[buttonName];
+            // If the labels contain HTML entities, we need to escape them
+            tempEl = document.createElement('div');
 
-                // Default Labels
-                tempEl.innerHTML = currButton.contentDefault;
-                defaultLabels[buttonName] = {
-                    action: currButton.action,
-                    label: tempEl.innerHTML
-                };
+            // Default Labels
+            tempEl.innerHTML = currButton.contentDefault;
+            defaultLabels[buttonName] = {
+                action: currButton.action,
+                label: tempEl.innerHTML
+            };
 
-                // fontawesome labels
-                tempEl.innerHTML = currButton.contentFA;
-                fontAwesomeLabels[buttonName] = tempEl.innerHTML;
+            // fontawesome labels
+            tempEl.innerHTML = currButton.contentFA;
+            fontAwesomeLabels[buttonName] = tempEl.innerHTML;
 
-                // custom labels (using aria label as a test)
-                customLabels[buttonName] = currButton.aria;
-            }
+            // custom labels (using aria label as a test)
+            customLabels[buttonName] = currButton.aria;
         });
 
         it('should have aria-label and title attributes set', function () {
@@ -229,7 +227,7 @@ describe('Buttons TestCase', function () {
             }
         });
 
-        it('should create an h3 element when header1 is clicked', function () {
+        it('should create an h3 element when h3 is clicked', function () {
             this.el.innerHTML = '<p><b>lorem ipsum</b></p>';
             var button,
                 editor = this.newMediumEditor('.editor'),
@@ -845,7 +843,7 @@ describe('Buttons TestCase', function () {
         it('buttons should be active if the selection already has the element', function () {
             var editor = this.newMediumEditor('.editor', {
                     toolbar: {
-                        buttons: ['header1', 'header2']
+                        buttons: ['h3', 'h4']
                     }
                 }),
                 toolbar = editor.getExtensionByName('toolbar'),
@@ -869,10 +867,8 @@ describe('Buttons TestCase', function () {
         it('buttons should be active if the selection already custom defined element types', function () {
             var editor = this.newMediumEditor('.editor', {
                     toolbar: {
-                        buttons: ['header1', 'header2']
-                    },
-                    firstHeader: 'h1',
-                    secondHeader: 'h5'
+                        buttons: ['h1', 'h5']
+                    }
                 }),
                 toolbar = editor.getExtensionByName('toolbar'),
                 buttonOne = toolbar.getToolbarElement().querySelector('[data-action="append-h1"]'),
@@ -898,9 +894,8 @@ describe('Buttons TestCase', function () {
         it('buttons should convert between element types and "undo" back to original type', function () {
             var editor = this.newMediumEditor('.editor', {
                     toolbar: {
-                        buttons: ['header1', 'header2']
-                    },
-                    firstHeader: 'h1'
+                        buttons: ['h1', 'h4']
+                    }
                 }),
                 toolbar = editor.getExtensionByName('toolbar'),
                 buttonOne = toolbar.getToolbarElement().querySelector('[data-action="append-h1"]'),
