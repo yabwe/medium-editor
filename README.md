@@ -93,7 +93,7 @@ MediumEditor also supports textarea. If you provide a textarea element, the scri
 ### Core options
 * __activeButtonClass__: CSS class added to active buttons in the toolbar. Default: `'medium-editor-button-active'`
 * __allowMultiParagraphSelection__: enables the toolbar when selecting multiple paragraphs/block elements. Default: `true`
-* __buttonLabels__: type of labels on the buttons. Values: 'fontawesome', `{'bold': '<b>b</b>', 'italic': '<i>i</i>'}`. Default: `false`
+* __buttonLabels__: type of labels on the buttons. Values: `false` | 'fontawesome'.  Default: `false`
 #### NOTE:
 Using `'fontawesome'` as the buttonLabels requires version 4.1.0 of the fontawesome css to be on the page to ensure all icons will be displayed correctly
 * __delay__: time in milliseconds to show the toolbar or anchor tag preview. Default: `0`

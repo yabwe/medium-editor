@@ -36,13 +36,23 @@
             });
         var editor2 = new MediumEditor('.secondEditable', {
                 toolbar: {
-                    buttons: ['bold', 'italic', 'underline', 'anchor']
-                },
-                buttonLabels: {
-                    'bold': 'bold',
-                    'italic': '<i>italic</i>',
-                    'underline': '<u>underline</u>',
-                    'anchor': 'link'
+                    buttons: [{
+                            name: 'bold',
+                            contentDefault: 'bold'
+                        },
+                        {
+                            name: 'italic',
+                            contentDefault: '<i>italic</i>'
+                        },
+                        {
+                            name: 'underline',
+                            contentDefault: '<u>underline</u>'
+                        },
+                        {
+                            name: 'anchor',
+                            contentDefault: 'link'
+                        }
+                    ]
                 }
             });
     </script>

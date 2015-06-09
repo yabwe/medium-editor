@@ -137,12 +137,8 @@ var Button;
                 button.setAttribute('title', ariaLabel);
                 button.setAttribute('aria-label', ariaLabel);
             }
-            if (buttonLabels) {
-                if (buttonLabels === 'fontawesome' && this.contentFA) {
-                    content = this.contentFA;
-                } else if (typeof buttonLabels === 'object' && buttonLabels[this.name]) {
-                    content = buttonLabels[this.name];
-                }
+            if (buttonLabels === 'fontawesome' && this.contentFA) {
+                content = this.contentFA;
             }
             button.innerHTML = content;
             return button;

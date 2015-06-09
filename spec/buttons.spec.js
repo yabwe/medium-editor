@@ -99,6 +99,7 @@ describe('Buttons TestCase', function () {
             fontAwesomeLabels = {},
             customLabels = {},
             allButtons = [],
+            customButtons = [],
             buttonsData = MediumEditor.extensions.button.prototype.defaults,
             currButton,
             tempEl;
@@ -122,6 +123,10 @@ describe('Buttons TestCase', function () {
 
             // custom labels (using aria label as a test)
             customLabels[buttonName] = currButton.aria;
+            customButtons.push({
+                name: buttonName,
+                contentDefault: currButton.aria
+            });
         });
 
         it('should have aria-label and title attributes set', function () {
@@ -190,9 +195,8 @@ describe('Buttons TestCase', function () {
                 button,
                 editor = this.newMediumEditor('.editor', {
                     toolbar: {
-                        buttons: allButtons
-                    },
-                    buttonLabels: customLabels
+                        buttons: customButtons
+                    }
                 }),
                 toolbar = editor.getExtensionByName('toolbar');
             expect(toolbar.getToolbarElement().querySelectorAll('button').length).toBe(allButtons.length);
