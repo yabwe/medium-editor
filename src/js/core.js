@@ -663,7 +663,6 @@ function MediumEditor(elements, options) {
             this.preventSelectionUpdates = false;
         },
 
-        // NOT DOCUMENTED - exposed as extension helper and for backwards compatability
         checkSelection: function () {
             var toolbar = this.getExtensionByName('toolbar');
             if (toolbar) {
