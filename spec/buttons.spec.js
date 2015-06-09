@@ -129,6 +129,35 @@ describe('Buttons TestCase', function () {
             });
         });
 
+        // Add in anchor button
+        allButtons.push('anchor');
+        tempEl = document.createElement('div');
+        tempEl.innerHTML = MediumEditor.extensions.anchor.prototype.contentDefault;
+        defaultLabels['anchor'] = {
+            label: tempEl.innerHTML
+        };
+        tempEl.innerHTML = MediumEditor.extensions.anchor.prototype.contentFA;
+        fontAwesomeLabels['anchor'] = tempEl.innerHTML;
+        customLabels['anchor'] = MediumEditor.extensions.anchor.prototype.aria;
+        customButtons.push({
+            name: 'anchor',
+            contentDefault: customLabels['anchor']
+        });
+
+        // Add in fontsize button
+        allButtons.push('fontsize');
+        tempEl.innerHTML = MediumEditor.extensions.fontSize.prototype.contentDefault;
+        defaultLabels['fontsize'] = {
+            label: tempEl.innerHTML
+        };
+        tempEl.innerHTML = MediumEditor.extensions.fontSize.prototype.contentFA;
+        fontAwesomeLabels['fontsize'] = tempEl.innerHTML;
+        customLabels['fontsize'] = MediumEditor.extensions.fontSize.prototype.aria;
+        customButtons.push({
+            name: 'fontsize',
+            contentDefault: customLabels['fontsize']
+        });
+
         it('should have aria-label and title attributes set', function () {
             var button,
                 editor = this.newMediumEditor('.editor', {
@@ -184,7 +213,9 @@ describe('Buttons TestCase', function () {
                 button = toolbar.getToolbarElement().querySelector('.medium-editor-action-' + buttonName);
                 expect(button).not.toBeUndefined();
                 fireEvent(button, 'click');
-                expect(editor.execAction).toHaveBeenCalledWith(action);
+                if (action) {
+                    expect(editor.execAction).toHaveBeenCalledWith(action);
+                }
                 expect(button.innerHTML).toBe(fontAwesomeLabels[buttonName]);
             });
         });
@@ -208,7 +239,9 @@ describe('Buttons TestCase', function () {
                 button = toolbar.getToolbarElement().querySelector('.medium-editor-action-' + buttonName);
                 expect(button).not.toBeUndefined();
                 fireEvent(button, 'click');
-                expect(editor.execAction).toHaveBeenCalledWith(action);
+                if (action) {
+                    expect(editor.execAction).toHaveBeenCalledWith(action);
+                }
                 expect(button.innerHTML).toBe(customLabels[buttonName]);
             });
         });
