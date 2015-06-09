@@ -56,11 +56,11 @@ function MediumEditor(elements, options) {
 
         if (Util.isKey(event, [Util.keyCode.BACKSPACE, Util.keyCode.ENTER]) &&
                 // has a preceeding sibling
-                node.previousElementSibling &&
+            node.previousElementSibling &&
                 // in a header
-                isHeader.test(tagName) &&
+            isHeader.test(tagName) &&
                 // at the very end of the block
-                Selection.getCaretOffsets(node).left === 0) {
+            Selection.getCaretOffsets(node).left === 0) {
             if (Util.isKey(event, Util.keyCode.BACKSPACE) && isEmpty.test(node.previousElementSibling.innerHTML)) {
                 // backspacing the begining of a header into an empty previous element will
                 // change the tagName of the current node to prevent one
@@ -97,13 +97,13 @@ function MediumEditor(elements, options) {
 
             event.preventDefault();
         } else if (Util.isKey(event, Util.keyCode.BACKSPACE) &&
-                tagName === 'li' &&
+            tagName === 'li' &&
                 // hitting backspace inside an empty li
-                isEmpty.test(node.innerHTML) &&
+            isEmpty.test(node.innerHTML) &&
                 // is first element (no preceeding siblings)
-                !node.previousElementSibling &&
+            !node.previousElementSibling &&
                 // parent also does not have a sibling
-                !node.parentElement.previousElementSibling &&
+            !node.parentElement.previousElementSibling &&
                 // is not the only li in a list
                 node.nextElementSibling &&
                 node.nextElementSibling.nodeName.toLowerCase() === 'li') {
@@ -433,6 +433,7 @@ function MediumEditor(elements, options) {
     function execActionInternal(action, opts) {
         /*jslint regexp: true*/
         var appendAction = /^append-(.+)$/gi,
+            justifyAction = /justify([A-Za-z]*)$/g, /* Detecting if is justifyCenter|Right|Left */
             match;
         /*jslint regexp: false*/
 
@@ -453,6 +454,27 @@ function MediumEditor(elements, options) {
 
         if (action === 'image') {
             return this.options.ownerDocument.execCommand('insertImage', false, this.options.contentWindow.getSelection());
+        }
+        /* Issue: https://github.com/yabwe/medium-editor/issues/595
+         * If the action is to justify the text */
+        if (justifyAction.exec(action)) {
+            var reg = /<br\/*>/gm,
+                html = Selection.getSelectionHtml.call(this);
+            /* The problem is caused by the <br> that are translated by Chrome in "div" instead of plain text */
+            if (reg.exec(html) !== null) {
+                var range = Selection.getSelectionRange(this.options.ownerDocument);
+                if (range !== null) {
+                    var parentNode = Selection.getSelectedParentElement(range),
+                        temp = html.replace(reg, "");
+                    /* Before the action is applied, alle the <br> are removed. */
+                    parentNode.innerHTML = temp;
+                    /* The action is applied so the markup does not get weird */
+                    this.options.ownerDocument.execCommand(action, false, null);
+                    /* Replace the html with the actual html with the <br> so the formatting
+                     * of the new line is not lost */
+                    return parentNode.innerHTML = html;
+                }
+            }
         }
 
         return this.options.ownerDocument.execCommand(action, false, null);
@@ -846,7 +868,7 @@ function MediumEditor(elements, options) {
             }
 
             var editableElementIndex = inSelectionState.editableElementIndex === undefined ?
-                                                0 : inSelectionState.editableElementIndex,
+                    0 : inSelectionState.editableElementIndex,
                 selectionState = {
                     editableElementIndex: editableElementIndex,
                     start: inSelectionState.start,
