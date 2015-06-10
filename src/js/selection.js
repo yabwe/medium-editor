@@ -27,23 +27,23 @@ var Selection;
         },
 
         // Utility method called from importSelection only
-        getSelectionTargetOverEmptyParagraphs: function (startContainer, countOfParagraphs, document, root) {
-            function filterOnlyParagraphsAndText(node) {
-                if (node.nodeType === 3 || node.nodeName.toLowerCase() === 'p') {
+        getSelectionTargetOverEmptyBlocks: function (startContainer, countOfBlocks, document, root) {
+            function filterOnlyBlocksAndText(node) {
+                if (node.nodeType === 3 || Util.parentElements.indexOf(node.nodeName.toLowerCase()) !== -1) {
                     return NodeFilter.FILTER_ACCEPT;
                 } else {
                     return NodeFilter.FILTER_SKIP;
                 }
             }
             var treeWalker = document.createTreeWalker(root, NodeFilter.SHOW_ELEMENT|NodeFilter.SHOW_TEXT,
-                filterOnlyParagraphsAndText, false);
+                filterOnlyBlocksAndText, false);
 
             treeWalker.currentNode = startContainer;
             var prevNode,
                 node;
-            while ((node = treeWalker.nextNode()) && node.nodeType !== 3 && countOfParagraphs > 0) {
+            while ((node = treeWalker.nextNode()) && node.nodeType !== 3 && countOfBlocks > 0) {
                 prevNode = node;
-                countOfParagraphs -= 1;
+                countOfBlocks -= 1;
             }
             return prevNode;
         },
@@ -81,10 +81,10 @@ var Selection;
             return range;
         },
 
-        // Returns 0 unless the cursor is within or preceded by empty paragraphs,
+        // Returns 0 unless the cursor is within or preceded by empty paragraphs/blocks,
         // in which case it returns the count of such preceding paragraphs, including
         // the empty paragraph in which the cursor itself may be embedded.
-        getIndexRelativeToAdjacentEmptyParagraphs: function (doc, root, cursorContainer, cursorOffset) {
+        getIndexRelativeToAdjacentEmptyBlocks: function (doc, root, cursorContainer, cursorOffset) {
             if (cursorContainer.nodeType === 3 && cursorOffset !== 0) {
                 return 0;
             }
@@ -98,19 +98,27 @@ var Selection;
                 treeWalker.currentNode = cursorContainer.childNodes[cursorOffset];
             }
 
-            var precedingEmptyParagraphsCount = 0,
+            var precedingEmptyBlocksCount = 0,
                 node,
                 initialNode = treeWalker.currentNode,
-                initialNodeParagraph = Util.getClosestTag(initialNode, 'p');
+                candidateNode = initialNode,
+                initialNodeBlock = null;
+            while (initialNodeBlock === null && candidateNode !== null) {
+                if (Util.parentElements.indexOf(candidateNode.nodeName.toLowerCase()) !== -1) {
+                    initialNodeBlock = candidateNode;
+                } else {
+                    candidateNode = candidateNode.parentNode;
+                }
+            }
             while ((node = treeWalker.previousNode()) && (node.nodeType !== 3) &&
                     !(node.nodeName.toLowerCase() === 'p' && node.textContent !== '' &&
-                        node !== initialNodeParagraph)) {
+                        node !== initialNodeBlock)) {
                 if (node.nodeName.toLowerCase() === 'p') {
-                    precedingEmptyParagraphsCount += 1;
+                    precedingEmptyBlocksCount += 1;
                 }
             }
 
-            return precedingEmptyParagraphsCount;
+            return precedingEmptyBlocksCount;
         },
 
         selectionInContentEditableFalse: function (contentWindow) {
