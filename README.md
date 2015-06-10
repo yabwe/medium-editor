@@ -192,7 +192,7 @@ var editor = new MediumEditor('.editable', {
                 contentDefault: '<b>H1</b>',
                 classList: ['custom-class-h1'],
                 attrs: {
-                    'data-header-type': 'h1'
+                    'data-custom-attr': 'attr-value-h1'
                 }
             },
             {
@@ -203,7 +203,7 @@ var editor = new MediumEditor('.editable', {
                 contentDefault: '<b>H2</b>',
                 classList: ['custom-class-h2'],
                 attrs: {
-                    'data-header-type': 'h2'
+                    'data-custom-attr': 'attr-value-h2'
                 }
             },
             'justifyCenter',
