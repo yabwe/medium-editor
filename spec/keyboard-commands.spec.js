@@ -110,5 +110,40 @@ describe('KeyboardCommands TestCase', function () {
             });
             expect(editor.execAction).not.toHaveBeenCalled();
         });
+
+        it('should not execute when the command key are false', function () {
+            spyOn(MediumEditor.prototype, 'execAction');
+            var result,
+                editor = this.newMediumEditor('.editor', {
+                keyboardCommands: {
+                    commands: [
+                        {
+                            command: false,
+                            key: 'J',
+                            meta: true,
+                            shift: false
+                        }
+                    ]
+                }
+            });
+            selectElementContentsAndFire(editor.elements[0]);
+            jasmine.clock().tick(1);
+
+            fireEvent(editor.elements[0], 'keydown', {
+                keyCode: 'J'.charCodeAt(0),
+                ctrlKey: true,
+                metaKey: true,
+                shiftKey: false
+            });
+            expect(editor.execAction).not.toHaveBeenCalled();
+
+            result = fireEvent(editor.elements[0], 'keydown', {
+                keyCode: 'J'.charCodeAt(0),
+                ctrlKey: true,
+                metaKey: true,
+                shiftKey: true
+            });
+            expect(result).toBe(false, 'The command was not blocked because shift key was pressed');
+        });
     });
 });
