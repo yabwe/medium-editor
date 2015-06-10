@@ -3318,7 +3318,6 @@ LINK_REGEXP_TEXT =
                         if (this.performLinking(keyPressEvent.target)) {
                             // pass true for favorLaterSelectionAnchor - this is needed for links at the end of a
                             // paragraph in MS IE, or MS IE causes the link to be deleted right after adding it.
-                            console.info('importing selection');
                             this.base.importSelection(sel, true);
                         }
                     } catch (e) {
@@ -3344,14 +3343,7 @@ LINK_REGEXP_TEXT =
             }
             for (var i = 0; i < paragraphs.length; i++) {
                 documentModified = this.removeObsoleteAutoLinkSpans(paragraphs[i]) || documentModified;
-                if (documentModified) {
-                    console.info('removeObsoleteAutoLinkSpans modified document');
-                }
-                var oldDocumentModified = documentModified;
                 documentModified = this.performLinkingWithinElement(paragraphs[i]) || documentModified;
-                if (documentModified && !oldDocumentModified) {
-                    console.info('performLinkingWithinElement modified document');
-                }
             }
             return documentModified;
         },
@@ -3434,7 +3426,10 @@ LINK_REGEXP_TEXT =
                     characterCount -= currentNodeValue.length;
                     // Just in case we run out of nodes, don't get stuck in an infinite loop
                     if (previousNode === null) {
-                        console.error('Ran out of trailing characters to trim and still had more characters to remove');
+                        if (window.console) {
+                            window.console.error('Ran out of trailing characters to trim and ' +
+                                'still had more characters to remove');
+                        }
                         break;
                     }
                 }
