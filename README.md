@@ -274,19 +274,19 @@ var editor = new MediumEditor('.editable', {
         commands: [
             {
                 command: 'bold',
-                key: 'b',
+                key: 'B',
                 meta: true,
                 shift: false
             },
             {
                 command: 'italic',
-                key: 'i',
+                key: 'I',
                 meta: true,
                 shift: false
             },
             {
                 command: 'underline',
-                key: 'u',
+                key: 'U',
                 meta: true,
                 shift: false
             }

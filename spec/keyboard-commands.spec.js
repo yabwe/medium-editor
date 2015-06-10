@@ -22,7 +22,7 @@ describe('KeyboardCommands TestCase', function () {
             jasmine.clock().tick(1);
             // bold
             fireEvent(editor.elements[0], 'keydown', {
-                keyCode: 'b'.charCodeAt(0),
+                keyCode: 'B'.charCodeAt(0),
                 ctrlKey: true,
                 metaKey: true
             });
@@ -30,7 +30,7 @@ describe('KeyboardCommands TestCase', function () {
 
             // italics
             fireEvent(editor.elements[0], 'keydown', {
-                keyCode: 'i'.charCodeAt(0),
+                keyCode: 'I'.charCodeAt(0),
                 ctrlKey: true,
                 metaKey: true
             });
@@ -38,7 +38,7 @@ describe('KeyboardCommands TestCase', function () {
 
             // underline
             fireEvent(editor.elements[0], 'keydown', {
-                keyCode: 'u'.charCodeAt(0),
+                keyCode: 'U'.charCodeAt(0),
                 ctrlKey: true,
                 metaKey: true
             });
@@ -88,7 +88,7 @@ describe('KeyboardCommands TestCase', function () {
             selectElementContentsAndFire(editor.elements[0]);
             jasmine.clock().tick(1);
             fireEvent(editor.elements[0], 'keydown', {
-                keyCode: 'b'.charCodeAt(0),
+                keyCode: 'B'.charCodeAt(0),
                 ctrlKey: true,
                 metaKey: true,
                 shiftKey: true
@@ -104,7 +104,7 @@ describe('KeyboardCommands TestCase', function () {
             selectElementContentsAndFire(editor.elements[0]);
             jasmine.clock().tick(1);
             fireEvent(editor.elements[0], 'keydown', {
-                keyCode: 'b'.charCodeAt(0),
+                keyCode: 'B'.charCodeAt(0),
                 ctrlKey: true,
                 metaKey: true
             });
