@@ -60,12 +60,17 @@ var KeyboardCommands;
 
             var isMeta = Util.isMetaCtrlKey(event),
                 isShift = !!event.shiftKey;
+
             this.keys[keyCode].forEach(function (data) {
                 if (data.meta === isMeta &&
                     data.shift === isShift) {
                     event.preventDefault();
                     event.stopPropagation();
-                    this.execAction(data.command);
+
+                    // command can be false so the shortcurt is just disabled
+                    if (false !== data.command) {
+                        this.execAction(data.command);
+                    }
                 }
             }, this);
         }
