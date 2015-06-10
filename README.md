@@ -92,7 +92,17 @@ MediumEditor also supports textarea. If you provide a textarea element, the scri
 
 People have contributed wrappers around MediumEditor for integrating with different frameworks and tech stacks.  Take a look at the list of existing [Wrappers and Integrations](https://github.com/yabwe/medium-editor/wiki/Wrappers-and-Integration) that have already been written for MediumEditor!
 
-## Initialization options
+## MediumEditor Options
+
+View the [MediumEditor Options documentation](https://github.com/yabwe/medium-editor/wiki/Options) on the Wiki for details on all the various options for MediumEditor.
+
+Options to customize medium-editor are passed as the second argument to the [MediumEditor constructor](https://github.com/yabwe/medium-editor/wiki/MediumEditor-Object-API#mediumeditorelements-options).  Example:
+
+```js
+var editor = new MediumEditor('.editor', {
+    // options go here
+});
+```
 
 ### Core options
 * __allowMultiParagraphSelection__: enables the toolbar when selecting multiple paragraphs/block elements. Default: true
@@ -286,25 +296,48 @@ var editor = new MediumEditor('.editable', {
 });
 ```
 
-## Extra buttons
 
-Medium Editor, by default, will show only the buttons listed above to avoid a huge toolbar. There are a few extra buttons you can use:
+## Buttons
 
-* __superscript__
-* __subscript__
+By default, MediumEditor supports buttons for most of the commands for `document.execCommand()` that are well-supported across all its supported browsers.
+
+### Default buttons.
+
+MediumEditor, by default, will show only the buttons listed here to avoid a huge toolbar:
+
+* __bold__
+* __italic__
+* __underline__
+* __anchor__ _(built-in support for collecting a url via the anchor extension)_
+* __header1__
+* __header2__
+* __quote__
+
+### All buttons.
+
+These are all the built-in buttons supported by MediumEditor.
+
+* __bold__
+* __italic__
+* __underline__
 * __strikethrough__
-* __unorderedlist__
-* __orderedlist__
-* __pre__
-* __justifyLeft__
-* __justifyFull__
-* __justifyCenter__
-* __justifyRight__
+* __subscript__
+* __superscript__
+* __anchor__
 * __image__ (this simply converts selected text to an image tag)
+* __quote__
+* __pre__
+* __orderedlist__
+* __unorderedlist__
 * __indent__ (moves the selected text up one level)
 * __outdent__ (moves the selected text down one level)
+* __justifyLeft__
+* __justifyCenter__
+* __justifyRight__
+* __justifyFull__
+* __header1__
+* __header2__
 * __removeFormat__ (clears inline style formatting, preserves blocks)
-
 
 ## Themes
 
@@ -312,36 +345,48 @@ Check out the Wiki page for a list of available themes: [https://github.com/yabw
 
 ## API
 
-### Core Methods
+View the [MediumEditor Object API documentation](https://github.com/yabwe/medium-editor/wiki/MediumEditor-Object-API) on the Wiki for details on all the methods supported on the MediumEditor object.
+
+### Initialization methods
+* __MediumEditor(elements, options)__:  Creates an instance of MediumEditor
 * __.destroy()__: tears down the editor if already setup, removing all DOM elements and event handlers
 * __.setup()__: rebuilds the editor if it has already been destroyed, recreating DOM elements and attaching event handlers
-* __.serialize()__: returns a JSON object with elements contents
-* __.execAction(action, opts)__: executes an built-in action via `document.execCommand`
-* __.createLink(opts)__: creates a link via the native `document.execCommand('createLink')` command
-* __.subscribe(event, listener)__: attaches a listener to a custom medium-editor event
-* __.unsubscribe(event, listener)__: detaches a listener from a custom medium-editor event
-* __.saveSelection()__: internally store the set of selected text
-* __.restoreSelection()__: restore the selection to what was selected when `saveSelection()` was called
-* __.selectAllContents()__: expands the selection to contain all text within the focused contenteditable
-* __.stopSelectionUpdates()__: stop the toolbar from updating to reflect the state of the selected text
-* __.startSelectionUpdates()__: put the toolbar back into its normal updating state
-* __.cleanPaste(text)__: convert text to plaintext and replace current selection with result
-* __.pasteHTML(html, options)__: replace the current selection with html
 
-### Helper Methods
+### Event Methods
 * __.on(target, event, listener, useCapture)__: attach a listener to a DOM event which will be detached when MediumEditor is deactivated
 * __.off(target, event, listener, useCapture)__: detach a listener to a DOM event that was attached via `on()`
-* __.delay(fn)__: delay any function from being executed by the amount of time passed as the `delay` option
-* __.getSelectionParentElement(range)__: get the parent contenteditable element that contains the current selection
-* __.getExtensionByName(name)__: get a reference to an extension with the specified name
-* __.getFocusedElement()__: returns an element if any contenteditable element monitored by MediumEditor currently has focused
-* __.selectElement(element)__: change selection to be a specific element and update the toolbar to reflect the selection
+* __.subscribe(event, listener)__: attaches a listener to a custom medium-editor event
+* __.unsubscribe(event, listener)__: detaches a listener from a custom medium-editor event
+* __.trigger(name, data, editable)__: manually triggers a custom medium-editor event
+
+### Selection Methods
+* __.checkSelection()__: manually trigger an update of the toolbar and extensions based on the current selection
 * __.exportSelection()__: return a data representation of the selected text, which can be applied via `importSelection()`
 * __.importSelection(selectionState)__: restore the selection using a data representation of previously selected text (ie value returned by `exportSelection()`)
+* __.getFocusedElement()__: returns an element if any contenteditable element monitored by MediumEditor currently has focused
+* __.getSelectionParentElement(range)__: get the parent contenteditable element that contains the current selection
+* __.restoreSelection()__: restore the selection to what was selected when `saveSelection()` was called
+* __.saveSelection()__: internally store the set of selected text
+* __.selectAllContents()__: expands the selection to contain all text within the focused contenteditable
+* __.selectElement(element)__: change selection to be a specific element and update the toolbar to reflect the selection
+* __.stopSelectionUpdates()__: stop the toolbar from updating to reflect the state of the selected text
+* __.startSelectionUpdates()__: put the toolbar back into its normal updating state
+
+### Editor Action Methods
+* __.cleanPaste(text)__: convert text to plaintext and replace current selection with result
+* __.createLink(opts)__: creates a link via the native `document.execCommand('createLink')` command
+* __.execAction(action, opts)__: executes an built-in action via `document.execCommand`
+* __.pasteHTML(html, options)__: replace the current selection with html
+* __.queryCommandState(action)__: wrapper around the browser's built in `document.queryCommandState(action)` for checking whether a specific action has already been applied to the selection.
+
+### Helper Methods
+* __.delay(fn)__: delay any function from being executed by the amount of time passed as the `delay` option
+* __.getExtensionByName(name)__: get a reference to an extension with the specified name
+* __.serialize()__: returns a JSON object with elements contents
 
 ## Capturing DOM changes
 
-For observing any changes on contentEditable, use the custom 'editableInput' event exposed via the `subscribe()` method:
+For observing any changes on contentEditable, use the custom `'editableInput'` event exposed via the `subscribe()` method:
 
 ```js
 var editor = new MediumEditor('.editable');

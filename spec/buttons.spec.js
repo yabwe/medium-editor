@@ -62,7 +62,7 @@ describe('Buttons TestCase', function () {
         it('should execute the button action on shortcut', function () {
             spyOn(MediumEditor.prototype, 'execAction');
             var editor = this.newMediumEditor('.editor'),
-                code = 'b'.charCodeAt(0);
+                code = 'B'.charCodeAt(0);
             selectElementContentsAndFire(editor.elements[0]);
             jasmine.clock().tick(1);
             fireEvent(editor.elements[0], 'keydown', {
@@ -76,7 +76,7 @@ describe('Buttons TestCase', function () {
         it('should not execute the button action when shift key is pressed', function () {
             spyOn(MediumEditor.prototype, 'execAction');
             var editor = this.newMediumEditor('.editor'),
-                code = 'b'.charCodeAt(0);
+                code = 'B'.charCodeAt(0);
             selectElementContentsAndFire(editor.elements[0]);
             jasmine.clock().tick(1);
             fireEvent(editor.elements[0], 'keydown', {

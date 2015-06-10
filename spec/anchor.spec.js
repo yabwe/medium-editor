@@ -35,7 +35,7 @@ describe('Anchor Button TestCase', function () {
         it('should show the form on shortcut', function () {
             var editor = this.newMediumEditor('.editor'),
                 anchorExtension = editor.getExtensionByName('anchor'),
-                code = 'k'.charCodeAt(0);
+                code = 'K'.charCodeAt(0);
 
             selectElementContentsAndFire(editor.elements[0]);
             jasmine.clock().tick(1);

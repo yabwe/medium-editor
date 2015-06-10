@@ -47,7 +47,7 @@ var AnchorForm;
         tagNames: ['a'],
         contentDefault: '<b>#</b>',
         contentFA: '<i class="fa fa-link"></i>',
-        key: 'k',
+        key: 'K',
 
         // Called when the button the toolbar is clicked
         // Overrides ButtonExtension.handleClick
