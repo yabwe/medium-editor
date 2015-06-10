@@ -15,7 +15,7 @@ var ButtonsData;
             useQueryState: true,
             contentDefault: '<b>B</b>',
             contentFA: '<i class="fa fa-bold"></i>',
-            key: 'b'
+            key: 'B'
         },
         'italic': {
             name: 'italic',
@@ -29,7 +29,7 @@ var ButtonsData;
             useQueryState: true,
             contentDefault: '<b><i>I</i></b>',
             contentFA: '<i class="fa fa-italic"></i>',
-            key: 'i'
+            key: 'I'
         },
         'underline': {
             name: 'underline',
@@ -43,7 +43,7 @@ var ButtonsData;
             useQueryState: true,
             contentDefault: '<b><u>U</u></b>',
             contentFA: '<i class="fa fa-underline"></i>',
-            key: 'u'
+            key: 'U'
         },
         'strikethrough': {
             name: 'strikethrough',
