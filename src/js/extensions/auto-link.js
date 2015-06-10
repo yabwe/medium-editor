@@ -130,17 +130,11 @@ LINK_REGEXP_TEXT =
                 }
                 if (spans[i].getAttribute('data-href') !== textContent && nodeIsNotInsideAnchorTag(spans[i])) {
                     documentModified = true;
-                    if (spans[i].getAttribute('data-href') === textContent.trim()) {
-                        // The user hit space or something after the link and it got added inside the SPAN.
-                        var whiteSpaceText = '';
-                        for (var j = textContent.length - 1; j >= 0; j--) {
-                            if (WHITESPACE_CHARS.indexOf(textContent[j]) === -1) {
-                                break;
-                            }
-                            whiteSpaceText += textContent[j];
-                        }
-                        spans[i].parentNode.insertBefore(this.document.createTextNode(whiteSpaceText), spans[i].nextSibling);
-                        this.removeTrailingCharacters(spans[i], whiteSpaceText.length);
+                    var trimmedTextContent = textContent.replace(/\s+$/, '');
+                    if (spans[i].getAttribute('data-href') === trimmedTextContent) {
+                        var charactersTrimmed = textContent.length - trimmedTextContent.length,
+                            subtree = Util.splitOffDOMTree(spans[i], this.splitTextBeforeEnd(spans[i], charactersTrimmed));
+                        spans[i].parentNode.insertBefore(subtree, spans[i].nextSibling);
                     } else {
                         // Some editing has happened to the span, so just remove it entirely. The user can put it back
                         // around just the href content if they need to prevent it from linking
@@ -154,7 +148,7 @@ LINK_REGEXP_TEXT =
             return documentModified;
         },
 
-        removeTrailingCharacters: function (element, characterCount) {
+        splitTextBeforeEnd: function (element, characterCount) {
             var treeWalker = this.document.createTreeWalker(element, NodeFilter.SHOW_TEXT, null, false),
                 lastChildNotExhausted = true;
 
@@ -163,26 +157,21 @@ LINK_REGEXP_TEXT =
                 lastChildNotExhausted = treeWalker.lastChild() !== null;
             }
 
-            while (characterCount > 0) {
-                var currentNode = treeWalker.currentNode,
-                    currentNodeValue = currentNode.nodeValue;
+            var currentNode,
+                currentNodeValue,
+                previousNode;
+            while (characterCount > 0 && previousNode !== null) {
+                currentNode = treeWalker.currentNode;
+                currentNodeValue = currentNode.nodeValue;
                 if (currentNodeValue.length > characterCount) {
-                    currentNode.nodeValue = currentNodeValue.substring(0, currentNodeValue.length - characterCount);
+                    previousNode = currentNode.splitText(currentNodeValue.length - characterCount);
                     characterCount = 0;
                 } else {
-                    var previousNode = treeWalker.previousNode();
-                    currentNode.parentNode.removeChild(currentNode);
+                    previousNode = treeWalker.previousNode();
                     characterCount -= currentNodeValue.length;
-                    // Just in case we run out of nodes, don't get stuck in an infinite loop
-                    if (previousNode === null) {
-                        if (window.console) {
-                            window.console.error('Ran out of trailing characters to trim and ' +
-                                'still had more characters to remove');
-                        }
-                        break;
-                    }
                 }
             }
+            return previousNode;
         },
 
         performLinkingWithinElement: function (element) {
