@@ -888,8 +888,10 @@ function MediumEditor(elements, options) {
             }
 
             if (inSelectionState.emptyParagraphsIndex && selectionState.end === nextCharIndex) {
-                Selection.moveRangeForwardOverEmptyParagraphs(range, inSelectionState.emptyParagraphsIndex,
-                    this.options.ownerDocument, editableElement);
+                targetNode = Selection.getSelectionTargetOverEmptyParagraphs(range.startContainer,
+                    inSelectionState.emptyParagraphsIndex, this.options.ownerDocument, editableElement);
+                range.setStart(targetNode, 0);
+                range.collapse(true);
             }
 
             // If the selection is right at the ending edge of a link, put it outside the anchor tag instead of inside.

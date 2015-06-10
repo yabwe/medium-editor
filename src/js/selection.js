@@ -27,7 +27,7 @@ var Selection;
         },
 
         // Utility method called from importSelection only
-        moveRangeForwardOverEmptyParagraphs: function (range, countOfParagraphs, document, root) {
+        getSelectionTargetOverEmptyParagraphs: function (startContainer, countOfParagraphs, document, root) {
             function filterOnlyParagraphsAndText(node) {
                 if (node.nodeType === 3 || node.nodeName.toLowerCase() === 'p') {
                     return NodeFilter.FILTER_ACCEPT;
@@ -38,15 +38,14 @@ var Selection;
             var treeWalker = document.createTreeWalker(root, NodeFilter.SHOW_ELEMENT|NodeFilter.SHOW_TEXT,
                 filterOnlyParagraphsAndText, false);
 
-            treeWalker.currentNode = range.startContainer;
+            treeWalker.currentNode = startContainer;
             var prevNode,
                 node;
             while ((node = treeWalker.nextNode()) && node.nodeType !== 3 && countOfParagraphs > 0) {
                 prevNode = node;
                 countOfParagraphs -= 1;
             }
-            range.setStart(prevNode, 0);
-            range.collapse(true);
+            return prevNode;
         },
 
         // Utility method called from importSelection only
