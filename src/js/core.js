@@ -601,15 +601,17 @@ function MediumEditor(elements, options) {
         /**
          * NOT DOCUMENTED - exposed as a helper for other extensions to use
          */
-        addBuiltInExtension: function (name) {
-            var extension = this.getExtensionByName(name);
+        addBuiltInExtension: function (name, opts) {
+            var extension = this.getExtensionByName(name),
+                merged;
             if (extension) {
                 return extension;
             }
 
             switch (name) {
                 case 'anchor':
-                    extension = new MediumEditor.extensions.anchor(this.options.anchor);
+                    merged = Util.extend({}, this.options.anchor, opts);
+                    extension = new MediumEditor.extensions.anchor(merged);
                     break;
                 case 'anchorPreview':
                     extension = new MediumEditor.extensions.anchorPreview(this.options.anchorPreview);
@@ -618,7 +620,7 @@ function MediumEditor(elements, options) {
                     extension = new MediumEditor.extensions.autoLink();
                     break;
                 case 'fontsize':
-                    extension = new MediumEditor.extensions.fontSize();
+                    extension = new MediumEditor.extensions.fontSize(opts);
                     break;
                 case 'imageDragging':
                     extension = new MediumEditor.extensions.imageDragging();
@@ -636,7 +638,12 @@ function MediumEditor(elements, options) {
                     // All of the built-in buttons for MediumEditor are extensions
                     // so check to see if the extension we're creating is a built-in button
                     if (MediumEditor.extensions.button.isBuiltInButton(name)) {
-                        extension = new MediumEditor.extensions.button(name);
+                        if (opts) {
+                            merged = Util.defaults({}, opts, MediumEditor.extensions.button.prototype.defaults[name]);
+                            extension = new MediumEditor.extensions.button(merged);
+                        } else {
+                            extension = new MediumEditor.extensions.button(name);
+                        }
                     }
                     break;
             }

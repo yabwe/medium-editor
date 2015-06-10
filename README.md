@@ -93,15 +93,17 @@ MediumEditor also supports textarea. If you provide a textarea element, the scri
 ### Core options
 * __activeButtonClass__: CSS class added to active buttons in the toolbar. Default: `'medium-editor-button-active'`
 * __allowMultiParagraphSelection__: enables the toolbar when selecting multiple paragraphs/block elements. Default: `true`
-* __buttonLabels__: type of labels on the buttons. Values: 'fontawesome', `{'bold': '<b>b</b>', 'italic': '<i>i</i>'}`. Default: `false`
+* __buttonLabels__: type of labels on the buttons. Values: `false` | 'fontawesome'.  Default: `false`
+
+#### NOTE:
+Using `'fontawesome'` as the buttonLabels requires version 4.1.0 of the fontawesome css to be on the page to ensure all icons will be displayed correctly
+
 * __delay__: time in milliseconds to show the toolbar or anchor tag preview. Default: `0`
 * __disableReturn__:  enables/disables the use of the return-key. You can also set specific element behavior by using setting a data-disable-return attribute. Default: `false`
 * __disableDoubleReturn__:  allows/disallows two (or more) empty new lines. You can also set specific element behavior by using setting a data-disable-double-return attribute. Default: `false`
 * __disableEditing__: enables/disables adding the contenteditable behavior. Useful for using the toolbar with customized buttons/actions. You can also set specific element behavior by using setting a data-disable-editing attribute. Default: `false`
 * __elementsContainer__: specifies a DOM node to contain MediumEditor's toolbar and anchor preview elements. Default: `document.body`
 * __extensions__: extension to use (see [Custom Buttons and Extensions](https://github.com/yabwe/medium-editor/wiki/Custom-Buttons-and-Extensions)) for more. Default: `{}`
-* __firstHeader__: HTML tag to be used as first header. Default: `h3`
-* __secondHeader__: HTML tag to be used as second header. Default: `h4`
 * __spellcheck__: Enable/disable native contentEditable automatic spellcheck. Default: `true`
 * __targetBlank__: enables/disables target="\_blank" for anchor tags. Default: `false`
 
@@ -115,7 +117,7 @@ var editor = new MediumEditor('.editable', {
     toolbar: {
         /* These are the default options for the toolbar,
            if nothing is passed this is what is used */
-        buttons: ['bold', 'italic', 'underline', 'anchor', 'header1', 'header2', 'quote'],
+        buttons: ['bold', 'italic', 'underline', 'anchor', 'h2', 'h3', 'quote'],
         diffLeft: 0,
         diffTop: -10,
         firstButtonClass: 'medium-editor-button-first',
@@ -131,7 +133,8 @@ var editor = new MediumEditor('.editable', {
 });
 ```
 
-* __buttons__: the set of buttons to display on the toolbar. Default: `['bold', 'italic', 'underline', 'anchor', 'header1', 'header2', 'quote']`
+* __buttons__: the set of buttons to display on the toolbar. Default: `['bold', 'italic', 'underline', 'anchor', 'h2', 'h3', 'quote']`
+  * See [Button Options](#button-options) for details on more button options
 * __diffLeft__: value in pixels to be added to the X axis positioning of the toolbar. Default: `0`
 * __diffTop__: value in pixels to be added to the Y axis positioning of the toolbar. Default: `-10`
 * __firstButtonClass__: CSS class added to the first button in the toolbar. Default: `'medium-editor-button-first'`
@@ -148,6 +151,66 @@ To disable the toolbar (which also disables the anchor-preview extension), set t
 ```javascript
 var editor = new MediumEditor('.editable', {
     toolbar: false
+});
+```
+
+#### Button Options
+
+Button behavior can be modified by passing an object into the buttons array instead of a string. This allow for overriding some of the default behavior of buttons. The following options are some of the basic parts of buttons that you may override, but any part of the `MediumEditor.extension.prototype` can be overriden via these button options. (Check out the [source code for buttons](https://github.com/yabwe/medium-editor/blob/master/src/js/extensions/button.js) to see what all can be overriden).
+
+* __name__: name of the button being overriden
+* __action__: argument to pass to `MediumEditor.execAction()` when the button is clicked.
+* __aria__: value to add as the aria-label attribute of the button element displayed in the toolbar. This is also used as the tooltip for the button.
+* __tagNames__: array of element tag names that would indicate that this button has already been applied. If this action has already been applied, the button will be displayed as 'active' in the toolbar.
+  * _Example_: For 'bold', if the text is ever within a `<b>` or `<strong>` tag that indicates the text is already bold. So the array of tagNames for bold would be: `['b', 'strong']`
+  * __NOTE__: This is not used if `useQueryState` is set to `true`.
+* __style__: A pair of css property & value(s) that indicate that this button has already been applied. If this action has already been applied, the button will be displayed as 'active' in the toolbar.
+  * _Example_: For 'bold', if the text is ever within an element with a `'font-weight'` style property set to `700` or `'bold'`, that indicates the text is already bold.  So the style object for bold would be `{ prop: 'font-weight', value: '700|bold' }`
+  * __NOTE__: This is not used if `useQueryState` is set to `true`.
+  * Properties of the __style__ object:
+    * __prop__: name of the css property
+    * __value__: value(s) of the css property (multiple values can be separated by a `'|'`)
+* __useQueryState__: Enables/disables whether this button should use the built-in `document.queryCommandState()` method to determine whether the action has already been applied.  If the action has already been applied, the button will be displayed as 'active' in the toolbar
+  * _Example_: For 'bold', if this is set to true, the code will call `document.queryCommandState('bold')` which will return true if the browser thinks the text is already bold, and false otherwise
+* __contentDefault__: Default `innerHTML` to put inside the button
+* __contentFA__: The `innerHTML` to use for the content of the button if the __buttonLabels__ option for MediumEditor is set to `'fontawesome'`
+* __classList__: An array of classNames (strings) to be added to the button
+* __attrs__: A set of key-value pairs to add to the button as custom attributes to the button element.
+
+Example of overriding buttons (here, the goal is to mimic medium by having <kbd>H1</kbd> and <kbd>H2</kbd> buttons which actually produce `<h2>` and `<h3>` tags respectively):
+```javascript
+var editor = new MediumEditor('.editable', {
+    toolbar: {
+        buttons: [
+            'bold', 
+            'italic',
+            {
+                name: 'h1',
+                action: 'append-h2',
+                aria: 'header type 1',
+                tagNames: ['h2'],
+                contentDefault: '<b>H1</b>',
+                classList: ['custom-class-h1'],
+                attrs: {
+                    'data-custom-attr': 'attr-value-h1'
+                }
+            },
+            {
+                name: 'h2',
+                action: 'append-h3',
+                aria: 'header type 2',
+                tagNames: ['h3'],
+                contentDefault: '<b>H2</b>',
+                classList: ['custom-class-h2'],
+                attrs: {
+                    'data-custom-attr': 'attr-value-h2'
+                }
+            },
+            'justifyCenter',
+            'quote',
+            'anchor'
+        ]
+    }
 });
 ```
 
@@ -335,8 +398,6 @@ var editor = new MediumEditor('.editable', {
 
 ```javascript
 var editor = new MediumEditor('.editable', {
-    firstHeader: 'h1',
-    secondHeader: 'h2',
     delay: 1000,
     targetBlank: true,
     toolbar: {

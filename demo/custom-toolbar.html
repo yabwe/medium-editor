@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <title>medium editor | demo</title>
     <link rel="stylesheet" href="css/demo.css">
-    <link href="http://netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" rel="stylesheet">
+    <link href="http://netdna.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.css" rel="stylesheet">
     <link rel="stylesheet" href="../dist/css/medium-editor.css">
     <link rel="stylesheet" href="../dist/css/themes/flat.css">
 </head>
@@ -27,7 +27,7 @@
     <script>
         var editor = new MediumEditor('.editable', {
                 toolbar: {
-                    buttons: ['bold', 'italic', 'underline', 'strikethrough', 'quote', 'anchor', 'image', 'justifyLeft', 'justifyCenter', 'justifyRight', 'justifyFull', 'superscript', 'subscript', 'orderedlist', 'unorderedlist', 'pre', 'removeFormat', 'outdent', 'indent', 'header1', 'header2'],
+                    buttons: ['bold', 'italic', 'underline', 'strikethrough', 'quote', 'anchor', 'image', 'justifyLeft', 'justifyCenter', 'justifyRight', 'justifyFull', 'superscript', 'subscript', 'orderedlist', 'unorderedlist', 'pre', 'removeFormat', 'outdent', 'indent', 'h2', 'h3'],
                 },
                 buttonLabels: 'fontawesome',
                 anchor: {
@@ -36,13 +36,23 @@
             });
         var editor2 = new MediumEditor('.secondEditable', {
                 toolbar: {
-                    buttons: ['bold', 'italic', 'underline', 'anchor']
-                },
-                buttonLabels: {
-                    'bold': 'bold',
-                    'italic': '<i>italic</i>',
-                    'underline': '<u>underline</u>',
-                    'anchor': 'link'
+                    buttons: [{
+                            name: 'bold',
+                            contentDefault: 'bold'
+                        },
+                        {
+                            name: 'italic',
+                            contentDefault: '<i>italic</i>'
+                        },
+                        {
+                            name: 'underline',
+                            contentDefault: '<u>underline</u>'
+                        },
+                        {
+                            name: 'anchor',
+                            contentDefault: 'link'
+                        }
+                    ]
                 }
             });
     </script>

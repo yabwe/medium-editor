@@ -107,9 +107,7 @@ describe('Initialization TestCase', function () {
                 elementsContainer: document.body,
                 contentWindow: window,
                 ownerDocument: document,
-                firstHeader: 'h3',
                 allowMultiParagraphSelection: true,
-                secondHeader: 'h4',
                 buttonLabels: false,
                 targetBlank: false,
                 extensions: {},
@@ -123,8 +121,6 @@ describe('Initialization TestCase', function () {
 
         it('should accept custom options values', function () {
             var options = {
-                firstHeader: 'h2',
-                secondHeader: 'h3',
                 delay: 300,
                 toolbar: {
                     diffLeft: 10,

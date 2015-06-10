@@ -85,14 +85,6 @@ var buttonDefaults;
             contentDefault: '<b>image</b>',
             contentFA: '<i class="fa fa-picture-o"></i>'
         },
-        'quote': {
-            name: 'quote',
-            action: 'append-blockquote',
-            aria: 'blockquote',
-            tagNames: ['blockquote'],
-            contentDefault: '<b>&ldquo;</b>',
-            contentFA: '<i class="fa fa-quote-right"></i>'
-        },
         'orderedlist': {
             name: 'orderedlist',
             action: 'insertorderedlist',
@@ -110,14 +102,6 @@ var buttonDefaults;
             useQueryState: true,
             contentDefault: '<b>&bull;</b>',
             contentFA: '<i class="fa fa-list-ul"></i>'
-        },
-        'pre': {
-            name: 'pre',
-            action: 'append-pre',
-            aria: 'preformatted text',
-            tagNames: ['pre'],
-            contentDefault: '<b>0101</b>',
-            contentFA: '<i class="fa fa-code fa-lg"></i>'
         },
         'indent': {
             name: 'indent',
@@ -183,32 +167,6 @@ var buttonDefaults;
             contentDefault: '<b>R</b>',
             contentFA: '<i class="fa fa-align-right"></i>'
         },
-        'header1': {
-            name: 'header1',
-            action: function (options) {
-                return 'append-' + options.firstHeader;
-            },
-            aria: function (options) {
-                return options.firstHeader;
-            },
-            tagNames: function (options) {
-                return [options.firstHeader];
-            },
-            contentDefault: '<b>H1</b>'
-        },
-        'header2': {
-            name: 'header2',
-            action: function (options) {
-                return 'append-' + options.secondHeader;
-            },
-            aria: function (options) {
-                return options.secondHeader;
-            },
-            tagNames: function (options) {
-                return [options.secondHeader];
-            },
-            contentDefault: '<b>H2</b>'
-        },
         // Known inline elements that are not removed, or not removed consistantly across browsers:
         // <span>, <label>, <br>
         'removeFormat': {
@@ -217,6 +175,73 @@ var buttonDefaults;
             action: 'removeFormat',
             contentDefault: '<b>X</b>',
             contentFA: '<i class="fa fa-eraser"></i>'
+        },
+
+        /***** Buttons for appending block elements (append-<element> action) *****/
+
+        'quote': {
+            name: 'quote',
+            action: 'append-blockquote',
+            aria: 'blockquote',
+            tagNames: ['blockquote'],
+            contentDefault: '<b>&ldquo;</b>',
+            contentFA: '<i class="fa fa-quote-right"></i>'
+        },
+        'pre': {
+            name: 'pre',
+            action: 'append-pre',
+            aria: 'preformatted text',
+            tagNames: ['pre'],
+            contentDefault: '<b>0101</b>',
+            contentFA: '<i class="fa fa-code fa-lg"></i>'
+        },
+        'h1': {
+            name: 'h1',
+            action: 'append-h1',
+            aria: 'header type one',
+            tagNames: ['h1'],
+            contentDefault: '<b>H1</b>',
+            contentFA: '<i class="fa fa-header"><sup>1</sup>'
+        },
+        'h2': {
+            name: 'h2',
+            action: 'append-h2',
+            aria: 'header type two',
+            tagNames: ['h2'],
+            contentDefault: '<b>H2</b>',
+            contentFA: '<i class="fa fa-header"><sup>2</sup>'
+        },
+        'h3': {
+            name: 'h3',
+            action: 'append-h3',
+            aria: 'header type three',
+            tagNames: ['h3'],
+            contentDefault: '<b>H3</b>',
+            contentFA: '<i class="fa fa-header"><sup>3</sup>'
+        },
+        'h4': {
+            name: 'h4',
+            action: 'append-h4',
+            aria: 'header type four',
+            tagNames: ['h4'],
+            contentDefault: '<b>H4</b>',
+            contentFA: '<i class="fa fa-header"><sup>4</sup>'
+        },
+        'h5': {
+            name: 'h5',
+            action: 'append-h5',
+            aria: 'header type five',
+            tagNames: ['h5'],
+            contentDefault: '<b>H5</b>',
+            contentFA: '<i class="fa fa-header"><sup>5</sup>'
+        },
+        'h6': {
+            name: 'h6',
+            action: 'append-h6',
+            aria: 'header type six',
+            tagNames: ['h6'],
+            contentDefault: '<b>H6</b>',
+            contentFA: '<i class="fa fa-header"><sup>6</sup>'
         }
     };
 

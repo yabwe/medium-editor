@@ -78,6 +78,16 @@ var Button;
          */
         contentFA: undefined,
 
+        /* classList: [Array]
+         * An array of classNames (strings) to be added to the button
+         */
+        classList: undefined,
+
+        /* attrs: [object]
+         * A set of key-value pairs to add to the button as custom attributes
+         */
+        attrs: undefined,
+
         /* buttonDefaults: [Object]
          * Set of default config options for all of the built-in MediumEditor buttons
          */
@@ -130,19 +140,29 @@ var Button;
                 content = this.contentDefault,
                 ariaLabel = this.getAria(),
                 buttonLabels = this.getEditorOption('buttonLabels');
+            // Add class names
             button.classList.add('medium-editor-action');
             button.classList.add('medium-editor-action-' + this.name);
+            if (this.classList) {
+                this.classList.forEach(function (className) {
+                    button.classList.add(className);
+                });
+            }
+
+            // Add attributes
             button.setAttribute('data-action', this.getAction());
             if (ariaLabel) {
                 button.setAttribute('title', ariaLabel);
                 button.setAttribute('aria-label', ariaLabel);
             }
-            if (buttonLabels) {
-                if (buttonLabels === 'fontawesome' && this.contentFA) {
-                    content = this.contentFA;
-                } else if (typeof buttonLabels === 'object' && buttonLabels[this.name]) {
-                    content = buttonLabels[this.name];
-                }
+            if (this.attrs) {
+                Object.keys(this.attrs).forEach(function (attr) {
+                    button.setAttribute(attr, this.attrs[attr]);
+                }, this);
+            }
+
+            if (buttonLabels === 'fontawesome' && this.contentFA) {
+                content = this.contentFA;
             }
             button.innerHTML = content;
             return button;

@@ -94,36 +94,133 @@ describe('Buttons TestCase', function () {
         });
     });
 
+    describe('Button options', function () {
+        it('should support overriding defaults', function () {
+            this.el.innerHTML = '<h2>lorem</h2><h3>ipsum</h3>';
+            var editor = this.newMediumEditor('.editor', {
+                    toolbar: {
+                        buttons: [
+                            'bold',
+                            {
+                                name: 'h1',
+                                action: 'append-h2',
+                                aria: 'fake h1',
+                                tagNames: ['h2'],
+                                contentDefault: '<b>H1</b>',
+                                classList: ['customClassName'],
+                                attrs: {
+                                    'data-custom-attr': 'custom-value'
+                                }
+                            },
+                            {
+                                name: 'h2',
+                                getAction: function () {
+                                    return 'append-h3';
+                                },
+                                getAria: function () {
+                                    return 'fake h2';
+                                },
+                                getTagNames: function () {
+                                    return ['h3'];
+                                },
+                                contentDefault: '<b>H2</b>'
+                            }
+                        ]
+                    }
+                }),
+                headerOneButton = editor.getExtensionByName('h1'),
+                headerTwoButton = editor.getExtensionByName('h2'),
+                toolbar = editor.getExtensionByName('toolbar');
+
+            expect(toolbar.getToolbarElement().querySelectorAll('button').length).toBe(3);
+
+            var button = toolbar.getToolbarElement().querySelector('.medium-editor-action-h1'),
+                buttonTwo = toolbar.getToolbarElement().querySelector('.medium-editor-action-h2');
+            expect(button).toBe(headerOneButton.getButton());
+            expect(button.getAttribute('aria-label')).toBe('fake h1');
+            expect(button.getAttribute('title')).toBe('fake h1');
+            expect(button.getAttribute('data-custom-attr')).toBe('custom-value');
+            expect(button.classList.contains('customClassName')).toBe(true);
+            expect(button.innerHTML).toBe('<b>H1</b>');
+
+            selectElementContentsAndFire(editor.elements[0].querySelector('h2').firstChild);
+            jasmine.clock().tick(1);
+            expect(button.classList.contains('medium-editor-button-active')).toBe(true);
+            expect(buttonTwo.classList.contains('medium-editor-button-active')).toBe(false);
+
+            expect(buttonTwo).toBe(headerTwoButton.getButton());
+            expect(buttonTwo.getAttribute('aria-label')).toBe('fake h2');
+            expect(buttonTwo.getAttribute('title')).toBe('fake h2');
+            expect(buttonTwo.innerHTML).toBe('<b>H2</b>');
+
+            selectElementContentsAndFire(editor.elements[0].querySelector('h3'), { eventToFire: 'mouseup' });
+            expect(button.classList.contains('medium-editor-button-active')).toBe(false);
+            expect(buttonTwo.classList.contains('medium-editor-button-active')).toBe(true);
+        });
+    });
+
     describe('Buttons with various labels', function () {
         var defaultLabels = {},
             fontAwesomeLabels = {},
             customLabels = {},
             allButtons = [],
+            customButtons = [],
             buttonsData = MediumEditor.extensions.button.prototype.defaults,
             currButton,
             tempEl;
 
         Object.keys(buttonsData).forEach(function (buttonName) {
-            if (buttonName !== 'header1' && buttonName !== 'header2') {
-                allButtons.push(buttonName);
-                currButton = buttonsData[buttonName];
-                // If the labels contain HTML entities, we need to escape them
-                tempEl = document.createElement('div');
+            allButtons.push(buttonName);
+            currButton = buttonsData[buttonName];
+            // If the labels contain HTML entities, we need to escape them
+            tempEl = document.createElement('div');
 
-                // Default Labels
-                tempEl.innerHTML = currButton.contentDefault;
-                defaultLabels[buttonName] = {
-                    action: currButton.action,
-                    label: tempEl.innerHTML
-                };
+            // Default Labels
+            tempEl.innerHTML = currButton.contentDefault;
+            defaultLabels[buttonName] = {
+                action: currButton.action,
+                label: tempEl.innerHTML
+            };
 
-                // fontawesome labels
-                tempEl.innerHTML = currButton.contentFA;
-                fontAwesomeLabels[buttonName] = tempEl.innerHTML;
+            // fontawesome labels
+            tempEl.innerHTML = currButton.contentFA;
+            fontAwesomeLabels[buttonName] = tempEl.innerHTML;
 
-                // custom labels (using aria label as a test)
-                customLabels[buttonName] = currButton.aria;
-            }
+            // custom labels (using aria label as a test)
+            customLabels[buttonName] = currButton.aria;
+            customButtons.push({
+                name: buttonName,
+                contentDefault: currButton.aria
+            });
+        });
+
+        // Add in anchor button
+        allButtons.push('anchor');
+        tempEl = document.createElement('div');
+        tempEl.innerHTML = MediumEditor.extensions.anchor.prototype.contentDefault;
+        defaultLabels['anchor'] = {
+            label: tempEl.innerHTML
+        };
+        tempEl.innerHTML = MediumEditor.extensions.anchor.prototype.contentFA;
+        fontAwesomeLabels['anchor'] = tempEl.innerHTML;
+        customLabels['anchor'] = MediumEditor.extensions.anchor.prototype.aria;
+        customButtons.push({
+            name: 'anchor',
+            contentDefault: customLabels['anchor']
+        });
+
+        // Add in fontsize button
+        allButtons.push('fontsize');
+        tempEl.innerHTML = MediumEditor.extensions.fontSize.prototype.contentDefault;
+        defaultLabels['fontsize'] = {
+            label: tempEl.innerHTML
+        };
+        tempEl.innerHTML = MediumEditor.extensions.fontSize.prototype.contentFA;
+        fontAwesomeLabels['fontsize'] = tempEl.innerHTML;
+        customLabels['fontsize'] = MediumEditor.extensions.fontSize.prototype.aria;
+        customButtons.push({
+            name: 'fontsize',
+            contentDefault: customLabels['fontsize']
         });
 
         it('should have aria-label and title attributes set', function () {
@@ -181,7 +278,9 @@ describe('Buttons TestCase', function () {
                 button = toolbar.getToolbarElement().querySelector('.medium-editor-action-' + buttonName);
                 expect(button).not.toBeUndefined();
                 fireEvent(button, 'click');
-                expect(editor.execAction).toHaveBeenCalledWith(action);
+                if (action) {
+                    expect(editor.execAction).toHaveBeenCalledWith(action);
+                }
                 expect(button.innerHTML).toBe(fontAwesomeLabels[buttonName]);
             });
         });
@@ -192,9 +291,8 @@ describe('Buttons TestCase', function () {
                 button,
                 editor = this.newMediumEditor('.editor', {
                     toolbar: {
-                        buttons: allButtons
-                    },
-                    buttonLabels: customLabels
+                        buttons: customButtons
+                    }
                 }),
                 toolbar = editor.getExtensionByName('toolbar');
             expect(toolbar.getToolbarElement().querySelectorAll('button').length).toBe(allButtons.length);
@@ -206,7 +304,9 @@ describe('Buttons TestCase', function () {
                 button = toolbar.getToolbarElement().querySelector('.medium-editor-action-' + buttonName);
                 expect(button).not.toBeUndefined();
                 fireEvent(button, 'click');
-                expect(editor.execAction).toHaveBeenCalledWith(action);
+                if (action) {
+                    expect(editor.execAction).toHaveBeenCalledWith(action);
+                }
                 expect(button.innerHTML).toBe(customLabels[buttonName]);
             });
         });
@@ -229,7 +329,7 @@ describe('Buttons TestCase', function () {
             }
         });
 
-        it('should create an h3 element when header1 is clicked', function () {
+        it('should create an h3 element when h3 is clicked', function () {
             this.el.innerHTML = '<p><b>lorem ipsum</b></p>';
             var button,
                 editor = this.newMediumEditor('.editor'),
@@ -845,7 +945,7 @@ describe('Buttons TestCase', function () {
         it('buttons should be active if the selection already has the element', function () {
             var editor = this.newMediumEditor('.editor', {
                     toolbar: {
-                        buttons: ['header1', 'header2']
+                        buttons: ['h3', 'h4']
                     }
                 }),
                 toolbar = editor.getExtensionByName('toolbar'),
@@ -869,10 +969,8 @@ describe('Buttons TestCase', function () {
         it('buttons should be active if the selection already custom defined element types', function () {
             var editor = this.newMediumEditor('.editor', {
                     toolbar: {
-                        buttons: ['header1', 'header2']
-                    },
-                    firstHeader: 'h1',
-                    secondHeader: 'h5'
+                        buttons: ['h1', 'h5']
+                    }
                 }),
                 toolbar = editor.getExtensionByName('toolbar'),
                 buttonOne = toolbar.getToolbarElement().querySelector('[data-action="append-h1"]'),
@@ -898,9 +996,8 @@ describe('Buttons TestCase', function () {
         it('buttons should convert between element types and "undo" back to original type', function () {
             var editor = this.newMediumEditor('.editor', {
                     toolbar: {
-                        buttons: ['header1', 'header2']
-                    },
-                    firstHeader: 'h1'
+                        buttons: ['h1', 'h4']
+                    }
                 }),
                 toolbar = editor.getExtensionByName('toolbar'),
                 buttonOne = toolbar.getToolbarElement().querySelector('[data-action="append-h1"]'),
