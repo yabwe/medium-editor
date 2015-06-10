@@ -55,9 +55,10 @@ var AnchorForm;
             event.preventDefault();
             event.stopPropagation();
 
-            var selectedParentElement = Selection.getSelectedParentElement(Selection.getSelectionRange(this.document));
-            if (selectedParentElement.tagName &&
-                    selectedParentElement.tagName.toLowerCase() === 'a') {
+            var selectedParentElement = Selection.getSelectedParentElement(Selection.getSelectionRange(this.document)),
+                firstTextNode = this.findFirstTextNodeWithinNode(selectedParentElement);
+
+            if (Util.getClosestTag(firstTextNode, 'a')) {
                 return this.execAction('unlink');
             }
 
@@ -66,6 +67,20 @@ var AnchorForm;
             }
 
             return false;
+        },
+
+        findFirstTextNodeWithinNode: function (ancestorNode) {
+            if (ancestorNode.nodeType === 3) {
+                return ancestorNode;
+            }
+
+            for (var i = 0; i < ancestorNode.childNodes.length; i++) {
+                var textNode = this.findFirstTextNodeWithinNode(ancestorNode.childNodes[i]);
+                if (textNode !== null) {
+                    return textNode;
+                }
+            }
+            return null;
         },
 
         // Called when user hits the defined shortcut (CTRL / COMMAND + K)
