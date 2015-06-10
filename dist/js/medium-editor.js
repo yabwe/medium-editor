@@ -1680,29 +1680,6 @@ var Selection;
         },
 
         // Utility method called from importSelection only
-        moveRangeForwardOverEmptyParagraphs: function (range, countOfParagraphs, document, root) {
-            function filterOnlyParagraphsAndText(node) {
-                if (node.nodeType === 3 || node.nodeName.toLowerCase() === 'p') {
-                    return NodeFilter.FILTER_ACCEPT;
-                } else {
-                    return NodeFilter.FILTER_SKIP;
-                }
-            }
-            var treeWalker = document.createTreeWalker(root, NodeFilter.SHOW_ELEMENT|NodeFilter.SHOW_TEXT,
-                filterOnlyParagraphsAndText, false);
-
-            treeWalker.currentNode = range.startContainer;
-            var prevNode,
-                node;
-            while ((node = treeWalker.nextNode()) && node.nodeType !== 3 && countOfParagraphs > 0) {
-                prevNode = node;
-                countOfParagraphs -= 1;
-            }
-            range.setStart(prevNode, 0);
-            range.collapse(true);
-        },
-
-        // Utility method called from importSelection only
         importSelectionMoveCursorPastAnchor: function (selectionState, range) {
             var nodeInsideAnchorTagFunction = function (node) {
                 return node.nodeName.toLowerCase() === 'a';
@@ -1733,38 +1710,6 @@ var Selection;
                 }
             }
             return range;
-        },
-
-        // Returns 0 unless the cursor is within or preceded by empty paragraphs,
-        // in which case it returns the count of such preceding paragraphs, including
-        // the empty paragraph in which the cursor itself may be embedded.
-        getIndexRelativeToAdjacentEmptyParagraphs: function (doc, root, cursorContainer, cursorOffset) {
-            if (cursorContainer.nodeType === 3 && cursorOffset !== 0) {
-                return 0;
-            }
-
-            var treeWalker = doc.createTreeWalker(root, NodeFilter.SHOW_ELEMENT|NodeFilter.SHOW_TEXT, null, false);
-            if (cursorContainer.nodeType === 3) {
-                treeWalker.currentNode = cursorContainer;
-            } else if (cursorOffset === cursorContainer.childNodes.length) {
-                return 0; // not always accurate but should be close enough
-            } else {
-                treeWalker.currentNode = cursorContainer.childNodes[cursorOffset];
-            }
-
-            var precedingEmptyParagraphsCount = 0,
-                node,
-                initialNode = treeWalker.currentNode,
-                initialNodeParagraph = Util.getClosestTag(initialNode, 'p');
-            while ((node = treeWalker.previousNode()) && (node.nodeType !== 3) &&
-                    !(node.nodeName.toLowerCase() === 'p' && node.textContent !== '' &&
-                        node !== initialNodeParagraph)) {
-                if (node.nodeName.toLowerCase() === 'p') {
-                    precedingEmptyParagraphsCount += 1;
-                }
-            }
-
-            return precedingEmptyParagraphsCount;
         },
 
         selectionInContentEditableFalse: function (contentWindow) {
@@ -1917,7 +1862,7 @@ var Selection;
 
         getSelectionRange: function (ownerDocument) {
             var selection = ownerDocument.getSelection();
-            if (selection.rangeCount === 0) {
+            if (selection.rangeCount === 0 || true === selection.isCollapsed) {
                 return null;
             }
             return selection.getRangeAt(0);
@@ -4009,12 +3954,9 @@ var AnchorPreview;
 }());
 
 var AutoLink,
-    WHITESPACE_CHARS,
     KNOWN_TLDS_FRAGMENT,
     LINK_REGEXP_TEXT;
 
-WHITESPACE_CHARS = [' ', '\t', '\n', '\r', '\u00A0', '\u2000', '\u2001', '\u2002', '\u2003',
-                                    '\u2028', '\u2029'];
 KNOWN_TLDS_FRAGMENT = 'com|net|org|edu|gov|mil|aero|asia|biz|cat|coop|info|int|jobs|mobi|museum|name|post|pro|tel|travel|' +
     'xxx|ac|ad|ae|af|ag|ai|al|am|an|ao|aq|ar|as|at|au|aw|ax|az|ba|bb|bd|be|bf|bg|bh|bi|bj|bm|bn|bo|br|bs|bt|bv|bw|by|' +
     'bz|ca|cc|cd|cf|cg|ch|ci|ck|cl|cm|cn|co|cr|cs|cu|cv|cx|cy|cz|dd|de|dj|dk|dm|do|dz|ec|ee|eg|eh|er|es|et|eu|fi|fj|' +
@@ -4136,59 +4078,15 @@ LINK_REGEXP_TEXT =
                 }
                 if (spans[i].getAttribute('data-href') !== textContent && nodeIsNotInsideAnchorTag(spans[i])) {
                     documentModified = true;
-                    if (spans[i].getAttribute('data-href') === textContent.trim()) {
-                        // The user hit space or something after the link and it got added inside the SPAN.
-                        var whiteSpaceText = '';
-                        for (var j = textContent.length - 1; j >= 0; j--) {
-                            if (WHITESPACE_CHARS.indexOf(textContent[j]) === -1) {
-                                break;
-                            }
-                            whiteSpaceText += textContent[j];
-                        }
-                        spans[i].parentNode.insertBefore(this.document.createTextNode(whiteSpaceText), spans[i].nextSibling);
-                        this.removeTrailingCharacters(spans[i], whiteSpaceText.length);
-                    } else {
-                        // Some editing has happened to the span, so just remove it entirely. The user can put it back
-                        // around just the href content if they need to prevent it from linking
-                        while (spans[i].childNodes.length > 0) {
-                            spans[i].parentNode.insertBefore(spans[i].firstChild, spans[i]);
-                        }
-                        spans[i].parentNode.removeChild(spans[i]);
+                    // Some editing has happened to the span, so just remove it entirely. The user can put it back
+                    // around just the href content if they need to prevent it from linking
+                    while (spans[i].childNodes.length > 0) {
+                        spans[i].parentNode.insertBefore(spans[i].firstChild, spans[i]);
                     }
+                    spans[i].parentNode.removeChild(spans[i]);
                 }
             }
             return documentModified;
-        },
-
-        removeTrailingCharacters: function (element, characterCount) {
-            var treeWalker = this.document.createTreeWalker(element, NodeFilter.SHOW_TEXT, null, false),
-                lastChildNotExhausted = true;
-
-            // Start the tree walker at the last descendant of the span
-            while (lastChildNotExhausted) {
-                lastChildNotExhausted = treeWalker.lastChild() !== null;
-            }
-
-            while (characterCount > 0) {
-                var currentNode = treeWalker.currentNode,
-                    currentNodeValue = currentNode.nodeValue;
-                if (currentNodeValue.length > characterCount) {
-                    currentNode.nodeValue = currentNodeValue.substring(0, currentNodeValue.length - characterCount);
-                    characterCount = 0;
-                } else {
-                    var previousNode = treeWalker.previousNode();
-                    currentNode.parentNode.removeChild(currentNode);
-                    characterCount -= currentNodeValue.length;
-                    // Just in case we run out of nodes, don't get stuck in an infinite loop
-                    if (previousNode === null) {
-                        if (window.console) {
-                            window.console.error('Ran out of trailing characters to trim and ' +
-                                'still had more characters to remove');
-                        }
-                        break;
-                    }
-                }
-            }
         },
 
         performLinkingWithinElement: function (element) {
@@ -4204,6 +4102,8 @@ LINK_REGEXP_TEXT =
 
         findLinkableText: function (contenteditable) {
             var linkRegExp = new RegExp(LINK_REGEXP_TEXT, 'gi'),
+                whitespaceChars = [' ', '\t', '\n', '\r', '\u00A0', '\u2000', '\u2001', '\u2002', '\u2003',
+                                    '\u2028', '\u2029'],
                 textContent = contenteditable.textContent,
                 match = null,
                 matches = [];
@@ -4212,8 +4112,8 @@ LINK_REGEXP_TEXT =
                 var matchOk = true,
                     matchEnd = match.index + match[0].length;
                 // If the regexp detected something as a link that has text immediately preceding/following it, bail out.
-                matchOk = (match.index === 0 || WHITESPACE_CHARS.indexOf(textContent[match.index - 1]) !== -1) &&
-                    (matchEnd === textContent.length || WHITESPACE_CHARS.indexOf(textContent[matchEnd]) !== -1);
+                matchOk = (match.index === 0 || whitespaceChars.indexOf(textContent[match.index - 1]) !== -1) &&
+                    (matchEnd === textContent.length || whitespaceChars.indexOf(textContent[matchEnd]) !== -1);
                 // If the regexp detected a bare domain that doesn't use one of our expected TLDs, bail out.
                 matchOk = matchOk && (match[0].indexOf('/') !== -1 ||
                     KNOWN_TLDS_REGEXP.test(match[0].split('.').pop().split('?').shift()));
@@ -6247,6 +6147,7 @@ function MediumEditor(elements, options) {
             this.preventSelectionUpdates = false;
         },
 
+        // NOT DOCUMENTED - exposed as extension helper and for backwards compatability
         checkSelection: function () {
             if (this.toolbar) {
                 this.toolbar.checkState();
@@ -6400,17 +6301,6 @@ function MediumEditor(elements, options) {
                         end: start + range.toString().length,
                         editableElementIndex: editableElementIndex
                     };
-                    // If start = 0 there may still be an empty paragraph before it, but we don't care.
-                    if (start !== 0) {
-                        var emptyParagraphsIndex = Selection.getIndexRelativeToAdjacentEmptyParagraphs(
-                                this.options.ownerDocument,
-                                this.elements[editableElementIndex],
-                                range.startContainer,
-                                range.startOffset);
-                        if (emptyParagraphsIndex !== 0) {
-                            selectionState.emptyParagraphsIndex = emptyParagraphsIndex;
-                        }
-                    }
                 }
             }
 
@@ -6485,15 +6375,11 @@ function MediumEditor(elements, options) {
                 }
             }
 
-            if (inSelectionState.emptyParagraphsIndex && selectionState.end === nextCharIndex) {
-                Selection.moveRangeForwardOverEmptyParagraphs(range, inSelectionState.emptyParagraphsIndex,
-                    this.options.ownerDocument, editableElement);
-            }
-
             // If the selection is right at the ending edge of a link, put it outside the anchor tag instead of inside.
             if (favorLaterSelectionAnchor) {
                 range = Selection.importSelectionMoveCursorPastAnchor(selectionState, range);
             }
+
             sel = this.options.contentWindow.getSelection();
             sel.removeAllRanges();
             sel.addRange(range);
