@@ -106,7 +106,11 @@ describe('Buttons TestCase', function () {
                                 action: 'append-h2',
                                 aria: 'fake h1',
                                 tagNames: ['h2'],
-                                contentDefault: '<b>H1</b>'
+                                contentDefault: '<b>H1</b>',
+                                classList: ['customClassName'],
+                                attrs: {
+                                    'data-custom-attr': 'custom-value'
+                                }
                             },
                             {
                                 name: 'h2',
@@ -135,6 +139,8 @@ describe('Buttons TestCase', function () {
             expect(button).toBe(headerOneButton.getButton());
             expect(button.getAttribute('aria-label')).toBe('fake h1');
             expect(button.getAttribute('title')).toBe('fake h1');
+            expect(button.getAttribute('data-custom-attr')).toBe('custom-value');
+            expect(button.classList.contains('customClassName')).toBe(true);
             expect(button.innerHTML).toBe('<b>H1</b>');
 
             selectElementContentsAndFire(editor.elements[0].querySelector('h2').firstChild);
