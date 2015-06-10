@@ -39,7 +39,7 @@ describe('Anchor Button TestCase', function () {
             var editor = this.newMediumEditor('.editor'),
                 anchorExtension = editor.getExtensionByName('anchor'),
                 toolbar = editor.getExtensionByName('toolbar'),
-                code = 'k'.charCodeAt(0);
+                code = 'K'.charCodeAt(0);
 
             selectElementContentsAndFire(editor.elements[0]);
             jasmine.clock().tick(1);
