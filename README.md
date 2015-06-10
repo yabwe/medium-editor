@@ -374,6 +374,7 @@ var editor = new MediumEditor('.editable', {
 
 * __commands__: Array of objects describing each command and the combination of keys that will trigger it.  Required for each object:
   * _command_: argument passed to `editor.execAction()` when key-combination is used
+    * if defined as `false`, the shortcut will be disabled
   * _key_: keyboard character that triggers this command
   * _meta_: whether the ctrl/meta key has to be active or inactive
   * _shift_: whether the shift key has to be active or inactive

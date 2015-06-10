@@ -113,7 +113,8 @@ describe('KeyboardCommands TestCase', function () {
 
         it('should not execute when the command key are false', function () {
             spyOn(MediumEditor.prototype, 'execAction');
-            var editor = this.newMediumEditor('.editor', {
+            var result,
+                editor = this.newMediumEditor('.editor', {
                 keyboardCommands: {
                     commands: [
                         {
@@ -131,9 +132,18 @@ describe('KeyboardCommands TestCase', function () {
             fireEvent(editor.elements[0], 'keydown', {
                 keyCode: 'J'.charCodeAt(0),
                 ctrlKey: true,
-                metaKey: true
+                metaKey: true,
+                shiftKey: false
             });
             expect(editor.execAction).not.toHaveBeenCalled();
+
+            result = fireEvent(editor.elements[0], 'keydown', {
+                keyCode: 'J'.charCodeAt(0),
+                ctrlKey: true,
+                metaKey: true,
+                shiftKey: true
+            });
+            expect(result).toBe(false, 'The command was not blocked because shift key was pressed');
         });
     });
 });
