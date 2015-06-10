@@ -451,8 +451,8 @@ MediumEditor, by default, will show only the buttons listed here to avoid a huge
 * __italic__
 * __underline__
 * __anchor__ _(built-in support for collecting a url via the anchor extension)_
-* __header1__
-* __header2__
+* __h2__
+* __h3__
 * __quote__
 
 ### All buttons.
@@ -477,8 +477,12 @@ These are all the built-in buttons supported by MediumEditor.
 * __justifyCenter__
 * __justifyRight__
 * __justifyFull__
-* __header1__
-* __header2__
+* __h1__
+* __h2__
+* __h3__
+* __h4__
+* __h5__
+* __h6__
 * __removeFormat__ (clears inline style formatting, preserves blocks)
 
 ## Themes
