@@ -916,13 +916,13 @@ function MediumEditor(elements, options) {
                     };
                     // If start = 0 there may still be an empty paragraph before it, but we don't care.
                     if (start !== 0) {
-                        var emptyParagraphsIndex = Selection.getIndexRelativeToAdjacentEmptyParagraphs(
+                        var emptyBlocksIndex = Selection.getIndexRelativeToAdjacentEmptyBlocks(
                                 this.options.ownerDocument,
                                 this.elements[editableElementIndex],
                                 range.startContainer,
                                 range.startOffset);
-                        if (emptyParagraphsIndex !== 0) {
-                            selectionState.emptyParagraphsIndex = emptyParagraphsIndex;
+                        if (emptyBlocksIndex !== 0) {
+                            selectionState.emptyBlocksIndex = emptyBlocksIndex;
                         }
                     }
                 }
@@ -999,9 +999,9 @@ function MediumEditor(elements, options) {
                 }
             }
 
-            if (inSelectionState.emptyParagraphsIndex && selectionState.end === nextCharIndex) {
-                targetNode = Selection.getSelectionTargetOverEmptyParagraphs(range.startContainer,
-                    inSelectionState.emptyParagraphsIndex, this.options.ownerDocument, editableElement);
+            if (inSelectionState.emptyBlocksIndex && selectionState.end === nextCharIndex) {
+                var targetNode = Selection.getSelectionTargetOverEmptyBlocks(range.startContainer,
+                    inSelectionState.emptyBlocksIndex, this.options.ownerDocument, editableElement);
                 range.setStart(targetNode, 0);
                 range.collapse(true);
             }

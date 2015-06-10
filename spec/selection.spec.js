@@ -82,7 +82,7 @@ describe('Selection TestCase', function () {
             });
             placeCursorInsideElement(editor.elements[1].querySelector('span'), 1); // end of first span
             var exportedSelection = editor.exportSelection();
-            expect(exportedSelection.emptyParagraphsIndex).toEqual(undefined);
+            expect(exportedSelection.emptyBlocksIndex).toEqual(undefined);
         });
 
         it('should export a position indicating the cursor is in an empty paragraph', function () {
@@ -92,7 +92,7 @@ describe('Selection TestCase', function () {
             });
             placeCursorInsideElement(editor.elements[1].getElementsByTagName('p')[1], 0);
             var exportedSelection = editor.exportSelection();
-            expect(exportedSelection.emptyParagraphsIndex).toEqual(1);
+            expect(exportedSelection.emptyBlocksIndex).toEqual(1);
         });
 
         it('should export a position indicating the cursor is after an empty paragraph', function () {
@@ -102,7 +102,7 @@ describe('Selection TestCase', function () {
             });
             placeCursorInsideElement(editor.elements[1].getElementsByTagName('p')[2], 0);
             var exportedSelection = editor.exportSelection();
-            expect(exportedSelection.emptyParagraphsIndex).toEqual(2);
+            expect(exportedSelection.emptyBlocksIndex).toEqual(2);
         });
 
         it('should import a position with the cursor in an empty paragraph', function () {
@@ -114,7 +114,7 @@ describe('Selection TestCase', function () {
                 'start': 14,
                 'end': 14,
                 'editableElementIndex': 1,
-                'emptyParagraphsIndex': 1
+                'emptyBlocksIndex': 1
             });
 
             var startParagraph = Util.getClosestTag(window.getSelection().getRangeAt(0).startContainer, 'p');
@@ -130,7 +130,7 @@ describe('Selection TestCase', function () {
                 'start': 14,
                 'end': 14,
                 'editableElementIndex': 1,
-                'emptyParagraphsIndex': 2
+                'emptyBlocksIndex': 2
             });
 
             var startParagraph = Util.getClosestTag(window.getSelection().getRangeAt(0).startContainer, 'p');
