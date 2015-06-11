@@ -56,11 +56,11 @@ function MediumEditor(elements, options) {
 
         if (Util.isKey(event, [Util.keyCode.BACKSPACE, Util.keyCode.ENTER]) &&
                 // has a preceeding sibling
-            node.previousElementSibling &&
+                node.previousElementSibling &&
                 // in a header
-            isHeader.test(tagName) &&
+                isHeader.test(tagName) &&
                 // at the very end of the block
-            Selection.getCaretOffsets(node).left === 0) {
+                Selection.getCaretOffsets(node).left === 0) {
             if (Util.isKey(event, Util.keyCode.BACKSPACE) && isEmpty.test(node.previousElementSibling.innerHTML)) {
                 // backspacing the begining of a header into an empty previous element will
                 // change the tagName of the current node to prevent one
@@ -97,13 +97,13 @@ function MediumEditor(elements, options) {
 
             event.preventDefault();
         } else if (Util.isKey(event, Util.keyCode.BACKSPACE) &&
-            tagName === 'li' &&
+                tagName === 'li' &&
                 // hitting backspace inside an empty li
-            isEmpty.test(node.innerHTML) &&
+                isEmpty.test(node.innerHTML) &&
                 // is first element (no preceeding siblings)
-            !node.previousElementSibling &&
+                !node.previousElementSibling &&
                 // parent also does not have a sibling
-            !node.parentElement.previousElementSibling &&
+                !node.parentElement.previousElementSibling &&
                 // is not the only li in a list
                 node.nextElementSibling &&
                 node.nextElementSibling.nodeName.toLowerCase() === 'li') {
@@ -868,7 +868,7 @@ function MediumEditor(elements, options) {
             }
 
             var editableElementIndex = inSelectionState.editableElementIndex === undefined ?
-                    0 : inSelectionState.editableElementIndex,
+                                                0 : inSelectionState.editableElementIndex,
                 selectionState = {
                     editableElementIndex: editableElementIndex,
                     start: inSelectionState.start,
