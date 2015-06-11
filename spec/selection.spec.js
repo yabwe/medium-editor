@@ -92,6 +92,43 @@ describe('Selection TestCase', function () {
             expect(exportedSelection.emptyBlocksIndex).toEqual(undefined);
         });
 
+        it('should not export a position indicating the cursor is after an empty paragraph', function () {
+            this.createElement('div', 'editor', '<p><span>www.google.com</span></p><p><br /></p>' +
+                '<p class="target">Whatever</p>');
+            var editor = this.newMediumEditor('.editor', {
+                buttons: ['italic', 'underline', 'strikethrough']
+            });
+            // After the 'W' in whatever
+            placeCursorInsideElement(editor.elements[1].querySelector('p.target').firstChild, 1);
+            var exportedSelection = editor.exportSelection();
+            expect(exportedSelection.emptyBlocksIndex).toEqual(undefined);
+        });
+
+        it('should not export a position indicating the cursor is after an empty paragraph (in a complicated markup case)',
+                function () {
+            this.createElement('div', 'editor', '<p><span>www.google.com</span></p><p><br /></p>' +
+                '<p>What<span class="target">ever</span></p>');
+            var editor = this.newMediumEditor('.editor', {
+                buttons: ['italic', 'underline', 'strikethrough']
+            });
+            // Before the 'e' in whatever
+            placeCursorInsideElement(editor.elements[1].querySelector('span.target').firstChild, 0);
+            var exportedSelection = editor.exportSelection();
+            expect(exportedSelection.emptyBlocksIndex).toEqual(undefined);
+        });
+        it('should not export a position indicating the cursor is after an empty paragraph ' +
+                '(in a complicated markup with selection on the element)', function () {
+            this.createElement('div', 'editor', '<p><span>www.google.com</span></p><p><br /></p>' +
+                '<p>What<span class="target">ever</span></p>');
+            var editor = this.newMediumEditor('.editor', {
+                buttons: ['italic', 'underline', 'strikethrough']
+            });
+            // Before the 'e' in whatever
+            placeCursorInsideElement(editor.elements[1].querySelector('span.target'), 0);
+            var exportedSelection = editor.exportSelection();
+            expect(exportedSelection.emptyBlocksIndex).toEqual(undefined);
+        });
+
         it('should export a position indicating the cursor is in an empty paragraph', function () {
             this.createElement('div', 'editor', '<p><span>www.google.com</span></p><p><br /></p><p>Whatever</p>');
             var editor = this.newMediumEditor('.editor', {
