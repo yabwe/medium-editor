@@ -136,10 +136,7 @@ LINK_REGEXP_TEXT =
                     } else {
                         // Some editing has happened to the span, so just remove it entirely. The user can put it back
                         // around just the href content if they need to prevent it from linking
-                        while (spans[i].childNodes.length > 0) {
-                            spans[i].parentNode.insertBefore(spans[i].firstChild, spans[i]);
-                        }
-                        spans[i].parentNode.removeChild(spans[i]);
+                        Util.unwrap(spans[i], this.document);
                     }
                 }
             }
