@@ -4,6 +4,29 @@ var Selection;
 (function () {
     'use strict';
 
+    function filterOnlyParentElements(node) {
+        if (Util.parentElements.indexOf(node.nodeName.toLowerCase()) !== -1) {
+            return NodeFilter.FILTER_ACCEPT;
+        } else {
+            return NodeFilter.FILTER_SKIP;
+        }
+    }
+
+    function adjustEmptyBlocksRelativeToCursorChildren(node, emptyBlocksCount, cursorContainer, cursorOffset) {
+        if (node.nodeType === 3) {
+            if (cursorOffset !== 0) {
+                emptyBlocksCount = 0;
+            }
+        } else {
+            for (var i = 0; i < cursorOffset; i++) {
+                if (cursorContainer.childNodes[i].textContent !== '') {
+                    emptyBlocksCount = 0;
+                }
+            }
+        }
+        return emptyBlocksCount;
+    }
+
     Selection = {
         findMatchingSelectionParent: function (testElementFunction, contentWindow) {
             var selection = contentWindow.getSelection(),
@@ -85,40 +108,38 @@ var Selection;
         // in which case it returns the count of such preceding paragraphs, including
         // the empty paragraph in which the cursor itself may be embedded.
         getIndexRelativeToAdjacentEmptyBlocks: function (doc, root, cursorContainer, cursorOffset) {
-            if (cursorContainer.nodeType === 3 && cursorOffset !== 0) {
-                return 0;
-            }
-
-            var treeWalker = doc.createTreeWalker(root, NodeFilter.SHOW_ELEMENT|NodeFilter.SHOW_TEXT, null, false);
-            if (cursorContainer.nodeType === 3) {
-                treeWalker.currentNode = cursorContainer;
-            } else if (cursorOffset === cursorContainer.childNodes.length) {
-                return 0; // not always accurate but should be close enough
-            } else {
-                treeWalker.currentNode = cursorContainer.childNodes[cursorOffset];
-            }
-
-            var precedingEmptyBlocksCount = 0,
-                node,
-                initialNode = treeWalker.currentNode,
-                candidateNode = initialNode,
-                initialNodeBlock = null;
-            while (initialNodeBlock === null && candidateNode !== null) {
-                if (Util.parentElements.indexOf(candidateNode.nodeName.toLowerCase()) !== -1) {
-                    initialNodeBlock = candidateNode;
-                } else {
-                    candidateNode = candidateNode.parentNode;
+            var treeWalker = doc.createTreeWalker(root, NodeFilter.SHOW_ELEMENT, filterOnlyParentElements, false),
+                emptyBlocksCount = 0;
+            while (treeWalker.nextNode()) {
+                var blockIsEmpty = treeWalker.currentNode.textContent === '';
+                if (blockIsEmpty || emptyBlocksCount > 0) {
+                    emptyBlocksCount += 1;
+                }
+                if (treeWalker.currentNode === cursorContainer) {
+                    return adjustEmptyBlocksRelativeToCursorChildren(treeWalker.currentNode, emptyBlocksCount,
+                        cursorContainer, cursorOffset);
+                } else if (Util.isDescendant(treeWalker.currentNode, cursorContainer, false)) {
+                    // Find if there is text before the cursor container and if so, reset the block count
+                    treeWalker = doc.createTreeWalker(treeWalker.currentNode,
+                        NodeFilter.SHOW_ELEMENT|NodeFilter.SHOW_TEXT, null, false);
+                    var node;
+                    while (node = treeWalker.nextNode()) {
+                        if (node === cursorContainer) {
+                            return adjustEmptyBlocksRelativeToCursorChildren(node, emptyBlocksCount, cursorContainer,
+                                cursorOffset);
+                        }
+                        if (node.nodeType === 3) {
+                            emptyBlocksCount = 0;
+                        }
+                    }
+                    return emptyBlocksCount;
+                }
+                if (!blockIsEmpty) {
+                    emptyBlocksCount = 0;
                 }
             }
-            while ((node = treeWalker.previousNode()) && (node.nodeType !== 3) &&
-                    !(node.nodeName.toLowerCase() === 'p' && node.textContent !== '' &&
-                        node !== initialNodeBlock)) {
-                if (node.nodeName.toLowerCase() === 'p') {
-                    precedingEmptyBlocksCount += 1;
-                }
-            }
 
-            return precedingEmptyBlocksCount;
+            return 0;
         },
 
         selectionInContentEditableFalse: function (contentWindow) {
