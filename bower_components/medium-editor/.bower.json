@@ -1,7 +1,7 @@
 {
   "name": "medium-editor",
-  "version": "4.11.1",
-  "homepage": "http://daviferreira.github.io/medium-editor/",
+  "version": "4.12.2",
+  "homepage": "http://yabwe.github.io/medium-editor/",
   "authors": [
     "Davi Ferreira <hi@daviferreira.com>",
     "Nate Mielnik <nathan@outlook.com>",
@@ -36,13 +36,13 @@
     "README.md",
     "CHANGES.md"
   ],
-  "_release": "4.11.1",
+  "_release": "4.12.2",
   "_resolution": {
     "type": "version",
-    "tag": "4.11.1",
-    "commit": "91633089fbb7367e96894173c9fddd5fb370dff5"
+    "tag": "4.12.2",
+    "commit": "caf3232422ea7b3a5315280eba18c1393ea2c14b"
   },
   "_source": "git://github.com/daviferreira/medium-editor.git",
-  "_target": "^4.6.0",
+  "_target": "^4.11.1",
   "_originalSource": "medium-editor"
 }

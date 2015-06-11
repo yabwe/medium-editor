@@ -1,14 +1,14 @@
 # Contributing
 
-## To contribute and end up in this [list](https://github.com/daviferreira/medium-editor/graphs/contributors):
+## To contribute and end up in this [list](https://github.com/yabwe/medium-editor/graphs/contributors):
 
-[Kill some bugs :)](https://github.com/daviferreira/medium-editor/issues?q=is%3Aopen+is%3Aissue+label%3Abug)
+[Kill some bugs :)](https://github.com/yabwe/medium-editor/issues?q=is%3Aopen+is%3Aissue+label%3Abug)
 
 1. Fork it
 2. Create your feature branch (`git checkout -b my-new-feature`)
 3. Test your changes to the best of your ability.
 4. Update the documentation to reflect your changes if they add or changes current functionality.
-5. Commit your changes (`git commit -am 'Added some feature'`)
+5. Commit your changes (`git commit -am 'Added some feature'`) **without files from the _dist_ directory**.
 6. Push to the branch (`git push origin my-new-feature`)
 7. Create new Pull Request
 
@@ -30,7 +30,7 @@ We use [EditorConfig](http://EditorConfig.org) to maintain consistent coding sty
 
 ## Easy First Bugs
 
-Looking for something simple for a first contribution? Try fixing an [easy first bug](https://github.com/daviferreira/medium-editor/issues?q=is%3Aopen+is%3Aissue+label%3A%22easy+first+bug%22)!
+Looking for something simple for a first contribution? Try fixing an [easy first bug](https://github.com/yabwe/medium-editor/issues?q=is%3Aopen+is%3Aissue+label%3A%22easy+first+bug%22)!
 
 ## Development
 

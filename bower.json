@@ -1,6 +1,5 @@
 {
   "name": "medium-editor",
-  "version": "4.6.0",
   "homepage": "http://yabwe.github.io/medium-editor/",
   "authors": [
     "Davi Ferreira <hi@daviferreira.com>",
@@ -35,6 +34,6 @@
     "CHANGES.md"
   ],
   "dependencies": {
-    "medium-editor": "4.11.1"
+    "medium-editor": "^4.11.1"
   }
 }
