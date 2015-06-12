@@ -1,4 +1,4 @@
-/*global NodeFilter, console, Selection*/
+/*global NodeFilter, Selection*/
 
 var Util;
 
@@ -614,6 +614,30 @@ var Util;
             return true;
         },
 
+        getBlockContainer: function (element) {
+            return this.traverseUp(element, function (el) {
+                return Util.parentElements.indexOf(el.tagName.toLowerCase()) !== -1;
+            });
+        },
+
+        getBlockElementByIndex: function (startElement, index) {
+            var block = this.getBlockContainer(startElement);
+            for (var i = 0; i < index; i++) {
+                if (!block.nextSibling) {
+                    break;
+                }
+                block = block.nextSibling;
+            }
+            return block;
+        },
+
+        getFirstLeafNode: function (element) {
+            while (element && element.firstChild) {
+                element = element.firstChild;
+            }
+            return element;
+        },
+
         ensureUrlHasProtocol: function (url) {
             if (url.indexOf('://') === -1) {
                 return 'http://' + url;
@@ -623,7 +647,7 @@ var Util;
 
         warn: function () {
             if (window.console !== undefined && typeof window.console.warn === 'function') {
-                window.console.warn.apply(console, arguments);
+                window.console.warn.apply(window.console, arguments);
             }
         },
 

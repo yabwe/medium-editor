@@ -888,9 +888,8 @@ function MediumEditor(elements, options) {
             }
 
             if (inSelectionState.emptyBlocksIndex && selectionState.end === nextCharIndex) {
-                var targetNode = Selection.getSelectionTargetOverEmptyBlocks(range.startContainer,
-                    inSelectionState.emptyBlocksIndex, this.options.ownerDocument, editableElement);
-                range.setStart(targetNode, 0);
+                var targetNode = Util.getBlockElementByIndex(range.startContainer, inSelectionState.emptyBlocksIndex);
+                range.setStart(Util.getFirstLeafNode(targetNode), 0);
                 range.collapse(true);
             }
 
