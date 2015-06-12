@@ -142,6 +142,16 @@ describe('Selection TestCase', function () {
             expect(exportedSelection.emptyBlocksIndex).toEqual(2);
         });
 
+        it('should export a position indicating the cursor is after an empty block element', function () {
+            this.createElement('div', 'editor', '<p><span>www.google.com</span></p><h1><br /></h1><h2><br /></h2><p>Whatever</p>');
+            var editor = this.newMediumEditor('.editor', {
+                buttons: ['italic', 'underline', 'strikethrough']
+            });
+            placeCursorInsideElement(editor.elements[1].querySelector('h2'), 0);
+            var exportedSelection = editor.exportSelection();
+            expect(exportedSelection.emptyBlocksIndex).toEqual(2);
+        });
+
         it('should import a position with the cursor in an empty paragraph', function () {
             this.createElement('div', 'editor', '<p><span>www.google.com</span></p><p><br /></p><p>Whatever</p>');
             var editor = this.newMediumEditor('.editor', {
@@ -172,6 +182,38 @@ describe('Selection TestCase', function () {
 
             var startParagraph = Util.getClosestTag(window.getSelection().getRangeAt(0).startContainer, 'p');
             expect(startParagraph).toBe(editor.elements[1].getElementsByTagName('p')[2], 'paragraph after empty paragraph');
+        });
+
+        it('should import a position with the cursor after an empty block element', function () {
+            this.createElement('div', 'editor', '<p><span>www.google.com</span></p><h1><br /></h1><h2><br /></h2><p>Whatever</p>');
+            var editor = this.newMediumEditor('.editor', {
+                buttons: ['italic', 'underline', 'strikethrough']
+            });
+            editor.importSelection({
+                'start': 14,
+                'end': 14,
+                'editableElementIndex': 1,
+                'emptyBlocksIndex': 2
+            });
+
+            var startParagraph = Util.getClosestTag(window.getSelection().getRangeAt(0).startContainer, 'h2');
+            expect(startParagraph).toBe(editor.elements[1].querySelector('h2'), 'block element after empty block element');
+        });
+
+        it('should import a position with the cursor after an empty block element inside an element with various children', function () {
+            this.createElement('div', 'editor', '<p><span>www.google.com</span></p><h1><br /></h1><h2><br /></h2><p><b><i>Whatever</i></b></p>');
+            var editor = this.newMediumEditor('.editor', {
+                buttons: ['italic', 'underline', 'strikethrough']
+            });
+            editor.importSelection({
+                'start': 14,
+                'end': 14,
+                'editableElementIndex': 1,
+                'emptyBlocksIndex': 3
+            });
+
+            var innerElement = window.getSelection().getRangeAt(0).startContainer;
+            expect(Util.isDescendant(editor.elements[1].querySelector('i'), innerElement, true)).toBe(true, 'nested inline elment inside block element after empty block element');
         });
     });
 
