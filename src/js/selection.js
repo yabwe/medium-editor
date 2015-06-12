@@ -35,28 +35,6 @@ var Selection;
         },
 
         // Utility method called from importSelection only
-        getSelectionTargetOverEmptyBlocks: function (startContainer, countOfBlocks, document, root) {
-            function filterOnlyBlocksAndText(node) {
-                if (node.nodeType === 3 || Util.parentElements.indexOf(node.nodeName.toLowerCase()) !== -1) {
-                    return NodeFilter.FILTER_ACCEPT;
-                } else {
-                    return NodeFilter.FILTER_SKIP;
-                }
-            }
-            var treeWalker = document.createTreeWalker(root, NodeFilter.SHOW_ELEMENT|NodeFilter.SHOW_TEXT,
-                filterOnlyBlocksAndText, false);
-
-            treeWalker.currentNode = startContainer;
-            var prevNode,
-                node;
-            while ((node = treeWalker.nextNode()) && node.nodeType !== 3 && countOfBlocks > 0) {
-                prevNode = node;
-                countOfBlocks -= 1;
-            }
-            return prevNode;
-        },
-
-        // Utility method called from importSelection only
         importSelectionMoveCursorPastAnchor: function (selectionState, range) {
             var nodeInsideAnchorTagFunction = function (node) {
                 return node.nodeName.toLowerCase() === 'a';
