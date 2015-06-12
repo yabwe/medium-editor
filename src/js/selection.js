@@ -77,11 +77,13 @@ var Selection;
             }
 
             // Check if the block that contains the cursor has any other text in front of the cursor
-            if (cursorContainer.childNodes.length !== cursorOffset) {
-                var node = cursorContainer.nodeType === 3 ? cursorContainer : cursorContainer.childNodes[cursorOffset];
-                if (!Util.isElementAtBeginningOfBlock(node)) {
-                    return 0;
-                }
+            var node = cursorContainer;
+            if (node.nodeType !== 3) {
+                //node = cursorContainer.childNodes.length === cursorOffset ? null : cursorContainer.childNodes[cursorOffset];
+                node = cursorContainer.childNodes[cursorOffset];
+            }
+            if (node && !Util.isElementAtBeginningOfBlock(node)) {
+                return 0;
             }
 
             // Walk over block elements, counting number of empty blocks between last piece of text
