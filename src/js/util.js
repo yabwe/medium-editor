@@ -672,17 +672,6 @@ var Util;
             });
         },
 
-        getBlockElementByIndex: function (startElement, index) {
-            var block = this.getBlockContainer(startElement);
-            for (var i = 0; i < index; i++) {
-                if (!block.nextSibling) {
-                    break;
-                }
-                block = block.nextSibling;
-            }
-            return block;
-        },
-
         getFirstLeafNode: function (element) {
             while (element && element.firstChild) {
                 element = element.firstChild;

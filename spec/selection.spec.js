@@ -215,6 +215,24 @@ describe('Selection TestCase', function () {
             var innerElement = window.getSelection().getRangeAt(0).startContainer;
             expect(Util.isDescendant(editor.elements[1].querySelector('i'), innerElement, true)).toBe(true, 'nested inline elment inside block element after empty block element');
         });
+
+        it('should import not import a selection beyond any block elements that have text, even when emptyBlocksIndex indicates it should ', function () {
+            this.createElement('div', 'editor', '<p><span>www.google.com</span></p><h1><br /></h1><h2>Not Empty</h2><p><b><i>Whatever</i></b></p>');
+            var editor = this.newMediumEditor('.editor', {
+                buttons: ['italic', 'underline', 'strikethrough']
+            });
+            // Import a selection that indicates the text should be at the end of the 'www.google.com' word, but in the 3rd paragraph (at the beginning of 'Whatever')
+            editor.importSelection({
+                'start': 14,
+                'end': 14,
+                'editableElementIndex': 1,
+                'emptyBlocksIndex': 3
+            });
+
+            var innerElement = window.getSelection().getRangeAt(0).startContainer;
+            expect(Util.isDescendant(editor.elements[1].querySelectorAll('p')[1], innerElement, true)).toBe(false, 'moved selection beyond non-empty block element');
+            expect(Util.isDescendant(editor.elements[1].querySelector('h2'), innerElement, true)).toBe(true, 'moved selection to element to incorrect block element');
+        });
     });
 
     describe('Saving Selection', function () {
