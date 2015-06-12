@@ -1,3 +1,8 @@
+4.12.3 / 2015-06-12
+==================
+* Fix bug with un-linked auto-links causing unexpected cursor positioning
+
+
 4.12.2 / 2015-06-10
 ==================
 * Fix broken keyboard shortcuts

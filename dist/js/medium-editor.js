@@ -1047,6 +1047,50 @@ var Util;
         },
         /* END - based on http://stackoverflow.com/a/6183069 */
 
+        isElementAtBeginningOfBlock: function (node) {
+            var textVal,
+                sibling;
+            while (node.nodeType === 3 ||
+                (this.parentElements.indexOf(node.tagName.toLowerCase()) === -1 && !node.getAttribute('data-medium-element'))) { // TODO: Change this in v5.0.0
+                sibling = node;
+                while (sibling = sibling.previousSibling) {
+                    textVal = sibling.nodeType === 3 ? sibling.nodeValue : sibling.textContent;
+                    if (textVal.length > 0) {
+                        return false;
+                    }
+                }
+                node = node.parentNode;
+            }
+            return true;
+        },
+
+        getBlockContainer: function (element) {
+            return this.traverseUp(element, function (el) {
+                return Util.parentElements.indexOf(el.tagName.toLowerCase()) !== -1;
+            });
+        },
+
+        getFirstLeafNode: function (element) {
+            while (element && element.firstChild) {
+                element = element.firstChild;
+            }
+            return element;
+        },
+
+        getFirstTextNode: function (element) {
+            if (element.nodeType === 3) {
+                return element;
+            }
+
+            for (var i = 0; i < element.childNodes.length; i++) {
+                var textNode = this.getFirstTextNode(element.childNodes[i]);
+                if (textNode !== null) {
+                    return textNode;
+                }
+            }
+            return null;
+        },
+
         ensureUrlHasProtocol: function (url) {
             if (url.indexOf('://') === -1) {
                 return 'http://' + url;
@@ -1056,7 +1100,7 @@ var Util;
 
         warn: function () {
             if (window.console !== undefined && typeof window.console.warn === 'function') {
-                window.console.warn.apply(console, arguments);
+                window.console.warn.apply(window.console, arguments);
             }
         },
 
@@ -1657,6 +1701,14 @@ var Selection;
 (function () {
     'use strict';
 
+    function filterOnlyParentElements(node) {
+        if (Util.parentElements.indexOf(node.nodeName.toLowerCase()) !== -1) {
+            return NodeFilter.FILTER_ACCEPT;
+        } else {
+            return NodeFilter.FILTER_SKIP;
+        }
+    }
+
     Selection = {
         findMatchingSelectionParent: function (testElementFunction, contentWindow) {
             var selection = contentWindow.getSelection(),
@@ -1710,6 +1762,45 @@ var Selection;
                 }
             }
             return range;
+        },
+
+        // Returns 0 unless the cursor is within or preceded by empty paragraphs/blocks,
+        // in which case it returns the count of such preceding paragraphs, including
+        // the empty paragraph in which the cursor itself may be embedded.
+        getIndexRelativeToAdjacentEmptyBlocks: function (doc, root, cursorContainer, cursorOffset) {
+            // If there is text in front of the cursor, that means there isn't only empty blocks before it
+            if (cursorContainer.nodeType === 3 && cursorOffset > 0) {
+                return 0;
+            }
+
+            // Check if the block that contains the cursor has any other text in front of the cursor
+            var node = cursorContainer;
+            if (node.nodeType !== 3) {
+                //node = cursorContainer.childNodes.length === cursorOffset ? null : cursorContainer.childNodes[cursorOffset];
+                node = cursorContainer.childNodes[cursorOffset];
+            }
+            if (node && !Util.isElementAtBeginningOfBlock(node)) {
+                return 0;
+            }
+
+            // Walk over block elements, counting number of empty blocks between last piece of text
+            // and the block the cursor is in
+            var treeWalker = doc.createTreeWalker(root, NodeFilter.SHOW_ELEMENT, filterOnlyParentElements, false),
+                emptyBlocksCount = 0;
+            while (treeWalker.nextNode()) {
+                var blockIsEmpty = treeWalker.currentNode.textContent === '';
+                if (blockIsEmpty || emptyBlocksCount > 0) {
+                    emptyBlocksCount += 1;
+                }
+                if (Util.isDescendant(treeWalker.currentNode, cursorContainer, true)) {
+                    return emptyBlocksCount;
+                }
+                if (!blockIsEmpty) {
+                    emptyBlocksCount = 0;
+                }
+            }
+
+            return emptyBlocksCount;
         },
 
         selectionInContentEditableFalse: function (contentWindow) {
@@ -3470,9 +3561,10 @@ var AnchorForm;
             event.preventDefault();
             event.stopPropagation();
 
-            var selectedParentElement = Selection.getSelectedParentElement(Selection.getSelectionRange(this.document));
-            if (selectedParentElement.tagName &&
-                    selectedParentElement.tagName.toLowerCase() === 'a') {
+            var selectedParentElement = Selection.getSelectedParentElement(Selection.getSelectionRange(this.document)),
+                firstTextNode = Util.getFirstTextNode(selectedParentElement);
+
+            if (Util.getClosestTag(firstTextNode, 'a')) {
                 return this.execAction('unlink');
             }
 
@@ -3954,9 +4046,12 @@ var AnchorPreview;
 }());
 
 var AutoLink,
+    WHITESPACE_CHARS,
     KNOWN_TLDS_FRAGMENT,
     LINK_REGEXP_TEXT;
 
+WHITESPACE_CHARS = [' ', '\t', '\n', '\r', '\u00A0', '\u2000', '\u2001', '\u2002', '\u2003',
+                                    '\u2028', '\u2029'];
 KNOWN_TLDS_FRAGMENT = 'com|net|org|edu|gov|mil|aero|asia|biz|cat|coop|info|int|jobs|mobi|museum|name|post|pro|tel|travel|' +
     'xxx|ac|ad|ae|af|ag|ai|al|am|an|ao|aq|ar|as|at|au|aw|ax|az|ba|bb|bd|be|bf|bg|bh|bi|bj|bm|bn|bo|br|bs|bt|bv|bw|by|' +
     'bz|ca|cc|cd|cf|cg|ch|ci|ck|cl|cm|cn|co|cr|cs|cu|cv|cx|cy|cz|dd|de|dj|dk|dm|do|dz|ec|ee|eg|eh|er|es|et|eu|fi|fj|' +
@@ -4078,15 +4173,45 @@ LINK_REGEXP_TEXT =
                 }
                 if (spans[i].getAttribute('data-href') !== textContent && nodeIsNotInsideAnchorTag(spans[i])) {
                     documentModified = true;
-                    // Some editing has happened to the span, so just remove it entirely. The user can put it back
-                    // around just the href content if they need to prevent it from linking
-                    while (spans[i].childNodes.length > 0) {
-                        spans[i].parentNode.insertBefore(spans[i].firstChild, spans[i]);
+                    var trimmedTextContent = textContent.replace(/\s+$/, '');
+                    if (spans[i].getAttribute('data-href') === trimmedTextContent) {
+                        var charactersTrimmed = textContent.length - trimmedTextContent.length,
+                            subtree = Util.splitOffDOMTree(spans[i], this.splitTextBeforeEnd(spans[i], charactersTrimmed));
+                        spans[i].parentNode.insertBefore(subtree, spans[i].nextSibling);
+                    } else {
+                        // Some editing has happened to the span, so just remove it entirely. The user can put it back
+                        // around just the href content if they need to prevent it from linking
+                        Util.unwrap(spans[i], this.document);
                     }
-                    spans[i].parentNode.removeChild(spans[i]);
                 }
             }
             return documentModified;
+        },
+
+        splitTextBeforeEnd: function (element, characterCount) {
+            var treeWalker = this.document.createTreeWalker(element, NodeFilter.SHOW_TEXT, null, false),
+                lastChildNotExhausted = true;
+
+            // Start the tree walker at the last descendant of the span
+            while (lastChildNotExhausted) {
+                lastChildNotExhausted = treeWalker.lastChild() !== null;
+            }
+
+            var currentNode,
+                currentNodeValue,
+                previousNode;
+            while (characterCount > 0 && previousNode !== null) {
+                currentNode = treeWalker.currentNode;
+                currentNodeValue = currentNode.nodeValue;
+                if (currentNodeValue.length > characterCount) {
+                    previousNode = currentNode.splitText(currentNodeValue.length - characterCount);
+                    characterCount = 0;
+                } else {
+                    previousNode = treeWalker.previousNode();
+                    characterCount -= currentNodeValue.length;
+                }
+            }
+            return previousNode;
         },
 
         performLinkingWithinElement: function (element) {
@@ -4102,8 +4227,6 @@ LINK_REGEXP_TEXT =
 
         findLinkableText: function (contenteditable) {
             var linkRegExp = new RegExp(LINK_REGEXP_TEXT, 'gi'),
-                whitespaceChars = [' ', '\t', '\n', '\r', '\u00A0', '\u2000', '\u2001', '\u2002', '\u2003',
-                                    '\u2028', '\u2029'],
                 textContent = contenteditable.textContent,
                 match = null,
                 matches = [];
@@ -4112,8 +4235,8 @@ LINK_REGEXP_TEXT =
                 var matchOk = true,
                     matchEnd = match.index + match[0].length;
                 // If the regexp detected something as a link that has text immediately preceding/following it, bail out.
-                matchOk = (match.index === 0 || whitespaceChars.indexOf(textContent[match.index - 1]) !== -1) &&
-                    (matchEnd === textContent.length || whitespaceChars.indexOf(textContent[matchEnd]) !== -1);
+                matchOk = (match.index === 0 || WHITESPACE_CHARS.indexOf(textContent[match.index - 1]) !== -1) &&
+                    (matchEnd === textContent.length || WHITESPACE_CHARS.indexOf(textContent[matchEnd]) !== -1);
                 // If the regexp detected a bare domain that doesn't use one of our expected TLDs, bail out.
                 matchOk = matchOk && (match[0].indexOf('/') !== -1 ||
                     KNOWN_TLDS_REGEXP.test(match[0].split('.').pop().split('?').shift()));
@@ -6300,6 +6423,17 @@ function MediumEditor(elements, options) {
                         end: start + range.toString().length,
                         editableElementIndex: editableElementIndex
                     };
+                    // If start = 0 there may still be an empty paragraph before it, but we don't care.
+                    if (start !== 0) {
+                        var emptyBlocksIndex = Selection.getIndexRelativeToAdjacentEmptyBlocks(
+                                this.options.ownerDocument,
+                                this.elements[editableElementIndex],
+                                range.startContainer,
+                                range.startOffset);
+                        if (emptyBlocksIndex !== 0) {
+                            selectionState.emptyBlocksIndex = emptyBlocksIndex;
+                        }
+                    }
                 }
             }
 
@@ -6374,11 +6508,29 @@ function MediumEditor(elements, options) {
                 }
             }
 
+            if (inSelectionState.emptyBlocksIndex && selectionState.end === nextCharIndex) {
+                var targetNode = Util.getBlockContainer(range.startContainer),
+                    index = 0;
+                // Skip over empty blocks until we hit the block we want the selection to be in
+                while (index < inSelectionState.emptyBlocksIndex && targetNode.nextSibling) {
+                    targetNode = targetNode.nextSibling;
+                    index++;
+                    // If we find a non-empty block, ignore the emptyBlocksIndex and just put selection here
+                    if (targetNode.textContent.length > 0) {
+                        break;
+                    }
+                }
+
+                // We're selecting a high-level block node, so make sure the cursor gets moved into the deepest
+                // element at the beginning of the block
+                range.setStart(Util.getFirstLeafNode(targetNode), 0);
+                range.collapse(true);
+            }
+
             // If the selection is right at the ending edge of a link, put it outside the anchor tag instead of inside.
             if (favorLaterSelectionAnchor) {
                 range = Selection.importSelectionMoveCursorPastAnchor(selectionState, range);
             }
-
             sel = this.options.contentWindow.getSelection();
             sel.removeAllRanges();
             sel.addRange(range);
@@ -6444,7 +6596,7 @@ MediumEditor.version = (function (major, minor, revision) {
     };
 }).apply(this, ({
     // grunt-bump looks for this:
-    'version': '4.12.2'
+    'version': '4.12.3'
 }).version.split('.'));
 
     return MediumEditor;
