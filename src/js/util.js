@@ -601,7 +601,7 @@ var Util;
             var textVal,
                 sibling;
             while (node.nodeType === 3 ||
-                (this.parentElements.indexOf(node.tagName.toLowerCase()) === -1 && !node.getAttribute('data-medium-element'))) { // TODO: Change this in v5.0.0
+                (this.parentElements.indexOf(node.tagName.toLowerCase()) === -1 && !node.getAttribute('data-medium-editor-element'))) { // TODO: Change this in v5.0.0
                 sibling = node;
                 while (sibling = sibling.previousSibling) {
                     textVal = sibling.nodeType === 3 ? sibling.nodeValue : sibling.textContent;
