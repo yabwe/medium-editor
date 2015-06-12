@@ -679,6 +679,20 @@ var Util;
             return element;
         },
 
+        getFirstTextNode: function (element) {
+            if (element.nodeType === 3) {
+                return element;
+            }
+
+            for (var i = 0; i < element.childNodes.length; i++) {
+                var textNode = this.getFirstTextNode(element.childNodes[i]);
+                if (textNode !== null) {
+                    return textNode;
+                }
+            }
+            return null;
+        },
+
         ensureUrlHasProtocol: function (url) {
             if (url.indexOf('://') === -1) {
                 return 'http://' + url;
