@@ -649,6 +649,23 @@ var Util;
         },
         /* END - based on http://stackoverflow.com/a/6183069 */
 
+        isElementAtBeginningOfBlock: function (node) {
+            var textVal,
+                sibling;
+            while (node.nodeType === 3 ||
+                (this.parentElements.indexOf(node.tagName.toLowerCase()) === -1 && !node.getAttribute('data-medium-element'))) { // TODO: Change this in v5.0.0
+                sibling = node;
+                while (sibling = sibling.previousSibling) {
+                    textVal = sibling.nodeType === 3 ? sibling.nodeValue : sibling.textContent;
+                    if (textVal.length > 0) {
+                        return false;
+                    }
+                }
+                node = node.parentNode;
+            }
+            return true;
+        },
+
         ensureUrlHasProtocol: function (url) {
             if (url.indexOf('://') === -1) {
                 return 'http://' + url;
