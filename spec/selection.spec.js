@@ -87,7 +87,7 @@ describe('Selection TestCase', function () {
             var editor = this.newMediumEditor('.editor', {
                 buttons: ['italic', 'underline', 'strikethrough']
             });
-            placeCursorInsideElement(editor.elements[0].querySelector('span').firstChild, 1); // end of first span
+            placeCursorInsideElement(editor.elements[0].querySelector('span'), 1); // end of first span
             var exportedSelection = editor.exportSelection();
             expect(exportedSelection.emptyBlocksIndex).toEqual(undefined);
         });
