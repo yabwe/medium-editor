@@ -914,6 +914,17 @@ function MediumEditor(elements, options) {
                         end: start + range.toString().length,
                         editableElementIndex: editableElementIndex
                     };
+                    // If start = 0 there may still be an empty paragraph before it, but we don't care.
+                    if (start !== 0) {
+                        var emptyBlocksIndex = Selection.getIndexRelativeToAdjacentEmptyBlocks(
+                                this.options.ownerDocument,
+                                this.elements[editableElementIndex],
+                                range.startContainer,
+                                range.startOffset);
+                        if (emptyBlocksIndex !== 0) {
+                            selectionState.emptyBlocksIndex = emptyBlocksIndex;
+                        }
+                    }
                 }
             }
 
@@ -988,11 +999,29 @@ function MediumEditor(elements, options) {
                 }
             }
 
+            if (inSelectionState.emptyBlocksIndex && selectionState.end === nextCharIndex) {
+                var targetNode = Util.getBlockContainer(range.startContainer),
+                    index = 0;
+                // Skip over empty blocks until we hit the block we want the selection to be in
+                while (index < inSelectionState.emptyBlocksIndex && targetNode.nextSibling) {
+                    targetNode = targetNode.nextSibling;
+                    index++;
+                    // If we find a non-empty block, ignore the emptyBlocksIndex and just put selection here
+                    if (targetNode.textContent.length > 0) {
+                        break;
+                    }
+                }
+
+                // We're selecting a high-level block node, so make sure the cursor gets moved into the deepest
+                // element at the beginning of the block
+                range.setStart(Util.getFirstLeafNode(targetNode), 0);
+                range.collapse(true);
+            }
+
             // If the selection is right at the ending edge of a link, put it outside the anchor tag instead of inside.
             if (favorLaterSelectionAnchor) {
                 range = Selection.importSelectionMoveCursorPastAnchor(selectionState, range);
             }
-
             sel = this.options.contentWindow.getSelection();
             sel.removeAllRanges();
             sel.addRange(range);

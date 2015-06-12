@@ -55,9 +55,10 @@ var AnchorForm;
             event.preventDefault();
             event.stopPropagation();
 
-            var selectedParentElement = Selection.getSelectedParentElement(Selection.getSelectionRange(this.document));
-            if (selectedParentElement.tagName &&
-                    selectedParentElement.tagName.toLowerCase() === 'a') {
+            var selectedParentElement = Selection.getSelectedParentElement(Selection.getSelectionRange(this.document)),
+                firstTextNode = Util.getFirstTextNode(selectedParentElement);
+
+            if (Util.getClosestTag(firstTextNode, 'a')) {
                 return this.execAction('unlink');
             }
 

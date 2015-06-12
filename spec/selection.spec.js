@@ -1,5 +1,5 @@
 /*global MediumEditor, describe, it, expect, spyOn,
-         afterEach, beforeEach, fireEvent,
+         afterEach, beforeEach, fireEvent, Util,
          jasmine, selectElementContents, setupTestHelpers,
          selectElementContentsAndFire, Selection, placeCursorInsideElement */
 
@@ -73,6 +73,176 @@ describe('Selection TestCase', function () {
             var exportedSelection = editor.exportSelection();
             expect(Object.keys(exportedSelection).sort()).toEqual(['editableElementIndex', 'end', 'start']);
             expect(exportedSelection.editableElementIndex).toEqual(1);
+        });
+
+        it('should not export a position indicating the cursor is before an empty paragraph', function () {
+            this.el.innerHTML = '<p><span>www.google.com</span></p><p><br /></p><p>Whatever</p>';
+            var editor = this.newMediumEditor('.editor', {
+                buttons: ['italic', 'underline', 'strikethrough']
+            });
+            placeCursorInsideElement(editor.elements[0].querySelector('span'), 1); // end of first span
+            var exportedSelection = editor.exportSelection();
+            expect(exportedSelection.emptyBlocksIndex).toEqual(undefined);
+        });
+
+        it('should not export a position indicating the cursor is after an empty paragraph', function () {
+            this.el.innerHTML = '<p><span>www.google.com</span></p><p><br /></p>' +
+                '<p class="target">Whatever</p>';
+            var editor = this.newMediumEditor('.editor', {
+                buttons: ['italic', 'underline', 'strikethrough']
+            });
+            // After the 'W' in whatever
+            placeCursorInsideElement(editor.elements[0].querySelector('p.target').firstChild, 1);
+            var exportedSelection = editor.exportSelection();
+            expect(exportedSelection.emptyBlocksIndex).toEqual(undefined);
+        });
+
+        it('should not export a position indicating the cursor is after an empty paragraph (in a complicated markup case)',
+                function () {
+            this.el.innerHTML = '<p><span>www.google.com</span></p><p><br /></p>' +
+                '<p>What<span class="target">ever</span></p>';
+            var editor = this.newMediumEditor('.editor', {
+                buttons: ['italic', 'underline', 'strikethrough']
+            });
+            // Before the 'e' in whatever
+            placeCursorInsideElement(editor.elements[0].querySelector('span.target').firstChild, 0);
+            var exportedSelection = editor.exportSelection();
+            expect(exportedSelection.emptyBlocksIndex).toEqual(undefined);
+        });
+        it('should not export a position indicating the cursor is after an empty paragraph ' +
+                '(in a complicated markup with selection on the element)', function () {
+            this.el.innerHTML = '<p><span>www.google.com</span></p><p><br /></p>' +
+                '<p>What<span class="target">ever</span></p>';
+            var editor = this.newMediumEditor('.editor', {
+                buttons: ['italic', 'underline', 'strikethrough']
+            });
+            // Before the 'e' in whatever
+            placeCursorInsideElement(editor.elements[0].querySelector('span.target'), 0);
+            var exportedSelection = editor.exportSelection();
+            expect(exportedSelection.emptyBlocksIndex).toEqual(undefined);
+        });
+
+        it('should export a position indicating the cursor is in an empty paragraph', function () {
+            this.el.innerHTML = '<p><span>www.google.com</span></p><p><br /></p><p>Whatever</p>';
+            var editor = this.newMediumEditor('.editor', {
+                buttons: ['italic', 'underline', 'strikethrough']
+            });
+            placeCursorInsideElement(editor.elements[0].getElementsByTagName('p')[1], 0);
+            var exportedSelection = editor.exportSelection();
+            expect(exportedSelection.emptyBlocksIndex).toEqual(1);
+        });
+
+        it('should export a position indicating the cursor is after an empty paragraph', function () {
+            this.el.innerHTML = '<p><span>www.google.com</span></p><p><br /></p><p>Whatever</p>';
+            var editor = this.newMediumEditor('.editor', {
+                buttons: ['italic', 'underline', 'strikethrough']
+            });
+            placeCursorInsideElement(editor.elements[0].getElementsByTagName('p')[2], 0);
+            var exportedSelection = editor.exportSelection();
+            expect(exportedSelection.emptyBlocksIndex).toEqual(2);
+        });
+
+        it('should export a position indicating the cursor is after an empty block element', function () {
+            this.el.innerHTML = '<p><span>www.google.com</span></p><h1><br /></h1><h2><br /></h2><p>Whatever</p>';
+            var editor = this.newMediumEditor('.editor', {
+                buttons: ['italic', 'underline', 'strikethrough']
+            });
+            placeCursorInsideElement(editor.elements[0].querySelector('h2'), 0);
+            var exportedSelection = editor.exportSelection();
+            expect(exportedSelection.emptyBlocksIndex).toEqual(2);
+        });
+
+        it('should import a position with the cursor in an empty paragraph', function () {
+            this.el.innerHTML = '<p><span>www.google.com</span></p><p><br /></p><p>Whatever</p>';
+            var editor = this.newMediumEditor('.editor', {
+                buttons: ['italic', 'underline', 'strikethrough']
+            });
+            editor.importSelection({
+                'start': 14,
+                'end': 14,
+                'emptyBlocksIndex': 1
+            });
+
+            var startParagraph = Util.getClosestTag(window.getSelection().getRangeAt(0).startContainer, 'p');
+            expect(startParagraph).toBe(editor.elements[0].getElementsByTagName('p')[1], 'empty paragraph');
+        });
+
+        it('should import a position with the cursor after an empty paragraph', function () {
+            this.el.innerHTML = '<p><span>www.google.com</span></p><p><br /></p><p>Whatever</p>';
+            var editor = this.newMediumEditor('.editor', {
+                buttons: ['italic', 'underline', 'strikethrough']
+            });
+            editor.importSelection({
+                'start': 14,
+                'end': 14,
+                'emptyBlocksIndex': 2
+            });
+
+            var startParagraph = Util.getClosestTag(window.getSelection().getRangeAt(0).startContainer, 'p');
+            expect(startParagraph).toBe(editor.elements[0].getElementsByTagName('p')[2], 'paragraph after empty paragraph');
+        });
+
+        it('should import a position with the cursor after an empty paragraph when there are multipled editable elements', function () {
+            this.createElement('div', 'editor', '<p><span>www.google.com</span></p><p><br /></p><p>Whatever</p>');
+            var editor = this.newMediumEditor('.editor', {
+                buttons: ['italic', 'underline', 'strikethrough']
+            });
+            editor.importSelection({
+                'start': 14,
+                'end': 14,
+                'editableElementIndex': 1,
+                'emptyBlocksIndex': 2
+            });
+
+            var startParagraph = Util.getClosestTag(window.getSelection().getRangeAt(0).startContainer, 'p');
+            expect(startParagraph).toBe(editor.elements[1].getElementsByTagName('p')[2], 'paragraph after empty paragraph');
+        });
+
+        it('should import a position with the cursor after an empty block element', function () {
+            this.el.innerHTML = '<p><span>www.google.com</span></p><h1><br /></h1><h2><br /></h2><p>Whatever</p>';
+            var editor = this.newMediumEditor('.editor', {
+                buttons: ['italic', 'underline', 'strikethrough']
+            });
+            editor.importSelection({
+                'start': 14,
+                'end': 14,
+                'emptyBlocksIndex': 2
+            });
+
+            var startParagraph = Util.getClosestTag(window.getSelection().getRangeAt(0).startContainer, 'h2');
+            expect(startParagraph).toBe(editor.elements[0].querySelector('h2'), 'block element after empty block element');
+        });
+
+        it('should import a position with the cursor after an empty block element inside an element with various children', function () {
+            this.el.innerHTML = '<p><span>www.google.com</span></p><h1><br /></h1><h2><br /></h2><p><b><i>Whatever</i></b></p>';
+            var editor = this.newMediumEditor('.editor', {
+                buttons: ['italic', 'underline', 'strikethrough']
+            });
+            editor.importSelection({
+                'start': 14,
+                'end': 14,
+                'emptyBlocksIndex': 3
+            });
+
+            var innerElement = window.getSelection().getRangeAt(0).startContainer;
+            expect(Util.isDescendant(editor.elements[0].querySelector('i'), innerElement, true)).toBe(true, 'nested inline elment inside block element after empty block element');
+        });
+
+        it('should import not import a selection beyond any block elements that have text, even when emptyBlocksIndex indicates it should ', function () {
+            this.el.innerHTML = '<p><span>www.google.com</span></p><h1><br /></h1><h2>Not Empty</h2><p><b><i>Whatever</i></b></p>';
+            var editor = this.newMediumEditor('.editor', {
+                buttons: ['italic', 'underline', 'strikethrough']
+            });
+            // Import a selection that indicates the text should be at the end of the 'www.google.com' word, but in the 3rd paragraph (at the beginning of 'Whatever')
+            editor.importSelection({
+                'start': 14,
+                'end': 14,
+                'emptyBlocksIndex': 3
+            });
+
+            var innerElement = window.getSelection().getRangeAt(0).startContainer;
+            expect(Util.isDescendant(editor.elements[0].querySelectorAll('p')[1], innerElement, true)).toBe(false, 'moved selection beyond non-empty block element');
+            expect(Util.isDescendant(editor.elements[0].querySelector('h2'), innerElement, true)).toBe(true, 'moved selection to element to incorrect block element');
         });
     });
 

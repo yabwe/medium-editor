@@ -183,7 +183,7 @@ describe('Autolink', function () {
                 selectElementContentsAndFire(this.el);
                 triggerAutolinking(this.el, Util.keyCode.ENTER);
                 links = this.el.getElementsByTagName('a');
-                expect(links.length).toBe(1);
+                expect(links.length).toBe(1, 'links length after ENTER');
                 expect(links[0].getAttribute('href')).toBe('http://www.example.enter');
                 expect(links[0].firstChild.getAttribute('data-auto-link')).toBe('true');
                 expect(links[0].textContent).toBe('http://www.example.enter');
@@ -193,7 +193,7 @@ describe('Autolink', function () {
                 selectElementContentsAndFire(this.el);
                 triggerAutolinking(this.el, Util.keyCode.SPACE);
                 links = this.el.getElementsByTagName('a');
-                expect(links.length).toBe(1);
+                expect(links.length).toBe(1, 'links length after SPACE');
                 expect(links[0].getAttribute('href')).toBe('http://www.example.space');
                 expect(links[0].firstChild.getAttribute('data-auto-link')).toBe('true');
                 expect(links[0].textContent).toBe('http://www.example.space');
