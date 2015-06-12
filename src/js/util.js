@@ -1,4 +1,4 @@
-/*global NodeFilter, console, Selection*/
+/*global NodeFilter, Selection*/
 
 var Util;
 
@@ -649,6 +649,50 @@ var Util;
         },
         /* END - based on http://stackoverflow.com/a/6183069 */
 
+        isElementAtBeginningOfBlock: function (node) {
+            var textVal,
+                sibling;
+            while (node.nodeType === 3 ||
+                (this.parentElements.indexOf(node.tagName.toLowerCase()) === -1 && !node.getAttribute('data-medium-element'))) { // TODO: Change this in v5.0.0
+                sibling = node;
+                while (sibling = sibling.previousSibling) {
+                    textVal = sibling.nodeType === 3 ? sibling.nodeValue : sibling.textContent;
+                    if (textVal.length > 0) {
+                        return false;
+                    }
+                }
+                node = node.parentNode;
+            }
+            return true;
+        },
+
+        getBlockContainer: function (element) {
+            return this.traverseUp(element, function (el) {
+                return Util.parentElements.indexOf(el.tagName.toLowerCase()) !== -1;
+            });
+        },
+
+        getFirstLeafNode: function (element) {
+            while (element && element.firstChild) {
+                element = element.firstChild;
+            }
+            return element;
+        },
+
+        getFirstTextNode: function (element) {
+            if (element.nodeType === 3) {
+                return element;
+            }
+
+            for (var i = 0; i < element.childNodes.length; i++) {
+                var textNode = this.getFirstTextNode(element.childNodes[i]);
+                if (textNode !== null) {
+                    return textNode;
+                }
+            }
+            return null;
+        },
+
         ensureUrlHasProtocol: function (url) {
             if (url.indexOf('://') === -1) {
                 return 'http://' + url;
@@ -658,7 +702,7 @@ var Util;
 
         warn: function () {
             if (window.console !== undefined && typeof window.console.warn === 'function') {
-                window.console.warn.apply(console, arguments);
+                window.console.warn.apply(window.console, arguments);
             }
         },
 
