@@ -12,21 +12,6 @@ var Selection;
         }
     }
 
-    function adjustEmptyBlocksRelativeToCursorChildren(node, emptyBlocksCount, cursorContainer, cursorOffset) {
-        if (node.nodeType === 3) {
-            if (cursorOffset !== 0) {
-                emptyBlocksCount = 0;
-            }
-        } else {
-            for (var i = 0; i < cursorOffset; i++) {
-                if (cursorContainer.childNodes[i].textContent !== '') {
-                    emptyBlocksCount = 0;
-                }
-            }
-        }
-        return emptyBlocksCount;
-    }
-
     Selection = {
         findMatchingSelectionParent: function (testElementFunction, contentWindow) {
             var selection = contentWindow.getSelection(),
@@ -108,6 +93,19 @@ var Selection;
         // in which case it returns the count of such preceding paragraphs, including
         // the empty paragraph in which the cursor itself may be embedded.
         getIndexRelativeToAdjacentEmptyBlocks: function (doc, root, cursorContainer, cursorOffset) {
+            // If there is text in front of the cursor, that means there isn't only empty blocks before it
+            if (cursorContainer.nodeType === 3 && cursorOffset > 0) {
+                return 0;
+            }
+
+            // Check if the block that contains the cursor has any other text in front of the cursor
+            var node = cursorContainer.nodeType === 3 ? cursorContainer : cursorContainer.childNodes[cursorOffset];
+            if (!Util.isElementAtBeginningOfBlock(node)) {
+                return 0;
+            }
+
+            // Walk over block elements, counting number of empty blocks between last piece of text
+            // and the block the cursor is in
             var treeWalker = doc.createTreeWalker(root, NodeFilter.SHOW_ELEMENT, filterOnlyParentElements, false),
                 emptyBlocksCount = 0;
             while (treeWalker.nextNode()) {
@@ -115,23 +113,7 @@ var Selection;
                 if (blockIsEmpty || emptyBlocksCount > 0) {
                     emptyBlocksCount += 1;
                 }
-                if (treeWalker.currentNode === cursorContainer) {
-                    return adjustEmptyBlocksRelativeToCursorChildren(treeWalker.currentNode, emptyBlocksCount,
-                        cursorContainer, cursorOffset);
-                } else if (Util.isDescendant(treeWalker.currentNode, cursorContainer, false)) {
-                    // Find if there is text before the cursor container and if so, reset the block count
-                    treeWalker = doc.createTreeWalker(treeWalker.currentNode,
-                        NodeFilter.SHOW_ELEMENT|NodeFilter.SHOW_TEXT, null, false);
-                    var node;
-                    while (node = treeWalker.nextNode()) {
-                        if (node === cursorContainer) {
-                            return adjustEmptyBlocksRelativeToCursorChildren(node, emptyBlocksCount, cursorContainer,
-                                cursorOffset);
-                        }
-                        if (node.nodeType === 3) {
-                            emptyBlocksCount = 0;
-                        }
-                    }
+                if (Util.isDescendant(treeWalker.currentNode, cursorContainer, true)) {
                     return emptyBlocksCount;
                 }
                 if (!blockIsEmpty) {
@@ -139,7 +121,7 @@ var Selection;
                 }
             }
 
-            return 0;
+            return emptyBlocksCount;
         },
 
         selectionInContentEditableFalse: function (contentWindow) {
