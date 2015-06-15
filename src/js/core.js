@@ -1014,7 +1014,7 @@ function MediumEditor(elements, options) {
 
                 // We're selecting a high-level block node, so make sure the cursor gets moved into the deepest
                 // element at the beginning of the block
-                range.setStart(Util.getFirstLeafNode(targetNode), 0);
+                range.setStart(Util.getFirstSelectableLeafNode(targetNode), 0);
                 range.collapse(true);
             }
 
