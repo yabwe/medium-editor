@@ -1014,7 +1014,12 @@ function MediumEditor(elements, options) {
 
                 // We're selecting a high-level block node, so make sure the cursor gets moved into the deepest
                 // element at the beginning of the block
-                range.setStart(Util.getFirstLeafNode(targetNode), 0);
+                var firstLeafNode = Util.getFirstLeafNode(targetNode);
+                if (['br', 'img', 'input'].indexOf(firstLeafNode.nodeName.toLowerCase()) !== -1) {
+                    // We don't want to set the selection to an element that can't have children, this messes up Gecko.
+                    firstLeafNode = firstLeafNode.parentNode;
+                }
+                range.setStart(firstLeafNode, 0);
                 range.collapse(true);
             }
 
