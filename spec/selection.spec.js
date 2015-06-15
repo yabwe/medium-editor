@@ -249,6 +249,29 @@ describe('Selection TestCase', function () {
             });
         });
 
+        it('should not import a selection into focusing on an empty element in a table', function () {
+            this.el.innerHTML = '<p>Hello</p><table><colgroup><col /></colgroup>' +
+                '<thead><tr><th>Head</th></tr></thead>' +
+                '<tbody><tr><td>Body</td></tr></tbody></table><p>World<p>';
+            var editor = this.newMediumEditor('.editor', {
+                buttons: ['italic', 'underline', 'strikethrough']
+            });
+            editor.importSelection({
+                'start': 5,
+                'end': 5,
+                'emptyBlocksIndex': 1
+            });
+
+            var innerElement = window.getSelection().getRangeAt(0).startContainer;
+            // The behavior varies from browser to browser for this case.
+            if (innerElement.nodeType === 3) {
+                expect(innerElement.nodeValue).toBe('Head');
+            } else {
+                expect(innerElement.nodeName.toLowerCase()).toBe('th', 'focused element nodeName');
+            }
+            expect(innerElement).toBe(window.getSelection().getRangeAt(0).endContainer);
+        });
+
         it('should not import a selection beyond any block elements that have text, even when emptyBlocksIndex indicates it should ', function () {
             this.el.innerHTML = '<p><span>www.google.com</span></p><h1><br /></h1><h2>Not Empty</h2><p><b><i>Whatever</i></b></p>';
             var editor = this.newMediumEditor('.editor', {
