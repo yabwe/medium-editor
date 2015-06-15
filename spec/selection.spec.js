@@ -109,6 +109,7 @@ describe('Selection TestCase', function () {
             var exportedSelection = editor.exportSelection();
             expect(exportedSelection.emptyBlocksIndex).toEqual(undefined);
         });
+
         it('should not export a position indicating the cursor is after an empty paragraph ' +
                 '(in a complicated markup with selection on the element)', function () {
             this.el.innerHTML = '<p><span>www.google.com</span></p><p><br /></p>' +
@@ -228,7 +229,47 @@ describe('Selection TestCase', function () {
             expect(Util.isDescendant(editor.elements[0].querySelector('i'), innerElement, true)).toBe(true, 'nested inline elment inside block element after empty block element');
         });
 
-        it('should import not import a selection beyond any block elements that have text, even when emptyBlocksIndex indicates it should ', function () {
+        ['br', 'img'].forEach(function (tagName) {
+            it('should not import a selection into focusing on the element \'' + tagName + '\' that cannot have children', function () {
+                this.el.innerHTML = '<p>Hello</p><p><' + tagName + ' /></p><p>World<p>';
+                var editor = this.newMediumEditor('.editor', {
+                    buttons: ['italic', 'underline', 'strikethrough']
+                });
+                editor.importSelection({
+                    'start': 5,
+                    'end': 5,
+                    'emptyBlocksIndex': 1
+                });
+
+                var innerElement = window.getSelection().getRangeAt(0).startContainer;
+                expect(innerElement.nodeName.toLowerCase()).toBe('p', 'focused element nodeName');
+                expect(innerElement).toBe(window.getSelection().getRangeAt(0).endContainer);
+                expect(innerElement.previousSibling.nodeName.toLowerCase()).toBe('p', 'previous sibling name');
+                expect(innerElement.nextSibling.nodeName.toLowerCase()).toBe('p', 'next sibling name');
+            });
+        });
+
+        it('should not import a selection into focusing on an empty element in a table', function () {
+            this.el.innerHTML = '<p>Hello</p><table><colgroup><col /></colgroup>' +
+                '<thead><tr><th>Head</th></tr></thead>' +
+                '<tbody><tr><td>Body</td></tr></tbody></table><p>World<p>';
+            var editor = this.newMediumEditor('.editor', {
+                buttons: ['italic', 'underline', 'strikethrough']
+            });
+            editor.importSelection({
+                'start': 5,
+                'end': 5,
+                'emptyBlocksIndex': 1
+            });
+
+            var innerElement = window.getSelection().getRangeAt(0).startContainer;
+            // The behavior varies from browser to browser for this case, some select TH, some #textNode
+            expect(Util.isDescendant(editor.elements[0].querySelector('th'), innerElement, true))
+                .toBe(true, 'expect selection to be of TH or a descendant');
+            expect(innerElement).toBe(window.getSelection().getRangeAt(0).endContainer);
+        });
+
+        it('should not import a selection beyond any block elements that have text, even when emptyBlocksIndex indicates it should ', function () {
             this.el.innerHTML = '<p><span>www.google.com</span></p><h1><br /></h1><h2>Not Empty</h2><p><b><i>Whatever</i></b></p>';
             var editor = this.newMediumEditor('.editor', {
                 buttons: ['italic', 'underline', 'strikethrough']
