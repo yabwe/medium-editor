@@ -263,12 +263,9 @@ describe('Selection TestCase', function () {
             });
 
             var innerElement = window.getSelection().getRangeAt(0).startContainer;
-            // The behavior varies from browser to browser for this case.
-            if (innerElement.nodeType === 3) {
-                expect(innerElement.nodeValue).toBe('Head');
-            } else {
-                expect(innerElement.nodeName.toLowerCase()).toBe('th', 'focused element nodeName');
-            }
+            // The behavior varies from browser to browser for this case, some select TH, some #textNode
+            expect(Util.isDescendant(editor.elements[0].querySelector('th'), innerElement, true))
+                .toBe(true, 'expect selection to be of TH or a descendant');
             expect(innerElement).toBe(window.getSelection().getRangeAt(0).endContainer);
         });
 
