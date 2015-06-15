@@ -902,10 +902,18 @@ function MediumEditor(elements, options) {
 
                 // We're selecting a high-level block node, so make sure the cursor gets moved into the deepest
                 // element at the beginning of the block
-                var firstLeafNode = Util.getFirstLeafNode(targetNode);
-                if (['br', 'img', 'input'].indexOf(firstLeafNode.nodeName.toLowerCase()) !== -1) {
+                var firstLeafNode = Util.getFirstLeafNode(targetNode),
+                    emptyElements = ['br', 'col', 'colgroup', 'hr', 'img', 'input', 'source', 'wbr'];
+                while (emptyElements.indexOf(firstLeafNode.nodeName.toLowerCase()) !== -1) {
                     // We don't want to set the selection to an element that can't have children, this messes up Gecko.
                     firstLeafNode = firstLeafNode.parentNode;
+                }
+                // Selecting at the beginning of a table doesn't work in PhantomJS.
+                if (firstLeafNode.nodeName.toLowerCase() === 'table') {
+                    var firstCell = firstLeafNode.querySelector('th, td');
+                    if (firstCell) {
+                        firstLeafNode = firstCell;
+                    }
                 }
                 range.setStart(firstLeafNode, 0);
                 range.collapse(true);
