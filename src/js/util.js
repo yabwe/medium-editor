@@ -621,7 +621,7 @@ var Util;
             return element && element.nodeType !== 3 && this.parentElements.indexOf(element.nodeName.toLowerCase()) !== -1;
         },
 
-        getBlockContainer: function (element) {
+        getTopBlockContainer: function (element) {
             return this.traverseUp(element, function (el) {
                 return Util.isBlockContainer(el) && !Util.isBlockContainer(el.parentNode);
             });
