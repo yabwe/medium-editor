@@ -1,3 +1,8 @@
+4.12.5 / 2015-06-16
+==================
+* Fix issue with restoring selection within nested block elements
+
+
 4.12.4 / 2015-06-15
 ==================
 * Ensure auto-link will never select an empty element (br, hr, input, etc.)
