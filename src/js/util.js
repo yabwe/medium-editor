@@ -614,7 +614,7 @@ var Util;
         },
 
         isMediumEditorElement: function (element) {
-            return element && element.nodeType !== 3 && !!element.getAttribute('data-medium-editor-element');
+            return element && element.getAttribute && !!element.getAttribute('data-medium-editor-element');
         },
 
         isBlockContainer: function (element) {

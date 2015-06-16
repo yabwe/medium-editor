@@ -449,8 +449,6 @@ var Toolbar;
                 return;
             }
 
-            parentNode = Selection.getSelectedParentElement(selectionRange);
-
             // Loop through all extensions
             this.forEachExtension(function (extension) {
                 // For those extensions where we can use document.queryCommandState(), do so
@@ -469,12 +467,14 @@ var Toolbar;
                 manualStateChecks.push(extension);
             });
 
+            parentNode = Selection.getSelectedParentElement(selectionRange);
+
             // Climb up the DOM and do manual checks for whether a certain extension is currently enabled for this node
-            while (parentNode.tagName !== undefined && Util.parentElements.indexOf(parentNode.tagName.toLowerCase) === -1) {
+            while (parentNode) {
                 manualStateChecks.forEach(updateExtensionState);
 
                 // we can abort the search upwards if we leave the contentEditable element
-                if (this.getEditorElements().indexOf(parentNode) !== -1) {
+                if (Util.isMediumEditorElement(parentNode)) {
                     break;
                 }
                 parentNode = parentNode.parentNode;
