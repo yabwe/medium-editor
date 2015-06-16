@@ -214,6 +214,21 @@ describe('Selection TestCase', function () {
             expect(startParagraph).toBe(editor.elements[0].querySelector('h2'), 'block element after empty block element');
         });
 
+        it('should import a position with the cursor after an empty block element when there are nested block elements', function () {
+            this.el.innerHTML = '<blockquote><p><span>www.google.com</span></p></blockquote><h1><br /></h1><h2><br /></h2><p>Whatever</p>';
+            var editor = this.newMediumEditor('.editor', {
+                buttons: ['italic', 'underline', 'strikethrough']
+            });
+            editor.importSelection({
+                'start': 14,
+                'end': 14,
+                'emptyBlocksIndex': 2
+            });
+
+            var startParagraph = Util.getClosestTag(window.getSelection().getRangeAt(0).startContainer, 'h2');
+            expect(startParagraph).toBe(editor.elements[0].querySelector('h2'), 'block element after empty block element');
+        });
+
         it('should import a position with the cursor after an empty block element inside an element with various children', function () {
             this.el.innerHTML = '<p><span>www.google.com</span></p><h1><br /></h1><h2><br /></h2><p><b><i>Whatever</i></b></p>';
             var editor = this.newMediumEditor('.editor', {
