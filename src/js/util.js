@@ -396,7 +396,7 @@ var Util;
 
             var parentNode = node.parentNode,
                 tagName = parentNode.tagName.toLowerCase();
-            while (this.parentElements.indexOf(tagName) === -1 && tagName !== 'div') {
+            while (!this.isBlockContainer(parentNode) && tagName !== 'div') {
                 if (tagName === 'li') {
                     return true;
                 }
@@ -652,8 +652,7 @@ var Util;
         isElementAtBeginningOfBlock: function (node) {
             var textVal,
                 sibling;
-            while (node.nodeType === 3 ||
-                (this.parentElements.indexOf(node.tagName.toLowerCase()) === -1 && !node.getAttribute('data-medium-element'))) { // TODO: Change this in v5.0.0
+            while (!this.isBlockContainer(node) && !this.isMediumEditorElement(node)) {
                 sibling = node;
                 while (sibling = sibling.previousSibling) {
                     textVal = sibling.nodeType === 3 ? sibling.nodeValue : sibling.textContent;
@@ -666,9 +665,17 @@ var Util;
             return true;
         },
 
+        isMediumEditorElement: function (element) {
+            return element && element.nodeType !== 3 && !!element.getAttribute('data-medium-element');
+        },
+
+        isBlockContainer: function (element) {
+            return element && element.nodeType !== 3 && this.parentElements.indexOf(element.nodeName.toLowerCase()) !== -1;
+        },
+
         getBlockContainer: function (element) {
             return this.traverseUp(element, function (el) {
-                return Util.parentElements.indexOf(el.tagName.toLowerCase()) !== -1;
+                return Util.isBlockContainer(el) && !Util.isBlockContainer(el.parentNode);
             });
         },
 
