@@ -170,7 +170,7 @@ var PasteHandler;
                 // elements are sometimes actually spaces.
                 workEl.innerHTML = workEl.innerHTML.replace(/\n/gi, ' ');
 
-                switch (workEl.tagName.toLowerCase()) {
+                switch (workEl.nodeName.toLowerCase()) {
                     case 'p':
                     case 'div':
                         this.filterCommonBlocks(workEl);
@@ -202,7 +202,7 @@ var PasteHandler;
             for (i = 0; i < elList.length; i += 1) {
                 workEl = elList[i];
 
-                if ('a' === workEl.tagName.toLowerCase() && this.getEditorOption('targetBlank')) {
+                if ('a' === workEl.nodeName.toLowerCase() && this.getEditorOption('targetBlank')) {
                     Util.setTargetBlank(workEl);
                 }
 
@@ -214,7 +214,7 @@ var PasteHandler;
         },
 
         isCommonBlock: function (el) {
-            return (el && (el.tagName.toLowerCase() === 'p' || el.tagName.toLowerCase() === 'div'));
+            return (el && (el.nodeName.toLowerCase() === 'p' || el.nodeName.toLowerCase() === 'div'));
         },
 
         filterCommonBlocks: function (el) {

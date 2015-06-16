@@ -259,7 +259,7 @@ describe('Util', function () {
                 tag = el.querySelector('b').firstChild,
                 closestTag = Util.getClosestTag(tag, 'span');
 
-            expect(closestTag.tagName.toLowerCase()).toBe('span');
+            expect(closestTag.nodeName.toLowerCase()).toBe('span');
         });
 
         it('should not get closed tag with data-medium-editor-element', function () {

@@ -143,7 +143,7 @@ var FontSizeForm;
 
         clearFontSize: function () {
             Selection.getSelectedElements(this.document).forEach(function (el) {
-                if (el.tagName === 'FONT' && el.hasAttribute('size')) {
+                if (el.nodeName.toLowerCase() === 'font' && el.hasAttribute('size')) {
                     el.removeAttribute('size');
                 }
             });

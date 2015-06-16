@@ -278,7 +278,7 @@ var Util;
             // allowing nesting, we need to use outdent
             // https://developer.mozilla.org/en-US/docs/Rich-Text_Editing_in_Mozilla
             if (tagName === 'blockquote' && selectionData.el &&
-                    selectionData.el.parentNode.tagName.toLowerCase() === 'blockquote') {
+                    selectionData.el.parentNode.nodeName.toLowerCase() === 'blockquote') {
                 return doc.execCommand('outdent', false, null);
             }
             if (selectionData.tagName === tagName) {
@@ -309,7 +309,7 @@ var Util;
          */
         setTargetBlank: function (el, anchorUrl) {
             var i, url = anchorUrl || false;
-            if (el.tagName.toLowerCase() === 'a') {
+            if (el.nodeName.toLowerCase() === 'a') {
                 el.target = '_blank';
             } else {
                 el = el.getElementsByTagName('a');
@@ -326,7 +326,7 @@ var Util;
             var classes = buttonClass.split(' '),
                 i,
                 j;
-            if (el.tagName.toLowerCase() === 'a') {
+            if (el.nodeName.toLowerCase() === 'a') {
                 for (j = 0; j < classes.length; j += 1) {
                     el.classList.add(classes[j]);
                 }
@@ -344,19 +344,19 @@ var Util;
             if (!node) {
                 return false;
             }
-            if (node.tagName.toLowerCase() === 'li') {
+            if (node.nodeName.toLowerCase() === 'li') {
                 return true;
             }
 
             var parentNode = node.parentNode,
-                tagName = parentNode.tagName.toLowerCase();
+                tagName = parentNode.nodeName.toLowerCase();
             while (!this.isBlockContainer(parentNode) && tagName !== 'div') {
                 if (tagName === 'li') {
                     return true;
                 }
                 parentNode = parentNode.parentNode;
-                if (parentNode && parentNode.tagName) {
-                    tagName = parentNode.tagName.toLowerCase();
+                if (parentNode) {
+                    tagName = parentNode.nodeName.toLowerCase();
                 } else {
                     return false;
                 }
@@ -365,13 +365,13 @@ var Util;
         },
 
         cleanListDOM: function (ownerDocument, element) {
-            if (element.tagName.toLowerCase() !== 'li') {
+            if (element.nodeName.toLowerCase() !== 'li') {
                 return;
             }
 
             var list = element.parentElement;
 
-            if (list.parentElement.tagName.toLowerCase() === 'p') { // yes we need to clean up
+            if (list.parentElement.nodeName.toLowerCase() === 'p') { // yes we need to clean up
                 this.unwrap(list.parentElement, ownerDocument);
 
                 // move cursor at the end of the text inside the list
@@ -698,7 +698,7 @@ var Util;
 
         cleanupTags: function (el, tags) {
             tags.forEach(function (tag) {
-                if (el.tagName.toLowerCase() === tag) {
+                if (el.nodeName.toLowerCase() === tag) {
                     el.parentNode.removeChild(el);
                 }
             }, this);
@@ -707,7 +707,7 @@ var Util;
         // get the closest parent
         getClosestTag: function (el, tag) {
             return this.traverseUp(el, function (element) {
-                return element.tagName.toLowerCase() === tag.toLowerCase();
+                return element.nodeName.toLowerCase() === tag.toLowerCase();
             });
         },
 

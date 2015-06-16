@@ -274,14 +274,14 @@ var Selection;
         getSelectionData: function (el) {
             var tagName;
 
-            if (el && el.tagName) {
-                tagName = el.tagName.toLowerCase();
+            if (el) {
+                tagName = el.nodeName.toLowerCase();
             }
 
             while (el && !Util.isBlockContainer(el)) {
                 el = el.parentNode;
-                if (el && el.tagName) {
-                    tagName = el.tagName.toLowerCase();
+                if (el) {
+                    tagName = el.nodeName.toLowerCase();
                 }
             }
 
