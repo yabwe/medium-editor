@@ -138,7 +138,7 @@ function MediumEditor(elements, options) {
             return;
         }
 
-        if (node.getAttribute('data-medium-editor-element') && node.children.length === 0) {
+        if (Util.isMediumEditorElement(node) && node.children.length === 0) {
             this.options.ownerDocument.execCommand('formatBlock', false, 'p');
         }
 
