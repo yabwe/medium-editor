@@ -794,7 +794,7 @@ var Util;
 
             var parentNode = node.parentNode,
                 tagName = parentNode.tagName.toLowerCase();
-            while (this.parentElements.indexOf(tagName) === -1 && tagName !== 'div') {
+            while (!this.isBlockContainer(parentNode) && tagName !== 'div') {
                 if (tagName === 'li') {
                     return true;
                 }
@@ -1050,8 +1050,7 @@ var Util;
         isElementAtBeginningOfBlock: function (node) {
             var textVal,
                 sibling;
-            while (node.nodeType === 3 ||
-                (this.parentElements.indexOf(node.tagName.toLowerCase()) === -1 && !node.getAttribute('data-medium-element'))) { // TODO: Change this in v5.0.0
+            while (!this.isBlockContainer(node) && !this.isMediumEditorElement(node)) {
                 sibling = node;
                 while (sibling = sibling.previousSibling) {
                     textVal = sibling.nodeType === 3 ? sibling.nodeValue : sibling.textContent;
@@ -1064,15 +1063,35 @@ var Util;
             return true;
         },
 
+        isMediumEditorElement: function (element) {
+            return element && element.nodeType !== 3 && !!element.getAttribute('data-medium-element');
+        },
+
+        isBlockContainer: function (element) {
+            return element && element.nodeType !== 3 && this.parentElements.indexOf(element.nodeName.toLowerCase()) !== -1;
+        },
+
         getBlockContainer: function (element) {
             return this.traverseUp(element, function (el) {
-                return Util.parentElements.indexOf(el.tagName.toLowerCase()) !== -1;
+                return Util.isBlockContainer(el) && !Util.isBlockContainer(el.parentNode);
             });
         },
 
-        getFirstLeafNode: function (element) {
+        getFirstSelectableLeafNode: function (element) {
             while (element && element.firstChild) {
                 element = element.firstChild;
+            }
+            var emptyElements = ['br', 'col', 'colgroup', 'hr', 'img', 'input', 'source', 'wbr'];
+            while (emptyElements.indexOf(element.nodeName.toLowerCase()) !== -1) {
+                // We don't want to set the selection to an element that can't have children, this messes up Gecko.
+                element = element.parentNode;
+            }
+            // Selecting at the beginning of a table doesn't work in PhantomJS.
+            if (element.nodeName.toLowerCase() === 'table') {
+                var firstCell = element.querySelector('th, td');
+                if (firstCell) {
+                    element = firstCell;
+                }
             }
             return element;
         },
@@ -1702,7 +1721,7 @@ var Selection;
     'use strict';
 
     function filterOnlyParentElements(node) {
-        if (Util.parentElements.indexOf(node.nodeName.toLowerCase()) !== -1) {
+        if (Util.isBlockContainer(node)) {
             return NodeFilter.FILTER_ACCEPT;
         } else {
             return NodeFilter.FILTER_SKIP;
@@ -1975,7 +1994,7 @@ var Selection;
                 tagName = el.tagName.toLowerCase();
             }
 
-            while (el && Util.parentElements.indexOf(tagName) === -1) {
+            while (el && !Util.isBlockContainer(el)) {
                 el = el.parentNode;
                 if (el && el.tagName) {
                     tagName = el.tagName.toLowerCase();
@@ -6523,7 +6542,7 @@ function MediumEditor(elements, options) {
 
                 // We're selecting a high-level block node, so make sure the cursor gets moved into the deepest
                 // element at the beginning of the block
-                range.setStart(Util.getFirstLeafNode(targetNode), 0);
+                range.setStart(Util.getFirstSelectableLeafNode(targetNode), 0);
                 range.collapse(true);
             }
 
@@ -6596,7 +6615,7 @@ MediumEditor.version = (function (major, minor, revision) {
     };
 }).apply(this, ({
     // grunt-bump looks for this:
-    'version': '4.12.3'
+    'version': '4.12.4'
 }).version.split('.'));
 
     return MediumEditor;
