@@ -1070,9 +1070,21 @@ var Util;
             });
         },
 
-        getFirstLeafNode: function (element) {
+        getFirstSelectableLeafNode: function (element) {
             while (element && element.firstChild) {
                 element = element.firstChild;
+            }
+            var emptyElements = ['br', 'col', 'colgroup', 'hr', 'img', 'input', 'source', 'wbr'];
+            while (emptyElements.indexOf(element.nodeName.toLowerCase()) !== -1) {
+                // We don't want to set the selection to an element that can't have children, this messes up Gecko.
+                element = element.parentNode;
+            }
+            // Selecting at the beginning of a table doesn't work in PhantomJS.
+            if (element.nodeName.toLowerCase() === 'table') {
+                var firstCell = element.querySelector('th, td');
+                if (firstCell) {
+                    element = firstCell;
+                }
             }
             return element;
         },
@@ -6523,7 +6535,7 @@ function MediumEditor(elements, options) {
 
                 // We're selecting a high-level block node, so make sure the cursor gets moved into the deepest
                 // element at the beginning of the block
-                range.setStart(Util.getFirstLeafNode(targetNode), 0);
+                range.setStart(Util.getFirstSelectableLeafNode(targetNode), 0);
                 range.collapse(true);
             }
 
@@ -6596,7 +6608,7 @@ MediumEditor.version = (function (major, minor, revision) {
     };
 }).apply(this, ({
     // grunt-bump looks for this:
-    'version': '4.12.3'
+    'version': '4.12.4'
 }).version.split('.'));
 
     return MediumEditor;
