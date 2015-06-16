@@ -469,6 +469,13 @@ var Toolbar;
 
             parentNode = Selection.getSelectedParentElement(selectionRange);
 
+            // Make sure the selection parent isn't outside of the contenteditable
+            if (!this.getEditorElements().some(function (element) {
+                    return Util.isDescendant(element, parentNode, true);
+                })) {
+                return;
+            }
+
             // Climb up the DOM and do manual checks for whether a certain extension is currently enabled for this node
             while (parentNode) {
                 manualStateChecks.forEach(updateExtensionState);
