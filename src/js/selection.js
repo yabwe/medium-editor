@@ -5,7 +5,7 @@ var Selection;
     'use strict';
 
     function filterOnlyParentElements(node) {
-        if (Util.parentElements.indexOf(node.nodeName.toLowerCase()) !== -1) {
+        if (Util.isBlockContainer(node)) {
             return NodeFilter.FILTER_ACCEPT;
         } else {
             return NodeFilter.FILTER_SKIP;
@@ -278,7 +278,7 @@ var Selection;
                 tagName = el.tagName.toLowerCase();
             }
 
-            while (el && Util.parentElements.indexOf(tagName) === -1) {
+            while (el && !Util.isBlockContainer(el)) {
                 el = el.parentNode;
                 if (el && el.tagName) {
                     tagName = el.tagName.toLowerCase();
