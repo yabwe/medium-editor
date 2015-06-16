@@ -10,7 +10,7 @@ describe('Font Size Button TestCase', function () {
     function testFontSizeContents(el, size) {
         expect(el.childNodes.length).toBe(1);
         var child = el.childNodes[0];
-        expect(child.tagName).toBe('FONT');
+        expect(child.nodeName.toLowerCase()).toBe('font');
         expect(child.getAttribute('size')).toBe(size);
         expect(child.innerHTML).toBe('lorem ipsum');
     }

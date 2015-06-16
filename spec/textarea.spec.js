@@ -26,7 +26,7 @@ describe('Textarea TestCase', function () {
     it('should accept a textarea element and "convert" it to a div, preserving important attributes', function () {
         var editor = this.newMediumEditor('.editor'),
             textarea = this.el;
-        expect(editor.elements[0].tagName.toLowerCase()).toBe('div');
+        expect(editor.elements[0].nodeName.toLowerCase()).toBe('div');
 
         var attributesToPreserve = ['data-disable-editing',
             'data-disable-toolbar',

@@ -440,7 +440,7 @@ describe('Selection TestCase', function () {
             elements = Selection.getSelectedElements(document);
 
             expect(elements.length).toBe(1);
-            expect(elements[0].tagName.toLowerCase()).toBe('i');
+            expect(elements[0].nodeName.toLowerCase()).toBe('i');
             expect(elements[0].innerHTML).toBe('ipsum');
         });
 
@@ -452,7 +452,7 @@ describe('Selection TestCase', function () {
             elements = Selection.getSelectedElements(document);
 
             expect(elements.length).toBe(1);
-            expect(elements[0].tagName.toLowerCase()).toBe('i');
+            expect(elements[0].nodeName.toLowerCase()).toBe('i');
             expect(elements[0].innerHTML).toBe('ipsum');
         });
     });

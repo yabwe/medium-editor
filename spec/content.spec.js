@@ -301,7 +301,7 @@ describe('Content TestCase', function () {
             });
             expect(this.el.innerHTML).toBe('<p><br></p><ul><li>lorem ipsum</li></ul>');
             range = document.getSelection().getRangeAt(0);
-            expect(range.commonAncestorContainer.tagName.toLowerCase()).toBe('p');
+            expect(range.commonAncestorContainer.nodeName.toLowerCase()).toBe('p');
         });
 
         it('should not insert a paragraph before the list if it is NOT the first element in the editor', function () {

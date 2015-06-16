@@ -30,7 +30,7 @@ var Selection;
 
         getSelectionElement: function (contentWindow) {
             return this.findMatchingSelectionParent(function (el) {
-                return el.getAttribute('data-medium-editor-element');
+                return Util.isMediumEditorElement(el);
             }, contentWindow);
         },
 
@@ -274,14 +274,14 @@ var Selection;
         getSelectionData: function (el) {
             var tagName;
 
-            if (el && el.tagName) {
-                tagName = el.tagName.toLowerCase();
+            if (el) {
+                tagName = el.nodeName.toLowerCase();
             }
 
             while (el && !Util.isBlockContainer(el)) {
                 el = el.parentNode;
-                if (el && el.tagName) {
-                    tagName = el.tagName.toLowerCase();
+                if (el) {
+                    tagName = el.nodeName.toLowerCase();
                 }
             }
 

@@ -211,8 +211,8 @@ var Button;
                 return this.knownState;
             }
 
-            if (tagNames && tagNames.length > 0 && node.tagName) {
-                isMatch = tagNames.indexOf(node.tagName.toLowerCase()) !== -1;
+            if (tagNames && tagNames.length > 0) {
+                isMatch = tagNames.indexOf(node.nodeName.toLowerCase()) !== -1;
             }
 
             if (!isMatch && this.style) {

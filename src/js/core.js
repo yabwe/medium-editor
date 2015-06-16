@@ -28,7 +28,7 @@ function MediumEditor(elements, options) {
     function handleTabKeydown(event) {
         // Override tab only for pre nodes
         var node = Selection.getSelectionStart(this.options.ownerDocument),
-            tag = node && node.tagName.toLowerCase();
+            tag = node && node.nodeName.toLowerCase();
 
         if (tag === 'pre') {
             event.preventDefault();
@@ -50,7 +50,7 @@ function MediumEditor(elements, options) {
 
     function handleBlockDeleteKeydowns(event) {
         var p, node = Selection.getSelectionStart(this.options.ownerDocument),
-            tagName = node.tagName.toLowerCase(),
+            tagName = node.nodeName.toLowerCase(),
             isEmpty = /^(\s+|<br\/?>)?$/i,
             isHeader = /h\d/i;
 
@@ -84,7 +84,7 @@ function MediumEditor(elements, options) {
                     // in an empty tag
                     isEmpty.test(node.innerHTML) &&
                     // when the next tag *is* a header
-                    isHeader.test(node.nextElementSibling.tagName)) {
+                    isHeader.test(node.nextElementSibling.nodeName.toLowerCase())) {
             // hitting delete in an empty element preceding a header, ex:
             //  <p>[CURSOR]</p><h1>Header</h1>
             // Will cause the h1 to become a paragraph.
@@ -106,7 +106,7 @@ function MediumEditor(elements, options) {
                 !node.parentElement.previousElementSibling &&
                 // is not the only li in a list
                 node.nextElementSibling &&
-                node.nextElementSibling.tagName.toLowerCase() === 'li') {
+                node.nextElementSibling.nodeName.toLowerCase() === 'li') {
             // backspacing in an empty first list element in the first list (with more elements) ex:
             //  <ul><li>[CURSOR]</li><li>List Item 2</li></ul>
             // will remove the first <li> but add some extra element before (varies based on browser)
@@ -138,12 +138,12 @@ function MediumEditor(elements, options) {
             return;
         }
 
-        if (node.getAttribute('data-medium-editor-element') && node.children.length === 0) {
+        if (Util.isMediumEditorElement(node) && node.children.length === 0) {
             this.options.ownerDocument.execCommand('formatBlock', false, 'p');
         }
 
         if (Util.isKey(event, Util.keyCode.ENTER) && !Util.isListItem(node)) {
-            tagName = node.tagName.toLowerCase();
+            tagName = node.nodeName.toLowerCase();
             // For anchor tags, unlink
             if (tagName === 'a') {
                 this.options.ownerDocument.execCommand('unlink', false, null);
@@ -207,7 +207,7 @@ function MediumEditor(elements, options) {
         // Loop through elements and convert textarea's into divs
         this.elements = [];
         elements.forEach(function (element) {
-            if (element.tagName.toLowerCase() === 'textarea') {
+            if (element.nodeName.toLowerCase() === 'textarea') {
                 this.elements.push(createContentEditable.call(this, element));
             } else {
                 this.elements.push(element);
