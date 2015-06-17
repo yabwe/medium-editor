@@ -60,6 +60,9 @@ For details on all the currently supported MediumEditor options, refer to the [M
 * The `firstHeader` & `secondHeader` options have been removed.  Instead, any number of the 6 header types can be passed as button names into the `toolbar.buttons` option array.
   * Example: Where before the code may have sent `firstHeader: 'h2'` and `secondHeader: 'h3'`, it should now pass `['bold', 'italic', 'quote', 'h2', 'h3']` via the `toolbar.buttons` property of the MediumEditor options object.
 
+#### `buttonLabels`
+* The `buttonLabels` option no longer supports taking an object in that specifies custom labels for all buttons.  Instead, pass an object into the `toolbar.buttons` option array that contains a `.name` property for the name of the button, a either a `contentDefault` or a `contentFA` property that should be in the innerHTML of the button (for default of `fontawesome` buttonLabels respectively)
+
 
 ## MediumEditor Extensions
 #### `.parent` 
