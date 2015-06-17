@@ -650,6 +650,7 @@ var Util;
             while (element && element.firstChild) {
                 element = element.firstChild;
             }
+
             // We don't want to set the selection to an element that can't have children, this messes up Gecko.
             element = this.traverseUp(element, function (el) {
                 return Util.emptyElementNames.indexOf(el.nodeName.toLowerCase()) === -1;
