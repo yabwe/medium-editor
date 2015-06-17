@@ -122,6 +122,11 @@ For details on all the currently supported MediumEditor options, refer to the [M
 * `MediumEditor.util.setObject()` has been removed
 * `MediumEditor.util.getObject()` has been removed
 * `MediumEditor.util.derives()` has been removed. Objects that can be drived from (like extensions and buttons) will have a `.extend()` method for extending.
+* `MediumEditor.util.now()` has been removed.  Use `Date.now()` instead.
+* `MediumEditor.util.parentElements` has been renamed `MediumEditor.util.blockContainerElementNames`
+
+### MediumEditor.selection
+* `MediumEditor.selection.getSelectionData()` has been removed
 
 
 ## MediumEditor CSS & Markup
