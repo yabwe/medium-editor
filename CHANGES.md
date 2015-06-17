@@ -1,3 +1,28 @@
+5.0.0 / xxxx-xx-xx
+==================
+* Shortcut are now centralized in the new Keyboard Command extension
+* Toolbar is now an extension (with its dedidated options)
+  * firstHeader and secondHeader are gone you should use h1 to h6
+* Buttons require an object as options
+* Options for Anchor, AnchorPreview, Paste & Placeholder are now passed as a dedidacted object (ie: anchor.targetCheckbox)
+* API
+  * medium unique id will now remain unique (regardless of how many instances are created)
+  * .statics references are gone
+* Extension
+  * .base is now everytime defined with the current MediumEditor instance (removing the need of .parent)
+  * window & document are now injected
+  * trigger event is now easier (`this.base.trigger`)
+  * deactivate has been replaced by destroy
+  * init no longer take instance as first argument
+* CSS
+  * all classes are now `medium-editor` prefixed
+* Util
+  * getProp, derives, getSelectionData, setObject & getObject are gone
+  * getSelectionRange & getSelectionStart are now in Selection
+* Version now handle pre release
+* and finally all deprecated function are gone too !
+
+
 4.12.0 / 2015-06-01
 ==================
 * Fix pasting links when targetBlank option is being used
