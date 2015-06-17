@@ -1,6 +1,6 @@
 # Upgrading to v5.0.0
 
-Version 5.0.0 of MediumEditor introduces a significantly simpler system for building custom extensions as well as extending existing buttons and extensions.  As part of moving towards this extendable model, there were significant changes to the way options are passed to MediumEditor, as well as the extensions and buttons themselves.
+Version 5.0.0 of MediumEditor introduces a significantly simpler system for building custom extensions as well as extending existing buttons and extensions. As part of moving towards this extendable model, there were significant changes to the way options are passed to MediumEditor, as well as the extensions and buttons themselves.
 
 In addition to extension related changes, there were several other potential breaking changes related to API methods, as well as utility helper methods.
 
@@ -30,7 +30,7 @@ For details on all the currently supported MediumEditor options, refer to the [M
   * `anchorInputCheckboxLabel` -> `anchor.targetCheckboxText`
 
 ### Anchor Preview Options
-* Options controlling the anchorp preview tooltip extension are now passed as a `'anchorPreview'` object inside the outer options object.
+* Options controlling the anchor preview extension are now passed as a `'anchorPreview'` object inside the outer options object.
   * `anchorPreviewHideDelay` -> `'anchorPreview.hideDelay`
 
 ### Paste Options
@@ -39,7 +39,7 @@ For details on all the currently supported MediumEditor options, refer to the [M
   * `cleanPastedHTML` -> `paste.cleanPastedHTML`
 
 ### Placeholder Options
-* Options controlling the placeholders extension are now passed as a `'placeholder'` object inside the outer options object.
+* Options controlling the placeholder extension are now passed as a `'placeholder'` object inside the outer options object.
   * `placeholder` -> `placeholder.text`
 
 ### Other Options
@@ -61,7 +61,7 @@ For details on all the currently supported MediumEditor options, refer to the [M
   * Example: Where before the code may have sent `firstHeader: 'h2'` and `secondHeader: 'h3'`, it should now pass `['bold', 'italic', 'quote', 'h2', 'h3']` via the `toolbar.buttons` property of the MediumEditor options object.
 
 #### `buttonLabels`
-* The `buttonLabels` option no longer supports taking an object in that specifies custom labels for all buttons.  Instead, pass an object into the `toolbar.buttons` option array that contains a `.name` property for the name of the button, a either a `contentDefault` or a `contentFA` property that should be in the innerHTML of the button (for default of `fontawesome` buttonLabels respectively)
+* The `buttonLabels` option no longer supports taking an object in that specifies custom labels for all buttons. Instead, pass an object into the `toolbar.buttons` option array that contains a `.name` property for the name of the button, a either a `contentDefault` or a `contentFA` property that should be in the innerHTML of the button (for default of `fontawesome` buttonLabels respectively)
 
 
 ## MediumEditor Extensions
@@ -82,7 +82,7 @@ For details on all the currently supported MediumEditor options, refer to the [M
 ## MediumEditor API
 
 #### `.id`
-* The unique identifier used for MediumEditor elements will now remain unique and remain regardless of how many instances are created. After calling `.destroy()` and `.setup()`, the id will remain the same.  This id was used to generate unique element ids for things like the id attribute of the toolbar element (`'medium-editor-toolbar-[ID]'`)
+* The unique identifier used for MediumEditor elements will now remain unique and remain regardless of how many instances are created. After calling `.destroy()` and `.setup()`, the id will remain the same. This id was used to generate unique element ids for things like the id attribute of the toolbar element (`'medium-editor-toolbar-[ID]'`)
 
 #### `.toolbar`
 * The MediumEditor toolbar is now an extension, so `MediumEditor.toolbar` is no longer a valid reference.  Use `MediumEditor.getExtensionByName('toolbar')` instead.
