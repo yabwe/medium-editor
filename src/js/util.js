@@ -635,9 +635,14 @@ var Util;
         },
 
         getTopBlockContainer: function (element) {
-            return this.traverseUp(element, function (el) {
-                return Util.isBlockContainer(el) && !Util.isBlockContainer(el.parentNode);
+            var topBlock = element;
+            this.traverseUp(element, function (el) {
+                if (Util.isBlockContainer(el)) {
+                    topBlock = el;
+                }
+                return false;
             });
+            return topBlock;
         },
 
         getFirstSelectableLeafNode: function (element) {
