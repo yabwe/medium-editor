@@ -88,7 +88,7 @@ var Util;
             return keyCode;
         },
 
-        blockElementNames: ['p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'blockquote', 'pre'],
+        blockContainerElementNames: ['p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'blockquote', 'pre'],
 
         extend: function extend(/* dest, source1, source2, ...*/) {
             var args = [true].concat(Array.prototype.slice.call(arguments));
@@ -631,7 +631,7 @@ var Util;
         },
 
         isBlockContainer: function (element) {
-            return element && element.nodeType !== 3 && this.blockElementNames.indexOf(element.nodeName.toLowerCase()) !== -1;
+            return element && element.nodeType !== 3 && this.blockContainerElementNames.indexOf(element.nodeName.toLowerCase()) !== -1;
         },
 
         getTopBlockContainer: function (element) {
