@@ -269,26 +269,6 @@ var Selection;
                 startNode = (node && node.nodeType === 3 ? node.parentNode : node);
 
             return startNode;
-        },
-
-        getSelectionData: function (el) {
-            var tagName;
-
-            if (el) {
-                tagName = el.nodeName.toLowerCase();
-            }
-
-            while (el && !Util.isBlockContainer(el)) {
-                el = el.parentNode;
-                if (el) {
-                    tagName = el.nodeName.toLowerCase();
-                }
-            }
-
-            return {
-                el: el,
-                tagName: tagName
-            };
         }
     };
 }());
