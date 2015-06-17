@@ -151,8 +151,6 @@ var Util;
             return !!(obj && obj.nodeType === 1);
         },
 
-        now: Date.now,
-
         // https://github.com/jashkenas/underscore
         throttle: function (func, wait) {
             var THROTTLE_INTERVAL = 50,
