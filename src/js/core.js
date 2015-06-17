@@ -645,7 +645,6 @@ function MediumEditor(elements, options) {
                             extension = new MediumEditor.extensions.button(name);
                         }
                     }
-                    break;
             }
 
             if (extension) {
