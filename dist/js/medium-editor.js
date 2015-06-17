@@ -486,7 +486,8 @@ var Util;
             return keyCode;
         },
 
-        parentElements: ['p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'blockquote', 'pre'],
+        blockContainerElementNames: ['p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'blockquote', 'pre'],
+        emptyElementNames: ['br', 'col', 'colgroup', 'hr', 'img', 'input', 'source', 'wbr'],
 
         extend: function extend(/* dest, source1, source2, ...*/) {
             var args = [true].concat(Array.prototype.slice.call(arguments));
@@ -549,8 +550,6 @@ var Util;
             return !!(obj && obj.nodeType === 1);
         },
 
-        now: Date.now,
-
         // https://github.com/jashkenas/underscore
         throttle: function (func, wait) {
             var THROTTLE_INTERVAL = 50,
@@ -606,7 +605,7 @@ var Util;
                         return current;
                     }
                     // do not traverse upwards past the nearest containing editor
-                    if (current.getAttribute('data-medium-editor-element')) {
+                    if (Util.isMediumEditorElement(current)) {
                         return false;
                     }
                 }
@@ -643,7 +642,7 @@ var Util;
                         (toReplace.nodeType !== 3 && toReplace.innerHTML === range.toString())) {
                     while (toReplace.parentNode &&
                             toReplace.parentNode.childNodes.length === 1 &&
-                            !toReplace.parentNode.getAttribute('data-medium-editor-element')) {
+                            !Util.isMediumEditorElement(toReplace.parentNode)) {
                         toReplace = toReplace.parentNode;
                     }
                     range.selectNode(toReplace);
@@ -671,25 +670,40 @@ var Util;
         },
 
         execFormatBlock: function (doc, tagName) {
-            var selectionData = Selection.getSelectionData(Selection.getSelectionStart(doc));
-            // FF handles blockquote differently on formatBlock
-            // allowing nesting, we need to use outdent
-            // https://developer.mozilla.org/en-US/docs/Rich-Text_Editing_in_Mozilla
-            if (tagName === 'blockquote' && selectionData.el &&
-                    selectionData.el.parentNode.tagName.toLowerCase() === 'blockquote') {
-                return doc.execCommand('outdent', false, null);
-            }
-            if (selectionData.tagName === tagName) {
-                tagName = 'p';
-            }
-            // When IE we need to add <> to heading elements and
-            //  blockquote needs to be called as indent
-            // http://stackoverflow.com/questions/10741831/execcommand-formatblock-headings-in-ie
-            // http://stackoverflow.com/questions/1816223/rich-text-editor-with-blockquote-function/1821777#1821777
-            if (this.isIE) {
-                if (tagName === 'blockquote') {
+            // Get the top level block element that contains the selection
+            var blockContainer = Util.getTopBlockContainer(Selection.getSelectionStart(doc));
+
+            // Special handling for blockquote
+            if (tagName === 'blockquote') {
+                if (blockContainer) {
+                    var childNodes = Array.prototype.slice.call(blockContainer.childNodes);
+                    // Check if the blockquote has a block element as a child (nested blocks)
+                    if (childNodes.some(function (childNode) {
+                        return Util.isBlockContainer(childNode);
+                    })) {
+                        // FF handles blockquote differently on formatBlock
+                        // allowing nesting, we need to use outdent
+                        // https://developer.mozilla.org/en-US/docs/Rich-Text_Editing_in_Mozilla
+                        return doc.execCommand('outdent', false, null);
+                    }
+                }
+
+                // When IE blockquote needs to be called as indent
+                // http://stackoverflow.com/questions/1816223/rich-text-editor-with-blockquote-function/1821777#1821777
+                if (this.isIE) {
                     return doc.execCommand('indent', false, tagName);
                 }
+            }
+
+            // If the blockContainer is already the element type being passed in
+            // treat it as 'undo' formatting and just convert it to a <p>
+            if (blockContainer && tagName === blockContainer.nodeName.toLowerCase()) {
+                tagName = 'p';
+            }
+
+            // When IE we need to add <> to heading elements
+            // http://stackoverflow.com/questions/10741831/execcommand-formatblock-headings-in-ie
+            if (this.isIE) {
                 tagName = '<' + tagName + '>';
             }
             return doc.execCommand('formatBlock', false, tagName);
@@ -707,7 +721,7 @@ var Util;
          */
         setTargetBlank: function (el, anchorUrl) {
             var i, url = anchorUrl || false;
-            if (el.tagName.toLowerCase() === 'a') {
+            if (el.nodeName.toLowerCase() === 'a') {
                 el.target = '_blank';
             } else {
                 el = el.getElementsByTagName('a');
@@ -724,7 +738,7 @@ var Util;
             var classes = buttonClass.split(' '),
                 i,
                 j;
-            if (el.tagName.toLowerCase() === 'a') {
+            if (el.nodeName.toLowerCase() === 'a') {
                 for (j = 0; j < classes.length; j += 1) {
                     el.classList.add(classes[j]);
                 }
@@ -742,19 +756,19 @@ var Util;
             if (!node) {
                 return false;
             }
-            if (node.tagName.toLowerCase() === 'li') {
+            if (node.nodeName.toLowerCase() === 'li') {
                 return true;
             }
 
             var parentNode = node.parentNode,
-                tagName = parentNode.tagName.toLowerCase();
-            while (this.parentElements.indexOf(tagName) === -1 && tagName !== 'div') {
+                tagName = parentNode.nodeName.toLowerCase();
+            while (!this.isBlockContainer(parentNode) && tagName !== 'div') {
                 if (tagName === 'li') {
                     return true;
                 }
                 parentNode = parentNode.parentNode;
-                if (parentNode && parentNode.tagName) {
-                    tagName = parentNode.tagName.toLowerCase();
+                if (parentNode) {
+                    tagName = parentNode.nodeName.toLowerCase();
                 } else {
                     return false;
                 }
@@ -763,13 +777,13 @@ var Util;
         },
 
         cleanListDOM: function (ownerDocument, element) {
-            if (element.tagName.toLowerCase() !== 'li') {
+            if (element.nodeName.toLowerCase() !== 'li') {
                 return;
             }
 
             var list = element.parentElement;
 
-            if (list.parentElement.tagName.toLowerCase() === 'p') { // yes we need to clean up
+            if (list.parentElement.nodeName.toLowerCase() === 'p') { // yes we need to clean up
                 this.unwrap(list.parentElement, ownerDocument);
 
                 // move cursor at the end of the text inside the list
@@ -995,6 +1009,73 @@ var Util;
         },
         /* END - based on http://stackoverflow.com/a/6183069 */
 
+        isElementAtBeginningOfBlock: function (node) {
+            var textVal,
+                sibling;
+            while (!this.isBlockContainer(node) && !this.isMediumEditorElement(node)) {
+                sibling = node;
+                while (sibling = sibling.previousSibling) {
+                    textVal = sibling.nodeType === 3 ? sibling.nodeValue : sibling.textContent;
+                    if (textVal.length > 0) {
+                        return false;
+                    }
+                }
+                node = node.parentNode;
+            }
+            return true;
+        },
+
+        isMediumEditorElement: function (element) {
+            return element && element.getAttribute && !!element.getAttribute('data-medium-editor-element');
+        },
+
+        isBlockContainer: function (element) {
+            return element && element.nodeType !== 3 && this.blockContainerElementNames.indexOf(element.nodeName.toLowerCase()) !== -1;
+        },
+
+        getTopBlockContainer: function (element) {
+            var topBlock = element;
+            this.traverseUp(element, function (el) {
+                if (Util.isBlockContainer(el)) {
+                    topBlock = el;
+                }
+                return false;
+            });
+            return topBlock;
+        },
+
+        getFirstSelectableLeafNode: function (element) {
+            while (element && element.firstChild) {
+                element = element.firstChild;
+            }
+            // We don't want to set the selection to an element that can't have children, this messes up Gecko.
+            element = this.traverseUp(element, function (el) {
+                return Util.emptyElementNames.indexOf(el.nodeName.toLowerCase()) === -1;
+            });
+            // Selecting at the beginning of a table doesn't work in PhantomJS.
+            if (element.nodeName.toLowerCase() === 'table') {
+                var firstCell = element.querySelector('th, td');
+                if (firstCell) {
+                    element = firstCell;
+                }
+            }
+            return element;
+        },
+
+        getFirstTextNode: function (element) {
+            if (element.nodeType === 3) {
+                return element;
+            }
+
+            for (var i = 0; i < element.childNodes.length; i++) {
+                var textNode = this.getFirstTextNode(element.childNodes[i]);
+                if (textNode !== null) {
+                    return textNode;
+                }
+            }
+            return null;
+        },
+
         ensureUrlHasProtocol: function (url) {
             if (url.indexOf('://') === -1) {
                 return 'http://' + url;
@@ -1004,7 +1085,7 @@ var Util;
 
         warn: function () {
             if (window.console !== undefined && typeof window.console.warn === 'function') {
-                window.console.warn.apply(console, arguments);
+                window.console.warn.apply(window.console, arguments);
             }
         },
 
@@ -1033,7 +1114,7 @@ var Util;
 
         cleanupTags: function (el, tags) {
             tags.forEach(function (tag) {
-                if (el.tagName.toLowerCase() === tag) {
+                if (el.nodeName.toLowerCase() === tag) {
                     el.parentNode.removeChild(el);
                 }
             }, this);
@@ -1042,7 +1123,7 @@ var Util;
         // get the closest parent
         getClosestTag: function (el, tag) {
             return this.traverseUp(el, function (element) {
-                return element.tagName.toLowerCase() === tag.toLowerCase();
+                return element.nodeName.toLowerCase() === tag.toLowerCase();
             });
         },
 
@@ -1601,6 +1682,14 @@ var Selection;
 (function () {
     'use strict';
 
+    function filterOnlyParentElements(node) {
+        if (Util.isBlockContainer(node)) {
+            return NodeFilter.FILTER_ACCEPT;
+        } else {
+            return NodeFilter.FILTER_SKIP;
+        }
+    }
+
     Selection = {
         findMatchingSelectionParent: function (testElementFunction, contentWindow) {
             var selection = contentWindow.getSelection(),
@@ -1619,31 +1708,8 @@ var Selection;
 
         getSelectionElement: function (contentWindow) {
             return this.findMatchingSelectionParent(function (el) {
-                return el.getAttribute('data-medium-editor-element');
+                return Util.isMediumEditorElement(el);
             }, contentWindow);
-        },
-
-        // Utility method called from importSelection only
-        moveRangeForwardOverEmptyParagraphs: function (range, countOfParagraphs, document, root) {
-            function filterOnlyParagraphsAndText(node) {
-                if (node.nodeType === 3 || node.nodeName.toLowerCase() === 'p') {
-                    return NodeFilter.FILTER_ACCEPT;
-                } else {
-                    return NodeFilter.FILTER_SKIP;
-                }
-            }
-            var treeWalker = document.createTreeWalker(root, NodeFilter.SHOW_ELEMENT|NodeFilter.SHOW_TEXT,
-                filterOnlyParagraphsAndText, false);
-
-            treeWalker.currentNode = range.startContainer;
-            var prevNode,
-                node;
-            while ((node = treeWalker.nextNode()) && node.nodeType !== 3 && countOfParagraphs > 0) {
-                prevNode = node;
-                countOfParagraphs -= 1;
-            }
-            range.setStart(prevNode, 0);
-            range.collapse(true);
         },
 
         // Utility method called from importSelection only
@@ -1679,36 +1745,43 @@ var Selection;
             return range;
         },
 
-        // Returns 0 unless the cursor is within or preceded by empty paragraphs,
+        // Returns 0 unless the cursor is within or preceded by empty paragraphs/blocks,
         // in which case it returns the count of such preceding paragraphs, including
         // the empty paragraph in which the cursor itself may be embedded.
-        getIndexRelativeToAdjacentEmptyParagraphs: function (doc, root, cursorContainer, cursorOffset) {
-            if (cursorContainer.nodeType === 3 && cursorOffset !== 0) {
+        getIndexRelativeToAdjacentEmptyBlocks: function (doc, root, cursorContainer, cursorOffset) {
+            // If there is text in front of the cursor, that means there isn't only empty blocks before it
+            if (cursorContainer.nodeType === 3 && cursorOffset > 0) {
                 return 0;
             }
 
-            var treeWalker = doc.createTreeWalker(root, NodeFilter.SHOW_ELEMENT|NodeFilter.SHOW_TEXT, null, false);
-            if (cursorContainer.nodeType === 3) {
-                treeWalker.currentNode = cursorContainer;
-            } else if (cursorOffset === cursorContainer.childNodes.length) {
-                return 0; // not always accurate but should be close enough
-            } else {
-                treeWalker.currentNode = cursorContainer.childNodes[cursorOffset];
+            // Check if the block that contains the cursor has any other text in front of the cursor
+            var node = cursorContainer;
+            if (node.nodeType !== 3) {
+                //node = cursorContainer.childNodes.length === cursorOffset ? null : cursorContainer.childNodes[cursorOffset];
+                node = cursorContainer.childNodes[cursorOffset];
+            }
+            if (node && !Util.isElementAtBeginningOfBlock(node)) {
+                return 0;
             }
 
-            var precedingEmptyParagraphsCount = 0,
-                node,
-                initialNode = treeWalker.currentNode,
-                initialNodeParagraph = Util.getClosestTag(initialNode, 'p');
-            while ((node = treeWalker.previousNode()) && (node.nodeType !== 3) &&
-                    !(node.nodeName.toLowerCase() === 'p' && node.textContent !== '' &&
-                        node !== initialNodeParagraph)) {
-                if (node.nodeName.toLowerCase() === 'p') {
-                    precedingEmptyParagraphsCount += 1;
+            // Walk over block elements, counting number of empty blocks between last piece of text
+            // and the block the cursor is in
+            var treeWalker = doc.createTreeWalker(root, NodeFilter.SHOW_ELEMENT, filterOnlyParentElements, false),
+                emptyBlocksCount = 0;
+            while (treeWalker.nextNode()) {
+                var blockIsEmpty = treeWalker.currentNode.textContent === '';
+                if (blockIsEmpty || emptyBlocksCount > 0) {
+                    emptyBlocksCount += 1;
+                }
+                if (Util.isDescendant(treeWalker.currentNode, cursorContainer, true)) {
+                    return emptyBlocksCount;
+                }
+                if (!blockIsEmpty) {
+                    emptyBlocksCount = 0;
                 }
             }
 
-            return precedingEmptyParagraphsCount;
+            return emptyBlocksCount;
         },
 
         selectionInContentEditableFalse: function (contentWindow) {
@@ -1874,26 +1947,6 @@ var Selection;
                 startNode = (node && node.nodeType === 3 ? node.parentNode : node);
 
             return startNode;
-        },
-
-        getSelectionData: function (el) {
-            var tagName;
-
-            if (el && el.tagName) {
-                tagName = el.tagName.toLowerCase();
-            }
-
-            while (el && Util.parentElements.indexOf(tagName) === -1) {
-                el = el.parentNode;
-                if (el && el.tagName) {
-                    tagName = el.tagName.toLowerCase();
-                }
-            }
-
-            return {
-                el: el,
-                tagName: tagName
-            };
         }
     };
 }());
@@ -2605,8 +2658,8 @@ var Button;
                 return this.knownState;
             }
 
-            if (tagNames && tagNames.length > 0 && node.tagName) {
-                isMatch = tagNames.indexOf(node.tagName.toLowerCase()) !== -1;
+            if (tagNames && tagNames.length > 0) {
+                isMatch = tagNames.indexOf(node.nodeName.toLowerCase()) !== -1;
             }
 
             if (!isMatch && this.style) {
@@ -2782,8 +2835,10 @@ var AnchorForm;
             event.preventDefault();
             event.stopPropagation();
 
-            var selectedParentElement = Selection.getSelectedParentElement(Selection.getSelectionRange(this.document));
-            if (selectedParentElement.tagName && selectedParentElement.tagName.toLowerCase() === 'a') {
+            var selectedParentElement = Selection.getSelectedParentElement(Selection.getSelectionRange(this.document)),
+                firstTextNode = Util.getFirstTextNode(selectedParentElement);
+
+            if (Util.getClosestTag(firstTextNode, 'a')) {
                 return this.execAction('unlink');
             }
 
@@ -3381,31 +3436,22 @@ LINK_REGEXP_TEXT =
                 }
                 if (spans[i].getAttribute('data-href') !== textContent && nodeIsNotInsideAnchorTag(spans[i])) {
                     documentModified = true;
-                    if (spans[i].getAttribute('data-href') === textContent.trim()) {
-                        // The user hit space or something after the link and it got added inside the SPAN.
-                        var whiteSpaceText = '';
-                        for (var j = textContent.length - 1; j >= 0; j--) {
-                            if (WHITESPACE_CHARS.indexOf(textContent[j]) === -1) {
-                                break;
-                            }
-                            whiteSpaceText += textContent[j];
-                        }
-                        spans[i].parentNode.insertBefore(this.document.createTextNode(whiteSpaceText), spans[i].nextSibling);
-                        this.removeTrailingCharacters(spans[i], whiteSpaceText.length);
+                    var trimmedTextContent = textContent.replace(/\s+$/, '');
+                    if (spans[i].getAttribute('data-href') === trimmedTextContent) {
+                        var charactersTrimmed = textContent.length - trimmedTextContent.length,
+                            subtree = Util.splitOffDOMTree(spans[i], this.splitTextBeforeEnd(spans[i], charactersTrimmed));
+                        spans[i].parentNode.insertBefore(subtree, spans[i].nextSibling);
                     } else {
                         // Some editing has happened to the span, so just remove it entirely. The user can put it back
                         // around just the href content if they need to prevent it from linking
-                        while (spans[i].childNodes.length > 0) {
-                            spans[i].parentNode.insertBefore(spans[i].firstChild, spans[i]);
-                        }
-                        spans[i].parentNode.removeChild(spans[i]);
+                        Util.unwrap(spans[i], this.document);
                     }
                 }
             }
             return documentModified;
         },
 
-        removeTrailingCharacters: function (element, characterCount) {
+        splitTextBeforeEnd: function (element, characterCount) {
             var treeWalker = this.document.createTreeWalker(element, NodeFilter.SHOW_TEXT, null, false),
                 lastChildNotExhausted = true;
 
@@ -3414,26 +3460,21 @@ LINK_REGEXP_TEXT =
                 lastChildNotExhausted = treeWalker.lastChild() !== null;
             }
 
-            while (characterCount > 0) {
-                var currentNode = treeWalker.currentNode,
-                    currentNodeValue = currentNode.nodeValue;
+            var currentNode,
+                currentNodeValue,
+                previousNode;
+            while (characterCount > 0 && previousNode !== null) {
+                currentNode = treeWalker.currentNode;
+                currentNodeValue = currentNode.nodeValue;
                 if (currentNodeValue.length > characterCount) {
-                    currentNode.nodeValue = currentNodeValue.substring(0, currentNodeValue.length - characterCount);
+                    previousNode = currentNode.splitText(currentNodeValue.length - characterCount);
                     characterCount = 0;
                 } else {
-                    var previousNode = treeWalker.previousNode();
-                    currentNode.parentNode.removeChild(currentNode);
+                    previousNode = treeWalker.previousNode();
                     characterCount -= currentNodeValue.length;
-                    // Just in case we run out of nodes, don't get stuck in an infinite loop
-                    if (previousNode === null) {
-                        if (window.console) {
-                            window.console.error('Ran out of trailing characters to trim and ' +
-                                'still had more characters to remove');
-                        }
-                        break;
-                    }
                 }
             }
+            return previousNode;
         },
 
         performLinkingWithinElement: function (element) {
@@ -3821,7 +3862,7 @@ var FontSizeForm;
 
         clearFontSize: function () {
             Selection.getSelectedElements(this.document).forEach(function (el) {
-                if (el.tagName === 'FONT' && el.hasAttribute('size')) {
+                if (el.nodeName.toLowerCase() === 'font' && el.hasAttribute('size')) {
                     el.removeAttribute('size');
                 }
             });
@@ -4025,7 +4066,7 @@ var PasteHandler;
                 // elements are sometimes actually spaces.
                 workEl.innerHTML = workEl.innerHTML.replace(/\n/gi, ' ');
 
-                switch (workEl.tagName.toLowerCase()) {
+                switch (workEl.nodeName.toLowerCase()) {
                     case 'p':
                     case 'div':
                         this.filterCommonBlocks(workEl);
@@ -4057,7 +4098,7 @@ var PasteHandler;
             for (i = 0; i < elList.length; i += 1) {
                 workEl = elList[i];
 
-                if ('a' === workEl.tagName.toLowerCase() && this.getEditorOption('targetBlank')) {
+                if ('a' === workEl.nodeName.toLowerCase() && this.getEditorOption('targetBlank')) {
                     Util.setTargetBlank(workEl);
                 }
 
@@ -4069,7 +4110,7 @@ var PasteHandler;
         },
 
         isCommonBlock: function (el) {
-            return (el && (el.tagName.toLowerCase() === 'p' || el.tagName.toLowerCase() === 'div'));
+            return (el && (el.nodeName.toLowerCase() === 'p' || el.nodeName.toLowerCase() === 'div'));
         },
 
         filterCommonBlocks: function (el) {
@@ -4694,8 +4735,6 @@ var Toolbar;
                 return;
             }
 
-            parentNode = Selection.getSelectedParentElement(selectionRange);
-
             // Loop through all extensions
             this.forEachExtension(function (extension) {
                 // For those extensions where we can use document.queryCommandState(), do so
@@ -4714,12 +4753,21 @@ var Toolbar;
                 manualStateChecks.push(extension);
             });
 
+            parentNode = Selection.getSelectedParentElement(selectionRange);
+
+            // Make sure the selection parent isn't outside of the contenteditable
+            if (!this.getEditorElements().some(function (element) {
+                    return Util.isDescendant(element, parentNode, true);
+                })) {
+                return;
+            }
+
             // Climb up the DOM and do manual checks for whether a certain extension is currently enabled for this node
-            while (parentNode.tagName !== undefined && Util.parentElements.indexOf(parentNode.tagName.toLowerCase) === -1) {
+            while (parentNode) {
                 manualStateChecks.forEach(updateExtensionState);
 
                 // we can abort the search upwards if we leave the contentEditable element
-                if (this.getEditorElements().indexOf(parentNode) !== -1) {
+                if (Util.isMediumEditorElement(parentNode)) {
                     break;
                 }
                 parentNode = parentNode.parentNode;
@@ -4901,7 +4949,7 @@ function MediumEditor(elements, options) {
     function handleTabKeydown(event) {
         // Override tab only for pre nodes
         var node = Selection.getSelectionStart(this.options.ownerDocument),
-            tag = node && node.tagName.toLowerCase();
+            tag = node && node.nodeName.toLowerCase();
 
         if (tag === 'pre') {
             event.preventDefault();
@@ -4923,7 +4971,7 @@ function MediumEditor(elements, options) {
 
     function handleBlockDeleteKeydowns(event) {
         var p, node = Selection.getSelectionStart(this.options.ownerDocument),
-            tagName = node.tagName.toLowerCase(),
+            tagName = node.nodeName.toLowerCase(),
             isEmpty = /^(\s+|<br\/?>)?$/i,
             isHeader = /h\d/i;
 
@@ -4957,7 +5005,7 @@ function MediumEditor(elements, options) {
                     // in an empty tag
                     isEmpty.test(node.innerHTML) &&
                     // when the next tag *is* a header
-                    isHeader.test(node.nextElementSibling.tagName)) {
+                    isHeader.test(node.nextElementSibling.nodeName.toLowerCase())) {
             // hitting delete in an empty element preceding a header, ex:
             //  <p>[CURSOR]</p><h1>Header</h1>
             // Will cause the h1 to become a paragraph.
@@ -4979,7 +5027,7 @@ function MediumEditor(elements, options) {
                 !node.parentElement.previousElementSibling &&
                 // is not the only li in a list
                 node.nextElementSibling &&
-                node.nextElementSibling.tagName.toLowerCase() === 'li') {
+                node.nextElementSibling.nodeName.toLowerCase() === 'li') {
             // backspacing in an empty first list element in the first list (with more elements) ex:
             //  <ul><li>[CURSOR]</li><li>List Item 2</li></ul>
             // will remove the first <li> but add some extra element before (varies based on browser)
@@ -5011,12 +5059,12 @@ function MediumEditor(elements, options) {
             return;
         }
 
-        if (node.getAttribute('data-medium-editor-element') && node.children.length === 0) {
+        if (Util.isMediumEditorElement(node) && node.children.length === 0) {
             this.options.ownerDocument.execCommand('formatBlock', false, 'p');
         }
 
         if (Util.isKey(event, Util.keyCode.ENTER) && !Util.isListItem(node)) {
-            tagName = node.tagName.toLowerCase();
+            tagName = node.nodeName.toLowerCase();
             // For anchor tags, unlink
             if (tagName === 'a') {
                 this.options.ownerDocument.execCommand('unlink', false, null);
@@ -5080,7 +5128,7 @@ function MediumEditor(elements, options) {
         // Loop through elements and convert textarea's into divs
         this.elements = [];
         elements.forEach(function (element) {
-            if (element.tagName.toLowerCase() === 'textarea') {
+            if (element.nodeName.toLowerCase() === 'textarea') {
                 this.elements.push(createContentEditable.call(this, element));
             } else {
                 this.elements.push(element);
@@ -5677,13 +5725,13 @@ function MediumEditor(elements, options) {
                     };
                     // If start = 0 there may still be an empty paragraph before it, but we don't care.
                     if (start !== 0) {
-                        var emptyParagraphsIndex = Selection.getIndexRelativeToAdjacentEmptyParagraphs(
+                        var emptyBlocksIndex = Selection.getIndexRelativeToAdjacentEmptyBlocks(
                                 this.options.ownerDocument,
                                 this.elements[editableElementIndex],
                                 range.startContainer,
                                 range.startOffset);
-                        if (emptyParagraphsIndex !== 0) {
-                            selectionState.emptyParagraphsIndex = emptyParagraphsIndex;
+                        if (emptyBlocksIndex !== 0) {
+                            selectionState.emptyBlocksIndex = emptyBlocksIndex;
                         }
                     }
                 }
@@ -5760,9 +5808,23 @@ function MediumEditor(elements, options) {
                 }
             }
 
-            if (inSelectionState.emptyParagraphsIndex && selectionState.end === nextCharIndex) {
-                Selection.moveRangeForwardOverEmptyParagraphs(range, inSelectionState.emptyParagraphsIndex,
-                    this.options.ownerDocument, editableElement);
+            if (inSelectionState.emptyBlocksIndex && selectionState.end === nextCharIndex) {
+                var targetNode = Util.getTopBlockContainer(range.startContainer),
+                    index = 0;
+                // Skip over empty blocks until we hit the block we want the selection to be in
+                while (index < inSelectionState.emptyBlocksIndex && targetNode.nextSibling) {
+                    targetNode = targetNode.nextSibling;
+                    index++;
+                    // If we find a non-empty block, ignore the emptyBlocksIndex and just put selection here
+                    if (targetNode.textContent.length > 0) {
+                        break;
+                    }
+                }
+
+                // We're selecting a high-level block node, so make sure the cursor gets moved into the deepest
+                // element at the beginning of the block
+                range.setStart(Util.getFirstSelectableLeafNode(targetNode), 0);
+                range.collapse(true);
             }
 
             // If the selection is right at the ending edge of a link, put it outside the anchor tag instead of inside.
@@ -5830,7 +5892,7 @@ MediumEditor.parseVersionString = function (release) {
 
 MediumEditor.version = MediumEditor.parseVersionString.call(this, ({
     // grunt-bump looks for this:
-    'version': '5.0.0-alpha.0'
+    'version': '5.0.0-rc.1'
 }).version);
 
     return MediumEditor;
