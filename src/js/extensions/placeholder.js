@@ -21,6 +21,8 @@ var Placeholder;
         hideOnClick: true,
 
         init: function () {
+            Extension.prototype.init.apply(this, arguments);
+
             this.initPlaceholders();
             this.attachEventHandlers();
         },

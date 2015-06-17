@@ -78,11 +78,9 @@ var PasteHandler;
          */
         cleanTags: ['meta'],
 
-        /* ----- internal options needed from base ----- */
-        targetBlank: false, // deprecated (should use .getEditorOption() instead)
-        disableReturn: false, // deprecated (should use .getEditorOption() instead)
-
         init: function () {
+            Extension.prototype.init.apply(this, arguments);
+
             if (this.forcePlainText || this.cleanPastedHTML) {
                 this.subscribe('editablePaste', this.handlePaste.bind(this));
             }
@@ -120,7 +118,7 @@ var PasteHandler;
                     return this.cleanPaste(pastedHTML);
                 }
 
-                if (!(this.disableReturn || element.getAttribute('data-disable-return'))) {
+                if (!(this.getEditorOption('disableReturn') || element.getAttribute('data-disable-return'))) {
                     paragraphs = pastedPlain.split(/[\r\n]+/g);
                     // If there are no \r\n in data, don't wrap in <p>
                     if (paragraphs.length > 1) {
@@ -172,7 +170,7 @@ var PasteHandler;
                 // elements are sometimes actually spaces.
                 workEl.innerHTML = workEl.innerHTML.replace(/\n/gi, ' ');
 
-                switch (workEl.tagName.toLowerCase()) {
+                switch (workEl.nodeName.toLowerCase()) {
                     case 'p':
                     case 'div':
                         this.filterCommonBlocks(workEl);
@@ -204,7 +202,7 @@ var PasteHandler;
             for (i = 0; i < elList.length; i += 1) {
                 workEl = elList[i];
 
-                if ('a' === workEl.tagName.toLowerCase() && this.targetBlank) {
+                if ('a' === workEl.nodeName.toLowerCase() && this.getEditorOption('targetBlank')) {
                     Util.setTargetBlank(workEl);
                 }
 
@@ -216,7 +214,7 @@ var PasteHandler;
         },
 
         isCommonBlock: function (el) {
-            return (el && (el.tagName.toLowerCase() === 'p' || el.tagName.toLowerCase() === 'div'));
+            return (el && (el.nodeName.toLowerCase() === 'p' || el.nodeName.toLowerCase() === 'div'));
         },
 
         filterCommonBlocks: function (el) {

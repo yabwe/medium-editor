@@ -235,7 +235,7 @@ describe('Autolink', function () {
                 triggerAutolinking(this.el);
                 var links = this.el.getElementsByTagName('a');
                 expect(links.length).toBe(1);
-                expect(this.el.firstChild.tagName.toLowerCase()).toBe('span');
+                expect(this.el.firstChild.nodeName.toLowerCase()).toBe('span');
                 expect(this.el.firstChild.textContent).toBe('Text with http://www.example.com inside!');
                 expect(this.el.firstChild.getElementsByTagName('a').length).toBe(1);
                 expect(links[0].getAttribute('href')).toBe('http://www.example.com');

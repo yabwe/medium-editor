@@ -35,10 +35,10 @@ describe('Elements TestCase', function () {
             expect(this.el.getAttribute('contenteditable')).toBeFalsy();
         });
 
-        it('should set element data attr medium-element to true', function () {
+        it('should set element data attr medium-editor-element to true', function () {
             var editor = this.newMediumEditor('.editor');
             expect(editor.elements.length).toBe(1);
-            expect(this.el.getAttribute('data-medium-element')).toEqual('true');
+            expect(this.el.getAttribute('data-medium-editor-element')).toEqual('true');
         });
 
         it('should set element role attribute to textbox', function () {

@@ -311,7 +311,8 @@ describe('Events TestCase', function () {
             var editableTwo = this.createElement('div', 'editor', 'lore ipsum'),
                 firedTarget,
                 editor = this.newMediumEditor('.editor'),
-                button = editor.toolbar.getToolbarElement().querySelector('[data-action="bold"]'),
+                toolbar = editor.getExtensionByName('toolbar'),
+                button = toolbar.getToolbarElement().querySelector('[data-action="bold"]'),
                 handler = function (event, editable) {
                     firedTarget = editable;
                 },

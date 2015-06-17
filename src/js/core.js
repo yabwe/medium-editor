@@ -1,7 +1,5 @@
-/*global Util, ButtonsData, Selection, Extension,
-    extensionDefaults, Toolbar, Events, editorDefaults,
-    DefaultButton, AnchorExtension, FontSizeExtension,
-    AnchorPreviewDeprecated*/
+/*global Util, Selection, Extension,
+    extensionDefaults, Events, editorDefaults*/
 
 function MediumEditor(elements, options) {
     'use strict';
@@ -30,7 +28,7 @@ function MediumEditor(elements, options) {
     function handleTabKeydown(event) {
         // Override tab only for pre nodes
         var node = Selection.getSelectionStart(this.options.ownerDocument),
-            tag = node && node.tagName.toLowerCase();
+            tag = node && node.nodeName.toLowerCase();
 
         if (tag === 'pre') {
             event.preventDefault();
@@ -52,7 +50,7 @@ function MediumEditor(elements, options) {
 
     function handleBlockDeleteKeydowns(event) {
         var p, node = Selection.getSelectionStart(this.options.ownerDocument),
-            tagName = node.tagName.toLowerCase(),
+            tagName = node.nodeName.toLowerCase(),
             isEmpty = /^(\s+|<br\/?>)?$/i,
             isHeader = /h\d/i;
 
@@ -86,7 +84,7 @@ function MediumEditor(elements, options) {
                     // in an empty tag
                     isEmpty.test(node.innerHTML) &&
                     // when the next tag *is* a header
-                    isHeader.test(node.nextElementSibling.tagName)) {
+                    isHeader.test(node.nextElementSibling.nodeName.toLowerCase())) {
             // hitting delete in an empty element preceding a header, ex:
             //  <p>[CURSOR]</p><h1>Header</h1>
             // Will cause the h1 to become a paragraph.
@@ -108,7 +106,7 @@ function MediumEditor(elements, options) {
                 !node.parentElement.previousElementSibling &&
                 // is not the only li in a list
                 node.nextElementSibling &&
-                node.nextElementSibling.tagName.toLowerCase() === 'li') {
+                node.nextElementSibling.nodeName.toLowerCase() === 'li') {
             // backspacing in an empty first list element in the first list (with more elements) ex:
             //  <ul><li>[CURSOR]</li><li>List Item 2</li></ul>
             // will remove the first <li> but add some extra element before (varies based on browser)
@@ -140,12 +138,12 @@ function MediumEditor(elements, options) {
             return;
         }
 
-        if (node.getAttribute('data-medium-element') && node.children.length === 0) {
+        if (Util.isMediumEditorElement(node) && node.children.length === 0) {
             this.options.ownerDocument.execCommand('formatBlock', false, 'p');
         }
 
         if (Util.isKey(event, Util.keyCode.ENTER) && !Util.isListItem(node)) {
-            tagName = node.tagName.toLowerCase();
+            tagName = node.nodeName.toLowerCase();
             // For anchor tags, unlink
             if (tagName === 'a') {
                 this.options.ownerDocument.execCommand('unlink', false, null);
@@ -159,6 +157,37 @@ function MediumEditor(elements, options) {
     }
 
     // Internal helper methods which shouldn't be exposed externally
+
+    function addToEditors(win) {
+        if (!win._mediumEditors) {
+            // To avoid breaking users who are assuming that the unique id on
+            // medium-editor elements will start at 1, inserting a 'null' in the
+            // array so the unique-id can always map to the index of the editor instance
+            win._mediumEditors = [null];
+        }
+
+        // If this already has a unique id, re-use it
+        if (!this.id) {
+            this.id = win._mediumEditors.length;
+        }
+
+        win._mediumEditors[this.id] = this;
+    }
+
+    function removeFromEditors(win) {
+        if (!win._mediumEditors || !win._mediumEditors[this.id]) {
+            return;
+        }
+
+        /* Setting the instance to null in the array instead of deleting it allows:
+         * 1) Each instance to preserve its own unique-id, even after being destroyed
+         *    and initialized again
+         * 2) The unique-id to always correspond to an index in the array of medium-editor
+         *    instances. Thus, we will be able to look at a contenteditable, and determine
+         *    which instance it belongs to, by indexing into the global array.
+         */
+        win._mediumEditors[this.id] = null;
+    }
 
     function createElementsArray(selector) {
         if (!selector) {
@@ -178,7 +207,7 @@ function MediumEditor(elements, options) {
         // Loop through elements and convert textarea's into divs
         this.elements = [];
         elements.forEach(function (element) {
-            if (element.tagName.toLowerCase() === 'textarea') {
+            if (element.nodeName.toLowerCase() === 'textarea') {
                 this.elements.push(createContentEditable.call(this, element));
             } else {
                 this.elements.push(element);
@@ -196,25 +225,18 @@ function MediumEditor(elements, options) {
     }
 
     function initExtension(extension, name, instance) {
-        if (typeof extension.parent !== 'undefined') {
-            Util.warn('Extension .parent property has been deprecated.  ' +
-                'The .base property for extensions will always be set to MediumEditor in version 5.0.0');
-        }
         var extensionDefaults = {
             'window': instance.options.contentWindow,
-            'document': instance.options.ownerDocument
+            'document': instance.options.ownerDocument,
+            'base': instance
         };
-        // TODO: Deprecated (Remove .parent check in v5.0.0)
-        if (extension.parent !== false) {
-            extensionDefaults.base = instance;
-        }
+
         // Add default options into the extension
         extension = setExtensionDefaults(extension, extensionDefaults);
 
         // Call init on the extension
         if (typeof extension.init === 'function') {
-            // Passing instance into init() will be deprecated in v5.0.0
-            extension.init(instance);
+            extension.init();
         }
 
         // Set extension name (if not already set)
@@ -224,65 +246,41 @@ function MediumEditor(elements, options) {
         return extension;
     }
 
-    function shouldAddDefaultAnchorPreview() {
-        var i,
-            shouldAdd = false;
-
-        // TODO: deprecated
-        // If anchor-preview is disabled, don't add
-        if (this.options.disableAnchorPreview) {
+    function isToolbarEnabled() {
+        // If any of the elements don't have the toolbar disabled
+        // We need a toolbar
+        if (this.elements.every(function (element) {
+                return !!element.getAttribute('data-disable-toolbar');
+            })) {
             return false;
-        }
-        // If anchor-preview is disabled, don't add
-        if (this.options.anchorPreview === false) {
-            return false;
-        }
-        // If anchor-preview extension has been overriden, don't add
-        if (this.options.extensions['anchor-preview']) {
-            return false;
-        }
-        // If toolbar is disabled, don't add
-        if (this.options.disableToolbar) {
-            return false;
-        }
-        // If all elements have 'data-disable-toolbar' attribute, don't add
-        for (i = 0; i < this.elements.length; i += 1) {
-            if (!this.elements[i].getAttribute('data-disable-toolbar')) {
-                shouldAdd = true;
-                break;
-            }
         }
 
-        return shouldAdd;
+        return this.options.toolbar !== false;
     }
 
-    function shouldAddDefaultPlaceholder() {
-        if (this.options.extensions['placeholder']) {
+    function isAnchorPreviewEnabled() {
+        // If toolbar is disabled, don't add
+        if (!isToolbarEnabled.call(this)) {
             return false;
         }
 
-        // TODO: deprecated
-        if (this.options.disablePlaceholders) {
-            return false;
-        }
+        return this.options.anchorPreview !== false;
+    }
 
+    function isPlaceholderEnabled() {
         return this.options.placeholder !== false;
     }
 
-    function shouldAddDefaultAutoLink() {
-        if (this.options.extensions['auto-link']) {
-            return false;
-        }
-
+    function isAutoLinkEnabled() {
         return this.options.autoLink !== false;
     }
 
-    function shouldAddDefaultImageDragging() {
-        if (this.options.extensions['image-dragging']) {
-            return false;
-        }
-
+    function isImageDraggingEnabled() {
         return this.options.imageDragging !== false;
+    }
+
+    function isKeyboardCommandsEnabled() {
+        return this.options.keyboardCommands !== false;
     }
 
     function createContentEditable(textarea) {
@@ -324,7 +322,7 @@ function MediumEditor(elements, options) {
                 element.setAttribute('contentEditable', true);
                 element.setAttribute('spellcheck', this.options.spellcheck);
             }
-            element.setAttribute('data-medium-element', true);
+            element.setAttribute('data-medium-editor-element', true);
             element.setAttribute('role', 'textbox');
             element.setAttribute('aria-multiline', true);
             element.setAttribute('medium-editor-index', index);
@@ -339,21 +337,6 @@ function MediumEditor(elements, options) {
                 }.bind(this));
             }
         }, this);
-    }
-
-    function initToolbar() {
-        if (this.toolbar || this.options.disableToolbar) {
-            return false;
-        }
-
-        var addToolbar = this.elements.some(function (element) {
-            return !element.getAttribute('data-disable-toolbar');
-        });
-
-        if (addToolbar) {
-            this.toolbar = new Toolbar(this);
-            this.options.elementsContainer.appendChild(this.toolbar.getToolbarElement());
-        }
     }
 
     function attachHandlers() {
@@ -389,141 +372,59 @@ function MediumEditor(elements, options) {
         }
     }
 
-    function initPlaceholder(options) {
-        // Backwards compatability
-        var defaultsBC = {
-            text: (typeof this.options.placeholder === 'string') ? this.options.placeholder : undefined // deprecated
-        };
+    function initExtensions() {
 
-        return new MediumEditor.extensions.placeholder(
-            Util.extend({}, options, defaultsBC)
-        );
-    }
+        this.extensions = [];
 
-    function initAnchorPreview(options) {
-        // Backwards compatability
-        var defaultsBC = {
-            hideDelay: this.options.anchorPreviewHideDelay, // deprecated
-            diffLeft: this.options.diffLeft, // deprecated (should use .getEditorOption() instead)
-            diffTop: this.options.diffTop, // deprecated (should use .getEditorOption() instead)
-            elementsContainer: this.options.elementsContainer // deprecated (should use .getEditorOption() instead)
-        };
-
-        return new MediumEditor.extensions.anchorPreview(
-            Util.extend({}, options, defaultsBC)
-        );
-    }
-
-    function initAnchorForm(options) {
-        // Backwards compatability
-        var defaultsBC = {
-            customClassOption: this.options.anchorButton ? (this.options.anchorButtonClass || 'btn') : undefined, // deprecated
-            linkValidation: this.options.checkLinkFormat, //deprecated
-            placeholderText: this.options.anchorInputPlaceholder, // deprecated
-            targetCheckbox: this.options.anchorTarget, // deprecated
-            targetCheckboxText: this.options.anchorInputCheckboxLabel // deprecated
-        };
-
-        return new MediumEditor.extensions.anchor(
-            Util.extend({}, options, defaultsBC)
-        );
-    }
-
-    function initPasteHandler(options) {
-        // Backwards compatability
-        var defaultsBC = {
-            forcePlainText: this.options.forcePlainText, // deprecated
-            cleanPastedHTML: this.options.cleanPastedHTML, // deprecated
-            disableReturn: this.options.disableReturn, // deprecated (should use .getEditorOption() instead)
-            targetBlank: this.options.targetBlank // deprecated (should use .getEditorOption() instead)
-        };
-
-        return new MediumEditor.extensions.paste(
-            Util.extend({}, options, defaultsBC)
-        );
-    }
-
-    function initCommands() {
-        var buttons = this.options.buttons,
-            extensions = this.options.extensions,
-            ext,
-            name;
-        this.commands = [];
-
-        buttons.forEach(function (buttonName) {
-            if (extensions[buttonName]) {
-                ext = initExtension(extensions[buttonName], buttonName, this);
-                this.commands.push(ext);
-            } else if (buttonName === 'anchor') {
-                ext = initExtension(initAnchorForm.call(this, this.options.anchor), 'anchor', this);
-                this.commands.push(ext);
-            } else if (buttonName === 'fontsize') {
-                ext = initExtension(new MediumEditor.extensions.fontSize(), buttonName, this);
-                this.commands.push(ext);
-            } else if (ButtonsData.hasOwnProperty(buttonName)) {
-                ext = initExtension(new MediumEditor.extensions.button(ButtonsData[buttonName]), buttonName, this);
-                this.commands.push(ext);
+        // Passed in extensions
+        Object.keys(this.options.extensions).forEach(function (name) {
+            // Always save the toolbar extension for last
+            if (name !== 'toolbar' && this.options.extensions[name]) {
+                this.extensions.push(initExtension(this.options.extensions[name], name, this));
             }
         }, this);
 
-        for (name in extensions) {
-            if (extensions.hasOwnProperty(name) && buttons.indexOf(name) === -1) {
-                ext = initExtension(extensions[name], name, this);
-                this.commands.push(ext);
+        // Built-in extensions
+        var builtIns = {
+            paste: true,
+            anchorPreview: isAnchorPreviewEnabled.call(this),
+            autoLink: isAutoLinkEnabled.call(this),
+            imageDragging: isImageDraggingEnabled.call(this),
+            keyboardCommands: isKeyboardCommandsEnabled.call(this),
+            placeholder: isPlaceholderEnabled.call(this)
+        };
+        Object.keys(builtIns).forEach(function (name) {
+            if (builtIns[name]) {
+                this.addBuiltInExtension(name);
             }
+        }, this);
+
+        // Users can pass in a custom toolbar extension
+        // so check for that first and if it's not present
+        // just create the default toolbar
+        var toolbarExtension = this.options.extensions['toolbar'];
+        if (!toolbarExtension && isToolbarEnabled.call(this)) {
+            toolbarExtension = new MediumEditor.extensions.toolbar(this.options.toolbar);
         }
 
-        // Only add default paste extension if it wasn't overriden
-        if (!this.options.extensions['paste']) {
-            this.commands.push(initExtension(initPasteHandler.call(this, this.options.paste), 'paste', this));
-        }
-
-        // Add AnchorPreview as extension if needed
-        if (shouldAddDefaultAnchorPreview.call(this)) {
-            this.commands.push(initExtension(initAnchorPreview.call(this, this.options.anchorPreview), 'anchor-preview', this));
-        }
-
-        if (shouldAddDefaultAutoLink.call(this)) {
-            this.commands.push(initExtension(new MediumEditor.extensions.autoLink(), 'auto-link', this));
-        }
-
-        if (shouldAddDefaultImageDragging.call(this)) {
-            this.commands.push(initExtension(new MediumEditor.extensions.imageDragging(), 'image-dragging', this));
-        }
-
-        if (shouldAddDefaultPlaceholder.call(this)) {
-            var placeholderOpts = (typeof this.options.placeholder === 'string') ? {} : this.options.placeholder;
-            this.commands.push(initExtension(initPlaceholder.call(this, placeholderOpts), 'placeholder', this));
+        // If the toolbar is not disabled, so we actually have an extension
+        // initialize it and add it to the extensions array
+        if (toolbarExtension) {
+            this.extensions.push(initExtension(toolbarExtension, 'toolbar', this));
         }
     }
 
     function mergeOptions(defaults, options) {
         var deprecatedProperties = [
-            ['forcePlainText', 'paste.forcePlainText'],
-            ['cleanPastedHTML', 'paste.cleanPastedHTML'],
-            ['anchorInputPlaceholder', 'anchor.placeholderText'],
-            ['checkLinkFormat', 'anchor.linkValidation'],
-            ['anchorButton', 'anchor.customClassOption'],
-            ['anchorButtonClass', 'anchor.customClassOption'],
-            ['anchorTarget', 'anchor.targetCheckbox'],
-            ['anchorInputCheckboxLabel', 'anchor.targetCheckboxText'],
-            ['anchorPreviewHideDelay', 'anchorPreview.hideDelay'],
-            ['disableAnchorPreview', 'anchorPreview: false'],
-            ['disablePlaceholders', 'placeholder: false'],
-            ['onShowToolbar', 'showToolbar custom event'],
-            ['onHideToolbar', 'hideToolbar custom event']
+            // ['forcePlainText', 'paste.forcePlainText'],
         ];
         // warn about using deprecated properties
         if (options) {
             deprecatedProperties.forEach(function (pair) {
                 if (options.hasOwnProperty(pair[0]) && options[pair[0]] !== undefined) {
-                    Util.deprecated(pair[0], pair[1], 'v5.0.0');
+                    Util.deprecated(pair[0], pair[1], 'v6.0.0');
                 }
             });
-
-            if (options.hasOwnProperty('placeholder') && typeof options.placeholder === 'string') {
-                Util.deprecated('placeholder', 'placeholder.text', 'v5.0.0');
-            }
         }
 
         return Util.defaults({}, options, defaults);
@@ -557,16 +458,6 @@ function MediumEditor(elements, options) {
         return this.options.ownerDocument.execCommand(action, false, null);
     }
 
-    // deprecate
-    MediumEditor.statics = {
-        ButtonsData: ButtonsData,
-        DefaultButton: DefaultButton,
-        AnchorExtension: AnchorExtension,
-        FontSizeExtension: FontSizeExtension,
-        Toolbar: Toolbar,
-        AnchorPreview: AnchorPreviewDeprecated
-    };
-
     MediumEditor.Extension = Extension;
 
     MediumEditor.extensions = extensionDefaults;
@@ -578,20 +469,12 @@ function MediumEditor(elements, options) {
 
         // NOT DOCUMENTED - exposed for backwards compatability
         init: function (elements, options) {
-            var uniqueId = 1;
-
             this.options = mergeOptions.call(this, this.defaults, options);
             this.origElements = elements;
 
             if (!this.options.elementsContainer) {
                 this.options.elementsContainer = this.options.ownerDocument.body;
             }
-
-            while (this.options.elementsContainer.querySelector('#medium-editor-toolbar-' + uniqueId)) {
-                uniqueId = uniqueId + 1;
-            }
-
-            this.id = uniqueId;
 
             return this.setup();
         },
@@ -602,17 +485,19 @@ function MediumEditor(elements, options) {
             }
 
             createElementsArray.call(this, this.origElements);
+
             if (this.elements.length === 0) {
                 return;
             }
 
-            this.events = new Events(this);
             this.isActive = true;
+            addToEditors.call(this, this.options.contentWindow);
+
+            this.events = new Events(this);
 
             // Call initialization helpers
             initElements.call(this);
-            initCommands.call(this);
-            initToolbar.call(this);
+            initExtensions.call(this);
             attachHandlers.call(this);
         },
 
@@ -623,19 +508,11 @@ function MediumEditor(elements, options) {
 
             this.isActive = false;
 
-            this.commands.forEach(function (extension) {
+            this.extensions.forEach(function (extension) {
                 if (typeof extension.destroy === 'function') {
                     extension.destroy();
-                } else if (typeof extension.deactivate === 'function') {
-                    Util.warn('Extension .deactivate() function has been deprecated. Use .destroy() instead. This will be removed in version 5.0.0');
-                    extension.deactivate();
                 }
             }, this);
-
-            if (this.toolbar !== undefined) {
-                this.toolbar.destroy();
-                delete this.toolbar;
-            }
 
             this.elements.forEach(function (element) {
                 // Reset elements content, fix for issue where after editor destroyed the red underlines on spelling errors are left
@@ -645,7 +522,7 @@ function MediumEditor(elements, options) {
 
                 element.removeAttribute('contentEditable');
                 element.removeAttribute('spellcheck');
-                element.removeAttribute('data-medium-element');
+                element.removeAttribute('data-medium-editor-element');
 
                 // Remove any elements created for textareas
                 if (element.hasAttribute('medium-editor-textarea-id')) {
@@ -662,6 +539,7 @@ function MediumEditor(elements, options) {
             this.elements = [];
 
             this.events.destroy();
+            removeFromEditors.call(this, this.options.contentWindow);
         },
 
         on: function (target, event, listener, useCapture) {
@@ -678,11 +556,6 @@ function MediumEditor(elements, options) {
 
         unsubscribe: function (event, listener) {
             this.events.detachCustomEvent(event, listener);
-        },
-
-        createEvent: function () {
-            Util.warn('.createEvent() has been deprecated and is no longer needed. ' +
-                'You can attach and trigger custom events without calling this method.  This will be removed in v5.0.0');
         },
 
         trigger: function (name, data, editable) {
@@ -713,8 +586,8 @@ function MediumEditor(elements, options) {
 
         getExtensionByName: function (name) {
             var extension;
-            if (this.commands && this.commands.length) {
-                this.commands.some(function (ext) {
+            if (this.extensions && this.extensions.length) {
+                this.extensions.some(function (ext) {
                     if (ext.name === name) {
                         extension = ext;
                         return true;
@@ -726,31 +599,60 @@ function MediumEditor(elements, options) {
         },
 
         /**
-         * NOT DOCUMENTED - exposed for backwards compatability
-         * Helper function to call a method with a number of parameters on all registered extensions.
-         * The function assures that the function exists before calling.
-         *
-         * @param {string} funcName name of the function to call
-         * @param [args] arguments passed into funcName
+         * NOT DOCUMENTED - exposed as a helper for other extensions to use
          */
-        callExtensions: function (funcName) {
-            if (arguments.length < 1) {
-                return;
+        addBuiltInExtension: function (name, opts) {
+            var extension = this.getExtensionByName(name),
+                merged;
+            if (extension) {
+                return extension;
             }
 
-            var args = Array.prototype.slice.call(arguments, 1),
-                ext,
-                name;
-
-            for (name in this.options.extensions) {
-                if (this.options.extensions.hasOwnProperty(name)) {
-                    ext = this.options.extensions[name];
-                    if (ext[funcName] !== undefined) {
-                        ext[funcName].apply(ext, args);
+            switch (name) {
+                case 'anchor':
+                    merged = Util.extend({}, this.options.anchor, opts);
+                    extension = new MediumEditor.extensions.anchor(merged);
+                    break;
+                case 'anchorPreview':
+                    extension = new MediumEditor.extensions.anchorPreview(this.options.anchorPreview);
+                    break;
+                case 'autoLink':
+                    extension = new MediumEditor.extensions.autoLink();
+                    break;
+                case 'fontsize':
+                    extension = new MediumEditor.extensions.fontSize(opts);
+                    break;
+                case 'imageDragging':
+                    extension = new MediumEditor.extensions.imageDragging();
+                    break;
+                case 'keyboardCommands':
+                    extension = new MediumEditor.extensions.keyboardCommands(this.options.keyboardCommands);
+                    break;
+                case 'paste':
+                    extension = new MediumEditor.extensions.paste(this.options.paste);
+                    break;
+                case 'placeholder':
+                    extension = new MediumEditor.extensions.placeholder(this.options.placeholder);
+                    break;
+                default:
+                    // All of the built-in buttons for MediumEditor are extensions
+                    // so check to see if the extension we're creating is a built-in button
+                    if (MediumEditor.extensions.button.isBuiltInButton(name)) {
+                        if (opts) {
+                            merged = Util.defaults({}, opts, MediumEditor.extensions.button.prototype.defaults[name]);
+                            extension = new MediumEditor.extensions.button(merged);
+                        } else {
+                            extension = new MediumEditor.extensions.button(name);
+                        }
                     }
-                }
+                    break;
             }
-            return this;
+
+            if (extension) {
+                this.extensions.push(initExtension(extension, name, this));
+            }
+
+            return extension;
         },
 
         stopSelectionUpdates: function () {
@@ -762,8 +664,9 @@ function MediumEditor(elements, options) {
         },
 
         checkSelection: function () {
-            if (this.toolbar) {
-                this.toolbar.checkState();
+            var toolbar = this.getExtensionByName('toolbar');
+            if (toolbar) {
+                toolbar.checkState();
             }
             return this;
         },
@@ -826,21 +729,6 @@ function MediumEditor(elements, options) {
                 range = this.options.contentWindow.getSelection().getRangeAt(0);
             }
             return Selection.getSelectedParentElement(range);
-        },
-
-        // NOT DOCUMENTED - exposed as extension helper
-        hideToolbarDefaultActions: function () {
-            if (this.toolbar) {
-                this.toolbar.hideToolbarDefaultActions();
-            }
-            return this;
-        },
-
-        // NOT DOCUMENTED - exposed as extension helper and for backwards compatability
-        setToolbarPosition: function () {
-            if (this.toolbar) {
-                this.toolbar.setToolbarPosition();
-            }
         },
 
         selectAllContents: function () {
@@ -1000,7 +888,7 @@ function MediumEditor(elements, options) {
             }
 
             if (inSelectionState.emptyBlocksIndex && selectionState.end === nextCharIndex) {
-                var targetNode = Util.getBlockContainer(range.startContainer),
+                var targetNode = Util.getTopBlockContainer(range.startContainer),
                     index = 0;
                 // Skip over empty blocks until we hit the block we want the selection to be in
                 while (index < inSelectionState.emptyBlocksIndex && targetNode.nextSibling) {
@@ -1054,16 +942,6 @@ function MediumEditor(elements, options) {
                     this.elements[i].dispatchEvent(customEvent);
                 }
             }
-        },
-
-        // alias for setup - keeping for backwards compatability
-        activate: function () {
-            Util.deprecatedMethod.call(this, 'activate', 'setup', arguments, 'v5.0.0');
-        },
-
-        // alias for destroy - keeping for backwards compatability
-        deactivate: function () {
-            Util.deprecatedMethod.call(this, 'deactivate', 'destroy', arguments, 'v5.0.0');
         },
 
         cleanPaste: function (text) {

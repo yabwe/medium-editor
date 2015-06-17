@@ -24,23 +24,6 @@ describe('Setup/Destroy TestCase', function () {
         expect(editor.isActive).toBe(false);
     });
 
-    describe('activate() and deactivate()', function () {
-        it('should be aliases for setup() and destory() for backwards compatability', function () {
-            var editor = this.newMediumEditor('.editor');
-            expect(editor.isActive).toBe(true);
-
-            spyOn(MediumEditor.prototype, 'destroy').and.callThrough();
-            editor.deactivate();
-            expect(editor.isActive).toBe(false);
-            expect(editor.destroy).toHaveBeenCalled();
-
-            spyOn(MediumEditor.prototype, 'setup').and.callThrough();
-            editor.activate();
-            expect(editor.isActive).toBe(true);
-            expect(editor.setup).toHaveBeenCalled();
-        });
-    });
-
     describe('Setup', function () {
         it('should init the toolbar and editor elements', function () {
             var editor = this.newMediumEditor('.editor');
@@ -82,7 +65,7 @@ describe('Setup/Destroy TestCase', function () {
                 fireEvent(document.body, 'blur');
             };
             // Store toolbar, since destroy will remove the reference from the editor
-            toolbar = editor.toolbar;
+            toolbar = editor.getExtensionByName('toolbar');
 
             // fire event (handler executed immediately)
             triggerEvents();
@@ -116,21 +99,22 @@ describe('Setup/Destroy TestCase', function () {
             }
 
             editor = this.newMediumEditor('.editor');
+            var toolbar = editor.getExtensionByName('toolbar');
 
-            spyOn(editor.toolbar, 'hideToolbar').and.callThrough(); // via: handleBlur
+            spyOn(toolbar, 'hideToolbar').and.callThrough(); // via: handleBlur
 
             selectElementContentsAndFire(editor.elements[0], { eventToFire: 'click' });
             jasmine.clock().tick(51);
-            expect(editor.toolbar.hideToolbar).not.toHaveBeenCalled();
+            expect(toolbar.hideToolbar).not.toHaveBeenCalled();
 
             selectElementContentsAndFire(editor.elements[1], { eventToFire: 'click' });
             jasmine.clock().tick(51);
-            expect(editor.toolbar.hideToolbar).not.toHaveBeenCalled();
+            expect(toolbar.hideToolbar).not.toHaveBeenCalled();
 
             selectElementContents(editor.elements[2]);
             selectElementContentsAndFire(editor.elements[2], { eventToFire: 'click' });
             jasmine.clock().tick(51);
-            expect(editor.toolbar.hideToolbar).not.toHaveBeenCalled();
+            expect(toolbar.hideToolbar).not.toHaveBeenCalled();
 
             elements.forEach(function (element) {
                 document.body.removeChild(element);

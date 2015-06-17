@@ -217,32 +217,6 @@ describe('Pasting content', function () {
     });
 
     describe('using cleanPaste', function () {
-        it('should filter inline rich-text by passing deprecated options', function () {
-            var i,
-                editorEl = this.el,
-                editor = this.newMediumEditor('.editor', {
-                    delay: 200,
-                    forcePlainText: false, // deprecated option
-                    cleanPastedHTML: true // deprecated option
-                });
-
-            for (i = 0; i < inlineTests.length; i += 1) {
-
-                // move caret to editor
-                editorEl.innerHTML = 'Before&nbsp;<span id="editor-inner">&nbsp;</span>&nbsp;after.';
-
-                selectElementContents(document.getElementById('editor-inner'));
-
-                editor.cleanPaste(inlineTests[i].paste);
-                jasmine.clock().tick(100);
-
-                // Firefox and IE: doing an insertHTML while this <span> is selected results in the html being inserted inside of the span
-                // Firefox replace the &nbsp; other either side of the <span> with a space
-                // Webkit: doing an insertHTML while this <span> is selected results in the span being replaced completely
-                expect(editorEl.innerHTML).toMatch(new RegExp('^Before(&nbsp;|\\s)(<span id="editor-inner">)?' + inlineTests[i].output + '(</span>)?(&nbsp;|\\s)after\\.$'));
-            }
-        });
-
         it('should filter inline rich-text', function () {
             var i,
                 editorEl = this.el,

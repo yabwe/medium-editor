@@ -15,71 +15,15 @@ describe('Extensions TestCase', function () {
     });
 
     describe('Editor', function () {
-
         it('should accept a number of extensions as parameter', function () {
             var extensions = {
-                'extension1': {},
-                'extension2': {}
-            },
+                    'extension1': {},
+                    'extension2': {}
+                },
                 editor = this.newMediumEditor('.editor', {
                     extensions: extensions
                 });
             expect(editor.options.extensions).toBe(extensions);
-        });
-
-        it('should call methods on all extensions with callExtensions is used', function () {
-
-            var Extension = function () {
-
-            },
-                ext1 = new Extension(),
-                ext2 = new Extension(),
-                editor = this.newMediumEditor('.editor', {
-                    extensions: {
-                        'one': ext1,
-                        'two': ext2
-                    }
-                });
-
-            Extension.prototype.aMethod = function () {
-                // just a stub function
-            };
-
-            spyOn(ext1, 'aMethod');
-            spyOn(ext2, 'aMethod');
-
-            editor.callExtensions('aMethod', 'theParam');
-            expect(ext1.aMethod).toHaveBeenCalledWith('theParam');
-            expect(ext2.aMethod).toHaveBeenCalledWith('theParam');
-        });
-
-        it('should call init (and pass the deprecated instance of itself) on extensions if the method exists', function () {
-            var ExtensionOne = function () {
-                this.init = function (me) {
-                    this.me = me;
-                };
-            },
-                ExtensionTwo = function () {},
-                ext1,
-                ext2,
-                editor;
-
-            ExtensionTwo.prototype.init = function (me) {
-                this.me = me;
-            };
-
-            ext1 = new ExtensionOne();
-            ext2 = new ExtensionTwo();
-
-            editor = this.newMediumEditor('.editor', {
-                extensions: {
-                    'one': ext1,
-                    'two': ext2
-                }
-            });
-
-            expect(ext1.me instanceof MediumEditor).toBeTruthy();
-            expect(ext2.me instanceof MediumEditor).toBeTruthy();
         });
 
         it('should set the base property to an instance of MediumEditor', function () {
@@ -92,20 +36,6 @@ describe('Extensions TestCase', function () {
 
             expect(editor instanceof MediumEditor).toBeTruthy();
             expect(extOne.base instanceof MediumEditor).toBeTruthy();
-        });
-
-        it('should not set the base property when deprecated parent attribute is set to false', function () {
-            var TempExtension = MediumEditor.Extension.extend({
-                    parent: false
-                }),
-                editor = this.newMediumEditor('.editor', {
-                    extensions: {
-                        'temp': new TempExtension()
-                    }
-                });
-
-            expect(editor instanceof MediumEditor).toBeTruthy();
-            expect(editor.getExtensionByName('temp').base).toBeUndefined();
         });
 
         it('should not override the base or name properties of an extension if overriden', function () {
@@ -182,49 +112,32 @@ describe('Extensions TestCase', function () {
                 extInstance = new TempExtension();
             spyOn(extInstance, 'destroy');
             var editor = this.newMediumEditor('.editor', {
-                extensions: {
-                    'temp-extension': extInstance
-                }
-            });
+                    extensions: {
+                        'temp-extension': extInstance
+                    }
+                });
             editor.destroy();
             expect(extInstance.destroy).toHaveBeenCalled();
-        });
-
-        it('should call deprecated deactivate on extensions when being destroyed if destroy is not implemented', function () {
-            var TempExtension = MediumEditor.Extension.extend({
-                    deactivate: function () {}
-                }),
-                extInstance = new TempExtension();
-            spyOn(extInstance, 'deactivate');
-            var editor = this.newMediumEditor('.editor', {
-                extensions: {
-                    'temp-extension': extInstance
-                }
-            });
-            editor.destroy();
-            expect(extInstance.deactivate).toHaveBeenCalled();
         });
     });
 
     describe('Core Extension', function () {
-
         it('exists', function () {
             expect(MediumEditor.Extension).toBeTruthy();
             expect(MediumEditor.Extension).toBe(Extension);
         });
 
         it('provides an .extend method', function () {
-
             expect(Extension.extend).toBeTruthy();
             var Extended = Extension.extend({
                 foo: 'bar'
             });
+
             expect(Extended.prototype.foo).toBe('bar');
             expect(Extended.extend).toBe(Extension.extend);
         });
 
         it('can be passed as an extension', function () {
-
             var Sub, editor, e1, e2;
 
             Sub = Extension.extend({
@@ -246,10 +159,65 @@ describe('Extensions TestCase', function () {
             expect(e1.y).toBe(10);
             expect(e2.y).toBe(20);
 
-            expect(e1.init).toHaveBeenCalledWith(editor);
-
+            expect(e1.init).toHaveBeenCalledWith();
+            expect(e1.base).toBe(editor);
         });
 
+        it('should not add default extensions', function () {
+            var editor,
+                Preview, Placeholder, AutoLink, ImageDragging,
+                extPreview, extPlaceholder, extAutoLink, extImageDragging;
+
+            Preview = Extension.extend({ name: 'anchor-preview' });
+            Placeholder = Extension.extend({ name: 'placeholder' });
+            AutoLink = Extension.extend({ name: 'auto-link' });
+            ImageDragging = Extension.extend({ name: 'image-dragging' });
+
+            extPreview = new Preview();
+            extPlaceholder = new Placeholder();
+            extAutoLink = new AutoLink();
+            extImageDragging = new ImageDragging();
+
+            editor = this.newMediumEditor('.editor', {
+                extensions: {
+                    'anchor-preview': extPreview,
+                    'placeholder': extPlaceholder,
+                    'auto-link': extAutoLink,
+                    'image-dragging': extImageDragging
+                }
+            });
+
+            expect(editor.getExtensionByName('anchor-preview')).toBe(extPreview);
+            expect(editor.getExtensionByName('placeholder')).toBe(extPlaceholder);
+            expect(editor.getExtensionByName('auto-link')).toBe(extAutoLink);
+            expect(editor.getExtensionByName('image-dragging')).toBe(extImageDragging);
+        });
+
+        it('should call constructor function if it exists', function () {
+            var editor, Sub, SubExtend, e1;
+
+            SubExtend = {
+                name: 'Sub',
+                constructor: function () {
+                    // dummy constructor
+                    return this;
+                }
+            };
+
+            spyOn(SubExtend, 'constructor');
+
+            Sub = Extension.extend(SubExtend);
+
+            e1 = new Sub();
+
+            editor = this.newMediumEditor('.editor', {
+                extensions: {
+                    'sub': e1
+                }
+            });
+
+            expect(SubExtend.constructor).toHaveBeenCalled();
+        });
     });
 
     describe('All extensions', function () {
@@ -259,7 +227,8 @@ describe('Extensions TestCase', function () {
                     'on': [document, 'click', noop, false],
                     'off': [document, 'click', noop, false],
                     'subscribe': ['editableClick', noop],
-                    'execAction': ['bold']
+                    'execAction': ['bold'],
+                    'trigger': ['someEvent', noop, this.el]
                 },
                 tempExtension = new MediumEditor.Extension(),
                 editor = this.newMediumEditor('.editor', {
@@ -285,6 +254,7 @@ describe('Extensions TestCase', function () {
                         'temp-extension': tempExtension
                     }
                 });
+
             expect(tempExtension.getEditorId()).toBe(editor.id);
         });
 
@@ -295,6 +265,7 @@ describe('Extensions TestCase', function () {
                         'temp-extension': tempExtension
                     }
                 });
+
             expect(tempExtension.getEditorElements()).toBe(editor.elements);
         });
 
@@ -306,22 +277,22 @@ describe('Extensions TestCase', function () {
                         'temp-extension': tempExtension
                     }
                 });
+
             expect(tempExtension.getEditorOption('disableReturn')).toBe(true);
             expect(tempExtension.getEditorOption('spellcheck')).toBe(editor.options.spellcheck);
         });
     });
 
     describe('Button integration', function () {
-
         var ExtensionWithElement = {
-            getButton: function () {
-                var button = document.createElement('button');
-                button.className = 'extension-button';
-                button.innerText = 'XXX';
-                return button;
+                getButton: function () {
+                    var button = document.createElement('button');
+                    button.className = 'extension-button';
+                    button.innerText = 'XXX';
+                    return button;
+                },
+                checkState: function () {}
             },
-            checkState: function () {}
-        },
             ExtensionWithString = {
                 getButton: function () {
                     return '<button class="extension-button">XXX</button>';
@@ -333,17 +304,22 @@ describe('Extensions TestCase', function () {
 
         it('should include extensions button into toolbar', function () {
             var editor = this.newMediumEditor('.editor', {
-                buttons: ['dummy'],
-                extensions: {
-                    'dummy': ExtensionWithElement
-                }
-            });
-            expect(editor.toolbar.getToolbarElement().querySelectorAll('.extension-button').length).toBe(1);
+                    toolbar: {
+                        buttons: ['dummy']
+                    },
+                    extensions: {
+                        'dummy': ExtensionWithElement
+                    }
+                }),
+                toolbar = editor.getExtensionByName('toolbar');
+            expect(toolbar.getToolbarElement().querySelectorAll('.extension-button').length).toBe(1);
         });
 
         it('should call checkState on extensions when toolbar selection updates', function () {
             var editor = this.newMediumEditor('.editor', {
-                    buttons: ['dummy'],
+                    toolbar: {
+                        buttons: ['dummy']
+                    },
                     extensions: {
                         'dummy': ExtensionWithElement
                     }
@@ -358,22 +334,28 @@ describe('Extensions TestCase', function () {
 
         it('should include extensions button by string into the toolbar', function () {
             var editor = this.newMediumEditor('.editor', {
-                buttons: ['dummy'],
-                extensions: {
-                    'dummy': ExtensionWithString
-                }
-            });
-            expect(editor.toolbar.getToolbarElement().querySelectorAll('.extension-button').length).toBe(1);
+                    toolbar: {
+                        buttons: ['dummy']
+                    },
+                    extensions: {
+                        'dummy': ExtensionWithString
+                    }
+                }),
+                toolbar = editor.getExtensionByName('toolbar');
+            expect(toolbar.getToolbarElement().querySelectorAll('.extension-button').length).toBe(1);
         });
 
         it('should not include extensions button into toolbar that are not in "buttons"', function () {
             var editor = this.newMediumEditor('.editor', {
-                buttons: ['bold'],
-                extensions: {
-                    'dummy': ExtensionWithElement
-                }
-            });
-            expect(editor.toolbar.getToolbarElement().querySelectorAll('.extension-button').length).toBe(0);
+                    toolbar: {
+                        buttons: ['bold']
+                    },
+                    extensions: {
+                        'dummy': ExtensionWithElement
+                    }
+                }),
+                toolbar = editor.getExtensionByName('toolbar');
+            expect(toolbar.getToolbarElement().querySelectorAll('.extension-button').length).toBe(0);
         });
 
         it('should not include buttons into the toolbar when an overriding extension is present', function () {
@@ -382,15 +364,18 @@ describe('Extensions TestCase', function () {
 
             spyOn(ext, 'init');
             editor = this.newMediumEditor('.editor', {
-                buttons: ['bold', 'italic'],
+                toolbar: {
+                    buttons: ['bold', 'italic']
+                },
                 extensions: {
                     'bold': ext
                 }
             });
+            var toolbar = editor.getExtensionByName('toolbar');
 
-            expect(editor.toolbar.getToolbarElement().querySelectorAll('button').length).toBe(1);
-            expect(editor.toolbar.getToolbarElement().querySelectorAll('button[data-action="italic"]').length).toBe(1);
-            expect(editor.toolbar.getToolbarElement().querySelectorAll('button[data-action="bold"]').length).toBe(0);
+            expect(toolbar.getToolbarElement().querySelectorAll('button').length).toBe(1);
+            expect(toolbar.getToolbarElement().querySelectorAll('button[data-action="italic"]').length).toBe(1);
+            expect(toolbar.getToolbarElement().querySelectorAll('button[data-action="bold"]').length).toBe(0);
             expect(ext.init).toHaveBeenCalled();
         });
     });

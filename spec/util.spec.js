@@ -1,5 +1,5 @@
 /*global MediumEditor, Util, describe, it, expect, spyOn,
-         afterEach, beforeEach, setupTestHelpers */
+         afterEach, beforeEach, setupTestHelpers, selectElementContents */
 
 describe('Util', function () {
     'use strict';
@@ -76,42 +76,6 @@ describe('Util', function () {
             expect(Util.warn).toHaveBeenCalledWith(
                 'old is deprecated, please use new instead. Will be removed in 11tybillion'
             );
-        });
-    });
-
-    describe('getobject', function () {
-        it('should get nested objects', function () {
-            var obj = { a: { b: { c: { d: 10 } } } };
-            expect(Util.getObject('a.b.c.d', false, obj)).toBe(10);
-            expect(Util.getObject('a.b.c.d', false, false)).toBe(undefined);
-            expect(Util.getObject(false, false, obj)).toBe(obj);
-            expect(Util.getObject('a.b.c', false, obj)).toEqual({ d: 10 });
-            expect(Util.getObject('a', false, obj)).toEqual({ b: { c: { d: 10 } } });
-        });
-
-        it('should create a path if told to', function () {
-            var obj = {};
-            expect(Util.getObject('a.b.c.d', true, obj)).toEqual({});
-            expect(obj.a.b.c.d).toBeTruthy();
-        });
-
-        it('should NOT create a path', function () {
-            var obj = {};
-            expect(Util.getObject('a.b.c.d.e.f.g', false, obj)).toBe(undefined);
-            expect(obj.a).toBe(undefined);
-        });
-    });
-
-    describe('setobject', function () {
-        it('sets returns the value', function () {
-            var obj = {};
-            expect(Util.setObject('a.b.c', 10, obj)).toBe(10);
-            expect(obj.a.b.c).toBe(10);
-        });
-
-        it('sets returns undefined because of empty string', function () {
-            var obj = {};
-            expect(Util.setObject('', 10, obj)).toBe(undefined);
         });
     });
 
@@ -295,11 +259,11 @@ describe('Util', function () {
                 tag = el.querySelector('b').firstChild,
                 closestTag = Util.getClosestTag(tag, 'span');
 
-            expect(closestTag.tagName.toLowerCase()).toBe('span');
+            expect(closestTag.nodeName.toLowerCase()).toBe('span');
         });
 
-        it('should not get closed tag with data-medium-element', function () {
-            var el = this.createElement('div', '', '<p>youpi<span data-medium-element="true">my <b>text</b></span></p>'),
+        it('should not get closed tag with data-medium-editor-element', function () {
+            var el = this.createElement('div', '', '<p>youpi<span data-medium-editor-element="true">my <b>text</b></span></p>'),
                 tag = el.querySelector('b').firstChild,
                 closestTag = Util.getClosestTag(tag, 'p');
 
@@ -388,6 +352,32 @@ describe('Util', function () {
             expect(Util.isKey(event, 65)).toBeFalsy();
             expect(Util.isKey(event, [65])).toBeFalsy();
             expect(Util.isKey(event, [65, 66])).toBeFalsy();
+        });
+    });
+
+    describe('execFormatBlock', function () {
+        it('should execute indent command when called with blockquote when selection is inside a nested block element within a blockquote', function () {
+            var el = this.createElement('div', '', '<blockquote><p>Some <b>Text</b></p></blockquote>');
+            el.setAttribute('contenteditable', true);
+            selectElementContents(el.querySelector('b'));
+            spyOn(document, 'execCommand');
+
+            Util.execFormatBlock(document, 'blockquote');
+            expect(document.execCommand).toHaveBeenCalledWith('outdent', false, null);
+        });
+
+        it('should execute indent command when called with blockquote when isIE is true', function () {
+            var origIsIE = Util.isIE,
+                el = this.createElement('div', '', '<p>Some <b>Text</b></p>');
+            Util.isIE = true;
+            el.setAttribute('contenteditable', true);
+            selectElementContents(el.querySelector('b'));
+            spyOn(document, 'execCommand');
+
+            Util.execFormatBlock(document, 'blockquote');
+            expect(document.execCommand).toHaveBeenCalledWith('indent', false, 'blockquote');
+
+            Util.isIE = origIsIE;
         });
     });
 });

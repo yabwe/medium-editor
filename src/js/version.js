@@ -1,15 +1,21 @@
 /*global MediumEditor */
 
-MediumEditor.version = (function (major, minor, revision) {
+MediumEditor.parseVersionString = function (release) {
+    var split = release.split('-'),
+        version = split[0].split('.'),
+        preRelease = (split.length > 1) ? split[1] : '';
     return {
-        major: parseInt(major, 10),
-        minor: parseInt(minor, 10),
-        revision: parseInt(revision, 10),
+        major: parseInt(version[0], 10),
+        minor: parseInt(version[1], 10),
+        revision: parseInt(version[2], 10),
+        preRelease: preRelease,
         toString: function () {
-            return [major, minor, revision].join('.');
+            return [[version[0], version[1], version[2]].join('.'), preRelease].join('-');
         }
     };
-}).apply(this, ({
+};
+
+MediumEditor.version = MediumEditor.parseVersionString.call(this, ({
     // grunt-bump looks for this:
-    'version': '4.12.0'
-}).version.split('.'));
+    'version': '5.0.0-rc.1'
+}).version);

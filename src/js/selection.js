@@ -30,7 +30,7 @@ var Selection;
 
         getSelectionElement: function (contentWindow) {
             return this.findMatchingSelectionParent(function (el) {
-                return el.getAttribute('data-medium-element');
+                return Util.isMediumEditorElement(el);
             }, contentWindow);
         },
 
@@ -124,14 +124,14 @@ var Selection;
 
         // http://stackoverflow.com/questions/4176923/html-of-selected-text
         // by Tim Down
-        getSelectionHtml: function getSelectionHtml() {
+        getSelectionHtml: function getSelectionHtml(doc) {
             var i,
                 html = '',
-                sel = this.options.contentWindow.getSelection(),
+                sel = doc.getSelection(),
                 len,
                 container;
             if (sel.rangeCount) {
-                container = this.options.ownerDocument.createElement('div');
+                container = doc.createElement('div');
                 for (i = 0, len = sel.rangeCount; i < len; i += 1) {
                     container.appendChild(sel.getRangeAt(i).cloneContents());
                 }
@@ -269,26 +269,6 @@ var Selection;
                 startNode = (node && node.nodeType === 3 ? node.parentNode : node);
 
             return startNode;
-        },
-
-        getSelectionData: function (el) {
-            var tagName;
-
-            if (el && el.tagName) {
-                tagName = el.tagName.toLowerCase();
-            }
-
-            while (el && !Util.isBlockContainer(el)) {
-                el = el.parentNode;
-                if (el && el.tagName) {
-                    tagName = el.tagName.toLowerCase();
-                }
-            }
-
-            return {
-                el: el,
-                tagName: tagName
-            };
         }
     };
 }());

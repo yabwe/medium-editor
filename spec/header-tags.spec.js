@@ -34,7 +34,7 @@ describe('Protect Header Tags TestCase', function () {
 
             el = document.getElementById('header');
             expect(el).toBeDefined();
-            expect(el.tagName).toBe('H2');
+            expect(el.nodeName.toLowerCase()).toBe('h2');
         });
 
         it('header leading return inserts paragraph, not additional header', function () {
@@ -54,7 +54,7 @@ describe('Protect Header Tags TestCase', function () {
             });
 
             el = document.getElementById('header');
-            expect(el.previousElementSibling.tagName).toBe('P');
+            expect(el.previousElementSibling.nodeName.toLowerCase()).toBe('p');
 
         });
 
@@ -71,13 +71,13 @@ describe('Protect Header Tags TestCase', function () {
             sel.addRange(range);
 
             // hit backspace
-            fireEvent(editor.elements[0].querySelector(el.tagName.toLowerCase()), 'keydown', {
+            fireEvent(editor.elements[0].querySelector(el.nodeName.toLowerCase()), 'keydown', {
                 keyCode: Util.keyCode.BACKSPACE
             });
 
             el = document.getElementById('header');
             expect(el).toBeDefined();
-            expect(el.tagName).toBe('H2');
+            expect(el.nodeName.toLowerCase()).toBe('h2');
 
             el = document.getElementById('editor');
             expect(el.innerHTML).not.toBe(originalHTML);

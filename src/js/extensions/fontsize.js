@@ -2,7 +2,7 @@ var FontSizeForm;
 (function () {
     'use strict';
 
-    /*global FormExtension, Selection, Util */
+    /*global FormExtension, Selection */
 
     FontSizeForm = FormExtension.extend({
 
@@ -11,6 +11,10 @@ var FontSizeForm;
         aria: 'increase/decrease font size',
         contentDefault: '&#xB1;', // ±
         contentFA: '<i class="fa fa-text-height"></i>',
+
+        init: function () {
+            FormExtension.prototype.init.apply(this, arguments);
+        },
 
         // Called when the button the toolbar is clicked
         // Overrides ButtonExtension.handleClick
@@ -49,9 +53,9 @@ var FontSizeForm;
             var input = this.getInput();
 
             this.base.saveSelection();
-            this.base.hideToolbarDefaultActions();
+            this.hideToolbarDefaultActions();
             this.getForm().style.display = 'block';
-            this.base.setToolbarPosition();
+            this.setToolbarPosition();
 
             input.value = fontSize || '';
             input.focus();
@@ -68,11 +72,6 @@ var FontSizeForm;
             }
 
             delete this.form;
-        },
-
-        // TODO: deprecate
-        deactivate: function () {
-            Util.deprecatedMethod.call(this, 'deactivate', 'destroy', arguments, 'v5.0.0');
         },
 
         // core methods
@@ -144,7 +143,7 @@ var FontSizeForm;
 
         clearFontSize: function () {
             Selection.getSelectedElements(this.document).forEach(function (el) {
-                if (el.tagName === 'FONT' && el.hasAttribute('size')) {
+                if (el.nodeName.toLowerCase() === 'font' && el.hasAttribute('size')) {
                     el.removeAttribute('size');
                 }
             });

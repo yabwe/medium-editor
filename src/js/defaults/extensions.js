@@ -1,7 +1,7 @@
 /*global Button, FormExtension,
     AnchorForm, AnchorPreview, AutoLink,
-    FontSizeForm, ImageDragging, PasteHandler,
-    Placeholder */
+    FontSizeForm, KeyboardCommands, ImageDragging,
+    PasteHandler, Placeholder, Toolbar */
 
 var extensionDefaults;
 (function () {
@@ -16,7 +16,9 @@ var extensionDefaults;
         autoLink: AutoLink,
         fontSize: FontSizeForm,
         imageDragging: ImageDragging,
+        keyboardCommands: KeyboardCommands,
         paste: PasteHandler,
-        placeholder: Placeholder
+        placeholder: Placeholder,
+        toolbar: Toolbar
     };
 })();

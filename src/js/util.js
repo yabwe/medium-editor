@@ -5,31 +5,6 @@ var Util;
 (function (window) {
     'use strict';
 
-    // Params: Array, Boolean, Object
-    function getProp(parts, create, context) {
-        if (!context) {
-            context = window;
-        }
-
-        try {
-            for (var i = 0; i < parts.length; i++) {
-                var p = parts[i];
-                if (!(p in context)) {
-                    if (create) {
-                        context[p] = {};
-                    } else {
-                        return;
-                    }
-                }
-                context = context[p];
-            }
-            return context;
-        } catch (e) {
-            // 'p in context' throws an exception when context is a number, boolean, etc. rather than an object,
-            // so in that corner case just return undefined (by having no return statement)
-        }
-    }
-
     function copyInto(overwrite, dest) {
         var prop,
             sources = Array.prototype.slice.call(arguments, 2);
@@ -65,7 +40,8 @@ var Util;
             ENTER: 13,
             ESCAPE: 27,
             SPACE: 32,
-            DELETE: 46
+            DELETE: 46,
+            K: 75 // K keycode, and not k
         },
 
         /**
@@ -87,12 +63,7 @@ var Util;
          * @see : http://stackoverflow.com/q/4471582/569101
          */
         isKey: function (event, keys) {
-            var keyCode = event.which;
-
-            // getting the key code from event
-            if (null === keyCode) {
-                keyCode = event.charCode !== null ? event.charCode : event.keyCode;
-            }
+            var keyCode = this.getKeyCode(event);
 
             // it's not an array let's just compare strings!
             if (false === Array.isArray(keys)) {
@@ -106,7 +77,19 @@ var Util;
             return true;
         },
 
-        parentElements: ['p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'blockquote', 'pre'],
+        getKeyCode: function (event) {
+            var keyCode = event.which;
+
+            // getting the key code from event
+            if (null === keyCode) {
+                keyCode = event.charCode !== null ? event.charCode : event.keyCode;
+            }
+
+            return keyCode;
+        },
+
+        blockContainerElementNames: ['p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'blockquote', 'pre'],
+        emptyElementNames: ['br', 'col', 'colgroup', 'hr', 'img', 'input', 'source', 'wbr'],
 
         extend: function extend(/* dest, source1, source2, ...*/) {
             var args = [true].concat(Array.prototype.slice.call(arguments));
@@ -116,16 +99,6 @@ var Util;
         defaults: function defaults(/*dest, source1, source2, ...*/) {
             var args = [false].concat(Array.prototype.slice.call(arguments));
             return copyInto.apply(this, args);
-        },
-
-        derives: function derives(base, derived) {
-            var origPrototype = derived.prototype;
-            function Proto() { }
-            Proto.prototype = base.prototype;
-            derived.prototype = new Proto();
-            derived.prototype.constructor = base;
-            derived.prototype = copyInto(false, derived.prototype, origPrototype);
-            return derived;
         },
 
         // Find the next node in the DOM tree that represents any text that is being
@@ -178,8 +151,6 @@ var Util;
         isElement: function isElement(obj) {
             return !!(obj && obj.nodeType === 1);
         },
-
-        now: Date.now,
 
         // https://github.com/jashkenas/underscore
         throttle: function (func, wait) {
@@ -236,7 +207,7 @@ var Util;
                         return current;
                     }
                     // do not traverse upwards past the nearest containing editor
-                    if (current.getAttribute('data-medium-element')) {
+                    if (Util.isMediumEditorElement(current)) {
                         return false;
                     }
                 }
@@ -273,7 +244,7 @@ var Util;
                         (toReplace.nodeType !== 3 && toReplace.innerHTML === range.toString())) {
                     while (toReplace.parentNode &&
                             toReplace.parentNode.childNodes.length === 1 &&
-                            !toReplace.parentNode.getAttribute('data-medium-element')) {
+                            !Util.isMediumEditorElement(toReplace.parentNode)) {
                         toReplace = toReplace.parentNode;
                     }
                     range.selectNode(toReplace);
@@ -300,44 +271,41 @@ var Util;
             }
         },
 
-        getSelectionRange: function (ownerDocument) {
-            this.deprecated('Util.getSelectionRange', 'Selection.getSelectionRange', 'v5.0.0');
-
-            return Selection.getSelectionRange(ownerDocument);
-        },
-
-        getSelectionStart: function (ownerDocument) {
-            this.deprecated('Util.getSelectionStart', 'Selection.getSelectionStart', 'v5.0.0');
-
-            return Selection.getSelectionStart(ownerDocument);
-        },
-
-        getSelectionData: function (el) {
-            this.deprecated('Util.getSelectionData', 'Selection.getSelectionData', 'v5.0.0');
-
-            return Selection.getSelectionData(el);
-        },
-
         execFormatBlock: function (doc, tagName) {
-            var selectionData = Selection.getSelectionData(Selection.getSelectionStart(doc));
-            // FF handles blockquote differently on formatBlock
-            // allowing nesting, we need to use outdent
-            // https://developer.mozilla.org/en-US/docs/Rich-Text_Editing_in_Mozilla
-            if (tagName === 'blockquote' && selectionData.el &&
-                    selectionData.el.parentNode.tagName.toLowerCase() === 'blockquote') {
-                return doc.execCommand('outdent', false, null);
-            }
-            if (selectionData.tagName === tagName) {
-                tagName = 'p';
-            }
-            // When IE we need to add <> to heading elements and
-            //  blockquote needs to be called as indent
-            // http://stackoverflow.com/questions/10741831/execcommand-formatblock-headings-in-ie
-            // http://stackoverflow.com/questions/1816223/rich-text-editor-with-blockquote-function/1821777#1821777
-            if (this.isIE) {
-                if (tagName === 'blockquote') {
+            // Get the top level block element that contains the selection
+            var blockContainer = Util.getTopBlockContainer(Selection.getSelectionStart(doc));
+
+            // Special handling for blockquote
+            if (tagName === 'blockquote') {
+                if (blockContainer) {
+                    var childNodes = Array.prototype.slice.call(blockContainer.childNodes);
+                    // Check if the blockquote has a block element as a child (nested blocks)
+                    if (childNodes.some(function (childNode) {
+                        return Util.isBlockContainer(childNode);
+                    })) {
+                        // FF handles blockquote differently on formatBlock
+                        // allowing nesting, we need to use outdent
+                        // https://developer.mozilla.org/en-US/docs/Rich-Text_Editing_in_Mozilla
+                        return doc.execCommand('outdent', false, null);
+                    }
+                }
+
+                // When IE blockquote needs to be called as indent
+                // http://stackoverflow.com/questions/1816223/rich-text-editor-with-blockquote-function/1821777#1821777
+                if (this.isIE) {
                     return doc.execCommand('indent', false, tagName);
                 }
+            }
+
+            // If the blockContainer is already the element type being passed in
+            // treat it as 'undo' formatting and just convert it to a <p>
+            if (blockContainer && tagName === blockContainer.nodeName.toLowerCase()) {
+                tagName = 'p';
+            }
+
+            // When IE we need to add <> to heading elements
+            // http://stackoverflow.com/questions/10741831/execcommand-formatblock-headings-in-ie
+            if (this.isIE) {
                 tagName = '<' + tagName + '>';
             }
             return doc.execCommand('formatBlock', false, tagName);
@@ -355,7 +323,7 @@ var Util;
          */
         setTargetBlank: function (el, anchorUrl) {
             var i, url = anchorUrl || false;
-            if (el.tagName.toLowerCase() === 'a') {
+            if (el.nodeName.toLowerCase() === 'a') {
                 el.target = '_blank';
             } else {
                 el = el.getElementsByTagName('a');
@@ -372,7 +340,7 @@ var Util;
             var classes = buttonClass.split(' '),
                 i,
                 j;
-            if (el.tagName.toLowerCase() === 'a') {
+            if (el.nodeName.toLowerCase() === 'a') {
                 for (j = 0; j < classes.length; j += 1) {
                     el.classList.add(classes[j]);
                 }
@@ -390,19 +358,19 @@ var Util;
             if (!node) {
                 return false;
             }
-            if (node.tagName.toLowerCase() === 'li') {
+            if (node.nodeName.toLowerCase() === 'li') {
                 return true;
             }
 
             var parentNode = node.parentNode,
-                tagName = parentNode.tagName.toLowerCase();
+                tagName = parentNode.nodeName.toLowerCase();
             while (!this.isBlockContainer(parentNode) && tagName !== 'div') {
                 if (tagName === 'li') {
                     return true;
                 }
                 parentNode = parentNode.parentNode;
-                if (parentNode && parentNode.tagName) {
-                    tagName = parentNode.tagName.toLowerCase();
+                if (parentNode) {
+                    tagName = parentNode.nodeName.toLowerCase();
                 } else {
                     return false;
                 }
@@ -411,25 +379,19 @@ var Util;
         },
 
         cleanListDOM: function (ownerDocument, element) {
-            if (element.tagName.toLowerCase() !== 'li') {
+            if (element.nodeName.toLowerCase() !== 'li') {
                 return;
             }
 
             var list = element.parentElement;
 
-            if (list.parentElement.tagName.toLowerCase() === 'p') { // yes we need to clean up
+            if (list.parentElement.nodeName.toLowerCase() === 'p') { // yes we need to clean up
                 this.unwrap(list.parentElement, ownerDocument);
 
                 // move cursor at the end of the text inside the list
                 // for some unknown reason, the cursor is moved to end of the "visual" line
                 Selection.moveCursor(ownerDocument, element.firstChild, element.firstChild.textContent.length);
             }
-        },
-
-        unwrapElement: function (element) {
-            this.deprecated('unwrapElement', 'unwrap', 'v5.0.0');
-
-            this.unwrap(element, element.ownerDocument);
         },
 
         /* splitDOMTree
@@ -666,28 +628,33 @@ var Util;
         },
 
         isMediumEditorElement: function (element) {
-            return element && element.nodeType !== 3 && !!element.getAttribute('data-medium-element');
+            return element && element.getAttribute && !!element.getAttribute('data-medium-editor-element');
         },
 
         isBlockContainer: function (element) {
-            return element && element.nodeType !== 3 && this.parentElements.indexOf(element.nodeName.toLowerCase()) !== -1;
+            return element && element.nodeType !== 3 && this.blockContainerElementNames.indexOf(element.nodeName.toLowerCase()) !== -1;
         },
 
-        getBlockContainer: function (element) {
-            return this.traverseUp(element, function (el) {
-                return Util.isBlockContainer(el) && !Util.isBlockContainer(el.parentNode);
+        getTopBlockContainer: function (element) {
+            var topBlock = element;
+            this.traverseUp(element, function (el) {
+                if (Util.isBlockContainer(el)) {
+                    topBlock = el;
+                }
+                return false;
             });
+            return topBlock;
         },
 
         getFirstSelectableLeafNode: function (element) {
             while (element && element.firstChild) {
                 element = element.firstChild;
             }
-            var emptyElements = ['br', 'col', 'colgroup', 'hr', 'img', 'input', 'source', 'wbr'];
-            while (emptyElements.indexOf(element.nodeName.toLowerCase()) !== -1) {
-                // We don't want to set the selection to an element that can't have children, this messes up Gecko.
-                element = element.parentNode;
-            }
+
+            // We don't want to set the selection to an element that can't have children, this messes up Gecko.
+            element = this.traverseUp(element, function (el) {
+                return Util.emptyElementNames.indexOf(el.nodeName.toLowerCase()) === -1;
+            });
             // Selecting at the beginning of a table doesn't work in PhantomJS.
             if (element.nodeName.toLowerCase() === 'table') {
                 var firstCell = element.querySelector('th, td');
@@ -750,7 +717,7 @@ var Util;
 
         cleanupTags: function (el, tags) {
             tags.forEach(function (tag) {
-                if (el.tagName.toLowerCase() === tag) {
+                if (el.nodeName.toLowerCase() === tag) {
                     el.parentNode.removeChild(el);
                 }
             }, this);
@@ -759,7 +726,7 @@ var Util;
         // get the closest parent
         getClosestTag: function (el, tag) {
             return this.traverseUp(el, function (element) {
-                return element.tagName.toLowerCase() === tag.toLowerCase();
+                return element.nodeName.toLowerCase() === tag.toLowerCase();
             });
         },
 
@@ -778,22 +745,6 @@ var Util;
             } else {
                 el.parentNode.removeChild(el);
             }
-        },
-
-        setObject: function (name, value, context) {
-            // summary:
-            //      Set a property from a dot-separated string, such as 'A.B.C'
-            var parts = name.split('.'),
-                p = parts.pop(),
-                obj = getProp(parts, true, context);
-            return obj && p ? (obj[p] = value) : undefined; // Object
-        },
-
-        getObject: function (name, create, context) {
-            // summary:
-            //      Get a property from a dot-separated string, such as 'A.B.C'
-            return getProp(name ? name.split('.') : [], create, context); // Object
         }
-
     };
 }(window));

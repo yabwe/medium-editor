@@ -6,7 +6,7 @@ describe('Core MediumEditor', function () {
         expect(MediumEditor).toBeTruthy();
     });
 
-    describe('version', function () {
+    describe('MediumEditor.version', function () {
 
         it('exists', function () {
             expect(MediumEditor.version).toBeTruthy();
@@ -22,7 +22,31 @@ describe('Core MediumEditor', function () {
             var v = '' + MediumEditor.version;
             expect(typeof v).toEqual('string');
         });
+    });
 
+    describe('MediumEditor.parseVersionString', function () {
+
+        it('exists', function () {
+            expect(MediumEditor.parseVersionString).toBeTruthy();
+        });
+
+        it('parses a normal version string', function () {
+            var info = MediumEditor.parseVersionString('1.2.3');
+
+            expect(info.major).toBe(1);
+            expect(info.minor).toBe(2);
+            expect(info.revision).toBe(3);
+            expect(info.preRelease).toBe('');
+        });
+
+        it('parses pre-release versions', function () {
+            var info = MediumEditor.parseVersionString('5.0.0-alpha.1');
+
+            expect(info.major).toBe(5);
+            expect(info.minor).toBe(0);
+            expect(info.revision).toBe(0);
+            expect(info.preRelease).toBe('alpha.1');
+        });
     });
 
 });
