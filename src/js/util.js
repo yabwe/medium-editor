@@ -88,7 +88,8 @@ var Util;
             return keyCode;
         },
 
-        parentElements: ['p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'blockquote', 'pre'],
+        blockContainerElementNames: ['p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'blockquote', 'pre'],
+        emptyElementNames: ['br', 'col', 'colgroup', 'hr', 'img', 'input', 'source', 'wbr'],
 
         extend: function extend(/* dest, source1, source2, ...*/) {
             var args = [true].concat(Array.prototype.slice.call(arguments));
@@ -150,8 +151,6 @@ var Util;
         isElement: function isElement(obj) {
             return !!(obj && obj.nodeType === 1);
         },
-
-        now: Date.now,
 
         // https://github.com/jashkenas/underscore
         throttle: function (func, wait) {
@@ -273,25 +272,40 @@ var Util;
         },
 
         execFormatBlock: function (doc, tagName) {
-            var selectionData = Selection.getSelectionData(Selection.getSelectionStart(doc));
-            // FF handles blockquote differently on formatBlock
-            // allowing nesting, we need to use outdent
-            // https://developer.mozilla.org/en-US/docs/Rich-Text_Editing_in_Mozilla
-            if (tagName === 'blockquote' && selectionData.el &&
-                    selectionData.el.parentNode.nodeName.toLowerCase() === 'blockquote') {
-                return doc.execCommand('outdent', false, null);
-            }
-            if (selectionData.tagName === tagName) {
-                tagName = 'p';
-            }
-            // When IE we need to add <> to heading elements and
-            //  blockquote needs to be called as indent
-            // http://stackoverflow.com/questions/10741831/execcommand-formatblock-headings-in-ie
-            // http://stackoverflow.com/questions/1816223/rich-text-editor-with-blockquote-function/1821777#1821777
-            if (this.isIE) {
-                if (tagName === 'blockquote') {
+            // Get the top level block element that contains the selection
+            var blockContainer = Util.getTopBlockContainer(Selection.getSelectionStart(doc));
+
+            // Special handling for blockquote
+            if (tagName === 'blockquote') {
+                if (blockContainer) {
+                    var childNodes = Array.prototype.slice.call(blockContainer.childNodes);
+                    // Check if the blockquote has a block element as a child (nested blocks)
+                    if (childNodes.some(function (childNode) {
+                        return Util.isBlockContainer(childNode);
+                    })) {
+                        // FF handles blockquote differently on formatBlock
+                        // allowing nesting, we need to use outdent
+                        // https://developer.mozilla.org/en-US/docs/Rich-Text_Editing_in_Mozilla
+                        return doc.execCommand('outdent', false, null);
+                    }
+                }
+
+                // When IE blockquote needs to be called as indent
+                // http://stackoverflow.com/questions/1816223/rich-text-editor-with-blockquote-function/1821777#1821777
+                if (this.isIE) {
                     return doc.execCommand('indent', false, tagName);
                 }
+            }
+
+            // If the blockContainer is already the element type being passed in
+            // treat it as 'undo' formatting and just convert it to a <p>
+            if (blockContainer && tagName === blockContainer.nodeName.toLowerCase()) {
+                tagName = 'p';
+            }
+
+            // When IE we need to add <> to heading elements
+            // http://stackoverflow.com/questions/10741831/execcommand-formatblock-headings-in-ie
+            if (this.isIE) {
                 tagName = '<' + tagName + '>';
             }
             return doc.execCommand('formatBlock', false, tagName);
@@ -618,24 +632,28 @@ var Util;
         },
 
         isBlockContainer: function (element) {
-            return element && element.nodeType !== 3 && this.parentElements.indexOf(element.nodeName.toLowerCase()) !== -1;
+            return element && element.nodeType !== 3 && this.blockContainerElementNames.indexOf(element.nodeName.toLowerCase()) !== -1;
         },
 
-        getBlockContainer: function (element) {
-            return this.traverseUp(element, function (el) {
-                return Util.isBlockContainer(el) && !Util.isBlockContainer(el.parentNode);
+        getTopBlockContainer: function (element) {
+            var topBlock = element;
+            this.traverseUp(element, function (el) {
+                if (Util.isBlockContainer(el)) {
+                    topBlock = el;
+                }
+                return false;
             });
+            return topBlock;
         },
 
         getFirstSelectableLeafNode: function (element) {
             while (element && element.firstChild) {
                 element = element.firstChild;
             }
-            var emptyElements = ['br', 'col', 'colgroup', 'hr', 'img', 'input', 'source', 'wbr'];
-            while (emptyElements.indexOf(element.nodeName.toLowerCase()) !== -1) {
-                // We don't want to set the selection to an element that can't have children, this messes up Gecko.
-                element = element.parentNode;
-            }
+            // We don't want to set the selection to an element that can't have children, this messes up Gecko.
+            element = this.traverseUp(element, function (el) {
+                return Util.emptyElementNames.indexOf(el.nodeName.toLowerCase()) === -1;
+            });
             // Selecting at the beginning of a table doesn't work in PhantomJS.
             if (element.nodeName.toLowerCase() === 'table') {
                 var firstCell = element.querySelector('th, td');

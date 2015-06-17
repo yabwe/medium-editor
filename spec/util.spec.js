@@ -1,5 +1,5 @@
 /*global MediumEditor, Util, describe, it, expect, spyOn,
-         afterEach, beforeEach, setupTestHelpers */
+         afterEach, beforeEach, setupTestHelpers, selectElementContents */
 
 describe('Util', function () {
     'use strict';
@@ -352,6 +352,32 @@ describe('Util', function () {
             expect(Util.isKey(event, 65)).toBeFalsy();
             expect(Util.isKey(event, [65])).toBeFalsy();
             expect(Util.isKey(event, [65, 66])).toBeFalsy();
+        });
+    });
+
+    describe('execFormatBlock', function () {
+        it('should execute indent command when called with blockquote when selection is inside a nested block element within a blockquote', function () {
+            var el = this.createElement('div', '', '<blockquote><p>Some <b>Text</b></p></blockquote>');
+            el.setAttribute('contenteditable', true);
+            selectElementContents(el.querySelector('b'));
+            spyOn(document, 'execCommand');
+
+            Util.execFormatBlock(document, 'blockquote');
+            expect(document.execCommand).toHaveBeenCalledWith('outdent', false, null);
+        });
+
+        it('should execute indent command when called with blockquote when isIE is true', function () {
+            var origIsIE = Util.isIE,
+                el = this.createElement('div', '', '<p>Some <b>Text</b></p>');
+            Util.isIE = true;
+            el.setAttribute('contenteditable', true);
+            selectElementContents(el.querySelector('b'));
+            spyOn(document, 'execCommand');
+
+            Util.execFormatBlock(document, 'blockquote');
+            expect(document.execCommand).toHaveBeenCalledWith('indent', false, 'blockquote');
+
+            Util.isIE = origIsIE;
         });
     });
 });

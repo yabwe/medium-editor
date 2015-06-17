@@ -888,7 +888,7 @@ function MediumEditor(elements, options) {
             }
 
             if (inSelectionState.emptyBlocksIndex && selectionState.end === nextCharIndex) {
-                var targetNode = Util.getBlockContainer(range.startContainer),
+                var targetNode = Util.getTopBlockContainer(range.startContainer),
                     index = 0;
                 // Skip over empty blocks until we hit the block we want the selection to be in
                 while (index < inSelectionState.emptyBlocksIndex && targetNode.nextSibling) {
