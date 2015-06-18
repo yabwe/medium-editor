@@ -1048,6 +1048,7 @@ var Util;
             while (element && element.firstChild) {
                 element = element.firstChild;
             }
+
             // We don't want to set the selection to an element that can't have children, this messes up Gecko.
             element = this.traverseUp(element, function (el) {
                 return Util.emptyElementNames.indexOf(el.nodeName.toLowerCase()) === -1;
@@ -3737,9 +3738,9 @@ var FontSizeForm;
 
         // Called when the button the toolbar is clicked
         // Overrides ButtonExtension.handleClick
-        handleClick: function (evt) {
-            evt.preventDefault();
-            evt.stopPropagation();
+        handleClick: function (event) {
+            event.preventDefault();
+            event.stopPropagation();
 
             if (!this.isDisplayed()) {
                 // Get fontsize of current selection (convert to string since IE returns this as number)
@@ -5566,7 +5567,6 @@ function MediumEditor(elements, options) {
                             extension = new MediumEditor.extensions.button(name);
                         }
                     }
-                    break;
             }
 
             if (extension) {
@@ -5892,7 +5892,7 @@ MediumEditor.parseVersionString = function (release) {
 
 MediumEditor.version = MediumEditor.parseVersionString.call(this, ({
     // grunt-bump looks for this:
-    'version': '5.0.0-rc.1'
+    'version': '5.0.0'
 }).version);
 
     return MediumEditor;
