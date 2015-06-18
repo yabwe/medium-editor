@@ -16,6 +16,7 @@ describe('Core MediumEditor', function () {
             expect(MediumEditor.version.major).toBeDefined();
             expect(MediumEditor.version.minor).toBeDefined();
             expect(MediumEditor.version.revision).toBeDefined();
+            expect(MediumEditor.version.preRelease).toBeDefined();
         });
 
         it('exposes the major/minor/revison as a string', function () {
@@ -37,6 +38,7 @@ describe('Core MediumEditor', function () {
             expect(info.minor).toBe(2);
             expect(info.revision).toBe(3);
             expect(info.preRelease).toBe('');
+            expect(info.toString()).toBe('1.2.3');
         });
 
         it('parses pre-release versions', function () {
@@ -46,6 +48,7 @@ describe('Core MediumEditor', function () {
             expect(info.minor).toBe(0);
             expect(info.revision).toBe(0);
             expect(info.preRelease).toBe('alpha.1');
+            expect(info.toString()).toBe('5.0.0-alpha.1');
         });
     });
 

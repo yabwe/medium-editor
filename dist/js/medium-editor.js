@@ -5885,7 +5885,7 @@ MediumEditor.parseVersionString = function (release) {
         revision: parseInt(version[2], 10),
         preRelease: preRelease,
         toString: function () {
-            return [[version[0], version[1], version[2]].join('.'), preRelease].join('-');
+            return [version[0], version[1], version[2]].join('.') + (preRelease ? '-' + preRelease : '');
         }
     };
 };
