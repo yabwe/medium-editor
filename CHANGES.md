@@ -1,3 +1,54 @@
+5.0.0 / xxxx-xx-xx
+==================
+* All deprecated functions have been removed
+* Keyboard Shorcuts are now part of an extension and not attached to specific button/commands
+* Placeholders are now part of an extension with its own dedicated options
+* Toolbar is now an extension with its own dedicated options
+* firstHeader and secondHeader are gone you should use h1 thru h6
+* Support pre-releases
+* Buttons
+  * The array of buttons can now contain objects, for overriding any part of the button object
+    * This replaces the custom object value for the buttonLabels option
+* API
+  * Unique id for MediumEditor instance will now remain unique (regardless of how many instances are created)
+  * .statics references are gone
+  * .trigger supports triggering events without needing to declare the event
+  * .callExtensions(), .setToolbarPosition(), and .hideToolbarDefaultActions() have been removed
+* Extension
+  * .window & .document are now exposed as members of the Extension
+  * init no longer is passed MediumEditor instance as first argument
+* CSS
+  * All classes are now `medium-editor` prefixed
+* Util
+  * getProp, derives, getSelectionData, setObject & getObject are gone
+  * getSelectionRange & getSelectionStart are now in Selection
+
+
+4.12.5 / 2015-06-16
+==================
+* Fix issue with restoring selection within nested block elements
+
+
+4.12.4 / 2015-06-15
+==================
+* Ensure auto-link will never select an empty element (br, hr, input, etc.)
+
+
+4.12.3 / 2015-06-12
+==================
+* Fix bug with un-linked auto-links causing unexpected cursor positioning
+
+
+4.12.2 / 2015-06-10
+==================
+* Fix broken keyboard shortcuts
+
+
+4.12.1 / 2015-06-02
+==================
+* Fix break with updateOnEmptySelection option for static toolbars
+
+
 4.12.0 / 2015-06-01
 ==================
 * Fix pasting links when targetBlank option is being used

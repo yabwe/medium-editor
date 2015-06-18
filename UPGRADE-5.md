@@ -31,7 +31,7 @@ For details on all the currently supported MediumEditor options, refer to the [M
 
 ### Anchor Preview Options
 * Options controlling the anchor preview extension are now passed as a `'anchorPreview'` object inside the outer options object.
-  * `anchorPreviewHideDelay` -> `'anchorPreview.hideDelay`
+  * `anchorPreviewHideDelay` -> `anchorPreview.hideDelay`
 
 ### Paste Options
 * Options controlling paste are now passed as a `'paste'` object inside the outer options object.
@@ -65,7 +65,7 @@ For details on all the currently supported MediumEditor options, refer to the [M
 
 
 ## MediumEditor Extensions
-#### `.parent` 
+#### `.parent`
 * `Extension.parent` is no longer supported.  All extensions will have a reference to the MediumEditor instance via their `.base` property, unless the property already exists.
 
 #### `.init()`

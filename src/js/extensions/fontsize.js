@@ -18,9 +18,9 @@ var FontSizeForm;
 
         // Called when the button the toolbar is clicked
         // Overrides ButtonExtension.handleClick
-        handleClick: function (evt) {
-            evt.preventDefault();
-            evt.stopPropagation();
+        handleClick: function (event) {
+            event.preventDefault();
+            event.stopPropagation();
 
             if (!this.isDisplayed()) {
                 // Get fontsize of current selection (convert to string since IE returns this as number)
