@@ -2,30 +2,26 @@
 ==================
 * All deprecated functions have been removed
 * Keyboard Shorcuts are now part of an extension and not attached to specific button/commands
-* Toolbar is now an extension (with its own dedicated options)
-  * firstHeader and secondHeader are gone you should use h1 thru h6
+* Placeholders are now part of an extension with its own dedicated options
+* Toolbar is now an extension with its own dedicated options
+* firstHeader and secondHeader are gone you should use h1 thru h6
+* Support pre-releases
 * Buttons
-  * The array of button names are now passed as a toolbar option
   * The array of buttons can now contain objects, for overriding any part of the button object
     * This replaces the custom object value for the buttonLabels option
-* Options for Anchor, AnchorPreview, Paste & Placeholder are now passed as a dedidacted object (ie: anchor.targetCheckbox)
 * API
   * Unique id for MediumEditor instance will now remain unique (regardless of how many instances are created)
   * .statics references are gone
-  * .trigger is supported for any event, even if it's not defined within MediumEditor 
+  * .trigger supports triggering events without needing to declare the event
+  * .callExtensions(), .setToolbarPosition(), and .hideToolbarDefaultActions() have been removed
 * Extension
-  * .parent is no longer supported
-  * .base will always be set to the instance of MediumEditor
   * .window & .document are now exposed as members of the Extension
-  * New helper methods exist on extensions (getEditorElements, getEditorId, getEditorOption)
-  * deactivate() has been replaced by destroy()
-  * init no longer take instance as first argument
+  * init no longer is passed MediumEditor instance as first argument
 * CSS
   * All classes are now `medium-editor` prefixed
 * Util
   * getProp, derives, getSelectionData, setObject & getObject are gone
   * getSelectionRange & getSelectionStart are now in Selection
-* Version now handle pre release
 
 
 4.12.5 / 2015-06-16
