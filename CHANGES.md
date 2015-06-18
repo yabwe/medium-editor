@@ -1,4 +1,4 @@
-5.0.0 / xxxx-xx-xx
+5.0.0 / 2015-06-18
 ==================
 * All deprecated functions have been removed
 * Keyboard Shorcuts are now part of an extension and not attached to specific button/commands
