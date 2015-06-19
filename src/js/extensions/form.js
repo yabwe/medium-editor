@@ -57,6 +57,18 @@ var FormExtension;
          * functionality for all form extensions
          *********************************************************/
 
+        /* showToolbarDefaultActions: [function ()]
+         *
+         * Helper method which will turn back the toolbar after canceling
+         * the customized form
+         */
+        showToolbarDefaultActions: function () {
+            var toolbar = this.base.getExtensionByName('toolbar');
+            if (toolbar) {
+                toolbar.showToolbarDefaultActions();
+            }
+        },
+
         /* hideToolbarDefaultActions: [function ()]
          *
          * Helper function which will hide the default contents of the
