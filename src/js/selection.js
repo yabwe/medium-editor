@@ -648,6 +648,13 @@
             return selection.getRangeAt(0);
         },
 
+        selectRange: function (ownerDocument, range) {
+            var selection = ownerDocument.getSelection();
+
+            selection.removeAllRanges();
+            selection.addRange(range);
+        },
+
         // http://stackoverflow.com/questions/1197401/how-can-i-get-the-element-the-caret-is-in-with-javascript-when-using-contentedi
         // by You
         getSelectionStart: function (ownerDocument) {

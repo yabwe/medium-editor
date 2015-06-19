@@ -49,6 +49,7 @@
         isMac: (window.navigator.platform.toUpperCase().indexOf('MAC') >= 0),
 
         // https://github.com/jashkenas/underscore
+        // Lonely letter MUST USE the uppercase code
         keyCode: {
             BACKSPACE: 8,
             TAB: 9,
@@ -56,8 +57,9 @@
             ESCAPE: 27,
             SPACE: 32,
             DELETE: 46,
-            K: 75, // K keycode, and not k
-            M: 77
+            K: 75,
+            M: 77,
+            V: 86
         },
 
         /**

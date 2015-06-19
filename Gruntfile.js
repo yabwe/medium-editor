@@ -248,7 +248,7 @@ module.exports = function (grunt) {
     gruntConfig.watch = {
         scripts: {
             files: ['src/js/**/*.js', 'spec/**/*.js', 'Gruntfile.js'],
-            tasks: ['js'],
+            tasks: ['concat'],
             options: {
                 debounceDelay: 250
             }

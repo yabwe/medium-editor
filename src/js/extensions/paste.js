@@ -1,5 +1,12 @@
+/*global Util, Selection, Extension */
+
+'use strict';
+
+var PasteHandler,
+    keyboardPasteTimeStamp = 0,
+    pasteBinDefaultContent = '%ME_PASTEBIN%';
+
 (function () {
-    'use strict';
     /*jslint regexp: true*/
     /*
         jslint does not allow character negation, because the negation
@@ -86,63 +93,264 @@
          */
         cleanTags: ['meta'],
 
+        pasteBinElm: null,
+        lastRange: null,
+
         init: function () {
             MediumEditor.Extension.prototype.init.apply(this, arguments);
 
             if (this.forcePlainText || this.cleanPastedHTML) {
-                this.subscribe('editablePaste', this.handlePaste.bind(this));
+                this.subscribe('editableKeydown', this.handleKeydown.bind(this));
+                // this.subscribe('editablePaste', this.handlePaste.bind(this));
             }
         },
 
-        handlePaste: function (event, element) {
-            var paragraphs,
+        handleKeydown: function (event) {
+            // if it's not Ctrl+V, do nothing
+            if (!(Util.isKey(event, Util.keyCode.V) && Util.isMetaCtrlKey(event))) {
+                return;
+            }
+
+            event.stopImmediatePropagation();
+
+            keyboardPasteTimeStamp = new Date().getTime();
+            this.lastRange = Selection.getSelectionRange(this.document);
+
+            this.removePasteBin();
+            this.createPasteBin();
+        },
+
+        handlePaste: function (event) {
+            var clipboardTimer, clipboardContent, clipboardDelay,
+                isKeyBoardPaste, plainTextMode,
+                paragraphs, content,
                 html = '',
-                p,
-                dataFormatHTML = 'text/html',
-                dataFormatPlain = 'text/plain',
-                pastedHTML,
-                pastedPlain;
+                that = this,
+                p;
 
-            if (this.window.clipboardData && event.clipboardData === undefined) {
-                event.clipboardData = this.window.clipboardData;
-                // If window.clipboardData exists, but event.clipboardData doesn't exist,
-                // we're probably in IE. IE only has two possibilities for clipboard
-                // data format: 'Text' and 'URL'.
-                //
-                // Of the two, we want 'Text':
-                dataFormatHTML = 'Text';
-                dataFormatPlain = 'Text';
+            clipboardTimer   = new Date().getTime();
+            clipboardContent = this.getClipboardContent(event);
+            clipboardDelay   = new Date().getTime() - clipboardTimer;
+
+            window.console.log('clipboardContent', clipboardContent);
+
+            isKeyBoardPaste = (new Date().getTime() - keyboardPasteTimeStamp - clipboardDelay) < 1000;
+
+            plainTextMode = !this.cleanPastedHTML || this.forcePlainText;
+
+            window.console.log('plainTextMode', !this.cleanPastedHTML, this.forcePlainText, plainTextMode);
+
+            if (event.isDefaultPrevented) {
+                this.removePasteBin();
+                return;
             }
 
-            if (event.clipboardData &&
-                    event.clipboardData.getData &&
-                    !event.defaultPrevented) {
+            // Not a keyboard paste prevent default paste and try to grab the clipboard contents using different APIs
+            if (!isKeyBoardPaste) {
                 event.preventDefault();
-
-                pastedHTML = event.clipboardData.getData(dataFormatHTML);
-                pastedPlain = event.clipboardData.getData(dataFormatPlain);
-
-                if (this.cleanPastedHTML && pastedHTML) {
-                    return this.cleanPaste(pastedHTML);
-                }
-
-                if (!(this.getEditorOption('disableReturn') || element.getAttribute('data-disable-return'))) {
-                    paragraphs = pastedPlain.split(/[\r\n]+/g);
-                    // If there are no \r\n in data, don't wrap in <p>
-                    if (paragraphs.length > 1) {
-                        for (p = 0; p < paragraphs.length; p += 1) {
-                            if (paragraphs[p] !== '') {
-                                html += '<p>' + MediumEditor.util.htmlEntities(paragraphs[p]) + '</p>';
-                            }
-                        }
-                    } else {
-                        html = MediumEditor.util.htmlEntities(paragraphs[0]);
-                    }
-                } else {
-                    html = MediumEditor.util.htmlEntities(pastedPlain);
-                }
-                MediumEditor.util.insertHTMLCommand(this.document, html);
             }
+
+            setTimeout(function() {
+                window.console.log('hasContentType', that.hasContentType(clipboardContent, 'text/html'));
+
+                // Grab HTML from Clipboard API or paste bin as a fallback
+                if (that.hasContentType(clipboardContent, 'text/html')) {
+                    content = clipboardContent['text/html'];
+                } else {
+                    content = that.getPasteBinHtml();
+
+                    // If paste bin is empty try using plain text mode
+                    // since that is better than nothing right
+                    if (content === pasteBinDefaultContent) {
+                        plainTextMode = true;
+                    }
+                }
+
+                content = that.trimHtml(content);
+
+                window.console.log('content', content);
+
+                // WebKit has a nice bug where it clones the paste bin if you paste from for example notepad
+                // so we need to force plain text mode in this case
+                if (this.pasteBinElm && this.pasteBinElm.firstChild && this.pasteBinElm.firstChild.id === 'mcepastebin') {
+                    plainTextMode = true;
+                }
+
+                that.removePasteBin();
+
+                // If we got nothing from clipboard API and pastebin then we could try the last resort: plain/text
+                if (!content.length) {
+                    plainTextMode = true;
+                }
+
+                // Grab plain text from Clipboard API or convert existing HTML to plain text
+                if (plainTextMode) {
+                    // Use plain text contents from Clipboard API unless the HTML contains paragraphs then
+                    // we should convert the HTML to plain text since works better when pasting HTML/Word contents as plain text
+                    if (that.hasContentType(clipboardContent, 'text/plain') && content.indexOf('</p>') === -1) {
+                        content = clipboardContent['text/plain'];
+                    } else {
+                        content = Util.innerText(content);
+                    }
+                }
+
+                // If the content is the paste bin default HTML then it was
+                // impossible to get the cliboard data out.
+                if (content === pasteBinDefaultContent) {
+                    if (!isKeyBoardPaste) {
+                        that.window.alert('Please use Ctrl+V/Cmd+V keyboard shortcuts to paste contents.');
+                    }
+
+                    return;
+                }
+
+                if (plainTextMode) {
+                    // pasteText(content);
+                    that.pasteHTML(content);
+                } else {
+                    that.pasteHTML(content);
+                }
+            }, 0);
+
+            // if (event.clipboardData &&
+            //     event.clipboardData.getData &&
+            //     !event.defaultPrevented) {
+            //     event.preventDefault();
+
+            //     if (this.cleanPastedHTML && pastedHTML) {
+            //         return this.cleanPaste(pastedHTML);
+            //     }
+
+            //     if (!(this.getEditorOption('disableReturn') || element.getAttribute('data-disable-return'))) {
+            //         paragraphs = pastedPlain.split(/[\r\n]+/g);
+            //         // If there are no \r\n in data, don't wrap in <p>
+            //         if (paragraphs.length > 1) {
+            //             for (p = 0; p < paragraphs.length; p += 1) {
+            //                 if (paragraphs[p] !== '') {
+            //                     html += '<p>' + Util.htmlEntities(paragraphs[p]) + '</p>';
+            //                 }
+            //             }
+            //         } else {
+            //             html = Util.htmlEntities(paragraphs[0]);
+            //         }
+            //     } else {
+            //         html = Util.htmlEntities(pastedPlain);
+            //     }
+            //     Util.insertHTMLCommand(this.document, html);
+            // }
+        },
+
+        /**
+         * Gets various content types out of the Clipboard API. It will also get the
+         * plain text using older IE and WebKit API.
+         *
+         * @param {event} event Event fired on paste.
+         * @return {Object} Object with mime types and data for those mime types.
+         */
+        getClipboardContent: function (event) {
+            var dataTransfer = event.clipboardData || this.document.dataTransfer,
+                data = {};
+
+            if (!dataTransfer) {
+                return data;
+            }
+
+            // Use old WebKit/IE API
+            if (dataTransfer.getData) {
+                var legacyText = dataTransfer.getData('Text');
+                if (legacyText && legacyText.length > 0) {
+                    data['text/plain'] = legacyText;
+                }
+            }
+
+            if (dataTransfer.types) {
+                for (var i = 0; i < dataTransfer.types.length; i++) {
+                    var contentType = dataTransfer.types[i];
+                    data[contentType] = dataTransfer.getData(contentType);
+                }
+            }
+
+            return data;
+        },
+
+        createPasteBin: function () {
+            var range, rects,
+                top = 20,
+                scrollTop = this.document.documentElement.clientHeight;
+
+            window.console.log('Create paste bin');
+
+            range = Selection.getSelectionRange(this.document);
+            window.console.log('range', range);
+            window.console.log('collapsed', range.collapsed);
+            window.console.log('startContainer', range.startContainer.nodeType);
+
+            if (range) {
+                rects = range.getClientRects();
+                window.console.log('rects', rects);
+
+                // on empty line, rects is empty so we grab information from the first container of the range
+                if (rects.length) {
+                    window.console.log('rects.length', rects.length);
+                    top = rects[0].top;
+                } else {
+                    top = range.startContainer.getBoundingClientRect().top;
+                }
+            }
+
+            window.console.log('top', top);
+
+            this.pasteBinElm = this.document.createElement('div');
+            this.pasteBinElm.id = 'medium-editor-pastebin';
+            this.pasteBinElm.setAttribute('style', 'border: 1px red solid; position: absolute; top: ' + top + 'px; width: 10px; height: 10px; overflow: hidden; opacity: 0');
+            this.pasteBinElm.setAttribute('contentEditable', true);
+            this.pasteBinElm.innerHTML = pasteBinDefaultContent;
+
+            this.getEditorOption('elementsContainer').appendChild(this.pasteBinElm);
+
+            // avoid .focus() to stop other event (actually the paste event)
+            this.on(this.pasteBinElm, 'focus', function (event) {
+                event.stopPropagation();
+            })
+            this.on(this.pasteBinElm, 'focusin', function (event) {
+                event.stopPropagation();
+            })
+            this.on(this.pasteBinElm, 'focusout', function (event) {
+                event.stopPropagation();
+            })
+
+            this.pasteBinElm.focus();
+
+            Selection.selectNode(this.pasteBinElm, this.document);
+
+            window.console.log(this.pasteBinElm);
+
+            this.on(this.pasteBinElm, 'paste', this.handlePaste.bind(this));
+        },
+
+        removePasteBin: function () {
+            window.console.log('Remove paste bin');
+
+            if (!this.pasteBinElm) {
+                this.pasteBinElm = null;
+                return;
+            }
+
+            if (null !== this.lastRange) {
+                Selection.selectRange(this.document, this.lastRange);
+                this.lastRange = null;
+            }
+
+            // this.getEditorOption('elementsContainer').removeChild(this.pasteBinElm);
+
+            var pasteBin = this.document.getElementById('medium-editor-pastebin');
+            if (pasteBin) {
+                this.getEditorOption('elementsContainer').removeChild(pasteBin);
+            }
+        },
+
+        getPasteBinHtml: function () {
+            return this.pasteBinElm.innerHTML;
         },
 
         cleanPaste: function (text) {
@@ -289,6 +497,36 @@
                 // remove empty spans, replace others with their contents
                 MediumEditor.util.unwrap(el, this.document);
             }
+        },
+
+        hasContentType: function (clipboardContent, mimeType) {
+            return mimeType in clipboardContent && clipboardContent[mimeType].length > 0;
+        },
+
+        /**
+         * Trims the specified HTML by removing all WebKit fragments, all elements wrapping the body trailing BR elements etc.
+         *
+         * @param {String} html Html string to trim contents on.
+         * @return {String} Html contents that got trimmed.
+         */
+        trimHtml: function (html) {
+            // Remove anything but the contents within the BODY element
+            html = html.replace(/^[\s\S]*<body[^>]*>\s*|\s*<\/body[^>]*>[\s\S]*$/g, '');
+            // Inner fragments (tables from excel on mac)
+            html = html.replace(/<!--StartFragment-->|<!--EndFragment-->/g, '');
+            html = html.replace(/( ?)<span class="Apple-converted-space">\u00a0<\/span>( ?)/g, function (all, s1, s2) {
+                // WebKit &nbsp; meant to preserve multiple spaces but instead inserted around all inline tags,
+                // including the spans with inline styles created on paste
+                if (!s1 && !s2) {
+                    return ' ';
+                }
+
+                return '\u00a0';
+            });
+            // Trailing BR elements
+            html = html.replace(/<br>$/i, '');
+
+            return html;
         }
     });
 
