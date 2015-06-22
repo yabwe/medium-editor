@@ -73,6 +73,65 @@ describe('Anchor Button TestCase', function () {
             expect(this.el.innerHTML).toBe('<a href="test">lorem ipsum</a>');
         });
 
+        it('should create only one anchor tag when the user selects across a boundary', function () {
+            this.el.innerHTML = 'Hello world, this <strong>will become a link, but this part won\'t.</strong>';
+
+            spyOn(MediumEditor.prototype, 'createLink').and.callThrough();
+            var editor = this.newMediumEditor('.editor'),
+                toolbar = editor.getExtensionByName('toolbar'),
+                selection = window.getSelection(),
+                newRange = document.createRange(),
+                button, input;
+
+            selection.removeAllRanges();
+            newRange.setStart(this.el.childNodes[0], 'Hello world, '.length);
+            newRange.setEnd(this.el.childNodes[1].childNodes[0], 'will become a link'.length);
+            selection.addRange(newRange);
+            button = toolbar.getToolbarElement().querySelector('[data-action="createLink"]');
+            fireEvent(button, 'click');
+            input = editor.getExtensionByName('anchor').getInput();
+            input.value = 'test';
+            fireEvent(input, 'keyup', {
+                keyCode: Util.keyCode.ENTER
+            });
+            expect(editor.createLink).toHaveBeenCalled();
+            expect(this.el.innerHTML).toBe('Hello world, <a href="test">this <strong>will become a link</strong></a>' +
+                '<strong>, but this part won\'t.</strong>');
+        });
+
+        it('should create a link when the user selects text within two paragraphs', function () {
+            this.el.innerHTML = '<p>Hello <span>world</span>.</p>' +
+                '<p><strong>Let us make a link</strong> across paragraphs.</p>';
+
+            spyOn(MediumEditor.prototype, 'createLink').and.callThrough();
+            var editor = this.newMediumEditor('.editor'),
+                toolbar = editor.getExtensionByName('toolbar'),
+                selection = window.getSelection(),
+                newRange = document.createRange(),
+                button, input;
+
+            selection.removeAllRanges();
+            newRange.setStart(this.el.querySelector('span'), 0);
+            newRange.setEnd(this.el.querySelector('strong'), 1);
+            selection.addRange(newRange);
+            button = toolbar.getToolbarElement().querySelector('[data-action="createLink"]');
+            fireEvent(button, 'click');
+            input = editor.getExtensionByName('anchor').getInput();
+            input.value = 'test';
+            fireEvent(input, 'keyup', {
+                keyCode: Util.keyCode.ENTER
+            });
+            expect(editor.createLink).toHaveBeenCalled();
+            var expectedHTML = '<p>Hello <a href="test"><span>world</span>.</a></p>';
+            // Different browser's native createLink implement this differently.
+            if (this.el.innerHTML.indexOf('<strong><a') !== -1) {
+                expectedHTML += '<p><strong><a href="test">Let us make a link</a></strong> across paragraphs.</p>';
+            } else {
+                expectedHTML += '<p><a href="test"><strong>Let us make a link</strong></a> across paragraphs.</p>';
+            }
+            expect(this.el.innerHTML).toBe(expectedHTML);
+        });
+
         it('shouldn\'t create a link when user presses enter without value', function () {
             spyOn(MediumEditor.prototype, 'createLink').and.callThrough();
             var editor = this.newMediumEditor('.editor'),

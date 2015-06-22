@@ -923,14 +923,38 @@ function MediumEditor(elements, options) {
                 i;
 
             if (opts.url && opts.url.trim().length > 0) {
-                this.options.ownerDocument.execCommand('createLink', false, opts.url);
+                var currentSelection = this.options.contentWindow.getSelection();
+                if (currentSelection) {
+                    var exportedSelection = this.exportSelection(),
+                        currentEditor,
+                        startContainerParentElement,
+                        endContainerParentElement,
+                        textNodes;
 
-                if (this.options.targetBlank || opts.target === '_blank') {
-                    Util.setTargetBlank(Selection.getSelectionStart(this.options.ownerDocument), opts.url);
-                }
+                    currentEditor = Util.traverseUp(currentSelection.getRangeAt(0).startContainer, function (node) {
+                        return node.getAttribute('data-medium-editor-element');
+                    });
+                    startContainerParentElement = Util.findParentBlockContainer(
+                        currentSelection.getRangeAt(0).startContainer);
+                    endContainerParentElement = Util.findParentBlockContainer(
+                        currentSelection.getRangeAt(0).endContainer);
 
-                if (opts.buttonClass) {
-                    Util.addClassToAnchors(Selection.getSelectionStart(this.options.ownerDocument), opts.buttonClass);
+                    if (startContainerParentElement === endContainerParentElement) {
+                        textNodes = Util.findOrCreateMatchingTextNodes(this.options.ownerDocument,
+                                currentEditor,
+                                exportedSelection);
+                        Util.createLink(this.options.ownerDocument, textNodes, opts.url.trim());
+                        this.restoreSelection();
+                    } else {
+                        this.options.ownerDocument.execCommand('createLink', false, opts.url);
+                    }
+                    if (this.options.targetBlank || opts.target === '_blank') {
+                        Util.setTargetBlank(Selection.getSelectionStart(this.options.ownerDocument), opts.url);
+                    }
+
+                    if (opts.buttonClass) {
+                        Util.addClassToAnchors(Selection.getSelectionStart(this.options.ownerDocument), opts.buttonClass);
+                    }
                 }
             }
 
