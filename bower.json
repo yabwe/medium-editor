@@ -30,7 +30,7 @@
     "Gruntfile.js",
     "demo",
     "package.json",
-    "src/js",
+    "src",
     "README.md",
     "CHANGES.md"
   ]
