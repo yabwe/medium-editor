@@ -925,21 +925,20 @@ function MediumEditor(elements, options) {
             if (opts.url && opts.url.trim().length > 0) {
                 var currentSelection = this.options.contentWindow.getSelection();
                 if (currentSelection) {
-                    var exportedSelection = this.exportSelection(),
+                    var exportedSelection,
                         currentEditor,
                         startContainerParentElement,
                         endContainerParentElement,
                         textNodes;
 
-                    currentEditor = Util.traverseUp(currentSelection.getRangeAt(0).startContainer, function (node) {
-                        return node.getAttribute('data-medium-editor-element');
-                    });
-                    startContainerParentElement = Util.findParentBlockContainer(
+                    startContainerParentElement = Util.getClosestBlockContainer(
                         currentSelection.getRangeAt(0).startContainer);
-                    endContainerParentElement = Util.findParentBlockContainer(
+                    endContainerParentElement = Util.getClosestBlockContainer(
                         currentSelection.getRangeAt(0).endContainer);
 
                     if (startContainerParentElement === endContainerParentElement) {
+                        currentEditor = Selection.getSelectionElement(this.options.contentWindow);
+                        exportedSelection = this.exportSelection();
                         textNodes = Util.findOrCreateMatchingTextNodes(this.options.ownerDocument,
                                 currentEditor,
                                 exportedSelection);

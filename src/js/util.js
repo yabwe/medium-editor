@@ -101,6 +101,11 @@ var Util;
             return copyInto.apply(this, args);
         },
 
+        /*
+         * Create a link around the provided text nodes which must be adjacent to each other and all be
+         * descendants of the same closest block container. If the preconditions are not met, unexpected
+         * behavior will result.
+         */
         createLink: function (document, textNodes, href) {
             var anchor = document.createElement('a');
             Util.moveTextRangeIntoElement(textNodes[0], textNodes[textNodes.length - 1], anchor);
@@ -108,6 +113,15 @@ var Util;
             return anchor;
         },
 
+        /*
+         * Given the provided match in the format {start: 1, end: 2} where start and end are indices into the
+         * textContent of the provided element argument, modify the DOM inside element to ensure that the text
+         * identified by the provided match can be returned as text nodes that contain exactly that text, without
+         * any additional text at the beginning or end of the returned array of adjacent text nodes.
+         *
+         * The only DOM manipulation performed by this function is splitting the text nodes, non-text nodes are
+         * not affected in any way.
+         */
         findOrCreateMatchingTextNodes: function (document, element, match) {
             var treeWalker = document.createTreeWalker(element, NodeFilter.SHOW_TEXT, null, false),
                 matchedNodes = [],
@@ -145,6 +159,12 @@ var Util;
             return matchedNodes;
         },
 
+        /*
+         * Given the provided text node and text coordinates, split the text node if needed to make it align
+         * precisely with the coordinates.
+         *
+         * This function is intended to be called from Util.findOrCreateMatchingTextNodes.
+         */
         splitStartNodeIfNeeded: function (currentNode, matchStartIndex, currentTextIndex) {
             if (matchStartIndex !== currentTextIndex) {
                 return currentNode.splitText(matchStartIndex - currentTextIndex);
@@ -152,6 +172,13 @@ var Util;
             return null;
         },
 
+        /*
+         * Given the provided text node and text coordinates, split the text node if needed to make it align
+         * precisely with the coordinates. The newNode argument should from the result of Util.splitStartNodeIfNeeded,
+         * if that function has been called on the same currentNode.
+         *
+         * This function is intended to be called from Util.findOrCreateMatchingTextNodes.
+         */
         splitEndNodeIfNeeded: function (currentNode, newNode, matchEndIndex, currentTextIndex) {
             var textIndexOfEndOfFarthestNode,
                 endSplitPoint;
@@ -282,12 +309,6 @@ var Util;
             } while (current);
 
             return false;
-        },
-
-        findParentBlockContainer: function (node) {
-            return Util.traverseUp(node, function (node) {
-                return Util.blockContainerElementNames.indexOf(node.nodeName.toLowerCase()) !== -1;
-            });
         },
 
         htmlEntities: function (str) {
@@ -705,6 +726,12 @@ var Util;
 
         isBlockContainer: function (element) {
             return element && element.nodeType !== 3 && this.blockContainerElementNames.indexOf(element.nodeName.toLowerCase()) !== -1;
+        },
+
+        getClosestBlockContainer: function (node) {
+            return Util.traverseUp(node, function (node) {
+                return Util.isBlockContainer(node);
+            });
         },
 
         getTopBlockContainer: function (element) {
