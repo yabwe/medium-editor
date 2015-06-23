@@ -285,7 +285,7 @@ function MediumEditor(elements, options) {
 
     function createContentEditable(textarea, id) {
         var div = this.options.ownerDocument.createElement('div'),
-            uniqueId = 'm' + Date.now() + '-' + id,
+            uniqueId = 'medium-editor-' + Date.now() + '-' + id,
             attributesToClone = [
                 'data-disable-editing',
                 'data-disable-toolbar',
