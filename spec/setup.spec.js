@@ -31,6 +31,10 @@ describe('Setup/Destroy TestCase', function () {
             spyOn(MediumEditor.prototype, 'setup').and.callThrough();
             editor.setup();
             expect(editor.setup).toHaveBeenCalled();
+            expect(document.querySelector('[data-medium-editor-element]')).toBeTruthy();
+            expect(document.querySelector('[aria-multiline]')).toBeTruthy();
+            expect(document.querySelector('[medium-editor-index]')).toBeTruthy();
+            expect(document.querySelector('[role]')).toBeTruthy();
         });
 
         it('should know about defaults', function () {
@@ -44,6 +48,12 @@ describe('Setup/Destroy TestCase', function () {
             expect(document.querySelector('.medium-editor-toolbar')).toBeTruthy();
             editor.destroy();
             expect(document.querySelector('.medium-editor-toolbar')).toBeFalsy();
+
+            expect(document.querySelector('[data-medium-editor-element]')).toBeFalsy();
+            expect(document.querySelector('[data-medium-focused]')).toBeFalsy();
+            expect(document.querySelector('[aria-multiline]')).toBeFalsy();
+            expect(document.querySelector('[medium-editor-index]')).toBeFalsy();
+            expect(document.querySelector('[role]')).toBeFalsy();
         });
 
         it('should remove all the added events', function () {
