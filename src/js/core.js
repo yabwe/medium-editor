@@ -206,9 +206,9 @@ function MediumEditor(elements, options) {
 
         // Loop through elements and convert textarea's into divs
         this.elements = [];
-        elements.forEach(function (element) {
+        elements.forEach(function (element, index) {
             if (element.nodeName.toLowerCase() === 'textarea') {
-                this.elements.push(createContentEditable.call(this, element));
+                this.elements.push(createContentEditable.call(this, element, index));
             } else {
                 this.elements.push(element);
             }
@@ -283,9 +283,9 @@ function MediumEditor(elements, options) {
         return this.options.keyboardCommands !== false;
     }
 
-    function createContentEditable(textarea) {
+    function createContentEditable(textarea, id) {
         var div = this.options.ownerDocument.createElement('div'),
-            id = (+new Date()),
+            uniqueId = 'medium-editor-' + Date.now() + '-' + id,
             attributesToClone = [
                 'data-disable-editing',
                 'data-disable-toolbar',
@@ -297,7 +297,7 @@ function MediumEditor(elements, options) {
             ];
 
         div.className = textarea.className;
-        div.id = id;
+        div.id = uniqueId;
         div.innerHTML = textarea.value;
         div.setAttribute('medium-editor-textarea-id', id);
         attributesToClone.forEach(function (attr) {
