@@ -31,6 +31,12 @@ describe('Setup/Destroy TestCase', function () {
             spyOn(MediumEditor.prototype, 'setup').and.callThrough();
             editor.setup();
             expect(editor.setup).toHaveBeenCalled();
+            expect(document.querySelector('[data-medium-editor-element]')).toBeTruthy();
+            expect(document.querySelector('[aria-multiline]')).toBeTruthy();
+            expect(document.querySelector('[medium-editor-index]')).toBeTruthy();
+            expect(document.querySelector('[role]')).toBeTruthy();
+            expect(document.querySelector('[spellcheck]')).toBeTruthy();
+            expect(document.querySelector('[contenteditable]')).toBeTruthy();
         });
 
         it('should know about defaults', function () {
@@ -44,6 +50,10 @@ describe('Setup/Destroy TestCase', function () {
             expect(document.querySelector('.medium-editor-toolbar')).toBeTruthy();
             editor.destroy();
             expect(document.querySelector('.medium-editor-toolbar')).toBeFalsy();
+
+            // ensure only initial attributes are here: the editor class
+            expect(this.el.getAttribute('class')).toBe('editor');
+            expect(this.el.attributes.length).toBe(1);
         });
 
         it('should remove all the added events', function () {

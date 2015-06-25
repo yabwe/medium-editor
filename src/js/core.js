@@ -520,9 +520,14 @@ function MediumEditor(elements, options) {
                     element.innerHTML = element.innerHTML;
                 }
 
+                // cleanup extra added attributes
                 element.removeAttribute('contentEditable');
                 element.removeAttribute('spellcheck');
+                element.removeAttribute('data-medium-focused');
                 element.removeAttribute('data-medium-editor-element');
+                element.removeAttribute('role');
+                element.removeAttribute('aria-multiline');
+                element.removeAttribute('medium-editor-index');
 
                 // Remove any elements created for textareas
                 if (element.hasAttribute('medium-editor-textarea-id')) {
