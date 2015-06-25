@@ -451,7 +451,9 @@
             if (!MediumEditor.util.isEdge && doc.queryCommandSupported('insertHTML')) {
                 try {
                     return doc.execCommand('insertHTML', false, html);
-                } catch (ignore) {}
+                } catch (ignore) {
+                    window.console.log('insertHTMLCommand > insertHTML', ignore);
+                }
             }
 
             selection = doc.getSelection();
