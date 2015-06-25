@@ -35,6 +35,8 @@ describe('Setup/Destroy TestCase', function () {
             expect(document.querySelector('[aria-multiline]')).toBeTruthy();
             expect(document.querySelector('[medium-editor-index]')).toBeTruthy();
             expect(document.querySelector('[role]')).toBeTruthy();
+            expect(document.querySelector('[spellcheck]')).toBeTruthy();
+            expect(document.querySelector('[contenteditable]')).toBeTruthy();
         });
 
         it('should know about defaults', function () {
@@ -49,11 +51,9 @@ describe('Setup/Destroy TestCase', function () {
             editor.destroy();
             expect(document.querySelector('.medium-editor-toolbar')).toBeFalsy();
 
-            expect(document.querySelector('[data-medium-editor-element]')).toBeFalsy();
-            expect(document.querySelector('[data-medium-focused]')).toBeFalsy();
-            expect(document.querySelector('[aria-multiline]')).toBeFalsy();
-            expect(document.querySelector('[medium-editor-index]')).toBeFalsy();
-            expect(document.querySelector('[role]')).toBeFalsy();
+            // ensure only initial attributes are here: the editor class
+            expect(this.el.getAttribute('class')).toBe('editor');
+            expect(this.el.attributes.length).toBe(1);
         });
 
         it('should remove all the added events', function () {
