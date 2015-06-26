@@ -89,9 +89,10 @@ var AnchorPreview;
             return this;
         },
 
-        positionPreview: function () {
+        positionPreview: function (activeAnchor) {
+            activeAnchor = activeAnchor || this.activeAnchor;
             var buttonHeight = this.anchorPreview.offsetHeight,
-                boundary = this.activeAnchor.getBoundingClientRect(),
+                boundary = activeAnchor.getBoundingClientRect(),
                 middleBoundary = (boundary.left + boundary.right) / 2,
                 diffLeft = this.diffLeft,
                 diffTop = this.diffTop,
