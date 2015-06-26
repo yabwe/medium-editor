@@ -289,7 +289,7 @@ describe('Content TestCase', function () {
         expect(this.el.innerHTML).toMatch(/(<p><br><\/p>)?/);
     });
 
-    describe('when deleting and empty first list item via backspace', function () {
+    describe('when deleting an empty first list item via backspace', function () {
         it('should insert a paragraph before the list if it is the first element in the editor', function () {
             this.el.innerHTML = '<ul><li></li><li>lorem ipsum</li></ul>';
             var editor = this.newMediumEditor('.editor'),
@@ -325,6 +325,17 @@ describe('Content TestCase', function () {
         it('should accept spellcheck as an options', function () {
             var editor = this.newMediumEditor('.editor', { spellcheck: false });
             expect(editor.elements[0].getAttribute('spellcheck')).toBe('false');
+        });
+    });
+
+    describe('justify actions', function () {
+        it('should not replace line breaks within blocks with div elements', function () {
+            this.el.innerHTML = '<h2>lorem ipsum<br />lorem ipsum<br />lorem ipsum</h2><ul><li>item 1</li><li>item 2</li><li>item 3</li></ul>';
+            var editor = this.newMediumEditor('.editor');
+            selectElementContentsAndFire(this.el.querySelector('h2').firstChild);
+            editor.execAction('justifyRight');
+            var regEx = /^<h2( (style="text-align:|align=")(\s)?right(;)?(\s)?")?>lorem ipsum<br(\s)?(\/)?>lorem ipsum<br(\s)?(\/)?>lorem ipsum<\/h2><ul><li>item 1<\/li><li>item 2<\/li><li>item 3<\/li><\/ul>?/;
+            expect(this.el.innerHTML).toMatch(regEx);
         });
     });
 });
