@@ -243,6 +243,7 @@ var Selection;
                 range.collapse(true);
             }
             doc.getSelection().addRange(range);
+            return range;
         },
 
         /**
@@ -253,17 +254,7 @@ var Selection;
          * @param  {integer}     offset  Where in the element should we jump, 0 by default
          */
         moveCursor: function (doc, node, offset) {
-            var range, sel,
-                startOffset = offset || 0;
-
-            range = doc.createRange();
-            sel = doc.getSelection();
-
-            range.setStart(node, startOffset);
-            range.collapse(true);
-
-            sel.removeAllRanges();
-            sel.addRange(range);
+            this.select(doc, node, offset);
         },
 
         getSelectionRange: function (ownerDocument) {
