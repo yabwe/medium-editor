@@ -329,13 +329,48 @@ describe('Content TestCase', function () {
     });
 
     describe('justify actions', function () {
-        it('should not replace line breaks within blocks with div elements', function () {
-            this.el.innerHTML = '<h2>lorem ipsum<br />lorem ipsum<br />lorem ipsum</h2><ul><li>item 1</li><li>item 2</li><li>item 3</li></ul>';
-            var editor = this.newMediumEditor('.editor');
-            selectElementContentsAndFire(this.el.querySelector('h2').firstChild);
+        it('should not replace line breaks inside header elements with div elements', function () {
+            this.el.innerHTML = '<h2>lorem ipsum<br />lorem ipsum<br />lorem ipsum<br /></h2><ul><li>item 1</li><li>item 2</li><li>item 3</li></ul>';
+            var editor = this.newMediumEditor('.editor'),
+                h2 = this.el.querySelector('h2');
+            selectElementContentsAndFire(h2.firstChild);
             editor.execAction('justifyRight');
-            var regEx = /^<h2( (style="text-align:|align=")(\s)?right(;)?(\s)?")?>lorem ipsum<br(\s)?(\/)?>lorem ipsum<br(\s)?(\/)?>lorem ipsum<\/h2><ul><li>item 1<\/li><li>item 2<\/li><li>item 3<\/li><\/ul>?/;
-            expect(this.el.innerHTML).toMatch(regEx);
+            h2 = this.el.querySelector('h2');
+            expect(h2.querySelectorAll('br').length).toBe(3, 'Some of the <br> elements have been removed from the <h2>');
+            expect(h2.querySelectorAll('div').length).toBe(0, 'Some <br> elements were replaced with <div> elements within the <h2>');
+        });
+
+        it('should not replace line breaks inside blockquote elements with div elements', function () {
+            this.el.innerHTML = '<ul><li>item 1</li><li>item 2</li></ul><blockquote>lorem ipsum<br />lorem ipsum<br />lorem ipsum<br /></blockquote><ul><li>item 1</li><li>item 2</li><li>item 3</li></ul>';
+            var editor = this.newMediumEditor('.editor'),
+                blockquote = this.el.querySelector('blockquote');
+            selectElementContentsAndFire(blockquote);
+            editor.execAction('justifyCenter');
+            blockquote = this.el.querySelector('blockquote');
+            expect(blockquote.querySelectorAll('br').length).toBe(3, 'Some of the <br> elements have been removed from the <blockquote>');
+            expect(blockquote.querySelectorAll('div').length).toBe(0, 'Some <br> elements were replaced with <div> elements within the <blckquote>');
+        });
+
+        it('should not replace line breaks inside pre elements with div elements', function () {
+            this.el.innerHTML = '<ul><li>item 1</li><li>item 2</li></ul><pre>lorem ipsum<br />lorem ipsum<br />lorem ipsum<br /></pre><ul><li>item 1</li><li>item 2</li><li>item 3</li></ul>';
+            var editor = this.newMediumEditor('.editor'),
+                pre = this.el.querySelector('pre');
+            selectElementContentsAndFire(pre);
+            editor.execAction('justifyCenter');
+            pre = this.el.querySelector('pre');
+            expect(pre.querySelectorAll('br').length).toBe(3, 'Some of the <br> elements have been removed from the <pre>');
+            expect(pre.querySelectorAll('div').length).toBe(0, 'Some <br> elements were replaced with <div> elements within the <pre>');
+        });
+
+        it('should not replace line breaks inside p elements with div elements', function () {
+            this.el.innerHTML = '<ul><li>item 1</li><li>item 2</li></ul><p>lorem ipsum<br />lorem ipsum<br />lorem ipsum<br /></p><ul><li>item 1</li><li>item 2</li><li>item 3</li></ul>';
+            var editor = this.newMediumEditor('.editor'),
+                para = this.el.querySelector('p');
+            selectElementContentsAndFire(para);
+            editor.execAction('justifyCenter');
+            para = this.el.querySelector('p');
+            expect(para.querySelectorAll('br').length).toBe(3, 'Some of the <br> elements have been removed from the <p>');
+            expect(para.querySelectorAll('div').length).toBe(0, 'Some <br> elements were replaced with <div> elements within the <p>');
         });
     });
 });
