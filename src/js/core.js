@@ -926,7 +926,6 @@ function MediumEditor(elements, options) {
                 var currentSelection = this.options.contentWindow.getSelection();
                 if (currentSelection) {
                     var exportedSelection,
-                        currentEditor,
                         startContainerParentElement,
                         endContainerParentElement,
                         textNodes;
@@ -937,13 +936,52 @@ function MediumEditor(elements, options) {
                         currentSelection.getRangeAt(0).endContainer);
 
                     if (startContainerParentElement === endContainerParentElement) {
-                        currentEditor = Selection.getSelectionElement(this.options.contentWindow);
+                        var currentEditor = Selection.getSelectionElement(this.options.contentWindow),
+                            parentElement = (startContainerParentElement || currentEditor),
+                            fragment = this.options.ownerDocument.createDocumentFragment();
                         exportedSelection = this.exportSelection();
+                        fragment.appendChild(parentElement.cloneNode(true));
+                        this.options.contentWindow.getSelection().removeAllRanges();
+                        var range = this.options.ownerDocument.createRange();
+                        if (currentEditor === parentElement) {
+                            // We have to avoid the editor itself being wiped out when it's the only block element,
+                            // as our reference inside this.elements gets detached from the page when insertHTML runs.
+                            // If we just use [parentElement, 0] and [parentElement, parentElement.childNodes.length]
+                            // as the range boundaries, this happens whenever parentElement === currentEditor.
+                            // The tradeoff to this workaround is that a orphaned tag can sometimes be left behind at
+                            // the end of the editor's content.
+                            // In Gecko:
+                            // as an empty <strong></strong> if parentElement.lastChild is a <strong> tag.
+                            // In WebKit:
+                            // an invented <br /> tag at the end in the same situation
+
+                            range.setStart(parentElement.firstChild, 0);
+                            range.setEnd(parentElement.lastChild, parentElement.lastChild.nodeType === 3 ?
+                                parentElement.lastChild.nodeValue.length : parentElement.lastChild.childNodes.length);
+                        } else {
+                            range.setStart(parentElement, 0);
+                            range.setEnd(parentElement, parentElement.childNodes.length);
+                        }
+                        this.options.contentWindow.getSelection().addRange(range);
+                        var modifiedExportedSelection = this.exportSelection();
+
                         textNodes = Util.findOrCreateMatchingTextNodes(this.options.ownerDocument,
-                                currentEditor,
-                                exportedSelection);
+                                fragment,
+                                {
+                                    start: exportedSelection.start - modifiedExportedSelection.start,
+                                    end: exportedSelection.end - modifiedExportedSelection.start,
+                                    editableElementIndex: exportedSelection.editableElementIndex
+                                });
+                        // Creates the link in the document fragment
                         Util.createLink(this.options.ownerDocument, textNodes, opts.url.trim());
-                        this.restoreSelection();
+                        // Chrome trims the leading whitespaces when inserting HTML, which messes up restoring the selection.
+                        var leadingWhitespacesCount = (fragment.firstChild.innerHTML.match(/^\s+/) || [''])[0].length;
+                        // Now move the created link back into the original document in a way to preserve undo/redo history
+                        Util.insertHTMLCommand(this.options.ownerDocument,
+                            fragment.firstChild.innerHTML.replace(/^\s+/, ''));
+                        exportedSelection.start -= leadingWhitespacesCount;
+                        exportedSelection.end -= leadingWhitespacesCount;
+                        this.importSelection(exportedSelection);
                     } else {
                         this.options.ownerDocument.execCommand('createLink', false, opts.url);
                     }

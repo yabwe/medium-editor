@@ -70,7 +70,8 @@ describe('Anchor Button TestCase', function () {
                 keyCode: Util.keyCode.ENTER
             });
             expect(editor.createLink).toHaveBeenCalled();
-            expect(this.el.innerHTML).toBe('<a href="test">lorem ipsum</a>');
+            // A trailing <br> may be added when insertHTML is used to add the link internally.
+            expect(this.el.innerHTML.indexOf('<a href="test">lorem ipsum</a>')).toBe(0);
         });
 
         it('should create only one anchor tag when the user selects across a boundary', function () {
@@ -95,8 +96,14 @@ describe('Anchor Button TestCase', function () {
                 keyCode: Util.keyCode.ENTER
             });
             expect(editor.createLink).toHaveBeenCalled();
+            var suffix;
+            if (this.el.innerHTML.indexOf('<br') !== -1) {
+                suffix = '<br>';
+            } else {
+                suffix = '<strong></strong>';
+            }
             expect(this.el.innerHTML).toBe('Hello world, <a href="test">this <strong>will become a link</strong></a>' +
-                '<strong>, but this part won\'t.</strong>');
+                '<strong>, but this part won\'t.</strong>' + suffix);
         });
 
         it('should create a link when the user selects text within two paragraphs', function () {
