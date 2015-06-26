@@ -359,12 +359,8 @@ var Toolbar;
                     while (adjacentNode.nodeValue.substr(offset, 1).trim().length === 0) {
                         offset = offset + 1;
                     }
-                    var newRange = this.document.createRange();
-                    newRange.setStart(adjacentNode, offset);
-                    newRange.setEnd(selectionRange.endContainer, selectionRange.endOffset);
-                    selection.removeAllRanges();
-                    selection.addRange(newRange);
-                    selectionRange = newRange;
+                    selectionRange = Selection.select(this.document, adjacentNode, offset,
+                        selectionRange.endContainer, selectionRange.offset);
                 }
             }
         },

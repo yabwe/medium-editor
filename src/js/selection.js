@@ -233,6 +233,19 @@ var Selection;
             sel.addRange(range);
         },
 
+        select: function (doc, startNode, startOffset, endNode, endOffset) {
+            doc.getSelection().removeAllRanges();
+            var range = doc.createRange();
+            range.setStart(startNode, startOffset);
+            if (endNode) {
+                range.setEnd(endNode, endOffset);
+            } else {
+                range.collapse(true);
+            }
+            doc.getSelection().addRange(range);
+            return range;
+        },
+
         /**
          * Move cursor to the given node with the given offset.
          *
@@ -241,17 +254,7 @@ var Selection;
          * @param  {integer}     offset  Where in the element should we jump, 0 by default
          */
         moveCursor: function (doc, node, offset) {
-            var range, sel,
-                startOffset = offset || 0;
-
-            range = doc.createRange();
-            sel = doc.getSelection();
-
-            range.setStart(node, startOffset);
-            range.collapse(true);
-
-            sel.removeAllRanges();
-            sel.addRange(range);
+            this.select(doc, node, offset);
         },
 
         getSelectionRange: function (ownerDocument) {

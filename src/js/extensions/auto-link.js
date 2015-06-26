@@ -97,28 +97,6 @@ LINK_REGEXP_TEXT =
             return documentModified;
         },
 
-        splitStartNodeIfNeeded: function (currentNode, matchStartIndex, currentTextIndex) {
-            if (matchStartIndex !== currentTextIndex) {
-                return currentNode.splitText(matchStartIndex - currentTextIndex);
-            }
-            return null;
-        },
-
-        splitEndNodeIfNeeded: function (currentNode, newNode, matchEndIndex, currentTextIndex) {
-            var textIndexOfEndOfFarthestNode,
-                endSplitPoint;
-            textIndexOfEndOfFarthestNode = currentTextIndex + (newNode || currentNode).nodeValue.length +
-                    (newNode ? currentNode.nodeValue.length : 0) -
-                    1;
-            endSplitPoint = (newNode || currentNode).nodeValue.length -
-                    (textIndexOfEndOfFarthestNode + 1 - matchEndIndex);
-            if (textIndexOfEndOfFarthestNode >= matchEndIndex &&
-                    currentTextIndex !== textIndexOfEndOfFarthestNode &&
-                    endSplitPoint !== 0) {
-                (newNode || currentNode).splitText(endSplitPoint);
-            }
-        },
-
         removeObsoleteAutoLinkSpans: function (element) {
             var spans = element.querySelectorAll('span[data-auto-link="true"]'),
                 documentModified = false;
@@ -176,10 +154,26 @@ LINK_REGEXP_TEXT =
                 linkCreated = false;
 
             for (var matchIndex = 0; matchIndex < matches.length; matchIndex++) {
-                linkCreated = this.createLink(this.findOrCreateMatchingTextNodes(element, matches[matchIndex]),
-                    matches[matchIndex].href) || linkCreated;
+                var matchingTextNodes = Util.findOrCreateMatchingTextNodes(this.document, element,
+                        matches[matchIndex]);
+                if (this.shouldNotLink(matchingTextNodes)) {
+                    continue;
+                }
+                this.createAutoLink(matchingTextNodes, matches[matchIndex].href);
             }
             return linkCreated;
+        },
+
+        shouldNotLink: function (textNodes) {
+            var shouldNotLink = false;
+            for (var i = 0; i < textNodes.length && shouldNotLink === false; i++) {
+                // Do not link if the text node is either inside an anchor or inside span[data-auto-link]
+                shouldNotLink = !!Util.traverseUp(textNodes[i], function (node) {
+                    return node.nodeName.toLowerCase() === 'a' ||
+                        (node.getAttribute && node.getAttribute('data-auto-link') === 'true');
+                });
+            }
+            return shouldNotLink;
         },
 
         findLinkableText: function (contenteditable) {
@@ -209,66 +203,17 @@ LINK_REGEXP_TEXT =
             return matches;
         },
 
-        findOrCreateMatchingTextNodes: function (element, match) {
-            var treeWalker = this.document.createTreeWalker(element, NodeFilter.SHOW_TEXT, null, false),
-                matchedNodes = [],
-                currentTextIndex = 0,
-                startReached = false,
-                currentNode = null,
-                newNode = null;
-
-            while ((currentNode = treeWalker.nextNode()) !== null) {
-                if (!startReached && match.start < (currentTextIndex + currentNode.nodeValue.length)) {
-                    startReached = true;
-                    newNode = this.splitStartNodeIfNeeded(currentNode, match.start, currentTextIndex);
-                }
-                if (startReached) {
-                    this.splitEndNodeIfNeeded(currentNode, newNode, match.end, currentTextIndex);
-                }
-                if (startReached && currentTextIndex === match.end) {
-                    break; // Found the node(s) corresponding to the link. Break out and move on to the next.
-                } else if (startReached && currentTextIndex > (match.end + 1)) {
-                    throw new Error('PerformLinking overshot the target!'); // should never happen...
-                }
-
-                if (startReached) {
-                    matchedNodes.push(newNode || currentNode);
-                }
-
-                currentTextIndex += currentNode.nodeValue.length;
-                if (newNode !== null) {
-                    currentTextIndex += newNode.nodeValue.length;
-                    // Skip the newNode as we'll already have pushed it to the matches
-                    treeWalker.nextNode();
-                }
-                newNode = null;
-            }
-            return matchedNodes;
-        },
-
-        createLink: function (textNodes, href) {
-            var shouldNotLink = false;
-            for (var i = 0; i < textNodes.length && shouldNotLink === false; i++) {
-                // Do not link if the text node is either inside an anchor or inside span[data-auto-link]
-                shouldNotLink = !!Util.traverseUp(textNodes[i], function (node) {
-                    return node.nodeName.toLowerCase() === 'a' ||
-                        (node.getAttribute && node.getAttribute('data-auto-link') === 'true');
-                });
-            }
-            if (shouldNotLink) {
-                return false;
-            }
-
-            var anchor = this.document.createElement('a'),
-                span = this.document.createElement('span'),
-                hrefWithProtocol = Util.ensureUrlHasProtocol(href);
-            Util.moveTextRangeIntoElement(textNodes[0], textNodes[textNodes.length - 1], span);
+        createAutoLink: function (textNodes, href) {
+            href = Util.ensureUrlHasProtocol(href);
+            var anchor = Util.createLink(this.document, textNodes, href),
+                span = this.document.createElement('span');
             span.setAttribute('data-auto-link', 'true');
-            span.setAttribute('data-href', hrefWithProtocol);
-            anchor.setAttribute('href', hrefWithProtocol);
-            span.parentNode.insertBefore(anchor, span);
-            anchor.appendChild(span);
-            return true;
+            span.setAttribute('data-href', href);
+            anchor.insertBefore(span, anchor.firstChild);
+            while (anchor.childNodes.length > 1) {
+                span.appendChild(anchor.childNodes[1]);
+            }
         }
+
     });
 }());
