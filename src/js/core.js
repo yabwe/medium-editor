@@ -455,34 +455,65 @@ function MediumEditor(elements, options) {
         if (action === 'image') {
             return this.options.ownerDocument.execCommand('insertImage', false, this.options.contentWindow.getSelection());
         }
+
         /* Issue: https://github.com/yabwe/medium-editor/issues/595
          * If the action is to justify the text */
         if (justifyAction.exec(action)) {
-            var reg = /<br\/*>/gm,
-                html = Selection.getSelectionHtml(this.options.ownerDocument);
-            /* The problem is caused by the <br> that are translated by Chrome in "div" instead of plain text */
-            if (reg.exec(html) !== null) {
-                var range = Selection.getSelectionRange(this.options.ownerDocument);
-                if (range !== null) {
-                    var parentNode = Selection.getSelectedParentElement(range),
-                        temp = html.replace(reg, '');
-                    /* Save selection */
-                    this.saveSelection();
-                    /* Before the action is applied, remove all the <br> elements. */
-                    parentNode.innerHTML = temp;
-                    /* The action is applied so the markup does not get weird */
-                    var result = this.options.ownerDocument.execCommand(action, false, null);
-                    /* Replace the html with the actual html with the <br> so the formatting
-                     * of the new line is not lost */
-                    parentNode.innerHTML = html;
-                    /* Restore selection */
-                    this.restoreSelection();
-                    return result;
-                }
+            var result = this.options.ownerDocument.execCommand(action, false, null),
+                parentNode = Selection.getSelectedParentElement(Selection.getSelectionRange(this.options.ownerDocument));
+            if (parentNode) {
+                cleanupJustifyDivFragments.call(this, Util.getTopBlockContainer(parentNode));
             }
+
+            return result;
         }
 
         return this.options.ownerDocument.execCommand(action, false, null);
+    }
+
+    /* If we've just justified text within a container block
+     * Chrome may have removed <br> elements and instead wrapped lines in <div> elements
+     * with a text-align property.  If so, we want to fix this
+     */
+    function cleanupJustifyDivFragments(blockContainer) {
+        if (!blockContainer) {
+            return;
+        }
+
+        var textAlign,
+            childDivs = Array.prototype.slice.call(blockContainer.childNodes).filter(function (element) {
+                var isDiv = element.nodeName.toLowerCase() === 'div';
+                if (isDiv && !textAlign) {
+                    textAlign = element.style.textAlign;
+                }
+                return isDiv;
+            });
+
+        /* If we found child <div> elements with text-align style attributes
+         * we should fix this by:
+         *
+         * 1) Unwrapping each <div> which has a text-align style
+         * 2) Insert a <br> element after each set of 'unwrapped' div children
+         * 3) Set the text-align style of the parent block element
+         */
+        if (childDivs.length) {
+            // Since we're mucking with the HTML, preserve selection
+            this.saveSelection();
+            childDivs.forEach(function (div) {
+                if (div.style.textAlign === textAlign) {
+                    var lastChild = div.lastChild;
+                    if (lastChild) {
+                        // Instead of a div, extract the child elements and add a <br>
+                        Util.unwrap(div, this.options.ownerDocument);
+                        var br = this.options.ownerDocument.createElement('BR');
+                        lastChild.parentNode.insertBefore(br, lastChild.nextSibling);
+                    }
+                }
+            }, this);
+            blockContainer.style.textAlign = textAlign;
+            // We're done, so restore selection
+            this.restoreSelection();
+        }
     }
 
     MediumEditor.Extension = Extension;
