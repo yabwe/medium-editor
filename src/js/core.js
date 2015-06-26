@@ -466,13 +466,18 @@ function MediumEditor(elements, options) {
                 if (range !== null) {
                     var parentNode = Selection.getSelectedParentElement(range),
                         temp = html.replace(reg, '');
-                    /* Before the action is applied, alle the <br> are removed. */
+                    /* Save selection */
+                    this.saveSelection();
+                    /* Before the action is applied, remove all the <br> elements. */
                     parentNode.innerHTML = temp;
                     /* The action is applied so the markup does not get weird */
-                    this.options.ownerDocument.execCommand(action, false, null);
+                    var result = this.options.ownerDocument.execCommand(action, false, null);
                     /* Replace the html with the actual html with the <br> so the formatting
                      * of the new line is not lost */
-                    return parentNode.innerHTML = html;
+                    parentNode.innerHTML = html;
+                    /* Restore selection */
+                    this.restoreSelection();
+                    return result;
                 }
             }
         }
