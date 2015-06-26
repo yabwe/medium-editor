@@ -233,6 +233,18 @@ var Selection;
             sel.addRange(range);
         },
 
+        select: function (doc, startNode, startOffset, endNode, endOffset) {
+            doc.getSelection().removeAllRanges();
+            var range = doc.createRange();
+            range.setStart(startNode, startOffset);
+            if (endNode) {
+                range.setEnd(endNode, endOffset);
+            } else {
+                range.collapse(true);
+            }
+            doc.getSelection().addRange(range);
+        },
+
         /**
          * Move cursor to the given node with the given offset.
          *

@@ -941,8 +941,6 @@ function MediumEditor(elements, options) {
                             fragment = this.options.ownerDocument.createDocumentFragment();
                         exportedSelection = this.exportSelection();
                         fragment.appendChild(parentElement.cloneNode(true));
-                        this.options.contentWindow.getSelection().removeAllRanges();
-                        var range = this.options.ownerDocument.createRange();
                         if (currentEditor === parentElement) {
                             // We have to avoid the editor itself being wiped out when it's the only block element,
                             // as our reference inside this.elements gets detached from the page when insertHTML runs.
@@ -955,14 +953,15 @@ function MediumEditor(elements, options) {
                             // In WebKit:
                             // an invented <br /> tag at the end in the same situation
 
-                            range.setStart(parentElement.firstChild, 0);
-                            range.setEnd(parentElement.lastChild, parentElement.lastChild.nodeType === 3 ?
+                            Selection.select(this.options.ownerDocument,
+                                parentElement.firstChild, 0,
+                                parentElement.lastChild, parentElement.lastChild.nodeType === 3 ?
                                 parentElement.lastChild.nodeValue.length : parentElement.lastChild.childNodes.length);
                         } else {
-                            range.setStart(parentElement, 0);
-                            range.setEnd(parentElement, parentElement.childNodes.length);
+                            Selection.select(this.options.ownerDocument,
+                                parentElement, 0,
+                                parentElement, parentElement.childNodes.length);
                         }
-                        this.options.contentWindow.getSelection().addRange(range);
                         var modifiedExportedSelection = this.exportSelection();
 
                         textNodes = Util.findOrCreateMatchingTextNodes(this.options.ownerDocument,

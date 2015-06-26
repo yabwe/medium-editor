@@ -1,7 +1,8 @@
 /*global MediumEditor, describe, it, expect, spyOn,
      afterEach, beforeEach, selectElementContents,
      jasmine, fireEvent, Util, setupTestHelpers,
-     selectElementContentsAndFire, AnchorForm */
+     selectElementContentsAndFire, AnchorForm,
+     Selection */
 
 describe('Anchor Button TestCase', function () {
     'use strict';
@@ -80,14 +81,10 @@ describe('Anchor Button TestCase', function () {
             spyOn(MediumEditor.prototype, 'createLink').and.callThrough();
             var editor = this.newMediumEditor('.editor'),
                 toolbar = editor.getExtensionByName('toolbar'),
-                selection = window.getSelection(),
-                newRange = document.createRange(),
                 button, input;
 
-            selection.removeAllRanges();
-            newRange.setStart(this.el.childNodes[0], 'Hello world, '.length);
-            newRange.setEnd(this.el.childNodes[1].childNodes[0], 'will become a link'.length);
-            selection.addRange(newRange);
+            Selection.select(document, this.el.childNodes[0], 'Hello world, '.length,
+                this.el.childNodes[1].childNodes[0], 'will become a link'.length);
             button = toolbar.getToolbarElement().querySelector('[data-action="createLink"]');
             fireEvent(button, 'click');
             input = editor.getExtensionByName('anchor').getInput();
@@ -113,14 +110,10 @@ describe('Anchor Button TestCase', function () {
             spyOn(MediumEditor.prototype, 'createLink').and.callThrough();
             var editor = this.newMediumEditor('.editor'),
                 toolbar = editor.getExtensionByName('toolbar'),
-                selection = window.getSelection(),
-                newRange = document.createRange(),
                 button, input;
 
-            selection.removeAllRanges();
-            newRange.setStart(this.el.querySelector('span'), 0);
-            newRange.setEnd(this.el.querySelector('strong'), 1);
-            selection.addRange(newRange);
+            Selection.select(document, this.el.querySelector('span'), 0,
+                this.el.querySelector('strong'), 1);
             button = toolbar.getToolbarElement().querySelector('[data-action="createLink"]');
             fireEvent(button, 'click');
             input = editor.getExtensionByName('anchor').getInput();
