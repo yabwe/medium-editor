@@ -459,7 +459,7 @@ function MediumEditor(elements, options) {
          * If the action is to justify the text */
         if (justifyAction.exec(action)) {
             var reg = /<br\/*>/gm,
-                html = Selection.getSelectionHtml.call(this);
+                html = Selection.getSelectionHtml(this.options.ownerDocument);
             /* The problem is caused by the <br> that are translated by Chrome in "div" instead of plain text */
             if (reg.exec(html) !== null) {
                 var range = Selection.getSelectionRange(this.options.ownerDocument);
