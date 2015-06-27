@@ -95,6 +95,12 @@ var Events;
             this.detachAllDOMEvents();
             this.detachAllCustomEvents();
             this.detachExecCommand();
+
+            if (this.base.elements) {
+                this.base.elements.forEach(function (element) {
+                    element.removeAttribute('data-medium-focused');
+                });
+            }
         },
 
         // Listening to calls to document.execCommand

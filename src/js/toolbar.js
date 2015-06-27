@@ -261,10 +261,10 @@ var Toolbar;
 
         // Checks for existance of multiple block elements in the current selection
         multipleBlockElementsSelected: function () {
-            /*jslint regexp: true*/
-            var selectionHtml = Selection.getSelectionHtml.call(this).replace(/<[\S]+><\/[\S]+>/gim, ''),
-                hasMultiParagraphs = selectionHtml.match(/<(p|h[1-6]|blockquote)[^>]*>/g);
-            /*jslint regexp: false*/
+            var regexEmptyHTMLTags = /<[^\/>][^>]*><\/[^>]+>/gim, // http://stackoverflow.com/questions/3129738/remove-empty-tags-using-regex
+                regexBlockElements = new RegExp('<(' + Util.parentElements.join('|') + ')[^>]*>', 'g'),
+                selectionHTML = Selection.getSelectionHtml.call(this).replace(regexEmptyHTMLTags, ''), // Filter out empty blocks from selection
+                hasMultiParagraphs = selectionHTML.match(regexBlockElements); // Find how many block elements are within the html
 
             return !!hasMultiParagraphs && hasMultiParagraphs.length > 1;
         },
