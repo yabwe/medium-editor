@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>MediumEditor - Extension Example</title>
+    <link rel="stylesheet" href="css/demo.css">
+    <link rel="stylesheet" href="../dist/css/medium-editor.css">
+    <link rel="stylesheet" href="../dist/css/themes/default.css">
+</head>
+<body>
+    <div id="container">
+        <h1>Medium Editor</h1>
+        <div class="editable">
+            <h2>Font Awesome</h2>
+            <p>My father’s family name being <a href="https://en.wikipedia.org/wiki/Pip_(Great_Expectations)">Pirrip</a>, and my Christian name Philip, my infant tongue could make of both names nothing longer or more explicit than Pip. So, I called myself Pip, and came to be called Pip.</p>
+            <p>I give Pirrip as my father’s family name, on the authority of his tombstone and my sister,—Mrs. Joe Gargery, who married the blacksmith. As I never saw my father or my mother, and never saw any likeness of either of them (for their days were long before the days of photographs), my first fancies regarding what they were like were unreasonably derived from their tombstones...</p>
+        </div>
+    </div>
+    <p style="text-align: center;"><small><a style="color: #333;" target="_blank" href="http://www.goodreads.com/reader/475-great-expectations">Source</a></small></p>
+    <script src="../dist/js/medium-editor.js"></script>
+    <script>
+        var DisableContextMenuExtension = MediumEditor.Extension.extend({
+            name: 'disable-context-menu',
+
+            init: function () {
+                this.getEditorElements().forEach(function (element) {
+                    this.on(element, 'contextmenu', this.handleContextmenu.bind(this));
+                }, this);
+                this.subscribe('editableKeydown', this.handleKeydown.bind(this));
+            },
+
+            handleContextmenu: function (event) {
+                if (!event.currentTarget.getAttribute('data-allow-context-menu')) {
+                    event.preventDefault();
+                }
+            },
+
+            handleKeydown: function (event, editable) {
+                // If the user hits escape, toggle the data-allow-context-menu attribute
+                if (MediumEditor.util.isKey(event, MediumEditor.util.keyCode.ESCAPE)) {
+                    if (editable.hasAttribute('data-allow-context-menu')) {
+                        editable.removeAttribute('data-allow-context-menu');
+                    } else {
+                        editable.setAttribute('data-allow-context-menu', true);
+                    }
+                }
+                
+            }
+        });
+        var editor = new MediumEditor('.editable', {
+                extensions: {
+                    'disable-context-menu': new DisableContextMenuExtension()
+                }
+            });
+    </script>
+</body>
+</html>
