@@ -95,6 +95,12 @@ var Events;
             this.detachAllDOMEvents();
             this.detachAllCustomEvents();
             this.detachExecCommand();
+
+            if (this.base.elements) {
+                this.base.elements.forEach(function (element) {
+                    element.removeAttribute('data-medium-focused');
+                });
+            }
         },
 
         // Listening to calls to document.execCommand
@@ -238,33 +244,23 @@ var Events;
                     break;
                 case 'editableClick':
                     // Detecting click in the contenteditables
-                    this.base.elements.forEach(function (element) {
-                        this.attachDOMEvent(element, 'click', this.handleClick.bind(this));
-                    }.bind(this));
+                    this.attachToEachElement('click', this.handleClick);
                     break;
                 case 'editableBlur':
                     // Detecting blur in the contenteditables
-                    this.base.elements.forEach(function (element) {
-                        this.attachDOMEvent(element, 'blur', this.handleBlur.bind(this));
-                    }.bind(this));
+                    this.attachToEachElement('blur', this.handleBlur);
                     break;
                 case 'editableKeypress':
                     // Detecting keypress in the contenteditables
-                    this.base.elements.forEach(function (element) {
-                        this.attachDOMEvent(element, 'keypress', this.handleKeypress.bind(this));
-                    }.bind(this));
+                    this.attachToEachElement('keypress', this.handleKeypress);
                     break;
                 case 'editableKeyup':
                     // Detecting keyup in the contenteditables
-                    this.base.elements.forEach(function (element) {
-                        this.attachDOMEvent(element, 'keyup', this.handleKeyup.bind(this));
-                    }.bind(this));
+                    this.attachToEachElement('keyup', this.handleKeyup);
                     break;
                 case 'editableKeydown':
                     // Detecting keydown on the contenteditables
-                    this.base.elements.forEach(function (element) {
-                        this.attachDOMEvent(element, 'keydown', this.handleKeydown.bind(this));
-                    }.bind(this));
+                    this.attachToEachElement('keydown', this.handleKeydown);
                     break;
                 case 'editableKeydownEnter':
                     // Detecting keydown for ENTER on the contenteditables
@@ -280,31 +276,29 @@ var Events;
                     break;
                 case 'editableMouseover':
                     // Detecting mouseover on the contenteditables
-                    this.base.elements.forEach(function (element) {
-                        this.attachDOMEvent(element, 'mouseover', this.handleMouseover.bind(this));
-                    }, this);
+                    this.attachToEachElement('mouseover', this.handleMouseover);
                     break;
                 case 'editableDrag':
                     // Detecting dragover and dragleave on the contenteditables
-                    this.base.elements.forEach(function (element) {
-                        this.attachDOMEvent(element, 'dragover', this.handleDragging.bind(this));
-                        this.attachDOMEvent(element, 'dragleave', this.handleDragging.bind(this));
-                    }, this);
+                    this.attachToEachElement('dragover', this.handleDragging);
+                    this.attachToEachElement('dragleave', this.handleDragging);
                     break;
                 case 'editableDrop':
                     // Detecting drop on the contenteditables
-                    this.base.elements.forEach(function (element) {
-                        this.attachDOMEvent(element, 'drop', this.handleDrop.bind(this));
-                    }, this);
+                    this.attachToEachElement('drop', this.handleDrop);
                     break;
                 case 'editablePaste':
                     // Detecting paste on the contenteditables
-                    this.base.elements.forEach(function (element) {
-                        this.attachDOMEvent(element, 'paste', this.handlePaste.bind(this));
-                    }, this);
+                    this.attachToEachElement('paste', this.handlePaste);
                     break;
             }
             this.listeners[name] = true;
+        },
+
+        attachToEachElement: function (name, handler) {
+            this.base.elements.forEach(function (element) {
+                this.attachDOMEvent(element, name, handler.bind(this));
+            }, this);
         },
 
         focusElement: function (element) {
