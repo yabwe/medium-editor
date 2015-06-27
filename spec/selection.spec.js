@@ -373,7 +373,7 @@ describe('Selection TestCase', function () {
             expect(toolbar.showAndUpdateToolbar).not.toHaveBeenCalled();
         });
 
-        it('should hide the toolbar when selecting multiple paragraphs and the allowMultiParagraphSelection option is false', function () {
+        it('should hide the toolbar when selecting multiple paragraphs and the deprecated allowMultiParagraphSelection option is false', function () {
             this.el.innerHTML = '<p id="p-one">lorem ipsum</p><p id="p-two">lorem ipsum</p>';
             var editor = this.newMediumEditor('.editor', {
                     allowMultiParagraphSelection: false

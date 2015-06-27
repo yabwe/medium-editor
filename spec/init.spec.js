@@ -107,7 +107,6 @@ describe('Initialization TestCase', function () {
                 elementsContainer: document.body,
                 contentWindow: window,
                 ownerDocument: document,
-                allowMultiParagraphSelection: true,
                 buttonLabels: false,
                 targetBlank: false,
                 extensions: {},

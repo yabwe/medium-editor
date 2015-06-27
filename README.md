@@ -106,7 +106,6 @@ var editor = new MediumEditor('.editor', {
 
 ### Core options
 * __activeButtonClass__: CSS class added to active buttons in the toolbar. Default: `'medium-editor-button-active'`
-* __allowMultiParagraphSelection__: enables the toolbar when selecting multiple paragraphs/block elements. Default: `true`
 * __buttonLabels__: type of labels on the buttons. Values: `false` | 'fontawesome'.  Default: `false`
 
 #### NOTE:
@@ -131,6 +130,7 @@ var editor = new MediumEditor('.editable', {
     toolbar: {
         /* These are the default options for the toolbar,
            if nothing is passed this is what is used */
+        allowMultiParagraphSelection: true,
         buttons: ['bold', 'italic', 'underline', 'anchor', 'h2', 'h3', 'quote'],
         diffLeft: 0,
         diffTop: -10,
@@ -147,6 +147,7 @@ var editor = new MediumEditor('.editable', {
 });
 ```
 
+* __allowMultiParagraphSelection__: enables/disables whether the toolbar should be displayed when selecting multiple paragraphs/block elements. Default: `true`
 * __buttons__: the set of buttons to display on the toolbar. Default: `['bold', 'italic', 'underline', 'anchor', 'h2', 'h3', 'quote']`
   * See [Button Options](#button-options) for details on more button options
 * __diffLeft__: value in pixels to be added to the X axis positioning of the toolbar. Default: `0`
