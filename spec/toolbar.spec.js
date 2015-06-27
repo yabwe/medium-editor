@@ -203,6 +203,20 @@ describe('Toolbar TestCase', function () {
             expect(document.getSelection().rangeCount).toBe(1);
             expect(toolbar.isDisplayed()).toBe(false);
         });
+
+        it('should hide the toolbar when selecting multiple paragraphs and the allowMultiParagraphSelection option is false', function () {
+            this.el.innerHTML = '<p id="p-one">lorem ipsum</p><p id="p-two">lorem ipsum</p>';
+            var editor = this.newMediumEditor('.editor', {
+                    toolbar: {
+                        allowMultiParagraphSelection: false
+                    }
+                }),
+                toolbar = editor.getExtensionByName('toolbar');
+            selectElementContentsAndFire(document.getElementById('p-one'), { eventToFire: 'focus' });
+            expect(toolbar.getToolbarElement().classList.contains('medium-editor-toolbar-active')).toBe(true);
+            selectElementContentsAndFire(this.el, { eventToFire: 'mouseup' });
+            expect(toolbar.getToolbarElement().classList.contains('medium-editor-toolbar-active')).toBe(false);
+        });
     });
 
     describe('Static Toolbars', function () {

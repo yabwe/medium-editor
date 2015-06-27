@@ -4,7 +4,6 @@ var editorDefaults;
 
     editorDefaults = {
         activeButtonClass: 'medium-editor-button-active',
-        allowMultiParagraphSelection: true,
         buttonLabels: false,
         delay: 0,
         disableReturn: false,

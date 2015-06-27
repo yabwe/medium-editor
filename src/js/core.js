@@ -404,7 +404,11 @@ function MediumEditor(elements, options) {
         // just create the default toolbar
         var toolbarExtension = this.options.extensions['toolbar'];
         if (!toolbarExtension && isToolbarEnabled.call(this)) {
-            toolbarExtension = new MediumEditor.extensions.toolbar(this.options.toolbar);
+            // Backwards compatability
+            var toolbarOptions = Util.extend({}, this.options.toolbar, {
+                allowMultiParagraphSelection: this.options.allowMultiParagraphSelection // deprecated
+            });
+            toolbarExtension = new MediumEditor.extensions.toolbar(toolbarOptions);
         }
 
         // If the toolbar is not disabled, so we actually have an extension
@@ -416,7 +420,7 @@ function MediumEditor(elements, options) {
 
     function mergeOptions(defaults, options) {
         var deprecatedProperties = [
-            // ['forcePlainText', 'paste.forcePlainText'],
+            ['allowMultiParagraphSelection', 'toolbar.allowMultiParagraphSelection']
         ];
         // warn about using deprecated properties
         if (options) {

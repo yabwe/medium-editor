@@ -15,6 +15,12 @@ var Toolbar;
          */
         align: 'center',
 
+        /* allowMultiParagraphSelection: [boolean]
+         * enables/disables whether the toolbar should be displayed when
+         * selecting multiple paragraphs/block elements
+         */
+        allowMultiParagraphSelection: true,
+
         /* buttons: [Array]
          * the names of the set of buttons to display on the toolbar.
          */
@@ -396,7 +402,7 @@ var Toolbar;
 
             // If we don't have a 'valid' selection -> hide toolbar
             if (this.window.getSelection().toString().trim() === '' ||
-                (this.getEditorOption('allowMultiParagraphSelection') === false && this.multipleBlockElementsSelected())) {
+                (this.allowMultiParagraphSelection === false && this.multipleBlockElementsSelected())) {
                 return this.hideToolbar();
             }
 
