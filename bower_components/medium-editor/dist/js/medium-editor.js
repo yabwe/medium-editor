@@ -2747,6 +2747,18 @@ var FormExtension;
          * functionality for all form extensions
          *********************************************************/
 
+        /* showToolbarDefaultActions: [function ()]
+         *
+         * Helper method which will turn back the toolbar after canceling
+         * the customized form
+         */
+        showToolbarDefaultActions: function () {
+            var toolbar = this.base.getExtensionByName('toolbar');
+            if (toolbar) {
+                toolbar.showToolbarDefaultActions();
+            }
+        },
+
         /* hideToolbarDefaultActions: [function ()]
          *
          * Helper function which will hide the default contents of the
@@ -3152,9 +3164,10 @@ var AnchorPreview;
             return this;
         },
 
-        positionPreview: function () {
+        positionPreview: function (activeAnchor) {
+            activeAnchor = activeAnchor || this.activeAnchor;
             var buttonHeight = this.anchorPreview.offsetHeight,
-                boundary = this.activeAnchor.getBoundingClientRect(),
+                boundary = activeAnchor.getBoundingClientRect(),
                 middleBoundary = (boundary.left + boundary.right) / 2,
                 diffLeft = this.diffLeft,
                 diffTop = this.diffTop,
@@ -5128,9 +5141,9 @@ function MediumEditor(elements, options) {
 
         // Loop through elements and convert textarea's into divs
         this.elements = [];
-        elements.forEach(function (element) {
+        elements.forEach(function (element, index) {
             if (element.nodeName.toLowerCase() === 'textarea') {
-                this.elements.push(createContentEditable.call(this, element));
+                this.elements.push(createContentEditable.call(this, element, index));
             } else {
                 this.elements.push(element);
             }
@@ -5205,9 +5218,9 @@ function MediumEditor(elements, options) {
         return this.options.keyboardCommands !== false;
     }
 
-    function createContentEditable(textarea) {
+    function createContentEditable(textarea, id) {
         var div = this.options.ownerDocument.createElement('div'),
-            id = (+new Date()),
+            uniqueId = 'medium-editor-' + Date.now() + '-' + id,
             attributesToClone = [
                 'data-disable-editing',
                 'data-disable-toolbar',
@@ -5219,7 +5232,7 @@ function MediumEditor(elements, options) {
             ];
 
         div.className = textarea.className;
-        div.id = id;
+        div.id = uniqueId;
         div.innerHTML = textarea.value;
         div.setAttribute('medium-editor-textarea-id', id);
         attributesToClone.forEach(function (attr) {
@@ -5355,6 +5368,7 @@ function MediumEditor(elements, options) {
     function execActionInternal(action, opts) {
         /*jslint regexp: true*/
         var appendAction = /^append-(.+)$/gi,
+            justifyAction = /justify([A-Za-z]*)$/g, /* Detecting if is justifyCenter|Right|Left */
             match;
         /*jslint regexp: false*/
 
@@ -5377,7 +5391,64 @@ function MediumEditor(elements, options) {
             return this.options.ownerDocument.execCommand('insertImage', false, this.options.contentWindow.getSelection());
         }
 
+        /* Issue: https://github.com/yabwe/medium-editor/issues/595
+         * If the action is to justify the text */
+        if (justifyAction.exec(action)) {
+            var result = this.options.ownerDocument.execCommand(action, false, null),
+                parentNode = Selection.getSelectedParentElement(Selection.getSelectionRange(this.options.ownerDocument));
+            if (parentNode) {
+                cleanupJustifyDivFragments.call(this, Util.getTopBlockContainer(parentNode));
+            }
+
+            return result;
+        }
+
         return this.options.ownerDocument.execCommand(action, false, null);
+    }
+
+    /* If we've just justified text within a container block
+     * Chrome may have removed <br> elements and instead wrapped lines in <div> elements
+     * with a text-align property.  If so, we want to fix this
+     */
+    function cleanupJustifyDivFragments(blockContainer) {
+        if (!blockContainer) {
+            return;
+        }
+
+        var textAlign,
+            childDivs = Array.prototype.slice.call(blockContainer.childNodes).filter(function (element) {
+                var isDiv = element.nodeName.toLowerCase() === 'div';
+                if (isDiv && !textAlign) {
+                    textAlign = element.style.textAlign;
+                }
+                return isDiv;
+            });
+
+        /* If we found child <div> elements with text-align style attributes
+         * we should fix this by:
+         *
+         * 1) Unwrapping each <div> which has a text-align style
+         * 2) Insert a <br> element after each set of 'unwrapped' div children
+         * 3) Set the text-align style of the parent block element
+         */
+        if (childDivs.length) {
+            // Since we're mucking with the HTML, preserve selection
+            this.saveSelection();
+            childDivs.forEach(function (div) {
+                if (div.style.textAlign === textAlign) {
+                    var lastChild = div.lastChild;
+                    if (lastChild) {
+                        // Instead of a div, extract the child elements and add a <br>
+                        Util.unwrap(div, this.options.ownerDocument);
+                        var br = this.options.ownerDocument.createElement('BR');
+                        lastChild.parentNode.insertBefore(br, lastChild.nextSibling);
+                    }
+                }
+            }, this);
+            blockContainer.style.textAlign = textAlign;
+            // We're done, so restore selection
+            this.restoreSelection();
+        }
     }
 
     MediumEditor.Extension = Extension;
@@ -5442,9 +5513,14 @@ function MediumEditor(elements, options) {
                     element.innerHTML = element.innerHTML;
                 }
 
+                // cleanup extra added attributes
                 element.removeAttribute('contentEditable');
                 element.removeAttribute('spellcheck');
+                element.removeAttribute('data-medium-focused');
                 element.removeAttribute('data-medium-editor-element');
+                element.removeAttribute('role');
+                element.removeAttribute('aria-multiline');
+                element.removeAttribute('medium-editor-index');
 
                 // Remove any elements created for textareas
                 if (element.hasAttribute('medium-editor-textarea-id')) {
@@ -5885,14 +5961,14 @@ MediumEditor.parseVersionString = function (release) {
         revision: parseInt(version[2], 10),
         preRelease: preRelease,
         toString: function () {
-            return [[version[0], version[1], version[2]].join('.'), preRelease].join('-');
+            return [version[0], version[1], version[2]].join('.') + (preRelease ? '-' + preRelease : '');
         }
     };
 };
 
 MediumEditor.version = MediumEditor.parseVersionString.call(this, ({
     // grunt-bump looks for this:
-    'version': '5.0.0'
+    'version': '5.1.0'
 }).version);
 
     return MediumEditor;
