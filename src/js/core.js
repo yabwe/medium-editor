@@ -177,9 +177,9 @@ function MediumEditor(elements, options) {
 
         // Loop through elements and convert textarea's into divs
         this.elements = [];
-        elements.forEach(function (element) {
+        elements.forEach(function (element, index) {
             if (element.tagName.toLowerCase() === 'textarea') {
-                this.elements.push(createContentEditable.call(this, element));
+                this.elements.push(createContentEditable.call(this, element, index));
             } else {
                 this.elements.push(element);
             }
@@ -285,9 +285,9 @@ function MediumEditor(elements, options) {
         return this.options.imageDragging !== false;
     }
 
-    function createContentEditable(textarea) {
+    function createContentEditable(textarea, id) {
         var div = this.options.ownerDocument.createElement('div'),
-            id = (+new Date()),
+            uniqueId = 'medium-editor-' + Date.now() + '-' + id,
             attributesToClone = [
                 'data-disable-editing',
                 'data-disable-toolbar',
@@ -299,7 +299,7 @@ function MediumEditor(elements, options) {
             ];
 
         div.className = textarea.className;
-        div.id = id;
+        div.id = uniqueId;
         div.innerHTML = textarea.value;
         div.setAttribute('medium-editor-textarea-id', id);
         attributesToClone.forEach(function (attr) {
@@ -637,6 +637,8 @@ function MediumEditor(elements, options) {
                 delete this.toolbar;
             }
 
+            this.events.destroy();
+
             this.elements.forEach(function (element) {
                 // Reset elements content, fix for issue where after editor destroyed the red underlines on spelling errors are left
                 if (this.options.spellcheck) {
@@ -646,6 +648,9 @@ function MediumEditor(elements, options) {
                 element.removeAttribute('contentEditable');
                 element.removeAttribute('spellcheck');
                 element.removeAttribute('data-medium-element');
+                element.removeAttribute('medium-editor-index');
+                element.removeAttribute('role');
+                element.removeAttribute('aria-multiline');
 
                 // Remove any elements created for textareas
                 if (element.hasAttribute('medium-editor-textarea-id')) {
@@ -660,8 +665,6 @@ function MediumEditor(elements, options) {
                 }
             }, this);
             this.elements = [];
-
-            this.events.destroy();
         },
 
         on: function (target, event, listener, useCapture) {

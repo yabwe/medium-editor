@@ -54,6 +54,25 @@ describe('Textarea TestCase', function () {
         expect(editor.elements[0].className).toBe('editor test-class test-class-2');
     });
 
+    it('should create unique div ids for multiple textareas', function () {
+        var tas = [];
+        for (var i = 0; i < 12; i++) {
+            var ta = document.createElement('textarea');
+            ta.className = 'editor';
+            ta.value = 'test content';
+            document.body.appendChild(ta);
+            tas.push(ta);
+        }
+        var editor = this.newMediumEditor('.editor');
+        editor.elements.forEach(function (el) {
+            expect(document.querySelectorAll('div#' + el.id).length).toEqual(1);
+        });
+        editor.destroy();
+        tas.forEach(function (el) {
+            document.body.removeChild(el);
+        });
+    });
+
     it('should cleanup after destroy', function () {
         var editor = this.newMediumEditor('.editor');
         expect(this.el.classList.contains('medium-editor-hidden')).toBe(true);
