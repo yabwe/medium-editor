@@ -572,6 +572,8 @@ function MediumEditor(elements, options) {
                 }
             }, this);
 
+            this.events.destroy();
+
             this.elements.forEach(function (element) {
                 // Reset elements content, fix for issue where after editor destroyed the red underlines on spelling errors are left
                 if (this.options.spellcheck) {
@@ -581,7 +583,6 @@ function MediumEditor(elements, options) {
                 // cleanup extra added attributes
                 element.removeAttribute('contentEditable');
                 element.removeAttribute('spellcheck');
-                element.removeAttribute('data-medium-focused');
                 element.removeAttribute('data-medium-editor-element');
                 element.removeAttribute('role');
                 element.removeAttribute('aria-multiline');
@@ -601,7 +602,6 @@ function MediumEditor(elements, options) {
             }, this);
             this.elements = [];
 
-            this.events.destroy();
             removeFromEditors.call(this, this.options.contentWindow);
         },
 
