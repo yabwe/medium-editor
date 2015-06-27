@@ -163,9 +163,9 @@ var AnchorPreview;
                 return true;
             }
 
-            // only show when hovering on anchors
-            if (this.base.toolbar && this.base.toolbar.isDisplayed()) {
-                // only show when toolbar is not present
+            // only show when toolbar is not present
+            var toolbar = this.base.getExtensionByName('toolbar');
+            if (toolbar && toolbar.isDisplayed && toolbar.isDisplayed()) {
                 return true;
             }
 
