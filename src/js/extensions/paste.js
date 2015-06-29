@@ -1,7 +1,7 @@
-/*global Util, Selection, console*/
+/*global Util, Selection, Extension */
 var PasteHandler;
 
-(function (window, document) {
+(function () {
     'use strict';
     /*jslint regexp: true*/
     /*
@@ -14,8 +14,8 @@ var PasteHandler;
         return [
 
             // replace two bogus tags that begin pastes from google docs
-            [new RegExp(/<[^>]*docs-internal-guid[^>]*>/gi), ""],
-            [new RegExp(/<\/b>(<br[^>]*>)?$/gi), ""],
+            [new RegExp(/<[^>]*docs-internal-guid[^>]*>/gi), ''],
+            [new RegExp(/<\/b>(<br[^>]*>)?$/gi), ''],
 
              // un-html spaces and newlines inserted by OS X
             [new RegExp(/<span class="Apple-converted-space">\s+<\/span>/g), ' '],
@@ -34,7 +34,7 @@ var PasteHandler;
             [new RegExp(/&lt;(\/?)(i|b|a)&gt;/gi), '<$1$2>'],
 
              // replace manually a tags with real ones, converting smart-quotes from google docs
-            [new RegExp(/&lt;a\s+href=(&quot;|&rdquo;|&ldquo;|“|”)([^&]+)(&quot;|&rdquo;|&ldquo;|“|”)&gt;/gi), '<a href="$2">'],
+            [new RegExp(/&lt;a(?:(?!href).)+href=(?:&quot;|&rdquo;|&ldquo;|"|“|”)(((?!&quot;|&rdquo;|&ldquo;|"|“|”).)*)(?:&quot;|&rdquo;|&ldquo;|"|“|”)(?:(?!&gt;).)*&gt;/gi), '<a href="$1">'],
 
             // Newlines between paragraphs in html have no syntactic value,
             // but then have a tendency to accidentally become additional paragraphs down the line
@@ -47,25 +47,56 @@ var PasteHandler;
     }
     /*jslint regexp: false*/
 
-    PasteHandler = function (instance) {
-        this.base = instance;
-        this.options = this.base.options;
+    PasteHandler = Extension.extend({
+        /* Paste Options */
 
-        if (this.options.forcePlainText || this.options.cleanPastedHTML) {
-            this.base.subscribe('editablePaste', this.handlePaste.bind(this));
-        }
-    };
+        /* forcePlainText: [boolean]
+         * Forces pasting as plain text.
+         */
+        forcePlainText: true,
 
-    PasteHandler.prototype = {
+        /* cleanPastedHTML: [boolean]
+         * cleans pasted content from different sources, like google docs etc.
+         */
+        cleanPastedHTML: false,
+
+        /* cleanReplacements: [Array]
+         * custom pairs (2 element arrays) of RegExp and replacement text to use during paste when
+         * __forcePlainText__ or __cleanPastedHTML__ are `true` OR when calling `cleanPaste(text)` helper method.
+         */
+        cleanReplacements: [],
+
+        /* cleanAttrs:: [Array]
+         * list of element attributes to remove during paste when __cleanPastedHTML__ is `true` or when
+         * calling `cleanPaste(text)` or `pasteHTML(html, options)` helper methods.
+         */
+        cleanAttrs: ['class', 'style', 'dir'],
+
+        /* cleanTags: [Array]
+         * list of element tag names to remove during paste when __cleanPastedHTML__ is `true` or when
+         * calling `cleanPaste(text)` or `pasteHTML(html, options)` helper methods.
+         */
+        cleanTags: ['meta'],
+
+        init: function () {
+            Extension.prototype.init.apply(this, arguments);
+
+            if (this.forcePlainText || this.cleanPastedHTML) {
+                this.subscribe('editablePaste', this.handlePaste.bind(this));
+            }
+        },
+
         handlePaste: function (event, element) {
             var paragraphs,
                 html = '',
                 p,
                 dataFormatHTML = 'text/html',
-                dataFormatPlain = 'text/plain';
+                dataFormatPlain = 'text/plain',
+                pastedHTML,
+                pastedPlain;
 
-            if (this.options.contentWindow.clipboardData && event.clipboardData === undefined) {
-                event.clipboardData = this.options.contentWindow.clipboardData;
+            if (this.window.clipboardData && event.clipboardData === undefined) {
+                event.clipboardData = this.window.clipboardData;
                 // If window.clipboardData exists, but event.clipboardData doesn't exist,
                 // we're probably in IE. IE only has two possibilities for clipboard
                 // data format: 'Text' and 'URL'.
@@ -75,66 +106,71 @@ var PasteHandler;
                 dataFormatPlain = 'Text';
             }
 
-            if (event.clipboardData
-                    && event.clipboardData.getData
-                    && !event.defaultPrevented) {
+            if (event.clipboardData &&
+                    event.clipboardData.getData &&
+                    !event.defaultPrevented) {
                 event.preventDefault();
 
-                if (this.options.cleanPastedHTML && event.clipboardData.getData(dataFormatHTML)) {
-                    return this.cleanPaste(event.clipboardData.getData(dataFormatHTML));
+                pastedHTML = event.clipboardData.getData(dataFormatHTML);
+                pastedPlain = event.clipboardData.getData(dataFormatPlain);
+
+                if (this.cleanPastedHTML && pastedHTML) {
+                    return this.cleanPaste(pastedHTML);
                 }
 
-                if (!(this.options.disableReturn || element.getAttribute('data-disable-return'))) {
-                    paragraphs = event.clipboardData.getData(dataFormatPlain).split(/[\r\n]/g);
-                    for (p = 0; p < paragraphs.length; p += 1) {
-                        if (paragraphs[p] !== '') {
-                            html += '<p>' + Util.htmlEntities(paragraphs[p]) + '</p>';
+                if (!(this.getEditorOption('disableReturn') || element.getAttribute('data-disable-return'))) {
+                    paragraphs = pastedPlain.split(/[\r\n]+/g);
+                    // If there are no \r\n in data, don't wrap in <p>
+                    if (paragraphs.length > 1) {
+                        for (p = 0; p < paragraphs.length; p += 1) {
+                            if (paragraphs[p] !== '') {
+                                html += '<p>' + Util.htmlEntities(paragraphs[p]) + '</p>';
+                            }
                         }
+                    } else {
+                        html = Util.htmlEntities(paragraphs[0]);
                     }
-                    Util.insertHTMLCommand(this.options.ownerDocument, html);
                 } else {
-                    html = Util.htmlEntities(event.clipboardData.getData(dataFormatPlain));
-                    Util.insertHTMLCommand(this.options.ownerDocument, html);
+                    html = Util.htmlEntities(pastedPlain);
                 }
+                Util.insertHTMLCommand(this.document, html);
             }
         },
 
         cleanPaste: function (text) {
             var i, elList, workEl,
-                el = Selection.getSelectionElement(this.options.contentWindow),
+                el = Selection.getSelectionElement(this.window),
                 multiline = /<p|<br|<div/.test(text),
-                replacements = createReplacements();
+                replacements = createReplacements().concat(this.cleanReplacements || []);
 
             for (i = 0; i < replacements.length; i += 1) {
                 text = text.replace(replacements[i][0], replacements[i][1]);
             }
 
-            if (multiline) {
-                // double br's aren't converted to p tags, but we want paragraphs.
-                elList = text.split('<br><br>');
+            if (!multiline) {
+                return this.pasteHTML(text);
+            }
 
-                this.pasteHTML('<p>' + elList.join('</p><p>') + '</p>');
+            // double br's aren't converted to p tags, but we want paragraphs.
+            elList = text.split('<br><br>');
 
-                try {
-                    this.options.ownerDocument.execCommand('insertText', false, "\n");
-                } catch (ignore) { }
+            this.pasteHTML('<p>' + elList.join('</p><p>') + '</p>');
 
-                // block element cleanup
-                elList = el.querySelectorAll('a,p,div,br');
-                for (i = 0; i < elList.length; i += 1) {
-                    workEl = elList[i];
+            try {
+                this.document.execCommand('insertText', false, '\n');
+            } catch (ignore) { }
 
-                    // Microsoft Word replaces some spaces with newlines.
-                    // While newlines between block elements are meaningless, newlines within
-                    // elements are sometimes actually spaces.
-                    workEl.innerHTML = workEl.innerHTML.replace(/\n/gi, ' ');
+            // block element cleanup
+            elList = el.querySelectorAll('a,p,div,br');
+            for (i = 0; i < elList.length; i += 1) {
+                workEl = elList[i];
 
-                    switch (workEl.tagName.toLowerCase()) {
-                    case 'a':
-                        if (this.options.targetBlank) {
-                            Util.setTargetBlank(workEl);
-                        }
-                        break;
+                // Microsoft Word replaces some spaces with newlines.
+                // While newlines between block elements are meaningless, newlines within
+                // elements are sometimes actually spaces.
+                workEl.innerHTML = workEl.innerHTML.replace(/\n/gi, ' ');
+
+                switch (workEl.nodeName.toLowerCase()) {
                     case 'p':
                     case 'div':
                         this.filterCommonBlocks(workEl);
@@ -142,17 +178,19 @@ var PasteHandler;
                     case 'br':
                         this.filterLineBreak(workEl);
                         break;
-                    }
                 }
-            } else {
-                this.pasteHTML(text);
             }
         },
 
-        pasteHTML: function (html) {
-            var elList, workEl, i, fragmentBody, pasteBlock = this.options.ownerDocument.createDocumentFragment();
+        pasteHTML: function (html, options) {
+            options = Util.defaults({}, options, {
+                cleanAttrs: this.cleanAttrs,
+                cleanTags: this.cleanTags
+            });
 
-            pasteBlock.appendChild(this.options.ownerDocument.createElement('body'));
+            var elList, workEl, i, fragmentBody, pasteBlock = this.document.createDocumentFragment();
+
+            pasteBlock.appendChild(this.document.createElement('body'));
 
             fragmentBody = pasteBlock.querySelector('body');
             fragmentBody.innerHTML = html;
@@ -160,30 +198,32 @@ var PasteHandler;
             this.cleanupSpans(fragmentBody);
 
             elList = fragmentBody.querySelectorAll('*');
+
             for (i = 0; i < elList.length; i += 1) {
                 workEl = elList[i];
 
-                // delete ugly attributes
-                workEl.removeAttribute('class');
-                workEl.removeAttribute('style');
-                workEl.removeAttribute('dir');
-
-                if (workEl.tagName.toLowerCase() === 'meta') {
-                    workEl.parentNode.removeChild(workEl);
+                if ('a' === workEl.nodeName.toLowerCase() && this.getEditorOption('targetBlank')) {
+                    Util.setTargetBlank(workEl);
                 }
+
+                Util.cleanupAttrs(workEl, options.cleanAttrs);
+                Util.cleanupTags(workEl, options.cleanTags);
             }
-            Util.insertHTMLCommand(this.options.ownerDocument, fragmentBody.innerHTML.replace(/&nbsp;/g, ' '));
+
+            Util.insertHTMLCommand(this.document, fragmentBody.innerHTML.replace(/&nbsp;/g, ' '));
         },
+
         isCommonBlock: function (el) {
-            return (el && (el.tagName.toLowerCase() === 'p' || el.tagName.toLowerCase() === 'div'));
+            return (el && (el.nodeName.toLowerCase() === 'p' || el.nodeName.toLowerCase() === 'div'));
         },
+
         filterCommonBlocks: function (el) {
             if (/^\s*$/.test(el.textContent) && el.parentNode) {
                 el.parentNode.removeChild(el);
             }
         },
-        filterLineBreak: function (el) {
 
+        filterLineBreak: function (el) {
             if (this.isCommonBlock(el.previousElementSibling)) {
                 // remove stray br's following common block elements
                 this.removeWithParent(el);
@@ -207,29 +247,29 @@ var PasteHandler;
             }
         },
 
-        cleanupSpans: function (container_el) {
+        cleanupSpans: function (containerEl) {
             var i,
                 el,
-                new_el,
-                spans = container_el.querySelectorAll('.replace-with'),
+                newEl,
+                spans = containerEl.querySelectorAll('.replace-with'),
                 isCEF = function (el) {
                     return (el && el.nodeName !== '#text' && el.getAttribute('contenteditable') === 'false');
                 };
 
             for (i = 0; i < spans.length; i += 1) {
                 el = spans[i];
-                new_el = this.options.ownerDocument.createElement(el.classList.contains('bold') ? 'b' : 'i');
+                newEl = this.document.createElement(el.classList.contains('bold') ? 'b' : 'i');
 
                 if (el.classList.contains('bold') && el.classList.contains('italic')) {
                     // add an i tag as well if this has both italics and bold
-                    new_el.innerHTML = '<i>' + el.innerHTML + '</i>';
+                    newEl.innerHTML = '<i>' + el.innerHTML + '</i>';
                 } else {
-                    new_el.innerHTML = el.innerHTML;
+                    newEl.innerHTML = el.innerHTML;
                 }
-                el.parentNode.replaceChild(new_el, el);
+                el.parentNode.replaceChild(newEl, el);
             }
 
-            spans = container_el.querySelectorAll('span');
+            spans = containerEl.querySelectorAll('span');
             for (i = 0; i < spans.length; i += 1) {
                 el = spans[i];
 
@@ -239,12 +279,8 @@ var PasteHandler;
                 }
 
                 // remove empty spans, replace others with their contents
-                if (/^\s*$/.test()) {
-                    el.parentNode.removeChild(el);
-                } else {
-                    el.parentNode.replaceChild(this.options.ownerDocument.createTextNode(el.textContent), el);
-                }
+                Util.unwrap(el, this.document);
             }
         }
-    };
-}(window, document));
+    });
+}());

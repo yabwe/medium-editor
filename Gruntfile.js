@@ -14,43 +14,54 @@ module.exports = function (grunt) {
         },
         srcFiles = [
             'src/js/util.js',
+            'src/js/defaults/buttons.js',
+            'src/js/defaults/options.js',
+            'src/js/extension.js',
             'src/js/selection.js',
             'src/js/events.js',
-            'src/js/button.js',
-            'src/js/paste.js',
-            'src/js/extension-anchor.js',
-            'src/js/extension-anchor-preview.js',
-            'src/js/toolbar.js',
-            'src/js/placeholders.js',
-            'src/js/core.js'
+            'src/js/extensions/button.js',
+            'src/js/extensions/form.js',
+            'src/js/extensions/anchor.js',
+            'src/js/extensions/anchor-preview.js',
+            'src/js/extensions/auto-link.js',
+            'src/js/extensions/image-dragging.js',
+            'src/js/extensions/keyboard-commands.js',
+            'src/js/extensions/fontsize.js',
+            'src/js/extensions/paste.js',
+            'src/js/extensions/placeholder.js',
+            'src/js/extensions/toolbar.js',
+            'src/js/defaults/options.js',
+            'src/js/defaults/extensions.js',
+            'src/js/core.js',
+            'src/js/version.js'
         ],
-        browsers = [ {
-            browserName: "internet explorer",
-            version: "9",
-            platform: "WIN7"
+        browsers = [{
+            browserName: 'internet explorer',
+            version: '9',
+            platform: 'WIN7'
         }, {
-            browserName: "internet explorer",
-            version: "10",
-            platform: "WIN8"
+            browserName: 'internet explorer',
+            version: '10',
+            platform: 'WIN8'
         }, {
-            browserName: "internet explorer",
-            version: "11",
-            platform: "WIN8.1"
+            browserName: 'internet explorer',
+            version: '11',
+            platform: 'WIN8.1'
         }, {
-            browserName: "chrome",
-            platform: "WIN8.1"
+            browserName: 'chrome',
+            platform: 'WIN8.1'
         }, {
-            browserName: "firefox",
-            platform: "WIN8.1"
+            browserName: 'firefox',
+            platform: 'WIN8.1'
         }, {
-            browserName: "safari",
-            platform: "OS X 10.10"
+            browserName: 'safari',
+            platform: 'OS X 10.10'
         }, {
-            browserName: "firefox",
-            platform: "OS X 10.10"
+            browserName: 'firefox',
+            platform: 'OS X 10.10'
         }, {
-            browserName: "googlechrome",
-            platform: "OS X 10.10"
+            browserName: 'googlechrome',
+            platform: 'OS X 10.10'
         }];
 
     gruntConfig.connect = {
@@ -62,21 +73,32 @@ module.exports = function (grunt) {
         }
     };
 
-    gruntConfig.jslint = {
-        client: {
-            exclude: ['src/js/polyfills.js'],
+    // TODO: build check with debug and devel false
+    gruntConfig.jshint = {
+        options: {
+            ignores: ['src/js/polyfills.js'],
+            jshintrc: true,
+            reporter: require('jshint-stylish')
+        },
+        all: {
             src: [
                 'src/js/**/*.js',
                 'spec/*.spec.js',
                 'Gruntfile.js'
-            ],
-            directives: {
-                browser: true,
-                unparam: true,
-                todo: true,
-                regexp: true,
-                debug: true
-            }
+            ]
+        }
+    };
+
+    // TODO: "maximumLineLength": 120
+    gruntConfig.jscs = {
+        src: [
+            'src/js/**/*.js',
+            'spec/*.spec.js',
+            'Gruntfile.js',
+            '!src/js/polyfills.js'
+        ],
+        options: {
+            config: '.jscsrc'
         }
     };
 
@@ -87,6 +109,7 @@ module.exports = function (grunt) {
                 specs: ['spec/*.spec.js'],
                 helpers: 'spec/helpers/*.js',
                 vendor: [
+                    'node_modules/lodash/index.js',
                     'spec/vendor/jasmine-jsreporter.js',
                     'spec/vendor/jasmine-jsreporter-script.js'
                 ],
@@ -106,11 +129,6 @@ module.exports = function (grunt) {
                         type: 'lcov',
                         options: {
                             dir: 'reports/jasmine/lcov'
-                        }
-                    }, {
-                        type: 'html',
-                        options: {
-                            dir: 'coverage'
                         }
                     }]
                 },
@@ -266,7 +284,7 @@ module.exports = function (grunt) {
         }
     };
 
-    gruntConfig.coveralls =  {
+    gruntConfig.coveralls = {
         dist: {
             src: 'reports/jasmine/lcov/lcov.info'
         }
@@ -274,7 +292,7 @@ module.exports = function (grunt) {
 
     gruntConfig.bump = {
         options: {
-            files: ['bower.json', 'package.json'],
+            files: ['package.json', 'src/js/version.js'],
             updateConfigs: [],
             commit: false,
             createTag: false,
@@ -292,15 +310,15 @@ module.exports = function (grunt) {
         ]
     });
 
-    if (process.env.TRAVIS_BRANCH === 'master') {
-        grunt.registerTask('travis', ['connect', 'jslint', 'jasmine:suite', 'csslint', 'saucelabs-jasmine', 'coveralls']);
+    if (parseInt(process.env.TRAVIS_PULL_REQUEST, 10) > 0) {
+        grunt.registerTask('travis', ['jshint', 'jscs', 'jasmine:suite', 'csslint', 'coveralls']);
     } else {
-        grunt.registerTask('travis', ['jslint', 'jasmine:suite', 'csslint', 'coveralls']);
+        grunt.registerTask('travis', ['connect', 'jshint', 'jscs', 'jasmine:suite', 'csslint', 'saucelabs-jasmine', 'coveralls']);
     }
 
-    grunt.registerTask('test', ['jslint', 'concat', 'jasmine:suite', 'csslint']);
+    grunt.registerTask('test', ['jshint', 'jscs', 'concat', 'jasmine:suite', 'csslint']);
     grunt.registerTask('sauce', ['connect', 'saucelabs-jasmine']);
-    grunt.registerTask('js', ['jslint', 'concat', 'jasmine:suite', 'uglify']);
+    grunt.registerTask('js', ['jshint', 'jscs', 'concat', 'jasmine:suite', 'uglify']);
     grunt.registerTask('css', ['sass', 'autoprefixer', 'cssmin', 'csslint']);
     grunt.registerTask('default', ['js', 'css']);
 
@@ -309,4 +327,8 @@ module.exports = function (grunt) {
         grunt.task.run(taskName + ':spec');
     });
 
+    // release tasks
+    grunt.registerTask('patch', ['bump', 'css', 'js']);
+    grunt.registerTask('minor', ['bump:minor', 'css', 'js']);
+    grunt.registerTask('major', ['bump:major', 'css', 'js']);
 };

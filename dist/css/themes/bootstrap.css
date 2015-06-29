@@ -1,46 +1,46 @@
 .medium-toolbar-arrow-under:after {
-  top: 60px;
-  border-color: #428bca transparent transparent transparent; }
+  border-color: #428bca transparent transparent transparent;
+  top: 60px; }
 
 .medium-toolbar-arrow-over:before {
   border-color: transparent transparent #428bca transparent; }
 
 .medium-editor-toolbar {
-  border: 1px solid #357ebd;
   background-color: #428bca;
+  border: 1px solid #357ebd;
   border-radius: 4px; }
   .medium-editor-toolbar li button {
-    min-width: 60px;
-    height: 60px;
+    background-color: transparent;
     border: none;
     border-right: 1px solid #357ebd;
-    background-color: transparent;
-    color: #fff;
     box-sizing: border-box;
-    -webkit-transition: background-color .2s ease-in, color .2s ease-in;
-            transition: background-color .2s ease-in, color .2s ease-in; }
+    color: #fff;
+    height: 60px;
+    min-width: 60px;
+    -webkit-transition: background-color 0.2s ease-in, color 0.2s ease-in;
+            transition: background-color 0.2s ease-in, color 0.2s ease-in; }
     .medium-editor-toolbar li button:hover {
       background-color: #3276b1;
       color: #fff; }
   .medium-editor-toolbar li .medium-editor-button-first {
-    border-top-left-radius: 4px;
-    border-bottom-left-radius: 4px; }
+    border-bottom-left-radius: 4px;
+    border-top-left-radius: 4px; }
   .medium-editor-toolbar li .medium-editor-button-last {
+    border-bottom-right-radius: 4px;
     border-right: none;
-    border-top-right-radius: 4px;
-    border-bottom-right-radius: 4px; }
+    border-top-right-radius: 4px; }
   .medium-editor-toolbar li .medium-editor-button-active {
     background-color: #3276b1;
     color: #fff; }
 
 .medium-editor-toolbar-form {
   background: #428bca;
-  color: #fff;
-  border-radius: 4px; }
+  border-radius: 4px;
+  color: #fff; }
   .medium-editor-toolbar-form .medium-editor-toolbar-input {
-    height: 60px;
     background: #428bca;
-    color: #fff; }
+    color: #fff;
+    height: 60px; }
     .medium-editor-toolbar-form .medium-editor-toolbar-input::-webkit-input-placeholder {
       color: #fff;
       color: rgba(255, 255, 255, 0.8); }
@@ -60,8 +60,8 @@
 
 .medium-editor-toolbar-anchor-preview {
   background: #428bca;
-  color: #fff;
-  border-radius: 4px; }
+  border-radius: 4px;
+  color: #fff; }
 
 .medium-editor-placeholder:after {
   color: #357ebd; }

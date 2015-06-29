@@ -1,7 +1,5 @@
-/*global module, console, define, FileReader,
- Util, ButtonsData, DefaultButton,
- PasteHandler, Selection, AnchorExtension,
- Toolbar, AnchorPreview, Events, Placeholders */
+/*global Util, Selection, Extension,
+    extensionDefaults, Events, editorDefaults*/
 
 function MediumEditor(elements, options) {
     'use strict';
@@ -16,18 +14,21 @@ function MediumEditor(elements, options) {
     function handleDisabledEnterKeydown(event, element) {
         if (this.options.disableReturn || element.getAttribute('data-disable-return')) {
             event.preventDefault();
-        } else if (this.options.disableDoubleReturn || this.getAttribute('data-disable-double-return')) {
-            var node = Util.getSelectionStart(this.options.ownerDocument);
-            if (node && node.textContent.trim() === '') {
+        } else if (this.options.disableDoubleReturn || element.getAttribute('data-disable-double-return')) {
+            var node = Selection.getSelectionStart(this.options.ownerDocument);
+
+            // if current text selection is empty OR previous sibling text is empty
+            if ((node && node.textContent.trim() === '') ||
+                (node.previousElementSibling && node.previousElementSibling.textContent.trim() === '')) {
                 event.preventDefault();
             }
         }
     }
 
-    function handleTabKeydown(event, element) {
+    function handleTabKeydown(event) {
         // Override tab only for pre nodes
-        var node = Util.getSelectionStart(this.options.ownerDocument),
-            tag = node && node.tagName.toLowerCase();
+        var node = Selection.getSelectionStart(this.options.ownerDocument),
+            tag = node && node.nodeName.toLowerCase();
 
         if (tag === 'pre') {
             event.preventDefault();
@@ -47,25 +48,26 @@ function MediumEditor(elements, options) {
         }
     }
 
-    function handleBlockDeleteKeydowns(event, element) {
-        var range, sel, p, node = Util.getSelectionStart(this.options.ownerDocument),
-            tagName = node.tagName.toLowerCase(),
+    function handleBlockDeleteKeydowns(event) {
+        var p, node = Selection.getSelectionStart(this.options.ownerDocument),
+            tagName = node.nodeName.toLowerCase(),
             isEmpty = /^(\s+|<br\/?>)?$/i,
             isHeader = /h\d/i;
 
-        if ((event.which === Util.keyCode.BACKSPACE || event.which === Util.keyCode.ENTER)
-                && node.previousElementSibling
+        if (Util.isKey(event, [Util.keyCode.BACKSPACE, Util.keyCode.ENTER]) &&
+                // has a preceeding sibling
+                node.previousElementSibling &&
                 // in a header
-                && isHeader.test(tagName)
+                isHeader.test(tagName) &&
                 // at the very end of the block
-                && Selection.getCaretOffsets(node).left === 0) {
-            if (event.which === Util.keyCode.BACKSPACE && isEmpty.test(node.previousElementSibling.innerHTML)) {
+                Selection.getCaretOffsets(node).left === 0) {
+            if (Util.isKey(event, Util.keyCode.BACKSPACE) && isEmpty.test(node.previousElementSibling.innerHTML)) {
                 // backspacing the begining of a header into an empty previous element will
                 // change the tagName of the current node to prevent one
                 // instead delete previous node and cancel the event.
                 node.previousElementSibling.parentNode.removeChild(node.previousElementSibling);
                 event.preventDefault();
-            } else if (event.which === Util.keyCode.ENTER) {
+            } else if (Util.isKey(event, Util.keyCode.ENTER)) {
                 // hitting return in the begining of a header will create empty header elements before the current one
                 // instead, make "<p><br></p>" element, which are what happens if you hit return in an empty paragraph
                 p = this.options.ownerDocument.createElement('p');
@@ -73,35 +75,45 @@ function MediumEditor(elements, options) {
                 node.previousElementSibling.parentNode.insertBefore(p, node);
                 event.preventDefault();
             }
-        } else if (event.which === Util.keyCode.DELETE
-                    && node.nextElementSibling
-                    && node.previousElementSibling
+        } else if (Util.isKey(event, Util.keyCode.DELETE) &&
+                    // between two sibling elements
+                    node.nextElementSibling &&
+                    node.previousElementSibling &&
                     // not in a header
-                    && !isHeader.test(tagName)
+                    !isHeader.test(tagName) &&
                     // in an empty tag
-                    && isEmpty.test(node.innerHTML)
+                    isEmpty.test(node.innerHTML) &&
                     // when the next tag *is* a header
-                    && isHeader.test(node.nextElementSibling.tagName)) {
+                    isHeader.test(node.nextElementSibling.nodeName.toLowerCase())) {
             // hitting delete in an empty element preceding a header, ex:
             //  <p>[CURSOR]</p><h1>Header</h1>
             // Will cause the h1 to become a paragraph.
             // Instead, delete the paragraph node and move the cursor to the begining of the h1
 
             // remove node and move cursor to start of header
-            range = document.createRange();
-            sel = this.options.contentWindow.getSelection();
-
-            range.setStart(node.nextElementSibling, 0);
-            range.collapse(true);
-
-            sel.removeAllRanges();
-            sel.addRange(range);
+            Selection.moveCursor(this.options.ownerDocument, node.nextElementSibling);
 
             node.previousElementSibling.parentNode.removeChild(node);
 
             event.preventDefault();
-        } else if (event.which === Util.keyCode.BACKSPACE && tagName === 'li' && node.textContent === '' && !node.previousElementSibling && !node.parentElement.previousElementSibling && node.nextElementSibling.tagName.toLowerCase() === 'li') {
-            // backspacing in an empty first list element in the first list (with more elements) should remove the list element, create a paragraph before the list and move the cursor into the paragraph
+        } else if (Util.isKey(event, Util.keyCode.BACKSPACE) &&
+                tagName === 'li' &&
+                // hitting backspace inside an empty li
+                isEmpty.test(node.innerHTML) &&
+                // is first element (no preceeding siblings)
+                !node.previousElementSibling &&
+                // parent also does not have a sibling
+                !node.parentElement.previousElementSibling &&
+                // is not the only li in a list
+                node.nextElementSibling &&
+                node.nextElementSibling.nodeName.toLowerCase() === 'li') {
+            // backspacing in an empty first list element in the first list (with more elements) ex:
+            //  <ul><li>[CURSOR]</li><li>List Item 2</li></ul>
+            // will remove the first <li> but add some extra element before (varies based on browser)
+            // Instead, this will:
+            // 1) remove the list element
+            // 2) create a paragraph before the list
+            // 3) move the cursor into the paragraph
 
             // create a paragraph before the list
             p = this.options.ownerDocument.createElement('p');
@@ -109,12 +121,7 @@ function MediumEditor(elements, options) {
             node.parentElement.parentElement.insertBefore(p, node.parentElement);
 
             // move the cursor into the new paragraph
-            range = document.createRange();
-            sel = this.options.contentWindow.getSelection();
-            range.setStart(p, 0);
-            range.collapse(true);
-            sel.removeAllRanges();
-            sel.addRange(range);
+            Selection.moveCursor(this.options.ownerDocument, p);
 
             // remove the list element
             node.parentElement.removeChild(node);
@@ -123,69 +130,24 @@ function MediumEditor(elements, options) {
         }
     }
 
-    function handleDrag(event, element) {
-        var className = 'medium-editor-dragover';
-        event.preventDefault();
-        event.dataTransfer.dropEffect = 'copy';
-
-        if (event.type === 'dragover') {
-            event.target.classList.add(className);
-        } else if (event.type === 'dragleave') {
-            event.target.classList.remove(className);
-        }
-    }
-
-    function handleDrop(event, element) {
-        var className = 'medium-editor-dragover',
-            files;
-        event.preventDefault();
-        event.stopPropagation();
-
-        // IE9 does not support the File API, so prevent file from opening in a new window
-        // but also don't try to actually get the file
-        if (event.dataTransfer.files) {
-            files = Array.prototype.slice.call(event.dataTransfer.files, 0);
-            files.some(function (file) {
-                if (file.type.match("image")) {
-                    var fileReader, id;
-                    fileReader = new FileReader();
-                    fileReader.readAsDataURL(file);
-
-                    id = 'medium-img-' + (+new Date());
-                    Util.insertHTMLCommand(this.options.ownerDocument, '<img class="medium-image-loading" id="' + id + '" />');
-
-                    fileReader.onload = function () {
-                        var img = document.getElementById(id);
-                        if (img) {
-                            img.removeAttribute('id');
-                            img.removeAttribute('class');
-                            img.src = fileReader.result;
-                        }
-                    };
-                }
-            }.bind(this));
-        }
-        event.target.classList.remove(className);
-    }
-
     function handleKeyup(event) {
-        var node = Util.getSelectionStart(this.options.ownerDocument),
+        var node = Selection.getSelectionStart(this.options.ownerDocument),
             tagName;
 
         if (!node) {
             return;
         }
 
-        if (node.getAttribute('data-medium-element') && node.children.length === 0) {
+        if (Util.isMediumEditorElement(node) && node.children.length === 0) {
             this.options.ownerDocument.execCommand('formatBlock', false, 'p');
         }
 
-        if (event.which === Util.keyCode.ENTER && !Util.isListItem(node)) {
-            tagName = node.tagName.toLowerCase();
+        if (Util.isKey(event, Util.keyCode.ENTER) && !Util.isListItem(node)) {
+            tagName = node.nodeName.toLowerCase();
             // For anchor tags, unlink
             if (tagName === 'a') {
                 this.options.ownerDocument.execCommand('unlink', false, null);
-            } else if (!event.shiftKey) {
+            } else if (!event.shiftKey && !event.ctrlKey) {
                 // only format block if this is not a header tag
                 if (!/h\d/.test(tagName)) {
                     this.options.ownerDocument.execCommand('formatBlock', false, 'p');
@@ -195,6 +157,37 @@ function MediumEditor(elements, options) {
     }
 
     // Internal helper methods which shouldn't be exposed externally
+
+    function addToEditors(win) {
+        if (!win._mediumEditors) {
+            // To avoid breaking users who are assuming that the unique id on
+            // medium-editor elements will start at 1, inserting a 'null' in the
+            // array so the unique-id can always map to the index of the editor instance
+            win._mediumEditors = [null];
+        }
+
+        // If this already has a unique id, re-use it
+        if (!this.id) {
+            this.id = win._mediumEditors.length;
+        }
+
+        win._mediumEditors[this.id] = this;
+    }
+
+    function removeFromEditors(win) {
+        if (!win._mediumEditors || !win._mediumEditors[this.id]) {
+            return;
+        }
+
+        /* Setting the instance to null in the array instead of deleting it allows:
+         * 1) Each instance to preserve its own unique-id, even after being destroyed
+         *    and initialized again
+         * 2) The unique-id to always correspond to an index in the array of medium-editor
+         *    instances. Thus, we will be able to look at a contenteditable, and determine
+         *    which instance it belongs to, by indexing into the global array.
+         */
+        win._mediumEditors[this.id] = null;
+    }
 
     function createElementsArray(selector) {
         if (!selector) {
@@ -209,71 +202,141 @@ function MediumEditor(elements, options) {
             selector = [selector];
         }
         // Convert NodeList (or other array like object) into an array
-        this.elements = Array.prototype.slice.apply(selector);
+        var elements = Array.prototype.slice.apply(selector);
+
+        // Loop through elements and convert textarea's into divs
+        this.elements = [];
+        elements.forEach(function (element, index) {
+            if (element.nodeName.toLowerCase() === 'textarea') {
+                this.elements.push(createContentEditable.call(this, element, index));
+            } else {
+                this.elements.push(element);
+            }
+        }, this);
+    }
+
+    function setExtensionDefaults(extension, defaults) {
+        Object.keys(defaults).forEach(function (prop) {
+            if (extension[prop] === undefined) {
+                extension[prop] = defaults[prop];
+            }
+        });
+        return extension;
     }
 
     function initExtension(extension, name, instance) {
-        if (extension.parent) {
-            extension.base = instance;
-        }
+        var extensionDefaults = {
+            'window': instance.options.contentWindow,
+            'document': instance.options.ownerDocument,
+            'base': instance
+        };
+
+        // Add default options into the extension
+        extension = setExtensionDefaults(extension, extensionDefaults);
+
+        // Call init on the extension
         if (typeof extension.init === 'function') {
-            extension.init(instance);
+            extension.init();
         }
+
+        // Set extension name (if not already set)
         if (!extension.name) {
             extension.name = name;
         }
         return extension;
     }
 
-    function shouldAddDefaultAnchorPreview() {
-        var i,
-            shouldAdd = false;
+    function isToolbarEnabled() {
+        // If any of the elements don't have the toolbar disabled
+        // We need a toolbar
+        if (this.elements.every(function (element) {
+                return !!element.getAttribute('data-disable-toolbar');
+            })) {
+            return false;
+        }
 
-        // If anchor-preview is disabled, don't add
-        if (this.options.disableAnchorPreview) {
-            return false;
-        }
-        // If anchor-preview extension has been overriden, don't add
-        if (this.options.extensions['anchor-preview']) {
-            return false;
-        }
+        return this.options.toolbar !== false;
+    }
+
+    function isAnchorPreviewEnabled() {
         // If toolbar is disabled, don't add
-        if (this.options.disableToolbar) {
+        if (!isToolbarEnabled.call(this)) {
             return false;
         }
-        // If all elements have 'data-disable-toolbar' attribute, don't add
-        for (i = 0; i < this.elements.length; i += 1) {
-            if (!this.elements[i].getAttribute('data-disable-toolbar')) {
-                shouldAdd = true;
-                break;
-            }
-        }
 
-        return shouldAdd;
+        return this.options.anchorPreview !== false;
+    }
+
+    function isPlaceholderEnabled() {
+        return this.options.placeholder !== false;
+    }
+
+    function isAutoLinkEnabled() {
+        return this.options.autoLink !== false;
+    }
+
+    function isImageDraggingEnabled() {
+        return this.options.imageDragging !== false;
+    }
+
+    function isKeyboardCommandsEnabled() {
+        return this.options.keyboardCommands !== false;
+    }
+
+    function createContentEditable(textarea, id) {
+        var div = this.options.ownerDocument.createElement('div'),
+            uniqueId = 'medium-editor-' + Date.now() + '-' + id,
+            attributesToClone = [
+                'data-disable-editing',
+                'data-disable-toolbar',
+                'data-placeholder',
+                'data-disable-return',
+                'data-disable-double-return',
+                'data-disable-preview',
+                'spellcheck'
+            ];
+
+        div.className = textarea.className;
+        div.id = uniqueId;
+        div.innerHTML = textarea.value;
+        div.setAttribute('medium-editor-textarea-id', id);
+        attributesToClone.forEach(function (attr) {
+            if (textarea.hasAttribute(attr)) {
+                div.setAttribute(attr, textarea.getAttribute(attr));
+            }
+        });
+
+        textarea.classList.add('medium-editor-hidden');
+        textarea.setAttribute('medium-editor-textarea-id', id);
+        textarea.parentNode.insertBefore(
+            div,
+            textarea
+        );
+
+        return div;
     }
 
     function initElements() {
-        var i,
-            addToolbar = false;
-        for (i = 0; i < this.elements.length; i += 1) {
-            if (!this.options.disableEditing && !this.elements[i].getAttribute('data-disable-editing')) {
-                this.elements[i].setAttribute('contentEditable', true);
+        this.elements.forEach(function (element, index) {
+            if (!this.options.disableEditing && !element.getAttribute('data-disable-editing')) {
+                element.setAttribute('contentEditable', true);
+                element.setAttribute('spellcheck', this.options.spellcheck);
             }
-            if (!this.elements[i].getAttribute('data-placeholder')) {
-                this.elements[i].setAttribute('data-placeholder', this.options.placeholder);
+            element.setAttribute('data-medium-editor-element', true);
+            element.setAttribute('role', 'textbox');
+            element.setAttribute('aria-multiline', true);
+            element.setAttribute('medium-editor-index', index);
+
+            if (element.hasAttribute('medium-editor-textarea-id')) {
+                this.on(element, 'input', function (event) {
+                    var target = event.target,
+                        textarea = target.parentNode.querySelector('textarea[medium-editor-textarea-id="' + target.getAttribute('medium-editor-textarea-id') + '"]');
+                    if (textarea) {
+                        textarea.value = this.serialize()[target.id].value;
+                    }
+                }.bind(this));
             }
-            this.elements[i].setAttribute('data-medium-element', true);
-            this.elements[i].setAttribute('role', 'textbox');
-            this.elements[i].setAttribute('aria-multiline', true);
-            if (!this.options.disableToolbar && !this.elements[i].getAttribute('data-disable-toolbar')) {
-                addToolbar = true;
-            }
-        }
-        // Init toolbar
-        if (!this.toolbar && addToolbar) {
-            this.toolbar = new Toolbar(this);
-            this.options.elementsContainer.appendChild(this.toolbar.getToolbarElement());
-        }
+        }, this);
     }
 
     function attachHandlers() {
@@ -305,51 +368,76 @@ function MediumEditor(elements, options) {
                 if (!element.getAttribute('data-disable-return')) {
                     this.on(element, 'keyup', handleKeyup.bind(this));
                 }
-            }.bind(this));
-        }
-
-        // drag and drop of images
-        if (this.options.imageDragging) {
-            this.subscribe('editableDrag', handleDrag.bind(this));
-            this.subscribe('editableDrop', handleDrop.bind(this));
+            }, this);
         }
     }
 
-    function initCommands() {
-        var buttons = this.options.buttons,
-            extensions = this.options.extensions,
-            ext,
-            name;
-        this.commands = [];
+    function initExtensions() {
 
-        buttons.forEach(function (buttonName) {
-            if (extensions[buttonName]) {
-                ext = initExtension(extensions[buttonName], buttonName, this);
-                this.commands.push(ext);
-            } else if (buttonName === 'anchor') {
-                ext = initExtension(new AnchorExtension(), buttonName, this);
-                this.commands.push(ext);
-            } else if (ButtonsData.hasOwnProperty(buttonName)) {
-                ext = new DefaultButton(ButtonsData[buttonName], this);
-                this.commands.push(ext);
-            }
-        }.bind(this));
+        this.extensions = [];
 
-        for (name in extensions) {
-            if (extensions.hasOwnProperty(name) && buttons.indexOf(name) === -1) {
-                ext = initExtension(extensions[name], name, this);
+        // Passed in extensions
+        Object.keys(this.options.extensions).forEach(function (name) {
+            // Always save the toolbar extension for last
+            if (name !== 'toolbar' && this.options.extensions[name]) {
+                this.extensions.push(initExtension(this.options.extensions[name], name, this));
             }
+        }, this);
+
+        // Built-in extensions
+        var builtIns = {
+            paste: true,
+            anchorPreview: isAnchorPreviewEnabled.call(this),
+            autoLink: isAutoLinkEnabled.call(this),
+            imageDragging: isImageDraggingEnabled.call(this),
+            keyboardCommands: isKeyboardCommandsEnabled.call(this),
+            placeholder: isPlaceholderEnabled.call(this)
+        };
+        Object.keys(builtIns).forEach(function (name) {
+            if (builtIns[name]) {
+                this.addBuiltInExtension(name);
+            }
+        }, this);
+
+        // Users can pass in a custom toolbar extension
+        // so check for that first and if it's not present
+        // just create the default toolbar
+        var toolbarExtension = this.options.extensions['toolbar'];
+        if (!toolbarExtension && isToolbarEnabled.call(this)) {
+            // Backwards compatability
+            var toolbarOptions = Util.extend({}, this.options.toolbar, {
+                allowMultiParagraphSelection: this.options.allowMultiParagraphSelection // deprecated
+            });
+            toolbarExtension = new MediumEditor.extensions.toolbar(toolbarOptions);
         }
 
-        // Add AnchorPreview as extension if needed
-        if (shouldAddDefaultAnchorPreview.call(this)) {
-            this.commands.push(initExtension(new AnchorPreview(), 'anchor-preview', this));
+        // If the toolbar is not disabled, so we actually have an extension
+        // initialize it and add it to the extensions array
+        if (toolbarExtension) {
+            this.extensions.push(initExtension(toolbarExtension, 'toolbar', this));
         }
+    }
+
+    function mergeOptions(defaults, options) {
+        var deprecatedProperties = [
+            ['allowMultiParagraphSelection', 'toolbar.allowMultiParagraphSelection']
+        ];
+        // warn about using deprecated properties
+        if (options) {
+            deprecatedProperties.forEach(function (pair) {
+                if (options.hasOwnProperty(pair[0]) && options[pair[0]] !== undefined) {
+                    Util.deprecated(pair[0], pair[1], 'v6.0.0');
+                }
+            });
+        }
+
+        return Util.defaults({}, options, defaults);
     }
 
     function execActionInternal(action, opts) {
         /*jslint regexp: true*/
         var appendAction = /^append-(.+)$/gi,
+            justifyAction = /justify([A-Za-z]*)$/g, /* Detecting if is justifyCenter|Right|Left */
             match;
         /*jslint regexp: false*/
 
@@ -360,6 +448,10 @@ function MediumEditor(elements, options) {
             return Util.execFormatBlock(this.options.ownerDocument, match[1]);
         }
 
+        if (action === 'fontSize') {
+            return this.options.ownerDocument.execCommand('fontSize', false, opts.size);
+        }
+
         if (action === 'createLink') {
             return this.createLink(opts);
         }
@@ -368,75 +460,83 @@ function MediumEditor(elements, options) {
             return this.options.ownerDocument.execCommand('insertImage', false, this.options.contentWindow.getSelection());
         }
 
+        /* Issue: https://github.com/yabwe/medium-editor/issues/595
+         * If the action is to justify the text */
+        if (justifyAction.exec(action)) {
+            var result = this.options.ownerDocument.execCommand(action, false, null),
+                parentNode = Selection.getSelectedParentElement(Selection.getSelectionRange(this.options.ownerDocument));
+            if (parentNode) {
+                cleanupJustifyDivFragments.call(this, Util.getTopBlockContainer(parentNode));
+            }
+
+            return result;
+        }
+
         return this.options.ownerDocument.execCommand(action, false, null);
     }
 
-    MediumEditor.statics = {
-        ButtonsData: ButtonsData,
-        DefaultButton: DefaultButton,
-        AnchorExtension: AnchorExtension,
-        Toolbar: Toolbar,
-        AnchorPreview: AnchorPreview
-    };
+    /* If we've just justified text within a container block
+     * Chrome may have removed <br> elements and instead wrapped lines in <div> elements
+     * with a text-align property.  If so, we want to fix this
+     */
+    function cleanupJustifyDivFragments(blockContainer) {
+        if (!blockContainer) {
+            return;
+        }
+
+        var textAlign,
+            childDivs = Array.prototype.slice.call(blockContainer.childNodes).filter(function (element) {
+                var isDiv = element.nodeName.toLowerCase() === 'div';
+                if (isDiv && !textAlign) {
+                    textAlign = element.style.textAlign;
+                }
+                return isDiv;
+            });
+
+        /* If we found child <div> elements with text-align style attributes
+         * we should fix this by:
+         *
+         * 1) Unwrapping each <div> which has a text-align style
+         * 2) Insert a <br> element after each set of 'unwrapped' div children
+         * 3) Set the text-align style of the parent block element
+         */
+        if (childDivs.length) {
+            // Since we're mucking with the HTML, preserve selection
+            this.saveSelection();
+            childDivs.forEach(function (div) {
+                if (div.style.textAlign === textAlign) {
+                    var lastChild = div.lastChild;
+                    if (lastChild) {
+                        // Instead of a div, extract the child elements and add a <br>
+                        Util.unwrap(div, this.options.ownerDocument);
+                        var br = this.options.ownerDocument.createElement('BR');
+                        lastChild.parentNode.insertBefore(br, lastChild.nextSibling);
+                    }
+                }
+            }, this);
+            blockContainer.style.textAlign = textAlign;
+            // We're done, so restore selection
+            this.restoreSelection();
+        }
+    }
+
+    MediumEditor.Extension = Extension;
+
+    MediumEditor.extensions = extensionDefaults;
+    MediumEditor.util = Util;
+    MediumEditor.selection = Selection;
 
     MediumEditor.prototype = {
-        defaults: {
-            allowMultiParagraphSelection: true,
-            anchorInputPlaceholder: 'Paste or type a link',
-            anchorInputCheckboxLabel: 'Open in new window',
-            anchorPreviewHideDelay: 500,
-            buttons: ['bold', 'italic', 'underline', 'anchor', 'header1', 'header2', 'quote'],
-            buttonLabels: false,
-            checkLinkFormat: false,
-            cleanPastedHTML: false,
-            delay: 0,
-            diffLeft: 0,
-            diffTop: -10,
-            disableReturn: false,
-            disableDoubleReturn: false,
-            disableToolbar: false,
-            disableAnchorPreview: false,
-            disableEditing: false,
-            disablePlaceholders: false,
-            toolbarAlign: 'center',
-            elementsContainer: false,
-            imageDragging: true,
-            standardizeSelectionStart: false,
-            contentWindow: window,
-            ownerDocument: document,
-            firstHeader: 'h3',
-            forcePlainText: true,
-            placeholder: 'Type your text',
-            secondHeader: 'h4',
-            targetBlank: false,
-            anchorTarget: false,
-            anchorButton: false,
-            anchorButtonClass: 'btn',
-            extensions: {},
-            activeButtonClass: 'medium-editor-button-active',
-            firstButtonClass: 'medium-editor-button-first',
-            lastButtonClass: 'medium-editor-button-last'
-        },
+        defaults: editorDefaults,
 
         // NOT DOCUMENTED - exposed for backwards compatability
         init: function (elements, options) {
-            var uniqueId = 1;
-
-            this.options = Util.defaults(options, this.defaults);
-            createElementsArray.call(this, elements);
-            if (this.elements.length === 0) {
-                return;
-            }
+            this.options = mergeOptions.call(this, this.defaults, options);
+            this.origElements = elements;
 
             if (!this.options.elementsContainer) {
                 this.options.elementsContainer = this.options.ownerDocument.body;
             }
-
-            while (this.options.elementsContainer.querySelector('#medium-editor-toolbar-' + uniqueId)) {
-                uniqueId = uniqueId + 1;
-            }
-
-            this.id = uniqueId;
 
             return this.setup();
         },
@@ -446,19 +546,21 @@ function MediumEditor(elements, options) {
                 return;
             }
 
-            this.events = new Events(this);
+            createElementsArray.call(this, this.origElements);
+
+            if (this.elements.length === 0) {
+                return;
+            }
+
             this.isActive = true;
+            addToEditors.call(this, this.options.contentWindow);
+
+            this.events = new Events(this);
 
             // Call initialization helpers
-            initCommands.call(this);
             initElements.call(this);
+            initExtensions.call(this);
             attachHandlers.call(this);
-
-            this.pasteHandler = new PasteHandler(this);
-
-            if (!this.options.disablePlaceholders) {
-                this.placeholders = new Placeholders(this);
-            }
         },
 
         destroy: function () {
@@ -466,27 +568,45 @@ function MediumEditor(elements, options) {
                 return;
             }
 
-            var i;
-
             this.isActive = false;
 
-            if (this.toolbar !== undefined) {
-                this.toolbar.deactivate();
-                delete this.toolbar;
-            }
-
-            for (i = 0; i < this.elements.length; i += 1) {
-                this.elements[i].removeAttribute('contentEditable');
-                this.elements[i].removeAttribute('data-medium-element');
-            }
-
-            this.commands.forEach(function (extension) {
-                if (typeof extension.deactivate === 'function') {
-                    extension.deactivate();
+            this.extensions.forEach(function (extension) {
+                if (typeof extension.destroy === 'function') {
+                    extension.destroy();
                 }
-            }.bind(this));
+            }, this);
 
-            this.events.detachAllDOMEvents();
+            this.events.destroy();
+
+            this.elements.forEach(function (element) {
+                // Reset elements content, fix for issue where after editor destroyed the red underlines on spelling errors are left
+                if (this.options.spellcheck) {
+                    element.innerHTML = element.innerHTML;
+                }
+
+                // cleanup extra added attributes
+                element.removeAttribute('contentEditable');
+                element.removeAttribute('spellcheck');
+                element.removeAttribute('data-medium-editor-element');
+                element.removeAttribute('role');
+                element.removeAttribute('aria-multiline');
+                element.removeAttribute('medium-editor-index');
+
+                // Remove any elements created for textareas
+                if (element.hasAttribute('medium-editor-textarea-id')) {
+                    var textarea = element.parentNode.querySelector('textarea[medium-editor-textarea-id="' + element.getAttribute('medium-editor-textarea-id') + '"]');
+                    if (textarea) {
+                        // Un-hide the textarea
+                        textarea.classList.remove('medium-editor-hidden');
+                    }
+                    if (element.parentNode) {
+                        element.parentNode.removeChild(element);
+                    }
+                }
+            }, this);
+            this.elements = [];
+
+            removeFromEditors.call(this, this.options.contentWindow);
         },
 
         on: function (target, event, listener, useCapture) {
@@ -501,9 +621,17 @@ function MediumEditor(elements, options) {
             this.events.attachCustomEvent(event, listener);
         },
 
+        unsubscribe: function (event, listener) {
+            this.events.detachCustomEvent(event, listener);
+        },
+
+        trigger: function (name, data, editable) {
+            this.events.triggerCustomEvent(name, data, editable);
+        },
+
         delay: function (fn) {
             var self = this;
-            setTimeout(function () {
+            return setTimeout(function () {
                 if (self.isActive) {
                     fn();
                 }
@@ -525,42 +653,72 @@ function MediumEditor(elements, options) {
 
         getExtensionByName: function (name) {
             var extension;
-            if (this.commands && this.commands.length) {
-                this.commands.forEach(function (ext) {
+            if (this.extensions && this.extensions.length) {
+                this.extensions.some(function (ext) {
                     if (ext.name === name) {
                         extension = ext;
+                        return true;
                     }
+                    return false;
                 });
             }
             return extension;
         },
 
         /**
-         * NOT DOCUMENTED - exposed for backwards compatability
-         * Helper function to call a method with a number of parameters on all registered extensions.
-         * The function assures that the function exists before calling.
-         *
-         * @param {string} funcName name of the function to call
-         * @param [args] arguments passed into funcName
+         * NOT DOCUMENTED - exposed as a helper for other extensions to use
          */
-        callExtensions: function (funcName) {
-            if (arguments.length < 1) {
-                return;
+        addBuiltInExtension: function (name, opts) {
+            var extension = this.getExtensionByName(name),
+                merged;
+            if (extension) {
+                return extension;
             }
 
-            var args = Array.prototype.slice.call(arguments, 1),
-                ext,
-                name;
-
-            for (name in this.options.extensions) {
-                if (this.options.extensions.hasOwnProperty(name)) {
-                    ext = this.options.extensions[name];
-                    if (ext[funcName] !== undefined) {
-                        ext[funcName].apply(ext, args);
+            switch (name) {
+                case 'anchor':
+                    merged = Util.extend({}, this.options.anchor, opts);
+                    extension = new MediumEditor.extensions.anchor(merged);
+                    break;
+                case 'anchorPreview':
+                    extension = new MediumEditor.extensions.anchorPreview(this.options.anchorPreview);
+                    break;
+                case 'autoLink':
+                    extension = new MediumEditor.extensions.autoLink();
+                    break;
+                case 'fontsize':
+                    extension = new MediumEditor.extensions.fontSize(opts);
+                    break;
+                case 'imageDragging':
+                    extension = new MediumEditor.extensions.imageDragging();
+                    break;
+                case 'keyboardCommands':
+                    extension = new MediumEditor.extensions.keyboardCommands(this.options.keyboardCommands);
+                    break;
+                case 'paste':
+                    extension = new MediumEditor.extensions.paste(this.options.paste);
+                    break;
+                case 'placeholder':
+                    extension = new MediumEditor.extensions.placeholder(this.options.placeholder);
+                    break;
+                default:
+                    // All of the built-in buttons for MediumEditor are extensions
+                    // so check to see if the extension we're creating is a built-in button
+                    if (MediumEditor.extensions.button.isBuiltInButton(name)) {
+                        if (opts) {
+                            merged = Util.defaults({}, opts, MediumEditor.extensions.button.prototype.defaults[name]);
+                            extension = new MediumEditor.extensions.button(merged);
+                        } else {
+                            extension = new MediumEditor.extensions.button(name);
+                        }
                     }
-                }
             }
-            return this;
+
+            if (extension) {
+                this.extensions.push(initExtension(extension, name, this));
+            }
+
+            return extension;
         },
 
         stopSelectionUpdates: function () {
@@ -571,10 +729,10 @@ function MediumEditor(elements, options) {
             this.preventSelectionUpdates = false;
         },
 
-        // NOT DOCUMENTED - exposed as extension helper and for backwards compatability
         checkSelection: function () {
-            if (this.toolbar) {
-                this.toolbar.checkState();
+            var toolbar = this.getExtensionByName('toolbar');
+            if (toolbar) {
+                toolbar.checkState();
             }
             return this;
         },
@@ -625,7 +783,7 @@ function MediumEditor(elements, options) {
 
             // do some DOM clean-up for known browser issues after the action
             if (action === 'insertunorderedlist' || action === 'insertorderedlist') {
-                this.cleanListDOM();
+                Util.cleanListDOM(this.options.ownerDocument, this.getSelectedParentElement());
             }
 
             this.checkSelection();
@@ -639,25 +797,8 @@ function MediumEditor(elements, options) {
             return Selection.getSelectedParentElement(range);
         },
 
-        // NOT DOCUMENTED - exposed as extension helper
-        hideToolbarDefaultActions: function () {
-            if (this.toolbar) {
-                this.toolbar.hideToolbarDefaultActions();
-            }
-            return this;
-        },
-
-        // NOT DOCUMENTED - exposed as extension helper and for backwards compatability
-        setToolbarPosition: function () {
-            if (this.toolbar) {
-                this.toolbar.setToolbarPosition();
-            }
-        },
-
         selectAllContents: function () {
-            var range = this.options.ownerDocument.createRange(),
-                sel = this.options.contentWindow.getSelection(),
-                currNode = Selection.getSelectionElement(this.options.contentWindow);
+            var currNode = Selection.getSelectionElement(this.options.contentWindow);
 
             if (currNode) {
                 // Move to the lowest descendant node that still selects all of the contents
@@ -665,19 +806,40 @@ function MediumEditor(elements, options) {
                     currNode = currNode.children[0];
                 }
 
-                range.selectNodeContents(currNode);
-                sel.removeAllRanges();
-                sel.addRange(range);
+                this.selectElement(currNode);
             }
+        },
+
+        selectElement: function (element) {
+            Selection.selectNode(element, this.options.ownerDocument);
+
+            var selElement = Selection.getSelectionElement(this.options.contentWindow);
+            if (selElement) {
+                this.events.focusElement(selElement);
+            }
+        },
+
+        getFocusedElement: function () {
+            var focused;
+            this.elements.some(function (element) {
+                // Find the element that has focus
+                if (!focused && element.getAttribute('data-medium-focused')) {
+                    focused = element;
+                }
+
+                // bail if we found the element that had focus
+                return !!focused;
+            }, this);
+
+            return focused;
         },
 
         // http://stackoverflow.com/questions/17678843/cant-restore-selection-after-html-modify-even-if-its-the-same-html
         // Tim Down
         // TODO: move to selection.js and clean up old methods there
-        saveSelection: function () {
-            this.selectionState = null;
-
-            var selection = this.options.contentWindow.getSelection(),
+        exportSelection: function () {
+            var selectionState = null,
+                selection = this.options.contentWindow.getSelection(),
                 range,
                 preSelectionRange,
                 start,
@@ -688,11 +850,12 @@ function MediumEditor(elements, options) {
                 preSelectionRange = range.cloneRange();
 
                 // Find element current selection is inside
-                this.elements.forEach(function (el, index) {
+                this.elements.some(function (el, index) {
                     if (el === range.startContainer || Util.isDescendant(el, range.startContainer)) {
                         editableElementIndex = index;
-                        return false;
+                        return true;
                     }
+                    return false;
                 });
 
                 if (editableElementIndex > -1) {
@@ -700,24 +863,58 @@ function MediumEditor(elements, options) {
                     preSelectionRange.setEnd(range.startContainer, range.startOffset);
                     start = preSelectionRange.toString().length;
 
-                    this.selectionState = {
+                    selectionState = {
                         start: start,
                         end: start + range.toString().length,
                         editableElementIndex: editableElementIndex
                     };
+                    // If start = 0 there may still be an empty paragraph before it, but we don't care.
+                    if (start !== 0) {
+                        var emptyBlocksIndex = Selection.getIndexRelativeToAdjacentEmptyBlocks(
+                                this.options.ownerDocument,
+                                this.elements[editableElementIndex],
+                                range.startContainer,
+                                range.startOffset);
+                        if (emptyBlocksIndex !== 0) {
+                            selectionState.emptyBlocksIndex = emptyBlocksIndex;
+                        }
+                    }
                 }
             }
+
+            if (selectionState !== null && selectionState.editableElementIndex === 0) {
+                delete selectionState.editableElementIndex;
+            }
+
+            return selectionState;
+        },
+
+        saveSelection: function () {
+            this.selectionState = this.exportSelection();
         },
 
         // http://stackoverflow.com/questions/17678843/cant-restore-selection-after-html-modify-even-if-its-the-same-html
         // Tim Down
         // TODO: move to selection.js and clean up old methods there
-        restoreSelection: function () {
-            if (!this.selectionState) {
+        //
+        // {object} inSelectionState - the selection to import
+        // {boolean} [favorLaterSelectionAnchor] - defaults to false. If true, import the cursor immediately
+        //      subsequent to an anchor tag if it would otherwise be placed right at the trailing edge inside the
+        //      anchor. This cursor positioning, even though visually equivalent to the user, can affect behavior
+        //      in MS IE.
+        importSelection: function (inSelectionState, favorLaterSelectionAnchor) {
+            if (!inSelectionState) {
                 return;
             }
 
-            var editableElement = this.elements[this.selectionState.editableElementIndex],
+            var editableElementIndex = inSelectionState.editableElementIndex === undefined ?
+                                                0 : inSelectionState.editableElementIndex,
+                selectionState = {
+                    editableElementIndex: editableElementIndex,
+                    start: inSelectionState.start,
+                    end: inSelectionState.end
+                },
+                editableElement = this.elements[selectionState.editableElementIndex],
                 charIndex = 0,
                 range = this.options.ownerDocument.createRange(),
                 nodeStack = [editableElement],
@@ -735,12 +932,12 @@ function MediumEditor(elements, options) {
             while (!stop && node) {
                 if (node.nodeType === 3) {
                     nextCharIndex = charIndex + node.length;
-                    if (!foundStart && this.selectionState.start >= charIndex && this.selectionState.start <= nextCharIndex) {
-                        range.setStart(node, this.selectionState.start - charIndex);
+                    if (!foundStart && selectionState.start >= charIndex && selectionState.start <= nextCharIndex) {
+                        range.setStart(node, selectionState.start - charIndex);
                         foundStart = true;
                     }
-                    if (foundStart && this.selectionState.end >= charIndex && this.selectionState.end <= nextCharIndex) {
-                        range.setEnd(node, this.selectionState.end - charIndex);
+                    if (foundStart && selectionState.end >= charIndex && selectionState.end <= nextCharIndex) {
+                        range.setEnd(node, selectionState.end - charIndex);
                         stop = true;
                     }
                     charIndex = nextCharIndex;
@@ -756,9 +953,36 @@ function MediumEditor(elements, options) {
                 }
             }
 
+            if (inSelectionState.emptyBlocksIndex && selectionState.end === nextCharIndex) {
+                var targetNode = Util.getTopBlockContainer(range.startContainer),
+                    index = 0;
+                // Skip over empty blocks until we hit the block we want the selection to be in
+                while (index < inSelectionState.emptyBlocksIndex && targetNode.nextSibling) {
+                    targetNode = targetNode.nextSibling;
+                    index++;
+                    // If we find a non-empty block, ignore the emptyBlocksIndex and just put selection here
+                    if (targetNode.textContent.length > 0) {
+                        break;
+                    }
+                }
+
+                // We're selecting a high-level block node, so make sure the cursor gets moved into the deepest
+                // element at the beginning of the block
+                range.setStart(Util.getFirstSelectableLeafNode(targetNode), 0);
+                range.collapse(true);
+            }
+
+            // If the selection is right at the ending edge of a link, put it outside the anchor tag instead of inside.
+            if (favorLaterSelectionAnchor) {
+                range = Selection.importSelectionMoveCursorPastAnchor(selectionState, range);
+            }
             sel = this.options.contentWindow.getSelection();
             sel.removeAllRanges();
             sel.addRange(range);
+        },
+
+        restoreSelection: function () {
+            this.importSelection(this.selectionState);
         },
 
         createLink: function (opts) {
@@ -766,64 +990,92 @@ function MediumEditor(elements, options) {
                 i;
 
             if (opts.url && opts.url.trim().length > 0) {
-                this.options.ownerDocument.execCommand('createLink', false, opts.url);
+                var currentSelection = this.options.contentWindow.getSelection();
+                if (currentSelection) {
+                    var exportedSelection,
+                        startContainerParentElement,
+                        endContainerParentElement,
+                        textNodes;
 
-                if (this.options.targetBlank || opts.target === '_blank') {
-                    Util.setTargetBlank(Util.getSelectionStart(this.options.ownerDocument));
-                }
+                    startContainerParentElement = Util.getClosestBlockContainer(
+                        currentSelection.getRangeAt(0).startContainer);
+                    endContainerParentElement = Util.getClosestBlockContainer(
+                        currentSelection.getRangeAt(0).endContainer);
 
-                if (opts.buttonClass) {
-                    Util.addClassToAnchors(Util.getSelectionStart(this.options.ownerDocument), opts.buttonClass);
+                    if (startContainerParentElement === endContainerParentElement) {
+                        var currentEditor = Selection.getSelectionElement(this.options.contentWindow),
+                            parentElement = (startContainerParentElement || currentEditor),
+                            fragment = this.options.ownerDocument.createDocumentFragment();
+                        exportedSelection = this.exportSelection();
+                        fragment.appendChild(parentElement.cloneNode(true));
+                        if (currentEditor === parentElement) {
+                            // We have to avoid the editor itself being wiped out when it's the only block element,
+                            // as our reference inside this.elements gets detached from the page when insertHTML runs.
+                            // If we just use [parentElement, 0] and [parentElement, parentElement.childNodes.length]
+                            // as the range boundaries, this happens whenever parentElement === currentEditor.
+                            // The tradeoff to this workaround is that a orphaned tag can sometimes be left behind at
+                            // the end of the editor's content.
+                            // In Gecko:
+                            // as an empty <strong></strong> if parentElement.lastChild is a <strong> tag.
+                            // In WebKit:
+                            // an invented <br /> tag at the end in the same situation
+
+                            Selection.select(this.options.ownerDocument,
+                                parentElement.firstChild, 0,
+                                parentElement.lastChild, parentElement.lastChild.nodeType === 3 ?
+                                parentElement.lastChild.nodeValue.length : parentElement.lastChild.childNodes.length);
+                        } else {
+                            Selection.select(this.options.ownerDocument,
+                                parentElement, 0,
+                                parentElement, parentElement.childNodes.length);
+                        }
+                        var modifiedExportedSelection = this.exportSelection();
+
+                        textNodes = Util.findOrCreateMatchingTextNodes(this.options.ownerDocument,
+                                fragment,
+                                {
+                                    start: exportedSelection.start - modifiedExportedSelection.start,
+                                    end: exportedSelection.end - modifiedExportedSelection.start,
+                                    editableElementIndex: exportedSelection.editableElementIndex
+                                });
+                        // Creates the link in the document fragment
+                        Util.createLink(this.options.ownerDocument, textNodes, opts.url.trim());
+                        // Chrome trims the leading whitespaces when inserting HTML, which messes up restoring the selection.
+                        var leadingWhitespacesCount = (fragment.firstChild.innerHTML.match(/^\s+/) || [''])[0].length;
+                        // Now move the created link back into the original document in a way to preserve undo/redo history
+                        Util.insertHTMLCommand(this.options.ownerDocument,
+                            fragment.firstChild.innerHTML.replace(/^\s+/, ''));
+                        exportedSelection.start -= leadingWhitespacesCount;
+                        exportedSelection.end -= leadingWhitespacesCount;
+                        this.importSelection(exportedSelection);
+                    } else {
+                        this.options.ownerDocument.execCommand('createLink', false, opts.url);
+                    }
+                    if (this.options.targetBlank || opts.target === '_blank') {
+                        Util.setTargetBlank(Selection.getSelectionStart(this.options.ownerDocument), opts.url);
+                    }
+
+                    if (opts.buttonClass) {
+                        Util.addClassToAnchors(Selection.getSelectionStart(this.options.ownerDocument), opts.buttonClass);
+                    }
                 }
             }
 
-            if (this.options.targetBlank || opts.target === "_blank" || opts.buttonClass) {
-                customEvent = this.options.ownerDocument.createEvent("HTMLEvents");
-                customEvent.initEvent("input", true, true, this.options.contentWindow);
+            if (this.options.targetBlank || opts.target === '_blank' || opts.buttonClass) {
+                customEvent = this.options.ownerDocument.createEvent('HTMLEvents');
+                customEvent.initEvent('input', true, true, this.options.contentWindow);
                 for (i = 0; i < this.elements.length; i += 1) {
                     this.elements[i].dispatchEvent(customEvent);
                 }
             }
         },
 
-        // alias for setup - keeping for backwards compatability
-        activate: function () {
-            Util.deprecatedMethod.call(this, 'activate', 'setup', arguments);
-        },
-
-        // alias for destory - keeping for backwards compatability
-        deactivate: function () {
-            Util.deprecatedMethod.call(this, 'deactivate', 'destroy', arguments);
-        },
-
         cleanPaste: function (text) {
-            this.pasteHandler.cleanPaste(text);
+            this.getExtensionByName('paste').cleanPaste(text);
         },
 
-        pasteHTML: function (html) {
-            this.pasteHandler.pasteHTML(html);
-        },
-
-        cleanListDOM: function () {
-            var list, element = this.getSelectedParentElement();
-            if (element.tagName.toLowerCase() === 'li') {
-                list = element.parentElement;
-                if (list.parentElement.tagName.toLowerCase() === 'p') { // yes we need to clean up
-                    this.unwrapElement(list.parentElement);
-                }
-            }
-        },
-
-        unwrapElement: function (element) {
-            var parent = element.parentNode,
-                current = element.firstChild,
-                next;
-            do {
-                next = current.nextSibling;
-                parent.insertBefore(current, element);
-                current = next;
-            } while (current);
-            parent.removeChild(element);
+        pasteHTML: function (html, options) {
+            this.getExtensionByName('paste').pasteHTML(html, options);
         }
     };
 }());

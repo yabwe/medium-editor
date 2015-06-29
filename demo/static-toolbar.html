@@ -4,12 +4,12 @@
     <meta charset="UTF-8">
     <title>medium editor | demo</title>
     <link rel="stylesheet" href="css/demo.css">
-    <link href="http://netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" rel="stylesheet">
+    <link href="http://netdna.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.css" rel="stylesheet">
     <link rel="stylesheet" href="../dist/css/medium-editor.css">
     <link rel="stylesheet" href="../dist/css/themes/default.css">
 </head>
 <body>
-    <a href="https://github.com/daviferreira/medium-editor" class="github-link"><img style="z-index: 100;position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_gray_6d6d6d.png" alt="Fork me on GitHub"></a>
+    <a href="https://github.com/yabwe/medium-editor" class="github-link"><img style="z-index: 100;position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_gray_6d6d6d.png" alt="Fork me on GitHub"></a>
     <div id="container">
         <h1>Medium Editor</h1>
         <div class="editable">
@@ -46,36 +46,44 @@
     <script src="../dist/js/medium-editor.js"></script>
     <script>
         var editor = new MediumEditor('.editable', {
-                buttons: ['bold', 'italic', 'underline', 'strikethrough', 'quote', 'anchor', 'image', 'justifyLeft', 'justifyCenter', 'justifyRight', 'justifyFull', 'superscript', 'subscript', 'orderedlist', 'unorderedlist', 'pre', 'outdent', 'indent', 'header1', 'header2'],
-                staticToolbar: true,
-                stickyToolbar: true
+                toolbar: {
+                    buttons: ['bold', 'italic', 'underline', 'strikethrough', 'quote', 'anchor', 'image', 'justifyLeft', 'justifyCenter', 'justifyRight', 'justifyFull', 'superscript', 'subscript', 'orderedlist', 'unorderedlist', 'pre', 'outdent', 'indent', 'h2', 'h3'],
+                    static: true,
+                    sticky: true
+                }
             });
 
         var editorColOne = new MediumEditor('#column-one', {
-                buttons: ['bold', 'italic', 'underline', 'strikethrough', 'quote', 'anchor', 'image', 'justifyLeft', 'justifyCenter', 'justifyRight', 'justifyFull', 'superscript', 'subscript', 'orderedlist', 'unorderedlist', 'pre', 'outdent', 'indent', 'header1', 'header2'],
-                buttonLabels: 'fontawesome',
-                stickyToolbar: true,
-                staticToolbar: true,
-                toolbarAlign: 'left',
-                updateOnEmptySelection: true
+                toolbar: {
+                    buttons: ['bold', 'italic', 'underline', 'strikethrough', 'quote', 'anchor', 'image', 'justifyLeft', 'justifyCenter', 'justifyRight', 'justifyFull', 'superscript', 'subscript', 'orderedlist', 'unorderedlist', 'pre', 'outdent', 'indent', 'h2', 'h3'],
+                    sticky: true,
+                    static: true,
+                    align: 'left',
+                    updateOnEmptySelection: true
+                },
+                buttonLabels: 'fontawesome'
             });
 
-        var editorColOne = new MediumEditor('#column-two', {
-                buttons: ['bold', 'italic', 'underline', 'strikethrough', 'quote', 'anchor', 'image', 'justifyLeft', 'justifyCenter', 'justifyRight', 'justifyFull', 'superscript', 'subscript', 'orderedlist', 'unorderedlist', 'pre', 'outdent', 'indent', 'header1', 'header2'],
-                buttonLabels: 'fontawesome',
-                stickyToolbar: true,
-                staticToolbar: true,
-                toolbarAlign: 'center',
-                updateOnEmptySelection: true
+        var editorColTwo = new MediumEditor('#column-two', {
+                toolbar: {
+                    buttons: ['bold', 'italic', 'underline', 'strikethrough', 'quote', 'anchor', 'image', 'justifyLeft', 'justifyCenter', 'justifyRight', 'justifyFull', 'superscript', 'subscript', 'orderedlist', 'unorderedlist', 'pre', 'outdent', 'indent', 'h2', 'h3'],
+                    sticky: true,
+                    static: true,
+                    align: 'center',
+                    updateOnEmptySelection: true
+                },
+                buttonLabels: 'fontawesome'
             });
 
-        var editorColOne = new MediumEditor('#column-three', {
-                buttons: ['bold', 'italic', 'underline', 'strikethrough', 'quote', 'anchor', 'image', 'justifyLeft', 'justifyCenter', 'justifyRight', 'justifyFull', 'superscript', 'subscript', 'orderedlist', 'unorderedlist', 'pre', 'outdent', 'indent', 'header1', 'header2'],
-                buttonLabels: 'fontawesome',
-                stickyToolbar: true,
-                staticToolbar: true,
-                toolbarAlign: 'right',
-                updateOnEmptySelection: true
+        var editorColThree = new MediumEditor('#column-three', {
+                toolbar: {
+                    buttons: ['bold', 'italic', 'underline', 'strikethrough', 'quote', 'anchor', 'image', 'justifyLeft', 'justifyCenter', 'justifyRight', 'justifyFull', 'superscript', 'subscript', 'orderedlist', 'unorderedlist', 'pre', 'outdent', 'indent', 'h2', 'h3'],
+                    sticky: true,
+                    static: true,
+                    align: 'right',
+                    updateOnEmptySelection: true
+                },
+                buttonLabels: 'fontawesome'
             });
     </script>
 </body>
