@@ -481,11 +481,13 @@ var Util;
             if ((parent.nodeName.toLowerCase() === 'ul' || parent.nodeName.toLowerCase() === 'ol') && (parent.parentElement.nodeName.toLowerCase() === 'ul' || parent.parentElement.nodeName.toLowerCase() === 'ol')) { // yes, we need to fix list nesting (valid is: ul/ol > li > ul/ol )
                 // correctly wrap <ul/ol> in <li>
                 this.wrap(parent, ownerDocument, 'li');
+                Selection.moveCursor(ownerDocument, element.firstChild, element.firstChild.textContent.length);
             }
 
             if (parent.nodeName.toLowerCase() === 'li' && element.nodeName.toLowerCase() === 'li') { // yes, we need to fix list nesting (valid is: ul > li > ul )
                 // un-wrap <li> <li> after outdenting a list
                 this.unwrap(parent, ownerDocument);
+                Selection.moveCursor(ownerDocument, element.firstChild, element.firstChild.textContent.length);
             }
 
             if ((parent.nodeName.toLowerCase() === 'ul' || parent.nodeName.toLowerCase() === 'ol') && parent.parentElement.nodeName.toLowerCase() === 'p') { // yes we need to clean up
