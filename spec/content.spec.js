@@ -56,12 +56,12 @@ describe('Content TestCase', function () {
             // I was unable to find a workaround, and this works fine in a browser
             // so let's just skip skip the innerHTML check in firefox
             if (!isFirefox()) {
-                expect(this.el.innerHTML).toBe('<ol><li>lorem</li><ol><li>ipsum</li></ol></ol>');
+                expect(this.el.innerHTML).toBe('<ol><li>lorem</li><li><ol><li>ipsum</li></ol></li></ol>');
             }
         });
 
         it('with shift key, should outdent when within an <li>', function () {
-            this.el.innerHTML = '<ol><li>lorem</li><ol><li><span><span>ipsum</span></span></li></ol></ol>';
+            this.el.innerHTML = '<ol><li>lorem</li><li><ol><li><span><span>ipsum</span></span></li></ol></li></ol>';
             var editor = this.newMediumEditor('.editor'),
                 target = editor.elements[0].querySelector('ol').lastChild.firstChild.firstChild;
             spyOn(document, 'execCommand').and.callThrough();
