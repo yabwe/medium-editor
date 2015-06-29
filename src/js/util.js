@@ -478,19 +478,22 @@ var Util;
 
             var parent = element.parentElement;
 
-            if ((parent.nodeName.toLowerCase() === 'ul' || parent.nodeName.toLowerCase() === 'ol') && (parent.parentElement.nodeName.toLowerCase() === 'ul' || parent.parentElement.nodeName.toLowerCase() === 'ol')) { // yes, we need to fix list nesting (valid is: ul/ol > li > ul/ol )
-                // correctly wrap <ul/ol> in <li>
+            // do we need to fix list nesting? (valid is: ul/ol > li > ul/ol )
+            if ((parent.nodeName.toLowerCase() === 'ul' || parent.nodeName.toLowerCase() === 'ol') && (parent.parentElement.nodeName.toLowerCase() === 'ul' || parent.parentElement.nodeName.toLowerCase() === 'ol')) {
+                // correctly wrap <ul/ol> in <li> after indenting a list
                 this.wrap(parent, ownerDocument, 'li');
                 Selection.moveCursor(ownerDocument, element.firstChild, element.firstChild.textContent.length);
             }
 
-            if (parent.nodeName.toLowerCase() === 'li' && element.nodeName.toLowerCase() === 'li') { // yes, we need to fix list nesting (valid is: ul > li > ul )
+            // do we need to fix list nesting? (valid is: ul > li > ul )
+            if (parent.nodeName.toLowerCase() === 'li' && element.nodeName.toLowerCase() === 'li') {
                 // un-wrap <li> <li> after outdenting a list
                 this.unwrap(parent, ownerDocument);
                 Selection.moveCursor(ownerDocument, element.firstChild, element.firstChild.textContent.length);
             }
 
-            if ((parent.nodeName.toLowerCase() === 'ul' || parent.nodeName.toLowerCase() === 'ol') && parent.parentElement.nodeName.toLowerCase() === 'p') { // yes we need to clean up
+            // do we need to clean the DOM? ( p > ul is invalid )
+            if ((parent.nodeName.toLowerCase() === 'ul' || parent.nodeName.toLowerCase() === 'ol') && parent.parentElement.nodeName.toLowerCase() === 'p') {
                 this.unwrap(parent.parentElement, ownerDocument);
                 // move cursor at the end of the text inside the list
                 // for some unknown reason, the cursor is moved to end of the "visual" line
@@ -856,7 +859,10 @@ var Util;
                 el.parentNode.removeChild(el);
             }
         },
-        wrap: function (el, doc, tag) { // see https://stackoverflow.com/questions/3337587/wrapping-a-set-of-dom-elements-using-javascript
+
+        // this function can wrap an element in another element
+        // see https://stackoverflow.com/questions/3337587/wrapping-a-set-of-dom-elements-using-javascript
+        wrap: function (el, doc, tag) {
             // Create the new DOM element
             // Cache the current parent and sibling of the first element.
             var wrap = doc.createElement(tag),
