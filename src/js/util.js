@@ -476,11 +476,20 @@ var Util;
                 return;
             }
 
-            var list = element.parentElement;
+            var parent = element.parentElement;
 
-            if (list.parentElement.nodeName.toLowerCase() === 'p') { // yes we need to clean up
-                this.unwrap(list.parentElement, ownerDocument);
+            if ((parent.nodeName.toLowerCase() === 'ul' || parent.nodeName.toLowerCase() === 'ol') && (parent.parentElement.nodeName.toLowerCase() === 'ul' || parent.parentElement.nodeName.toLowerCase() === 'ol')) { // yes, we need to fix list nesting (valid is: ul/ol > li > ul/ol )
+                // correctly wrap <ul/ol> in <li>
+                this.wrap(parent, ownerDocument, 'li');
+            }
 
+            if (parent.nodeName.toLowerCase() === 'li' && element.nodeName.toLowerCase() === 'li') { // yes, we need to fix list nesting (valid is: ul > li > ul )
+                // un-wrap <li> <li> after outdenting a list
+                this.unwrap(parent, ownerDocument);
+            }
+
+            if ((parent.nodeName.toLowerCase() === 'ul' || parent.nodeName.toLowerCase() === 'ol') && parent.parentElement.nodeName.toLowerCase() === 'p') { // yes we need to clean up
+                this.unwrap(parent.parentElement, ownerDocument);
                 // move cursor at the end of the text inside the list
                 // for some unknown reason, the cursor is moved to end of the "visual" line
                 Selection.moveCursor(ownerDocument, element.firstChild, element.firstChild.textContent.length);
