@@ -42,8 +42,10 @@ function MediumEditor(elements, options) {
             // If Shift is down, outdent, otherwise indent
             if (event.shiftKey) {
                 this.options.ownerDocument.execCommand('outdent', false, null);
+                Util.cleanListDOM(this.options.ownerDocument, Selection.getSelectionStart(this.options.ownerDocument));
             } else {
                 this.options.ownerDocument.execCommand('indent', false, null);
+                Util.cleanListDOM(this.options.ownerDocument, Selection.getSelectionStart(this.options.ownerDocument));
             }
         }
     }
