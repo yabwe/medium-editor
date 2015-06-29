@@ -844,6 +844,26 @@ var Util;
             } else {
                 el.parentNode.removeChild(el);
             }
+        },
+        wrap: function (el, doc, tag) { // see https://stackoverflow.com/questions/3337587/wrapping-a-set-of-dom-elements-using-javascript
+            // Create the new DOM element
+            // Cache the current parent and sibling of the first element.
+            var wrap = doc.createElement(tag),
+                parent = el.parentNode,
+                sibling = el.nextSibling;
+
+            // Wrap the first element (is automatically removed from its
+            // current parent).
+            wrap.appendChild(el);
+
+            // If the first element had a sibling, insert the wrapper before the
+            // sibling to maintain the HTML structure; otherwise, just append it
+            // to the parent.
+            if (sibling) {
+                parent.insertBefore(wrap, sibling);
+            } else {
+                parent.appendChild(wrap);
+            }
         }
     };
 }(window));
