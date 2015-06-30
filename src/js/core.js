@@ -836,54 +836,17 @@ function MediumEditor(elements, options) {
 
         // http://stackoverflow.com/questions/17678843/cant-restore-selection-after-html-modify-even-if-its-the-same-html
         // Tim Down
-        // TODO: move to selection.js and clean up old methods there
         exportSelection: function () {
-            var selectionState = null,
-                selection = this.options.contentWindow.getSelection(),
-                range,
-                preSelectionRange,
-                start,
-                editableElementIndex = -1;
+            var selectionElement = Selection.getSelectionElement(this.options.contentWindow),
+                editableElementIndex = this.elements.indexOf(selectionElement),
+                selectionState = null;
 
-            if (selection.rangeCount > 0) {
-                range = selection.getRangeAt(0);
-                preSelectionRange = range.cloneRange();
-
-                // Find element current selection is inside
-                this.elements.some(function (el, index) {
-                    if (el === range.startContainer || Util.isDescendant(el, range.startContainer)) {
-                        editableElementIndex = index;
-                        return true;
-                    }
-                    return false;
-                });
-
-                if (editableElementIndex > -1) {
-                    preSelectionRange.selectNodeContents(this.elements[editableElementIndex]);
-                    preSelectionRange.setEnd(range.startContainer, range.startOffset);
-                    start = preSelectionRange.toString().length;
-
-                    selectionState = {
-                        start: start,
-                        end: start + range.toString().length,
-                        editableElementIndex: editableElementIndex
-                    };
-                    // If start = 0 there may still be an empty paragraph before it, but we don't care.
-                    if (start !== 0) {
-                        var emptyBlocksIndex = Selection.getIndexRelativeToAdjacentEmptyBlocks(
-                                this.options.ownerDocument,
-                                this.elements[editableElementIndex],
-                                range.startContainer,
-                                range.startOffset);
-                        if (emptyBlocksIndex !== 0) {
-                            selectionState.emptyBlocksIndex = emptyBlocksIndex;
-                        }
-                    }
-                }
+            if (editableElementIndex >= 0) {
+                selectionState = Selection.exportSelection(selectionElement, this.options.ownerDocument);
             }
 
-            if (selectionState !== null && selectionState.editableElementIndex === 0) {
-                delete selectionState.editableElementIndex;
+            if (selectionState !== null && editableElementIndex !== 0) {
+                selectionState.editableElementIndex = editableElementIndex;
             }
 
             return selectionState;
@@ -895,7 +858,6 @@ function MediumEditor(elements, options) {
 
         // http://stackoverflow.com/questions/17678843/cant-restore-selection-after-html-modify-even-if-its-the-same-html
         // Tim Down
-        // TODO: move to selection.js and clean up old methods there
         //
         // {object} inSelectionState - the selection to import
         // {boolean} [favorLaterSelectionAnchor] - defaults to false. If true, import the cursor immediately
