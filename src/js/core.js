@@ -44,8 +44,11 @@ function MediumEditor(elements, options) {
                 this.options.ownerDocument.execCommand('outdent', false, null);
                 Util.cleanListDOM(this.options.ownerDocument, Selection.getSelectionStart(this.options.ownerDocument));
             } else {
-                this.options.ownerDocument.execCommand('indent', false, null);
-                Util.cleanListDOM(this.options.ownerDocument, Selection.getSelectionStart(this.options.ownerDocument));
+                // If it's the first element in the list, ignore this command
+                if (node.previousSibling !== null) {
+                    this.options.ownerDocument.execCommand('indent', false, null);
+                    Util.cleanListDOM(this.options.ownerDocument, Selection.getSelectionStart(this.options.ownerDocument));
+                }
             }
         }
     }
