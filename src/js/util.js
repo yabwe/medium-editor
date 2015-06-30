@@ -480,15 +480,20 @@ var Util;
 
             // do we need to fix list nesting? (valid is: ul/ol > li > ul/ol )
             if ((parent.nodeName.toLowerCase() === 'ul' || parent.nodeName.toLowerCase() === 'ol') && (parent.parentElement.nodeName.toLowerCase() === 'ul' || parent.parentElement.nodeName.toLowerCase() === 'ol')) {
-                // correctly wrap <ul/ol> in <li> after indenting a list
-                this.wrap(parent, ownerDocument, 'li');
+                // does a previous list item exist? (a second order list needs to be inside a previous list item)
+                if (parent.previousElementSibling.nodeName.toLowerCase() === 'li') {
+                    parent.previousElementSibling.appendChild(parent);
+                }
                 Selection.moveCursor(ownerDocument, element.firstChild, element.firstChild.textContent.length);
             }
 
             // do we need to fix list nesting? (valid is: ul > li > ul )
             if (parent.nodeName.toLowerCase() === 'li' && element.nodeName.toLowerCase() === 'li') {
                 // un-wrap <li> <li> after outdenting a list
-                this.unwrap(parent, ownerDocument);
+                if (element.lastElementChild.nodeName.toLowerCase() === 'br') {
+                    element.removeChild(element.lastElementChild);
+                }
+                parent.parentNode.insertBefore(element, parent.nextSibling);
                 Selection.moveCursor(ownerDocument, element.firstChild, element.firstChild.textContent.length);
             }
 
