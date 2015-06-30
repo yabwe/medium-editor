@@ -205,7 +205,7 @@ LINK_REGEXP_TEXT =
 
         createAutoLink: function (textNodes, href) {
             href = Util.ensureUrlHasProtocol(href);
-            var anchor = Util.createLink(this.document, textNodes, href),
+            var anchor = Util.createLink(this.document, textNodes, href, this.getEditorOption('targetBlank')),
                 span = this.document.createElement('span');
             span.setAttribute('data-auto-link', 'true');
             span.setAttribute('data-href', href);

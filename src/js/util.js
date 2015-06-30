@@ -106,10 +106,13 @@ var Util;
          * descendants of the same closest block container. If the preconditions are not met, unexpected
          * behavior will result.
          */
-        createLink: function (document, textNodes, href) {
+        createLink: function (document, textNodes, href, blank) {
             var anchor = document.createElement('a');
             Util.moveTextRangeIntoElement(textNodes[0], textNodes[textNodes.length - 1], anchor);
             anchor.setAttribute('href', href);
+            if (blank) {
+                anchor.setAttribute('target', '_blank');
+            }
             return anchor;
         },
 
