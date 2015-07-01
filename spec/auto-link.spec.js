@@ -398,6 +398,22 @@ describe('Autolink', function () {
                     'link should have been added');
             });
 
+            it('should create a link with target="_blank" when respective option is set to true', function () {
+                this.el = this.createElement('div', 'editor-blank', '');
+                this.newMediumEditor('.editor-blank', {
+                    autoLink: true,
+                    targetBlank: true
+                });
+
+                this.el.innerHTML = 'http://www.example.com';
+                selectElementContentsAndFire(this.el);
+                triggerAutolinking(this.el);
+                var links = this.el.getElementsByTagName('a');
+                expect(links.length).toBe(1);
+                expect(links[0].getAttribute('href')).toBe('http://www.example.com');
+                expect(links[0].target).toBe('_blank');
+            });
+
             it('should stop attempting to auto-link on keypress if an error is encountered', function () {
                 var spy = spyOn(MediumEditor.extensions.autoLink.prototype, 'performLinking').and.throwError('DOM ERROR');
 

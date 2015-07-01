@@ -34,6 +34,120 @@ var Selection;
             }, contentWindow);
         },
 
+        // http://stackoverflow.com/questions/17678843/cant-restore-selection-after-html-modify-even-if-its-the-same-html
+        // Tim Down
+        exportSelection: function (root, doc) {
+            if (!root) {
+                return null;
+            }
+
+            var selectionState = null,
+                selection = doc.getSelection();
+
+            if (selection.rangeCount > 0) {
+                var range = selection.getRangeAt(0),
+                    preSelectionRange = range.cloneRange(),
+                    start;
+
+                preSelectionRange.selectNodeContents(root);
+                preSelectionRange.setEnd(range.startContainer, range.startOffset);
+                start = preSelectionRange.toString().length;
+
+                selectionState = {
+                    start: start,
+                    end: start + range.toString().length
+                };
+                // If start = 0 there may still be an empty paragraph before it, but we don't care.
+                if (start !== 0) {
+                    var emptyBlocksIndex = this.getIndexRelativeToAdjacentEmptyBlocks(doc, root, range.startContainer, range.startOffset);
+                    if (emptyBlocksIndex !== 0) {
+                        selectionState.emptyBlocksIndex = emptyBlocksIndex;
+                    }
+                }
+            }
+
+            return selectionState;
+        },
+
+        // http://stackoverflow.com/questions/17678843/cant-restore-selection-after-html-modify-even-if-its-the-same-html
+        // Tim Down
+        //
+        // {object} selectionState - the selection to import
+        // {DOMElement} root - the root element the selection is being restored inside of
+        // {Document} doc - the document to use for managing selection
+        // {boolean} [favorLaterSelectionAnchor] - defaults to false. If true, import the cursor immediately
+        //      subsequent to an anchor tag if it would otherwise be placed right at the trailing edge inside the
+        //      anchor. This cursor positioning, even though visually equivalent to the user, can affect behavior
+        //      in MS IE.
+        importSelection: function (selectionState, root, doc, favorLaterSelectionAnchor) {
+            if (!selectionState || !root) {
+                return;
+            }
+
+            var range = doc.createRange();
+            range.setStart(root, 0);
+            range.collapse(true);
+
+            var node = root,
+                nodeStack = [],
+                charIndex = 0,
+                foundStart = false,
+                stop = false,
+                nextCharIndex;
+
+            while (!stop && node) {
+                if (node.nodeType === 3) {
+                    nextCharIndex = charIndex + node.length;
+                    if (!foundStart && selectionState.start >= charIndex && selectionState.start <= nextCharIndex) {
+                        range.setStart(node, selectionState.start - charIndex);
+                        foundStart = true;
+                    }
+                    if (foundStart && selectionState.end >= charIndex && selectionState.end <= nextCharIndex) {
+                        range.setEnd(node, selectionState.end - charIndex);
+                        stop = true;
+                    }
+                    charIndex = nextCharIndex;
+                } else {
+                    var i = node.childNodes.length - 1;
+                    while (i >= 0) {
+                        nodeStack.push(node.childNodes[i]);
+                        i -= 1;
+                    }
+                }
+                if (!stop) {
+                    node = nodeStack.pop();
+                }
+            }
+
+            if (selectionState.emptyBlocksIndex && selectionState.end === nextCharIndex) {
+                var targetNode = Util.getTopBlockContainer(range.startContainer),
+                    index = 0;
+                // Skip over empty blocks until we hit the block we want the selection to be in
+                while (index < selectionState.emptyBlocksIndex && targetNode.nextSibling) {
+                    targetNode = targetNode.nextSibling;
+                    index++;
+                    // If we find a non-empty block, ignore the emptyBlocksIndex and just put selection here
+                    if (targetNode.textContent.length > 0) {
+                        break;
+                    }
+                }
+
+                // We're selecting a high-level block node, so make sure the cursor gets moved into the deepest
+                // element at the beginning of the block
+                range.setStart(Util.getFirstSelectableLeafNode(targetNode), 0);
+                range.collapse(true);
+            }
+
+            // If the selection is right at the ending edge of a link, put it outside the anchor tag instead of inside.
+            if (favorLaterSelectionAnchor) {
+                range = Selection.importSelectionMoveCursorPastAnchor(selectionState, range);
+            }
+
+            var sel = doc.getSelection();
+            sel.removeAllRanges();
+            sel.addRange(range);
+        },
+
         // Utility method called from importSelection only
         importSelectionMoveCursorPastAnchor: function (selectionState, range) {
             var nodeInsideAnchorTagFunction = function (node) {
