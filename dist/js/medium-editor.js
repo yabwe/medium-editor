@@ -499,6 +499,99 @@ var Util;
             return copyInto.apply(this, args);
         },
 
+        /*
+         * Create a link around the provided text nodes which must be adjacent to each other and all be
+         * descendants of the same closest block container. If the preconditions are not met, unexpected
+         * behavior will result.
+         */
+        createLink: function (document, textNodes, href) {
+            var anchor = document.createElement('a');
+            Util.moveTextRangeIntoElement(textNodes[0], textNodes[textNodes.length - 1], anchor);
+            anchor.setAttribute('href', href);
+            return anchor;
+        },
+
+        /*
+         * Given the provided match in the format {start: 1, end: 2} where start and end are indices into the
+         * textContent of the provided element argument, modify the DOM inside element to ensure that the text
+         * identified by the provided match can be returned as text nodes that contain exactly that text, without
+         * any additional text at the beginning or end of the returned array of adjacent text nodes.
+         *
+         * The only DOM manipulation performed by this function is splitting the text nodes, non-text nodes are
+         * not affected in any way.
+         */
+        findOrCreateMatchingTextNodes: function (document, element, match) {
+            var treeWalker = document.createTreeWalker(element, NodeFilter.SHOW_TEXT, null, false),
+                matchedNodes = [],
+                currentTextIndex = 0,
+                startReached = false,
+                currentNode = null,
+                newNode = null;
+
+            while ((currentNode = treeWalker.nextNode()) !== null) {
+                if (!startReached && match.start < (currentTextIndex + currentNode.nodeValue.length)) {
+                    startReached = true;
+                    newNode = Util.splitStartNodeIfNeeded(currentNode, match.start, currentTextIndex);
+                }
+                if (startReached) {
+                    Util.splitEndNodeIfNeeded(currentNode, newNode, match.end, currentTextIndex);
+                }
+                if (startReached && currentTextIndex === match.end) {
+                    break; // Found the node(s) corresponding to the link. Break out and move on to the next.
+                } else if (startReached && currentTextIndex > (match.end + 1)) {
+                    throw new Error('PerformLinking overshot the target!'); // should never happen...
+                }
+
+                if (startReached) {
+                    matchedNodes.push(newNode || currentNode);
+                }
+
+                currentTextIndex += currentNode.nodeValue.length;
+                if (newNode !== null) {
+                    currentTextIndex += newNode.nodeValue.length;
+                    // Skip the newNode as we'll already have pushed it to the matches
+                    treeWalker.nextNode();
+                }
+                newNode = null;
+            }
+            return matchedNodes;
+        },
+
+        /*
+         * Given the provided text node and text coordinates, split the text node if needed to make it align
+         * precisely with the coordinates.
+         *
+         * This function is intended to be called from Util.findOrCreateMatchingTextNodes.
+         */
+        splitStartNodeIfNeeded: function (currentNode, matchStartIndex, currentTextIndex) {
+            if (matchStartIndex !== currentTextIndex) {
+                return currentNode.splitText(matchStartIndex - currentTextIndex);
+            }
+            return null;
+        },
+
+        /*
+         * Given the provided text node and text coordinates, split the text node if needed to make it align
+         * precisely with the coordinates. The newNode argument should from the result of Util.splitStartNodeIfNeeded,
+         * if that function has been called on the same currentNode.
+         *
+         * This function is intended to be called from Util.findOrCreateMatchingTextNodes.
+         */
+        splitEndNodeIfNeeded: function (currentNode, newNode, matchEndIndex, currentTextIndex) {
+            var textIndexOfEndOfFarthestNode,
+                endSplitPoint;
+            textIndexOfEndOfFarthestNode = currentTextIndex + (newNode || currentNode).nodeValue.length +
+                    (newNode ? currentNode.nodeValue.length : 0) -
+                    1;
+            endSplitPoint = (newNode || currentNode).nodeValue.length -
+                    (textIndexOfEndOfFarthestNode + 1 - matchEndIndex);
+            if (textIndexOfEndOfFarthestNode >= matchEndIndex &&
+                    currentTextIndex !== textIndexOfEndOfFarthestNode &&
+                    endSplitPoint !== 0) {
+                (newNode || currentNode).splitText(endSplitPoint);
+            }
+        },
+
         // Find the next node in the DOM tree that represents any text that is being
         // displayed directly next to the targetNode (passed as an argument)
         // Text that appears directly next to the current node can be:
@@ -1033,6 +1126,12 @@ var Util;
             return element && element.nodeType !== 3 && this.blockContainerElementNames.indexOf(element.nodeName.toLowerCase()) !== -1;
         },
 
+        getClosestBlockContainer: function (node) {
+            return Util.traverseUp(node, function (node) {
+                return Util.isBlockContainer(node);
+            });
+        },
+
         getTopBlockContainer: function (element) {
             var topBlock = element;
             this.traverseUp(element, function (el) {
@@ -1401,7 +1500,6 @@ var editorDefaults;
 
     editorDefaults = {
         activeButtonClass: 'medium-editor-button-active',
-        allowMultiParagraphSelection: true,
         buttonLabels: false,
         delay: 0,
         disableReturn: false,
@@ -1912,6 +2010,19 @@ var Selection;
             sel.addRange(range);
         },
 
+        select: function (doc, startNode, startOffset, endNode, endOffset) {
+            doc.getSelection().removeAllRanges();
+            var range = doc.createRange();
+            range.setStart(startNode, startOffset);
+            if (endNode) {
+                range.setEnd(endNode, endOffset);
+            } else {
+                range.collapse(true);
+            }
+            doc.getSelection().addRange(range);
+            return range;
+        },
+
         /**
          * Move cursor to the given node with the given offset.
          *
@@ -1920,17 +2031,7 @@ var Selection;
          * @param  {integer}     offset  Where in the element should we jump, 0 by default
          */
         moveCursor: function (doc, node, offset) {
-            var range, sel,
-                startOffset = offset || 0;
-
-            range = doc.createRange();
-            sel = doc.getSelection();
-
-            range.setStart(node, startOffset);
-            range.collapse(true);
-
-            sel.removeAllRanges();
-            sel.addRange(range);
+            this.select(doc, node, offset);
         },
 
         getSelectionRange: function (ownerDocument) {
@@ -2047,6 +2148,12 @@ var Events;
             this.detachAllDOMEvents();
             this.detachAllCustomEvents();
             this.detachExecCommand();
+
+            if (this.base.elements) {
+                this.base.elements.forEach(function (element) {
+                    element.removeAttribute('data-medium-focused');
+                });
+            }
         },
 
         // Listening to calls to document.execCommand
@@ -2190,33 +2297,23 @@ var Events;
                     break;
                 case 'editableClick':
                     // Detecting click in the contenteditables
-                    this.base.elements.forEach(function (element) {
-                        this.attachDOMEvent(element, 'click', this.handleClick.bind(this));
-                    }.bind(this));
+                    this.attachToEachElement('click', this.handleClick);
                     break;
                 case 'editableBlur':
                     // Detecting blur in the contenteditables
-                    this.base.elements.forEach(function (element) {
-                        this.attachDOMEvent(element, 'blur', this.handleBlur.bind(this));
-                    }.bind(this));
+                    this.attachToEachElement('blur', this.handleBlur);
                     break;
                 case 'editableKeypress':
                     // Detecting keypress in the contenteditables
-                    this.base.elements.forEach(function (element) {
-                        this.attachDOMEvent(element, 'keypress', this.handleKeypress.bind(this));
-                    }.bind(this));
+                    this.attachToEachElement('keypress', this.handleKeypress);
                     break;
                 case 'editableKeyup':
                     // Detecting keyup in the contenteditables
-                    this.base.elements.forEach(function (element) {
-                        this.attachDOMEvent(element, 'keyup', this.handleKeyup.bind(this));
-                    }.bind(this));
+                    this.attachToEachElement('keyup', this.handleKeyup);
                     break;
                 case 'editableKeydown':
                     // Detecting keydown on the contenteditables
-                    this.base.elements.forEach(function (element) {
-                        this.attachDOMEvent(element, 'keydown', this.handleKeydown.bind(this));
-                    }.bind(this));
+                    this.attachToEachElement('keydown', this.handleKeydown);
                     break;
                 case 'editableKeydownEnter':
                     // Detecting keydown for ENTER on the contenteditables
@@ -2232,31 +2329,29 @@ var Events;
                     break;
                 case 'editableMouseover':
                     // Detecting mouseover on the contenteditables
-                    this.base.elements.forEach(function (element) {
-                        this.attachDOMEvent(element, 'mouseover', this.handleMouseover.bind(this));
-                    }, this);
+                    this.attachToEachElement('mouseover', this.handleMouseover);
                     break;
                 case 'editableDrag':
                     // Detecting dragover and dragleave on the contenteditables
-                    this.base.elements.forEach(function (element) {
-                        this.attachDOMEvent(element, 'dragover', this.handleDragging.bind(this));
-                        this.attachDOMEvent(element, 'dragleave', this.handleDragging.bind(this));
-                    }, this);
+                    this.attachToEachElement('dragover', this.handleDragging);
+                    this.attachToEachElement('dragleave', this.handleDragging);
                     break;
                 case 'editableDrop':
                     // Detecting drop on the contenteditables
-                    this.base.elements.forEach(function (element) {
-                        this.attachDOMEvent(element, 'drop', this.handleDrop.bind(this));
-                    }, this);
+                    this.attachToEachElement('drop', this.handleDrop);
                     break;
                 case 'editablePaste':
                     // Detecting paste on the contenteditables
-                    this.base.elements.forEach(function (element) {
-                        this.attachDOMEvent(element, 'paste', this.handlePaste.bind(this));
-                    }, this);
+                    this.attachToEachElement('paste', this.handlePaste);
                     break;
             }
             this.listeners[name] = true;
+        },
+
+        attachToEachElement: function (name, handler) {
+            this.base.elements.forEach(function (element) {
+                this.attachDOMEvent(element, name, handler.bind(this));
+            }, this);
         },
 
         focusElement: function (element) {
@@ -3238,9 +3333,9 @@ var AnchorPreview;
                 return true;
             }
 
-            // only show when hovering on anchors
-            if (this.base.toolbar && this.base.toolbar.isDisplayed()) {
-                // only show when toolbar is not present
+            // only show when toolbar is not present
+            var toolbar = this.base.getExtensionByName('toolbar');
+            if (toolbar && toolbar.isDisplayed && toolbar.isDisplayed()) {
                 return true;
             }
 
@@ -3417,28 +3512,6 @@ LINK_REGEXP_TEXT =
             return documentModified;
         },
 
-        splitStartNodeIfNeeded: function (currentNode, matchStartIndex, currentTextIndex) {
-            if (matchStartIndex !== currentTextIndex) {
-                return currentNode.splitText(matchStartIndex - currentTextIndex);
-            }
-            return null;
-        },
-
-        splitEndNodeIfNeeded: function (currentNode, newNode, matchEndIndex, currentTextIndex) {
-            var textIndexOfEndOfFarthestNode,
-                endSplitPoint;
-            textIndexOfEndOfFarthestNode = currentTextIndex + (newNode || currentNode).nodeValue.length +
-                    (newNode ? currentNode.nodeValue.length : 0) -
-                    1;
-            endSplitPoint = (newNode || currentNode).nodeValue.length -
-                    (textIndexOfEndOfFarthestNode + 1 - matchEndIndex);
-            if (textIndexOfEndOfFarthestNode >= matchEndIndex &&
-                    currentTextIndex !== textIndexOfEndOfFarthestNode &&
-                    endSplitPoint !== 0) {
-                (newNode || currentNode).splitText(endSplitPoint);
-            }
-        },
-
         removeObsoleteAutoLinkSpans: function (element) {
             var spans = element.querySelectorAll('span[data-auto-link="true"]'),
                 documentModified = false;
@@ -3496,10 +3569,26 @@ LINK_REGEXP_TEXT =
                 linkCreated = false;
 
             for (var matchIndex = 0; matchIndex < matches.length; matchIndex++) {
-                linkCreated = this.createLink(this.findOrCreateMatchingTextNodes(element, matches[matchIndex]),
-                    matches[matchIndex].href) || linkCreated;
+                var matchingTextNodes = Util.findOrCreateMatchingTextNodes(this.document, element,
+                        matches[matchIndex]);
+                if (this.shouldNotLink(matchingTextNodes)) {
+                    continue;
+                }
+                this.createAutoLink(matchingTextNodes, matches[matchIndex].href);
             }
             return linkCreated;
+        },
+
+        shouldNotLink: function (textNodes) {
+            var shouldNotLink = false;
+            for (var i = 0; i < textNodes.length && shouldNotLink === false; i++) {
+                // Do not link if the text node is either inside an anchor or inside span[data-auto-link]
+                shouldNotLink = !!Util.traverseUp(textNodes[i], function (node) {
+                    return node.nodeName.toLowerCase() === 'a' ||
+                        (node.getAttribute && node.getAttribute('data-auto-link') === 'true');
+                });
+            }
+            return shouldNotLink;
         },
 
         findLinkableText: function (contenteditable) {
@@ -3529,67 +3618,18 @@ LINK_REGEXP_TEXT =
             return matches;
         },
 
-        findOrCreateMatchingTextNodes: function (element, match) {
-            var treeWalker = this.document.createTreeWalker(element, NodeFilter.SHOW_TEXT, null, false),
-                matchedNodes = [],
-                currentTextIndex = 0,
-                startReached = false,
-                currentNode = null,
-                newNode = null;
-
-            while ((currentNode = treeWalker.nextNode()) !== null) {
-                if (!startReached && match.start < (currentTextIndex + currentNode.nodeValue.length)) {
-                    startReached = true;
-                    newNode = this.splitStartNodeIfNeeded(currentNode, match.start, currentTextIndex);
-                }
-                if (startReached) {
-                    this.splitEndNodeIfNeeded(currentNode, newNode, match.end, currentTextIndex);
-                }
-                if (startReached && currentTextIndex === match.end) {
-                    break; // Found the node(s) corresponding to the link. Break out and move on to the next.
-                } else if (startReached && currentTextIndex > (match.end + 1)) {
-                    throw new Error('PerformLinking overshot the target!'); // should never happen...
-                }
-
-                if (startReached) {
-                    matchedNodes.push(newNode || currentNode);
-                }
-
-                currentTextIndex += currentNode.nodeValue.length;
-                if (newNode !== null) {
-                    currentTextIndex += newNode.nodeValue.length;
-                    // Skip the newNode as we'll already have pushed it to the matches
-                    treeWalker.nextNode();
-                }
-                newNode = null;
-            }
-            return matchedNodes;
-        },
-
-        createLink: function (textNodes, href) {
-            var shouldNotLink = false;
-            for (var i = 0; i < textNodes.length && shouldNotLink === false; i++) {
-                // Do not link if the text node is either inside an anchor or inside span[data-auto-link]
-                shouldNotLink = !!Util.traverseUp(textNodes[i], function (node) {
-                    return node.nodeName.toLowerCase() === 'a' ||
-                        (node.getAttribute && node.getAttribute('data-auto-link') === 'true');
-                });
-            }
-            if (shouldNotLink) {
-                return false;
-            }
-
-            var anchor = this.document.createElement('a'),
-                span = this.document.createElement('span'),
-                hrefWithProtocol = Util.ensureUrlHasProtocol(href);
-            Util.moveTextRangeIntoElement(textNodes[0], textNodes[textNodes.length - 1], span);
+        createAutoLink: function (textNodes, href) {
+            href = Util.ensureUrlHasProtocol(href);
+            var anchor = Util.createLink(this.document, textNodes, href),
+                span = this.document.createElement('span');
             span.setAttribute('data-auto-link', 'true');
-            span.setAttribute('data-href', hrefWithProtocol);
-            anchor.setAttribute('href', hrefWithProtocol);
-            span.parentNode.insertBefore(anchor, span);
-            anchor.appendChild(span);
-            return true;
+            span.setAttribute('data-href', href);
+            anchor.insertBefore(span, anchor.firstChild);
+            while (anchor.childNodes.length > 1) {
+                span.appendChild(anchor.childNodes[1]);
+            }
         }
+
     });
 }());
 var ImageDragging;
@@ -4315,6 +4355,12 @@ var Toolbar;
          */
         align: 'center',
 
+        /* allowMultiParagraphSelection: [boolean]
+         * enables/disables whether the toolbar should be displayed when
+         * selecting multiple paragraphs/block elements
+         */
+        allowMultiParagraphSelection: true,
+
         /* buttons: [Array]
          * the names of the set of buttons to display on the toolbar.
          */
@@ -4622,10 +4668,10 @@ var Toolbar;
 
         // Checks for existance of multiple block elements in the current selection
         multipleBlockElementsSelected: function () {
-            /*jslint regexp: true*/
-            var selectionHtml = Selection.getSelectionHtml(this.document).replace(/<[\S]+><\/[\S]+>/gim, ''),
-                hasMultiParagraphs = selectionHtml.match(/<(p|h[1-6]|blockquote)[^>]*>/g);
-            /*jslint regexp: false*/
+            var regexEmptyHTMLTags = /<[^\/>][^>]*><\/[^>]+>/gim, // http://stackoverflow.com/questions/3129738/remove-empty-tags-using-regex
+                regexBlockElements = new RegExp('<(' + Util.blockContainerElementNames.join('|') + ')[^>]*>', 'g'),
+                selectionHTML = Selection.getSelectionHtml(this.document).replace(regexEmptyHTMLTags, ''), // Filter out empty blocks from selection
+                hasMultiParagraphs = selectionHTML.match(regexBlockElements); // Find how many block elements are within the html
 
             return !!hasMultiParagraphs && hasMultiParagraphs.length > 1;
         },
@@ -4659,12 +4705,8 @@ var Toolbar;
                     while (adjacentNode.nodeValue.substr(offset, 1).trim().length === 0) {
                         offset = offset + 1;
                     }
-                    var newRange = this.document.createRange();
-                    newRange.setStart(adjacentNode, offset);
-                    newRange.setEnd(selectionRange.endContainer, selectionRange.endOffset);
-                    selection.removeAllRanges();
-                    selection.addRange(newRange);
-                    selectionRange = newRange;
+                    selectionRange = Selection.select(this.document, adjacentNode, offset,
+                        selectionRange.endContainer, selectionRange.offset);
                 }
             }
         },
@@ -4700,7 +4742,7 @@ var Toolbar;
 
             // If we don't have a 'valid' selection -> hide toolbar
             if (this.window.getSelection().toString().trim() === '' ||
-                (this.getEditorOption('allowMultiParagraphSelection') === false && this.multipleBlockElementsSelected())) {
+                (this.allowMultiParagraphSelection === false && this.multipleBlockElementsSelected())) {
                 return this.hideToolbar();
             }
 
@@ -5339,7 +5381,11 @@ function MediumEditor(elements, options) {
         // just create the default toolbar
         var toolbarExtension = this.options.extensions['toolbar'];
         if (!toolbarExtension && isToolbarEnabled.call(this)) {
-            toolbarExtension = new MediumEditor.extensions.toolbar(this.options.toolbar);
+            // Backwards compatability
+            var toolbarOptions = Util.extend({}, this.options.toolbar, {
+                allowMultiParagraphSelection: this.options.allowMultiParagraphSelection // deprecated
+            });
+            toolbarExtension = new MediumEditor.extensions.toolbar(toolbarOptions);
         }
 
         // If the toolbar is not disabled, so we actually have an extension
@@ -5351,7 +5397,7 @@ function MediumEditor(elements, options) {
 
     function mergeOptions(defaults, options) {
         var deprecatedProperties = [
-            // ['forcePlainText', 'paste.forcePlainText'],
+            ['allowMultiParagraphSelection', 'toolbar.allowMultiParagraphSelection']
         ];
         // warn about using deprecated properties
         if (options) {
@@ -5507,6 +5553,8 @@ function MediumEditor(elements, options) {
                 }
             }, this);
 
+            this.events.destroy();
+
             this.elements.forEach(function (element) {
                 // Reset elements content, fix for issue where after editor destroyed the red underlines on spelling errors are left
                 if (this.options.spellcheck) {
@@ -5516,7 +5564,6 @@ function MediumEditor(elements, options) {
                 // cleanup extra added attributes
                 element.removeAttribute('contentEditable');
                 element.removeAttribute('spellcheck');
-                element.removeAttribute('data-medium-focused');
                 element.removeAttribute('data-medium-editor-element');
                 element.removeAttribute('role');
                 element.removeAttribute('aria-multiline');
@@ -5536,7 +5583,6 @@ function MediumEditor(elements, options) {
             }, this);
             this.elements = [];
 
-            this.events.destroy();
             removeFromEditors.call(this, this.options.contentWindow);
         },
 
@@ -5921,14 +5967,74 @@ function MediumEditor(elements, options) {
                 i;
 
             if (opts.url && opts.url.trim().length > 0) {
-                this.options.ownerDocument.execCommand('createLink', false, opts.url);
+                var currentSelection = this.options.contentWindow.getSelection();
+                if (currentSelection) {
+                    var exportedSelection,
+                        startContainerParentElement,
+                        endContainerParentElement,
+                        textNodes;
 
-                if (this.options.targetBlank || opts.target === '_blank') {
-                    Util.setTargetBlank(Selection.getSelectionStart(this.options.ownerDocument), opts.url);
-                }
+                    startContainerParentElement = Util.getClosestBlockContainer(
+                        currentSelection.getRangeAt(0).startContainer);
+                    endContainerParentElement = Util.getClosestBlockContainer(
+                        currentSelection.getRangeAt(0).endContainer);
 
-                if (opts.buttonClass) {
-                    Util.addClassToAnchors(Selection.getSelectionStart(this.options.ownerDocument), opts.buttonClass);
+                    if (startContainerParentElement === endContainerParentElement) {
+                        var currentEditor = Selection.getSelectionElement(this.options.contentWindow),
+                            parentElement = (startContainerParentElement || currentEditor),
+                            fragment = this.options.ownerDocument.createDocumentFragment();
+                        exportedSelection = this.exportSelection();
+                        fragment.appendChild(parentElement.cloneNode(true));
+                        if (currentEditor === parentElement) {
+                            // We have to avoid the editor itself being wiped out when it's the only block element,
+                            // as our reference inside this.elements gets detached from the page when insertHTML runs.
+                            // If we just use [parentElement, 0] and [parentElement, parentElement.childNodes.length]
+                            // as the range boundaries, this happens whenever parentElement === currentEditor.
+                            // The tradeoff to this workaround is that a orphaned tag can sometimes be left behind at
+                            // the end of the editor's content.
+                            // In Gecko:
+                            // as an empty <strong></strong> if parentElement.lastChild is a <strong> tag.
+                            // In WebKit:
+                            // an invented <br /> tag at the end in the same situation
+
+                            Selection.select(this.options.ownerDocument,
+                                parentElement.firstChild, 0,
+                                parentElement.lastChild, parentElement.lastChild.nodeType === 3 ?
+                                parentElement.lastChild.nodeValue.length : parentElement.lastChild.childNodes.length);
+                        } else {
+                            Selection.select(this.options.ownerDocument,
+                                parentElement, 0,
+                                parentElement, parentElement.childNodes.length);
+                        }
+                        var modifiedExportedSelection = this.exportSelection();
+
+                        textNodes = Util.findOrCreateMatchingTextNodes(this.options.ownerDocument,
+                                fragment,
+                                {
+                                    start: exportedSelection.start - modifiedExportedSelection.start,
+                                    end: exportedSelection.end - modifiedExportedSelection.start,
+                                    editableElementIndex: exportedSelection.editableElementIndex
+                                });
+                        // Creates the link in the document fragment
+                        Util.createLink(this.options.ownerDocument, textNodes, opts.url.trim());
+                        // Chrome trims the leading whitespaces when inserting HTML, which messes up restoring the selection.
+                        var leadingWhitespacesCount = (fragment.firstChild.innerHTML.match(/^\s+/) || [''])[0].length;
+                        // Now move the created link back into the original document in a way to preserve undo/redo history
+                        Util.insertHTMLCommand(this.options.ownerDocument,
+                            fragment.firstChild.innerHTML.replace(/^\s+/, ''));
+                        exportedSelection.start -= leadingWhitespacesCount;
+                        exportedSelection.end -= leadingWhitespacesCount;
+                        this.importSelection(exportedSelection);
+                    } else {
+                        this.options.ownerDocument.execCommand('createLink', false, opts.url);
+                    }
+                    if (this.options.targetBlank || opts.target === '_blank') {
+                        Util.setTargetBlank(Selection.getSelectionStart(this.options.ownerDocument), opts.url);
+                    }
+
+                    if (opts.buttonClass) {
+                        Util.addClassToAnchors(Selection.getSelectionStart(this.options.ownerDocument), opts.buttonClass);
+                    }
                 }
             }
 
@@ -5968,7 +6074,7 @@ MediumEditor.parseVersionString = function (release) {
 
 MediumEditor.version = MediumEditor.parseVersionString.call(this, ({
     // grunt-bump looks for this:
-    'version': '5.1.0'
+    'version': '5.2.0'
 }).version);
 
     return MediumEditor;

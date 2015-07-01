@@ -1,4 +1,14 @@
-5.1.0 / 2015-06-18
+5.2.0 / 2015-06-29
+==================
+* Move allowMultiParagraphSelection into toolbar options
+  * Deprecate global allowMultiParagraphSelection option
+* Fix issue with allowMultiParagraphSelection option over empty elements
+* Fix issue with creating links producing multiple anchor tags
+* Fix issue where anchor preview displays while toolbar is visible
+* Add demo pages for example extension and example button
+
+
+5.1.0 / 2015-06-26
 ==================
 * Add showToolbarDefaultAction helper method to form extension
 * Ensure elements generated for textareas have a unique id
