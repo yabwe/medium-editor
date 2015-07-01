@@ -484,7 +484,7 @@ var Util;
             // do we need to fix list nesting? (valid is: ul/ol > li > ul/ol )
             if ((parent.nodeName.toLowerCase() === 'ul' || parent.nodeName.toLowerCase() === 'ol') && (parent.parentElement.nodeName.toLowerCase() === 'ul' || parent.parentElement.nodeName.toLowerCase() === 'ol')) {
                 // does a previous list item exist? (a second order list needs to be inside a previous list item)
-                if (parent.previousElementSibling.nodeName.toLowerCase() === 'li') {
+                if (parent.previousElementSibling && parent.previousElementSibling.nodeName.toLowerCase() === 'li') {
                     parent.previousElementSibling.appendChild(parent);
                 }
                 Selection.moveCursor(ownerDocument, element.firstChild, element.firstChild.textContent.length);
