@@ -60,7 +60,9 @@
     "jshint-stylish": "1.0.2",
     "load-grunt-tasks": "3.1.0",
     "lodash": "3.9.1",
-    "time-grunt": "1.2.0"
+    "time-grunt": "1.2.0",
+    "grunt-exec": "^0.4.6",
+    "spacejam": "^1.1.1"
   },
   "scripts": {
     "test": "grunt test --verbose",
