@@ -356,7 +356,7 @@ module.exports = function (grunt) {
     grunt.registerTask('major', ['bump:major', 'css', 'js']);
 
     // Meteor tasks
-    grunt.registerTask( 'meteor-test', ['exec:meteor-init', 'exec:meteor-test', 'exec:meteor-cleanup']);
-    grunt.registerTask( 'meteor-publish', ['exec:meteor-init', 'exec:meteor-publish', 'exec:meteor-cleanup']);
-    grunt.registerTask( 'meteor', ['exec:meteor-init', 'exec:meteor-test', 'exec:meteor-publish', 'exec:meteor-cleanup']);
+    grunt.registerTask('meteor-test', ['exec:meteor-init', 'exec:meteor-test', 'exec:meteor-cleanup']);
+    grunt.registerTask('meteor-publish', ['exec:meteor-init', 'exec:meteor-publish', 'exec:meteor-cleanup']);
+    grunt.registerTask('meteor', ['exec:meteor-init', 'exec:meteor-test', 'exec:meteor-publish', 'exec:meteor-cleanup']);
 };

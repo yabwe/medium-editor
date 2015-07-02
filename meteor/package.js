@@ -1,7 +1,7 @@
 // package metadata file for Meteor.js
 'use strict';
 
-var packageName = 'medium-editor:medium-editor';  // https://atmospherejs.com/medium-editor/medium-editor
+var packageName = 'mediumeditor:mediumeditor';  // https://atmospherejs.com/medium-editor/medium-editor
 var where = 'client';  // where to install: 'client' or 'server'. For both, pass nothing.
 
 var packageJson = JSON.parse(Npm.require("fs").readFileSync('package.json'));
