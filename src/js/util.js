@@ -727,6 +727,12 @@ var Util;
             return element && element.getAttribute && !!element.getAttribute('data-medium-editor-element');
         },
 
+        getContainerEditorElement: function (element) {
+            return Util.traverseUp(element, function (node) {
+                return Util.isMediumEditorElement(node);
+            });
+        },
+
         isBlockContainer: function (element) {
             return element && element.nodeType !== 3 && this.blockContainerElementNames.indexOf(element.nodeName.toLowerCase()) !== -1;
         },

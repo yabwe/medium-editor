@@ -158,8 +158,13 @@ function prepareEvent (element, eventName, options) {
             evt.dataTransfer = {
                 dropEffect: ''
             };
-            if (!isIE9()) {
-                evt.dataTransfer.files = [dataURItoBlob('data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7')];
+            // File API only allows access to 'files' on drop, not on any other event
+            if (!isIE9() && eventName === 'drop') {
+                var file = dataURItoBlob('data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7');
+                if (!file.type) {
+                    file.type = 'image/gif';
+                }
+                evt.dataTransfer.files = [file];
             }
         }
     } else {

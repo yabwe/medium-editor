@@ -14,24 +14,28 @@ describe('Drag and Drop TestCase', function () {
         this.cleanupTest();
     });
 
-    it('should do nothing when option is false', function () {
-        var editor = this.newMediumEditor(this.el, { imageDragging: false });
-        fireEvent(editor.elements[0], 'dragover');
-        expect(editor.elements[0].className).not.toContain('medium-editor-dragover');
-    });
+    describe('drag', function () {
+        it('should add medium-editor-dragover class', function () {
+            var editor = this.newMediumEditor(this.el);
+            fireEvent(editor.elements[0], 'dragover');
+            expect(editor.elements[0].className).toContain('medium-editor-dragover');
+        });
 
-    it('should add medium-editor-dragover class on drag over', function () {
-        var editor = this.newMediumEditor(this.el);
-        fireEvent(editor.elements[0], 'dragover');
-        expect(editor.elements[0].className).toContain('medium-editor-dragover');
-    });
+        it('should add medium-editor-dragover class even when data is invalid', function () {
+            var editor = this.newMediumEditor(this.el, {
+                imageDragging: false
+            });
+            fireEvent(editor.elements[0], 'dragover');
+            expect(editor.elements[0].className).toContain('medium-editor-dragover');
+        });
 
-    it('should remove medium-editor-dragover class on drag leave', function () {
-        var editor = this.newMediumEditor(this.el);
-        fireEvent(editor.elements[0], 'dragover');
-        expect(editor.elements[0].className).toContain('medium-editor-dragover');
-        fireEvent(editor.elements[0], 'dragleave');
-        expect(editor.elements[0].className).not.toContain('medium-editor-dragover');
+        it('should remove medium-editor-dragover class on drag leave', function () {
+            var editor = this.newMediumEditor(this.el);
+            fireEvent(editor.elements[0], 'dragover');
+            expect(editor.elements[0].className).toContain('medium-editor-dragover');
+            fireEvent(editor.elements[0], 'dragleave');
+            expect(editor.elements[0].className).not.toContain('medium-editor-dragover');
+        });
     });
 
     describe('drop', function () {
@@ -46,6 +50,16 @@ describe('Drag and Drop TestCase', function () {
             if (!isIE9()) {
                 expect(Util.insertHTMLCommand).toHaveBeenCalled();
             }
+        });
+
+        it('should remove medium-editor-dragover class and NOT add the image to the editor content', function () {
+            spyOn(Util, 'insertHTMLCommand').and.callThrough();
+            var editor = this.newMediumEditor(this.el, { imageDragging: false });
+            fireEvent(editor.elements[0], 'dragover');
+            expect(editor.elements[0].className).toContain('medium-editor-dragover');
+            fireEvent(editor.elements[0], 'drop');
+            expect(editor.elements[0].className).not.toContain('medium-editor-dragover');
+            expect(Util.insertHTMLCommand).not.toHaveBeenCalled();
         });
     });
 });
