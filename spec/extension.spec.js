@@ -166,31 +166,31 @@ describe('Extensions TestCase', function () {
         it('should not add default extensions when overriden', function () {
             var editor,
                 Preview, Placeholder, AutoLink, ImageDragging,
-                extPreview, extPlaceholder, extAutoLink, extImageDragging;
+                extPreview, extPlaceholder, extAutoLink, extFileDragging;
 
             Preview = Extension.extend({ name: 'anchor-preview' });
             Placeholder = Extension.extend({ name: 'placeholder' });
             AutoLink = Extension.extend({ name: 'auto-link' });
-            ImageDragging = Extension.extend({ name: 'image-dragging' });
+            FileDragging = Extension.extend({ name: 'fileDragging' });
 
             extPreview = new Preview();
             extPlaceholder = new Placeholder();
             extAutoLink = new AutoLink();
-            extImageDragging = new ImageDragging();
+            extFileDragging = new FileDragging();
 
             editor = this.newMediumEditor('.editor', {
                 extensions: {
                     'anchor-preview': extPreview,
                     'placeholder': extPlaceholder,
                     'auto-link': extAutoLink,
-                    'image-dragging': extImageDragging
+                    'fileDragging': extFileDragging
                 }
             });
 
             expect(editor.getExtensionByName('anchor-preview')).toBe(extPreview);
             expect(editor.getExtensionByName('placeholder')).toBe(extPlaceholder);
             expect(editor.getExtensionByName('auto-link')).toBe(extAutoLink);
-            expect(editor.getExtensionByName('image-dragging')).toBe(extImageDragging);
+            expect(editor.getExtensionByName('fileDragging')).toBe(extFileDragging);
         });
 
         it('should call constructor function if it exists', function () {

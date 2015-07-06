@@ -720,9 +720,6 @@ function MediumEditor(elements, options) {
                 case 'fontsize':
                     extension = new MediumEditor.extensions.fontSize(opts);
                     break;
-                case 'imageDragging':
-                    extension = new MediumEditor.extensions.imageDragging();
-                    break;
                 case 'keyboardCommands':
                     extension = new MediumEditor.extensions.keyboardCommands(this.options.keyboardCommands);
                     break;
