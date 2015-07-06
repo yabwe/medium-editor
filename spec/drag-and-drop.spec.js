@@ -14,13 +14,15 @@ describe('Drag and Drop TestCase', function () {
         this.cleanupTest();
     });
 
-    it('should do nothing when option is false', function () {
-        var editor = this.newMediumEditor(this.el, { imageDragging: false });
+    it('should add medium-editor-dragover class on invalid drag over', function () {
+        var editor = this.newMediumEditor(this.el, {
+            imageDragging: false
+        });
         fireEvent(editor.elements[0], 'dragover');
-        expect(editor.elements[0].className).not.toContain('medium-editor-dragover');
+        expect(editor.elements[0].className).toContain('medium-editor-dragover');
     });
 
-    it('should add medium-editor-dragover class on drag over', function () {
+    it('should add medium-editor-dragover class on drag over with some valid data', function () {
         var editor = this.newMediumEditor(this.el);
         fireEvent(editor.elements[0], 'dragover');
         expect(editor.elements[0].className).toContain('medium-editor-dragover');

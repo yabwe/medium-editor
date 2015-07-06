@@ -283,6 +283,13 @@ function MediumEditor(elements, options) {
         return this.options.keyboardCommands !== false;
     }
 
+    function shouldUseFileDraggingExtension() {
+        // Since the file-dragging extension replaces the image-dragging extension,
+        // we need to check if the user passed an overrided image-dragging extension.
+        // If they have, to avoid breaking users, we won't use file-dragging extension.
+        return !this.options.extensions['imageDragging'];
+    }
+
     function createContentEditable(textarea, id) {
         var div = this.options.ownerDocument.createElement('div'),
             uniqueId = 'medium-editor-' + Date.now() + '-' + id,
@@ -384,12 +391,33 @@ function MediumEditor(elements, options) {
             }
         }, this);
 
+        // 4 Cases for imageDragging + fileDragging extensons:
+        //
+        // 1. ImageDragging ON + No Custom Image Dragging Extension:
+        //    * Use fileDragging extension (default options)
+        // 2. ImageDragging OFF + No Custom Image Dragging Extension:
+        //    * Use fileDragging extension w/ images turned off
+        // 3. ImageDragging ON + Custom Image Dragging Extension:
+        //    * Don't use fileDragging (could interfere with custom image dragging extension)
+        // 4. ImageDragging OFF + Custom Image Dragging:
+        //    * Don't use fileDragging (could interfere with custom image dragging extension)
+        if (shouldUseFileDraggingExtension.call(this)) {
+            var opts = this.options.fileDragging || {};
+            if (!opts.disabledTypes) {
+                opts.disabledTypes = [];
+            }
+            if (!isImageDraggingEnabled.call(this)) {
+                // Disable allowing dragging images
+                opts.disabledTypes.push('image');
+            }
+            this.addBuiltInExtension('fileDragging', opts);
+        }
+
         // Built-in extensions
         var builtIns = {
             paste: true,
             anchorPreview: isAnchorPreviewEnabled.call(this),
             autoLink: isAutoLinkEnabled.call(this),
-            imageDragging: isImageDraggingEnabled.call(this),
             keyboardCommands: isKeyboardCommandsEnabled.call(this),
             placeholder: isPlaceholderEnabled.call(this)
         };
@@ -685,6 +713,9 @@ function MediumEditor(elements, options) {
                     break;
                 case 'autoLink':
                     extension = new MediumEditor.extensions.autoLink();
+                    break;
+                case 'fileDragging':
+                    extension = new MediumEditor.extensions.fileDragging(opts);
                     break;
                 case 'fontsize':
                     extension = new MediumEditor.extensions.fontSize(opts);

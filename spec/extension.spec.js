@@ -163,7 +163,7 @@ describe('Extensions TestCase', function () {
             expect(e1.base).toBe(editor);
         });
 
-        it('should not add default extensions', function () {
+        it('should not add default extensions when overriden', function () {
             var editor,
                 Preview, Placeholder, AutoLink, ImageDragging,
                 extPreview, extPlaceholder, extAutoLink, extImageDragging;

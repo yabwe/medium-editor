@@ -1,5 +1,5 @@
-/*global Button, FormExtension,
-    AnchorForm, AnchorPreview, AutoLink,
+/*global Button, FormExtension, AnchorForm,
+    AnchorPreview, AutoLink, FileDragging,
     FontSizeForm, KeyboardCommands, ImageDragging,
     PasteHandler, Placeholder, Toolbar */
 
@@ -14,8 +14,9 @@ var extensionDefaults;
         anchor: AnchorForm,
         anchorPreview: AnchorPreview,
         autoLink: AutoLink,
+        fileDragging: FileDragging,
         fontSize: FontSizeForm,
-        imageDragging: ImageDragging,
+        imageDragging: ImageDragging, // deprecated
         keyboardCommands: KeyboardCommands,
         paste: PasteHandler,
         placeholder: Placeholder,
