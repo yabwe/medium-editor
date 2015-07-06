@@ -165,7 +165,7 @@ describe('Extensions TestCase', function () {
 
         it('should not add default extensions when overriden', function () {
             var editor,
-                Preview, Placeholder, AutoLink, ImageDragging,
+                Preview, Placeholder, AutoLink, FileDragging,
                 extPreview, extPlaceholder, extAutoLink, extFileDragging;
 
             Preview = Extension.extend({ name: 'anchor-preview' });

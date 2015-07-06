@@ -42,11 +42,11 @@ var FileDragging;
         },
 
         handleDrop: function (event) {
-            // Prevent file from opening in another window
+            // Prevent file from opening in the current window
             event.preventDefault();
             event.stopPropagation();
 
-            // IE9 does not support the File API, so prevent file from opening in a new window
+            // IE9 does not support the File API, so prevent file from opening in the window
             // but also don't try to actually get the file
             if (event.dataTransfer.files) {
                 Array.prototype.slice.call(event.dataTransfer.files).forEach(function (file) {
