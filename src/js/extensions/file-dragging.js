@@ -6,18 +6,6 @@ var FileDragging;
 
     var CLASS_DRAG_OVER = 'medium-editor-dragover';
 
-    function containsDisabledFile(files, disabledTypes) {
-        if (!files || !disabledTypes.length) {
-            return false;
-        }
-
-        return Array.prototype.slice.call(files).some(function (file) {
-            return disabledTypes.some(function (fileType) {
-                return !!file.type.match(fileType);
-            });
-        }, this);
-    }
-
     function clearClassNames(element) {
         var editable = Util.getContainerEditorElement(element),
             existing = Array.prototype.slice.call(editable.parentElement.querySelectorAll('.' + CLASS_DRAG_OVER));
@@ -30,7 +18,7 @@ var FileDragging;
     FileDragging = Extension.extend({
         name: 'fileDragging',
 
-        disabledTypes: [],
+        allowedTypes: ['image'],
 
         init: function () {
             Extension.prototype.init.apply(this, arguments);
@@ -54,21 +42,30 @@ var FileDragging;
         },
 
         handleDrop: function (event) {
+            // Prevent file from opening in another window
             event.preventDefault();
             event.stopPropagation();
 
             // IE9 does not support the File API, so prevent file from opening in a new window
             // but also don't try to actually get the file
-            if (event.dataTransfer.files && !containsDisabledFile(event.dataTransfer.files, this.disabledTypes)) {
+            if (event.dataTransfer.files) {
                 Array.prototype.slice.call(event.dataTransfer.files).forEach(function (file) {
-                    if (file.type.match('image')) {
-                        this.insertImageFile(file);
+                    if (this.isAllowedFile(file)) {
+                        if (file.type.match('image')) {
+                            this.insertImageFile(file);
+                        }
                     }
                 }, this);
             }
 
             // Make sure we remove our class from everything
             clearClassNames(event.target);
+        },
+
+        isAllowedFile: function (file) {
+            return this.allowedTypes.some(function (fileType) {
+                return !!file.type.match(fileType);
+            });
         },
 
         insertImageFile: function (file) {

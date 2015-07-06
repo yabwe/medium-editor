@@ -402,13 +402,15 @@ function MediumEditor(elements, options) {
         // 4. ImageDragging OFF + Custom Image Dragging:
         //    * Don't use fileDragging (could interfere with custom image dragging extension)
         if (shouldUseFileDraggingExtension.call(this)) {
-            var opts = this.options.fileDragging || {};
-            if (!opts.disabledTypes) {
-                opts.disabledTypes = [];
-            }
-            if (!isImageDraggingEnabled.call(this)) {
-                // Disable allowing dragging images
-                opts.disabledTypes.push('image');
+            var opts = this.options.fileDragging;
+            if (!opts) {
+                opts = {};
+
+                // Image is in the 'allowedTypes' list by default.
+                // If imageDragging is off override the 'allowedTypes' list with an empty one
+                if (!isImageDraggingEnabled.call(this)) {
+                    opts.allowedTypes = [];
+                }
             }
             this.addBuiltInExtension('fileDragging', opts);
         }
