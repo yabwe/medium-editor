@@ -1,3 +1,12 @@
+5.3.0 / 2015-07-07
+==================
+* Fix issue with disabling image drag & drop via imageDragging option
+  * Deprecate image-dragging extension
+  * Introduce file-dragging extension
+* Ensure autolink urls respect targetBlank option
+* Expose importSelection and exportSelection as generic Selection helpers
+
+
 5.2.0 / 2015-06-29
 ==================
 * Move allowMultiParagraphSelection into toolbar options

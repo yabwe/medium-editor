@@ -504,10 +504,13 @@ var Util;
          * descendants of the same closest block container. If the preconditions are not met, unexpected
          * behavior will result.
          */
-        createLink: function (document, textNodes, href) {
+        createLink: function (document, textNodes, href, target) {
             var anchor = document.createElement('a');
             Util.moveTextRangeIntoElement(textNodes[0], textNodes[textNodes.length - 1], anchor);
             anchor.setAttribute('href', href);
+            if (target) {
+                anchor.setAttribute('target', target);
+            }
             return anchor;
         },
 
@@ -1120,6 +1123,12 @@ var Util;
 
         isMediumEditorElement: function (element) {
             return element && element.getAttribute && !!element.getAttribute('data-medium-editor-element');
+        },
+
+        getContainerEditorElement: function (element) {
+            return Util.traverseUp(element, function (node) {
+                return Util.isMediumEditorElement(node);
+            });
         },
 
         isBlockContainer: function (element) {
@@ -1809,6 +1818,120 @@ var Selection;
             return this.findMatchingSelectionParent(function (el) {
                 return Util.isMediumEditorElement(el);
             }, contentWindow);
+        },
+
+        // http://stackoverflow.com/questions/17678843/cant-restore-selection-after-html-modify-even-if-its-the-same-html
+        // Tim Down
+        exportSelection: function (root, doc) {
+            if (!root) {
+                return null;
+            }
+
+            var selectionState = null,
+                selection = doc.getSelection();
+
+            if (selection.rangeCount > 0) {
+                var range = selection.getRangeAt(0),
+                    preSelectionRange = range.cloneRange(),
+                    start;
+
+                preSelectionRange.selectNodeContents(root);
+                preSelectionRange.setEnd(range.startContainer, range.startOffset);
+                start = preSelectionRange.toString().length;
+
+                selectionState = {
+                    start: start,
+                    end: start + range.toString().length
+                };
+                // If start = 0 there may still be an empty paragraph before it, but we don't care.
+                if (start !== 0) {
+                    var emptyBlocksIndex = this.getIndexRelativeToAdjacentEmptyBlocks(doc, root, range.startContainer, range.startOffset);
+                    if (emptyBlocksIndex !== 0) {
+                        selectionState.emptyBlocksIndex = emptyBlocksIndex;
+                    }
+                }
+            }
+
+            return selectionState;
+        },
+
+        // http://stackoverflow.com/questions/17678843/cant-restore-selection-after-html-modify-even-if-its-the-same-html
+        // Tim Down
+        //
+        // {object} selectionState - the selection to import
+        // {DOMElement} root - the root element the selection is being restored inside of
+        // {Document} doc - the document to use for managing selection
+        // {boolean} [favorLaterSelectionAnchor] - defaults to false. If true, import the cursor immediately
+        //      subsequent to an anchor tag if it would otherwise be placed right at the trailing edge inside the
+        //      anchor. This cursor positioning, even though visually equivalent to the user, can affect behavior
+        //      in MS IE.
+        importSelection: function (selectionState, root, doc, favorLaterSelectionAnchor) {
+            if (!selectionState || !root) {
+                return;
+            }
+
+            var range = doc.createRange();
+            range.setStart(root, 0);
+            range.collapse(true);
+
+            var node = root,
+                nodeStack = [],
+                charIndex = 0,
+                foundStart = false,
+                stop = false,
+                nextCharIndex;
+
+            while (!stop && node) {
+                if (node.nodeType === 3) {
+                    nextCharIndex = charIndex + node.length;
+                    if (!foundStart && selectionState.start >= charIndex && selectionState.start <= nextCharIndex) {
+                        range.setStart(node, selectionState.start - charIndex);
+                        foundStart = true;
+                    }
+                    if (foundStart && selectionState.end >= charIndex && selectionState.end <= nextCharIndex) {
+                        range.setEnd(node, selectionState.end - charIndex);
+                        stop = true;
+                    }
+                    charIndex = nextCharIndex;
+                } else {
+                    var i = node.childNodes.length - 1;
+                    while (i >= 0) {
+                        nodeStack.push(node.childNodes[i]);
+                        i -= 1;
+                    }
+                }
+                if (!stop) {
+                    node = nodeStack.pop();
+                }
+            }
+
+            if (selectionState.emptyBlocksIndex && selectionState.end === nextCharIndex) {
+                var targetNode = Util.getTopBlockContainer(range.startContainer),
+                    index = 0;
+                // Skip over empty blocks until we hit the block we want the selection to be in
+                while (index < selectionState.emptyBlocksIndex && targetNode.nextSibling) {
+                    targetNode = targetNode.nextSibling;
+                    index++;
+                    // If we find a non-empty block, ignore the emptyBlocksIndex and just put selection here
+                    if (targetNode.textContent.length > 0) {
+                        break;
+                    }
+                }
+
+                // We're selecting a high-level block node, so make sure the cursor gets moved into the deepest
+                // element at the beginning of the block
+                range.setStart(Util.getFirstSelectableLeafNode(targetNode), 0);
+                range.collapse(true);
+            }
+
+            // If the selection is right at the ending edge of a link, put it outside the anchor tag instead of inside.
+            if (favorLaterSelectionAnchor) {
+                range = Selection.importSelectionMoveCursorPastAnchor(selectionState, range);
+            }
+
+            var sel = doc.getSelection();
+            sel.removeAllRanges();
+            sel.addRange(range);
         },
 
         // Utility method called from importSelection only
@@ -3620,7 +3743,7 @@ LINK_REGEXP_TEXT =
 
         createAutoLink: function (textNodes, href) {
             href = Util.ensureUrlHasProtocol(href);
-            var anchor = Util.createLink(this.document, textNodes, href),
+            var anchor = Util.createLink(this.document, textNodes, href, this.getEditorOption('targetBlank') ? '_blank' : null),
                 span = this.document.createElement('span');
             span.setAttribute('data-auto-link', 'true');
             span.setAttribute('data-href', href);
@@ -3632,12 +3755,27 @@ LINK_REGEXP_TEXT =
 
     });
 }());
-var ImageDragging;
+var FileDragging;
 
 (function () {
     'use strict';
 
-    ImageDragging = Extension.extend({
+    var CLASS_DRAG_OVER = 'medium-editor-dragover';
+
+    function clearClassNames(element) {
+        var editable = Util.getContainerEditorElement(element),
+            existing = Array.prototype.slice.call(editable.parentElement.querySelectorAll('.' + CLASS_DRAG_OVER));
+
+        existing.forEach(function (el) {
+            el.classList.remove(CLASS_DRAG_OVER);
+        });
+    }
+
+    FileDragging = Extension.extend({
+        name: 'fileDragging',
+
+        allowedTypes: ['image'],
+
         init: function () {
             Extension.prototype.init.apply(this, arguments);
 
@@ -3646,48 +3784,61 @@ var ImageDragging;
         },
 
         handleDrag: function (event) {
-            var className = 'medium-editor-dragover';
             event.preventDefault();
             event.dataTransfer.dropEffect = 'copy';
 
+            var target = event.target.classList ? event.target : event.target.parentElement;
+
+            // Ensure the class gets removed from anything that had it before
+            clearClassNames(target);
+
             if (event.type === 'dragover') {
-                event.target.classList.add(className);
-            } else if (event.type === 'dragleave') {
-                event.target.classList.remove(className);
+                target.classList.add(CLASS_DRAG_OVER);
             }
         },
 
         handleDrop: function (event) {
-            var className = 'medium-editor-dragover',
-                files;
+            // Prevent file from opening in the current window
             event.preventDefault();
             event.stopPropagation();
 
-            // IE9 does not support the File API, so prevent file from opening in a new window
+            // IE9 does not support the File API, so prevent file from opening in the window
             // but also don't try to actually get the file
             if (event.dataTransfer.files) {
-                files = Array.prototype.slice.call(event.dataTransfer.files, 0);
-                files.some(function (file) {
-                    if (file.type.match('image')) {
-                        var fileReader, id;
-                        fileReader = new FileReader();
-                        fileReader.readAsDataURL(file);
-
-                        id = 'medium-img-' + (+new Date());
-                        Util.insertHTMLCommand(this.document, '<img class="medium-editor-image-loading" id="' + id + '" />');
-
-                        fileReader.onload = function () {
-                            var img = this.document.getElementById(id);
-                            if (img) {
-                                img.removeAttribute('id');
-                                img.removeAttribute('class');
-                                img.src = fileReader.result;
-                            }
-                        }.bind(this);
+                Array.prototype.slice.call(event.dataTransfer.files).forEach(function (file) {
+                    if (this.isAllowedFile(file)) {
+                        if (file.type.match('image')) {
+                            this.insertImageFile(file);
+                        }
                     }
-                }.bind(this));
+                }, this);
             }
-            event.target.classList.remove(className);
+
+            // Make sure we remove our class from everything
+            clearClassNames(event.target);
+        },
+
+        isAllowedFile: function (file) {
+            return this.allowedTypes.some(function (fileType) {
+                return !!file.type.match(fileType);
+            });
+        },
+
+        insertImageFile: function (file) {
+            var fileReader = new FileReader();
+            fileReader.readAsDataURL(file);
+
+            var id = 'medium-img-' + (+new Date());
+            Util.insertHTMLCommand(this.document, '<img class="medium-editor-image-loading" id="' + id + '" />');
+
+            fileReader.onload = function () {
+                var img = this.document.getElementById(id);
+                if (img) {
+                    img.removeAttribute('id');
+                    img.removeAttribute('class');
+                    img.src = fileReader.result;
+                }
+            }.bind(this);
         }
     });
 }());
@@ -4958,6 +5109,66 @@ var Toolbar;
     });
 }());
 
+var ImageDragging;
+
+(function () {
+    'use strict';
+
+    ImageDragging = Extension.extend({
+        init: function () {
+            Extension.prototype.init.apply(this, arguments);
+
+            this.subscribe('editableDrag', this.handleDrag.bind(this));
+            this.subscribe('editableDrop', this.handleDrop.bind(this));
+        },
+
+        handleDrag: function (event) {
+            var className = 'medium-editor-dragover';
+            event.preventDefault();
+            event.dataTransfer.dropEffect = 'copy';
+
+            if (event.type === 'dragover') {
+                event.target.classList.add(className);
+            } else if (event.type === 'dragleave') {
+                event.target.classList.remove(className);
+            }
+        },
+
+        handleDrop: function (event) {
+            var className = 'medium-editor-dragover',
+                files;
+            event.preventDefault();
+            event.stopPropagation();
+
+            // IE9 does not support the File API, so prevent file from opening in a new window
+            // but also don't try to actually get the file
+            if (event.dataTransfer.files) {
+                files = Array.prototype.slice.call(event.dataTransfer.files, 0);
+                files.some(function (file) {
+                    if (file.type.match('image')) {
+                        var fileReader, id;
+                        fileReader = new FileReader();
+                        fileReader.readAsDataURL(file);
+
+                        id = 'medium-img-' + (+new Date());
+                        Util.insertHTMLCommand(this.document, '<img class="medium-editor-image-loading" id="' + id + '" />');
+
+                        fileReader.onload = function () {
+                            var img = this.document.getElementById(id);
+                            if (img) {
+                                img.removeAttribute('id');
+                                img.removeAttribute('class');
+                                img.src = fileReader.result;
+                            }
+                        }.bind(this);
+                    }
+                }.bind(this));
+            }
+            event.target.classList.remove(className);
+        }
+    });
+}());
+
 var extensionDefaults;
 (function () {
     // for now this is empty because nothing interally uses an Extension default.
@@ -4969,8 +5180,9 @@ var extensionDefaults;
         anchor: AnchorForm,
         anchorPreview: AnchorPreview,
         autoLink: AutoLink,
+        fileDragging: FileDragging,
         fontSize: FontSizeForm,
-        imageDragging: ImageDragging,
+        imageDragging: ImageDragging, // deprecated
         keyboardCommands: KeyboardCommands,
         paste: PasteHandler,
         placeholder: Placeholder,
@@ -5260,6 +5472,13 @@ function MediumEditor(elements, options) {
         return this.options.keyboardCommands !== false;
     }
 
+    function shouldUseFileDraggingExtension() {
+        // Since the file-dragging extension replaces the image-dragging extension,
+        // we need to check if the user passed an overrided image-dragging extension.
+        // If they have, to avoid breaking users, we won't use file-dragging extension.
+        return !this.options.extensions['imageDragging'];
+    }
+
     function createContentEditable(textarea, id) {
         var div = this.options.ownerDocument.createElement('div'),
             uniqueId = 'medium-editor-' + Date.now() + '-' + id,
@@ -5361,12 +5580,35 @@ function MediumEditor(elements, options) {
             }
         }, this);
 
+        // 4 Cases for imageDragging + fileDragging extensons:
+        //
+        // 1. ImageDragging ON + No Custom Image Dragging Extension:
+        //    * Use fileDragging extension (default options)
+        // 2. ImageDragging OFF + No Custom Image Dragging Extension:
+        //    * Use fileDragging extension w/ images turned off
+        // 3. ImageDragging ON + Custom Image Dragging Extension:
+        //    * Don't use fileDragging (could interfere with custom image dragging extension)
+        // 4. ImageDragging OFF + Custom Image Dragging:
+        //    * Don't use fileDragging (could interfere with custom image dragging extension)
+        if (shouldUseFileDraggingExtension.call(this)) {
+            var opts = this.options.fileDragging;
+            if (!opts) {
+                opts = {};
+
+                // Image is in the 'allowedTypes' list by default.
+                // If imageDragging is off override the 'allowedTypes' list with an empty one
+                if (!isImageDraggingEnabled.call(this)) {
+                    opts.allowedTypes = [];
+                }
+            }
+            this.addBuiltInExtension('fileDragging', opts);
+        }
+
         // Built-in extensions
         var builtIns = {
             paste: true,
             anchorPreview: isAnchorPreviewEnabled.call(this),
             autoLink: isAutoLinkEnabled.call(this),
-            imageDragging: isImageDraggingEnabled.call(this),
             keyboardCommands: isKeyboardCommandsEnabled.call(this),
             placeholder: isPlaceholderEnabled.call(this)
         };
@@ -5663,11 +5905,11 @@ function MediumEditor(elements, options) {
                 case 'autoLink':
                     extension = new MediumEditor.extensions.autoLink();
                     break;
+                case 'fileDragging':
+                    extension = new MediumEditor.extensions.fileDragging(opts);
+                    break;
                 case 'fontsize':
                     extension = new MediumEditor.extensions.fontSize(opts);
-                    break;
-                case 'imageDragging':
-                    extension = new MediumEditor.extensions.imageDragging();
                     break;
                 case 'keyboardCommands':
                     extension = new MediumEditor.extensions.keyboardCommands(this.options.keyboardCommands);
@@ -5811,56 +6053,19 @@ function MediumEditor(elements, options) {
             return focused;
         },
 
-        // http://stackoverflow.com/questions/17678843/cant-restore-selection-after-html-modify-even-if-its-the-same-html
-        // Tim Down
-        // TODO: move to selection.js and clean up old methods there
+        // Export the state of the selection in respect to one of this
+        // instance of MediumEditor's elements
         exportSelection: function () {
-            var selectionState = null,
-                selection = this.options.contentWindow.getSelection(),
-                range,
-                preSelectionRange,
-                start,
-                editableElementIndex = -1;
+            var selectionElement = Selection.getSelectionElement(this.options.contentWindow),
+                editableElementIndex = this.elements.indexOf(selectionElement),
+                selectionState = null;
 
-            if (selection.rangeCount > 0) {
-                range = selection.getRangeAt(0);
-                preSelectionRange = range.cloneRange();
-
-                // Find element current selection is inside
-                this.elements.some(function (el, index) {
-                    if (el === range.startContainer || Util.isDescendant(el, range.startContainer)) {
-                        editableElementIndex = index;
-                        return true;
-                    }
-                    return false;
-                });
-
-                if (editableElementIndex > -1) {
-                    preSelectionRange.selectNodeContents(this.elements[editableElementIndex]);
-                    preSelectionRange.setEnd(range.startContainer, range.startOffset);
-                    start = preSelectionRange.toString().length;
-
-                    selectionState = {
-                        start: start,
-                        end: start + range.toString().length,
-                        editableElementIndex: editableElementIndex
-                    };
-                    // If start = 0 there may still be an empty paragraph before it, but we don't care.
-                    if (start !== 0) {
-                        var emptyBlocksIndex = Selection.getIndexRelativeToAdjacentEmptyBlocks(
-                                this.options.ownerDocument,
-                                this.elements[editableElementIndex],
-                                range.startContainer,
-                                range.startOffset);
-                        if (emptyBlocksIndex !== 0) {
-                            selectionState.emptyBlocksIndex = emptyBlocksIndex;
-                        }
-                    }
-                }
+            if (editableElementIndex >= 0) {
+                selectionState = Selection.exportSelection(selectionElement, this.options.ownerDocument);
             }
 
-            if (selectionState !== null && selectionState.editableElementIndex === 0) {
-                delete selectionState.editableElementIndex;
+            if (selectionState !== null && editableElementIndex !== 0) {
+                selectionState.editableElementIndex = editableElementIndex;
             }
 
             return selectionState;
@@ -5870,92 +6075,15 @@ function MediumEditor(elements, options) {
             this.selectionState = this.exportSelection();
         },
 
-        // http://stackoverflow.com/questions/17678843/cant-restore-selection-after-html-modify-even-if-its-the-same-html
-        // Tim Down
-        // TODO: move to selection.js and clean up old methods there
-        //
-        // {object} inSelectionState - the selection to import
-        // {boolean} [favorLaterSelectionAnchor] - defaults to false. If true, import the cursor immediately
-        //      subsequent to an anchor tag if it would otherwise be placed right at the trailing edge inside the
-        //      anchor. This cursor positioning, even though visually equivalent to the user, can affect behavior
-        //      in MS IE.
-        importSelection: function (inSelectionState, favorLaterSelectionAnchor) {
-            if (!inSelectionState) {
+        // Restore a selection based on a selectionState returned by a call
+        // to MediumEditor.exportSelection
+        importSelection: function (selectionState, favorLaterSelectionAnchor) {
+            if (!selectionState) {
                 return;
             }
 
-            var editableElementIndex = inSelectionState.editableElementIndex === undefined ?
-                                                0 : inSelectionState.editableElementIndex,
-                selectionState = {
-                    editableElementIndex: editableElementIndex,
-                    start: inSelectionState.start,
-                    end: inSelectionState.end
-                },
-                editableElement = this.elements[selectionState.editableElementIndex],
-                charIndex = 0,
-                range = this.options.ownerDocument.createRange(),
-                nodeStack = [editableElement],
-                node,
-                foundStart = false,
-                stop = false,
-                i,
-                sel,
-                nextCharIndex;
-
-            range.setStart(editableElement, 0);
-            range.collapse(true);
-
-            node = nodeStack.pop();
-            while (!stop && node) {
-                if (node.nodeType === 3) {
-                    nextCharIndex = charIndex + node.length;
-                    if (!foundStart && selectionState.start >= charIndex && selectionState.start <= nextCharIndex) {
-                        range.setStart(node, selectionState.start - charIndex);
-                        foundStart = true;
-                    }
-                    if (foundStart && selectionState.end >= charIndex && selectionState.end <= nextCharIndex) {
-                        range.setEnd(node, selectionState.end - charIndex);
-                        stop = true;
-                    }
-                    charIndex = nextCharIndex;
-                } else {
-                    i = node.childNodes.length - 1;
-                    while (i >= 0) {
-                        nodeStack.push(node.childNodes[i]);
-                        i -= 1;
-                    }
-                }
-                if (!stop) {
-                    node = nodeStack.pop();
-                }
-            }
-
-            if (inSelectionState.emptyBlocksIndex && selectionState.end === nextCharIndex) {
-                var targetNode = Util.getTopBlockContainer(range.startContainer),
-                    index = 0;
-                // Skip over empty blocks until we hit the block we want the selection to be in
-                while (index < inSelectionState.emptyBlocksIndex && targetNode.nextSibling) {
-                    targetNode = targetNode.nextSibling;
-                    index++;
-                    // If we find a non-empty block, ignore the emptyBlocksIndex and just put selection here
-                    if (targetNode.textContent.length > 0) {
-                        break;
-                    }
-                }
-
-                // We're selecting a high-level block node, so make sure the cursor gets moved into the deepest
-                // element at the beginning of the block
-                range.setStart(Util.getFirstSelectableLeafNode(targetNode), 0);
-                range.collapse(true);
-            }
-
-            // If the selection is right at the ending edge of a link, put it outside the anchor tag instead of inside.
-            if (favorLaterSelectionAnchor) {
-                range = Selection.importSelectionMoveCursorPastAnchor(selectionState, range);
-            }
-            sel = this.options.contentWindow.getSelection();
-            sel.removeAllRanges();
-            sel.addRange(range);
+            var editableElement = this.elements[selectionState.editableElementIndex || 0];
+            Selection.importSelection(selectionState, editableElement, this.options.ownerDocument, favorLaterSelectionAnchor);
         },
 
         restoreSelection: function () {
@@ -6074,7 +6202,7 @@ MediumEditor.parseVersionString = function (release) {
 
 MediumEditor.version = MediumEditor.parseVersionString.call(this, ({
     // grunt-bump looks for this:
-    'version': '5.2.0'
+    'version': '5.3.0'
 }).version);
 
     return MediumEditor;
