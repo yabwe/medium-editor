@@ -354,19 +354,22 @@ var editor = new MediumEditor('.editable', {
                 command: 'bold',
                 key: 'B',
                 meta: true,
-                shift: false
+                shift: false,
+                alt: false
             },
             {
                 command: 'italic',
                 key: 'I',
                 meta: true,
-                shift: false
+                shift: false,
+                alt: false
             },
             {
                 command: 'underline',
                 key: 'U',
                 meta: true,
-                shift: false
+                shift: false,
+                alt: false
             }
         ],
     }
@@ -379,6 +382,7 @@ var editor = new MediumEditor('.editable', {
   * _key_: keyboard character that triggers this command
   * _meta_: whether the ctrl/meta key has to be active or inactive
   * _shift_: whether the shift key has to be active or inactive
+  * _alt_: whether the alt key has to be active or inactive
 
 To disable the keyboard commands, set the value of the `keyboardCommands` option to `false`:
 ```javascript

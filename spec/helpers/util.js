@@ -89,7 +89,7 @@ function dataURItoBlob(dataURI) {
     return new Blob([ia], {type: mimeString});
 }
 
-// keyCode, ctrlKey, target, relatedTarget, shiftKey
+// keyCode, ctrlKey, target, relatedTarget, shiftKey, altKey
 function fireEvent(element, eventName, options) {
     var evt = prepareEvent(
         element,
@@ -152,6 +152,10 @@ function prepareEvent (element, eventName, options) {
 
         if (options.shiftKey) {
             evt.shiftKey = true;
+        }
+
+        if (options.altKey) {
+          evt.altKey = true;
         }
 
         if (eventName.indexOf('drag') !== -1 || eventName === 'drop') {

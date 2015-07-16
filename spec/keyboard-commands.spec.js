@@ -54,13 +54,15 @@ describe('KeyboardCommands TestCase', function () {
                             command: 'superscript',
                             key: 'p',
                             meta: true,
-                            shift: false
+                            shift: false,
+                            alt: false
                         },
                         {
                             command: 'subscript',
                             key: 'p',
                             meta: true,
-                            shift: true
+                            shift: true,
+                            alt: false
                         }
                     ]
                 }
@@ -80,6 +82,69 @@ describe('KeyboardCommands TestCase', function () {
                 metaKey: true
             });
             expect(editor.execAction).toHaveBeenCalledWith('superscript');
+        });
+
+        it('should support the use of Alt key', function () {
+            spyOn(MediumEditor.prototype, 'execAction');
+            var editor = this.newMediumEditor('.editor', {
+                keyboardCommands: {
+                    commands: [
+                        {
+                            command: 'append-h1',
+                            key: '1',
+                            meta: true,
+                            shift: false,
+                            alt: true
+                        },
+                        {
+                            command: 'append-h2',
+                            key: '2',
+                            meta: true,
+                            shift: false,
+                            alt: true
+                        },
+                        {
+                            command: 'append-h3',
+                            key: '3',
+                            meta: true,
+                            shift: false,
+                            alt: true
+                        },
+                        {
+                            command: 'append-h4',
+                            key: '4',
+                            meta: true,
+                            shift: false,
+                            alt: true
+                        },
+                        {
+                            command: 'append-h5',
+                            key: '5',
+                            meta: true,
+                            shift: false,
+                            alt: true
+                        },
+                        {
+                            command: 'append-h6',
+                            key: '6',
+                            meta: true,
+                            shift: false,
+                            alt: true
+                        }
+                    ]
+                }
+            });
+            selectElementContentsAndFire(editor.elements[0]);
+            jasmine.clock().tick(1);
+            ['1', '2', '3', '4', '5', '6'].forEach(function (heading) {
+                fireEvent(editor.elements[0], 'keydown', {
+                    keyCode: (heading).toString().charCodeAt(0),
+                    ctrlKey: true,
+                    metaKey: true,
+                    altKey: true
+                });
+                expect(editor.execAction).toHaveBeenCalledWith('append-h' + heading);
+            });
         });
 
         it('should not execute the button action when shift key is pressed', function () {
