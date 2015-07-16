@@ -516,7 +516,7 @@ View the [MediumEditor Object API documentation](https://github.com/yabwe/medium
 * __.exportSelection()__: return a data representation of the selected text, which can be applied via `importSelection()`
 * __.importSelection(selectionState)__: restore the selection using a data representation of previously selected text (ie value returned by `exportSelection()`)
 * __.getFocusedElement()__: returns an element if any contenteditable element monitored by MediumEditor currently has focused
-* __.getSelectionParentElement(range)__: get the parent contenteditable element that contains the current selection
+* __.getSelectedParentElement(range)__: get the parent contenteditable element that contains the current selection
 * __.restoreSelection()__: restore the selection to what was selected when `saveSelection()` was called
 * __.saveSelection()__: internally store the set of selected text
 * __.selectAllContents()__: expands the selection to contain all text within the focused contenteditable
