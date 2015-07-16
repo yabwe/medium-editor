@@ -1,3 +1,8 @@
+5.4.0 / 2015-07-16
+==================
+* Add support for including 'alt' key in keyboard-commands
+
+
 5.3.0 / 2015-07-07
 ==================
 * Fix issue with disabling image drag & drop via imageDragging option

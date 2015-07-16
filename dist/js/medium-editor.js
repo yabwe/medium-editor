@@ -3861,25 +3861,29 @@ var KeyboardCommands;
          *   key [String] (keyboard character that triggers this command)
          *   meta [boolean] (whether the ctrl/meta key has to be active or inactive)
          *   shift [boolean] (whether the shift key has to be active or inactive)
+         *   alt [boolean] (whether the alt key has to be active or inactive)
          */
         commands: [
             {
                 command: 'bold',
                 key: 'B',
                 meta: true,
-                shift: false
+                shift: false,
+                alt: false
             },
             {
                 command: 'italic',
                 key: 'I',
                 meta: true,
-                shift: false
+                shift: false,
+                alt: false
             },
             {
                 command: 'underline',
                 key: 'U',
                 meta: true,
-                shift: false
+                shift: false,
+                alt: false
             }
         ],
 
@@ -3904,11 +3908,13 @@ var KeyboardCommands;
             }
 
             var isMeta = Util.isMetaCtrlKey(event),
-                isShift = !!event.shiftKey;
+                isShift = !!event.shiftKey,
+                isAlt = !!event.altKey;
 
             this.keys[keyCode].forEach(function (data) {
                 if (data.meta === isMeta &&
-                    data.shift === isShift) {
+                    data.shift === isShift &&
+                    data.alt === isAlt) {
                     event.preventDefault();
                     event.stopPropagation();
 
@@ -6202,7 +6208,7 @@ MediumEditor.parseVersionString = function (release) {
 
 MediumEditor.version = MediumEditor.parseVersionString.call(this, ({
     // grunt-bump looks for this:
-    'version': '5.3.0'
+    'version': '5.4.0'
 }).version);
 
     return MediumEditor;
