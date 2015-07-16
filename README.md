@@ -124,7 +124,7 @@ Using `'fontawesome'` as the buttonLabels requires version 4.1.0 of the fontawes
 
 The toolbar for MediumEditor is implemented as a built-in extension which automatically displays whenever the user selects some text.  The toolbar can hold any set of defined built-in buttons, but can also hold any custom buttons passed in as extensions.
 
-Options for the toolbar are passed as an object taht is a member of the outer options object. Example:
+Options for the toolbar are passed as an object that is a member of the outer options object. Example:
 ```javascript
 var editor = new MediumEditor('.editable', {
     toolbar: {
