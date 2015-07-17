@@ -26,8 +26,8 @@
   - [`stopSelectionUpdates()`](#stopselectionupdates)
   - [`startSelectionUpdates()`](#startselectionupdates)
 - [Editor Action Functions](#editor-action-functions)
-  - [`createLink(opts)`](#createlinkopts)
   - [`cleanPaste(text)`](#cleanpastetext)
+  - [`createLink(opts)`](#createlinkopts)
   - [`execAction(action, opts)`](#execactionaction-opts)
   - [`pasteHTML(html, options)`](#pastehtmlhtml-options)
   - [`queryCommandState(action)`](#querycommandstateaction)
@@ -61,7 +61,7 @@ _**elements** (`String` | `HTMLElement` | `Array`)_:
 
 _**options** (`Object`)_: 
 
-Set of [custom options](https://github.com/yabwe/medium-editor/wiki/Options) used to initialize `MediumEditor`.
+Set of [custom options](OPTIONS.md) used to initialize `MediumEditor`.
 
 ***
 ### `destroy()`
@@ -135,7 +135,7 @@ Attaches a listener for the specified custom event name.
 
 1. _**name** (`String`)_:
 
-  * Name of the event to listen to.  See the list of built-in [Custom Events](#custom-events) below.
+  * Name of the event to listen to.  See the list of built-in [Custom Events](CUSTOM-EVENTS.md).
 
 2. _**listener(data, editable)** (`function`)_: 
 
