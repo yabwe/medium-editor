@@ -1,6 +1,6 @@
 # MediumEditor Options (v5.0.0)
 
-Options to customize medium-editor are passed as the second argument to the [MediumEditor constructor](https://github.com/yabwe/medium-editor/wiki/MediumEditor-Object-API#mediumeditorelements-options).  Example:
+Options to customize medium-editor are passed as the second argument to the [MediumEditor constructor](API.md#mediumeditorelements-options).  Example:
 
 ```js
 var editor = new MediumEditor('.editor', {
@@ -157,7 +157,7 @@ Specifies a DOM node to contain MediumEditor's toolbar and anchor preview elemen
 #### `extensions`
 **Default:** `{}`
 
-Custom extensions to use. See [Custom Buttons and Extensions](https://github.com/yabwe/medium-editor/wiki/Custom-Buttons-and-Extensions) for more details on extensions.
+Custom extensions to use. See [Custom Buttons and Extensions](src/js/extensions) for more details on extensions.
 
 ***
 #### `ownerDocument`
