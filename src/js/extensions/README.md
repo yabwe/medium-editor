@@ -72,7 +72,7 @@ The following are properties and method that MediumEditor will attempt to use / 
 
 ### `name` _(string)_
 
-The name to identify the extension by.  This is used for calls to [`MediumEditor.getExtensionByName(name)`](https://github.com/yabwe/medium-editor/wiki/MediumEditor-Object-API#getextensionbynamename) to retrieve the extension.  If not defined, this will be set to whatever identifier was used when passing the extension into MediumEditor via the `extensions` option.
+The name to identify the extension by.  This is used for calls to [`MediumEditor.getExtensionByName(name)`](../../../API.md#getextensionbynamename) to retrieve the extension.  If not defined, this will be set to whatever identifier was used when passing the extension into MediumEditor via the `extensions` option.
 
 ```javascript
 var MyExtension = MediumEditor.Extension.extend({
@@ -94,8 +94,6 @@ editor.getExtensionByName(`myextension`) === myExt //true
 ### `init()`
 
 Called by MediumEditor during initialization.  The `.base` property will already have been set to current instance of MediumEditor when this is called. All helper methods will exist as well.
-
-See the [code above](#attaching-to-click) for an example of implementing the `init()` method.
 
 ***
 ### `checkState(node)`
