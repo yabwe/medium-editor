@@ -94,9 +94,9 @@ People have contributed wrappers around MediumEditor for integrating with differ
 
 ## MediumEditor Options
 
-View the [MediumEditor Options documentation](https://github.com/yabwe/medium-editor/wiki/Options) on the Wiki for details on all the various options for MediumEditor.
+View the [MediumEditor Options documentation](OPTIONS.md) on all the various options for MediumEditor.
 
-Options to customize medium-editor are passed as the second argument to the [MediumEditor constructor](https://github.com/yabwe/medium-editor/wiki/MediumEditor-Object-API#mediumeditorelements-options).  Example:
+Options to customize medium-editor are passed as the second argument to the [MediumEditor constructor](API.md#mediumeditorelements-options).  Example:
 
 ```js
 var editor = new MediumEditor('.editor', {
@@ -116,7 +116,7 @@ Using `'fontawesome'` as the buttonLabels requires version 4.1.0 of the fontawes
 * __disableDoubleReturn__:  allows/disallows two (or more) empty new lines. You can also set specific element behavior by using setting a data-disable-double-return attribute. Default: `false`
 * __disableEditing__: enables/disables adding the contenteditable behavior. Useful for using the toolbar with customized buttons/actions. You can also set specific element behavior by using setting a data-disable-editing attribute. Default: `false`
 * __elementsContainer__: specifies a DOM node to contain MediumEditor's toolbar and anchor preview elements. Default: `document.body`
-* __extensions__: extension to use (see [Custom Buttons and Extensions](https://github.com/yabwe/medium-editor/wiki/Custom-Buttons-and-Extensions)) for more. Default: `{}`
+* __extensions__: extension to use (see [Custom Buttons and Extensions](src/js/extensions)) for more. Default: `{}`
 * __spellcheck__: Enable/disable native contentEditable automatic spellcheck. Default: `true`
 * __targetBlank__: enables/disables target="\_blank" for anchor tags. Default: `false`
 
@@ -171,7 +171,7 @@ var editor = new MediumEditor('.editable', {
 
 #### Button Options
 
-Button behavior can be modified by passing an object into the buttons array instead of a string. This allow for overriding some of the default behavior of buttons. The following options are some of the basic parts of buttons that you may override, but any part of the `MediumEditor.extension.prototype` can be overriden via these button options. (Check out the [source code for buttons](https://github.com/yabwe/medium-editor/blob/master/src/js/extensions/button.js) to see what all can be overriden).
+Button behavior can be modified by passing an object into the buttons array instead of a string. This allow for overriding some of the default behavior of buttons. The following options are some of the basic parts of buttons that you may override, but any part of the `MediumEditor.extension.prototype` can be overriden via these button options. (Check out the [source code for buttons](src/js/extensions/button.js) to see what all can be overriden).
 
 * __name__: name of the button being overriden
 * __action__: argument to pass to `MediumEditor.execAction()` when the button is clicked.
@@ -497,7 +497,7 @@ Check out the Wiki page for a list of available themes: [https://github.com/yabw
 
 ## API
 
-View the [MediumEditor Object API documentation](https://github.com/yabwe/medium-editor/wiki/MediumEditor-Object-API) on the Wiki for details on all the methods supported on the MediumEditor object.
+View the [MediumEditor Object API documentation](API.md) on the Wiki for details on all the methods supported on the MediumEditor object.
 
 ### Initialization methods
 * __MediumEditor(elements, options)__:  Creates an instance of MediumEditor
@@ -563,7 +563,7 @@ So, to properly support the `editableInput` event in Internet Explorer, MediumEd
 
 ## Extensions & Plugins
 
-Check the [documentation](https://github.com/yabwe/medium-editor/wiki/Custom-Buttons-and-Extensions) in order to learn how to develop extensions for MediumEditor.
+Check the [documentation](src/js/extensions) in order to learn how to develop extensions for MediumEditor.
 
 A list of existing extensions and plugins, such as [Images and Media embeds](http://orthes.github.io/medium-editor-insert-plugin/), [Tables](https://github.com/yabwe/medium-editor-tables) and [Markdown](https://github.com/IonicaBizau/medium-editor-markdown) can be found [here](https://github.com/yabwe/medium-editor/wiki/Extensions-Plugins).
 
