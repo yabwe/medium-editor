@@ -6,7 +6,7 @@ MediumEditor exposes a variety of custom events for convienience when using the 
 
 Custom event listeners are triggered in the order that they were 'subscribed' to.  Most functionality within medium-editor uses these custom events to trigger updates, so in general, it can be assumed that most of the built-in functionality has already been completed before any of your custom event listeners will be called.
 
-If you need to override the editor's bult-in behavior, try overriding the built-in extensions with your own [custom extension](https://github.com/yabwe/medium-editor/wiki/Creating-Custom-Extensions-%26-Buttons).
+If you need to override the editor's bult-in behavior, try overriding the built-in extensions with your own [custom extension](src/js/extensions/README.md).
 
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
@@ -42,7 +42,7 @@ If you need to override the editor's bult-in behavior, try overriding the built-
 
 ## API Methods
 
-Use the following methods of [MediumEditor](https://github.com/yabwe/medium-editor/wiki/MediumEditor-Object-API) for custom event interaction:
+Use the following methods of [MediumEditor](API.md) for custom event interaction:
 
 ### `MediumEditor.subscribe(name, listener)`
 
@@ -84,7 +84,7 @@ Detaches a custom event listener for the specified custom event name.
 
 **NOTE**
 
-  * Calling [destroy()](#destroy) on the MediumEditor object will automatically remove all custom event listeners.
+  * Calling [destroy()](API.md#destroy) on the MediumEditor object will automatically remove all custom event listeners.
 
 ***
 ### `MediumEditor.trigger(name, data, editable)`
