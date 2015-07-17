@@ -6,7 +6,7 @@ MediumEditor exposes a variety of custom events for convienience when using the 
 
 Custom event listeners are triggered in the order that they were 'subscribed' to.  Most functionality within medium-editor uses these custom events to trigger updates, so in general, it can be assumed that most of the built-in functionality has already been completed before any of your custom event listeners will be called.
 
-If you need to override the editor's bult-in behavior, try overriding the built-in extensions with your own [custom extension](src/js/extensions/README.md).
+If you need to override the editor's bult-in behavior, try overriding the built-in extensions with your own [custom extension](src/js/extensions).
 
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->

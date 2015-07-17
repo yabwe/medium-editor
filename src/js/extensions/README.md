@@ -2,7 +2,6 @@
 
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
-**Table of Contents**
 
   - [What is an Extension?](#what-is-an-extension)
       - [Examples of functionality that are implemented via built-in extensions:](#examples-of-functionality-that-are-implemented-via-built-in-extensions)
