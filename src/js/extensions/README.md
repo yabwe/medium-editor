@@ -150,7 +150,7 @@ var editor = new MediumEditor('.editor', {
 ***
 ### `destroy()`
 
-If implemented, this method will be called whenever the MediumEditor is being destroyed (via a call to [`MediumEditor.destroy()](https://github.com/yabwe/medium-editor/wiki/MediumEditor-Object-API#destroy)).
+If implemented, this method will be called whenever the MediumEditor is being destroyed (via a call to [`MediumEditor.destroy()`](../../../API.md#destroy)).
 
 This gives the extensions the chance to remove any created html, custom event handlers or execute any other cleanup tasks that should be performed.
 
@@ -226,7 +226,7 @@ this.base.saveSelection();
 ***
 ### `window` _(Window)_
 
-A reference to the content window to be used by this instance of MediumEditor.  This maps to the value of the [`contentWindow`](https://github.com/yabwe/medium-editor/wiki/Options#contentwindow) option that is passed into MediumEditor.
+A reference to the content window to be used by this instance of MediumEditor.  This maps to the value of the [`contentWindow`](../../../OPTIONS.md#contentwindow) option that is passed into MediumEditor.
 
 For example, if you wanted to get the width of the window that contains this instance of MediumEditor, you could call the following within your extension:
 
@@ -237,7 +237,7 @@ var windowWidth = this.window.innerWidth;
 ***
 ### `document` _(Document)_
 
-A reference to the owner document to be used by this instance of MediumEditor.  This maps to the value of the [`ownerDocument`](https://github.com/yabwe/medium-editor/wiki/Options#ownerdocument) option that is passed into MediumEditor.
+A reference to the owner document to be used by this instance of MediumEditor.  This maps to the value of the [`ownerDocument`](../../../OPTIONS.md#ownerdocument) option that is passed into MediumEditor.
 
 For example, to create an element in the current document corresponding to this instance of MediumEditor, you would call the following within your extension:
 
@@ -307,7 +307,7 @@ Returns the value of a specific option used to initialize the MediumEditor objec
 
 **Returns:** Value of the MediumEditor option
 
-For example, the following is an excerpt from the `getTemplate()` method of the Anchor extension, which checks the [`buttonLabels`](https://github.com/yabwe/medium-editor/wiki/Options#buttonlabels) option MediumEditor to decide the appearance of the 'save' button in the form:
+For example, the following is an excerpt from the `getTemplate()` method of the Anchor extension, which checks the [`buttonLabels`](../../../OPTIONS.md#buttonlabels) option MediumEditor to decide the appearance of the 'save' button in the form:
 
 ```javascript
 AnchorForm = FormExtension.extend({
@@ -335,7 +335,7 @@ AnchorForm = FormExtension.extend({
 
 ### `execAction(action, opts)`
 
-Calls [`MediumEditor.execAction(action, opts)`](https://github.com/yabwe/medium-editor/wiki/MediumEditor-Object-API#execactionaction-opts)
+Calls [`MediumEditor.execAction(action, opts)`](../../../API.md#execactionaction-opts)
 
 For example, the Button Extension will - by default - call `execAction()` each time a button is clicked, to trigger a command:
 
@@ -359,7 +359,7 @@ Button = Extension.extend({
 ***
 ### `on(target, event, listener, useCapture)`
 
-Calls [`MediumEditor.on(target, event, listener, useCapture)`](https://github.com/yabwe/medium-editor/wiki/MediumEditor-Object-API#ontarget-event-listener-usecapture)
+Calls [`MediumEditor.on(target, event, listener, useCapture)`](../../../API.md#ontarget-event-listener-usecapture)
 
 This allows extensions to easily attach event handlers to the DOM which will automatically be detached when MediumEditor is destroyed.
 
@@ -381,7 +381,7 @@ AnchorPreview = Extension.extend({
 ***
 ### `off(target, event, listener, useCapture)`
 
-Calls [`MediumEditor.off(target, event, listener, useCapture)`](https://github.com/yabwe/medium-editor/wiki/MediumEditor-Object-API#offtarget-event-listener-usecapture)
+Calls [`MediumEditor.off(target, event, listener, useCapture)`](../../../API.md#offtarget-event-listener-usecapture)
 
 To compliment the above example for `on(target, event, listener, useCapture)`, when the Anchor Preview Extension detects a `mouseout` event for a link, it will detach the the event handler for `mouseout` until the next time the mouse hovers over the link:
 
@@ -400,7 +400,7 @@ AnchorPreview = Extension.extend({
 ***
 ### `subscribe(name, listener)`
 
-Calls [`MediumEditor.subscribe(name, listener)`](https://github.com/yabwe/medium-editor/wiki/MediumEditor-Object-API#subscribename-listener)
+Calls [`MediumEditor.subscribe(name, listener)`](../../../API.md#subscribename-listener)
 
 For example, the Keyboard Commands Extension will subscribe to the `editableKeydown` custom event during `init()`, to monitor when keys are pressed while any of the editor **elements** are focused:
 
@@ -420,7 +420,7 @@ KeyboardCommands = Extension.extend({
 ***
 ### `trigger(name, data, editable)`
 
-Calls [`MediumEditor.trigger(name, data, editable)`](https://github.com/yabwe/medium-editor/wiki/MediumEditor-Object-API#triggername-data-editable)
+Calls [`MediumEditor.trigger(name, data, editable)`](../../../API.md#triggername-data-editable)
 
 For example, the Toolbar Extension triggers the `hideToolbar` custom event whenever the toolbar is being hidden:
 
