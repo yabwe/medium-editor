@@ -418,7 +418,7 @@ function MediumEditor(elements, options) {
         // Built-in extensions
         var builtIns = {
             paste: true,
-            anchorPreview: isAnchorPreviewEnabled.call(this),
+            'anchor-preview': isAnchorPreviewEnabled.call(this),
             autoLink: isAutoLinkEnabled.call(this),
             keyboardCommands: isKeyboardCommandsEnabled.call(this),
             placeholder: isPlaceholderEnabled.call(this)
@@ -710,7 +710,7 @@ function MediumEditor(elements, options) {
                     merged = Util.extend({}, this.options.anchor, opts);
                     extension = new MediumEditor.extensions.anchor(merged);
                     break;
-                case 'anchorPreview':
+                case 'anchor-preview':
                     extension = new MediumEditor.extensions.anchorPreview(this.options.anchorPreview);
                     break;
                 case 'autoLink':
