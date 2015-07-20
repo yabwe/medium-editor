@@ -208,16 +208,13 @@ describe('Anchor Preview TestCase', function () {
         });
 
         it('should NOT be in the DOM when a custom anchorPreview extension is provided', function () {
-            var editor = this.newMediumEditor('.editor', {
+            this.newMediumEditor('.editor', {
                 extensions: {
                     'anchor-preview': {}
                 }
             });
 
             expect(document.querySelector('.medium-editor-anchor-preview')).toBeNull();
-
-            // destroy
-            editor.destroy();
         });
     });
 
