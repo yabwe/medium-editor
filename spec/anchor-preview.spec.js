@@ -194,6 +194,19 @@ describe('Anchor Preview TestCase', function () {
             expect(document.querySelector('.medium-editor-anchor-preview-active')).toBeNull();
             expect(document.querySelector('.medium-editor-anchor-preview')).toBeNull();
         });
+
+        it('should NOT be in the DOM when a custom anchorPreview extension is provided', function () {
+            var editor = this.newMediumEditor('.editor', {
+                extensions: {
+                    'anchor-preview': {}
+                }
+            });
+
+            expect(document.querySelector('.medium-editor-anchor-preview')).toBeNull();
+
+            // destroy
+            editor.destroy();
+        });
     });
 
 });
