@@ -1,3 +1,9 @@
+5.4.1 / 2015-07-20
+==================
+* Fix issue where custom anchor-preview extensions weren't overriding built-in anchor preview
+* Add documentation from wiki into the source code
+
+
 5.4.0 / 2015-07-16
 ==================
 * Add support for including 'alt' key in keyboard-commands

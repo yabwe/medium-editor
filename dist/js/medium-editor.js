@@ -5177,8 +5177,7 @@ var ImageDragging;
 
 var extensionDefaults;
 (function () {
-    // for now this is empty because nothing interally uses an Extension default.
-    // as they are converted, provide them here.
+
     extensionDefaults = {
         button: Button,
         form: FormExtension,
@@ -5613,7 +5612,7 @@ function MediumEditor(elements, options) {
         // Built-in extensions
         var builtIns = {
             paste: true,
-            anchorPreview: isAnchorPreviewEnabled.call(this),
+            'anchor-preview': isAnchorPreviewEnabled.call(this),
             autoLink: isAutoLinkEnabled.call(this),
             keyboardCommands: isKeyboardCommandsEnabled.call(this),
             placeholder: isPlaceholderEnabled.call(this)
@@ -5905,7 +5904,7 @@ function MediumEditor(elements, options) {
                     merged = Util.extend({}, this.options.anchor, opts);
                     extension = new MediumEditor.extensions.anchor(merged);
                     break;
-                case 'anchorPreview':
+                case 'anchor-preview':
                     extension = new MediumEditor.extensions.anchorPreview(this.options.anchorPreview);
                     break;
                 case 'autoLink':
@@ -6208,7 +6207,7 @@ MediumEditor.parseVersionString = function (release) {
 
 MediumEditor.version = MediumEditor.parseVersionString.call(this, ({
     // grunt-bump looks for this:
-    'version': '5.4.0'
+    'version': '5.4.1'
 }).version);
 
     return MediumEditor;
