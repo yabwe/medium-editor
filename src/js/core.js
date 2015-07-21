@@ -992,6 +992,16 @@ function MediumEditor(elements, options) {
 
         pasteHTML: function (html, options) {
             this.getExtensionByName('paste').pasteHTML(html, options);
+        },
+
+        setContent: function (html, index) {
+            index = index || 0;
+
+            if (this.elements[index]) {
+                var target = this.elements[index];
+                target.innerHTML = html;
+                this.events.updateInput(target, { target: target, currentTarget: target });
+            }
         }
     };
 }());

@@ -37,4 +37,21 @@ describe('Core-API', function () {
             expect(focused).toBe(elementOne);
         });
     });
+
+    describe('setContent', function () {
+        it('should set the content of the editor\'s element', function () {
+            var newHTML = 'Lorem ipsum dolor',
+                otherHTML = 'something different',
+                elementOne = this.createElement('div', 'editor', 'lorem ipsum'),
+                editor = this.newMediumEditor('.editor');
+
+            editor.setContent(newHTML);
+            expect(this.el.innerHTML).toEqual(newHTML);
+            expect(elementOne.innerHTML).not.toEqual(newHTML);
+
+            editor.setContent(otherHTML, 1);
+            expect(elementOne.innerHTML).toEqual(otherHTML);
+            expect(this.el.innerHTML).not.toEqual(otherHTML);
+        });
+    });
 });
