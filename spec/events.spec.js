@@ -302,6 +302,39 @@ describe('Events TestCase', function () {
 
                 Events.prototype.InputEventOnContenteditableSupported = originalInputSupport;
             });
+
+            it(namePrefix + ',setContent should fire editableInput when content changes', function () {
+                var newHTML = 'Lorem ipsum dolor',
+                    editor = this.newMediumEditor('.editor'),
+                    spy = jasmine.createSpy('handler'),
+                    originalInputSupport = Events.prototype.InputEventOnContenteditableSupported;
+
+                Events.prototype.InputEventOnContenteditableSupported = inputSupported;
+
+                editor.subscribe('editableInput', spy);
+                expect(spy).not.toHaveBeenCalled();
+
+                editor.setContent(newHTML, 0);
+                var obj = { target: this.el, currentTarget: this.el };
+                expect(spy).toHaveBeenCalledWith(obj, this.el);
+                Events.prototype.InputEventOnContenteditableSupported = originalInputSupport;
+            });
+
+            it(namePrefix + ', setContent should not fire editableInput when content doesn\'t change', function () {
+                var sameHTML = 'lore ipsum',
+                    editor = this.newMediumEditor('.editor'),
+                    spy = jasmine.createSpy('handler'),
+                    originalInputSupport = Events.prototype.InputEventOnContenteditableSupported;
+
+                Events.prototype.InputEventOnContenteditableSupported = inputSupported;
+
+                editor.subscribe('editableInput', spy);
+                expect(spy).not.toHaveBeenCalled();
+
+                editor.setContent(sameHTML, 0);
+                expect(spy).not.toHaveBeenCalled();
+                Events.prototype.InputEventOnContenteditableSupported = originalInputSupport;
+            });
         }
 
         runEditableInputTests(true);

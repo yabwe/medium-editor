@@ -365,6 +365,9 @@ var Events;
         },
 
         updateInput: function (target, eventObj) {
+            if (!this.contentCache) {
+                return;
+            }
             // An event triggered which signifies that the user may have changed someting
             // Look in our cache of input for the contenteditables to see if something changed
             var index = target.getAttribute('medium-editor-index');
