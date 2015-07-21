@@ -1,3 +1,8 @@
+5.5.0 / 2015-07-21
+==================
+* Add setContent method into core API, which triggers editableInput
+
+
 5.4.1 / 2015-07-20
 ==================
 * Fix issue where custom anchor-preview extensions weren't overriding built-in anchor preview

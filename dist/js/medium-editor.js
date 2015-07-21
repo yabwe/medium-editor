@@ -2541,6 +2541,9 @@ var Events;
         },
 
         updateInput: function (target, eventObj) {
+            if (!this.contentCache) {
+                return;
+            }
             // An event triggered which signifies that the user may have changed someting
             // Look in our cache of input for the contenteditables to see if something changed
             var index = target.getAttribute('medium-editor-index');
@@ -6186,6 +6189,16 @@ function MediumEditor(elements, options) {
 
         pasteHTML: function (html, options) {
             this.getExtensionByName('paste').pasteHTML(html, options);
+        },
+
+        setContent: function (html, index) {
+            index = index || 0;
+
+            if (this.elements[index]) {
+                var target = this.elements[index];
+                target.innerHTML = html;
+                this.events.updateInput(target, { target: target, currentTarget: target });
+            }
         }
     };
 }());
@@ -6207,7 +6220,7 @@ MediumEditor.parseVersionString = function (release) {
 
 MediumEditor.version = MediumEditor.parseVersionString.call(this, ({
     // grunt-bump looks for this:
-    'version': '5.4.1'
+    'version': '5.5.0'
 }).version);
 
     return MediumEditor;
