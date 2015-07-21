@@ -3,6 +3,7 @@
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 
+
 - [Initialization Functions](#initialization-functions)
   - [`MediumEditor(elements, options)`](#mediumeditorelements-options)
   - [`destroy()`](#destroy)
@@ -35,6 +36,7 @@
   - [`delay(fn)`](#delayfn)
   - [`getExtensionByName(name)`](#getextensionbynamename)
   - [`serialize()`](#serialize)
+  - [`setContent(html, index)`](#setcontenthtml-index)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -59,7 +61,7 @@ _**elements** (`String` | `HTMLElement` | `Array`)_:
 
 3. `Array`: If passed as an `Array` of `HTMLElement`s, this will be used as the internal list of **elements**.
 
-_**options** (`Object`)_: 
+_**options** (`Object`)_:
 
 Set of [custom options](OPTIONS.md) used to initialize `MediumEditor`.
 
@@ -91,7 +93,7 @@ Attaches an event listener to specific element via the browser's built-in `addEv
 
   * Element to attach listener to via `addEventListener(type, listener, useCapture)`
 
-2. _**event** (`String`)_: 
+2. _**event** (`String`)_:
 
   * type argument for `addEventListener(type, listener, useCapture)`
 
@@ -114,7 +116,7 @@ Detach an event listener from a specific element via the browser's built-in `rem
 
   * Element to detach listener from via `removeEventListener(type, listener, useCapture)`
 
-2. _**event** (`String`)_: 
+2. _**event** (`String`)_:
 
   * type argument for `removeEventListener(type, listener, useCapture)`
 
@@ -137,7 +139,7 @@ Attaches a listener for the specified custom event name.
 
   * Name of the event to listen to.  See the list of built-in [Custom Events](CUSTOM-EVENTS.md).
 
-2. _**listener(data, editable)** (`function`)_: 
+2. _**listener(data, editable)** (`function`)_:
 
   * Listener method that will be called whenever the custom event is triggered.
 
@@ -161,7 +163,7 @@ Detaches a custom event listener for the specified custom event name.
 
   * Name of the event to detach the listener for.
 
-2. _**listener** (`function`)_: 
+2. _**listener** (`function`)_:
 
   * A reference to the listener to detach.  This must be a match by-reference and not a copy.
 
@@ -211,7 +213,7 @@ Restores the selection using a data representation of previously selected text (
 
   * Data representing the state of the selection to restore.
 
-2. _**favorLaterSelectionAnchor** (`boolen`)_: 
+2. _**favorLaterSelectionAnchor** (`boolean`)_:
 
   * If `true`, import the cursor immediately subsequent to an anchor tag if it would otherwise be placed right at the trailing edge inside the anchor. THis cursor positioning, even though visually equivalent to the user, can affect behavior in Internet Explorer.
 
@@ -286,7 +288,7 @@ _wrapper around the browser's built in `document.queryCommandState(action)` for 
 ***
 ## Helper Functions
 
-### `delay(fn)` 
+### `delay(fn)`
 
 Delay any function from being executed by the amount of time passed as the **delay** option.
 
@@ -313,3 +315,15 @@ Get a reference to an extension with the specified name.
 Returns a JSON object including the content of each of the **elements** inside the editor.
 
 ***
+### `setContent(html, index)`
+
+Sets the innerHTML content for the element at `index`.
+Trigger the `editableInput` event.
+
+**Arguments**
+
+1. _**html** (`string`)_:
+  * The content to set the element to
+
+2. _**index** (`integer`)_:
+  * Index of the element to set the content on. Defaults to 0 when not provided.
