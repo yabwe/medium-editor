@@ -14,10 +14,10 @@ MediumEditor has been written using vanilla JavaScript, no additional frameworks
 
 [![NPM info](https://nodei.co/npm/medium-editor.png?downloads=true)](https://www.npmjs.com/package/medium-editor)
 
-[![Travis build status](http://img.shields.io/travis/yabwe/medium-editor/master.svg?style=flat-square)](https://travis-ci.org/yabwe/medium-editor)
-[![dependencies](http://img.shields.io/david/yabwe/medium-editor.svg?style=flat-square)](https://david-dm.org/yabwe/medium-editor)
-[![devDependency Status](http://img.shields.io/david/dev/yabwe/medium-editor.svg?style=flat-square)](https://david-dm.org/yabwe/medium-editor#info=devDependencies)
-[![Coverage Status](http://img.shields.io/coveralls/yabwe/medium-editor.svg?style=flat-square)](https://coveralls.io/r/yabwe/medium-editor?branch=master)
+[![Travis build status](https://travis-ci.org/yabwe/medium-editor.svg?branch=master)](https://travis-ci.org/yabwe/medium-editor)
+[![Dependency Status](https://david-dm.org/yabwe/medium-editor.svg)](https://david-dm.org/yabwe/medium-editor)
+[![devDependency Status](https://david-dm.org/yabwe/medium-editor/dev-status.svg)](https://david-dm.org/yabwe/medium-editor#info=devDependencies)
+[![Coverage Status](https://coveralls.io/repos/yabwe/medium-editor/badge.svg?branch=master&service=github)](https://coveralls.io/github/yabwe/medium-editor?branch=master)
 
 # Basic usage
 
