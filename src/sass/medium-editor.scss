@@ -132,10 +132,17 @@ $medium_editor_z_index: 2000 !default;
         font-family: HelveticaNeue, Helvetica, Arial, sans-serif;
     }
 
+    .medium-editor-toolbar-form-row {
+        line-height: 14px;
+        margin-left: 5px;
+        padding-bottom: 5px;
+    }
+
     .medium-editor-toolbar-input, label {
         margin: 0;
         padding: 6px;
         width: 316px;
+        display: inline-block;
         border: none;
         font-size: 14px;
         box-sizing: border-box;
@@ -145,11 +152,6 @@ $medium_editor_z_index: 2000 !default;
             box-shadow: none;
             appearance: none;
         }
-    }
-
-    label {
-        display: block;
-
     }
 
     a {

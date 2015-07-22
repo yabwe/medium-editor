@@ -108,10 +108,12 @@ var AnchorForm;
                 // fixme: ideally, this targetCheckboxText would be a formLabel too,
                 // figure out how to deprecate? also consider `fa-` icon default implcations.
                 template.push(
+                    '<div class="medium-editor-toolbar-form-row">',
                     '<input type="checkbox" class="medium-editor-toolbar-anchor-target">',
                     '<label>',
                     this.targetCheckboxText,
-                    '</label>'
+                    '</label>',
+                    '</div>'
                 );
             }
 
@@ -119,10 +121,12 @@ var AnchorForm;
                 // fixme: expose this `Button` text as a formLabel property, too
                 // and provide similar access to a `fa-` icon default.
                 template.push(
+                    '<div class="medium-editor-toolbar-form-row">',
                     '<input type="checkbox" class="medium-editor-toolbar-anchor-button">',
                     '<label>',
                     this.customClassOptionText,
-                    '</label>'
+                    '</label>',
+                    '</div>'
                 );
             }
 
