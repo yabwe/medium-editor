@@ -6,6 +6,12 @@
         font-family: $font-sans-serif;
     }
 
+    .medium-editor-toolbar-form-row {
+        line-height: 14px;
+        margin-left: 5px;
+        padding-bottom: 5px;
+    }
+
     .medium-editor-toolbar-input,
     label {
         border: none;
@@ -14,6 +20,7 @@
         margin: 0;
         padding: 6px;
         width: 316px;
+        display: inline-block;
 
         &:focus {
             appearance: none;
@@ -21,10 +28,6 @@
             box-shadow: none;
             outline: 0;
         }
-    }
-
-    label {
-        display: block;
     }
 
     a {
