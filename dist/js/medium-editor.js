@@ -3120,10 +3120,12 @@ var AnchorForm;
                 // fixme: ideally, this targetCheckboxText would be a formLabel too,
                 // figure out how to deprecate? also consider `fa-` icon default implcations.
                 template.push(
+                    '<div class="medium-editor-toolbar-form-row">',
                     '<input type="checkbox" class="medium-editor-toolbar-anchor-target">',
                     '<label>',
                     this.targetCheckboxText,
-                    '</label>'
+                    '</label>',
+                    '</div>'
                 );
             }
 
@@ -3131,10 +3133,12 @@ var AnchorForm;
                 // fixme: expose this `Button` text as a formLabel property, too
                 // and provide similar access to a `fa-` icon default.
                 template.push(
+                    '<div class="medium-editor-toolbar-form-row">',
                     '<input type="checkbox" class="medium-editor-toolbar-anchor-button">',
                     '<label>',
                     this.customClassOptionText,
-                    '</label>'
+                    '</label>',
+                    '</div>'
                 );
             }
 
@@ -3454,7 +3458,7 @@ var AnchorPreview;
 
             // Detect empty href attributes
             // The browser will make href="" or href="#top"
-            // into absolute urls when accessed as event.targed.href, so check the html
+            // into absolute urls when accessed as event.target.href, so check the html
             if (!/href=["']\S+["']/.test(target.outerHTML) || /href=["']#\S+["']/.test(target.outerHTML)) {
                 return true;
             }
@@ -4866,7 +4870,7 @@ var Toolbar;
                         offset = offset + 1;
                     }
                     selectionRange = Selection.select(this.document, adjacentNode, offset,
-                        selectionRange.endContainer, selectionRange.offset);
+                        selectionRange.endContainer, selectionRange.endOffset);
                 }
             }
         },
@@ -6220,7 +6224,7 @@ MediumEditor.parseVersionString = function (release) {
 
 MediumEditor.version = MediumEditor.parseVersionString.call(this, ({
     // grunt-bump looks for this:
-    'version': '5.5.0'
+    'version': '5.5.1'
 }).version);
 
     return MediumEditor;

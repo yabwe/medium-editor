@@ -1,3 +1,9 @@
+5.5.1 / 2015-07-23
+==================
+* Fix appearance of anchor form when checkboxes are present
+* Fix breaking issue with standardizeSelectionStart option
+
+
 5.5.0 / 2015-07-21
 ==================
 * Add setContent method into core API, which triggers editableInput
