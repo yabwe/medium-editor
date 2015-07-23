@@ -158,7 +158,7 @@ var AnchorPreview;
 
             // Detect empty href attributes
             // The browser will make href="" or href="#top"
-            // into absolute urls when accessed as event.targed.href, so check the html
+            // into absolute urls when accessed as event.target.href, so check the html
             if (!/href=["']\S+["']/.test(target.outerHTML) || /href=["']#\S+["']/.test(target.outerHTML)) {
                 return true;
             }
