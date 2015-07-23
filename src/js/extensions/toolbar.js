@@ -366,7 +366,7 @@ var Toolbar;
                         offset = offset + 1;
                     }
                     selectionRange = Selection.select(this.document, adjacentNode, offset,
-                        selectionRange.endContainer, selectionRange.offset);
+                        selectionRange.endContainer, selectionRange.endOffset);
                 }
             }
         },
