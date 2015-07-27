@@ -73,7 +73,7 @@ var KeyboardCommands;
                     event.preventDefault();
                     event.stopPropagation();
 
-                    // command can be false so the shortcurt is just disabled
+                    // command can be false so the shortcut is just disabled
                     if (false !== data.command) {
                         this.execAction(data.command);
                     }
