@@ -134,7 +134,12 @@ var AnchorPreview;
                 // We may actually be displaying the anchor form, which should be controlled by delay
                 this.base.delay(function () {
                     if (activeAnchor) {
-                        anchorExtension.showForm(activeAnchor.attributes.href.value);
+                        var opts = {
+                            url: activeAnchor.attributes.href.value,
+                            target: activeAnchor.getAttribute('target'),
+                            buttonClass: activeAnchor.getAttribute('class')
+                        };
+                        anchorExtension.showForm(opts);
                         activeAnchor = null;
                     }
                 }.bind(this));

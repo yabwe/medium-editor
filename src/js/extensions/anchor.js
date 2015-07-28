@@ -147,16 +147,40 @@ var AnchorForm;
             this.getInput().value = '';
         },
 
-        showForm: function (linkValue) {
-            var input = this.getInput();
+        showForm: function (opts) {
+            var input = this.getInput(),
+                targetCheckbox = this.getAnchorTargetCheckbox(),
+                buttonCheckbox = this.getAnchorButtonCheckbox();
+
+            opts = opts || { url: '' };
+            // TODO: This is for backwards compatability
+            // We don't need to support the 'string' argument in 6.0.0
+            if (typeof opts === 'string') {
+                opts = {
+                    url: opts
+                };
+            }
 
             this.base.saveSelection();
             this.hideToolbarDefaultActions();
             this.getForm().style.display = 'block';
             this.setToolbarPosition();
 
-            input.value = linkValue || '';
+            input.value = opts.url;
             input.focus();
+
+            // If we have a target checkbox, we want it to be checked/unchecked
+            // based on whether the existing link has target=_blank
+            if (targetCheckbox) {
+                targetCheckbox.checked = opts.target === '_blank';
+            }
+
+            // If we have a custom class checkbox, we want it to be checked/unchecked
+            // based on whether an existing link already has the class
+            if (buttonCheckbox) {
+                var classList = opts.buttonClass ? opts.buttonClass.split(' ') : [];
+                buttonCheckbox.checked = (classList.indexOf(this.customClassOption) !== -1);
+            }
         },
 
         // Called by core when tearing down medium-editor (destroy)
@@ -176,8 +200,8 @@ var AnchorForm;
 
         getFormOpts: function () {
             // no notion of private functions? wanted `_getFormOpts`
-            var targetCheckbox = this.getForm().querySelector('.medium-editor-toolbar-anchor-target'),
-                buttonCheckbox = this.getForm().querySelector('.medium-editor-toolbar-anchor-button'),
+            var targetCheckbox = this.getAnchorTargetCheckbox(),
+                buttonCheckbox = this.getAnchorButtonCheckbox(),
                 opts = {
                     url: this.getInput().value
                 };
@@ -254,6 +278,14 @@ var AnchorForm;
 
         getInput: function () {
             return this.getForm().querySelector('input.medium-editor-toolbar-input');
+        },
+
+        getAnchorTargetCheckbox: function () {
+            return this.getForm().querySelector('.medium-editor-toolbar-anchor-target');
+        },
+
+        getAnchorButtonCheckbox: function () {
+            return this.getForm().querySelector('.medium-editor-toolbar-anchor-button');
         },
 
         handleTextboxKeyup: function (event) {
