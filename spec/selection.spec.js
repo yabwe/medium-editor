@@ -68,6 +68,24 @@ describe('Selection TestCase', function () {
             expect(node.getAttribute('id')).toBe('1');
         });
 
+        it('should import an exported non-collapsed selection after an empty paragraph', function () {
+            this.el.innerHTML = '<p>This is <a href="#">a link</a></p><p><br/></p><p>not a link</p>';
+            var editor = this.newMediumEditor('.editor'),
+                lastTextNode = this.el.childNodes[2].firstChild;
+
+            MediumEditor.selection.select(document, lastTextNode, 0, lastTextNode, 'not a link'.length);
+
+            var exportedSelection = editor.exportSelection();
+            expect(exportedSelection).toEqual({ start: 14, end: 24, emptyBlocksIndex: 2 });
+            editor.importSelection(exportedSelection);
+
+            var range = window.getSelection().getRangeAt(0);
+            expect(range.startContainer).toBe(lastTextNode);
+            expect(range.startOffset).toBe(0, 'The start of the selection is not at the beginning of the text node');
+            expect(range.endContainer).toBe(lastTextNode);
+            expect(range.endOffset).toBe('not a link'.length, 'The end of the selection is not at the end of the text node');
+        });
+
         it('should have an index in the exported selection when it is in the second contenteditable', function () {
             this.createElement('div', 'editor', 'lorem <i>ipsum</i> dolor');
             var editor = this.newMediumEditor('.editor', {
