@@ -14,7 +14,9 @@ describe('Anchor Preview TestCase', function () {
             '<a id="test-empty-link" href="">ipsum</a> ' +
             '<a id="test-link-disable-preview" data-disable-preview="true" href="http://test.com">ipsum</a> ' +
             '<a id="test-markup-link" href="http://test.com"><b>ipsum</b></a> ' +
-            '<a id="test-symbol-link" href="http://[{~#custom#~}].com"></a>');
+            '<a id="test-symbol-link" href="http://[{~#custom#~}].com"></a> ' +
+            '<a id="text-target-blank-link" target="_blank" href="http://test.com">ipsum</a> ' +
+            '<a id="text-custom-class-link" class="custom-class" href="http://test.com">ipsum</a>');
     });
 
     afterEach(function () {
@@ -116,7 +118,14 @@ describe('Anchor Preview TestCase', function () {
         });
 
         it('should display the anchor form in the toolbar when clicked', function () {
-            var editor = this.newMediumEditor('.editor'),
+            var editor = this.newMediumEditor('.editor', {
+                    anchor: {
+                        targetCheckbox: true,
+                        targetCheckboxText: 'Open in new window',
+                        customClassOption: 'custom-class',
+                        customClassOptionText: 'Custom Class'
+                    }
+                }),
                 anchorPreview = editor.getExtensionByName('anchor-preview'),
                 anchor = editor.getExtensionByName('anchor'),
                 toolbar = editor.getExtensionByName('toolbar');
@@ -131,6 +140,68 @@ describe('Anchor Preview TestCase', function () {
 
             expect(toolbar.isDisplayed()).toBe(true);
             expect(anchor.isDisplayed()).toBe(true);
+
+            // the checkboxes should be unchecked
+            expect(anchor.getAnchorTargetCheckbox().checked).toBe(false);
+            expect(anchor.getAnchorButtonCheckbox().checked).toBe(false);
+        });
+
+        it('should display the anchor form with target checkbox checked in the toolbar when clicked', function () {
+            var editor = this.newMediumEditor('.editor', {
+                    anchor: {
+                        targetCheckbox: true,
+                        targetCheckboxText: 'Open in new window',
+                        customClassOption: 'custom-class',
+                        customClassOptionText: 'Custom Class'
+                    }
+                }),
+                anchorPreview = editor.getExtensionByName('anchor-preview'),
+                anchor = editor.getExtensionByName('anchor'),
+                toolbar = editor.getExtensionByName('toolbar');
+
+            // show preview
+            fireEvent(document.getElementById('text-target-blank-link'), 'mouseover');
+
+            // load into editor
+            jasmine.clock().tick(1);
+            fireEvent(anchorPreview.getPreviewElement(), 'click');
+            jasmine.clock().tick(200);
+
+            expect(toolbar.isDisplayed()).toBe(true);
+            expect(anchor.isDisplayed()).toBe(true);
+
+            // the checkboxes should be unchecked
+            expect(anchor.getAnchorTargetCheckbox().checked).toBe(true);
+            expect(anchor.getAnchorButtonCheckbox().checked).toBe(false);
+        });
+
+        it('should display the anchor form with custom class checkbox checked in the toolbar when clicked', function () {
+            var editor = this.newMediumEditor('.editor', {
+                    anchor: {
+                        targetCheckbox: true,
+                        targetCheckboxText: 'Open in new window',
+                        customClassOption: 'custom-class',
+                        customClassOptionText: 'Custom Class'
+                    }
+                }),
+                anchorPreview = editor.getExtensionByName('anchor-preview'),
+                anchor = editor.getExtensionByName('anchor'),
+                toolbar = editor.getExtensionByName('toolbar');
+
+            // show preview
+            fireEvent(document.getElementById('text-custom-class-link'), 'mouseover');
+
+            // load into editor
+            jasmine.clock().tick(1);
+            fireEvent(anchorPreview.getPreviewElement(), 'click');
+            jasmine.clock().tick(200);
+
+            expect(toolbar.isDisplayed()).toBe(true);
+            expect(anchor.isDisplayed()).toBe(true);
+
+            // the checkboxes should be unchecked
+            expect(anchor.getAnchorTargetCheckbox().checked).toBe(false);
+            expect(anchor.getAnchorButtonCheckbox().checked).toBe(true);
         });
 
         it('should NOT be displayed when the hovered link is empty', function () {
