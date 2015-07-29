@@ -61,7 +61,6 @@ var Selection;
                         }
                     }
                     range.setStart(currentNode.parentNode, currentNodeIndex + 1);
-                    range.collapse(true);
                 }
             }
             return range;

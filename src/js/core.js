@@ -1018,7 +1018,6 @@ function MediumEditor(elements, options) {
                 // We're selecting a high-level block node, so make sure the cursor gets moved into the deepest
                 // element at the beginning of the block
                 range.setStart(Util.getFirstSelectableLeafNode(targetNode), 0);
-                range.collapse(true);
             }
 
             // If the selection is right at the ending edge of a link, put it outside the anchor tag instead of inside.
