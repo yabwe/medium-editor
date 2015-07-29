@@ -68,6 +68,7 @@ describe('Selection TestCase', function () {
             expect(node.getAttribute('id')).toBe('1');
         });
 
+        // https://github.com/yabwe/medium-editor/issues/738
         it('should import an exported non-collapsed selection after an empty paragraph', function () {
             this.el.innerHTML = '<p>This is <a href="#">a link</a></p><p><br/></p><p>not a link</p>';
             var editor = this.newMediumEditor('.editor'),
@@ -80,9 +81,11 @@ describe('Selection TestCase', function () {
             editor.importSelection(exportedSelection);
 
             var range = window.getSelection().getRangeAt(0);
-            expect(range.startContainer).toBe(lastTextNode);
+            expect(range.startContainer === lastTextNode || range.startContainer === lastTextNode.parentNode)
+                .toBe(true, 'The selection is starting at the wrong element');
             expect(range.startOffset).toBe(0, 'The start of the selection is not at the beginning of the text node');
-            expect(range.endContainer).toBe(lastTextNode);
+            expect(range.endContainer === lastTextNode || range.endContainer === lastTextNode.parentNode)
+                .toBe(true, 'The selection is ending at the wrong element');
             expect(range.endOffset).toBe('not a link'.length, 'The end of the selection is not at the end of the text node');
         });
 
