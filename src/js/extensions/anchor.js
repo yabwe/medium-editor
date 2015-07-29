@@ -55,9 +55,17 @@ var AnchorForm;
             event.preventDefault();
             event.stopPropagation();
 
-            var selectedParentElement = Selection.getSelectedParentElement(Selection.getSelectionRange(this.document));
+            var linkSelected = false,
+                range = Selection.getSelectionRange(this.document);
 
-            if (Util.getClosestTag(selectedParentElement, 'a')) {
+            if (range.startContainer.nodeName.toLowerCase() === 'a' ||
+                range.endContainer.nodeName.toLowerCase() === 'a') {
+                linkSelected = true;
+            } else if (Util.getClosestTag(Selection.getSelectedParentElement(range), 'a')) {
+                linkSelected = true;
+            }
+
+            if (linkSelected) {
                 return this.execAction('unlink');
             }
 
