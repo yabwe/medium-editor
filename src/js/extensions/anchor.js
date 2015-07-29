@@ -55,10 +55,9 @@ var AnchorForm;
             event.preventDefault();
             event.stopPropagation();
 
-            var selectedParentElement = Selection.getSelectedParentElement(Selection.getSelectionRange(this.document)),
-                firstTextNode = Util.getFirstTextNode(selectedParentElement);
+            var selectedParentElement = Selection.getSelectedParentElement(Selection.getSelectionRange(this.document));
 
-            if (Util.getClosestTag(firstTextNode, 'a')) {
+            if (Util.getClosestTag(selectedParentElement, 'a')) {
                 return this.execAction('unlink');
             }
 
