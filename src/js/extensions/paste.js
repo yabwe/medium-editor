@@ -1,4 +1,4 @@
-/*global Util, Selection, Extension */
+/*global Util, Extension */
 var PasteHandler;
 
 (function () {
@@ -138,8 +138,7 @@ var PasteHandler;
         },
 
         cleanPaste: function (text) {
-            var i, elList, workEl,
-                el = Selection.getSelectionElement(this.window),
+            var i, elList,
                 multiline = /<p|<br|<div/.test(text),
                 replacements = createReplacements().concat(this.cleanReplacements || []);
 
@@ -155,31 +154,6 @@ var PasteHandler;
             elList = text.split('<br><br>');
 
             this.pasteHTML('<p>' + elList.join('</p><p>') + '</p>');
-
-            try {
-                this.document.execCommand('insertText', false, '\n');
-            } catch (ignore) { }
-
-            // block element cleanup
-            elList = el.querySelectorAll('a,p,div,br');
-            for (i = 0; i < elList.length; i += 1) {
-                workEl = elList[i];
-
-                // Microsoft Word replaces some spaces with newlines.
-                // While newlines between block elements are meaningless, newlines within
-                // elements are sometimes actually spaces.
-                workEl.innerHTML = workEl.innerHTML.replace(/\n/gi, ' ');
-
-                switch (workEl.nodeName.toLowerCase()) {
-                    case 'p':
-                    case 'div':
-                        this.filterCommonBlocks(workEl);
-                        break;
-                    case 'br':
-                        this.filterLineBreak(workEl);
-                        break;
-                }
-            }
         },
 
         pasteHTML: function (html, options) {
@@ -198,7 +172,6 @@ var PasteHandler;
             this.cleanupSpans(fragmentBody);
 
             elList = fragmentBody.querySelectorAll('*');
-
             for (i = 0; i < elList.length; i += 1) {
                 workEl = elList[i];
 
@@ -208,6 +181,27 @@ var PasteHandler;
 
                 Util.cleanupAttrs(workEl, options.cleanAttrs);
                 Util.cleanupTags(workEl, options.cleanTags);
+            }
+
+            // block element cleanup
+            elList = fragmentBody.querySelectorAll('a,p,div,br');
+            for (i = 0; i < elList.length; i += 1) {
+                workEl = elList[i];
+
+                // Microsoft Word replaces some spaces with newlines.
+                // While newlines between block elements are meaningless, newlines within
+                // elements are sometimes actually spaces.
+                workEl.innerHTML = workEl.innerHTML.replace(/\n/gi, ' ');
+
+                switch (workEl.nodeName.toLowerCase()) {
+                    case 'p':
+                    case 'div':
+                        this.filterCommonBlocks(workEl);
+                        break;
+                    case 'br':
+                        this.filterLineBreak(workEl);
+                        break;
+                }
             }
 
             Util.insertHTMLCommand(this.document, fragmentBody.innerHTML.replace(/&nbsp;/g, ' '));
