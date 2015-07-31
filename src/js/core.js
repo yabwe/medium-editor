@@ -906,6 +906,7 @@ function MediumEditor(elements, options) {
                 i;
 
             if (opts.url && opts.url.trim().length > 0) {
+	            this.execAction('unlink');
                 var currentSelection = this.options.contentWindow.getSelection();
                 if (currentSelection) {
                     var exportedSelection,
