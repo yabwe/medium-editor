@@ -15,6 +15,7 @@ describe('Textarea TestCase', function () {
         this.el.setAttribute('data-disable-double-return', false);
         this.el.setAttribute('data-disable-preview', false);
         this.el.setAttribute('spellcheck', true);
+        this.el.setAttribute('data-imhere', 'ohyeah');
         document.body.appendChild(this.el);
     });
 
@@ -23,19 +24,22 @@ describe('Textarea TestCase', function () {
         this.cleanupTest();
     });
 
-    it('should accept a textarea element and "convert" it to a div, preserving important attributes', function () {
+    it('should accept a textarea element and "convert" it to a div, preserving all attributes', function () {
         var editor = this.newMediumEditor('.editor'),
             textarea = this.el;
         expect(editor.elements[0].tagName.toLowerCase()).toBe('div');
 
-        var attributesToPreserve = ['data-disable-editing',
+        var attributes = [
+            'data-disable-editing',
             'data-disable-toolbar',
             'data-placeholder',
             'data-disable-return',
             'data-disable-double-return',
             'data-disable-preview',
-            'spellcheck'];
-        attributesToPreserve.forEach(function (attr) {
+            'spellcheck',
+            'data-imhere'
+        ];
+        attributes.forEach(function (attr) {
             expect(editor.elements[0].getAttribute(attr)).toBe(textarea.getAttribute(attr));
         });
     });

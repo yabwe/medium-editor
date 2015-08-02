@@ -288,28 +288,23 @@ function MediumEditor(elements, options) {
     function createContentEditable(textarea, id) {
         var div = this.options.ownerDocument.createElement('div'),
             uniqueId = 'medium-editor-' + Date.now() + '-' + id,
-            attributesToClone = [
-                'data-disable-editing',
-                'data-disable-toolbar',
-                'data-placeholder',
-                'data-disable-return',
-                'data-disable-double-return',
-                'data-disable-preview',
-                'spellcheck'
-            ];
+            atts = textarea.attributes;
 
         div.className = textarea.className;
         div.id = uniqueId;
         div.innerHTML = textarea.value;
-        div.setAttribute('medium-editor-textarea-id', id);
-        attributesToClone.forEach(function (attr) {
-            if (textarea.hasAttribute(attr)) {
-                div.setAttribute(attr, textarea.getAttribute(attr));
+
+        textarea.setAttribute('medium-editor-textarea-id', id);
+
+        // re-create all attributes from the textearea to the new created div
+        for (var i = 0, n = atts.length; i < n; i++) {
+            // do not re-create existing attributes
+            if (!div.hasAttribute(atts[i].nodeName)) {
+                div.setAttribute(atts[i].nodeName, atts[i].nodeValue);
             }
-        });
+        }
 
         textarea.classList.add('medium-editor-hidden');
-        textarea.setAttribute('medium-editor-textarea-id', id);
         textarea.parentNode.insertBefore(
             div,
             textarea
