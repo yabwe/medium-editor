@@ -60,10 +60,11 @@ var AnchorForm;
             event.preventDefault();
             event.stopPropagation();
 
-            var selectedParentElement = Selection.getSelectedParentElement(Selection.getSelectionRange(this.document)),
-                firstTextNode = Util.getFirstTextNode(selectedParentElement);
+            var range = Selection.getSelectionRange(this.document);
 
-            if (Util.getClosestTag(firstTextNode, 'a')) {
+            if (range.startContainer.nodeName.toLowerCase() === 'a' ||
+                range.endContainer.nodeName.toLowerCase() === 'a' ||
+                Util.getClosestTag(Selection.getSelectedParentElement(range), 'a')) {
                 return this.execAction('unlink');
             }
 

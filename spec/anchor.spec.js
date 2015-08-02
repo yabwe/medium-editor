@@ -1,8 +1,7 @@
 /*global MediumEditor, describe, it, expect, spyOn,
      afterEach, beforeEach, selectElementContents,
      jasmine, fireEvent, Util, setupTestHelpers,
-     selectElementContentsAndFire, AnchorForm,
-     Selection */
+     selectElementContentsAndFire */
 
 describe('Anchor Button TestCase', function () {
     'use strict';
@@ -83,7 +82,7 @@ describe('Anchor Button TestCase', function () {
                 toolbar = editor.getExtensionByName('toolbar'),
                 button, input;
 
-            Selection.select(document, this.el.childNodes[0], 'Hello world, '.length,
+            MediumEditor.selection.select(document, this.el.childNodes[0], 'Hello world, '.length,
                 this.el.childNodes[1].childNodes[0], 'will become a link'.length);
             button = toolbar.getToolbarElement().querySelector('[data-action="createLink"]');
             fireEvent(button, 'click');
@@ -112,7 +111,7 @@ describe('Anchor Button TestCase', function () {
                 toolbar = editor.getExtensionByName('toolbar'),
                 button, input;
 
-            Selection.select(document, this.el.querySelector('span'), 0,
+            MediumEditor.selection.select(document, this.el.querySelector('span'), 0,
                 this.el.querySelector('strong'), 1);
             button = toolbar.getToolbarElement().querySelector('[data-action="createLink"]');
             fireEvent(button, 'click');
@@ -301,7 +300,7 @@ describe('Anchor Button TestCase', function () {
 
     describe('Click', function () {
         it('should display the anchor form when toolbar is visible', function () {
-            spyOn(AnchorForm.prototype, 'showForm').and.callThrough();
+            spyOn(MediumEditor.extensions.anchor.prototype, 'showForm').and.callThrough();
             var button,
                 editor = this.newMediumEditor('.editor'),
                 anchorExtension = editor.getExtensionByName('anchor'),
@@ -329,6 +328,28 @@ describe('Anchor Button TestCase', function () {
             expect(document.execCommand).toHaveBeenCalled();
         });
 
+        // https://github.com/yabwe/medium-editor/issues/751
+        it('should allow more than one link creation within a paragraph', function () {
+            spyOn(MediumEditor.extensions.anchor.prototype, 'showForm').and.callThrough();
+            this.el.innerHTML = '<p><a href="#">beginning</a> some text middle some text end</p>';
+            var editor = this.newMediumEditor('.editor'),
+                anchorExtension = editor.getExtensionByName('anchor'),
+                toolbar = editor.getExtensionByName('toolbar'),
+                para = this.el.firstChild;
+
+            // Select the text 'middle'
+            MediumEditor.selection.select(document, para.childNodes[1], 11, para.childNodes[1], 18);
+            fireEvent(editor.elements[0], 'focus');
+            jasmine.clock().tick(1);
+
+            // Click the 'anchor' button in the toolbar
+            fireEvent(toolbar.getToolbarElement().querySelector('[data-action="createLink"]'), 'click');
+
+            expect(toolbar.getToolbarActionsElement().style.display).toBe('none');
+            expect(anchorExtension.isDisplayed()).toBe(true);
+            expect(anchorExtension.showForm).toHaveBeenCalled();
+            expect(anchorExtension.getInput().value).toBe('');
+        });
     });
 
 });
