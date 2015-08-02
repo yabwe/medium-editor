@@ -1,3 +1,12 @@
+5.5.2 / 2015-08-02
+==================
+* Fix issue where block elements where cleaned up incorrectly when pasting
+* Fix anchor form checkboxes to reflect status of selected link
+* Fix issue with creating links in same paragraph as another link
+* Fix issue with creating links after empty paragraphs
+* Ensure all attributes are copied from textareas to divs
+
+
 5.5.1 / 2015-07-23
 ==================
 * Fix appearance of anchor form when checkboxes are present
