@@ -60,17 +60,11 @@ var AnchorForm;
             event.preventDefault();
             event.stopPropagation();
 
-            var linkSelected = false,
-                range = Selection.getSelectionRange(this.document);
+            var range = Selection.getSelectionRange(this.document);
 
             if (range.startContainer.nodeName.toLowerCase() === 'a' ||
-                range.endContainer.nodeName.toLowerCase() === 'a') {
-                linkSelected = true;
-            } else if (Util.getClosestTag(Selection.getSelectedParentElement(range), 'a')) {
-                linkSelected = true;
-            }
-
-            if (linkSelected) {
+                range.endContainer.nodeName.toLowerCase() === 'a' ||
+                Util.getClosestTag(Selection.getSelectedParentElement(range), 'a')) {
                 return this.execAction('unlink');
             }
 
