@@ -1,3 +1,9 @@
+5.5.3 / 2015-08-03
+==================
+* Fix issue with replacing a pre-existing link
+* Fix issue with selection after creating a link after empty paragraphs
+
+
 5.5.2 / 2015-08-02
 ==================
 * Fix issue where block elements where cleaned up incorrectly when pasting

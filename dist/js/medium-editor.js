@@ -1905,7 +1905,7 @@ var Selection;
                 }
             }
 
-            if (selectionState.emptyBlocksIndex && selectionState.end === nextCharIndex) {
+            if (selectionState.emptyBlocksIndex) {
                 var targetNode = Util.getTopBlockContainer(range.startContainer),
                     index = 0;
                 // Skip over empty blocks until we hit the block we want the selection to be in
@@ -1960,6 +1960,7 @@ var Selection;
                         }
                     }
                     range.setStart(currentNode.parentNode, currentNodeIndex + 1);
+                    range.collapse(true);
                 }
             }
             return range;
@@ -6128,8 +6129,7 @@ function MediumEditor(elements, options) {
         },
 
         createLink: function (opts) {
-            var customEvent,
-                i;
+            var customEvent, i;
 
             if (opts.url && opts.url.trim().length > 0) {
                 var currentSelection = this.options.contentWindow.getSelection();
@@ -6139,17 +6139,22 @@ function MediumEditor(elements, options) {
                         endContainerParentElement,
                         textNodes;
 
-                    startContainerParentElement = Util.getClosestBlockContainer(
-                        currentSelection.getRangeAt(0).startContainer);
-                    endContainerParentElement = Util.getClosestBlockContainer(
-                        currentSelection.getRangeAt(0).endContainer);
+                    startContainerParentElement = Util.getClosestBlockContainer(currentSelection.getRangeAt(0).startContainer);
+                    endContainerParentElement = Util.getClosestBlockContainer(currentSelection.getRangeAt(0).endContainer);
 
                     if (startContainerParentElement === endContainerParentElement) {
                         var currentEditor = Selection.getSelectionElement(this.options.contentWindow),
                             parentElement = (startContainerParentElement || currentEditor),
                             fragment = this.options.ownerDocument.createDocumentFragment();
+
+                        // since we are going to create a link from an extracted text,
+                        // be sure that if we are updating a link, we won't let an empty link behind (see #754)
+                        // (Workaroung for Chrome)
+                        this.execAction('unlink');
+
                         exportedSelection = this.exportSelection();
                         fragment.appendChild(parentElement.cloneNode(true));
+
                         if (currentEditor === parentElement) {
                             // We have to avoid the editor itself being wiped out when it's the only block element,
                             // as our reference inside this.elements gets detached from the page when insertHTML runs.
@@ -6162,37 +6167,50 @@ function MediumEditor(elements, options) {
                             // In WebKit:
                             // an invented <br /> tag at the end in the same situation
 
-                            Selection.select(this.options.ownerDocument,
-                                parentElement.firstChild, 0,
-                                parentElement.lastChild, parentElement.lastChild.nodeType === 3 ?
-                                parentElement.lastChild.nodeValue.length : parentElement.lastChild.childNodes.length);
+                            Selection.select(
+                                this.options.ownerDocument,
+                                parentElement.firstChild,
+                                0,
+                                parentElement.lastChild,
+                                parentElement.lastChild.nodeType === 3 ?
+                                parentElement.lastChild.nodeValue.length : parentElement.lastChild.childNodes.length
+                            );
                         } else {
-                            Selection.select(this.options.ownerDocument,
-                                parentElement, 0,
-                                parentElement, parentElement.childNodes.length);
+                            Selection.select(
+                                this.options.ownerDocument,
+                                parentElement,
+                                0,
+                                parentElement,
+                                parentElement.childNodes.length
+                            );
                         }
+
                         var modifiedExportedSelection = this.exportSelection();
 
-                        textNodes = Util.findOrCreateMatchingTextNodes(this.options.ownerDocument,
-                                fragment,
-                                {
-                                    start: exportedSelection.start - modifiedExportedSelection.start,
-                                    end: exportedSelection.end - modifiedExportedSelection.start,
-                                    editableElementIndex: exportedSelection.editableElementIndex
-                                });
+                        textNodes = Util.findOrCreateMatchingTextNodes(
+                            this.options.ownerDocument,
+                            fragment,
+                            {
+                                start: exportedSelection.start - modifiedExportedSelection.start,
+                                end: exportedSelection.end - modifiedExportedSelection.start,
+                                editableElementIndex: exportedSelection.editableElementIndex
+                            }
+                        );
+
                         // Creates the link in the document fragment
                         Util.createLink(this.options.ownerDocument, textNodes, opts.url.trim());
                         // Chrome trims the leading whitespaces when inserting HTML, which messes up restoring the selection.
                         var leadingWhitespacesCount = (fragment.firstChild.innerHTML.match(/^\s+/) || [''])[0].length;
                         // Now move the created link back into the original document in a way to preserve undo/redo history
-                        Util.insertHTMLCommand(this.options.ownerDocument,
-                            fragment.firstChild.innerHTML.replace(/^\s+/, ''));
+                        Util.insertHTMLCommand(this.options.ownerDocument, fragment.firstChild.innerHTML.replace(/^\s+/, ''));
                         exportedSelection.start -= leadingWhitespacesCount;
                         exportedSelection.end -= leadingWhitespacesCount;
+
                         this.importSelection(exportedSelection);
                     } else {
                         this.options.ownerDocument.execCommand('createLink', false, opts.url);
                     }
+
                     if (this.options.targetBlank || opts.target === '_blank') {
                         Util.setTargetBlank(Selection.getSelectionStart(this.options.ownerDocument), opts.url);
                     }
@@ -6249,7 +6267,7 @@ MediumEditor.parseVersionString = function (release) {
 
 MediumEditor.version = MediumEditor.parseVersionString.call(this, ({
     // grunt-bump looks for this:
-    'version': '5.5.2'
+    'version': '5.5.3'
 }).version);
 
     return MediumEditor;
