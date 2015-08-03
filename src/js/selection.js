@@ -119,7 +119,7 @@ var Selection;
                 }
             }
 
-            if (selectionState.emptyBlocksIndex && selectionState.end === nextCharIndex) {
+            if (selectionState.emptyBlocksIndex) {
                 var targetNode = Util.getTopBlockContainer(range.startContainer),
                     index = 0;
                 // Skip over empty blocks until we hit the block we want the selection to be in
@@ -174,6 +174,7 @@ var Selection;
                         }
                     }
                     range.setStart(currentNode.parentNode, currentNodeIndex + 1);
+                    range.collapse(true);
                 }
             }
             return range;
