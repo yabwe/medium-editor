@@ -278,8 +278,7 @@ describe('Anchor Button TestCase', function () {
             this.el.innerHTML = '<p>Some text</p><p><br/></p><p><br/></p><p>link text more text</p>';
             var editor = this.newMediumEditor('.editor'),
                 lastP = this.el.lastChild,
-                anchorExtension = editor.getExtensionByName('anchor'),
-                toolbar = editor.getExtensionByName('toolbar');
+                anchorExtension = editor.getExtensionByName('anchor');
 
             // Select the text 'link text' in the last paragraph
             MediumEditor.selection.select(document, lastP.firstChild, 0, lastP.firstChild, 'link text'.length);
@@ -287,7 +286,7 @@ describe('Anchor Button TestCase', function () {
             jasmine.clock().tick(1);
 
             // Click the 'anchor' button in the toolbar
-            fireEvent(toolbar.getToolbarElement().querySelector('[data-action="createLink"]'), 'click');
+            fireEvent(editor.toolbar.getToolbarElement().querySelector('[data-action="createLink"]'), 'click');
 
             // Input a url and save
             var input = anchorExtension.getInput();
