@@ -1,3 +1,8 @@
+5.5.4 / 2015-08-04
+==================
+* Fix issue with anchor and selection inconsitencies in IE
+
+
 5.5.3 / 2015-08-03
 ==================
 * Fix issue with replacing a pre-existing link

@@ -728,13 +728,13 @@ var Util;
                 } catch (ignore) {}
             }
 
-            selection = doc.defaultView.getSelection();
-            if (selection.getRangeAt && selection.rangeCount) {
+            selection = doc.getSelection();
+            if (selection.rangeCount) {
                 range = selection.getRangeAt(0);
                 toReplace = range.commonAncestorContainer;
                 // Ensure range covers maximum amount of nodes as possible
                 // By moving up the DOM and selecting ancestors whose only child is the range
-                if ((toReplace.nodeType === 3 && toReplace.nodeValue === range.toString()) ||
+                if ((toReplace.nodeType === 3 && range.startOffset === 0 && range.endOffset === toReplace.nodeValue.length) ||
                         (toReplace.nodeType !== 3 && toReplace.innerHTML === range.toString())) {
                     while (toReplace.parentNode &&
                             toReplace.parentNode.childNodes.length === 1 &&
@@ -6134,15 +6134,35 @@ function MediumEditor(elements, options) {
             if (opts.url && opts.url.trim().length > 0) {
                 var currentSelection = this.options.contentWindow.getSelection();
                 if (currentSelection) {
-                    var exportedSelection,
+                    var currRange = currentSelection.getRangeAt(0),
+                        commonAncestorContainer = currRange.commonAncestorContainer,
+                        exportedSelection,
                         startContainerParentElement,
                         endContainerParentElement,
                         textNodes;
 
-                    startContainerParentElement = Util.getClosestBlockContainer(currentSelection.getRangeAt(0).startContainer);
-                    endContainerParentElement = Util.getClosestBlockContainer(currentSelection.getRangeAt(0).endContainer);
+                    // If the selection is contained within a single text node
+                    // and the selection starts at the beginning of the text node,
+                    // MSIE still says the startContainer is the parent of the text node.
+                    // If the selection is contained within a single text node, we
+                    // want to just use the default browser 'createLink', so we need
+                    // to account for this case and adjust the commonAncestorContainer accordingly
+                    if (currRange.endContainer.nodeType === 3 &&
+                        currRange.startContainer.nodeType !== 3 &&
+                        currRange.startOffset === 0 &&
+                        currRange.startContainer.firstChild === currRange.endContainer) {
+                        commonAncestorContainer = currRange.endContainer;
+                    }
 
-                    if (startContainerParentElement === endContainerParentElement) {
+                    startContainerParentElement = Util.getClosestBlockContainer(currRange.startContainer);
+                    endContainerParentElement = Util.getClosestBlockContainer(currRange.endContainer);
+
+                    // If the selection is not contained within a single text node
+                    // but the selection is contained within the same block element
+                    // we want to make sure we create a single link, and not multiple links
+                    // which can happen with the built in browser functionality
+                    if (commonAncestorContainer.nodeType !== 3 && startContainerParentElement === endContainerParentElement) {
+
                         var currentEditor = Selection.getSelectionElement(this.options.contentWindow),
                             parentElement = (startContainerParentElement || currentEditor),
                             fragment = this.options.ownerDocument.createDocumentFragment();
@@ -6166,7 +6186,6 @@ function MediumEditor(elements, options) {
                             // as an empty <strong></strong> if parentElement.lastChild is a <strong> tag.
                             // In WebKit:
                             // an invented <br /> tag at the end in the same situation
-
                             Selection.select(
                                 this.options.ownerDocument,
                                 parentElement.firstChild,
@@ -6199,8 +6218,10 @@ function MediumEditor(elements, options) {
 
                         // Creates the link in the document fragment
                         Util.createLink(this.options.ownerDocument, textNodes, opts.url.trim());
+
                         // Chrome trims the leading whitespaces when inserting HTML, which messes up restoring the selection.
                         var leadingWhitespacesCount = (fragment.firstChild.innerHTML.match(/^\s+/) || [''])[0].length;
+
                         // Now move the created link back into the original document in a way to preserve undo/redo history
                         Util.insertHTMLCommand(this.options.ownerDocument, fragment.firstChild.innerHTML.replace(/^\s+/, ''));
                         exportedSelection.start -= leadingWhitespacesCount;
@@ -6267,7 +6288,7 @@ MediumEditor.parseVersionString = function (release) {
 
 MediumEditor.version = MediumEditor.parseVersionString.call(this, ({
     // grunt-bump looks for this:
-    'version': '5.5.3'
+    'version': '5.5.4'
 }).version);
 
     return MediumEditor;
