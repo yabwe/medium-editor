@@ -131,7 +131,8 @@ module.exports = function (grunt) {
                         options: {
                             dir: 'reports/jasmine/lcov'
                         }
-                    }]
+                    }],
+                    files: srcFiles.concat('!src/js/extensions/deprecated/*')
                 },
                 summary: true
             }
