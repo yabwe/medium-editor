@@ -330,13 +330,13 @@ var Util;
                 } catch (ignore) {}
             }
 
-            selection = doc.defaultView.getSelection();
-            if (selection.getRangeAt && selection.rangeCount) {
+            selection = doc.getSelection();
+            if (selection.rangeCount) {
                 range = selection.getRangeAt(0);
                 toReplace = range.commonAncestorContainer;
                 // Ensure range covers maximum amount of nodes as possible
                 // By moving up the DOM and selecting ancestors whose only child is the range
-                if ((toReplace.nodeType === 3 && toReplace.nodeValue === range.toString()) ||
+                if ((toReplace.nodeType === 3 && range.startOffset === 0 && range.endOffset === toReplace.nodeValue.length) ||
                         (toReplace.nodeType !== 3 && toReplace.innerHTML === range.toString())) {
                     while (toReplace.parentNode &&
                             toReplace.parentNode.childNodes.length === 1 &&

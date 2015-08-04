@@ -291,10 +291,58 @@ describe('Anchor Button TestCase', function () {
                 target: '_self'
             });
 
+            // Make sure the <p> wasn't removed, and the <a> was added to the end
+            expect(this.el.lastChild).toBe(lastP);
+            expect(lastP.firstChild.nodeName.toLowerCase()).toBe('a');
+
             // Make sure selection is only the link
             var range = window.getSelection().getRangeAt(0);
             expect(MediumEditor.util.isDescendant(lastP, range.startContainer, true)).toBe(true, 'The start of the selection is incorrect');
-            expect(MediumEditor.util.isDescendant(lastP, range.endContainer, true)).toBe(true, 'The end of the selection is incorrect');
+            expect(range.startOffset).toBe(0);
+            expect(MediumEditor.util.isDescendant(lastP.firstChild, range.endContainer, true)).toBe(true, 'The end of the selection is not contained within the link');
+        });
+
+        it('should not remove the <p> container when adding a link inside a top-level <p> with a single text-node child', function () {
+            spyOn(MediumEditor.prototype, 'createLink').and.callThrough();
+            this.el.innerHTML = '<p>Some text</p><p><br/></p><p><br/></p><p>some text link text</p>';
+            var editor = this.newMediumEditor('.editor'),
+                lastP = this.el.lastChild,
+                anchorExtension = editor.getExtensionByName('anchor'),
+                toolbar = editor.getExtensionByName('toolbar');
+
+            // Select the text 'link text' in the last paragraph
+            MediumEditor.selection.select(document, lastP.firstChild, 'some text '.length, lastP.firstChild, 'some text link text'.length);
+            fireEvent(editor.elements[0], 'focus');
+            jasmine.clock().tick(1);
+
+            // Click the 'anchor' button in the toolbar
+            fireEvent(toolbar.getToolbarElement().querySelector('[data-action="createLink"]'), 'click');
+
+            // Input a url and save
+            var input = anchorExtension.getInput();
+            input.value = 'http://www.example.com';
+            fireEvent(input, 'keyup', {
+                keyCode: Util.keyCode.ENTER
+            });
+
+            expect(editor.createLink).toHaveBeenCalledWith({
+                url: 'http://www.example.com',
+                target: '_self'
+            });
+
+            // Make sure the <p> wasn't removed, and the <a> was added to the end
+            expect(this.el.lastChild).toBe(lastP);
+            expect(lastP.lastChild.nodeName.toLowerCase()).toBe('a');
+
+            // Make sure selection is only the link
+            var range = window.getSelection().getRangeAt(0);
+            if (range.startContainer === lastP.lastChild.firstChild) {
+                expect(range.startOffset).toBe(0, 'The start of the selection is not at the front of the link');
+            } else {
+                expect(range.startContainer).toBe(lastP.firstChild);
+                expect(range.startOffset).toBe('some text '.length, 'The start of the selection is not at the front of the link');
+            }
+            expect(MediumEditor.util.isDescendant(lastP.lastChild, range.endContainer, true)).toBe(true, 'The end of the selection is incorrect');
         });
     });
 
