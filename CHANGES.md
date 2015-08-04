@@ -1,3 +1,12 @@
+4.12.7 / 2015-08-04
+==================
+* Fix issue with finding anchor when clicking anchor button
+* Fix issue where block elements outside of range were removed on paste
+* Fix issue with creating links and restoring selection after empty paragraphs
+* Fix issue with selection spanning empty paragraphs after creating link
+* Fix test broken with Chrome for Windows updates
+
+
 4.12.5 / 2015-06-16
 ==================
 * Fix issue with restoring selection within nested block elements

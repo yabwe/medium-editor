@@ -1949,6 +1949,19 @@ var Selection;
             sel.addRange(range);
         },
 
+        select: function (doc, startNode, startOffset, endNode, endOffset) {
+            doc.getSelection().removeAllRanges();
+            var range = doc.createRange();
+            range.setStart(startNode, startOffset);
+            if (endNode) {
+                range.setEnd(endNode, endOffset);
+            } else {
+                range.collapse(true);
+            }
+            doc.getSelection().addRange(range);
+            return range;
+        },
+
         /**
          * Move cursor to the given node with the given offset.
          *
@@ -3586,10 +3599,11 @@ var AnchorForm;
             event.preventDefault();
             event.stopPropagation();
 
-            var selectedParentElement = Selection.getSelectedParentElement(Selection.getSelectionRange(this.document)),
-                firstTextNode = Util.getFirstTextNode(selectedParentElement);
+            var range = Selection.getSelectionRange(this.document);
 
-            if (Util.getClosestTag(firstTextNode, 'a')) {
+            if (range.startContainer.nodeName.toLowerCase() === 'a' ||
+                range.endContainer.nodeName.toLowerCase() === 'a' ||
+                Util.getClosestTag(Selection.getSelectedParentElement(range), 'a')) {
                 return this.execAction('unlink');
             }
 
@@ -4718,8 +4732,7 @@ var PasteHandler;
         },
 
         cleanPaste: function (text) {
-            var i, elList, workEl,
-                el = Selection.getSelectionElement(this.window),
+            var i, elList,
                 multiline = /<p|<br|<div/.test(text),
                 replacements = createReplacements().concat(this.cleanReplacements || []);
 
@@ -4735,31 +4748,6 @@ var PasteHandler;
             elList = text.split('<br><br>');
 
             this.pasteHTML('<p>' + elList.join('</p><p>') + '</p>');
-
-            try {
-                this.document.execCommand('insertText', false, '\n');
-            } catch (ignore) { }
-
-            // block element cleanup
-            elList = el.querySelectorAll('a,p,div,br');
-            for (i = 0; i < elList.length; i += 1) {
-                workEl = elList[i];
-
-                // Microsoft Word replaces some spaces with newlines.
-                // While newlines between block elements are meaningless, newlines within
-                // elements are sometimes actually spaces.
-                workEl.innerHTML = workEl.innerHTML.replace(/\n/gi, ' ');
-
-                switch (workEl.tagName.toLowerCase()) {
-                    case 'p':
-                    case 'div':
-                        this.filterCommonBlocks(workEl);
-                        break;
-                    case 'br':
-                        this.filterLineBreak(workEl);
-                        break;
-                }
-            }
         },
 
         pasteHTML: function (html, options) {
@@ -4778,7 +4766,6 @@ var PasteHandler;
             this.cleanupSpans(fragmentBody);
 
             elList = fragmentBody.querySelectorAll('*');
-
             for (i = 0; i < elList.length; i += 1) {
                 workEl = elList[i];
 
@@ -4788,6 +4775,27 @@ var PasteHandler;
 
                 Util.cleanupAttrs(workEl, options.cleanAttrs);
                 Util.cleanupTags(workEl, options.cleanTags);
+            }
+
+            // block element cleanup
+            elList = fragmentBody.querySelectorAll('a,p,div,br');
+            for (i = 0; i < elList.length; i += 1) {
+                workEl = elList[i];
+
+                // Microsoft Word replaces some spaces with newlines.
+                // While newlines between block elements are meaningless, newlines within
+                // elements are sometimes actually spaces.
+                workEl.innerHTML = workEl.innerHTML.replace(/\n/gi, ' ');
+
+                switch (workEl.nodeName.toLowerCase()) {
+                    case 'p':
+                    case 'div':
+                        this.filterCommonBlocks(workEl);
+                        break;
+                    case 'br':
+                        this.filterLineBreak(workEl);
+                        break;
+                }
             }
 
             Util.insertHTMLCommand(this.document, fragmentBody.innerHTML.replace(/&nbsp;/g, ' '));
@@ -6536,7 +6544,7 @@ function MediumEditor(elements, options) {
                 }
             }
 
-            if (inSelectionState.emptyBlocksIndex && selectionState.end === nextCharIndex) {
+            if (inSelectionState.emptyBlocksIndex) {
                 var targetNode = Util.getBlockContainer(range.startContainer),
                     index = 0;
                 // Skip over empty blocks until we hit the block we want the selection to be in
@@ -6552,7 +6560,6 @@ function MediumEditor(elements, options) {
                 // We're selecting a high-level block node, so make sure the cursor gets moved into the deepest
                 // element at the beginning of the block
                 range.setStart(Util.getFirstSelectableLeafNode(targetNode), 0);
-                range.collapse(true);
             }
 
             // If the selection is right at the ending edge of a link, put it outside the anchor tag instead of inside.
@@ -6624,7 +6631,7 @@ MediumEditor.version = (function (major, minor, revision) {
     };
 }).apply(this, ({
     // grunt-bump looks for this:
-    'version': '4.12.6'
+    'version': '4.12.7'
 }).version.split('.'));
 
     return MediumEditor;
