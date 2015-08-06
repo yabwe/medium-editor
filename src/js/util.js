@@ -324,11 +324,6 @@ var Util;
         insertHTMLCommand: function (doc, html) {
             var selection, range, el, fragment, node, lastNode, toReplace;
 
-            // cleanup fragment comment created by Chrome
-            html = html
-                .replace('<!--EndFragment-->', '')
-                .replace('<!--StartFragment-->', '');
-
             if (doc.queryCommandSupported('insertHTML')) {
                 try {
                     return doc.execCommand('insertHTML', false, html);

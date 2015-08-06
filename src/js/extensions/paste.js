@@ -12,7 +12,6 @@ var PasteHandler;
     */
     function createReplacements() {
         return [
-
             // replace two bogus tags that begin pastes from google docs
             [new RegExp(/<[^>]*docs-internal-guid[^>]*>/gi), ''],
             [new RegExp(/<\/b>(<br[^>]*>)?$/gi), ''],
@@ -42,7 +41,11 @@ var PasteHandler;
             [new RegExp(/\n+<p/gi), '<p'],
 
             // Microsoft Word makes these odd tags, like <o:p></o:p>
-            [new RegExp(/<\/?o:[a-z]*>/gi), '']
+            [new RegExp(/<\/?o:[a-z]*>/gi), ''],
+
+            // cleanup comments added by Chrome when pasting html
+            ['<!--EndFragment-->', ''],
+            ['<!--StartFragment-->', '']
         ];
     }
     /*jslint regexp: false*/
