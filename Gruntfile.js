@@ -183,7 +183,8 @@ module.exports = function (grunt) {
                 'dist/css/themes/default.css': 'src/sass/themes/default.scss',
                 'dist/css/themes/flat.css': 'src/sass/themes/flat.scss',
                 'dist/css/themes/mani.css': 'src/sass/themes/mani.scss',
-                'dist/css/themes/roman.css': 'src/sass/themes/roman.scss'
+                'dist/css/themes/roman.css': 'src/sass/themes/roman.scss',
+                'dist/css/themes/tim.css': 'src/sass/themes/tim.scss'
             }
         }
     };
