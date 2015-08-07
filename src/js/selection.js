@@ -120,21 +120,7 @@ var Selection;
             }
 
             if (typeof selectionState.emptyBlocksIndex !== 'undefined') {
-                var targetNode = Util.getTopBlockContainer(range.startContainer),
-                    index = 0;
-                // Skip over empty blocks until we hit the block we want the selection to be in
-                while ((index === 0 || index < selectionState.emptyBlocksIndex) && targetNode.nextSibling) {
-                    targetNode = targetNode.nextSibling;
-                    index++;
-                    // If we find a non-empty block, ignore the emptyBlocksIndex and just put selection here
-                    if (targetNode.textContent.length > 0) {
-                        break;
-                    }
-                }
-
-                // We're selecting a high-level block node, so make sure the cursor gets moved into the deepest
-                // element at the beginning of the block
-                range.setStart(Util.getFirstSelectableLeafNode(targetNode), 0);
+                range = Selection.importSelectionMoveCursorPastBlocks(doc, root, selectionState.emptyBlocksIndex, range);
             }
 
             // If the selection is right at the ending edge of a link, put it outside the anchor tag instead of inside.
@@ -180,6 +166,54 @@ var Selection;
             return range;
         },
 
+        // Uses the emptyBlocksIndex calculated by getIndexRelativeToAdjacentEmptyBlocks
+        // to move the cursor back to the start of the correct paragraph
+        importSelectionMoveCursorPastBlocks: function (doc, root, index, range) {
+            var treeWalker = doc.createTreeWalker(root, NodeFilter.SHOW_ELEMENT, filterOnlyParentElements, false),
+                startContainer = range.startContainer,
+                startBlock,
+                targetNode,
+                currIndex = 0;
+            index = index || 1; // If index is 0, we still want to move to the next block
+
+            // Chrome counts newlines and spaces that separate block elements as actual elements.
+            // If the selection is inside one of these text nodes, and it has a previous sibling
+            // which is a block element, we want the treewalker to start at the previous sibling
+            // and NOT at the parent of the textnode
+            if (startContainer.nodeType === 3 && Util.isBlockContainer(startContainer.previousSibling)) {
+                startBlock = startContainer.previousSibling;
+            } else {
+                startBlock = Util.getClosestBlockContainer(startContainer);
+            }
+
+            // Skip over empty blocks until we hit the block we want the selection to be in
+            while (treeWalker.nextNode()) {
+                if (!targetNode) {
+                    // Loop through all blocks until we hit the starting block element
+                    if (startBlock === treeWalker.currentNode) {
+                        targetNode = treeWalker.currentNode;
+                    }
+                } else {
+                    targetNode = treeWalker.currentNode;
+                    currIndex++;
+                    // We hit the target index, bail
+                    if (currIndex === index) {
+                        break;
+                    }
+                    // If we find a non-empty block, ignore the emptyBlocksIndex and just put selection here
+                    if (targetNode.textContent.length > 0) {
+                        break;
+                    }
+                }
+            }
+
+            // We're selecting a high-level block node, so make sure the cursor gets moved into the deepest
+            // element at the beginning of the block
+            range.setStart(Util.getFirstSelectableLeafNode(targetNode), 0);
+
+            return range;
+        },
+
         // Returns -1 unless the cursor is at the beginning of a paragraph/block
         // If the paragraph/block is preceeded by empty paragraphs/block (with no text)
         // it will return the number of empty paragraphs before the cursor.
@@ -202,14 +236,15 @@ var Selection;
 
             // Walk over block elements, counting number of empty blocks between last piece of text
             // and the block the cursor is in
-            var treeWalker = doc.createTreeWalker(root, NodeFilter.SHOW_ELEMENT, filterOnlyParentElements, false),
+            var closestBlock = Util.getClosestBlockContainer(cursorContainer),
+                treeWalker = doc.createTreeWalker(root, NodeFilter.SHOW_ELEMENT, filterOnlyParentElements, false),
                 emptyBlocksCount = 0;
             while (treeWalker.nextNode()) {
                 var blockIsEmpty = treeWalker.currentNode.textContent === '';
                 if (blockIsEmpty || emptyBlocksCount > 0) {
                     emptyBlocksCount += 1;
                 }
-                if (Util.isDescendant(treeWalker.currentNode, cursorContainer, true)) {
+                if (treeWalker.currentNode === closestBlock) {
                     return emptyBlocksCount;
                 }
                 if (!blockIsEmpty) {
