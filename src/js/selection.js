@@ -60,7 +60,7 @@ var Selection;
                 // If start = 0 there may still be an empty paragraph before it, but we don't care.
                 if (start !== 0) {
                     var emptyBlocksIndex = this.getIndexRelativeToAdjacentEmptyBlocks(doc, root, range.startContainer, range.startOffset);
-                    if (emptyBlocksIndex !== 0) {
+                    if (emptyBlocksIndex !== -1) {
                         selectionState.emptyBlocksIndex = emptyBlocksIndex;
                     }
                 }
@@ -119,11 +119,11 @@ var Selection;
                 }
             }
 
-            if (selectionState.emptyBlocksIndex) {
+            if (typeof selectionState.emptyBlocksIndex !== 'undefined') {
                 var targetNode = Util.getTopBlockContainer(range.startContainer),
                     index = 0;
                 // Skip over empty blocks until we hit the block we want the selection to be in
-                while (index < selectionState.emptyBlocksIndex && targetNode.nextSibling) {
+                while ((index === 0 || index < selectionState.emptyBlocksIndex) && targetNode.nextSibling) {
                     targetNode = targetNode.nextSibling;
                     index++;
                     // If we find a non-empty block, ignore the emptyBlocksIndex and just put selection here
@@ -186,7 +186,7 @@ var Selection;
         getIndexRelativeToAdjacentEmptyBlocks: function (doc, root, cursorContainer, cursorOffset) {
             // If there is text in front of the cursor, that means there isn't only empty blocks before it
             if (cursorContainer.nodeType === 3 && cursorOffset > 0) {
-                return 0;
+                return -1;
             }
 
             // Check if the block that contains the cursor has any other text in front of the cursor
@@ -196,7 +196,7 @@ var Selection;
                 node = cursorContainer.childNodes[cursorOffset];
             }
             if (node && !Util.isElementAtBeginningOfBlock(node)) {
-                return 0;
+                return -1;
             }
 
             // Walk over block elements, counting number of empty blocks between last piece of text

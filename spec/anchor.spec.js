@@ -306,9 +306,50 @@ describe('Anchor Button TestCase', function () {
             expect(selectionWhenEventsFired[0]).toBe('ipsum', 'selected text should have been the same when event fired');
         });
 
-        it('should not select empty paragraphs when link is created at beginning of paragraph', function () {
+        // https://github.com/yabwe/medium-editor/issues/757
+        it('should not select empty paragraphs when link is created at beginning of paragraph after empty paragraphs', function () {
             spyOn(MediumEditor.prototype, 'createLink').and.callThrough();
             this.el.innerHTML = '<p>Some text</p><p><br/></p><p><br/></p><p>link text more text</p>';
+            var editor = this.newMediumEditor('.editor'),
+                lastP = this.el.lastChild,
+                anchorExtension = editor.getExtensionByName('anchor'),
+                toolbar = editor.getExtensionByName('toolbar');
+
+            // Select the text 'link text' in the last paragraph
+            MediumEditor.selection.select(document, lastP.firstChild, 0, lastP.firstChild, 'link text'.length);
+            fireEvent(editor.elements[0], 'focus');
+            jasmine.clock().tick(1);
+
+            // Click the 'anchor' button in the toolbar
+            fireEvent(toolbar.getToolbarElement().querySelector('[data-action="createLink"]'), 'click');
+
+            // Input a url and save
+            var input = anchorExtension.getInput();
+            input.value = 'http://www.example.com';
+            fireEvent(input, 'keyup', {
+                keyCode: Util.keyCode.ENTER
+            });
+
+            expect(editor.createLink).toHaveBeenCalledWith({
+                url: 'http://www.example.com',
+                target: '_self'
+            });
+
+            // Make sure the <p> wasn't removed, and the <a> was added to the end
+            expect(this.el.lastChild).toBe(lastP);
+            expect(lastP.firstChild.nodeName.toLowerCase()).toBe('a');
+
+            // Make sure selection is only the link
+            var range = window.getSelection().getRangeAt(0);
+            expect(MediumEditor.util.isDescendant(lastP, range.startContainer, true)).toBe(true, 'The start of the selection is incorrect');
+            expect(range.startOffset).toBe(0);
+            expect(MediumEditor.util.isDescendant(lastP.firstChild, range.endContainer, true)).toBe(true, 'The end of the selection is not contained within the link');
+        });
+
+        // https://github.com/yabwe/medium-editor/issues/757
+        it('should not select empty paragraphs when link is created at beginning of paragraph after another paragraph', function () {
+            spyOn(MediumEditor.prototype, 'createLink').and.callThrough();
+            this.el.innerHTML = '<p>Some text</p><p>link text more text</p>';
             var editor = this.newMediumEditor('.editor'),
                 lastP = this.el.lastChild,
                 anchorExtension = editor.getExtensionByName('anchor'),
