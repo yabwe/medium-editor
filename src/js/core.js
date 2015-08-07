@@ -897,10 +897,10 @@ function MediumEditor(elements, options) {
         },
 
         createLink: function (opts) {
-            var customEvent, i;
+            var currentEditor, customEvent, i;
 
             try {
-                this.events.disabledEvents.push('editableInput');
+                this.events.disableCustomEvent('editableInput');
                 if (opts.url && opts.url.trim().length > 0) {
                     var currentSelection = this.options.contentWindow.getSelection();
                     if (currentSelection) {
@@ -933,8 +933,8 @@ function MediumEditor(elements, options) {
                         // which can happen with the built in browser functionality
                         if (commonAncestorContainer.nodeType !== 3 && startContainerParentElement === endContainerParentElement) {
 
-                            var currentEditor = Selection.getSelectionElement(this.options.contentWindow),
-                                parentElement = (startContainerParentElement || currentEditor),
+                            currentEditor = Selection.getSelectionElement(this.options.contentWindow);
+                            var parentElement = (startContainerParentElement || currentEditor),
                                 fragment = this.options.ownerDocument.createDocumentFragment();
 
                             // since we are going to create a link from an extracted text,
@@ -1011,15 +1011,17 @@ function MediumEditor(elements, options) {
                         }
                     }
                 }
+                // Fire input event for backwards compatibility if anyone was listening directly to the DOM input event
+                customEvent = this.options.ownerDocument.createEvent('HTMLEvents');
+                customEvent.initEvent('input', true, true, this.options.contentWindow);
+                for (i = 0; i < this.elements.length; i += 1) {
+                    this.elements[i].dispatchEvent(customEvent);
+                }
             } finally {
-                this.events.disabledEvents.splice(this.events.disabledEvents.indexOf('editableInput'), 1);
+                this.events.enableCustomEvent('editableInput');
             }
-
-            customEvent = this.options.ownerDocument.createEvent('HTMLEvents');
-            customEvent.initEvent('input', true, true, this.options.contentWindow);
-            for (i = 0; i < this.elements.length; i += 1) {
-                this.elements[i].dispatchEvent(customEvent);
-            }
+            // Fire our custom editableInput event
+            this.events.triggerCustomEvent('editableInput', customEvent, currentEditor);
         },
 
         cleanPaste: function (text) {
