@@ -9,6 +9,7 @@ var Events;
         this.base = instance;
         this.options = this.base.options;
         this.events = [];
+        this.disabledEvents = [];
         this.customEvents = {};
         this.listeners = {};
     };
@@ -82,7 +83,7 @@ var Events;
         },
 
         triggerCustomEvent: function (name, data, editable) {
-            if (this.customEvents[name]) {
+            if (this.customEvents[name] && this.disabledEvents.indexOf(name) === -1) {
                 this.customEvents[name].forEach(function (listener) {
                     listener(data, editable);
                 });

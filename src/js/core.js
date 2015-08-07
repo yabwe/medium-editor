@@ -1037,24 +1037,26 @@ function MediumEditor(elements, options) {
             var customEvent,
                 i;
 
-            if (opts.url && opts.url.trim().length > 0) {
-                this.options.ownerDocument.execCommand('createLink', false, opts.url);
+            try {
+                this.events.disabledEvents.push('editableInput');
+                if (opts.url && opts.url.trim().length > 0) {
+                    this.options.ownerDocument.execCommand('createLink', false, opts.url);
 
-                if (this.options.targetBlank || opts.target === '_blank') {
-                    Util.setTargetBlank(Selection.getSelectionStart(this.options.ownerDocument), opts.url);
-                }
+                    if (this.options.targetBlank || opts.target === '_blank') {
+                        Util.setTargetBlank(Selection.getSelectionStart(this.options.ownerDocument), opts.url);
+                    }
 
-                if (opts.buttonClass) {
-                    Util.addClassToAnchors(Selection.getSelectionStart(this.options.ownerDocument), opts.buttonClass);
+                    if (opts.buttonClass) {
+                        Util.addClassToAnchors(Selection.getSelectionStart(this.options.ownerDocument), opts.buttonClass);
                 }
+            } finally {
+                this.events.disabledEvents.splice(this.events.disabledEvents.indexOf('editableInput'), 1);
             }
 
-            if (this.options.targetBlank || opts.target === '_blank' || opts.buttonClass) {
-                customEvent = this.options.ownerDocument.createEvent('HTMLEvents');
-                customEvent.initEvent('input', true, true, this.options.contentWindow);
-                for (i = 0; i < this.elements.length; i += 1) {
-                    this.elements[i].dispatchEvent(customEvent);
-                }
+            customEvent = this.options.ownerDocument.createEvent('HTMLEvents');
+            customEvent.initEvent('input', true, true, this.options.contentWindow);
+            for (i = 0; i < this.elements.length; i += 1) {
+                this.elements[i].dispatchEvent(customEvent);
             }
         },
 
