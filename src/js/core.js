@@ -1038,7 +1038,7 @@ function MediumEditor(elements, options) {
                 i;
 
             try {
-                this.events.disabledEvents.push('editableInput');
+                this.events.disableCustomEvent('editableInput');
                 if (opts.url && opts.url.trim().length > 0) {
                     this.options.ownerDocument.execCommand('createLink', false, opts.url);
 
@@ -1049,15 +1049,17 @@ function MediumEditor(elements, options) {
                     if (opts.buttonClass) {
                         Util.addClassToAnchors(Selection.getSelectionStart(this.options.ownerDocument), opts.buttonClass);
                 }
+                // Fire input event for backwards compatibility if anyone was listening directly to the DOM input event
+                customEvent = this.options.ownerDocument.createEvent('HTMLEvents');
+                customEvent.initEvent('input', true, true, this.options.contentWindow);
+                for (i = 0; i < this.elements.length; i += 1) {
+                    this.elements[i].dispatchEvent(customEvent);
+                }
             } finally {
-                this.events.disabledEvents.splice(this.events.disabledEvents.indexOf('editableInput'), 1);
+                this.events.enableCustomEvent('editableInput');
             }
-
-            customEvent = this.options.ownerDocument.createEvent('HTMLEvents');
-            customEvent.initEvent('input', true, true, this.options.contentWindow);
-            for (i = 0; i < this.elements.length; i += 1) {
-                this.elements[i].dispatchEvent(customEvent);
-            }
+            // Fire our custom editableInput event
+            this.events.triggerCustomEvent('editableInput', customEvent, currentEditor);
         },
 
         // alias for setup - keeping for backwards compatability

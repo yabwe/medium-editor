@@ -9,7 +9,7 @@ var Events;
         this.base = instance;
         this.options = this.base.options;
         this.events = [];
-        this.disabledEvents = [];
+        this.disabledEvents = {};
         this.customEvents = {};
         this.listeners = {};
     };
@@ -52,6 +52,16 @@ var Events;
             }
         },
 
+        enableCustomEvent: function (event) {
+            if (this.disabledEvents[event] !== undefined) {
+                delete this.disabledEvents[event];
+            }
+        },
+
+        disableCustomEvent: function (event) {
+            this.disabledEvents[event] = true;
+        },
+
         // custom events
         attachCustomEvent: function (event, listener) {
             this.setupListener(event);
@@ -83,7 +93,7 @@ var Events;
         },
 
         triggerCustomEvent: function (name, data, editable) {
-            if (this.customEvents[name] && this.disabledEvents.indexOf(name) === -1) {
+            if (this.customEvents[name] && !this.disabledEvents[name]) {
                 this.customEvents[name].forEach(function (listener) {
                     listener(data, editable);
                 });
