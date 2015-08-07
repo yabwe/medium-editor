@@ -263,6 +263,49 @@ describe('Anchor Button TestCase', function () {
             expect(link.classList.contains('btn-default')).toBe(true);
         });
 
+        it('should fire editableInput only once when the user creates a link open to a new window,' +
+                ' and it should fire at the end of the DOM and selection modifications', function () {
+            spyOn(MediumEditor.prototype, 'createLink').and.callThrough();
+            this.el.innerHTML = '<p>Lorem ipsum et dolitur sunt.</p>';
+            var editor = this.newMediumEditor('.editor', {
+                    anchor: {
+                        targetCheckbox: true
+                    }
+                }),
+                p = this.el.lastChild,
+                anchorExtension = editor.getExtensionByName('anchor'),
+                toolbar = editor.getExtensionByName('toolbar'),
+                selectionWhenEventsFired = [],
+                listener = function () {
+                    selectionWhenEventsFired.push(window.getSelection().toString());
+                };
+
+            MediumEditor.selection.select(document, p.firstChild, 'Lorem '.length, p.firstChild, 'Lorem ipsum'.length);
+            fireEvent(editor.elements[0], 'focus');
+            jasmine.clock().tick(1);
+
+            // Click the 'anchor' button in the toolbar
+            fireEvent(toolbar.getToolbarElement().querySelector('[data-action="createLink"]'), 'click');
+
+            // Input a url and save
+            var input = anchorExtension.getInput(),
+                checkbox = anchorExtension.getAnchorTargetCheckbox();
+            input.value = 'http://www.example.com';
+            checkbox.checked = true;
+            editor.subscribe('editableInput', listener);
+            fireEvent(input, 'keyup', {
+                keyCode: Util.keyCode.ENTER
+            });
+
+            expect(editor.createLink).toHaveBeenCalledWith({
+                url: 'http://www.example.com',
+                target: '_blank'
+            });
+            expect(window.getSelection().toString()).toBe('ipsum', 'selected text should remain selected');
+            expect(selectionWhenEventsFired.length).toBe(1, 'only one editableInput event should have been registered');
+            expect(selectionWhenEventsFired[0]).toBe('ipsum', 'selected text should have been the same when event fired');
+        });
+
         it('should not select empty paragraphs when link is created at beginning of paragraph', function () {
             spyOn(MediumEditor.prototype, 'createLink').and.callThrough();
             this.el.innerHTML = '<p>Some text</p><p><br/></p><p><br/></p><p>link text more text</p>';
