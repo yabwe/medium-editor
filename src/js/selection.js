@@ -187,7 +187,7 @@ var Selection;
         // of a paragraph/block, and not at the end of the paragraph/block before it
         getIndexRelativeToAdjacentEmptyBlocks: function (doc, root, cursorContainer, cursorOffset) {
             // If there is text in front of the cursor, that means there isn't only empty blocks before it
-            if (cursorContainer.nodeType === 3 && cursorOffset > 0) {
+            if (cursorContainer.textContent.length > 0 && cursorOffset > 0) {
                 return -1;
             }
 
