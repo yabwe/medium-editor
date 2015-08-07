@@ -1003,21 +1003,7 @@ function MediumEditor(elements, options) {
             }
 
             if (typeof inSelectionState.emptyBlocksIndex !== 'undefined') {
-                var targetNode = Util.getBlockContainer(range.startContainer),
-                    index = 0;
-                // Skip over empty blocks until we hit the block we want the selection to be in
-                while ((index === 0 || index < inSelectionState.emptyBlocksIndex) && targetNode.nextSibling) {
-                    targetNode = targetNode.nextSibling;
-                    index++;
-                    // If we find a non-empty block, ignore the emptyBlocksIndex and just put selection here
-                    if (targetNode.textContent.length > 0) {
-                        break;
-                    }
-                }
-
-                // We're selecting a high-level block node, so make sure the cursor gets moved into the deepest
-                // element at the beginning of the block
-                range.setStart(Util.getFirstSelectableLeafNode(targetNode), 0);
+                range = Selection.importSelectionMoveCursorPastBlocks(this.options.ownerDocument, editableElement, inSelectionState.emptyBlocksIndex, range);
             }
 
             // If the selection is right at the ending edge of a link, put it outside the anchor tag instead of inside.

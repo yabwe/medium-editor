@@ -1,5 +1,5 @@
 /*global MediumEditor, describe, it, expect, spyOn,
-         afterEach, beforeEach, fireEvent, Util,
+         afterEach, beforeEach, fireEvent,
          jasmine, selectElementContents, setupTestHelpers,
          selectElementContentsAndFire, Selection, placeCursorInsideElement */
 
@@ -195,7 +195,7 @@ describe('Selection TestCase', function () {
                 'emptyBlocksIndex': 1
             });
 
-            var startParagraph = Util.getClosestTag(window.getSelection().getRangeAt(0).startContainer, 'p');
+            var startParagraph = MediumEditor.util.getClosestTag(window.getSelection().getRangeAt(0).startContainer, 'p');
             expect(startParagraph).toBe(editor.elements[0].getElementsByTagName('p')[1], 'empty paragraph');
         });
 
@@ -210,7 +210,7 @@ describe('Selection TestCase', function () {
                 'emptyBlocksIndex': 2
             });
 
-            var startParagraph = Util.getClosestTag(window.getSelection().getRangeAt(0).startContainer, 'p');
+            var startParagraph = MediumEditor.util.getClosestTag(window.getSelection().getRangeAt(0).startContainer, 'p');
             expect(startParagraph).toBe(editor.elements[0].getElementsByTagName('p')[2], 'paragraph after empty paragraph');
         });
 
@@ -226,7 +226,7 @@ describe('Selection TestCase', function () {
                 'emptyBlocksIndex': 2
             });
 
-            var startParagraph = Util.getClosestTag(window.getSelection().getRangeAt(0).startContainer, 'p');
+            var startParagraph = MediumEditor.util.getClosestTag(window.getSelection().getRangeAt(0).startContainer, 'p');
             expect(startParagraph).toBe(editor.elements[1].getElementsByTagName('p')[2], 'paragraph after empty paragraph');
         });
 
@@ -241,7 +241,7 @@ describe('Selection TestCase', function () {
                 'emptyBlocksIndex': 2
             });
 
-            var startParagraph = Util.getClosestTag(window.getSelection().getRangeAt(0).startContainer, 'h2');
+            var startParagraph = MediumEditor.util.getClosestTag(window.getSelection().getRangeAt(0).startContainer, 'h2');
             expect(startParagraph).toBe(editor.elements[0].querySelector('h2'), 'block element after empty block element');
         });
 
@@ -256,7 +256,7 @@ describe('Selection TestCase', function () {
                 'emptyBlocksIndex': 2
             });
 
-            var startParagraph = Util.getClosestTag(window.getSelection().getRangeAt(0).startContainer, 'h2');
+            var startParagraph = MediumEditor.util.getClosestTag(window.getSelection().getRangeAt(0).startContainer, 'h2');
             expect(startParagraph).toBe(editor.elements[0].querySelector('h2'), 'block element after empty block element');
         });
 
@@ -272,7 +272,7 @@ describe('Selection TestCase', function () {
             });
 
             var innerElement = window.getSelection().getRangeAt(0).startContainer;
-            expect(Util.isDescendant(editor.elements[0].querySelector('i'), innerElement, true)).toBe(true, 'nested inline elment inside block element after empty block element');
+            expect(MediumEditor.util.isDescendant(editor.elements[0].querySelector('i'), innerElement, true)).toBe(true, 'nested inline elment inside block element after empty block element');
         });
 
         ['br', 'img'].forEach(function (tagName) {
@@ -310,7 +310,7 @@ describe('Selection TestCase', function () {
 
             var innerElement = window.getSelection().getRangeAt(0).startContainer;
             // The behavior varies from browser to browser for this case, some select TH, some #textNode
-            expect(Util.isDescendant(editor.elements[0].querySelector('th'), innerElement, true))
+            expect(MediumEditor.util.isDescendant(editor.elements[0].querySelector('th'), innerElement, true))
                 .toBe(true, 'expect selection to be of TH or a descendant');
             expect(innerElement).toBe(window.getSelection().getRangeAt(0).endContainer);
         });
@@ -328,8 +328,32 @@ describe('Selection TestCase', function () {
             });
 
             var innerElement = window.getSelection().getRangeAt(0).startContainer;
-            expect(Util.isDescendant(editor.elements[0].querySelectorAll('p')[1], innerElement, true)).toBe(false, 'moved selection beyond non-empty block element');
-            expect(Util.isDescendant(editor.elements[0].querySelector('h2'), innerElement, true)).toBe(true, 'moved selection to element to incorrect block element');
+            expect(MediumEditor.util.isDescendant(editor.elements[0].querySelectorAll('p')[1], innerElement, true)).toBe(false, 'moved selection beyond non-empty block element');
+            expect(MediumEditor.util.isDescendant(editor.elements[0].querySelector('h2'), innerElement, true)).toBe(true, 'moved selection to element to incorrect block element');
+        });
+
+        // https://github.com/yabwe/medium-editor/issues/732
+        it('should support a selection correctly when space + newlines are separating block elements', function () {
+            this.el.innerHTML = '<ul>\n' +
+                                '    <li><a href="#">a link</a></li>\n' +
+                                '    <li>a list item</li>\n' +
+                                '    <li>target</li>\n' +
+                                '</ul>';
+            var editor = this.newMediumEditor('.editor'),
+                lastLi = this.el.querySelectorAll('ul > li')[2];
+
+            // Select the <li> with 'target'
+            selectElementContents(lastLi.firstChild);
+
+            var selectionData = editor.exportSelection();
+            expect(selectionData.emptyBlocksIndex).toBe(0);
+
+            editor.importSelection(selectionData);
+            var range = window.getSelection().getRangeAt(0);
+
+            expect(range.toString()).toBe('target', 'The selection is around the wrong element');
+            expect(MediumEditor.util.isDescendant(lastLi, range.startContainer, true)).toBe(true, 'The start of the selection is invalid');
+            expect(MediumEditor.util.isDescendant(lastLi, range.endContainer, true)).toBe(true, 'The end of the selection is invalid');
         });
     });
 
@@ -439,7 +463,7 @@ describe('Selection TestCase', function () {
 
     describe('getSelectedElements', function () {
         it('no selected elements on empty selection', function () {
-            var elements = Selection.getSelectedElements(document);
+            var elements = MediumEditor.selection.getSelectedElements(document);
 
             expect(elements.length).toBe(0);
         });
@@ -450,7 +474,7 @@ describe('Selection TestCase', function () {
                 elements;
 
             selectElementContents(editor.elements[0].querySelector('i').firstChild);
-            elements = Selection.getSelectedElements(document);
+            elements = MediumEditor.selection.getSelectedElements(document);
 
             expect(elements.length).toBe(1);
             expect(elements[0].tagName.toLowerCase()).toBe('i');
@@ -462,7 +486,7 @@ describe('Selection TestCase', function () {
             var elements;
 
             selectElementContents(this.el);
-            elements = Selection.getSelectedElements(document);
+            elements = MediumEditor.selection.getSelectedElements(document);
 
             expect(elements.length).toBe(1);
             expect(elements[0].tagName.toLowerCase()).toBe('i');
@@ -472,8 +496,8 @@ describe('Selection TestCase', function () {
 
     describe('getSelectedParentElement', function () {
         it('should return null on bad range', function () {
-            expect(Selection.getSelectedParentElement(null)).toBe(null);
-            expect(Selection.getSelectedParentElement(false)).toBe(null);
+            expect(MediumEditor.selection.getSelectedParentElement(null)).toBe(null);
+            expect(MediumEditor.selection.getSelectedParentElement(false)).toBe(null);
         });
 
         it('should select the document', function () {
@@ -488,7 +512,7 @@ describe('Selection TestCase', function () {
             sel.removeAllRanges();
             sel.addRange(range);
 
-            element = Selection.getSelectedParentElement(range);
+            element = MediumEditor.selection.getSelectedParentElement(range);
 
             expect(element).toBe(document);
         });
