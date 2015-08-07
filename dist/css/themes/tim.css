@@ -17,7 +17,8 @@
     color: #fff;
     height: 60px;
     min-width: 60px;
-    transition: background-color 0.2s ease-in, color 0.2s ease-in; }
+    -webkit-transition: background-color 0.2s ease-in, color 0.2s ease-in;
+            transition: background-color 0.2s ease-in, color 0.2s ease-in; }
     .medium-editor-toolbar li button:hover {
       background-color: #030200;
       color: #fff; }

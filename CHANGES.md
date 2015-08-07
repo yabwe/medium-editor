@@ -1,3 +1,10 @@
+5.6.0 / 2015-08-07
+==================
+* Add new 'tim' theme for medium-editor toolbar
+* Fix issue Chrome generated comment tags when pasting
+* Fix issue where 'editableInput' is triggered multiple times when creating links
+
+
 5.5.4 / 2015-08-04
 ==================
 * Fix issue with anchor and selection inconsitencies in IE
