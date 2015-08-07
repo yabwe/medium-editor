@@ -52,6 +52,20 @@ describe('Events TestCase', function () {
             editor.trigger('myIncredibleEvent', tempData, editor.elements[0]);
             expect(spy).toHaveBeenCalledWith(tempData, editor.elements[0]);
         });
+
+        it('can be disabled for a temporary period of time on a named basis', function () {
+            var editor = this.newMediumEditor('.editor'),
+                spy = jasmine.createSpy('handler'),
+                tempData = { temp: 'data' };
+            editor.subscribe('myIncredibleEvent', spy);
+            expect(spy).not.toHaveBeenCalled();
+            editor.events.disableCustomEvent('myIncredibleEvent');
+            editor.trigger('myIncredibleEvent', tempData, editor.elements[0]);
+            expect(spy).not.toHaveBeenCalled();
+            editor.events.enableCustomEvent('myIncredibleEvent');
+            editor.trigger('myIncredibleEvent', tempData, editor.elements[0]);
+            expect(spy).toHaveBeenCalledWith(tempData, editor.elements[0]);
+        });
     });
 
     describe('Custom Focus/Blur Listener', function () {

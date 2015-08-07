@@ -897,126 +897,133 @@ function MediumEditor(elements, options) {
         },
 
         createLink: function (opts) {
-            var customEvent, i;
+            var currentEditor, customEvent, i;
 
-            if (opts.url && opts.url.trim().length > 0) {
-                var currentSelection = this.options.contentWindow.getSelection();
-                if (currentSelection) {
-                    var currRange = currentSelection.getRangeAt(0),
-                        commonAncestorContainer = currRange.commonAncestorContainer,
-                        exportedSelection,
-                        startContainerParentElement,
-                        endContainerParentElement,
-                        textNodes;
+            try {
+                this.events.disableCustomEvent('editableInput');
+                if (opts.url && opts.url.trim().length > 0) {
+                    var currentSelection = this.options.contentWindow.getSelection();
+                    if (currentSelection) {
+                        var currRange = currentSelection.getRangeAt(0),
+                            commonAncestorContainer = currRange.commonAncestorContainer,
+                            exportedSelection,
+                            startContainerParentElement,
+                            endContainerParentElement,
+                            textNodes;
 
-                    // If the selection is contained within a single text node
-                    // and the selection starts at the beginning of the text node,
-                    // MSIE still says the startContainer is the parent of the text node.
-                    // If the selection is contained within a single text node, we
-                    // want to just use the default browser 'createLink', so we need
-                    // to account for this case and adjust the commonAncestorContainer accordingly
-                    if (currRange.endContainer.nodeType === 3 &&
-                        currRange.startContainer.nodeType !== 3 &&
-                        currRange.startOffset === 0 &&
-                        currRange.startContainer.firstChild === currRange.endContainer) {
-                        commonAncestorContainer = currRange.endContainer;
-                    }
-
-                    startContainerParentElement = Util.getClosestBlockContainer(currRange.startContainer);
-                    endContainerParentElement = Util.getClosestBlockContainer(currRange.endContainer);
-
-                    // If the selection is not contained within a single text node
-                    // but the selection is contained within the same block element
-                    // we want to make sure we create a single link, and not multiple links
-                    // which can happen with the built in browser functionality
-                    if (commonAncestorContainer.nodeType !== 3 && startContainerParentElement === endContainerParentElement) {
-
-                        var currentEditor = Selection.getSelectionElement(this.options.contentWindow),
-                            parentElement = (startContainerParentElement || currentEditor),
-                            fragment = this.options.ownerDocument.createDocumentFragment();
-
-                        // since we are going to create a link from an extracted text,
-                        // be sure that if we are updating a link, we won't let an empty link behind (see #754)
-                        // (Workaroung for Chrome)
-                        this.execAction('unlink');
-
-                        exportedSelection = this.exportSelection();
-                        fragment.appendChild(parentElement.cloneNode(true));
-
-                        if (currentEditor === parentElement) {
-                            // We have to avoid the editor itself being wiped out when it's the only block element,
-                            // as our reference inside this.elements gets detached from the page when insertHTML runs.
-                            // If we just use [parentElement, 0] and [parentElement, parentElement.childNodes.length]
-                            // as the range boundaries, this happens whenever parentElement === currentEditor.
-                            // The tradeoff to this workaround is that a orphaned tag can sometimes be left behind at
-                            // the end of the editor's content.
-                            // In Gecko:
-                            // as an empty <strong></strong> if parentElement.lastChild is a <strong> tag.
-                            // In WebKit:
-                            // an invented <br /> tag at the end in the same situation
-                            Selection.select(
-                                this.options.ownerDocument,
-                                parentElement.firstChild,
-                                0,
-                                parentElement.lastChild,
-                                parentElement.lastChild.nodeType === 3 ?
-                                parentElement.lastChild.nodeValue.length : parentElement.lastChild.childNodes.length
-                            );
-                        } else {
-                            Selection.select(
-                                this.options.ownerDocument,
-                                parentElement,
-                                0,
-                                parentElement,
-                                parentElement.childNodes.length
-                            );
+                        // If the selection is contained within a single text node
+                        // and the selection starts at the beginning of the text node,
+                        // MSIE still says the startContainer is the parent of the text node.
+                        // If the selection is contained within a single text node, we
+                        // want to just use the default browser 'createLink', so we need
+                        // to account for this case and adjust the commonAncestorContainer accordingly
+                        if (currRange.endContainer.nodeType === 3 &&
+                            currRange.startContainer.nodeType !== 3 &&
+                            currRange.startOffset === 0 &&
+                            currRange.startContainer.firstChild === currRange.endContainer) {
+                            commonAncestorContainer = currRange.endContainer;
                         }
 
-                        var modifiedExportedSelection = this.exportSelection();
+                        startContainerParentElement = Util.getClosestBlockContainer(currRange.startContainer);
+                        endContainerParentElement = Util.getClosestBlockContainer(currRange.endContainer);
 
-                        textNodes = Util.findOrCreateMatchingTextNodes(
-                            this.options.ownerDocument,
-                            fragment,
-                            {
-                                start: exportedSelection.start - modifiedExportedSelection.start,
-                                end: exportedSelection.end - modifiedExportedSelection.start,
-                                editableElementIndex: exportedSelection.editableElementIndex
+                        // If the selection is not contained within a single text node
+                        // but the selection is contained within the same block element
+                        // we want to make sure we create a single link, and not multiple links
+                        // which can happen with the built in browser functionality
+                        if (commonAncestorContainer.nodeType !== 3 && startContainerParentElement === endContainerParentElement) {
+
+                            currentEditor = Selection.getSelectionElement(this.options.contentWindow);
+                            var parentElement = (startContainerParentElement || currentEditor),
+                                fragment = this.options.ownerDocument.createDocumentFragment();
+
+                            // since we are going to create a link from an extracted text,
+                            // be sure that if we are updating a link, we won't let an empty link behind (see #754)
+                            // (Workaroung for Chrome)
+                            this.execAction('unlink');
+
+                            exportedSelection = this.exportSelection();
+                            fragment.appendChild(parentElement.cloneNode(true));
+
+                            if (currentEditor === parentElement) {
+                                // We have to avoid the editor itself being wiped out when it's the only block element,
+                                // as our reference inside this.elements gets detached from the page when insertHTML runs.
+                                // If we just use [parentElement, 0] and [parentElement, parentElement.childNodes.length]
+                                // as the range boundaries, this happens whenever parentElement === currentEditor.
+                                // The tradeoff to this workaround is that a orphaned tag can sometimes be left behind at
+                                // the end of the editor's content.
+                                // In Gecko:
+                                // as an empty <strong></strong> if parentElement.lastChild is a <strong> tag.
+                                // In WebKit:
+                                // an invented <br /> tag at the end in the same situation
+                                Selection.select(
+                                    this.options.ownerDocument,
+                                    parentElement.firstChild,
+                                    0,
+                                    parentElement.lastChild,
+                                    parentElement.lastChild.nodeType === 3 ?
+                                    parentElement.lastChild.nodeValue.length : parentElement.lastChild.childNodes.length
+                                );
+                            } else {
+                                Selection.select(
+                                    this.options.ownerDocument,
+                                    parentElement,
+                                    0,
+                                    parentElement,
+                                    parentElement.childNodes.length
+                                );
                             }
-                        );
 
-                        // Creates the link in the document fragment
-                        Util.createLink(this.options.ownerDocument, textNodes, opts.url.trim());
+                            var modifiedExportedSelection = this.exportSelection();
 
-                        // Chrome trims the leading whitespaces when inserting HTML, which messes up restoring the selection.
-                        var leadingWhitespacesCount = (fragment.firstChild.innerHTML.match(/^\s+/) || [''])[0].length;
+                            textNodes = Util.findOrCreateMatchingTextNodes(
+                                this.options.ownerDocument,
+                                fragment,
+                                {
+                                    start: exportedSelection.start - modifiedExportedSelection.start,
+                                    end: exportedSelection.end - modifiedExportedSelection.start,
+                                    editableElementIndex: exportedSelection.editableElementIndex
+                                }
+                            );
 
-                        // Now move the created link back into the original document in a way to preserve undo/redo history
-                        Util.insertHTMLCommand(this.options.ownerDocument, fragment.firstChild.innerHTML.replace(/^\s+/, ''));
-                        exportedSelection.start -= leadingWhitespacesCount;
-                        exportedSelection.end -= leadingWhitespacesCount;
+                            // Creates the link in the document fragment
+                            Util.createLink(this.options.ownerDocument, textNodes, opts.url.trim());
 
-                        this.importSelection(exportedSelection);
-                    } else {
-                        this.options.ownerDocument.execCommand('createLink', false, opts.url);
-                    }
+                            // Chrome trims the leading whitespaces when inserting HTML, which messes up restoring the selection.
+                            var leadingWhitespacesCount = (fragment.firstChild.innerHTML.match(/^\s+/) || [''])[0].length;
 
-                    if (this.options.targetBlank || opts.target === '_blank') {
-                        Util.setTargetBlank(Selection.getSelectionStart(this.options.ownerDocument), opts.url);
-                    }
+                            // Now move the created link back into the original document in a way to preserve undo/redo history
+                            Util.insertHTMLCommand(this.options.ownerDocument, fragment.firstChild.innerHTML.replace(/^\s+/, ''));
+                            exportedSelection.start -= leadingWhitespacesCount;
+                            exportedSelection.end -= leadingWhitespacesCount;
 
-                    if (opts.buttonClass) {
-                        Util.addClassToAnchors(Selection.getSelectionStart(this.options.ownerDocument), opts.buttonClass);
+                            this.importSelection(exportedSelection);
+                        } else {
+                            this.options.ownerDocument.execCommand('createLink', false, opts.url);
+                        }
+
+                        if (this.options.targetBlank || opts.target === '_blank') {
+                            Util.setTargetBlank(Selection.getSelectionStart(this.options.ownerDocument), opts.url);
+                        }
+
+                        if (opts.buttonClass) {
+                            Util.addClassToAnchors(Selection.getSelectionStart(this.options.ownerDocument), opts.buttonClass);
+                        }
                     }
                 }
-            }
-
-            if (this.options.targetBlank || opts.target === '_blank' || opts.buttonClass) {
-                customEvent = this.options.ownerDocument.createEvent('HTMLEvents');
-                customEvent.initEvent('input', true, true, this.options.contentWindow);
-                for (i = 0; i < this.elements.length; i += 1) {
-                    this.elements[i].dispatchEvent(customEvent);
+                // Fire input event for backwards compatibility if anyone was listening directly to the DOM input event
+                if (this.options.targetBlank || opts.target === '_blank' || opts.buttonClass) {
+                    customEvent = this.options.ownerDocument.createEvent('HTMLEvents');
+                    customEvent.initEvent('input', true, true, this.options.contentWindow);
+                    for (i = 0; i < this.elements.length; i += 1) {
+                        this.elements[i].dispatchEvent(customEvent);
+                    }
                 }
+            } finally {
+                this.events.enableCustomEvent('editableInput');
             }
+            // Fire our custom editableInput event
+            this.events.triggerCustomEvent('editableInput', customEvent, currentEditor);
         },
 
         cleanPaste: function (text) {
