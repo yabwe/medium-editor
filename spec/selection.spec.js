@@ -106,6 +106,16 @@ describe('Selection TestCase', function () {
             expect(exportedSelection.emptyBlocksIndex).toEqual(undefined);
         });
 
+        it('should export a position indicating the cursor is at the beginning of a paragraph', function () {
+            this.el.innerHTML = '<p><span>www.google.com</span></p><p><b>Whatever</b></p>';
+            var editor = this.newMediumEditor('.editor', {
+                buttons: ['italic', 'underline', 'strikethrough']
+            });
+            placeCursorInsideElement(editor.elements[0].querySelector('b'), 0); // beginning of <b> tag
+            var exportedSelection = editor.exportSelection();
+            expect(exportedSelection.emptyBlocksIndex).toEqual(0);
+        });
+
         it('should not export a position indicating the cursor is after an empty paragraph', function () {
             this.el.innerHTML = '<p><span>www.google.com</span></p><p><br /></p>' +
                 '<p class="target">Whatever</p>';
