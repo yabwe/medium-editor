@@ -42,7 +42,7 @@ describe('Content TestCase', function () {
     });
 
     describe('when the tab key is pressed', function () {
-        it('should indent when within an <li>', function () {
+        it('should indent when within an <li> (which is not the first <li>)', function () {
             this.el.innerHTML = '<ol><li>lorem</li><li>ipsum</li></ol>';
             var editor = this.newMediumEditor('.editor'),
                 target = editor.elements[0].querySelector('ol').lastChild;
@@ -56,14 +56,30 @@ describe('Content TestCase', function () {
             // I was unable to find a workaround, and this works fine in a browser
             // so let's just skip skip the innerHTML check in firefox
             if (!isFirefox()) {
-                expect(this.el.innerHTML).toBe('<ol><li>lorem</li><ol><li>ipsum</li></ol></ol>');
+                expect(this.el.innerHTML).toBe('<ol><li>lorem<ol><li>ipsum</li></ol></li></ol>');
+            }
+        });
+
+        it('should not indent when within the first <li>', function () {
+            this.el.innerHTML = '<ol><li>lorem</li><li>ipsum</li></ol>';
+            var editor = this.newMediumEditor('.editor'),
+                target = editor.elements[0].querySelector('ol').firstChild;
+            selectElementContents(target);
+            fireEvent(target, 'keydown', {
+                keyCode: Util.keyCode.TAB
+            });
+            // Firefox (annoyingly) throws a NS_ERROR_FAILURE when attempting to mimic this through a test case
+            // I was unable to find a workaround, and this works fine in a browser
+            // so let's just skip skip the innerHTML check in firefox
+            if (!isFirefox()) {
+                expect(this.el.innerHTML).toBe('<ol><li>lorem</li><li>ipsum</li></ol>');
             }
         });
 
         it('with shift key, should outdent when within an <li>', function () {
-            this.el.innerHTML = '<ol><li>lorem</li><ol><li><span><span>ipsum</span></span></li></ol></ol>';
+            this.el.innerHTML = '<ol><li>lorem<ol><li><span><span>ipsum</span></span></li></ol></li></ol>';
             var editor = this.newMediumEditor('.editor'),
-                target = editor.elements[0].querySelector('ol').lastChild.firstChild.firstChild;
+                target = editor.elements[0].querySelector('ol').lastChild.lastChild.firstChild;
             spyOn(document, 'execCommand').and.callThrough();
             selectElementContents(target);
             fireEvent(target, 'keydown', {
@@ -76,7 +92,7 @@ describe('Content TestCase', function () {
             // so let's just skip skip the innerHTML check in firefox
             if (!isFirefox()) {
                 // Webkit removes the nested spans, IE does not
-                expect(this.el.innerHTML).toMatch(/<ol><li>lorem<\/li><li>(<span><span>)?ipsum(<br>|<\/span><\/span>)<\/li><\/ol>/);
+                expect(this.el.innerHTML).toMatch(/<ol><li>lorem<\/li><li>(<span><span>)?ipsum(<\/span><\/span>)?<\/li><\/ol>/);
             }
         });
     });

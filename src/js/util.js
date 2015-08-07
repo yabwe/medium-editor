@@ -479,11 +479,30 @@ var Util;
                 return;
             }
 
-            var list = element.parentElement;
+            var parent = element.parentElement;
 
-            if (list.parentElement.nodeName.toLowerCase() === 'p') { // yes we need to clean up
-                this.unwrap(list.parentElement, ownerDocument);
+            // do we need to fix list nesting? (valid is: ul/ol > li > ul/ol )
+            if ((parent.nodeName.toLowerCase() === 'ul' || parent.nodeName.toLowerCase() === 'ol') && (parent.parentElement.nodeName.toLowerCase() === 'ul' || parent.parentElement.nodeName.toLowerCase() === 'ol')) {
+                // does a previous list item exist? (a second order list needs to be inside a previous list item)
+                if (parent.previousElementSibling && parent.previousElementSibling.nodeName.toLowerCase() === 'li') {
+                    parent.previousElementSibling.appendChild(parent);
+                }
+                Selection.moveCursor(ownerDocument, element.firstChild, element.firstChild.textContent.length);
+            }
 
+            // do we need to fix list nesting? (valid is: ul > li > ul )
+            if (parent.nodeName.toLowerCase() === 'li' && element.nodeName.toLowerCase() === 'li') {
+                // un-wrap <li> <li> after outdenting a list
+                if (element.lastElementChild.nodeName.toLowerCase() === 'br') {
+                    element.removeChild(element.lastElementChild);
+                }
+                parent.parentNode.insertBefore(element, parent.nextSibling);
+                Selection.moveCursor(ownerDocument, element.firstChild, element.firstChild.textContent.length);
+            }
+
+            // do we need to clean the DOM? ( p > ul is invalid )
+            if ((parent.nodeName.toLowerCase() === 'ul' || parent.nodeName.toLowerCase() === 'ol') && parent.parentElement.nodeName.toLowerCase() === 'p') {
+                this.unwrap(parent.parentElement, ownerDocument);
                 // move cursor at the end of the text inside the list
                 // for some unknown reason, the cursor is moved to end of the "visual" line
                 Selection.moveCursor(ownerDocument, element.firstChild, element.firstChild.textContent.length);
