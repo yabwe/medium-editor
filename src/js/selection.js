@@ -73,7 +73,7 @@ var Selection;
         getIndexRelativeToAdjacentEmptyBlocks: function (doc, root, cursorContainer, cursorOffset) {
             // If there is text in front of the cursor, that means there isn't only empty blocks before it
             if (cursorContainer.nodeType === 3 && cursorOffset > 0) {
-                return 0;
+                return -1;
             }
 
             // Check if the block that contains the cursor has any other text in front of the cursor
@@ -83,7 +83,7 @@ var Selection;
                 node = cursorContainer.childNodes[cursorOffset];
             }
             if (node && !Util.isElementAtBeginningOfBlock(node)) {
-                return 0;
+                return -1;
             }
 
             // Walk over block elements, counting number of empty blocks between last piece of text
