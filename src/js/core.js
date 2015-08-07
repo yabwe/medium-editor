@@ -1050,10 +1050,12 @@ function MediumEditor(elements, options) {
                         Util.addClassToAnchors(Selection.getSelectionStart(this.options.ownerDocument), opts.buttonClass);
                 }
                 // Fire input event for backwards compatibility if anyone was listening directly to the DOM input event
-                customEvent = this.options.ownerDocument.createEvent('HTMLEvents');
-                customEvent.initEvent('input', true, true, this.options.contentWindow);
-                for (i = 0; i < this.elements.length; i += 1) {
-                    this.elements[i].dispatchEvent(customEvent);
+                if (this.options.targetBlank || opts.target === '_blank' || opts.buttonClass) {
+                    customEvent = this.options.ownerDocument.createEvent('HTMLEvents');
+                    customEvent.initEvent('input', true, true, this.options.contentWindow);
+                    for (i = 0; i < this.elements.length; i += 1) {
+                        this.elements[i].dispatchEvent(customEvent);
+                    }
                 }
             } finally {
                 this.events.enableCustomEvent('editableInput');
