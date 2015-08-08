@@ -245,7 +245,6 @@ describe('Anchor Button TestCase', function () {
                 }),
                 p = this.el.lastChild,
                 anchorExtension = editor.getExtensionByName('anchor'),
-                toolbar = editor.getExtensionByName('toolbar'),
                 selectionWhenEventsFired = [],
                 listener = function () {
                     selectionWhenEventsFired.push(window.getSelection().toString());
@@ -256,11 +255,11 @@ describe('Anchor Button TestCase', function () {
             jasmine.clock().tick(1);
 
             // Click the 'anchor' button in the toolbar
-            fireEvent(toolbar.getToolbarElement().querySelector('[data-action="createLink"]'), 'click');
+            fireEvent(editor.toolbar.getToolbarElement().querySelector('[data-action="createLink"]'), 'click');
 
             // Input a url and save
             var input = anchorExtension.getInput(),
-                checkbox = anchorExtension.getAnchorTargetCheckbox();
+                checkbox = anchorExtension.getForm().querySelector('.medium-editor-toolbar-anchor-target');
             input.value = 'http://www.example.com';
             checkbox.checked = true;
             editor.subscribe('editableInput', listener);

@@ -1048,6 +1048,7 @@ function MediumEditor(elements, options) {
 
                     if (opts.buttonClass) {
                         Util.addClassToAnchors(Selection.getSelectionStart(this.options.ownerDocument), opts.buttonClass);
+                    }
                 }
                 // Fire input event for backwards compatibility if anyone was listening directly to the DOM input event
                 if (this.options.targetBlank || opts.target === '_blank' || opts.buttonClass) {
@@ -1061,7 +1062,7 @@ function MediumEditor(elements, options) {
                 this.events.enableCustomEvent('editableInput');
             }
             // Fire our custom editableInput event
-            this.events.triggerCustomEvent('editableInput', customEvent, currentEditor);
+            this.events.triggerCustomEvent('editableInput', customEvent, this.getFocusedElement());
         },
 
         // alias for setup - keeping for backwards compatability
