@@ -487,7 +487,7 @@ var Events;
         handleKeydown: function (event) {
             this.triggerCustomEvent('editableKeydown', event, event.currentTarget);
 
-            if (Util.isKey(event, Util.keyCode.ENTER)) {
+            if (Util.isKey(event, Util.keyCode.ENTER) || Util.isKey(event, Util.keyCode.ENTER_OF_EMACS)) {
                 return this.triggerCustomEvent('editableKeydownEnter', event, event.currentTarget);
             }
 
