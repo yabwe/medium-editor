@@ -41,7 +41,8 @@ var Util;
             ESCAPE: 27,
             SPACE: 32,
             DELETE: 46,
-            K: 75 // K keycode, and not k
+            K: 75, // K keycode, and not k
+            M: 77
         },
 
         /**

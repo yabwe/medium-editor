@@ -212,6 +212,111 @@ describe('Content TestCase', function () {
         });
     });
 
+    describe('when the ctrl key and m key is pressed', function () {
+        it('should prevent new lines from being inserted when disableReturn options is true', function () {
+            this.el.innerHTML = 'lorem ipsum';
+
+            var editor = this.newMediumEditor('.editor', { disableReturn: true }),
+                evt;
+
+            placeCursorInsideElement(editor.elements[0], 0);
+
+            evt = prepareEvent(editor.elements[0], 'keydown', {
+                ctrlKey: true,
+                keyCode: Util.keyCode.M
+            });
+
+            spyOn(evt, 'preventDefault').and.callThrough();
+
+            firePreparedEvent(evt, editor.elements[0], 'keydown');
+
+            expect(evt.preventDefault).toHaveBeenCalled();
+        });
+
+        it('should prevent new lines from being inserted when data-disable-return is defined', function () {
+            this.el.innerHTML = 'lorem ipsum';
+            this.el.setAttribute('data-disable-return', true);
+
+            var editor = this.newMediumEditor('.editor'),
+                evt;
+
+            placeCursorInsideElement(editor.elements[0], 0);
+
+            evt = prepareEvent(editor.elements[0], 'keydown', {
+                ctrlKey: true,
+                keyCode: Util.keyCode.M
+            });
+
+            spyOn(evt, 'preventDefault').and.callThrough();
+
+            firePreparedEvent(evt, editor.elements[0], 'keydown');
+
+            expect(evt.preventDefault).toHaveBeenCalled();
+        });
+
+        it('should prevent consecutive new lines from being inserted when disableDoubleReturn is true', function () {
+            this.el.innerHTML = '<p><br></p>';
+            var editor = this.newMediumEditor('.editor', { disableDoubleReturn: true }),
+                p = editor.elements[0].querySelector('p'),
+                evt;
+
+            placeCursorInsideElement(p, 0);
+
+            evt = prepareEvent(p, 'keydown', {
+                ctrlKey: true,
+                keyCode: Util.keyCode.M
+            });
+
+            spyOn(evt, 'preventDefault').and.callThrough();
+
+            firePreparedEvent(evt, p, 'keydown');
+
+            expect(evt.preventDefault).toHaveBeenCalled();
+        });
+
+        it('should prevent consecutive new lines from being inserted when data-disable-double-return is defined', function () {
+            this.el.innerHTML = '<p><br></p>';
+            this.el.setAttribute('data-disable-double-return', true);
+
+            var editor = this.newMediumEditor('.editor'),
+                p = editor.elements[0].querySelector('p'),
+                evt;
+
+            placeCursorInsideElement(p, 0);
+
+            evt = prepareEvent(p, 'keydown', {
+                ctrlKey: true,
+                keyCode: Util.keyCode.M
+            });
+
+            spyOn(evt, 'preventDefault').and.callThrough();
+
+            firePreparedEvent(evt, p, 'keydown');
+
+            expect(evt.preventDefault).toHaveBeenCalled();
+        });
+
+        it('should prevent consecutive new lines from being inserted inside a sentence when disableDoubleReturn is true', function () {
+            this.el.innerHTML = '<p>hello</p><p><br></p><p>word</p>';
+            var editor = this.newMediumEditor('.editor', { disableDoubleReturn: true }),
+                p = editor.elements[0].getElementsByTagName('p')[2],
+                evt;
+
+            placeCursorInsideElement(p, 0);
+
+            evt = prepareEvent(p, 'keydown', {
+                ctrlKey: true,
+                keyCode: Util.keyCode.M
+            });
+
+            spyOn(evt, 'preventDefault').and.callThrough();
+
+            firePreparedEvent(evt, p, 'keydown');
+
+            expect(evt.preventDefault).toHaveBeenCalled();
+        });
+    });
+
     describe('should unlink anchors', function () {
         it('when the user presses enter inside an anchor', function () {
             this.el.innerHTML = '<a href="#">test</a>';

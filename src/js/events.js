@@ -487,7 +487,7 @@ var Events;
         handleKeydown: function (event) {
             this.triggerCustomEvent('editableKeydown', event, event.currentTarget);
 
-            if (Util.isKey(event, Util.keyCode.ENTER)) {
+            if (Util.isKey(event, Util.keyCode.ENTER) || (event.ctrlKey && Util.isKey(event, Util.keyCode.M))) {
                 return this.triggerCustomEvent('editableKeydownEnter', event, event.currentTarget);
             }
 
