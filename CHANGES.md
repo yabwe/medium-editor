@@ -1,3 +1,10 @@
+5.6.1 / 2015-08-10
+==================
+* Fix issue with creating anchors and restoring selection at the beginning of paragraphs
+* Fix issue with creating anchors and restoring selection within list items and nested blocks
+* Ensure CTRL + M is respected as a way to insert new lines
+
+
 5.6.0 / 2015-08-07
 ==================
 * Add new 'tim' theme for medium-editor toolbar

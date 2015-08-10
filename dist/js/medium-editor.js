@@ -439,7 +439,8 @@ var Util;
             ESCAPE: 27,
             SPACE: 32,
             DELETE: 46,
-            K: 75 // K keycode, and not k
+            K: 75, // K keycode, and not k
+            M: 77
         },
 
         /**
@@ -486,7 +487,15 @@ var Util;
             return keyCode;
         },
 
-        blockContainerElementNames: ['p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'blockquote', 'pre'],
+        blockContainerElementNames: [
+            // elements our editor generates
+            'p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'blockquote', 'pre', 'ul', 'li', 'ol',
+            // all other known block elements
+            'address', 'article', 'aside', 'audio', 'canvas', 'dd', 'dl', 'dt', 'fieldset',
+            'figcaption', 'figure', 'footer', 'form', 'header', 'hgroup', 'main', 'nav',
+            'noscript', 'output', 'section', 'table', 'tbody', 'tfoot', 'video'
+        ],
+
         emptyElementNames: ['br', 'col', 'colgroup', 'hr', 'img', 'input', 'source', 'wbr'],
 
         extend: function extend(/* dest, source1, source2, ...*/) {
@@ -858,7 +867,7 @@ var Util;
 
             var parentNode = node.parentNode,
                 tagName = parentNode.nodeName.toLowerCase();
-            while (!this.isBlockContainer(parentNode) && tagName !== 'div') {
+            while (tagName === 'li' || (!this.isBlockContainer(parentNode) && tagName !== 'div')) {
                 if (tagName === 'li') {
                     return true;
                 }
@@ -1846,7 +1855,7 @@ var Selection;
                 // If start = 0 there may still be an empty paragraph before it, but we don't care.
                 if (start !== 0) {
                     var emptyBlocksIndex = this.getIndexRelativeToAdjacentEmptyBlocks(doc, root, range.startContainer, range.startOffset);
-                    if (emptyBlocksIndex !== 0) {
+                    if (emptyBlocksIndex !== -1) {
                         selectionState.emptyBlocksIndex = emptyBlocksIndex;
                     }
                 }
@@ -1905,22 +1914,8 @@ var Selection;
                 }
             }
 
-            if (selectionState.emptyBlocksIndex) {
-                var targetNode = Util.getTopBlockContainer(range.startContainer),
-                    index = 0;
-                // Skip over empty blocks until we hit the block we want the selection to be in
-                while (index < selectionState.emptyBlocksIndex && targetNode.nextSibling) {
-                    targetNode = targetNode.nextSibling;
-                    index++;
-                    // If we find a non-empty block, ignore the emptyBlocksIndex and just put selection here
-                    if (targetNode.textContent.length > 0) {
-                        break;
-                    }
-                }
-
-                // We're selecting a high-level block node, so make sure the cursor gets moved into the deepest
-                // element at the beginning of the block
-                range.setStart(Util.getFirstSelectableLeafNode(targetNode), 0);
+            if (typeof selectionState.emptyBlocksIndex !== 'undefined') {
+                range = Selection.importSelectionMoveCursorPastBlocks(doc, root, selectionState.emptyBlocksIndex, range);
             }
 
             // If the selection is right at the ending edge of a link, put it outside the anchor tag instead of inside.
@@ -1966,35 +1961,85 @@ var Selection;
             return range;
         },
 
-        // Returns 0 unless the cursor is within or preceded by empty paragraphs/blocks,
-        // in which case it returns the count of such preceding paragraphs, including
-        // the empty paragraph in which the cursor itself may be embedded.
+        // Uses the emptyBlocksIndex calculated by getIndexRelativeToAdjacentEmptyBlocks
+        // to move the cursor back to the start of the correct paragraph
+        importSelectionMoveCursorPastBlocks: function (doc, root, index, range) {
+            var treeWalker = doc.createTreeWalker(root, NodeFilter.SHOW_ELEMENT, filterOnlyParentElements, false),
+                startContainer = range.startContainer,
+                startBlock,
+                targetNode,
+                currIndex = 0;
+            index = index || 1; // If index is 0, we still want to move to the next block
+
+            // Chrome counts newlines and spaces that separate block elements as actual elements.
+            // If the selection is inside one of these text nodes, and it has a previous sibling
+            // which is a block element, we want the treewalker to start at the previous sibling
+            // and NOT at the parent of the textnode
+            if (startContainer.nodeType === 3 && Util.isBlockContainer(startContainer.previousSibling)) {
+                startBlock = startContainer.previousSibling;
+            } else {
+                startBlock = Util.getClosestBlockContainer(startContainer);
+            }
+
+            // Skip over empty blocks until we hit the block we want the selection to be in
+            while (treeWalker.nextNode()) {
+                if (!targetNode) {
+                    // Loop through all blocks until we hit the starting block element
+                    if (startBlock === treeWalker.currentNode) {
+                        targetNode = treeWalker.currentNode;
+                    }
+                } else {
+                    targetNode = treeWalker.currentNode;
+                    currIndex++;
+                    // We hit the target index, bail
+                    if (currIndex === index) {
+                        break;
+                    }
+                    // If we find a non-empty block, ignore the emptyBlocksIndex and just put selection here
+                    if (targetNode.textContent.length > 0) {
+                        break;
+                    }
+                }
+            }
+
+            // We're selecting a high-level block node, so make sure the cursor gets moved into the deepest
+            // element at the beginning of the block
+            range.setStart(Util.getFirstSelectableLeafNode(targetNode), 0);
+
+            return range;
+        },
+
+        // Returns -1 unless the cursor is at the beginning of a paragraph/block
+        // If the paragraph/block is preceeded by empty paragraphs/block (with no text)
+        // it will return the number of empty paragraphs before the cursor.
+        // Otherwise, it will return 0, which indicates the cursor is at the beginning
+        // of a paragraph/block, and not at the end of the paragraph/block before it
         getIndexRelativeToAdjacentEmptyBlocks: function (doc, root, cursorContainer, cursorOffset) {
             // If there is text in front of the cursor, that means there isn't only empty blocks before it
-            if (cursorContainer.nodeType === 3 && cursorOffset > 0) {
-                return 0;
+            if (cursorContainer.textContent.length > 0 && cursorOffset > 0) {
+                return -1;
             }
 
             // Check if the block that contains the cursor has any other text in front of the cursor
             var node = cursorContainer;
             if (node.nodeType !== 3) {
-                //node = cursorContainer.childNodes.length === cursorOffset ? null : cursorContainer.childNodes[cursorOffset];
                 node = cursorContainer.childNodes[cursorOffset];
             }
             if (node && !Util.isElementAtBeginningOfBlock(node)) {
-                return 0;
+                return -1;
             }
 
             // Walk over block elements, counting number of empty blocks between last piece of text
             // and the block the cursor is in
-            var treeWalker = doc.createTreeWalker(root, NodeFilter.SHOW_ELEMENT, filterOnlyParentElements, false),
+            var closestBlock = Util.getClosestBlockContainer(cursorContainer),
+                treeWalker = doc.createTreeWalker(root, NodeFilter.SHOW_ELEMENT, filterOnlyParentElements, false),
                 emptyBlocksCount = 0;
             while (treeWalker.nextNode()) {
                 var blockIsEmpty = treeWalker.currentNode.textContent === '';
                 if (blockIsEmpty || emptyBlocksCount > 0) {
                     emptyBlocksCount += 1;
                 }
-                if (Util.isDescendant(treeWalker.currentNode, cursorContainer, true)) {
+                if (treeWalker.currentNode === closestBlock) {
                     return emptyBlocksCount;
                 }
                 if (!blockIsEmpty) {
@@ -2662,7 +2707,7 @@ var Events;
         handleKeydown: function (event) {
             this.triggerCustomEvent('editableKeydown', event, event.currentTarget);
 
-            if (Util.isKey(event, Util.keyCode.ENTER)) {
+            if (Util.isKey(event, Util.keyCode.ENTER) || (event.ctrlKey && Util.isKey(event, Util.keyCode.M))) {
                 return this.triggerCustomEvent('editableKeydownEnter', event, event.currentTarget);
             }
 
@@ -6309,7 +6354,7 @@ MediumEditor.parseVersionString = function (release) {
 
 MediumEditor.version = MediumEditor.parseVersionString.call(this, ({
     // grunt-bump looks for this:
-    'version': '5.6.0'
+    'version': '5.6.1'
 }).version);
 
     return MediumEditor;
