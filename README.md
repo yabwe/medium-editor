@@ -535,7 +535,7 @@ View the [MediumEditor Object API documentation](API.md) on the Wiki for details
 * __.delay(fn)__: delay any function from being executed by the amount of time passed as the `delay` option
 * __.getExtensionByName(name)__: get a reference to an extension with the specified name
 * __.serialize()__: returns a JSON object with elements contents
-* __.setContent(html, element)__: sets the `innerHTML` to `html` of the element at `index`
+* __.setContent(html, index)__: sets the `innerHTML` to `html` of the element at `index`
 
 ## Capturing DOM changes
 
