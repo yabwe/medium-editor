@@ -1,3 +1,9 @@
+4.12.8 / 2015-08-10
+==================
+* Fix issue with creating anchors and restoring selection at the beginning of paragraphs
+* Fix issue with creating anchors and restoring selection within list items and nested blocks
+
+
 4.12.7 / 2015-08-04
 ==================
 * Fix issue with finding anchor when clicking anchor button

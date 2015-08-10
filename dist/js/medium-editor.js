@@ -504,7 +504,14 @@ var Util;
             return true;
         },
 
-        parentElements: ['p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'blockquote', 'pre'],
+        parentElements: [
+            // elements our editor generates
+            'p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'blockquote', 'pre', 'ul', 'li', 'ol',
+            // all other known block elements
+            'address', 'article', 'aside', 'audio', 'canvas', 'dd', 'dl', 'dt', 'fieldset',
+            'figcaption', 'figure', 'footer', 'form', 'header', 'hgroup', 'main', 'nav',
+            'noscript', 'output', 'section', 'table', 'tbody', 'tfoot', 'video'
+        ],
 
         extend: function extend(/* dest, source1, source2, ...*/) {
             var args = [true].concat(Array.prototype.slice.call(arguments));
@@ -794,7 +801,7 @@ var Util;
 
             var parentNode = node.parentNode,
                 tagName = parentNode.tagName.toLowerCase();
-            while (!this.isBlockContainer(parentNode) && tagName !== 'div') {
+            while (tagName === 'li' || (!this.isBlockContainer(parentNode) && tagName !== 'div')) {
                 if (tagName === 'li') {
                     return true;
                 }
@@ -1069,6 +1076,12 @@ var Util;
 
         isBlockContainer: function (element) {
             return element && element.nodeType !== 3 && this.parentElements.indexOf(element.nodeName.toLowerCase()) !== -1;
+        },
+
+        getClosestBlockContainer: function (node) {
+            return Util.traverseUp(node, function (node) {
+                return Util.isBlockContainer(node);
+            });
         },
 
         getBlockContainer: function (element) {
@@ -1783,35 +1796,85 @@ var Selection;
             return range;
         },
 
-        // Returns 0 unless the cursor is within or preceded by empty paragraphs/blocks,
-        // in which case it returns the count of such preceding paragraphs, including
-        // the empty paragraph in which the cursor itself may be embedded.
+        // Uses the emptyBlocksIndex calculated by getIndexRelativeToAdjacentEmptyBlocks
+        // to move the cursor back to the start of the correct paragraph
+        importSelectionMoveCursorPastBlocks: function (doc, root, index, range) {
+            var treeWalker = doc.createTreeWalker(root, NodeFilter.SHOW_ELEMENT, filterOnlyParentElements, false),
+                startContainer = range.startContainer,
+                startBlock,
+                targetNode,
+                currIndex = 0;
+            index = index || 1; // If index is 0, we still want to move to the next block
+
+            // Chrome counts newlines and spaces that separate block elements as actual elements.
+            // If the selection is inside one of these text nodes, and it has a previous sibling
+            // which is a block element, we want the treewalker to start at the previous sibling
+            // and NOT at the parent of the textnode
+            if (startContainer.nodeType === 3 && Util.isBlockContainer(startContainer.previousSibling)) {
+                startBlock = startContainer.previousSibling;
+            } else {
+                startBlock = Util.getClosestBlockContainer(startContainer);
+            }
+
+            // Skip over empty blocks until we hit the block we want the selection to be in
+            while (treeWalker.nextNode()) {
+                if (!targetNode) {
+                    // Loop through all blocks until we hit the starting block element
+                    if (startBlock === treeWalker.currentNode) {
+                        targetNode = treeWalker.currentNode;
+                    }
+                } else {
+                    targetNode = treeWalker.currentNode;
+                    currIndex++;
+                    // We hit the target index, bail
+                    if (currIndex === index) {
+                        break;
+                    }
+                    // If we find a non-empty block, ignore the emptyBlocksIndex and just put selection here
+                    if (targetNode.textContent.length > 0) {
+                        break;
+                    }
+                }
+            }
+
+            // We're selecting a high-level block node, so make sure the cursor gets moved into the deepest
+            // element at the beginning of the block
+            range.setStart(Util.getFirstSelectableLeafNode(targetNode), 0);
+
+            return range;
+        },
+
+        // Returns -1 unless the cursor is at the beginning of a paragraph/block
+        // If the paragraph/block is preceeded by empty paragraphs/block (with no text)
+        // it will return the number of empty paragraphs before the cursor.
+        // Otherwise, it will return 0, which indicates the cursor is at the beginning
+        // of a paragraph/block, and not at the end of the paragraph/block before it
         getIndexRelativeToAdjacentEmptyBlocks: function (doc, root, cursorContainer, cursorOffset) {
             // If there is text in front of the cursor, that means there isn't only empty blocks before it
-            if (cursorContainer.nodeType === 3 && cursorOffset > 0) {
-                return 0;
+            if (cursorContainer.textContent.length > 0 && cursorOffset > 0) {
+                return -1;
             }
 
             // Check if the block that contains the cursor has any other text in front of the cursor
             var node = cursorContainer;
             if (node.nodeType !== 3) {
-                //node = cursorContainer.childNodes.length === cursorOffset ? null : cursorContainer.childNodes[cursorOffset];
                 node = cursorContainer.childNodes[cursorOffset];
             }
             if (node && !Util.isElementAtBeginningOfBlock(node)) {
-                return 0;
+                return -1;
             }
 
             // Walk over block elements, counting number of empty blocks between last piece of text
             // and the block the cursor is in
-            var treeWalker = doc.createTreeWalker(root, NodeFilter.SHOW_ELEMENT, filterOnlyParentElements, false),
+            var closestBlock = Util.getClosestBlockContainer(cursorContainer),
+                treeWalker = doc.createTreeWalker(root, NodeFilter.SHOW_ELEMENT, filterOnlyParentElements, false),
                 emptyBlocksCount = 0;
             while (treeWalker.nextNode()) {
                 var blockIsEmpty = treeWalker.currentNode.textContent === '';
                 if (blockIsEmpty || emptyBlocksCount > 0) {
                     emptyBlocksCount += 1;
                 }
-                if (Util.isDescendant(treeWalker.currentNode, cursorContainer, true)) {
+                if (treeWalker.currentNode === closestBlock) {
                     return emptyBlocksCount;
                 }
                 if (!blockIsEmpty) {
@@ -2031,6 +2094,7 @@ var Events;
         this.base = instance;
         this.options = this.base.options;
         this.events = [];
+        this.disabledEvents = {};
         this.customEvents = {};
         this.listeners = {};
     };
@@ -2073,6 +2137,16 @@ var Events;
             }
         },
 
+        enableCustomEvent: function (event) {
+            if (this.disabledEvents[event] !== undefined) {
+                delete this.disabledEvents[event];
+            }
+        },
+
+        disableCustomEvent: function (event) {
+            this.disabledEvents[event] = true;
+        },
+
         // custom events
         attachCustomEvent: function (event, listener) {
             this.setupListener(event);
@@ -2104,7 +2178,7 @@ var Events;
         },
 
         triggerCustomEvent: function (name, data, editable) {
-            if (this.customEvents[name]) {
+            if (this.customEvents[name] && !this.disabledEvents[name]) {
                 this.customEvents[name].forEach(function (listener) {
                     listener(data, editable);
                 });
@@ -6466,7 +6540,7 @@ function MediumEditor(elements, options) {
                                 this.elements[editableElementIndex],
                                 range.startContainer,
                                 range.startOffset);
-                        if (emptyBlocksIndex !== 0) {
+                        if (emptyBlocksIndex !== -1) {
                             selectionState.emptyBlocksIndex = emptyBlocksIndex;
                         }
                     }
@@ -6544,22 +6618,8 @@ function MediumEditor(elements, options) {
                 }
             }
 
-            if (inSelectionState.emptyBlocksIndex) {
-                var targetNode = Util.getBlockContainer(range.startContainer),
-                    index = 0;
-                // Skip over empty blocks until we hit the block we want the selection to be in
-                while (index < inSelectionState.emptyBlocksIndex && targetNode.nextSibling) {
-                    targetNode = targetNode.nextSibling;
-                    index++;
-                    // If we find a non-empty block, ignore the emptyBlocksIndex and just put selection here
-                    if (targetNode.textContent.length > 0) {
-                        break;
-                    }
-                }
-
-                // We're selecting a high-level block node, so make sure the cursor gets moved into the deepest
-                // element at the beginning of the block
-                range.setStart(Util.getFirstSelectableLeafNode(targetNode), 0);
+            if (typeof inSelectionState.emptyBlocksIndex !== 'undefined') {
+                range = Selection.importSelectionMoveCursorPastBlocks(this.options.ownerDocument, editableElement, inSelectionState.emptyBlocksIndex, range);
             }
 
             // If the selection is right at the ending edge of a link, put it outside the anchor tag instead of inside.
@@ -6579,25 +6639,32 @@ function MediumEditor(elements, options) {
             var customEvent,
                 i;
 
-            if (opts.url && opts.url.trim().length > 0) {
-                this.options.ownerDocument.execCommand('createLink', false, opts.url);
+            try {
+                this.events.disableCustomEvent('editableInput');
+                if (opts.url && opts.url.trim().length > 0) {
+                    this.options.ownerDocument.execCommand('createLink', false, opts.url);
 
-                if (this.options.targetBlank || opts.target === '_blank') {
-                    Util.setTargetBlank(Selection.getSelectionStart(this.options.ownerDocument), opts.url);
-                }
+                    if (this.options.targetBlank || opts.target === '_blank') {
+                        Util.setTargetBlank(Selection.getSelectionStart(this.options.ownerDocument), opts.url);
+                    }
 
-                if (opts.buttonClass) {
-                    Util.addClassToAnchors(Selection.getSelectionStart(this.options.ownerDocument), opts.buttonClass);
+                    if (opts.buttonClass) {
+                        Util.addClassToAnchors(Selection.getSelectionStart(this.options.ownerDocument), opts.buttonClass);
+                    }
                 }
+                // Fire input event for backwards compatibility if anyone was listening directly to the DOM input event
+                if (this.options.targetBlank || opts.target === '_blank' || opts.buttonClass) {
+                    customEvent = this.options.ownerDocument.createEvent('HTMLEvents');
+                    customEvent.initEvent('input', true, true, this.options.contentWindow);
+                    for (i = 0; i < this.elements.length; i += 1) {
+                        this.elements[i].dispatchEvent(customEvent);
+                    }
+                }
+            } finally {
+                this.events.enableCustomEvent('editableInput');
             }
-
-            if (this.options.targetBlank || opts.target === '_blank' || opts.buttonClass) {
-                customEvent = this.options.ownerDocument.createEvent('HTMLEvents');
-                customEvent.initEvent('input', true, true, this.options.contentWindow);
-                for (i = 0; i < this.elements.length; i += 1) {
-                    this.elements[i].dispatchEvent(customEvent);
-                }
-            }
+            // Fire our custom editableInput event
+            this.events.triggerCustomEvent('editableInput', customEvent, this.getFocusedElement());
         },
 
         // alias for setup - keeping for backwards compatability
@@ -6631,7 +6698,7 @@ MediumEditor.version = (function (major, minor, revision) {
     };
 }).apply(this, ({
     // grunt-bump looks for this:
-    'version': '4.12.7'
+    'version': '4.12.8'
 }).version.split('.'));
 
     return MediumEditor;
