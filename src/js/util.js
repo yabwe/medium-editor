@@ -42,7 +42,7 @@ var Util;
             SPACE: 32,
             DELETE: 46,
             K: 75, // K keycode, and not k
-            ENTER_OF_EMACS: 77
+            M: 77
         },
 
         /**
