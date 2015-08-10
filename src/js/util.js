@@ -106,7 +106,14 @@ var Util;
             return true;
         },
 
-        parentElements: ['p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'blockquote', 'pre'],
+        parentElements: [
+            // elements our editor generates
+            'p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'blockquote', 'pre', 'ul', 'li', 'ol',
+            // all other known block elements
+            'address', 'article', 'aside', 'audio', 'canvas', 'dd', 'dl', 'dt', 'fieldset',
+            'figcaption', 'figure', 'footer', 'form', 'header', 'hgroup', 'main', 'nav',
+            'noscript', 'output', 'section', 'table', 'tbody', 'tfoot', 'video'
+        ],
 
         extend: function extend(/* dest, source1, source2, ...*/) {
             var args = [true].concat(Array.prototype.slice.call(arguments));
@@ -396,7 +403,7 @@ var Util;
 
             var parentNode = node.parentNode,
                 tagName = parentNode.tagName.toLowerCase();
-            while (!this.isBlockContainer(parentNode) && tagName !== 'div') {
+            while (tagName === 'li' || (!this.isBlockContainer(parentNode) && tagName !== 'div')) {
                 if (tagName === 'li') {
                     return true;
                 }
@@ -671,6 +678,12 @@ var Util;
 
         isBlockContainer: function (element) {
             return element && element.nodeType !== 3 && this.parentElements.indexOf(element.nodeName.toLowerCase()) !== -1;
+        },
+
+        getClosestBlockContainer: function (node) {
+            return Util.traverseUp(node, function (node) {
+                return Util.isBlockContainer(node);
+            });
         },
 
         getBlockContainer: function (element) {
