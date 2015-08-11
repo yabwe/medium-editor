@@ -439,7 +439,8 @@ var Util;
             ESCAPE: 27,
             SPACE: 32,
             DELETE: 46,
-            K: 75 // K keycode, and not k
+            K: 75, // K keycode, and not k
+            M: 77
         },
 
         /**
@@ -486,7 +487,15 @@ var Util;
             return keyCode;
         },
 
-        blockContainerElementNames: ['p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'blockquote', 'pre'],
+        blockContainerElementNames: [
+            // elements our editor generates
+            'p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'blockquote', 'pre', 'ul', 'li', 'ol',
+            // all other known block elements
+            'address', 'article', 'aside', 'audio', 'canvas', 'dd', 'dl', 'dt', 'fieldset',
+            'figcaption', 'figure', 'footer', 'form', 'header', 'hgroup', 'main', 'nav',
+            'noscript', 'output', 'section', 'table', 'tbody', 'tfoot', 'video'
+        ],
+
         emptyElementNames: ['br', 'col', 'colgroup', 'hr', 'img', 'input', 'source', 'wbr'],
 
         extend: function extend(/* dest, source1, source2, ...*/) {
@@ -728,13 +737,13 @@ var Util;
                 } catch (ignore) {}
             }
 
-            selection = doc.defaultView.getSelection();
-            if (selection.getRangeAt && selection.rangeCount) {
+            selection = doc.getSelection();
+            if (selection.rangeCount) {
                 range = selection.getRangeAt(0);
                 toReplace = range.commonAncestorContainer;
                 // Ensure range covers maximum amount of nodes as possible
                 // By moving up the DOM and selecting ancestors whose only child is the range
-                if ((toReplace.nodeType === 3 && toReplace.nodeValue === range.toString()) ||
+                if ((toReplace.nodeType === 3 && range.startOffset === 0 && range.endOffset === toReplace.nodeValue.length) ||
                         (toReplace.nodeType !== 3 && toReplace.innerHTML === range.toString())) {
                     while (toReplace.parentNode &&
                             toReplace.parentNode.childNodes.length === 1 &&
@@ -858,7 +867,7 @@ var Util;
 
             var parentNode = node.parentNode,
                 tagName = parentNode.nodeName.toLowerCase();
-            while (!this.isBlockContainer(parentNode) && tagName !== 'div') {
+            while (tagName === 'li' || (!this.isBlockContainer(parentNode) && tagName !== 'div')) {
                 if (tagName === 'li') {
                     return true;
                 }
@@ -1846,7 +1855,7 @@ var Selection;
                 // If start = 0 there may still be an empty paragraph before it, but we don't care.
                 if (start !== 0) {
                     var emptyBlocksIndex = this.getIndexRelativeToAdjacentEmptyBlocks(doc, root, range.startContainer, range.startOffset);
-                    if (emptyBlocksIndex !== 0) {
+                    if (emptyBlocksIndex !== -1) {
                         selectionState.emptyBlocksIndex = emptyBlocksIndex;
                     }
                 }
@@ -1905,22 +1914,8 @@ var Selection;
                 }
             }
 
-            if (selectionState.emptyBlocksIndex && selectionState.end === nextCharIndex) {
-                var targetNode = Util.getTopBlockContainer(range.startContainer),
-                    index = 0;
-                // Skip over empty blocks until we hit the block we want the selection to be in
-                while (index < selectionState.emptyBlocksIndex && targetNode.nextSibling) {
-                    targetNode = targetNode.nextSibling;
-                    index++;
-                    // If we find a non-empty block, ignore the emptyBlocksIndex and just put selection here
-                    if (targetNode.textContent.length > 0) {
-                        break;
-                    }
-                }
-
-                // We're selecting a high-level block node, so make sure the cursor gets moved into the deepest
-                // element at the beginning of the block
-                range.setStart(Util.getFirstSelectableLeafNode(targetNode), 0);
+            if (typeof selectionState.emptyBlocksIndex !== 'undefined') {
+                range = Selection.importSelectionMoveCursorPastBlocks(doc, root, selectionState.emptyBlocksIndex, range);
             }
 
             // If the selection is right at the ending edge of a link, put it outside the anchor tag instead of inside.
@@ -1960,40 +1955,91 @@ var Selection;
                         }
                     }
                     range.setStart(currentNode.parentNode, currentNodeIndex + 1);
+                    range.collapse(true);
                 }
             }
             return range;
         },
 
-        // Returns 0 unless the cursor is within or preceded by empty paragraphs/blocks,
-        // in which case it returns the count of such preceding paragraphs, including
-        // the empty paragraph in which the cursor itself may be embedded.
+        // Uses the emptyBlocksIndex calculated by getIndexRelativeToAdjacentEmptyBlocks
+        // to move the cursor back to the start of the correct paragraph
+        importSelectionMoveCursorPastBlocks: function (doc, root, index, range) {
+            var treeWalker = doc.createTreeWalker(root, NodeFilter.SHOW_ELEMENT, filterOnlyParentElements, false),
+                startContainer = range.startContainer,
+                startBlock,
+                targetNode,
+                currIndex = 0;
+            index = index || 1; // If index is 0, we still want to move to the next block
+
+            // Chrome counts newlines and spaces that separate block elements as actual elements.
+            // If the selection is inside one of these text nodes, and it has a previous sibling
+            // which is a block element, we want the treewalker to start at the previous sibling
+            // and NOT at the parent of the textnode
+            if (startContainer.nodeType === 3 && Util.isBlockContainer(startContainer.previousSibling)) {
+                startBlock = startContainer.previousSibling;
+            } else {
+                startBlock = Util.getClosestBlockContainer(startContainer);
+            }
+
+            // Skip over empty blocks until we hit the block we want the selection to be in
+            while (treeWalker.nextNode()) {
+                if (!targetNode) {
+                    // Loop through all blocks until we hit the starting block element
+                    if (startBlock === treeWalker.currentNode) {
+                        targetNode = treeWalker.currentNode;
+                    }
+                } else {
+                    targetNode = treeWalker.currentNode;
+                    currIndex++;
+                    // We hit the target index, bail
+                    if (currIndex === index) {
+                        break;
+                    }
+                    // If we find a non-empty block, ignore the emptyBlocksIndex and just put selection here
+                    if (targetNode.textContent.length > 0) {
+                        break;
+                    }
+                }
+            }
+
+            // We're selecting a high-level block node, so make sure the cursor gets moved into the deepest
+            // element at the beginning of the block
+            range.setStart(Util.getFirstSelectableLeafNode(targetNode), 0);
+
+            return range;
+        },
+
+        // Returns -1 unless the cursor is at the beginning of a paragraph/block
+        // If the paragraph/block is preceeded by empty paragraphs/block (with no text)
+        // it will return the number of empty paragraphs before the cursor.
+        // Otherwise, it will return 0, which indicates the cursor is at the beginning
+        // of a paragraph/block, and not at the end of the paragraph/block before it
         getIndexRelativeToAdjacentEmptyBlocks: function (doc, root, cursorContainer, cursorOffset) {
             // If there is text in front of the cursor, that means there isn't only empty blocks before it
-            if (cursorContainer.nodeType === 3 && cursorOffset > 0) {
-                return 0;
+            if (cursorContainer.textContent.length > 0 && cursorOffset > 0) {
+                return -1;
             }
 
             // Check if the block that contains the cursor has any other text in front of the cursor
             var node = cursorContainer;
             if (node.nodeType !== 3) {
-                //node = cursorContainer.childNodes.length === cursorOffset ? null : cursorContainer.childNodes[cursorOffset];
                 node = cursorContainer.childNodes[cursorOffset];
             }
             if (node && !Util.isElementAtBeginningOfBlock(node)) {
-                return 0;
+                return -1;
             }
 
             // Walk over block elements, counting number of empty blocks between last piece of text
             // and the block the cursor is in
-            var treeWalker = doc.createTreeWalker(root, NodeFilter.SHOW_ELEMENT, filterOnlyParentElements, false),
+            var closestBlock = Util.getClosestBlockContainer(cursorContainer),
+                treeWalker = doc.createTreeWalker(root, NodeFilter.SHOW_ELEMENT, filterOnlyParentElements, false),
                 emptyBlocksCount = 0;
             while (treeWalker.nextNode()) {
                 var blockIsEmpty = treeWalker.currentNode.textContent === '';
                 if (blockIsEmpty || emptyBlocksCount > 0) {
                     emptyBlocksCount += 1;
                 }
-                if (Util.isDescendant(treeWalker.currentNode, cursorContainer, true)) {
+                if (treeWalker.currentNode === closestBlock) {
                     return emptyBlocksCount;
                 }
                 if (!blockIsEmpty) {
@@ -2183,6 +2229,7 @@ var Events;
         this.base = instance;
         this.options = this.base.options;
         this.events = [];
+        this.disabledEvents = {};
         this.customEvents = {};
         this.listeners = {};
     };
@@ -2225,6 +2272,16 @@ var Events;
             }
         },
 
+        enableCustomEvent: function (event) {
+            if (this.disabledEvents[event] !== undefined) {
+                delete this.disabledEvents[event];
+            }
+        },
+
+        disableCustomEvent: function (event) {
+            this.disabledEvents[event] = true;
+        },
+
         // custom events
         attachCustomEvent: function (event, listener) {
             this.setupListener(event);
@@ -2256,7 +2313,7 @@ var Events;
         },
 
         triggerCustomEvent: function (name, data, editable) {
-            if (this.customEvents[name]) {
+            if (this.customEvents[name] && !this.disabledEvents[name]) {
                 this.customEvents[name].forEach(function (listener) {
                     listener(data, editable);
                 });
@@ -2650,7 +2707,7 @@ var Events;
         handleKeydown: function (event) {
             this.triggerCustomEvent('editableKeydown', event, event.currentTarget);
 
-            if (Util.isKey(event, Util.keyCode.ENTER)) {
+            if (Util.isKey(event, Util.keyCode.ENTER) || (event.ctrlKey && Util.isKey(event, Util.keyCode.M))) {
                 return this.triggerCustomEvent('editableKeydownEnter', event, event.currentTarget);
             }
 
@@ -4162,7 +4219,6 @@ var PasteHandler;
     */
     function createReplacements() {
         return [
-
             // replace two bogus tags that begin pastes from google docs
             [new RegExp(/<[^>]*docs-internal-guid[^>]*>/gi), ''],
             [new RegExp(/<\/b>(<br[^>]*>)?$/gi), ''],
@@ -4192,7 +4248,11 @@ var PasteHandler;
             [new RegExp(/\n+<p/gi), '<p'],
 
             // Microsoft Word makes these odd tags, like <o:p></o:p>
-            [new RegExp(/<\/?o:[a-z]*>/gi), '']
+            [new RegExp(/<\/?o:[a-z]*>/gi), ''],
+
+            // cleanup comments added by Chrome when pasting html
+            ['<!--EndFragment-->', ''],
+            ['<!--StartFragment-->', '']
         ];
     }
     /*jslint regexp: false*/
@@ -6128,88 +6188,133 @@ function MediumEditor(elements, options) {
         },
 
         createLink: function (opts) {
-            var customEvent,
-                i;
+            var currentEditor, customEvent, i;
 
-            if (opts.url && opts.url.trim().length > 0) {
-                var currentSelection = this.options.contentWindow.getSelection();
-                if (currentSelection) {
-                    var exportedSelection,
-                        startContainerParentElement,
-                        endContainerParentElement,
-                        textNodes;
+            try {
+                this.events.disableCustomEvent('editableInput');
+                if (opts.url && opts.url.trim().length > 0) {
+                    var currentSelection = this.options.contentWindow.getSelection();
+                    if (currentSelection) {
+                        var currRange = currentSelection.getRangeAt(0),
+                            commonAncestorContainer = currRange.commonAncestorContainer,
+                            exportedSelection,
+                            startContainerParentElement,
+                            endContainerParentElement,
+                            textNodes;
 
-                    startContainerParentElement = Util.getClosestBlockContainer(
-                        currentSelection.getRangeAt(0).startContainer);
-                    endContainerParentElement = Util.getClosestBlockContainer(
-                        currentSelection.getRangeAt(0).endContainer);
-
-                    if (startContainerParentElement === endContainerParentElement) {
-                        var currentEditor = Selection.getSelectionElement(this.options.contentWindow),
-                            parentElement = (startContainerParentElement || currentEditor),
-                            fragment = this.options.ownerDocument.createDocumentFragment();
-                        exportedSelection = this.exportSelection();
-                        fragment.appendChild(parentElement.cloneNode(true));
-                        if (currentEditor === parentElement) {
-                            // We have to avoid the editor itself being wiped out when it's the only block element,
-                            // as our reference inside this.elements gets detached from the page when insertHTML runs.
-                            // If we just use [parentElement, 0] and [parentElement, parentElement.childNodes.length]
-                            // as the range boundaries, this happens whenever parentElement === currentEditor.
-                            // The tradeoff to this workaround is that a orphaned tag can sometimes be left behind at
-                            // the end of the editor's content.
-                            // In Gecko:
-                            // as an empty <strong></strong> if parentElement.lastChild is a <strong> tag.
-                            // In WebKit:
-                            // an invented <br /> tag at the end in the same situation
-
-                            Selection.select(this.options.ownerDocument,
-                                parentElement.firstChild, 0,
-                                parentElement.lastChild, parentElement.lastChild.nodeType === 3 ?
-                                parentElement.lastChild.nodeValue.length : parentElement.lastChild.childNodes.length);
-                        } else {
-                            Selection.select(this.options.ownerDocument,
-                                parentElement, 0,
-                                parentElement, parentElement.childNodes.length);
+                        // If the selection is contained within a single text node
+                        // and the selection starts at the beginning of the text node,
+                        // MSIE still says the startContainer is the parent of the text node.
+                        // If the selection is contained within a single text node, we
+                        // want to just use the default browser 'createLink', so we need
+                        // to account for this case and adjust the commonAncestorContainer accordingly
+                        if (currRange.endContainer.nodeType === 3 &&
+                            currRange.startContainer.nodeType !== 3 &&
+                            currRange.startOffset === 0 &&
+                            currRange.startContainer.firstChild === currRange.endContainer) {
+                            commonAncestorContainer = currRange.endContainer;
                         }
-                        var modifiedExportedSelection = this.exportSelection();
 
-                        textNodes = Util.findOrCreateMatchingTextNodes(this.options.ownerDocument,
+                        startContainerParentElement = Util.getClosestBlockContainer(currRange.startContainer);
+                        endContainerParentElement = Util.getClosestBlockContainer(currRange.endContainer);
+
+                        // If the selection is not contained within a single text node
+                        // but the selection is contained within the same block element
+                        // we want to make sure we create a single link, and not multiple links
+                        // which can happen with the built in browser functionality
+                        if (commonAncestorContainer.nodeType !== 3 && startContainerParentElement === endContainerParentElement) {
+
+                            currentEditor = Selection.getSelectionElement(this.options.contentWindow);
+                            var parentElement = (startContainerParentElement || currentEditor),
+                                fragment = this.options.ownerDocument.createDocumentFragment();
+
+                            // since we are going to create a link from an extracted text,
+                            // be sure that if we are updating a link, we won't let an empty link behind (see #754)
+                            // (Workaroung for Chrome)
+                            this.execAction('unlink');
+
+                            exportedSelection = this.exportSelection();
+                            fragment.appendChild(parentElement.cloneNode(true));
+
+                            if (currentEditor === parentElement) {
+                                // We have to avoid the editor itself being wiped out when it's the only block element,
+                                // as our reference inside this.elements gets detached from the page when insertHTML runs.
+                                // If we just use [parentElement, 0] and [parentElement, parentElement.childNodes.length]
+                                // as the range boundaries, this happens whenever parentElement === currentEditor.
+                                // The tradeoff to this workaround is that a orphaned tag can sometimes be left behind at
+                                // the end of the editor's content.
+                                // In Gecko:
+                                // as an empty <strong></strong> if parentElement.lastChild is a <strong> tag.
+                                // In WebKit:
+                                // an invented <br /> tag at the end in the same situation
+                                Selection.select(
+                                    this.options.ownerDocument,
+                                    parentElement.firstChild,
+                                    0,
+                                    parentElement.lastChild,
+                                    parentElement.lastChild.nodeType === 3 ?
+                                    parentElement.lastChild.nodeValue.length : parentElement.lastChild.childNodes.length
+                                );
+                            } else {
+                                Selection.select(
+                                    this.options.ownerDocument,
+                                    parentElement,
+                                    0,
+                                    parentElement,
+                                    parentElement.childNodes.length
+                                );
+                            }
+
+                            var modifiedExportedSelection = this.exportSelection();
+
+                            textNodes = Util.findOrCreateMatchingTextNodes(
+                                this.options.ownerDocument,
                                 fragment,
                                 {
                                     start: exportedSelection.start - modifiedExportedSelection.start,
                                     end: exportedSelection.end - modifiedExportedSelection.start,
                                     editableElementIndex: exportedSelection.editableElementIndex
-                                });
-                        // Creates the link in the document fragment
-                        Util.createLink(this.options.ownerDocument, textNodes, opts.url.trim());
-                        // Chrome trims the leading whitespaces when inserting HTML, which messes up restoring the selection.
-                        var leadingWhitespacesCount = (fragment.firstChild.innerHTML.match(/^\s+/) || [''])[0].length;
-                        // Now move the created link back into the original document in a way to preserve undo/redo history
-                        Util.insertHTMLCommand(this.options.ownerDocument,
-                            fragment.firstChild.innerHTML.replace(/^\s+/, ''));
-                        exportedSelection.start -= leadingWhitespacesCount;
-                        exportedSelection.end -= leadingWhitespacesCount;
-                        this.importSelection(exportedSelection);
-                    } else {
-                        this.options.ownerDocument.execCommand('createLink', false, opts.url);
-                    }
-                    if (this.options.targetBlank || opts.target === '_blank') {
-                        Util.setTargetBlank(Selection.getSelectionStart(this.options.ownerDocument), opts.url);
-                    }
+                                }
+                            );
 
-                    if (opts.buttonClass) {
-                        Util.addClassToAnchors(Selection.getSelectionStart(this.options.ownerDocument), opts.buttonClass);
+                            // Creates the link in the document fragment
+                            Util.createLink(this.options.ownerDocument, textNodes, opts.url.trim());
+
+                            // Chrome trims the leading whitespaces when inserting HTML, which messes up restoring the selection.
+                            var leadingWhitespacesCount = (fragment.firstChild.innerHTML.match(/^\s+/) || [''])[0].length;
+
+                            // Now move the created link back into the original document in a way to preserve undo/redo history
+                            Util.insertHTMLCommand(this.options.ownerDocument, fragment.firstChild.innerHTML.replace(/^\s+/, ''));
+                            exportedSelection.start -= leadingWhitespacesCount;
+                            exportedSelection.end -= leadingWhitespacesCount;
+
+                            this.importSelection(exportedSelection);
+                        } else {
+                            this.options.ownerDocument.execCommand('createLink', false, opts.url);
+                        }
+
+                        if (this.options.targetBlank || opts.target === '_blank') {
+                            Util.setTargetBlank(Selection.getSelectionStart(this.options.ownerDocument), opts.url);
+                        }
+
+                        if (opts.buttonClass) {
+                            Util.addClassToAnchors(Selection.getSelectionStart(this.options.ownerDocument), opts.buttonClass);
+                        }
                     }
                 }
-            }
-
-            if (this.options.targetBlank || opts.target === '_blank' || opts.buttonClass) {
-                customEvent = this.options.ownerDocument.createEvent('HTMLEvents');
-                customEvent.initEvent('input', true, true, this.options.contentWindow);
-                for (i = 0; i < this.elements.length; i += 1) {
-                    this.elements[i].dispatchEvent(customEvent);
+                // Fire input event for backwards compatibility if anyone was listening directly to the DOM input event
+                if (this.options.targetBlank || opts.target === '_blank' || opts.buttonClass) {
+                    customEvent = this.options.ownerDocument.createEvent('HTMLEvents');
+                    customEvent.initEvent('input', true, true, this.options.contentWindow);
+                    for (i = 0; i < this.elements.length; i += 1) {
+                        this.elements[i].dispatchEvent(customEvent);
+                    }
                 }
+            } finally {
+                this.events.enableCustomEvent('editableInput');
             }
+            // Fire our custom editableInput event
+            this.events.triggerCustomEvent('editableInput', customEvent, currentEditor);
         },
 
         cleanPaste: function (text) {
@@ -6249,7 +6354,7 @@ MediumEditor.parseVersionString = function (release) {
 
 MediumEditor.version = MediumEditor.parseVersionString.call(this, ({
     // grunt-bump looks for this:
-    'version': '5.5.2'
+    'version': '5.6.1'
 }).version);
 
     return MediumEditor;
