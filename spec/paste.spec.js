@@ -311,6 +311,23 @@ describe('Pasting content', function () {
 
             expect(this.el.innerHTML).toMatch(new RegExp('^Before(&nbsp;|\\s)(<span id="editor-inner">)?<sub>div one</sub><sub>div two</sub>(</span>)?(&nbsp;|\\s)after\\.$'));
         });
+
+        it('should cleanup only pasted element on multi-line when nothing is selected', function () {
+            var editor = this.newMediumEditor('.editor', {
+                paste: {
+                    forcePlainText: false,
+                    cleanPastedHTML: true
+                }
+            });
+
+            this.el.innerHTML = '<div><img src="http://0.0.0.0/ohyeah.png" /></div>';
+
+            selectElementContents(this.el.firstChild, { collapse: true });
+
+            editor.cleanPaste('<table><tr><td>test</td><td><br/></td></tr></table>');
+
+            expect(this.el.innerHTML).toContain('<img src="http://0.0.0.0/ohyeah.png"></div>');
+        });
     });
 
     describe('using pasteHTML', function () {
@@ -319,6 +336,23 @@ describe('Pasting content', function () {
             selectElementContents(this.el.firstChild);
             editor.pasteHTML('<p class="some-class" style="font-weight: bold" dir="ltr"><meta name="description" content="test" />test</p>');
             expect(editor.elements[0].innerHTML).toBe('<p>test</p>');
+        });
+
+        it('should not remove node with "empty" content', function () {
+            var editor = this.newMediumEditor('.editor', {
+                paste: {
+                    forcePlainText: false,
+                    cleanPastedHTML: true
+                }
+            });
+
+            this.el.innerHTML = '<div>this is a div</div><figure id="editor-inner">and this is a figure</figure>.';
+
+            selectElementContents(this.el.firstChild);
+
+            editor.pasteHTML('<table><tr><td>test</td><td><br/></td></tr></table>');
+
+            expect(this.el.innerHTML).toContain('<table><tbody><tr><td>test</td><td><br></td></tr></tbody></table>');
         });
 
         it('should accept a list of attrs to clean up', function () {
