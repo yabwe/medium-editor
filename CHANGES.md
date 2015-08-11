@@ -1,3 +1,8 @@
+5.6.2 / 2015-08-11
+==================
+* Fix a regression in the paste extension related to `pasteHTML` function
+
+
 5.6.1 / 2015-08-10
 ==================
 * Fix issue with creating anchors and restoring selection at the beginning of paragraphs
