@@ -49,19 +49,29 @@ module.exports = function (grunt) {
             version: '11',
             platform: 'WIN8.1'
         }, {
+            browserName: 'internet explorer',
+            version: '11',
+            platform: 'Windows 10'
+        }, {
             browserName: 'chrome',
             platform: 'WIN8.1'
         }, {
+            browserName: 'chrome',
+            platform: 'Windows 10'
+        }, {
+            browserName: 'googlechrome',
+            platform: 'OS X 10.10'
+        }, {
             browserName: 'firefox',
             platform: 'WIN8.1'
         }, {
-            browserName: 'safari',
-            platform: 'OS X 10.10'
+            browserName: 'firefox',
+            platform: 'Windows 10'
         }, {
             browserName: 'firefox',
             platform: 'OS X 10.10'
         }, {
-            browserName: 'googlechrome',
+            browserName: 'safari',
             platform: 'OS X 10.10'
         }];
 
