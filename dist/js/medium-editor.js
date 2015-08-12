@@ -4806,7 +4806,7 @@ var PasteHandler;
         },
 
         cleanPaste: function (text) {
-            var i, elList,
+            var i, elList, tmp, workEl,
                 multiline = /<p|<br|<div/.test(text),
                 replacements = createReplacements().concat(this.cleanReplacements || []);
 
@@ -4818,10 +4818,34 @@ var PasteHandler;
                 return this.pasteHTML(text);
             }
 
-            // double br's aren't converted to p tags, but we want paragraphs.
-            elList = text.split('<br><br>');
+            // create a temporary div to cleanup block elements
+            tmp = this.document.createElement('div');
 
-            this.pasteHTML('<p>' + elList.join('</p><p>') + '</p>');
+            // double br's aren't converted to p tags, but we want paragraphs.
+            tmp.innerHTML = '<p>' + text.split('<br><br>').join('</p><p>') + '</p>';
+
+            // block element cleanup
+            elList = tmp.querySelectorAll('a,p,div,br');
+            for (i = 0; i < elList.length; i += 1) {
+                workEl = elList[i];
+
+                // Microsoft Word replaces some spaces with newlines.
+                // While newlines between block elements are meaningless, newlines within
+                // elements are sometimes actually spaces.
+                workEl.innerHTML = workEl.innerHTML.replace(/\n/gi, ' ');
+
+                switch (workEl.nodeName.toLowerCase()) {
+                    case 'p':
+                    case 'div':
+                        this.filterCommonBlocks(workEl);
+                        break;
+                    case 'br':
+                        this.filterLineBreak(workEl);
+                        break;
+                }
+            }
+
+            this.pasteHTML(tmp.innerHTML);
         },
 
         pasteHTML: function (html, options) {
@@ -4849,27 +4873,6 @@ var PasteHandler;
 
                 Util.cleanupAttrs(workEl, options.cleanAttrs);
                 Util.cleanupTags(workEl, options.cleanTags);
-            }
-
-            // block element cleanup
-            elList = fragmentBody.querySelectorAll('a,p,div,br');
-            for (i = 0; i < elList.length; i += 1) {
-                workEl = elList[i];
-
-                // Microsoft Word replaces some spaces with newlines.
-                // While newlines between block elements are meaningless, newlines within
-                // elements are sometimes actually spaces.
-                workEl.innerHTML = workEl.innerHTML.replace(/\n/gi, ' ');
-
-                switch (workEl.nodeName.toLowerCase()) {
-                    case 'p':
-                    case 'div':
-                        this.filterCommonBlocks(workEl);
-                        break;
-                    case 'br':
-                        this.filterLineBreak(workEl);
-                        break;
-                }
             }
 
             Util.insertHTMLCommand(this.document, fragmentBody.innerHTML.replace(/&nbsp;/g, ' '));
@@ -6698,7 +6701,7 @@ MediumEditor.version = (function (major, minor, revision) {
     };
 }).apply(this, ({
     // grunt-bump looks for this:
-    'version': '4.12.8'
+    'version': '4.12.9'
 }).version.split('.'));
 
     return MediumEditor;
