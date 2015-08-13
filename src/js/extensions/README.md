@@ -84,6 +84,8 @@
   * A Medium Editor extension to add markdown support.
 * [MediumEditor Insert Plugin](https://github.com/orthes/medium-editor-insert-plugin)
   * Enables users to insert into the editor various types of content like images or embeds.
+* [MediumEditor Multi-placeholder Plugin](https://github.com/smiled0g/medium-editor-multi-placeholders-plugin)
+  * Enables users to add multiple placeholders with specific HTML tags.
 
 
 ## What is a Button?
