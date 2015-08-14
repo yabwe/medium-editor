@@ -1,5 +1,3 @@
-/*global Events */
-
 (function () {
     'use strict';
 
@@ -566,7 +564,7 @@
             this.isActive = true;
             addToEditors.call(this, this.options.contentWindow);
 
-            this.events = new Events(this);
+            this.events = new MediumEditor.Events(this);
 
             // Call initialization helpers
             initElements.call(this);

@@ -1,9 +1,7 @@
-var Events;
-
 (function () {
     'use strict';
 
-    Events = function (instance) {
+    MediumEditor.Events = function (instance) {
         this.base = instance;
         this.options = this.base.options;
         this.events = [];
@@ -12,7 +10,7 @@ var Events;
         this.listeners = {};
     };
 
-    Events.prototype = {
+    MediumEditor.Events.prototype = {
         InputEventOnContenteditableSupported: !MediumEditor.util.isIE,
 
         // Helpers for event handling
