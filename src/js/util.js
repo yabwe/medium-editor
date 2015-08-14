@@ -1,4 +1,4 @@
-/*global NodeFilter, Selection*/
+/*global NodeFilter*/
 
 var Util;
 
@@ -378,7 +378,7 @@ var Util;
 
         execFormatBlock: function (doc, tagName) {
             // Get the top level block element that contains the selection
-            var blockContainer = Util.getTopBlockContainer(Selection.getSelectionStart(doc));
+            var blockContainer = Util.getTopBlockContainer(MediumEditor.selection.getSelectionStart(doc));
 
             // Special handling for blockquote
             if (tagName === 'blockquote') {
@@ -495,7 +495,7 @@ var Util;
 
                 // move cursor at the end of the text inside the list
                 // for some unknown reason, the cursor is moved to end of the "visual" line
-                Selection.moveCursor(ownerDocument, element.firstChild, element.firstChild.textContent.length);
+                MediumEditor.selection.moveCursor(ownerDocument, element.firstChild, element.firstChild.textContent.length);
             }
         },
 

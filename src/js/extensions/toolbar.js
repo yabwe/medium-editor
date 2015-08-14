@@ -2,7 +2,7 @@ var Toolbar;
 (function () {
     'use strict';
 
-    /*global Util, Selection, Extension */
+    /*global Util, Extension */
 
     Toolbar = Extension.extend({
         name: 'toolbar',
@@ -330,7 +330,7 @@ var Toolbar;
         multipleBlockElementsSelected: function () {
             var regexEmptyHTMLTags = /<[^\/>][^>]*><\/[^>]+>/gim, // http://stackoverflow.com/questions/3129738/remove-empty-tags-using-regex
                 regexBlockElements = new RegExp('<(' + Util.blockContainerElementNames.join('|') + ')[^>]*>', 'g'),
-                selectionHTML = Selection.getSelectionHtml(this.document).replace(regexEmptyHTMLTags, ''), // Filter out empty blocks from selection
+                selectionHTML = MediumEditor.selection.getSelectionHtml(this.document).replace(regexEmptyHTMLTags, ''), // Filter out empty blocks from selection
                 hasMultiParagraphs = selectionHTML.match(regexBlockElements); // Find how many block elements are within the html
 
             return !!hasMultiParagraphs && hasMultiParagraphs.length > 1;
@@ -359,13 +359,13 @@ var Toolbar;
             if (this.standardizeSelectionStart &&
                     selectionRange.startContainer.nodeValue &&
                     (selectionRange.startOffset === selectionRange.startContainer.nodeValue.length)) {
-                var adjacentNode = Util.findAdjacentTextNodeWithContent(Selection.getSelectionElement(this.window), selectionRange.startContainer, this.document);
+                var adjacentNode = Util.findAdjacentTextNodeWithContent(MediumEditor.selection.getSelectionElement(this.window), selectionRange.startContainer, this.document);
                 if (adjacentNode) {
                     var offset = 0;
                     while (adjacentNode.nodeValue.substr(offset, 1).trim().length === 0) {
                         offset = offset + 1;
                     }
-                    selectionRange = Selection.select(this.document, adjacentNode, offset,
+                    selectionRange = MediumEditor.selection.select(this.document, adjacentNode, offset,
                         selectionRange.endContainer, selectionRange.endOffset);
                 }
             }
@@ -379,14 +379,14 @@ var Toolbar;
             // If no editable has focus OR selection is inside contenteditable = false
             // hide toolbar
             if (!this.base.getFocusedElement() ||
-                    Selection.selectionInContentEditableFalse(this.window)) {
+                    MediumEditor.selection.selectionInContentEditableFalse(this.window)) {
                 return this.hideToolbar();
             }
 
             // If there's no selection element, selection element doesn't belong to this editor
             // or toolbar is disabled for this selection element
             // hide toolbar
-            var selectionElement = Selection.getSelectionElement(this.window);
+            var selectionElement = MediumEditor.selection.getSelectionElement(this.window);
             if (!selectionElement ||
                     this.getEditorElements().indexOf(selectionElement) === -1 ||
                     selectionElement.getAttribute('data-disable-toolbar')) {
@@ -433,7 +433,7 @@ var Toolbar;
         checkActiveButtons: function () {
             var manualStateChecks = [],
                 queryState = null,
-                selectionRange = Selection.getSelectionRange(this.document),
+                selectionRange = MediumEditor.selection.getSelectionRange(this.document),
                 parentNode,
                 updateExtensionState = function (extension) {
                     if (typeof extension.checkState === 'function') {
@@ -469,7 +469,7 @@ var Toolbar;
                 manualStateChecks.push(extension);
             });
 
-            parentNode = Selection.getSelectedParentElement(selectionRange);
+            parentNode = MediumEditor.selection.getSelectedParentElement(selectionRange);
 
             // Make sure the selection parent isn't outside of the contenteditable
             if (!this.getEditorElements().some(function (element) {

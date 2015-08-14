@@ -120,12 +120,12 @@ var Selection;
             }
 
             if (typeof selectionState.emptyBlocksIndex !== 'undefined') {
-                range = Selection.importSelectionMoveCursorPastBlocks(doc, root, selectionState.emptyBlocksIndex, range);
+                range = this.importSelectionMoveCursorPastBlocks(doc, root, selectionState.emptyBlocksIndex, range);
             }
 
             // If the selection is right at the ending edge of a link, put it outside the anchor tag instead of inside.
             if (favorLaterSelectionAnchor) {
-                range = Selection.importSelectionMoveCursorPastAnchor(selectionState, range);
+                range = this.importSelectionMoveCursorPastAnchor(selectionState, range);
             }
 
             var sel = doc.getSelection();

@@ -2,7 +2,7 @@ var FontSizeForm;
 (function () {
     'use strict';
 
-    /*global FormExtension, Selection */
+    /*global FormExtension */
 
     FontSizeForm = FormExtension.extend({
 
@@ -142,7 +142,7 @@ var FontSizeForm;
         },
 
         clearFontSize: function () {
-            Selection.getSelectedElements(this.document).forEach(function (el) {
+            MediumEditor.selection.getSelectedElements(this.document).forEach(function (el) {
                 if (el.nodeName.toLowerCase() === 'font' && el.hasAttribute('size')) {
                     el.removeAttribute('size');
                 }

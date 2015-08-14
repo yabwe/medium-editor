@@ -2,7 +2,7 @@ var AnchorForm;
 (function () {
     'use strict';
 
-    /*global Util, Selection, FormExtension */
+    /*global Util, FormExtension */
 
     AnchorForm = FormExtension.extend({
         /* Anchor Form Options */
@@ -60,11 +60,11 @@ var AnchorForm;
             event.preventDefault();
             event.stopPropagation();
 
-            var range = Selection.getSelectionRange(this.document);
+            var range = MediumEditor.selection.getSelectionRange(this.document);
 
             if (range.startContainer.nodeName.toLowerCase() === 'a' ||
                 range.endContainer.nodeName.toLowerCase() === 'a' ||
-                Util.getClosestTag(Selection.getSelectedParentElement(range), 'a')) {
+                Util.getClosestTag(MediumEditor.selection.getSelectedParentElement(range), 'a')) {
                 return this.execAction('unlink');
             }
 
