@@ -1,5 +1,3 @@
-/*global Util */
-
 var Events;
 
 (function () {
@@ -15,7 +13,7 @@ var Events;
     };
 
     Events.prototype = {
-        InputEventOnContenteditableSupported: !Util.isIE,
+        InputEventOnContenteditableSupported: !MediumEditor.util.isIE,
 
         // Helpers for event handling
 

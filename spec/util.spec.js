@@ -1,7 +1,7 @@
-/*global Util, describe, it, expect, spyOn,
+/*global describe, it, expect, spyOn,
          afterEach, beforeEach, setupTestHelpers, selectElementContents */
 
-describe('Util', function () {
+describe('MediumEditor.util', function () {
     'use strict';
 
     beforeEach(function () {
@@ -15,7 +15,6 @@ describe('Util', function () {
     describe('Exposure', function () {
         it('is exposed on the MediumEditor ctor', function () {
             expect(MediumEditor.util).toBeTruthy();
-            expect(MediumEditor.util).toEqual(Util);
         });
 
     });

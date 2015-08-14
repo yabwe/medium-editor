@@ -1,5 +1,3 @@
-var Selection;
-
 (function () {
     'use strict';
 
@@ -11,7 +9,7 @@ var Selection;
         }
     }
 
-    Selection = {
+    var Selection = {
         findMatchingSelectionParent: function (testElementFunction, contentWindow) {
             var selection = contentWindow.getSelection(),
                 range,
@@ -422,4 +420,6 @@ var Selection;
             return startNode;
         }
     };
+
+    MediumEditor.selection = Selection;
 }());

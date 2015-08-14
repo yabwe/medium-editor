@@ -6,7 +6,7 @@ var FormExtension;
 
     var noop = function () {};
 
-    /* Base functionality for an extension whcih will display
+    /* Base functionality for an extension which will display
      * a 'form' inside the toolbar
      */
     FormExtension = Button.extend({

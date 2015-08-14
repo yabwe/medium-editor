@@ -1,11 +1,9 @@
-/* global Util */
-
 var Extension;
 (function () {
     'use strict';
 
     Extension = function (options) {
-        Util.extend(this, options);
+        MediumEditor.util.extend(this, options);
     };
 
     Extension.extend = function (protoProps) {
@@ -49,7 +47,7 @@ var Extension;
         }
 
         // das statics (.extend comes over, so your subclass can have subclasses too)
-        Util.extend(child, parent);
+        MediumEditor.util.extend(child, parent);
 
         // Set the prototype chain to inherit from `parent`, without calling
         // `parent`'s constructor function.
@@ -60,7 +58,7 @@ var Extension;
         child.prototype = new Surrogate();
 
         if (protoProps) {
-            Util.extend(child.prototype, protoProps);
+            MediumEditor.util.extend(child.prototype, protoProps);
         }
 
         // todo: $super?

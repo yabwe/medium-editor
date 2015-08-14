@@ -1,7 +1,5 @@
 /*global NodeFilter*/
 
-var Util;
-
 (function (window) {
     'use strict';
 
@@ -24,7 +22,7 @@ var Util;
         return dest;
     }
 
-    Util = {
+    var Util = {
 
         // http://stackoverflow.com/questions/17907445/how-to-detect-ie11#comment30165888_17907562
         // by rg89
@@ -864,4 +862,6 @@ var Util;
             }
         }
     };
+
+    MediumEditor.util = Util;
 }(window));
