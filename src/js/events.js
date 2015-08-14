@@ -1,7 +1,7 @@
 (function () {
     'use strict';
 
-    MediumEditor.Events = function (instance) {
+    var Events = function (instance) {
         this.base = instance;
         this.options = this.base.options;
         this.events = [];
@@ -10,7 +10,7 @@
         this.listeners = {};
     };
 
-    MediumEditor.Events.prototype = {
+    Events.prototype = {
         InputEventOnContenteditableSupported: !MediumEditor.util.isIE,
 
         // Helpers for event handling
@@ -496,4 +496,6 @@
             }
         }
     };
+
+    MediumEditor.Events = Events;
 }());

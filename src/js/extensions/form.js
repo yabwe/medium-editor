@@ -1,12 +1,10 @@
 (function () {
     'use strict';
 
-    var noop = function () {};
-
     /* Base functionality for an extension which will display
      * a 'form' inside the toolbar
      */
-    MediumEditor.extensions.form = MediumEditor.extensions.button.extend({
+    var FormExtension = MediumEditor.extensions.button.extend({
 
         init: function () {
             MediumEditor.extensions.button.prototype.init.apply(this, arguments);
@@ -31,21 +29,21 @@
          * the toolbar container. The form should start hidden, and
          * the extension can choose when to hide/show it
          */
-        getForm: noop,
+        getForm: function () {},
 
         /* isDisplayed: [function ()]
          *
          * This function should return true/false reflecting
          * whether the form is currently displayed
          */
-        isDisplayed: noop,
+        isDisplayed: function () {},
 
         /* hideForm: [function ()]
          *
          * This function should hide the form element inside
          * the toolbar container
          */
-        hideForm: noop,
+        hideForm: function () {},
 
         /************************ Helpers ************************
          * The following are helpers that are either set by MediumEditor
@@ -92,4 +90,6 @@
             }
         }
     });
+
+    MediumEditor.extensions.form = FormExtension;
 })();

@@ -1,7 +1,7 @@
 (function () {
     'use strict';
 
-    MediumEditor.extensions.toolbar = MediumEditor.Extension.extend({
+    var Toolbar = MediumEditor.Extension.extend({
         name: 'toolbar',
 
         /* Toolbar Options */
@@ -613,4 +613,6 @@
             }
         }
     });
+
+    MediumEditor.extensions.toolbar = Toolbar;
 }());

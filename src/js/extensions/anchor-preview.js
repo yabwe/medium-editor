@@ -1,7 +1,7 @@
 (function () {
     'use strict';
 
-    MediumEditor.extensions.anchorPreview = MediumEditor.Extension.extend({
+    var AnchorPreview = MediumEditor.Extension.extend({
         name: 'anchor-preview',
 
         // Anchor Preview Options
@@ -245,4 +245,6 @@
             this.on(this.activeAnchor, 'mouseout', this.instanceHandlePreviewMouseout);
         }
     });
+
+    MediumEditor.extensions.anchorPreview = AnchorPreview;
 }());

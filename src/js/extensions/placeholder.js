@@ -1,7 +1,7 @@
 (function () {
     'use strict';
 
-    MediumEditor.extensions.placeholder = MediumEditor.Extension.extend({
+    var Placeholder = MediumEditor.Extension.extend({
         name: 'placeholder',
 
         /* Placeholder Options */
@@ -95,4 +95,6 @@
             this.initPlaceholders();
         }
     });
+
+    MediumEditor.extensions.placeholder = Placeholder;
 }());

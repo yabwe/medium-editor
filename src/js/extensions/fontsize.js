@@ -1,7 +1,7 @@
 (function () {
     'use strict';
 
-    MediumEditor.extensions.fontSize = MediumEditor.extensions.form.extend({
+    var FontSizeForm = MediumEditor.extensions.form.extend({
 
         name: 'fontsize',
         action: 'fontSize',
@@ -172,4 +172,6 @@
             this.doFormCancel();
         }
     });
+
+    MediumEditor.extensions.fontSize = FontSizeForm;
 }());

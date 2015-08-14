@@ -1,7 +1,7 @@
 (function () {
     'use strict';
 
-    MediumEditor.extensions.button = MediumEditor.Extension.extend({
+    var Button = MediumEditor.Extension.extend({
 
         /* Button Options */
 
@@ -90,7 +90,7 @@
         // When the name of a button is passed, it will initialize itself with the
         // configuration for that button
         constructor: function (options) {
-            if (MediumEditor.extensions.button.isBuiltInButton(options)) {
+            if (Button.isBuiltInButton(options)) {
                 MediumEditor.Extension.call(this, this.defaults[options]);
             } else {
                 MediumEditor.Extension.call(this, options);
@@ -227,7 +227,9 @@
         }
     });
 
-    MediumEditor.extensions.button.isBuiltInButton = function (name) {
+    Button.isBuiltInButton = function (name) {
         return (typeof name === 'string') && MediumEditor.extensions.button.prototype.defaults.hasOwnProperty(name);
     };
+
+    MediumEditor.extensions.button = Button;
 }());

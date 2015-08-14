@@ -1,7 +1,7 @@
 (function () {
     'use strict';
 
-    MediumEditor.extensions.imageDragging = MediumEditor.Extension.extend({
+    var ImageDragging = MediumEditor.Extension.extend({
         init: function () {
             MediumEditor.Extension.prototype.init.apply(this, arguments);
 
@@ -54,4 +54,6 @@
             event.target.classList.remove(className);
         }
     });
+
+    MediumEditor.extensions.imageDragging = ImageDragging;
 }());

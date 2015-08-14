@@ -12,7 +12,7 @@
         });
     }
 
-    MediumEditor.extensions.fileDragging = MediumEditor.Extension.extend({
+    var FileDragging = MediumEditor.Extension.extend({
         name: 'fileDragging',
 
         allowedTypes: ['image'],
@@ -82,4 +82,6 @@
             }.bind(this);
         }
     });
+
+    MediumEditor.extensions.fileDragging = FileDragging;
 }());

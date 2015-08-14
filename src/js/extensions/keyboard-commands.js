@@ -1,7 +1,7 @@
 (function () {
     'use strict';
 
-    MediumEditor.extensions.keyboardCommands = MediumEditor.Extension.extend({
+    var KeyboardCommands = MediumEditor.Extension.extend({
         name: 'keyboard-commands',
 
         /* KeyboardCommands Options */
@@ -78,4 +78,6 @@
             }, this);
         }
     });
+
+    MediumEditor.extensions.keyboardCommands = KeyboardCommands;
 }());

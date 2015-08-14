@@ -28,7 +28,7 @@ LINK_REGEXP_TEXT =
         return !MediumEditor.util.getClosestTag(node, 'a');
     }
 
-    MediumEditor.extensions.autoLink = MediumEditor.Extension.extend({
+    var AutoLink = MediumEditor.Extension.extend({
         init: function () {
             MediumEditor.Extension.prototype.init.apply(this, arguments);
 
@@ -213,4 +213,6 @@ LINK_REGEXP_TEXT =
         }
 
     });
+
+    MediumEditor.extensions.autoLink = AutoLink;
 }());

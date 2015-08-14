@@ -1,7 +1,7 @@
 (function () {
     'use strict';
 
-    MediumEditor.extensions.anchor = MediumEditor.extensions.form.extend({
+    var AnchorForm = MediumEditor.extensions.form.extend({
         /* Anchor Form Options */
 
         /* customClassOption: [string]  (previously options.anchorButton + options.anchorButtonClass)
@@ -318,4 +318,6 @@
             this.doFormCancel();
         }
     });
+
+    MediumEditor.extensions.anchor = AnchorForm;
 }());

@@ -47,7 +47,7 @@
     }
     /*jslint regexp: false*/
 
-    MediumEditor.extensions.paste = MediumEditor.Extension.extend({
+    var PasteHandler = MediumEditor.Extension.extend({
         /* Paste Options */
 
         /* forcePlainText: [boolean]
@@ -280,4 +280,6 @@
             }
         }
     });
+
+    MediumEditor.extensions.paste = PasteHandler;
 }());
