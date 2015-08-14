@@ -1,6 +1,6 @@
 /*global describe, it, expect, spyOn, jasmine,
     fireEvent, afterEach, beforeEach, selectElementContents,
-    setupTestHelpers, selectElementContentsAndFire, editorDefaults */
+    setupTestHelpers, selectElementContentsAndFire */
 
 describe('Setup/Destroy TestCase', function () {
     'use strict';
@@ -40,7 +40,7 @@ describe('Setup/Destroy TestCase', function () {
         });
 
         it('should know about defaults', function () {
-            expect(MediumEditor.prototype.defaults).toBe(editorDefaults);
+            expect(MediumEditor.prototype.defaults).toBeTruthy();
         });
     });
 

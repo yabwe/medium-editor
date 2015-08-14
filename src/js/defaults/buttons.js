@@ -1,8 +1,10 @@
-var buttonDefaults;
 (function () {
     'use strict';
 
-    buttonDefaults = {
+    /* MediumEditor.extensions.button.defaults: [Object]
+     * Set of default config options for all of the built-in MediumEditor buttons
+     */
+    MediumEditor.extensions.button.prototype.defaults = {
         'bold': {
             name: 'bold',
             action: 'bold',

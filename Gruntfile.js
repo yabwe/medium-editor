@@ -15,12 +15,11 @@ module.exports = function (grunt) {
         srcFiles = [
             'src/js/globals.js',
             'src/js/util.js',
-            'src/js/defaults/buttons.js',
-            'src/js/defaults/options.js',
             'src/js/extension.js',
             'src/js/selection.js',
             'src/js/events.js',
             'src/js/extensions/button.js',
+            'src/js/defaults/buttons.js',
             'src/js/extensions/form.js',
             'src/js/extensions/anchor.js',
             'src/js/extensions/anchor-preview.js',
@@ -33,6 +32,7 @@ module.exports = function (grunt) {
             'src/js/extensions/toolbar.js',
             'src/js/extensions/deprecated/image-dragging.js',
             'src/js/core.js',
+            'src/js/defaults/options.js',
             'src/js/version.js'
         ],
         browsers = [{

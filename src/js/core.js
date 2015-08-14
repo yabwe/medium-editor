@@ -1,4 +1,4 @@
-/*global Events, editorDefaults*/
+/*global Events */
 
 (function () {
     'use strict';
@@ -540,8 +540,6 @@
     }
 
     MediumEditor.prototype = {
-        defaults: editorDefaults,
-
         // NOT DOCUMENTED - exposed for backwards compatability
         init: function (elements, options) {
             this.options = mergeOptions.call(this, this.defaults, options);

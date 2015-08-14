@@ -1,8 +1,6 @@
 (function () {
     'use strict';
 
-    /*global buttonDefaults */
-
     MediumEditor.extensions.button = MediumEditor.Extension.extend({
 
         /* Button Options */
@@ -86,11 +84,6 @@
          * A set of key-value pairs to add to the button as custom attributes
          */
         attrs: undefined,
-
-        /* buttonDefaults: [Object]
-         * Set of default config options for all of the built-in MediumEditor buttons
-         */
-        defaults: buttonDefaults,
 
         // The button constructor can optionally accept the name of a built-in button
         // (ie 'bold', 'italic', etc.)
