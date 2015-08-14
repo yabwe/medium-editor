@@ -2,7 +2,7 @@ var Toolbar;
 (function () {
     'use strict';
 
-    /*global Util, Extension */
+    /*global Extension */
 
     Toolbar = Extension.extend({
         name: 'toolbar',
@@ -146,7 +146,7 @@ var Toolbar;
                 if (extension && typeof extension.getButton === 'function') {
                     btn = extension.getButton(this.base);
                     li = this.document.createElement('li');
-                    if (Util.isElement(btn)) {
+                    if (MediumEditor.util.isElement(btn)) {
                         li.appendChild(btn);
                     } else {
                         li.innerHTML = btn;
@@ -193,7 +193,7 @@ var Toolbar;
             // throttledPositionToolbar is throttled because:
             // - It will be called when the browser is resizing, which can fire many times very quickly
             // - For some event (like resize) a slight lag in UI responsiveness is OK and provides performance benefits
-            this.throttledPositionToolbar = Util.throttle(function () {
+            this.throttledPositionToolbar = MediumEditor.util.throttle(function () {
                 if (this.base.isActive) {
                     this.positionToolbarIfShown();
                 }
@@ -234,7 +234,7 @@ var Toolbar;
             // Do not trigger checkState when mouseup fires over the toolbar
             if (event &&
                     event.target &&
-                    Util.isDescendant(this.getToolbarElement(), event.target)) {
+                    MediumEditor.util.isDescendant(this.getToolbarElement(), event.target)) {
                 return false;
             }
             this.checkState();
@@ -329,7 +329,7 @@ var Toolbar;
         // Checks for existance of multiple block elements in the current selection
         multipleBlockElementsSelected: function () {
             var regexEmptyHTMLTags = /<[^\/>][^>]*><\/[^>]+>/gim, // http://stackoverflow.com/questions/3129738/remove-empty-tags-using-regex
-                regexBlockElements = new RegExp('<(' + Util.blockContainerElementNames.join('|') + ')[^>]*>', 'g'),
+                regexBlockElements = new RegExp('<(' + MediumEditor.util.blockContainerElementNames.join('|') + ')[^>]*>', 'g'),
                 selectionHTML = MediumEditor.selection.getSelectionHtml(this.document).replace(regexEmptyHTMLTags, ''), // Filter out empty blocks from selection
                 hasMultiParagraphs = selectionHTML.match(regexBlockElements); // Find how many block elements are within the html
 
@@ -359,7 +359,7 @@ var Toolbar;
             if (this.standardizeSelectionStart &&
                     selectionRange.startContainer.nodeValue &&
                     (selectionRange.startOffset === selectionRange.startContainer.nodeValue.length)) {
-                var adjacentNode = Util.findAdjacentTextNodeWithContent(MediumEditor.selection.getSelectionElement(this.window), selectionRange.startContainer, this.document);
+                var adjacentNode = MediumEditor.util.findAdjacentTextNodeWithContent(MediumEditor.selection.getSelectionElement(this.window), selectionRange.startContainer, this.document);
                 if (adjacentNode) {
                     var offset = 0;
                     while (adjacentNode.nodeValue.substr(offset, 1).trim().length === 0) {
@@ -473,7 +473,7 @@ var Toolbar;
 
             // Make sure the selection parent isn't outside of the contenteditable
             if (!this.getEditorElements().some(function (element) {
-                    return Util.isDescendant(element, parentNode, true);
+                    return MediumEditor.util.isDescendant(element, parentNode, true);
                 })) {
                 return;
             }
@@ -483,7 +483,7 @@ var Toolbar;
                 manualStateChecks.forEach(updateExtensionState);
 
                 // we can abort the search upwards if we leave the contentEditable element
-                if (Util.isMediumEditorElement(parentNode)) {
+                if (MediumEditor.util.isMediumEditorElement(parentNode)) {
                     break;
                 }
                 parentNode = parentNode.parentNode;

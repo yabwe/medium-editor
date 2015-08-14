@@ -1,4 +1,4 @@
-/*global Util*/
+/*global Util */
 
 var Events;
 
@@ -330,16 +330,16 @@ var Events;
             if (hadFocus &&
                     eventObj.type === 'click' &&
                     this.lastMousedownTarget &&
-                    (Util.isDescendant(hadFocus, this.lastMousedownTarget, true) ||
-                     Util.isDescendant(toolbarEl, this.lastMousedownTarget, true) ||
-                     Util.isDescendant(previewEl, this.lastMousedownTarget, true))) {
+                    (MediumEditor.util.isDescendant(hadFocus, this.lastMousedownTarget, true) ||
+                     MediumEditor.util.isDescendant(toolbarEl, this.lastMousedownTarget, true) ||
+                     MediumEditor.util.isDescendant(previewEl, this.lastMousedownTarget, true))) {
                 toFocus = hadFocus;
             }
 
             if (!toFocus) {
                 this.base.elements.some(function (element) {
                     // If the target is part of an editor element, this is the element getting focus
-                    if (!toFocus && (Util.isDescendant(element, target, true))) {
+                    if (!toFocus && (MediumEditor.util.isDescendant(element, target, true))) {
                         toFocus = element;
                     }
 
@@ -349,9 +349,9 @@ var Events;
             }
 
             // Check if the target is external (not part of the editor, toolbar, or anchorpreview)
-            var externalEvent = !Util.isDescendant(hadFocus, target, true) &&
-                                !Util.isDescendant(toolbarEl, target, true) &&
-                                !Util.isDescendant(previewEl, target, true);
+            var externalEvent = !MediumEditor.util.isDescendant(hadFocus, target, true) &&
+                                !MediumEditor.util.isDescendant(toolbarEl, target, true) &&
+                                !MediumEditor.util.isDescendant(previewEl, target, true);
 
             if (toFocus !== hadFocus) {
                 // If element has focus, and focus is going outside of editor
@@ -400,7 +400,7 @@ var Events;
                 // We can look at the 'activeElement' to determine if the selectionchange has
                 // happened within a contenteditable owned by this instance of MediumEditor
                 this.base.elements.some(function (element) {
-                    if (Util.isDescendant(element, activeElement, true)) {
+                    if (MediumEditor.util.isDescendant(element, activeElement, true)) {
                         currentTarget = element;
                         return true;
                     }
@@ -487,15 +487,15 @@ var Events;
         handleKeydown: function (event) {
             this.triggerCustomEvent('editableKeydown', event, event.currentTarget);
 
-            if (Util.isKey(event, Util.keyCode.ENTER) || (event.ctrlKey && Util.isKey(event, Util.keyCode.M))) {
+            if (MediumEditor.util.isKey(event, MediumEditor.util.keyCode.ENTER) || (event.ctrlKey && MediumEditor.util.isKey(event, MediumEditor.util.keyCode.M))) {
                 return this.triggerCustomEvent('editableKeydownEnter', event, event.currentTarget);
             }
 
-            if (Util.isKey(event, Util.keyCode.TAB)) {
+            if (MediumEditor.util.isKey(event, MediumEditor.util.keyCode.TAB)) {
                 return this.triggerCustomEvent('editableKeydownTab', event, event.currentTarget);
             }
 
-            if (Util.isKey(event, [Util.keyCode.DELETE, Util.keyCode.BACKSPACE])) {
+            if (MediumEditor.util.isKey(event, [MediumEditor.util.keyCode.DELETE, MediumEditor.util.keyCode.BACKSPACE])) {
                 return this.triggerCustomEvent('editableKeydownDelete', event, event.currentTarget);
             }
         }

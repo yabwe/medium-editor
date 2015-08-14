@@ -110,7 +110,7 @@ function fireEvent(element, eventName, options) {
  *
  * Example:
  *     var p = document.querySelector('p');
- *     var evt = prepareEvent(p, 'keydown', { keyCode: Util.keyCode.ENTER });
+ *     var evt = prepareEvent(p, 'keydown', { keyCode: MediumEditor.util.keyCode.ENTER });
  *     spyOn(evt, 'preventDefault').and.callThrough();
  *     firePreparedEvent(evt, p, 'keydown');
  *     expect(evt.preventDefault).toHaveBeenCalled();

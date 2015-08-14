@@ -1,4 +1,4 @@
-/*global Util, Extension */
+/*global Extension */
 var PasteHandler;
 
 (function () {
@@ -127,16 +127,16 @@ var PasteHandler;
                     if (paragraphs.length > 1) {
                         for (p = 0; p < paragraphs.length; p += 1) {
                             if (paragraphs[p] !== '') {
-                                html += '<p>' + Util.htmlEntities(paragraphs[p]) + '</p>';
+                                html += '<p>' + MediumEditor.util.htmlEntities(paragraphs[p]) + '</p>';
                             }
                         }
                     } else {
-                        html = Util.htmlEntities(paragraphs[0]);
+                        html = MediumEditor.util.htmlEntities(paragraphs[0]);
                     }
                 } else {
-                    html = Util.htmlEntities(pastedPlain);
+                    html = MediumEditor.util.htmlEntities(pastedPlain);
                 }
-                Util.insertHTMLCommand(this.document, html);
+                MediumEditor.util.insertHTMLCommand(this.document, html);
             }
         },
 
@@ -184,7 +184,7 @@ var PasteHandler;
         },
 
         pasteHTML: function (html, options) {
-            options = Util.defaults({}, options, {
+            options = MediumEditor.util.defaults({}, options, {
                 cleanAttrs: this.cleanAttrs,
                 cleanTags: this.cleanTags
             });
@@ -203,14 +203,14 @@ var PasteHandler;
                 workEl = elList[i];
 
                 if ('a' === workEl.nodeName.toLowerCase() && this.getEditorOption('targetBlank')) {
-                    Util.setTargetBlank(workEl);
+                    MediumEditor.util.setTargetBlank(workEl);
                 }
 
-                Util.cleanupAttrs(workEl, options.cleanAttrs);
-                Util.cleanupTags(workEl, options.cleanTags);
+                MediumEditor.util.cleanupAttrs(workEl, options.cleanAttrs);
+                MediumEditor.util.cleanupTags(workEl, options.cleanTags);
             }
 
-            Util.insertHTMLCommand(this.document, fragmentBody.innerHTML.replace(/&nbsp;/g, ' '));
+            MediumEditor.util.insertHTMLCommand(this.document, fragmentBody.innerHTML.replace(/&nbsp;/g, ' '));
         },
 
         isCommonBlock: function (el) {
@@ -274,12 +274,12 @@ var PasteHandler;
                 el = spans[i];
 
                 // bail if span is in contenteditable = false
-                if (Util.traverseUp(el, isCEF)) {
+                if (MediumEditor.util.traverseUp(el, isCEF)) {
                     return false;
                 }
 
                 // remove empty spans, replace others with their contents
-                Util.unwrap(el, this.document);
+                MediumEditor.util.unwrap(el, this.document);
             }
         }
     });

@@ -1,4 +1,4 @@
-/*global describe, it, expect, afterEach, Util,
+/*global describe, it, expect, afterEach,
     beforeEach, fireEvent, setupTestHelpers */
 
 describe('Protect Header Tags TestCase', function () {
@@ -29,7 +29,7 @@ describe('Protect Header Tags TestCase', function () {
 
             // hit return
             fireEvent(editor.elements[0], 'keypress', {
-                keyCode: Util.keyCode.ENTER
+                keyCode: MediumEditor.util.keyCode.ENTER
             });
 
             el = document.getElementById('header');
@@ -50,7 +50,7 @@ describe('Protect Header Tags TestCase', function () {
 
             // hit return
             fireEvent(editor.elements[0], 'keypress', {
-                keyCode: Util.keyCode.ENTER
+                keyCode: MediumEditor.util.keyCode.ENTER
             });
 
             el = document.getElementById('header');
@@ -72,7 +72,7 @@ describe('Protect Header Tags TestCase', function () {
 
             // hit backspace
             fireEvent(editor.elements[0].querySelector(el.nodeName.toLowerCase()), 'keydown', {
-                keyCode: Util.keyCode.BACKSPACE
+                keyCode: MediumEditor.util.keyCode.BACKSPACE
             });
 
             el = document.getElementById('header');

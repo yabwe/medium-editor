@@ -1,4 +1,4 @@
-/*global describe, it, expect, Util,
+/*global describe, it, expect,
     afterEach, beforeEach, fireEvent, setupTestHelpers,
     Placeholder */
 
@@ -79,7 +79,7 @@ describe('Placeholder TestCase', function () {
         fireEvent(document.getElementById('target'), 'keypress');
         expect(editor.elements[0].className).not.toContain('medium-editor-placeholder');
         this.el.innerHTML = '';
-        fireEvent(editor.elements[0], 'keyup', { keyCode: Util.keyCode.DELETE });
+        fireEvent(editor.elements[0], 'keyup', { keyCode: MediumEditor.util.keyCode.DELETE });
         expect(editor.elements[0].className).toContain('medium-editor-placeholder');
     });
 

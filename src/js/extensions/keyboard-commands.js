@@ -2,7 +2,7 @@ var KeyboardCommands;
 (function () {
     'use strict';
 
-    /*global Extension, Util */
+    /*global Extension */
 
     KeyboardCommands = Extension.extend({
         name: 'keyboard-commands',
@@ -57,12 +57,12 @@ var KeyboardCommands;
         },
 
         handleKeydown: function (event) {
-            var keyCode = Util.getKeyCode(event);
+            var keyCode = MediumEditor.util.getKeyCode(event);
             if (!this.keys[keyCode]) {
                 return;
             }
 
-            var isMeta = Util.isMetaCtrlKey(event),
+            var isMeta = MediumEditor.util.isMetaCtrlKey(event),
                 isShift = !!event.shiftKey,
                 isAlt = !!event.altKey;
 

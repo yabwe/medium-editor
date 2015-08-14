@@ -1,4 +1,4 @@
-/*global Util, Extension */
+/*global Extension */
 var FileDragging;
 
 (function () {
@@ -7,7 +7,7 @@ var FileDragging;
     var CLASS_DRAG_OVER = 'medium-editor-dragover';
 
     function clearClassNames(element) {
-        var editable = Util.getContainerEditorElement(element),
+        var editable = MediumEditor.util.getContainerEditorElement(element),
             existing = Array.prototype.slice.call(editable.parentElement.querySelectorAll('.' + CLASS_DRAG_OVER));
 
         existing.forEach(function (el) {
@@ -73,7 +73,7 @@ var FileDragging;
             fileReader.readAsDataURL(file);
 
             var id = 'medium-img-' + (+new Date());
-            Util.insertHTMLCommand(this.document, '<img class="medium-editor-image-loading" id="' + id + '" />');
+            MediumEditor.util.insertHTMLCommand(this.document, '<img class="medium-editor-image-loading" id="' + id + '" />');
 
             fileReader.onload = function () {
                 var img = this.document.getElementById(id);

@@ -1,4 +1,4 @@
-/*global Util, Extension */
+/*global Extension */
 var ImageDragging;
 
 (function () {
@@ -41,7 +41,7 @@ var ImageDragging;
                         fileReader.readAsDataURL(file);
 
                         id = 'medium-img-' + (+new Date());
-                        Util.insertHTMLCommand(this.document, '<img class="medium-editor-image-loading" id="' + id + '" />');
+                        MediumEditor.util.insertHTMLCommand(this.document, '<img class="medium-editor-image-loading" id="' + id + '" />');
 
                         fileReader.onload = function () {
                             var img = this.document.getElementById(id);

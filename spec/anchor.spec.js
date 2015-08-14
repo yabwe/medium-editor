@@ -1,6 +1,6 @@
 /*global describe, it, expect, spyOn,
      afterEach, beforeEach, selectElementContents,
-     jasmine, fireEvent, Util, setupTestHelpers,
+     jasmine, fireEvent, setupTestHelpers,
      selectElementContentsAndFire */
 
 describe('Anchor Button TestCase', function () {
@@ -67,7 +67,7 @@ describe('Anchor Button TestCase', function () {
             input = editor.getExtensionByName('anchor').getInput();
             input.value = 'test';
             fireEvent(input, 'keyup', {
-                keyCode: Util.keyCode.ENTER
+                keyCode: MediumEditor.util.keyCode.ENTER
             });
             expect(editor.createLink).toHaveBeenCalled();
             // A trailing <br> may be added when insertHTML is used to add the link internally.
@@ -89,7 +89,7 @@ describe('Anchor Button TestCase', function () {
             input = editor.getExtensionByName('anchor').getInput();
             input.value = 'test';
             fireEvent(input, 'keyup', {
-                keyCode: Util.keyCode.ENTER
+                keyCode: MediumEditor.util.keyCode.ENTER
             });
             expect(editor.createLink).toHaveBeenCalled();
             var suffix;
@@ -118,7 +118,7 @@ describe('Anchor Button TestCase', function () {
             input = editor.getExtensionByName('anchor').getInput();
             input.value = 'test';
             fireEvent(input, 'keyup', {
-                keyCode: Util.keyCode.ENTER
+                keyCode: MediumEditor.util.keyCode.ENTER
             });
             expect(editor.createLink).toHaveBeenCalled();
             var expectedHTML = '<p>Hello <a href="test"><span>world</span>.</a></p>';
@@ -144,7 +144,7 @@ describe('Anchor Button TestCase', function () {
             input = editor.getExtensionByName('anchor').getInput();
             input.value = '';
             fireEvent(input, 'keyup', {
-                keyCode: Util.keyCode.ENTER
+                keyCode: MediumEditor.util.keyCode.ENTER
             });
             expect(editor.elements[0].querySelector('a')).toBeNull();
         });
@@ -248,7 +248,7 @@ describe('Anchor Button TestCase', function () {
             button.checked = true;
 
             fireEvent(input, 'keyup', {
-                keyCode: Util.keyCode.ENTER
+                keyCode: MediumEditor.util.keyCode.ENTER
             });
             opts = {
                 url: 'test',
@@ -294,7 +294,7 @@ describe('Anchor Button TestCase', function () {
             checkbox.checked = true;
             editor.subscribe('editableInput', listener);
             fireEvent(input, 'keyup', {
-                keyCode: Util.keyCode.ENTER
+                keyCode: MediumEditor.util.keyCode.ENTER
             });
 
             expect(editor.createLink).toHaveBeenCalledWith({
@@ -327,7 +327,7 @@ describe('Anchor Button TestCase', function () {
             var input = anchorExtension.getInput();
             input.value = 'http://www.example.com';
             fireEvent(input, 'keyup', {
-                keyCode: Util.keyCode.ENTER
+                keyCode: MediumEditor.util.keyCode.ENTER
             });
 
             expect(editor.createLink).toHaveBeenCalledWith({
@@ -367,7 +367,7 @@ describe('Anchor Button TestCase', function () {
             var input = anchorExtension.getInput();
             input.value = 'http://www.example.com';
             fireEvent(input, 'keyup', {
-                keyCode: Util.keyCode.ENTER
+                keyCode: MediumEditor.util.keyCode.ENTER
             });
 
             expect(editor.createLink).toHaveBeenCalledWith({
@@ -406,7 +406,7 @@ describe('Anchor Button TestCase', function () {
             var input = anchorExtension.getInput();
             input.value = 'http://www.example.com';
             fireEvent(input, 'keyup', {
-                keyCode: Util.keyCode.ENTER
+                keyCode: MediumEditor.util.keyCode.ENTER
             });
 
             expect(editor.createLink).toHaveBeenCalledWith({
@@ -458,7 +458,7 @@ describe('Anchor Button TestCase', function () {
             fireEvent(toolbar.getToolbarElement().querySelector('[data-action="createLink"]'), 'click');
             expect(anchorExtension.isDisplayed()).toBe(true);
             fireEvent(anchorExtension.getInput(), 'keyup', {
-                keyCode: Util.keyCode.ESCAPE
+                keyCode: MediumEditor.util.keyCode.ESCAPE
             });
             expect(anchorExtension.isDisplayed()).toBe(false);
         });

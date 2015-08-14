@@ -1,4 +1,4 @@
-/*global Extension, Util */
+/*global Extension */
 
 var AutoLink,
     WHITESPACE_CHARS,
@@ -28,7 +28,7 @@ LINK_REGEXP_TEXT =
     var KNOWN_TLDS_REGEXP = new RegExp('^(' + KNOWN_TLDS_FRAGMENT + ')$', 'i');
 
     function nodeIsNotInsideAnchorTag(node) {
-        return !Util.getClosestTag(node, 'a');
+        return !MediumEditor.util.getClosestTag(node, 'a');
     }
 
     AutoLink = Extension.extend({
@@ -58,7 +58,7 @@ LINK_REGEXP_TEXT =
                 return;
             }
 
-            if (Util.isKey(keyPressEvent, [Util.keyCode.SPACE, Util.keyCode.ENTER])) {
+            if (MediumEditor.util.isKey(keyPressEvent, [MediumEditor.util.keyCode.SPACE, MediumEditor.util.keyCode.ENTER])) {
                 clearTimeout(this.performLinkingTimeout);
                 // Saving/restoring the selection in the middle of a keypress doesn't work well...
                 this.performLinkingTimeout = setTimeout(function () {
@@ -104,19 +104,19 @@ LINK_REGEXP_TEXT =
             for (var i = 0; i < spans.length; i++) {
                 var textContent = spans[i].textContent;
                 if (textContent.indexOf('://') === -1) {
-                    textContent = Util.ensureUrlHasProtocol(textContent);
+                    textContent = MediumEditor.util.ensureUrlHasProtocol(textContent);
                 }
                 if (spans[i].getAttribute('data-href') !== textContent && nodeIsNotInsideAnchorTag(spans[i])) {
                     documentModified = true;
                     var trimmedTextContent = textContent.replace(/\s+$/, '');
                     if (spans[i].getAttribute('data-href') === trimmedTextContent) {
                         var charactersTrimmed = textContent.length - trimmedTextContent.length,
-                            subtree = Util.splitOffDOMTree(spans[i], this.splitTextBeforeEnd(spans[i], charactersTrimmed));
+                            subtree = MediumEditor.util.splitOffDOMTree(spans[i], this.splitTextBeforeEnd(spans[i], charactersTrimmed));
                         spans[i].parentNode.insertBefore(subtree, spans[i].nextSibling);
                     } else {
                         // Some editing has happened to the span, so just remove it entirely. The user can put it back
                         // around just the href content if they need to prevent it from linking
-                        Util.unwrap(spans[i], this.document);
+                        MediumEditor.util.unwrap(spans[i], this.document);
                     }
                 }
             }
@@ -154,7 +154,7 @@ LINK_REGEXP_TEXT =
                 linkCreated = false;
 
             for (var matchIndex = 0; matchIndex < matches.length; matchIndex++) {
-                var matchingTextNodes = Util.findOrCreateMatchingTextNodes(this.document, element,
+                var matchingTextNodes = MediumEditor.util.findOrCreateMatchingTextNodes(this.document, element,
                         matches[matchIndex]);
                 if (this.shouldNotLink(matchingTextNodes)) {
                     continue;
@@ -168,7 +168,7 @@ LINK_REGEXP_TEXT =
             var shouldNotLink = false;
             for (var i = 0; i < textNodes.length && shouldNotLink === false; i++) {
                 // Do not link if the text node is either inside an anchor or inside span[data-auto-link]
-                shouldNotLink = !!Util.traverseUp(textNodes[i], function (node) {
+                shouldNotLink = !!MediumEditor.util.traverseUp(textNodes[i], function (node) {
                     return node.nodeName.toLowerCase() === 'a' ||
                         (node.getAttribute && node.getAttribute('data-auto-link') === 'true');
                 });
@@ -204,8 +204,8 @@ LINK_REGEXP_TEXT =
         },
 
         createAutoLink: function (textNodes, href) {
-            href = Util.ensureUrlHasProtocol(href);
-            var anchor = Util.createLink(this.document, textNodes, href, this.getEditorOption('targetBlank') ? '_blank' : null),
+            href = MediumEditor.util.ensureUrlHasProtocol(href);
+            var anchor = MediumEditor.util.createLink(this.document, textNodes, href, this.getEditorOption('targetBlank') ? '_blank' : null),
                 span = this.document.createElement('span');
             span.setAttribute('data-auto-link', 'true');
             span.setAttribute('data-href', href);

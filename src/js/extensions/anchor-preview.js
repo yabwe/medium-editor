@@ -2,7 +2,7 @@ var AnchorPreview;
 (function () {
     'use strict';
 
-    /*global Util, Extension */
+    /*global Extension */
 
     AnchorPreview = Extension.extend({
         name: 'anchor-preview',
@@ -155,7 +155,7 @@ var AnchorPreview;
         },
 
         handleEditableMouseover: function (event) {
-            var target = Util.getClosestTag(event.target, 'a');
+            var target = MediumEditor.util.getClosestTag(event.target, 'a');
 
             if (false === target) {
                 return;

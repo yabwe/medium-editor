@@ -2,7 +2,7 @@ var AnchorForm;
 (function () {
     'use strict';
 
-    /*global Util, FormExtension */
+    /*global FormExtension */
 
     AnchorForm = FormExtension.extend({
         /* Anchor Form Options */
@@ -64,7 +64,7 @@ var AnchorForm;
 
             if (range.startContainer.nodeName.toLowerCase() === 'a' ||
                 range.endContainer.nodeName.toLowerCase() === 'a' ||
-                Util.getClosestTag(MediumEditor.selection.getSelectedParentElement(range), 'a')) {
+                MediumEditor.util.getClosestTag(MediumEditor.selection.getSelectedParentElement(range), 'a')) {
                 return this.execAction('unlink');
             }
 
@@ -77,7 +77,7 @@ var AnchorForm;
 
         // Called when user hits the defined shortcut (CTRL / COMMAND + K)
         handleKeydown: function (event) {
-            if (Util.isKey(event, Util.keyCode.K) && Util.isMetaCtrlKey(event) && !event.shiftKey) {
+            if (MediumEditor.util.isKey(event, MediumEditor.util.keyCode.K) && MediumEditor.util.isMetaCtrlKey(event) && !event.shiftKey) {
                 this.handleClick(event);
             }
         },
@@ -291,14 +291,14 @@ var AnchorForm;
 
         handleTextboxKeyup: function (event) {
             // For ENTER -> create the anchor
-            if (event.keyCode === Util.keyCode.ENTER) {
+            if (event.keyCode === MediumEditor.util.keyCode.ENTER) {
                 event.preventDefault();
                 this.doFormSave();
                 return;
             }
 
             // For ESCAPE -> close the form
-            if (event.keyCode === Util.keyCode.ESCAPE) {
+            if (event.keyCode === MediumEditor.util.keyCode.ESCAPE) {
                 event.preventDefault();
                 this.doFormCancel();
             }

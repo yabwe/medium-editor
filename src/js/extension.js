@@ -1,8 +1,8 @@
+/* global Util */
+
 var Extension;
 (function () {
     'use strict';
-
-    /* global Util */
 
     Extension = function (options) {
         Util.extend(this, options);

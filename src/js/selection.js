@@ -1,11 +1,10 @@
-/*global Util */
 var Selection;
 
 (function () {
     'use strict';
 
     function filterOnlyParentElements(node) {
-        if (Util.isBlockContainer(node)) {
+        if (MediumEditor.util.isBlockContainer(node)) {
             return NodeFilter.FILTER_ACCEPT;
         } else {
             return NodeFilter.FILTER_SKIP;
@@ -25,12 +24,12 @@ var Selection;
             range = selection.getRangeAt(0);
             current = range.commonAncestorContainer;
 
-            return Util.traverseUp(current, testElementFunction);
+            return MediumEditor.util.traverseUp(current, testElementFunction);
         },
 
         getSelectionElement: function (contentWindow) {
             return this.findMatchingSelectionParent(function (el) {
-                return Util.isMediumEditorElement(el);
+                return MediumEditor.util.isMediumEditorElement(el);
             }, contentWindow);
         },
 
@@ -141,7 +140,7 @@ var Selection;
             if (selectionState.start === selectionState.end &&
                     range.startContainer.nodeType === 3 &&
                     range.startOffset === range.startContainer.nodeValue.length &&
-                    Util.traverseUp(range.startContainer, nodeInsideAnchorTagFunction)) {
+                    MediumEditor.util.traverseUp(range.startContainer, nodeInsideAnchorTagFunction)) {
                 var prevNode = range.startContainer,
                     currentNode = range.startContainer.parentNode;
                 while (currentNode !== null && currentNode.nodeName.toLowerCase() !== 'a') {
@@ -180,10 +179,10 @@ var Selection;
             // If the selection is inside one of these text nodes, and it has a previous sibling
             // which is a block element, we want the treewalker to start at the previous sibling
             // and NOT at the parent of the textnode
-            if (startContainer.nodeType === 3 && Util.isBlockContainer(startContainer.previousSibling)) {
+            if (startContainer.nodeType === 3 && MediumEditor.util.isBlockContainer(startContainer.previousSibling)) {
                 startBlock = startContainer.previousSibling;
             } else {
-                startBlock = Util.getClosestBlockContainer(startContainer);
+                startBlock = MediumEditor.util.getClosestBlockContainer(startContainer);
             }
 
             // Skip over empty blocks until we hit the block we want the selection to be in
@@ -209,7 +208,7 @@ var Selection;
 
             // We're selecting a high-level block node, so make sure the cursor gets moved into the deepest
             // element at the beginning of the block
-            range.setStart(Util.getFirstSelectableLeafNode(targetNode), 0);
+            range.setStart(MediumEditor.util.getFirstSelectableLeafNode(targetNode), 0);
 
             return range;
         },
@@ -230,13 +229,13 @@ var Selection;
             if (node.nodeType !== 3) {
                 node = cursorContainer.childNodes[cursorOffset];
             }
-            if (node && !Util.isElementAtBeginningOfBlock(node)) {
+            if (node && !MediumEditor.util.isElementAtBeginningOfBlock(node)) {
                 return -1;
             }
 
             // Walk over block elements, counting number of empty blocks between last piece of text
             // and the block the cursor is in
-            var closestBlock = Util.getClosestBlockContainer(cursorContainer),
+            var closestBlock = MediumEditor.util.getClosestBlockContainer(cursorContainer),
                 treeWalker = doc.createTreeWalker(root, NodeFilter.SHOW_ELEMENT, filterOnlyParentElements, false),
                 emptyBlocksCount = 0;
             while (treeWalker.nextNode()) {
