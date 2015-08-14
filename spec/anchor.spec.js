@@ -63,13 +63,13 @@ describe('Anchor Button TestCase', function () {
             button = toolbar.getToolbarElement().querySelector('[data-action="createLink"]');
             fireEvent(button, 'click');
             input = editor.getExtensionByName('anchor').getInput();
-            input.value = 'test';
+            input.value = 'http://test.com';
             fireEvent(input, 'keyup', {
                 keyCode: MediumEditor.util.keyCode.ENTER
             });
             expect(editor.createLink).toHaveBeenCalled();
             // A trailing <br> may be added when insertHTML is used to add the link internally.
-            expect(this.el.innerHTML.indexOf('<a href="test">lorem ipsum</a>')).toBe(0);
+            expect(this.el.innerHTML.indexOf('<a href="http://test.com">lorem ipsum</a>')).toBe(0);
         });
 
         it('should remove the extra white spaces in the link when user presses enter', function () {
@@ -122,19 +122,12 @@ describe('Anchor Button TestCase', function () {
             button = toolbar.getToolbarElement().querySelector('[data-action="createLink"]');
             fireEvent(button, 'click');
             input = editor.getExtensionByName('anchor').getInput();
-            input.value = 'test';
+            input.value = 'http://test.com';
             fireEvent(input, 'keyup', {
                 keyCode: MediumEditor.util.keyCode.ENTER
             });
             expect(editor.createLink).toHaveBeenCalled();
-            var suffix;
-            if (this.el.innerHTML.indexOf('<br') !== -1) {
-                suffix = '<br>';
-            } else {
-                suffix = '<strong></strong>';
-            }
-            expect(this.el.innerHTML).toBe('Hello world, <a href="test">this <strong>will become a link</strong></a>' +
-                '<strong>, but this part won\'t.</strong>' + suffix);
+            expect(this.el.innerHTML).toMatch(/^Hello world, <a href="http:\/\/test\.com\/?">this <strong>will become a link<\/strong><\/a><strong>, but this part won\'t\.<\/strong>(<br>|<strong><\/strong>)?$/);
         });
 
         it('should create a link when the user selects text within two paragraphs', function () {
@@ -151,17 +144,17 @@ describe('Anchor Button TestCase', function () {
             button = toolbar.getToolbarElement().querySelector('[data-action="createLink"]');
             fireEvent(button, 'click');
             input = editor.getExtensionByName('anchor').getInput();
-            input.value = 'test';
+            input.value = 'http://test.com';
             fireEvent(input, 'keyup', {
                 keyCode: MediumEditor.util.keyCode.ENTER
             });
             expect(editor.createLink).toHaveBeenCalled();
-            var expectedHTML = '<p>Hello <a href="test"><span>world</span>.</a></p>';
+            var expectedHTML = '<p>Hello <a href="http://test.com"><span>world</span>.</a></p>';
             // Different browser's native createLink implement this differently.
             if (this.el.innerHTML.indexOf('<strong><a') !== -1) {
-                expectedHTML += '<p><strong><a href="test">Let us make a link</a></strong> across paragraphs.</p>';
+                expectedHTML += '<p><strong><a href="http://test.com">Let us make a link</a></strong> across paragraphs.</p>';
             } else {
-                expectedHTML += '<p><a href="test"><strong>Let us make a link</strong></a> across paragraphs.</p>';
+                expectedHTML += '<p><a href="http://test.com"><strong>Let us make a link</strong></a> across paragraphs.</p>';
             }
             expect(this.el.innerHTML).toBe(expectedHTML);
         });
@@ -367,7 +360,7 @@ describe('Anchor Button TestCase', function () {
             fireEvent(save, 'click');
 
             input = anchorExtension.getInput();
-            input.value = 'test';
+            input.value = 'http://test.com';
 
             button = anchorExtension.getForm().querySelector('input.medium-editor-toolbar-anchor-button');
             button.setAttribute('type', 'checkbox');
@@ -377,7 +370,7 @@ describe('Anchor Button TestCase', function () {
                 keyCode: MediumEditor.util.keyCode.ENTER
             });
             opts = {
-                url: 'test',
+                url: 'http://test.com',
                 target: '_self',
                 buttonClass: 'btn btn-default'
             };
