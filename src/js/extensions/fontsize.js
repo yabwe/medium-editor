@@ -1,10 +1,7 @@
-var FontSizeForm;
 (function () {
     'use strict';
 
-    /*global FormExtension */
-
-    FontSizeForm = FormExtension.extend({
+    MediumEditor.extensions.fontSize = MediumEditor.extensions.form.extend({
 
         name: 'fontsize',
         action: 'fontSize',
@@ -13,7 +10,7 @@ var FontSizeForm;
         contentFA: '<i class="fa fa-text-height"></i>',
 
         init: function () {
-            FormExtension.prototype.init.apply(this, arguments);
+            MediumEditor.extensions.form.prototype.init.apply(this, arguments);
         },
 
         // Called when the button the toolbar is clicked

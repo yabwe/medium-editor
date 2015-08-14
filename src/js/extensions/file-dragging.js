@@ -1,5 +1,3 @@
-var FileDragging;
-
 (function () {
     'use strict';
 
@@ -14,7 +12,7 @@ var FileDragging;
         });
     }
 
-    FileDragging = MediumEditor.Extension.extend({
+    MediumEditor.extensions.fileDragging = MediumEditor.Extension.extend({
         name: 'fileDragging',
 
         allowedTypes: ['image'],

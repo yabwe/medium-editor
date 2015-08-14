@@ -32,7 +32,6 @@ module.exports = function (grunt) {
             'src/js/extensions/placeholder.js',
             'src/js/extensions/toolbar.js',
             'src/js/extensions/deprecated/image-dragging.js',
-            'src/js/defaults/extensions.js',
             'src/js/core.js',
             'src/js/version.js'
         ],

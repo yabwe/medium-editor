@@ -1,9 +1,7 @@
-var ImageDragging;
-
 (function () {
     'use strict';
 
-    ImageDragging = MediumEditor.Extension.extend({
+    MediumEditor.extensions.imageDragging = MediumEditor.Extension.extend({
         init: function () {
             MediumEditor.Extension.prototype.init.apply(this, arguments);
 

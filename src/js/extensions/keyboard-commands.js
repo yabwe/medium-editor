@@ -1,8 +1,7 @@
-var KeyboardCommands;
 (function () {
     'use strict';
 
-    KeyboardCommands = MediumEditor.Extension.extend({
+    MediumEditor.extensions.keyboardCommands = MediumEditor.Extension.extend({
         name: 'keyboard-commands',
 
         /* KeyboardCommands Options */

@@ -1,9 +1,9 @@
 /*global describe, it, expect, spyOn,
     afterEach, beforeEach, selectElementContents,
     fireEvent, setupTestHelpers, jasmine, selectElementContentsAndFire,
-    placeCursorInsideElement, Toolbar*/
+    placeCursorInsideElement */
 
-describe('Toolbar TestCase', function () {
+describe('MediumEditor.extensions.toolbar TestCase', function () {
     'use strict';
 
     beforeEach(function () {
@@ -421,7 +421,7 @@ describe('Toolbar TestCase', function () {
                     }
                 }),
                 toolbar = editor.getExtensionByName('toolbar');
-            spyOn(Toolbar.prototype, 'positionToolbarIfShown');
+            spyOn(MediumEditor.extensions.toolbar.prototype, 'positionToolbarIfShown');
             fireEvent(window, 'scroll');
             expect(toolbar.positionToolbarIfShown).toHaveBeenCalled();
         });

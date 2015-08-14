@@ -1,4 +1,4 @@
-/*global extensionDefaults, Events, editorDefaults*/
+/*global Events, editorDefaults*/
 
 (function () {
     'use strict';
@@ -538,8 +538,6 @@
             this.restoreSelection();
         }
     }
-
-    MediumEditor.extensions = extensionDefaults;
 
     MediumEditor.prototype = {
         defaults: editorDefaults,

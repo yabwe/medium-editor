@@ -1,5 +1,3 @@
-var PasteHandler;
-
 (function () {
     'use strict';
     /*jslint regexp: true*/
@@ -49,7 +47,7 @@ var PasteHandler;
     }
     /*jslint regexp: false*/
 
-    PasteHandler = MediumEditor.Extension.extend({
+    MediumEditor.extensions.paste = MediumEditor.Extension.extend({
         /* Paste Options */
 
         /* forcePlainText: [boolean]

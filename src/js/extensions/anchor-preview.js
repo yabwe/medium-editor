@@ -1,8 +1,7 @@
-var AnchorPreview;
 (function () {
     'use strict';
 
-    AnchorPreview = MediumEditor.Extension.extend({
+    MediumEditor.extensions.anchorPreview = MediumEditor.Extension.extend({
         name: 'anchor-preview',
 
         // Anchor Preview Options

@@ -1,8 +1,7 @@
 /*global describe, it, expect,
-    afterEach, beforeEach, fireEvent, setupTestHelpers,
-    Placeholder */
+    afterEach, beforeEach, fireEvent, setupTestHelpers */
 
-describe('Placeholder TestCase', function () {
+describe('MediumEditor.extensions.placeholder TestCase', function () {
     'use strict';
 
     beforeEach(function () {
@@ -118,14 +117,14 @@ describe('Placeholder TestCase', function () {
 
     it('should add the default placeholder text when data-placeholder is not present', function () {
         var editor = this.newMediumEditor('.editor');
-        validatePlaceholderContent(editor.elements[0], Placeholder.prototype.text);
+        validatePlaceholderContent(editor.elements[0], MediumEditor.extensions.placeholder.prototype.text);
     });
 
     it('should remove the added data-placeholder attribute when destroyed', function () {
         expect(this.el.hasAttribute('data-placeholder')).toBe(false);
 
         var editor = this.newMediumEditor('.editor');
-        expect(this.el.getAttribute('data-placeholder')).toBe(Placeholder.prototype.text);
+        expect(this.el.getAttribute('data-placeholder')).toBe(MediumEditor.extensions.placeholder.prototype.text);
 
         editor.destroy();
         expect(this.el.hasAttribute('data-placeholder')).toBe(false);

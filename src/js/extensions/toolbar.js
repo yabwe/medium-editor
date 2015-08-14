@@ -1,8 +1,7 @@
-var Toolbar;
 (function () {
     'use strict';
 
-    Toolbar = MediumEditor.Extension.extend({
+    MediumEditor.extensions.toolbar = MediumEditor.Extension.extend({
         name: 'toolbar',
 
         /* Toolbar Options */

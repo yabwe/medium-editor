@@ -1,18 +1,15 @@
-var FormExtension;
 (function () {
     'use strict';
-
-    /* global Button */
 
     var noop = function () {};
 
     /* Base functionality for an extension which will display
      * a 'form' inside the toolbar
      */
-    FormExtension = Button.extend({
+    MediumEditor.extensions.form = MediumEditor.extensions.button.extend({
 
         init: function () {
-            Button.prototype.init.apply(this, arguments);
+            MediumEditor.extensions.button.prototype.init.apply(this, arguments);
         },
 
         // default labels for the form buttons

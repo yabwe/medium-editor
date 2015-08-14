@@ -1,9 +1,7 @@
-var Placeholder;
-
 (function () {
     'use strict';
 
-    Placeholder = MediumEditor.Extension.extend({
+    MediumEditor.extensions.placeholder = MediumEditor.Extension.extend({
         name: 'placeholder',
 
         /* Placeholder Options */

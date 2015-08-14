@@ -1,5 +1,4 @@
-var AutoLink,
-    WHITESPACE_CHARS,
+var WHITESPACE_CHARS,
     KNOWN_TLDS_FRAGMENT,
     LINK_REGEXP_TEXT;
 
@@ -29,7 +28,7 @@ LINK_REGEXP_TEXT =
         return !MediumEditor.util.getClosestTag(node, 'a');
     }
 
-    AutoLink = MediumEditor.Extension.extend({
+    MediumEditor.extensions.autoLink = MediumEditor.Extension.extend({
         init: function () {
             MediumEditor.Extension.prototype.init.apply(this, arguments);
 

@@ -1,10 +1,7 @@
-var AnchorForm;
 (function () {
     'use strict';
 
-    /*global FormExtension */
-
-    AnchorForm = FormExtension.extend({
+    MediumEditor.extensions.anchor = MediumEditor.extensions.form.extend({
         /* Anchor Form Options */
 
         /* customClassOption: [string]  (previously options.anchorButton + options.anchorButtonClass)
@@ -49,7 +46,7 @@ var AnchorForm;
         contentFA: '<i class="fa fa-link"></i>',
 
         init: function () {
-            FormExtension.prototype.init.apply(this, arguments);
+            MediumEditor.extensions.form.prototype.init.apply(this, arguments);
 
             this.subscribe('editableKeydown', this.handleKeydown.bind(this));
         },
