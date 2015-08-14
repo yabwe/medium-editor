@@ -1,4 +1,4 @@
-/*global MediumEditor, describe, it, expect, spyOn,
+/*global describe, it, expect, spyOn,
     AnchorForm, afterEach, beforeEach, setupTestHelpers, _,
     AnchorPreview */
 

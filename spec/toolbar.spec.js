@@ -1,4 +1,4 @@
-/*global MediumEditor, describe, it, expect, spyOn,
+/*global describe, it, expect, spyOn,
     afterEach, beforeEach, selectElementContents,
     fireEvent, setupTestHelpers, jasmine, selectElementContentsAndFire,
     placeCursorInsideElement, Toolbar*/

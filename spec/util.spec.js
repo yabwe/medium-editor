@@ -1,4 +1,4 @@
-/*global MediumEditor, Util, describe, it, expect, spyOn,
+/*global Util, describe, it, expect, spyOn,
          afterEach, beforeEach, setupTestHelpers, selectElementContents */
 
 describe('Util', function () {

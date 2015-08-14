@@ -8,6 +8,7 @@
   "latedef": true,
   "newcap": false,
   "noarg": true,
+  "predef": [ "MediumEditor" ],
   "sub": true,
   "undef": true,
   "unused": true,

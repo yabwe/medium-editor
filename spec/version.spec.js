@@ -1,4 +1,4 @@
-/*global MediumEditor, describe, it, expect */
+/*global describe, it, expect */
 
 describe('Core MediumEditor', function () {
 

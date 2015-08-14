@@ -1,4 +1,4 @@
-/*global MediumEditor, describe, it, expect, spyOn, AnchorForm,
+/*global describe, it, expect, spyOn, AnchorForm,
          beforeAll, afterAll,
          afterEach, beforeEach, jasmine, fireEvent, setupTestHelpers,
          selectElementContentsAndFire, isOldIE, isIE */

@@ -1,5 +1,3 @@
-/*global MediumEditor */
-
 MediumEditor.parseVersionString = function (release) {
     var split = release.split('-'),
         version = split[0].split('.'),

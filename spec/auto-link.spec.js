@@ -1,6 +1,6 @@
 /*global describe, it, expect, beforeEach, afterEach,
     setupTestHelpers, selectElementContentsAndFire, fireEvent,
-    Util, jasmine, spyOn, MediumEditor */
+    Util, jasmine, spyOn */
 
 describe('Autolink', function () {
     'use strict';
