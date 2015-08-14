@@ -2,9 +2,9 @@ var Button;
 (function () {
     'use strict';
 
-    /*global Extension, buttonDefaults */
+    /*global buttonDefaults */
 
-    Button = Extension.extend({
+    Button = MediumEditor.Extension.extend({
 
         /* Button Options */
 
@@ -99,14 +99,14 @@ var Button;
         // configuration for that button
         constructor: function (options) {
             if (Button.isBuiltInButton(options)) {
-                Extension.call(this, this.defaults[options]);
+                MediumEditor.Extension.call(this, this.defaults[options]);
             } else {
-                Extension.call(this, options);
+                MediumEditor.Extension.call(this, options);
             }
         },
 
         init: function () {
-            Extension.prototype.init.apply(this, arguments);
+            MediumEditor.Extension.prototype.init.apply(this, arguments);
 
             this.button = this.createButton();
             this.on(this.button, 'click', this.handleClick.bind(this));

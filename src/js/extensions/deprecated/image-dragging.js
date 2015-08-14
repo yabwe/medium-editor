@@ -1,12 +1,11 @@
-/*global Extension */
 var ImageDragging;
 
 (function () {
     'use strict';
 
-    ImageDragging = Extension.extend({
+    ImageDragging = MediumEditor.Extension.extend({
         init: function () {
-            Extension.prototype.init.apply(this, arguments);
+            MediumEditor.Extension.prototype.init.apply(this, arguments);
 
             this.subscribe('editableDrag', this.handleDrag.bind(this));
             this.subscribe('editableDrop', this.handleDrop.bind(this));

@@ -2,9 +2,7 @@ var KeyboardCommands;
 (function () {
     'use strict';
 
-    /*global Extension */
-
-    KeyboardCommands = Extension.extend({
+    KeyboardCommands = MediumEditor.Extension.extend({
         name: 'keyboard-commands',
 
         /* KeyboardCommands Options */
@@ -43,7 +41,7 @@ var KeyboardCommands;
         ],
 
         init: function () {
-            Extension.prototype.init.apply(this, arguments);
+            MediumEditor.Extension.prototype.init.apply(this, arguments);
 
             this.subscribe('editableKeydown', this.handleKeydown.bind(this));
             this.keys = {};

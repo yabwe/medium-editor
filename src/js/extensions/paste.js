@@ -1,4 +1,3 @@
-/*global Extension */
 var PasteHandler;
 
 (function () {
@@ -50,7 +49,7 @@ var PasteHandler;
     }
     /*jslint regexp: false*/
 
-    PasteHandler = Extension.extend({
+    PasteHandler = MediumEditor.Extension.extend({
         /* Paste Options */
 
         /* forcePlainText: [boolean]
@@ -82,7 +81,7 @@ var PasteHandler;
         cleanTags: ['meta'],
 
         init: function () {
-            Extension.prototype.init.apply(this, arguments);
+            MediumEditor.Extension.prototype.init.apply(this, arguments);
 
             if (this.forcePlainText || this.cleanPastedHTML) {
                 this.subscribe('editablePaste', this.handlePaste.bind(this));

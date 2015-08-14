@@ -1,4 +1,4 @@
-/*global Extension, extensionDefaults, Events, editorDefaults*/
+/*global extensionDefaults, Events, editorDefaults*/
 
 (function () {
     'use strict';
@@ -538,8 +538,6 @@
             this.restoreSelection();
         }
     }
-
-    MediumEditor.Extension = Extension;
 
     MediumEditor.extensions = extensionDefaults;
 

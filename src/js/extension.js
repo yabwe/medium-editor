@@ -1,8 +1,7 @@
-var Extension;
 (function () {
     'use strict';
 
-    Extension = function (options) {
+    var Extension = function (options) {
         MediumEditor.util.extend(this, options);
     };
 
@@ -255,4 +254,6 @@ var Extension;
             return this.base[helper].apply(this.base, arguments);
         };
     });
+
+    MediumEditor.Extension = Extension;
 })();

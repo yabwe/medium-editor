@@ -1,4 +1,3 @@
-/*global Extension */
 var FileDragging;
 
 (function () {
@@ -15,13 +14,13 @@ var FileDragging;
         });
     }
 
-    FileDragging = Extension.extend({
+    FileDragging = MediumEditor.Extension.extend({
         name: 'fileDragging',
 
         allowedTypes: ['image'],
 
         init: function () {
-            Extension.prototype.init.apply(this, arguments);
+            MediumEditor.Extension.prototype.init.apply(this, arguments);
 
             this.subscribe('editableDrag', this.handleDrag.bind(this));
             this.subscribe('editableDrop', this.handleDrop.bind(this));

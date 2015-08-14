@@ -2,9 +2,7 @@ var Toolbar;
 (function () {
     'use strict';
 
-    /*global Extension */
-
-    Toolbar = Extension.extend({
+    Toolbar = MediumEditor.Extension.extend({
         name: 'toolbar',
 
         /* Toolbar Options */
@@ -73,7 +71,7 @@ var Toolbar;
         updateOnEmptySelection: false,
 
         init: function () {
-            Extension.prototype.init.apply(this, arguments);
+            MediumEditor.Extension.prototype.init.apply(this, arguments);
 
             this.initThrottledMethods();
             this.getEditorOption('elementsContainer').appendChild(this.getToolbarElement());

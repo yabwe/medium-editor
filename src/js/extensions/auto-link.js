@@ -1,5 +1,3 @@
-/*global Extension */
-
 var AutoLink,
     WHITESPACE_CHARS,
     KNOWN_TLDS_FRAGMENT,
@@ -31,9 +29,9 @@ LINK_REGEXP_TEXT =
         return !MediumEditor.util.getClosestTag(node, 'a');
     }
 
-    AutoLink = Extension.extend({
+    AutoLink = MediumEditor.Extension.extend({
         init: function () {
-            Extension.prototype.init.apply(this, arguments);
+            MediumEditor.Extension.prototype.init.apply(this, arguments);
 
             this.disableEventHandling = false;
             this.subscribe('editableKeypress', this.onKeypress.bind(this));

@@ -3,9 +3,7 @@ var Placeholder;
 (function () {
     'use strict';
 
-    /*global Extension */
-
-    Placeholder = Extension.extend({
+    Placeholder = MediumEditor.Extension.extend({
         name: 'placeholder',
 
         /* Placeholder Options */
@@ -21,7 +19,7 @@ var Placeholder;
         hideOnClick: true,
 
         init: function () {
-            Extension.prototype.init.apply(this, arguments);
+            MediumEditor.Extension.prototype.init.apply(this, arguments);
 
             this.initPlaceholders();
             this.attachEventHandlers();
