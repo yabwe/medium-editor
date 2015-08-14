@@ -1,5 +1,4 @@
-/*global describe, it, expect, spyOn,
-         afterEach, beforeEach, setupTestHelpers, selectElementContents */
+/*global selectElementContents*/
 
 describe('MediumEditor.util', function () {
     'use strict';

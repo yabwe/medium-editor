@@ -1,6 +1,5 @@
-/*global describe, it, expect, spyOn, jasmine,
-    fireEvent, afterEach, beforeEach, selectElementContents,
-    setupTestHelpers, selectElementContentsAndFire */
+/*global fireEvent, selectElementContents,
+         selectElementContentsAndFire */
 
 describe('Setup/Destroy TestCase', function () {
     'use strict';

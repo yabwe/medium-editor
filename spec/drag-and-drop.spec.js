@@ -1,5 +1,4 @@
-/*global describe, it, expect, spyOn,
-     afterEach, beforeEach, setupTestHelpers, fireEvent, isIE9*/
+/*global fireEvent, isIE9 */
 
 describe('Drag and Drop TestCase', function () {
     'use strict';

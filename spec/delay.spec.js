@@ -1,6 +1,3 @@
-/*global describe, it, expect, jasmine,
-    afterEach, beforeEach, setupTestHelpers */
-
 describe('Delay TestCase', function () {
     'use strict';
 

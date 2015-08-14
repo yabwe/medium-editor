@@ -1,7 +1,5 @@
-/*global describe, it, expect, spyOn,
-     afterEach, beforeEach, selectElementContents,
-     jasmine, fireEvent, setupTestHelpers,
-     selectElementContentsAndFire */
+/*global fireEvent, selectElementContents,
+         selectElementContentsAndFire */
 
 describe('Anchor Button TestCase', function () {
     'use strict';

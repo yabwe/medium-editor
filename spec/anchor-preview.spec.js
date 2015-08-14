@@ -1,5 +1,4 @@
-/*global describe, it, expect, spyOn, afterEach,
-  beforeEach, jasmine, fireEvent, setupTestHelpers */
+/*global fireEvent */
 
 describe('Anchor Preview TestCase', function () {
     'use strict';

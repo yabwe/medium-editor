@@ -1,6 +1,3 @@
-/*global describe, it, expect,
-         afterEach, beforeEach, setupTestHelpers*/
-
 describe('Elements TestCase', function () {
     'use strict';
 

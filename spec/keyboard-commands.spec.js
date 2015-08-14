@@ -1,6 +1,4 @@
-/*global describe, it, expect, beforeEach,
-    afterEach, setupTestHelpers, jasmine, spyOn, fireEvent,
-    selectElementContentsAndFire */
+/*global fireEvent, selectElementContentsAndFire */
 
 describe('KeyboardCommands TestCase', function () {
     'use strict';

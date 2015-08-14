@@ -1,7 +1,6 @@
-/*global describe, it, expect, spyOn,
-    afterEach, beforeEach, selectElementContents,
-    fireEvent, setupTestHelpers, jasmine, selectElementContentsAndFire,
-    placeCursorInsideElement */
+/*global fireEvent, selectElementContents,
+         selectElementContentsAndFire,
+         placeCursorInsideElement */
 
 describe('MediumEditor.extensions.toolbar TestCase', function () {
     'use strict';

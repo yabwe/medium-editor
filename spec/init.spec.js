@@ -1,5 +1,4 @@
-/*global describe, it, expect, spyOn,
-    afterEach, beforeEach, setupTestHelpers, _ */
+/*global _ */
 
 describe('Initialization TestCase', function () {
     'use strict';

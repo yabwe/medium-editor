@@ -1,7 +1,5 @@
-/*global describe, it, expect, spyOn,
-         beforeAll, afterAll,
-         afterEach, beforeEach, jasmine, fireEvent, setupTestHelpers,
-         selectElementContentsAndFire, isOldIE, isIE */
+/*global fireEvent, selectElementContentsAndFire,
+         isIE, isOldIE */
 
 describe('Buttons TestCase', function () {
     'use strict';

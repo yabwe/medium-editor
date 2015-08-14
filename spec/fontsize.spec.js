@@ -1,7 +1,5 @@
-/*global describe, it, expect, spyOn,
-     afterEach, beforeEach, selectElementContents,
-     jasmine, fireEvent, setupTestHelpers,
-     selectElementContentsAndFire, isIE9 */
+/*global fireEvent, selectElementContents,
+         selectElementContentsAndFire, isIE9 */
 
 describe('Font Size Button TestCase', function () {
     'use strict';

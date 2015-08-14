@@ -1,7 +1,5 @@
-/*global describe, it, expect, jasmine,
-    fireEvent, afterEach, beforeEach, setupTestHelpers,
-    selectElementContentsAndFire, spyOn,
-    selectElementContents */
+/*global fireEvent, selectElementContents,
+         selectElementContentsAndFire */
 
 describe('MediumEditor.Events TestCase', function () {
     'use strict';

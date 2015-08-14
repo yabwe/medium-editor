@@ -1,5 +1,4 @@
-/*global describe, it, expect, afterEach,
-    beforeEach, fireEvent, setupTestHelpers */
+/*global fireEvent */
 
 describe('Protect Header Tags TestCase', function () {
     'use strict';

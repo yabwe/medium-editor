@@ -1,6 +1,5 @@
-/*global describe, it, expect, spyOn,
-    afterEach, beforeEach, selectElementContents,
-    jasmine, setupTestHelpers, selectElementContentsAndFire */
+/*global selectElementContents,
+         selectElementContentsAndFire */
 
 describe('Pasting content', function () {
     'use strict';

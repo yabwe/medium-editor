@@ -1,5 +1,4 @@
-/*global describe, it, expect,
-    afterEach, beforeEach, fireEvent, setupTestHelpers */
+/*global fireEvent */
 
 describe('MediumEditor.extensions.placeholder TestCase', function () {
     'use strict';

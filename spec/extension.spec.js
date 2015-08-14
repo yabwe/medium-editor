@@ -1,6 +1,4 @@
-/*global describe, it, expect, spyOn,
-    afterEach, beforeEach, jasmine, setupTestHelpers,
-    selectElementContentsAndFire */
+/*global selectElementContentsAndFire */
 
 describe('Extensions TestCase', function () {
     'use strict';
