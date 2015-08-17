@@ -77,6 +77,31 @@ describe('Textarea TestCase', function () {
         });
     });
 
+    it('should create unique medium-editor-textarea-ids across all editor instances', function () {
+        var tas = [];
+        for (var i = 0; i < 12; i++) {
+            var ta = document.createElement('textarea');
+            ta.className = 'editor';
+            ta.value = 'test content';
+            document.body.appendChild(ta);
+            tas.push(ta);
+        }
+        var editors = [];
+        tas.forEach(function (el) {
+            editors.push(this.newMediumEditor(el));
+        }, this);
+        editors.forEach(function (editor) {
+            expect(document.querySelectorAll('textarea[medium-editor-textarea-id="' +
+                editor.elements[0].getAttribute('medium-editor-textarea-id') + '"]').length).toEqual(1);
+        });
+        editors.forEach(function (editor) {
+            editor.destroy();
+        });
+        tas.forEach(function (el) {
+            document.body.removeChild(el);
+        });
+    });
+
     it('should cleanup after destroy', function () {
         var editor = this.newMediumEditor('.editor');
         expect(this.el.classList.contains('medium-editor-hidden')).toBe(true);
