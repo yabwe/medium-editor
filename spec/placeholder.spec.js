@@ -1,8 +1,6 @@
-/*global describe, it, expect, Util,
-    afterEach, beforeEach, fireEvent, setupTestHelpers,
-    Placeholder */
+/*global fireEvent */
 
-describe('Placeholder TestCase', function () {
+describe('MediumEditor.extensions.placeholder TestCase', function () {
     'use strict';
 
     beforeEach(function () {
@@ -79,7 +77,7 @@ describe('Placeholder TestCase', function () {
         fireEvent(document.getElementById('target'), 'keypress');
         expect(editor.elements[0].className).not.toContain('medium-editor-placeholder');
         this.el.innerHTML = '';
-        fireEvent(editor.elements[0], 'keyup', { keyCode: Util.keyCode.DELETE });
+        fireEvent(editor.elements[0], 'keyup', { keyCode: MediumEditor.util.keyCode.DELETE });
         expect(editor.elements[0].className).toContain('medium-editor-placeholder');
     });
 
@@ -118,14 +116,14 @@ describe('Placeholder TestCase', function () {
 
     it('should add the default placeholder text when data-placeholder is not present', function () {
         var editor = this.newMediumEditor('.editor');
-        validatePlaceholderContent(editor.elements[0], Placeholder.prototype.text);
+        validatePlaceholderContent(editor.elements[0], MediumEditor.extensions.placeholder.prototype.text);
     });
 
     it('should remove the added data-placeholder attribute when destroyed', function () {
         expect(this.el.hasAttribute('data-placeholder')).toBe(false);
 
         var editor = this.newMediumEditor('.editor');
-        expect(this.el.getAttribute('data-placeholder')).toBe(Placeholder.prototype.text);
+        expect(this.el.getAttribute('data-placeholder')).toBe(MediumEditor.extensions.placeholder.prototype.text);
 
         editor.destroy();
         expect(this.el.hasAttribute('data-placeholder')).toBe(false);

@@ -1,6 +1,3 @@
-/*global describe, it, expect, beforeEach, afterEach,
-    setupTestHelpers */
-
 describe('Core-API', function () {
     'use strict';
 

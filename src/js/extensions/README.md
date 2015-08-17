@@ -315,7 +315,7 @@ Returns a reference to the array of **elements** monitored by this instance of M
 For example, the following is the destroy method of the Placeholder Extension, which removes an attribute from all editor **elements**:
 
 ```javascript
-Placeholder = Extension.extend({
+MediumEditor.extensions.placeholder = MediumEditor.Extension.extend({
   // ...
   destroy: function () {
     this.getEditorElements().forEach(function (el) {
@@ -338,7 +338,7 @@ Returns the unique identifier for this instance of MediumEditor
 For example, the following is an excerpt from the `createToolbar()` method of the Toolbar extension, which creates the toolbar element and gives it a unique id tied to the editor's unique id:
 
 ```javascript
-Placeholder = Extension.extend({
+MediumEditor.extensions.placeholder = MediumEditor.Extension.extend({
   // ...
   createToolbar: function () {
     var toolbar = this.document.createElement('div');
@@ -370,7 +370,7 @@ Returns the value of a specific option used to initialize the MediumEditor objec
 For example, the following is an excerpt from the `getTemplate()` method of the Anchor extension, which checks the [`buttonLabels`](../../../OPTIONS.md#buttonlabels) option MediumEditor to decide the appearance of the 'save' button in the form:
 
 ```javascript
-AnchorForm = FormExtension.extend({
+MediumEditor.extensions.anchor = MediumEditor.extensions.form.extend({
   // ...
   getTemplate: function () {
     var template = [
@@ -400,7 +400,7 @@ Calls [`MediumEditor.execAction(action, opts)`](../../../API.md#execactionaction
 For example, the Button Extension will - by default - call `execAction()` each time a button is clicked, to trigger a command:
 
 ```javascript
-Button = Extension.extend({
+MediumEditor.extensions.button = MediumEditor.Extension.extend({
   // ...
   handleClick: function (event) {
     event.preventDefault();
@@ -426,7 +426,7 @@ This allows extensions to easily attach event handlers to the DOM which will aut
 For example, when the Anchor Preview Extension detects a `mouseover` event for a link, it will attach to the `mouseout` event for the same link so it can hide the anchor preview:
 
 ```javascript
-AnchorPreview = Extension.extend({
+MediumEditor.extensions.anchorPreview = MediumEditor.Extension.extend({
   // ...
   handleEditableMouseover: function (event) {
     // ...
@@ -446,7 +446,7 @@ Calls [`MediumEditor.off(target, event, listener, useCapture)`](../../../API.md#
 To compliment the above example for `on(target, event, listener, useCapture)`, when the Anchor Preview Extension detects a `mouseout` event for a link, it will detach the the event handler for `mouseout` until the next time the mouse hovers over the link:
 
 ```javascript
-AnchorPreview = Extension.extend({
+MediumEditor.extensions.anchorPreview = MediumEditor.Extension.extend({
   // ...
   handleAnchorMouseout: function () {
     this.anchorToPreview = null;
@@ -465,10 +465,10 @@ Calls [`MediumEditor.subscribe(name, listener)`](../../../API.md#subscribename-l
 For example, the Keyboard Commands Extension will subscribe to the `editableKeydown` custom event during `init()`, to monitor when keys are pressed while any of the editor **elements** are focused:
 
 ```javascript
-KeyboardCommands = Extension.extend({
+MediumEditor.extensions.keyboardCommands = MediumEditor.Extension.extend({
   // ...
   init: function () {
-    Extension.prototype.init.apply(this, arguments);
+    MediumEditor.Extension.prototype.init.apply(this, arguments);
 
     this.subscribe('editableKeydown', this.handleKeydown.bind(this));
     // ...
@@ -485,7 +485,7 @@ Calls [`MediumEditor.trigger(name, data, editable)`](../../../API.md#triggername
 For example, the Toolbar Extension triggers the `hideToolbar` custom event whenever the toolbar is being hidden:
 
 ```javascript
-Toolbar = Extension.extend({
+MediumEditor.extensions.toolbar = MediumEditor.Extension.extend({
   // ...
   hideToolbar: function () {
     if (this.isDisplayed()) {

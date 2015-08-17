@@ -1,10 +1,7 @@
-var AnchorForm;
 (function () {
     'use strict';
 
-    /*global Util, Selection, FormExtension */
-
-    AnchorForm = FormExtension.extend({
+    var AnchorForm = MediumEditor.extensions.form.extend({
         /* Anchor Form Options */
 
         /* customClassOption: [string]  (previously options.anchorButton + options.anchorButtonClass)
@@ -49,7 +46,7 @@ var AnchorForm;
         contentFA: '<i class="fa fa-link"></i>',
 
         init: function () {
-            FormExtension.prototype.init.apply(this, arguments);
+            MediumEditor.extensions.form.prototype.init.apply(this, arguments);
 
             this.subscribe('editableKeydown', this.handleKeydown.bind(this));
         },
@@ -60,11 +57,11 @@ var AnchorForm;
             event.preventDefault();
             event.stopPropagation();
 
-            var range = Selection.getSelectionRange(this.document);
+            var range = MediumEditor.selection.getSelectionRange(this.document);
 
             if (range.startContainer.nodeName.toLowerCase() === 'a' ||
                 range.endContainer.nodeName.toLowerCase() === 'a' ||
-                Util.getClosestTag(Selection.getSelectedParentElement(range), 'a')) {
+                MediumEditor.util.getClosestTag(MediumEditor.selection.getSelectedParentElement(range), 'a')) {
                 return this.execAction('unlink');
             }
 
@@ -77,7 +74,7 @@ var AnchorForm;
 
         // Called when user hits the defined shortcut (CTRL / COMMAND + K)
         handleKeydown: function (event) {
-            if (Util.isKey(event, Util.keyCode.K) && Util.isMetaCtrlKey(event) && !event.shiftKey) {
+            if (MediumEditor.util.isKey(event, MediumEditor.util.keyCode.K) && MediumEditor.util.isMetaCtrlKey(event) && !event.shiftKey) {
                 this.handleClick(event);
             }
         },
@@ -291,14 +288,14 @@ var AnchorForm;
 
         handleTextboxKeyup: function (event) {
             // For ENTER -> create the anchor
-            if (event.keyCode === Util.keyCode.ENTER) {
+            if (event.keyCode === MediumEditor.util.keyCode.ENTER) {
                 event.preventDefault();
                 this.doFormSave();
                 return;
             }
 
             // For ESCAPE -> close the form
-            if (event.keyCode === Util.keyCode.ESCAPE) {
+            if (event.keyCode === MediumEditor.util.keyCode.ESCAPE) {
                 event.preventDefault();
                 this.doFormCancel();
             }
@@ -321,4 +318,6 @@ var AnchorForm;
             this.doFormCancel();
         }
     });
+
+    MediumEditor.extensions.anchor = AnchorForm;
 }());

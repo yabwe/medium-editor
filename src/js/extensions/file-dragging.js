@@ -1,13 +1,10 @@
-/*global Util, Extension */
-var FileDragging;
-
 (function () {
     'use strict';
 
     var CLASS_DRAG_OVER = 'medium-editor-dragover';
 
     function clearClassNames(element) {
-        var editable = Util.getContainerEditorElement(element),
+        var editable = MediumEditor.util.getContainerEditorElement(element),
             existing = Array.prototype.slice.call(editable.parentElement.querySelectorAll('.' + CLASS_DRAG_OVER));
 
         existing.forEach(function (el) {
@@ -15,13 +12,13 @@ var FileDragging;
         });
     }
 
-    FileDragging = Extension.extend({
+    var FileDragging = MediumEditor.Extension.extend({
         name: 'fileDragging',
 
         allowedTypes: ['image'],
 
         init: function () {
-            Extension.prototype.init.apply(this, arguments);
+            MediumEditor.Extension.prototype.init.apply(this, arguments);
 
             this.subscribe('editableDrag', this.handleDrag.bind(this));
             this.subscribe('editableDrop', this.handleDrop.bind(this));
@@ -73,7 +70,7 @@ var FileDragging;
             fileReader.readAsDataURL(file);
 
             var id = 'medium-img-' + (+new Date());
-            Util.insertHTMLCommand(this.document, '<img class="medium-editor-image-loading" id="' + id + '" />');
+            MediumEditor.util.insertHTMLCommand(this.document, '<img class="medium-editor-image-loading" id="' + id + '" />');
 
             fileReader.onload = function () {
                 var img = this.document.getElementById(id);
@@ -85,4 +82,6 @@ var FileDragging;
             }.bind(this);
         }
     });
+
+    MediumEditor.extensions.fileDragging = FileDragging;
 }());

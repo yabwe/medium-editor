@@ -1,6 +1,4 @@
-/*global describe, it,  expect, spyOn, AnchorForm,
-    afterEach, beforeEach, jasmine, fireEvent, setupTestHelpers,
-    AnchorPreview, MediumEditor */
+/*global fireEvent */
 
 describe('Anchor Preview TestCase', function () {
     'use strict';
@@ -34,7 +32,7 @@ describe('Anchor Preview TestCase', function () {
                 nextRange;
 
             // show preview
-            spyOn(AnchorPreview.prototype, 'showPreview').and.callThrough();
+            spyOn(MediumEditor.extensions.anchorPreview.prototype, 'showPreview').and.callThrough();
             fireEvent(document.getElementById('test-link'), 'mouseover');
 
             // preview shows only after delay
@@ -46,7 +44,7 @@ describe('Anchor Preview TestCase', function () {
             expect(anchorPreview.getPreviewElement().querySelector('a').innerHTML).toBe(document.getElementById('test-link').attributes.href.value);
 
             // load into editor
-            spyOn(AnchorForm.prototype, 'showForm').and.callThrough();
+            spyOn(MediumEditor.extensions.anchor.prototype, 'showForm').and.callThrough();
             fireEvent(anchorPreview.getPreviewElement(), 'click');
             jasmine.clock().tick(300);
             expect(editor.getExtensionByName('anchor').showForm).toHaveBeenCalled();
@@ -69,7 +67,7 @@ describe('Anchor Preview TestCase', function () {
                 anchorPreview = editor.getExtensionByName('anchor-preview');
 
             // show preview
-            spyOn(AnchorPreview.prototype, 'showPreview').and.callThrough();
+            spyOn(MediumEditor.extensions.anchorPreview.prototype, 'showPreview').and.callThrough();
             fireEvent(document.getElementById('test-markup-link'), 'mouseover');
 
             // preview shows only after delay
@@ -211,7 +209,7 @@ describe('Anchor Preview TestCase', function () {
                 anchorPreview = editor.getExtensionByName('anchor-preview');
 
             // show preview
-            spyOn(AnchorPreview.prototype, 'showPreview').and.callThrough();
+            spyOn(MediumEditor.extensions.anchorPreview.prototype, 'showPreview').and.callThrough();
             fireEvent(document.getElementById('test-empty-link'), 'mouseover');
 
             // preview shows only after delay
@@ -226,7 +224,7 @@ describe('Anchor Preview TestCase', function () {
                 anchorPreview = editor.getExtensionByName('anchor-preview');
 
             // show preview
-            spyOn(AnchorPreview.prototype, 'showPreview').and.callThrough();
+            spyOn(MediumEditor.extensions.anchorPreview.prototype, 'showPreview').and.callThrough();
             fireEvent(document.getElementById('test-link-disable-preview'), 'mouseover');
 
             // preview shows only after delay
@@ -261,7 +259,7 @@ describe('Anchor Preview TestCase', function () {
             var editor = this.newMediumEditor('.editor'),
                 anchorPreview = editor.getExtensionByName('anchor-preview');
 
-            spyOn(AnchorPreview.prototype, 'destroy').and.callThrough();
+            spyOn(MediumEditor.extensions.anchorPreview.prototype, 'destroy').and.callThrough();
             expect(document.querySelector('.medium-editor-anchor-preview')).not.toBeNull();
             expect(document.querySelector('.medium-editor-anchor-preview-active')).toBeNull();
 

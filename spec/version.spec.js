@@ -1,5 +1,3 @@
-/*global MediumEditor, describe, it, expect */
-
 describe('Core MediumEditor', function () {
 
     it('exists', function () {

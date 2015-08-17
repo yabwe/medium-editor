@@ -1,5 +1,4 @@
-/*global describe, it, expect, afterEach, beforeEach,
-    setupTestHelpers, selectElementContentsAndFire */
+/*global selectElementContentsAndFire */
 
 describe('Full Content Action TestCase', function () {
     'use strict';

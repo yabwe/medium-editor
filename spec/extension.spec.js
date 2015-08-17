@@ -1,6 +1,4 @@
-/*global MediumEditor, describe, it, expect, spyOn,
-    afterEach, beforeEach, jasmine, setupTestHelpers,
-    selectElementContentsAndFire, Extension */
+/*global selectElementContentsAndFire */
 
 describe('Extensions TestCase', function () {
     'use strict';
@@ -124,23 +122,22 @@ describe('Extensions TestCase', function () {
     describe('Core Extension', function () {
         it('exists', function () {
             expect(MediumEditor.Extension).toBeTruthy();
-            expect(MediumEditor.Extension).toBe(Extension);
         });
 
         it('provides an .extend method', function () {
-            expect(Extension.extend).toBeTruthy();
-            var Extended = Extension.extend({
+            expect(MediumEditor.Extension.extend).toBeTruthy();
+            var Extended = MediumEditor.Extension.extend({
                 foo: 'bar'
             });
 
             expect(Extended.prototype.foo).toBe('bar');
-            expect(Extended.extend).toBe(Extension.extend);
+            expect(Extended.extend).toBe(MediumEditor.Extension.extend);
         });
 
         it('can be passed as an extension', function () {
             var Sub, editor, e1, e2;
 
-            Sub = Extension.extend({
+            Sub = MediumEditor.Extension.extend({
                 y: 10
             });
 
@@ -168,10 +165,10 @@ describe('Extensions TestCase', function () {
                 Preview, Placeholder, AutoLink, FileDragging,
                 extPreview, extPlaceholder, extAutoLink, extFileDragging;
 
-            Preview = Extension.extend({ name: 'anchor-preview' });
-            Placeholder = Extension.extend({ name: 'placeholder' });
-            AutoLink = Extension.extend({ name: 'auto-link' });
-            FileDragging = Extension.extend({ name: 'fileDragging' });
+            Preview = MediumEditor.Extension.extend({ name: 'anchor-preview' });
+            Placeholder = MediumEditor.Extension.extend({ name: 'placeholder' });
+            AutoLink = MediumEditor.Extension.extend({ name: 'auto-link' });
+            FileDragging = MediumEditor.Extension.extend({ name: 'fileDragging' });
 
             extPreview = new Preview();
             extPlaceholder = new Placeholder();
@@ -206,7 +203,7 @@ describe('Extensions TestCase', function () {
 
             spyOn(SubExtend, 'constructor');
 
-            Sub = Extension.extend(SubExtend);
+            Sub = MediumEditor.Extension.extend(SubExtend);
 
             e1 = new Sub();
 

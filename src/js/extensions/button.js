@@ -1,10 +1,7 @@
-var Button;
 (function () {
     'use strict';
 
-    /*global Extension, buttonDefaults */
-
-    Button = Extension.extend({
+    var Button = MediumEditor.Extension.extend({
 
         /* Button Options */
 
@@ -88,25 +85,20 @@ var Button;
          */
         attrs: undefined,
 
-        /* buttonDefaults: [Object]
-         * Set of default config options for all of the built-in MediumEditor buttons
-         */
-        defaults: buttonDefaults,
-
         // The button constructor can optionally accept the name of a built-in button
         // (ie 'bold', 'italic', etc.)
         // When the name of a button is passed, it will initialize itself with the
         // configuration for that button
         constructor: function (options) {
             if (Button.isBuiltInButton(options)) {
-                Extension.call(this, this.defaults[options]);
+                MediumEditor.Extension.call(this, this.defaults[options]);
             } else {
-                Extension.call(this, options);
+                MediumEditor.Extension.call(this, options);
             }
         },
 
         init: function () {
-            Extension.prototype.init.apply(this, arguments);
+            MediumEditor.Extension.prototype.init.apply(this, arguments);
 
             this.button = this.createButton();
             this.on(this.button, 'click', this.handleClick.bind(this));
@@ -236,6 +228,8 @@ var Button;
     });
 
     Button.isBuiltInButton = function (name) {
-        return (typeof name === 'string') && Button.prototype.defaults.hasOwnProperty(name);
+        return (typeof name === 'string') && MediumEditor.extensions.button.prototype.defaults.hasOwnProperty(name);
     };
+
+    MediumEditor.extensions.button = Button;
 }());

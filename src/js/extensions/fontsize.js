@@ -1,10 +1,7 @@
-var FontSizeForm;
 (function () {
     'use strict';
 
-    /*global FormExtension, Selection */
-
-    FontSizeForm = FormExtension.extend({
+    var FontSizeForm = MediumEditor.extensions.form.extend({
 
         name: 'fontsize',
         action: 'fontSize',
@@ -13,7 +10,7 @@ var FontSizeForm;
         contentFA: '<i class="fa fa-text-height"></i>',
 
         init: function () {
-            FormExtension.prototype.init.apply(this, arguments);
+            MediumEditor.extensions.form.prototype.init.apply(this, arguments);
         },
 
         // Called when the button the toolbar is clicked
@@ -142,7 +139,7 @@ var FontSizeForm;
         },
 
         clearFontSize: function () {
-            Selection.getSelectedElements(this.document).forEach(function (el) {
+            MediumEditor.selection.getSelectedElements(this.document).forEach(function (el) {
                 if (el.nodeName.toLowerCase() === 'font' && el.hasAttribute('size')) {
                     el.removeAttribute('size');
                 }
@@ -175,4 +172,6 @@ var FontSizeForm;
             this.doFormCancel();
         }
     });
+
+    MediumEditor.extensions.fontSize = FontSizeForm;
 }());

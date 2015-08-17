@@ -1,10 +1,7 @@
-var AnchorPreview;
 (function () {
     'use strict';
 
-    /*global Util, Extension */
-
-    AnchorPreview = Extension.extend({
+    var AnchorPreview = MediumEditor.Extension.extend({
         name: 'anchor-preview',
 
         // Anchor Preview Options
@@ -155,7 +152,7 @@ var AnchorPreview;
         },
 
         handleEditableMouseover: function (event) {
-            var target = Util.getClosestTag(event.target, 'a');
+            var target = MediumEditor.util.getClosestTag(event.target, 'a');
 
             if (false === target) {
                 return;
@@ -248,4 +245,6 @@ var AnchorPreview;
             this.on(this.activeAnchor, 'mouseout', this.instanceHandlePreviewMouseout);
         }
     });
+
+    MediumEditor.extensions.anchorPreview = AnchorPreview;
 }());

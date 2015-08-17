@@ -1,6 +1,3 @@
-/*global describe, it, expect,
-    afterEach, beforeEach, setupTestHelpers */
-
 describe('Anchor Button TestCase', function () {
     'use strict';
 

@@ -1,10 +1,8 @@
-/*global MediumEditor, describe, it, expect, spyOn,
-         afterEach, beforeEach, fireEvent,
-         jasmine, selectElementContents, setupTestHelpers,
-         selectElementContentsAndFire, Selection,
+/*global fireEvent, selectElementContents,
+         selectElementContentsAndFire,
          placeCursorInsideElement */
 
-describe('Selection TestCase', function () {
+describe('MediumEditor.selection TestCase', function () {
     'use strict';
 
     beforeEach(function () {
@@ -19,7 +17,6 @@ describe('Selection TestCase', function () {
     describe('Exposure', function () {
         it('is exposed on the MediumEditor ctor', function () {
             expect(MediumEditor.selection).toBeTruthy();
-            expect(MediumEditor.selection).toEqual(Selection);
         });
     });
 

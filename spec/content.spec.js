@@ -1,7 +1,8 @@
-/*global describe, it, expect, spyOn,
-    fireEvent, prepareEvent, firePreparedEvent, afterEach, beforeEach,
-    selectElementContents, setupTestHelpers, placeCursorInsideElement,
-    isFirefox, isIE, Util, selectElementContentsAndFire */
+/*global fireEvent, firePreparedEvent,
+         prepareEvent, selectElementContents,
+         selectElementContentsAndFire,
+         placeCursorInsideElement,
+         isIE, isFirefox */
 
 describe('Content TestCase', function () {
     'use strict';
@@ -49,7 +50,7 @@ describe('Content TestCase', function () {
             spyOn(document, 'execCommand').and.callThrough();
             selectElementContents(target);
             fireEvent(target, 'keydown', {
-                keyCode: Util.keyCode.TAB
+                keyCode: MediumEditor.util.keyCode.TAB
             });
             expect(document.execCommand).toHaveBeenCalledWith('indent', false, null);
             // Firefox (annoyingly) throws a NS_ERROR_FAILURE when attempting to mimic this through a test case
@@ -67,7 +68,7 @@ describe('Content TestCase', function () {
             spyOn(document, 'execCommand').and.callThrough();
             selectElementContents(target);
             fireEvent(target, 'keydown', {
-                keyCode: Util.keyCode.TAB,
+                keyCode: MediumEditor.util.keyCode.TAB,
                 shiftKey: true
             });
             expect(document.execCommand).toHaveBeenCalledWith('outdent', false, null);
@@ -91,7 +92,7 @@ describe('Content TestCase', function () {
             placeCursorInsideElement(editor.elements[0], 0);
 
             evt = prepareEvent(editor.elements[0], 'keydown', {
-                keyCode: Util.keyCode.ENTER
+                keyCode: MediumEditor.util.keyCode.ENTER
             });
 
             spyOn(evt, 'preventDefault').and.callThrough();
@@ -111,7 +112,7 @@ describe('Content TestCase', function () {
             placeCursorInsideElement(editor.elements[0], 0);
 
             evt = prepareEvent(editor.elements[0], 'keydown', {
-                keyCode: Util.keyCode.ENTER
+                keyCode: MediumEditor.util.keyCode.ENTER
             });
 
             spyOn(evt, 'preventDefault').and.callThrough();
@@ -130,7 +131,7 @@ describe('Content TestCase', function () {
             placeCursorInsideElement(p, 0);
 
             evt = prepareEvent(p, 'keydown', {
-                keyCode: Util.keyCode.ENTER
+                keyCode: MediumEditor.util.keyCode.ENTER
             });
 
             spyOn(evt, 'preventDefault').and.callThrough();
@@ -151,7 +152,7 @@ describe('Content TestCase', function () {
             placeCursorInsideElement(p, 0);
 
             evt = prepareEvent(p, 'keydown', {
-                keyCode: Util.keyCode.ENTER
+                keyCode: MediumEditor.util.keyCode.ENTER
             });
 
             spyOn(evt, 'preventDefault').and.callThrough();
@@ -170,7 +171,7 @@ describe('Content TestCase', function () {
             placeCursorInsideElement(p, 0);
 
             evt = prepareEvent(p, 'keydown', {
-                keyCode: Util.keyCode.ENTER
+                keyCode: MediumEditor.util.keyCode.ENTER
             });
 
             spyOn(evt, 'preventDefault').and.callThrough();
@@ -187,7 +188,7 @@ describe('Content TestCase', function () {
             spyOn(document, 'execCommand').and.callThrough();
             placeCursorInsideElement(targetNode, 0);
             fireEvent(targetNode, 'keyup', {
-                keyCode: Util.keyCode.ENTER
+                keyCode: MediumEditor.util.keyCode.ENTER
             });
             expect(document.execCommand).toHaveBeenCalledWith('formatBlock', false, 'p');
             expect(this.el.innerHTML).toBe('<p>lorem ipsum</p>');
@@ -204,7 +205,7 @@ describe('Content TestCase', function () {
             placeCursorInsideElement(p, 0);
 
             fireEvent(p, 'keyup', {
-                keyCode: Util.keyCode.ENTER,
+                keyCode: MediumEditor.util.keyCode.ENTER,
                 ctrlKey: true
             });
 
@@ -223,7 +224,7 @@ describe('Content TestCase', function () {
 
             evt = prepareEvent(editor.elements[0], 'keydown', {
                 ctrlKey: true,
-                keyCode: Util.keyCode.M
+                keyCode: MediumEditor.util.keyCode.M
             });
 
             spyOn(evt, 'preventDefault').and.callThrough();
@@ -244,7 +245,7 @@ describe('Content TestCase', function () {
 
             evt = prepareEvent(editor.elements[0], 'keydown', {
                 ctrlKey: true,
-                keyCode: Util.keyCode.M
+                keyCode: MediumEditor.util.keyCode.M
             });
 
             spyOn(evt, 'preventDefault').and.callThrough();
@@ -264,7 +265,7 @@ describe('Content TestCase', function () {
 
             evt = prepareEvent(p, 'keydown', {
                 ctrlKey: true,
-                keyCode: Util.keyCode.M
+                keyCode: MediumEditor.util.keyCode.M
             });
 
             spyOn(evt, 'preventDefault').and.callThrough();
@@ -286,7 +287,7 @@ describe('Content TestCase', function () {
 
             evt = prepareEvent(p, 'keydown', {
                 ctrlKey: true,
-                keyCode: Util.keyCode.M
+                keyCode: MediumEditor.util.keyCode.M
             });
 
             spyOn(evt, 'preventDefault').and.callThrough();
@@ -306,7 +307,7 @@ describe('Content TestCase', function () {
 
             evt = prepareEvent(p, 'keydown', {
                 ctrlKey: true,
-                keyCode: Util.keyCode.M
+                keyCode: MediumEditor.util.keyCode.M
             });
 
             spyOn(evt, 'preventDefault').and.callThrough();
@@ -325,7 +326,7 @@ describe('Content TestCase', function () {
             spyOn(document, 'execCommand').and.callThrough();
             placeCursorInsideElement(target, 1);
             fireEvent(target, 'keyup', {
-                keyCode: Util.keyCode.ENTER
+                keyCode: MediumEditor.util.keyCode.ENTER
             });
             expect(document.execCommand).toHaveBeenCalledWith('unlink', false, null);
         });
@@ -338,7 +339,7 @@ describe('Content TestCase', function () {
                 targetNode = editor.elements[0].querySelector('h3');
             placeCursorInsideElement(targetNode, 0);
             fireEvent(targetNode, 'keydown', {
-                keyCode: Util.keyCode.ENTER
+                keyCode: MediumEditor.util.keyCode.ENTER
             });
             expect(this.el.innerHTML).toBe('<h2>lorem</h2><p><br></p><h3>ipsum</h3>');
         });
@@ -349,7 +350,7 @@ describe('Content TestCase', function () {
                 targetNode = editor.elements[0].querySelector('p');
             selectElementContents(targetNode);
             fireEvent(targetNode, 'keydown', {
-                keyCode: Util.keyCode.DELETE
+                keyCode: MediumEditor.util.keyCode.DELETE
             });
             expect(this.el.innerHTML).toBe('<h2>lorem</h2><h3>ipsum</h3>');
         });
@@ -361,7 +362,7 @@ describe('Content TestCase', function () {
             spyOn(document, 'execCommand').and.callThrough();
             placeCursorInsideElement(targetNode, 0);
             fireEvent(targetNode, 'keyup', {
-                keyCode: Util.keyCode.ENTER
+                keyCode: MediumEditor.util.keyCode.ENTER
             });
             expect(document.execCommand).not.toHaveBeenCalledWith('formatBlock', false, 'p');
             expect(this.el.innerHTML).toBe('<h2>lorem ipsum</h2>');
@@ -374,7 +375,7 @@ describe('Content TestCase', function () {
             targetNode = editor.elements[0].querySelector('pre');
         placeCursorInsideElement(targetNode, 0);
         fireEvent(targetNode, 'keydown', {
-            keyCode: Util.keyCode.TAB
+            keyCode: MediumEditor.util.keyCode.TAB
         });
         expect(this.el.innerHTML).toBe('<pre>    lorem ipsum</pre>');
     });
@@ -387,7 +388,7 @@ describe('Content TestCase', function () {
         selectElementContents(target);
         target.parentNode.removeChild(target);
         fireEvent(editor.elements[0], 'keyup', {
-            keyCode: Util.keyCode.BACKSPACE
+            keyCode: MediumEditor.util.keyCode.BACKSPACE
         });
         expect(document.execCommand).toHaveBeenCalledWith('formatBlock', false, 'p');
         // Webkit inserts a <p> tag, firefox & ie do not
@@ -402,7 +403,7 @@ describe('Content TestCase', function () {
                 range;
             placeCursorInsideElement(target, 0);
             fireEvent(target, 'keydown', {
-                keyCode: Util.keyCode.BACKSPACE
+                keyCode: MediumEditor.util.keyCode.BACKSPACE
             });
             expect(this.el.innerHTML).toBe('<p><br></p><ul><li>lorem ipsum</li></ul>');
             range = document.getSelection().getRangeAt(0);
@@ -415,7 +416,7 @@ describe('Content TestCase', function () {
                 target = editor.elements[0].querySelector('li');
             placeCursorInsideElement(target, 0);
             fireEvent(target, 'keydown', {
-                keyCode: Util.keyCode.BACKSPACE
+                keyCode: MediumEditor.util.keyCode.BACKSPACE
             });
             expect(this.el.innerHTML).toBe('<p>lorem ipsum</p><ul><li></li><li>lorem ipsum</li></ul>');
         });

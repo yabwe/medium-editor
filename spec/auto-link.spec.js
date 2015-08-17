@@ -1,6 +1,4 @@
-/*global describe, it, expect, beforeEach, afterEach,
-    setupTestHelpers, selectElementContentsAndFire, fireEvent,
-    Util, jasmine, spyOn, MediumEditor */
+/*global fireEvent, selectElementContentsAndFire */
 
 describe('Autolink', function () {
     'use strict';
@@ -105,7 +103,7 @@ describe('Autolink', function () {
             ];
 
             function triggerAutolinking(element, key) {
-                var keyPressed = key || Util.keyCode.SPACE;
+                var keyPressed = key || MediumEditor.util.keyCode.SPACE;
                 fireEvent(element, 'keypress', {
                     keyCode: keyPressed
                 });
@@ -181,7 +179,7 @@ describe('Autolink', function () {
                 this.el.innerHTML = 'http://www.example.enter';
 
                 selectElementContentsAndFire(this.el);
-                triggerAutolinking(this.el, Util.keyCode.ENTER);
+                triggerAutolinking(this.el, MediumEditor.util.keyCode.ENTER);
                 links = this.el.getElementsByTagName('a');
                 expect(links.length).toBe(1, 'links length after ENTER');
                 expect(links[0].getAttribute('href')).toBe('http://www.example.enter');
@@ -191,7 +189,7 @@ describe('Autolink', function () {
                 this.el.innerHTML = 'http://www.example.space';
 
                 selectElementContentsAndFire(this.el);
-                triggerAutolinking(this.el, Util.keyCode.SPACE);
+                triggerAutolinking(this.el, MediumEditor.util.keyCode.SPACE);
                 links = this.el.getElementsByTagName('a');
                 expect(links.length).toBe(1, 'links length after SPACE');
                 expect(links[0].getAttribute('href')).toBe('http://www.example.space');

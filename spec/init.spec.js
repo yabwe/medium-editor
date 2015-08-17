@@ -1,6 +1,4 @@
-/*global MediumEditor, describe, it, expect, spyOn,
-    AnchorForm, afterEach, beforeEach, setupTestHelpers, _,
-    AnchorPreview */
+/*global _ */
 
 describe('Initialization TestCase', function () {
     'use strict';
@@ -143,8 +141,8 @@ describe('Initialization TestCase', function () {
         it('should call the default initialization methods', function () {
             spyOn(MediumEditor.prototype, 'setup').and.callThrough();
             spyOn(MediumEditor.extensions.toolbar.prototype, 'createToolbar').and.callThrough();
-            spyOn(AnchorForm.prototype, 'createForm').and.callThrough();
-            spyOn(AnchorPreview.prototype, 'createPreview').and.callThrough();
+            spyOn(MediumEditor.extensions.anchor.prototype, 'createForm').and.callThrough();
+            spyOn(MediumEditor.extensions.anchorPreview.prototype, 'createPreview').and.callThrough();
             var editor = this.newMediumEditor('.editor'),
                 anchorExtension = editor.getExtensionByName('anchor'),
                 anchorPreview = editor.getExtensionByName('anchor-preview'),

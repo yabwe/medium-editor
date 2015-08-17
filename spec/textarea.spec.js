@@ -1,5 +1,4 @@
-/*global describe, it, beforeEach, afterEach, expect,
-         fireEvent, setupTestHelpers */
+/*global fireEvent */
 
 describe('Textarea TestCase', function () {
     'use strict';

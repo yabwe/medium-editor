@@ -1,6 +1,4 @@
-/*global NodeFilter, Selection*/
-
-var Util;
+/*global NodeFilter*/
 
 (function (window) {
     'use strict';
@@ -24,7 +22,7 @@ var Util;
         return dest;
     }
 
-    Util = {
+    var Util = {
 
         // http://stackoverflow.com/questions/17907445/how-to-detect-ie11#comment30165888_17907562
         // by rg89
@@ -50,7 +48,7 @@ var Util;
          * See #591
          */
         isMetaCtrlKey: function (event) {
-            if ((this.isMac && event.metaKey) || (!this.isMac && event.ctrlKey)) {
+            if ((Util.isMac && event.metaKey) || (!Util.isMac && event.ctrlKey)) {
                 return true;
             }
 
@@ -64,7 +62,7 @@ var Util;
          * @see : http://stackoverflow.com/q/4471582/569101
          */
         isKey: function (event, keys) {
-            var keyCode = this.getKeyCode(event);
+            var keyCode = Util.getKeyCode(event);
 
             // it's not an array let's just compare strings!
             if (false === Array.isArray(keys)) {
@@ -378,7 +376,7 @@ var Util;
 
         execFormatBlock: function (doc, tagName) {
             // Get the top level block element that contains the selection
-            var blockContainer = Util.getTopBlockContainer(Selection.getSelectionStart(doc));
+            var blockContainer = Util.getTopBlockContainer(MediumEditor.selection.getSelectionStart(doc));
 
             // Special handling for blockquote
             if (tagName === 'blockquote') {
@@ -397,7 +395,7 @@ var Util;
 
                 // When IE blockquote needs to be called as indent
                 // http://stackoverflow.com/questions/1816223/rich-text-editor-with-blockquote-function/1821777#1821777
-                if (this.isIE) {
+                if (Util.isIE) {
                     return doc.execCommand('indent', false, tagName);
                 }
             }
@@ -410,7 +408,7 @@ var Util;
 
             // When IE we need to add <> to heading elements
             // http://stackoverflow.com/questions/10741831/execcommand-formatblock-headings-in-ie
-            if (this.isIE) {
+            if (Util.isIE) {
                 tagName = '<' + tagName + '>';
             }
             return doc.execCommand('formatBlock', false, tagName);
@@ -469,7 +467,7 @@ var Util;
 
             var parentNode = node.parentNode,
                 tagName = parentNode.nodeName.toLowerCase();
-            while (tagName === 'li' || (!this.isBlockContainer(parentNode) && tagName !== 'div')) {
+            while (tagName === 'li' || (!Util.isBlockContainer(parentNode) && tagName !== 'div')) {
                 if (tagName === 'li') {
                     return true;
                 }
@@ -491,11 +489,11 @@ var Util;
             var list = element.parentElement;
 
             if (list.parentElement.nodeName.toLowerCase() === 'p') { // yes we need to clean up
-                this.unwrap(list.parentElement, ownerDocument);
+                Util.unwrap(list.parentElement, ownerDocument);
 
                 // move cursor at the end of the text inside the list
                 // for some unknown reason, the cursor is moved to end of the "visual" line
-                Selection.moveCursor(ownerDocument, element.firstChild, element.firstChild.textContent.length);
+                MediumEditor.selection.moveCursor(ownerDocument, element.firstChild, element.firstChild.textContent.length);
             }
         },
 
@@ -598,7 +596,7 @@ var Util;
                 return false;
             }
 
-            var rootNode = this.findCommonRoot(startNode, endNode);
+            var rootNode = Util.findCommonRoot(startNode, endNode);
             if (!rootNode) {
                 return false;
             }
@@ -625,11 +623,11 @@ var Util;
             for (var i = 0; i < rootNode.childNodes.length; i++) {
                 nextNode = rootNode.childNodes[i];
                 if (!firstChild) {
-                    if (this.isDescendant(nextNode, startNode, true)) {
+                    if (Util.isDescendant(nextNode, startNode, true)) {
                         firstChild = nextNode;
                     }
                 } else {
-                    if (this.isDescendant(nextNode, endNode, true)) {
+                    if (Util.isDescendant(nextNode, endNode, true)) {
                         lastChild = nextNode;
                         break;
                     } else {
@@ -646,7 +644,7 @@ var Util;
                 firstChild.parentNode.removeChild(firstChild);
                 fragment.appendChild(firstChild);
             } else {
-                fragment.appendChild(this.splitOffDOMTree(firstChild, startNode));
+                fragment.appendChild(Util.splitOffDOMTree(firstChild, startNode));
             }
 
             // add any elements between firstChild & lastChild
@@ -660,7 +658,7 @@ var Util;
                 lastChild.parentNode.removeChild(lastChild);
                 fragment.appendChild(lastChild);
             } else {
-                fragment.appendChild(this.splitOffDOMTree(lastChild, endNode, true));
+                fragment.appendChild(Util.splitOffDOMTree(lastChild, endNode, true));
             }
 
             // Add fragment into passed in element
@@ -692,8 +690,8 @@ var Util;
         },
 
         findCommonRoot: function (inNode1, inNode2) {
-            var depth1 = this.depthOfNode(inNode1),
-                depth2 = this.depthOfNode(inNode2),
+            var depth1 = Util.depthOfNode(inNode1),
+                depth2 = Util.depthOfNode(inNode2),
                 node1 = inNode1,
                 node2 = inNode2;
 
@@ -719,7 +717,7 @@ var Util;
         isElementAtBeginningOfBlock: function (node) {
             var textVal,
                 sibling;
-            while (!this.isBlockContainer(node) && !this.isMediumEditorElement(node)) {
+            while (!Util.isBlockContainer(node) && !Util.isMediumEditorElement(node)) {
                 sibling = node;
                 while (sibling = sibling.previousSibling) {
                     textVal = sibling.nodeType === 3 ? sibling.nodeValue : sibling.textContent;
@@ -743,7 +741,7 @@ var Util;
         },
 
         isBlockContainer: function (element) {
-            return element && element.nodeType !== 3 && this.blockContainerElementNames.indexOf(element.nodeName.toLowerCase()) !== -1;
+            return element && element.nodeType !== 3 && Util.blockContainerElementNames.indexOf(element.nodeName.toLowerCase()) !== -1;
         },
 
         getClosestBlockContainer: function (node) {
@@ -754,7 +752,7 @@ var Util;
 
         getTopBlockContainer: function (element) {
             var topBlock = element;
-            this.traverseUp(element, function (el) {
+            Util.traverseUp(element, function (el) {
                 if (Util.isBlockContainer(el)) {
                     topBlock = el;
                 }
@@ -769,7 +767,7 @@ var Util;
             }
 
             // We don't want to set the selection to an element that can't have children, this messes up Gecko.
-            element = this.traverseUp(element, function (el) {
+            element = Util.traverseUp(element, function (el) {
                 return Util.emptyElementNames.indexOf(el.nodeName.toLowerCase()) === -1;
             });
             // Selecting at the beginning of a table doesn't work in PhantomJS.
@@ -788,7 +786,7 @@ var Util;
             }
 
             for (var i = 0; i < element.childNodes.length; i++) {
-                var textNode = this.getFirstTextNode(element.childNodes[i]);
+                var textNode = Util.getFirstTextNode(element.childNodes[i]);
                 if (textNode !== null) {
                     return textNode;
                 }
@@ -837,12 +835,12 @@ var Util;
                 if (el.nodeName.toLowerCase() === tag) {
                     el.parentNode.removeChild(el);
                 }
-            }, this);
+            });
         },
 
         // get the closest parent
         getClosestTag: function (el, tag) {
-            return this.traverseUp(el, function (element) {
+            return Util.traverseUp(el, function (element) {
                 return element.nodeName.toLowerCase() === tag.toLowerCase();
             });
         },
@@ -864,4 +862,6 @@ var Util;
             }
         }
     };
+
+    MediumEditor.util = Util;
 }(window));

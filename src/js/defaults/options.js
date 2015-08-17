@@ -1,8 +1,7 @@
-var editorDefaults;
 (function () {
     // summary: The default options hash used by the Editor
 
-    editorDefaults = {
+    MediumEditor.prototype.defaults = {
         activeButtonClass: 'medium-editor-button-active',
         buttonLabels: false,
         delay: 0,
