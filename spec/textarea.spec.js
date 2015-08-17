@@ -59,46 +59,29 @@ describe('Textarea TestCase', function () {
     });
 
     it('should create unique div ids for multiple textareas', function () {
-        var tas = [];
         for (var i = 0; i < 12; i++) {
-            var ta = document.createElement('textarea');
-            ta.className = 'editor';
+            var ta = this.createElement('textarea', 'editor');
             ta.value = 'test content';
-            document.body.appendChild(ta);
-            tas.push(ta);
         }
         var editor = this.newMediumEditor('.editor');
         editor.elements.forEach(function (el) {
             expect(document.querySelectorAll('div#' + el.id).length).toEqual(1);
-        });
-        editor.destroy();
-        tas.forEach(function (el) {
-            document.body.removeChild(el);
         });
     });
 
     it('should create unique medium-editor-textarea-ids across all editor instances', function () {
         var tas = [];
         for (var i = 0; i < 12; i++) {
-            var ta = document.createElement('textarea');
-            ta.className = 'editor';
+            var ta = this.createElement('textarea', 'editor');
             ta.value = 'test content';
-            document.body.appendChild(ta);
             tas.push(ta);
         }
-        var editors = [];
         tas.forEach(function (el) {
-            editors.push(this.newMediumEditor(el));
+            this.newMediumEditor(el);
         }, this);
-        editors.forEach(function (editor) {
+        this.editors.forEach(function (editor) {
             expect(document.querySelectorAll('textarea[medium-editor-textarea-id="' +
                 editor.elements[0].getAttribute('medium-editor-textarea-id') + '"]').length).toEqual(1);
-        });
-        editors.forEach(function (editor) {
-            editor.destroy();
-        });
-        tas.forEach(function (el) {
-            document.body.removeChild(el);
         });
     });
 
