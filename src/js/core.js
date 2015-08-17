@@ -284,8 +284,16 @@
 
     function createContentEditable(textarea, id) {
         var div = this.options.ownerDocument.createElement('div'),
-            uniqueId = 'medium-editor-' + Date.now() + '-' + id,
+            now = Date.now(),
+            uniqueId = 'medium-editor-' + now + '-' + id,
             atts = textarea.attributes;
+
+        // Some browsers can move pretty fast, since we're using a timestamp
+        // to make a unique-id, ensure that the id is actually unique on the page
+        while (this.options.ownerDocument.getElementById(uniqueId)) {
+            now++;
+            uniqueId = 'medium-editor-' + now + '-' + id;
+        }
 
         div.className = textarea.className;
         div.id = uniqueId;
