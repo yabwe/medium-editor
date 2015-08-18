@@ -425,6 +425,20 @@ describe('Autolink', function () {
                 triggerAutolinking(this.el);
                 expect(spy.calls.count()).toBe(1);
             });
+
+            it('should create a link for a url within a list item', function () {
+                this.el.innerHTML = '<p>This is my list of links:</p><ol><li>http://www.example.com</li></ol><p>It is very impressive</p>';
+
+                selectElementContentsAndFire(this.el);
+                triggerAutolinking(this.el);
+                var links = this.el.getElementsByTagName('a'),
+                    li = this.el.querySelector('li');
+                expect(links.length).toBe(1, 'A single link was not automatically created');
+                expect(li.firstChild).toBe(links[0]);
+                expect(li.textContent).toBe('http://www.example.com');
+                expect(links[0].getAttribute('href')).toBe('http://www.example.com');
+                expect(links[0].firstChild.getAttribute('data-auto-link')).toBe('true');
+            });
         });
     });
 
