@@ -390,4 +390,31 @@ describe('Util', function () {
             expect(Util.isKey(event, [65, 66])).toBeFalsy();
         });
     });
+
+    describe('insertHTMLCommand', function () {
+        it('should not remove the contenteditable element when calling insert into an empty contenteditable element', function () {
+            var el = this.createElement('div', 'editable', ''),
+                origQCS = document.queryCommandSupported;
+            // Force our custom implementation to run
+            spyOn(document, 'queryCommandSupported').and.callFake(function (command) {
+                if (command === 'insertHTML') {
+                    return false;
+                }
+                return origQCS.apply(document, arguments);
+            });
+            // Mimic an editor element
+            el.setAttribute('contenteditable', true);
+            el.setAttribute('data-medium-editor-element', true);
+
+            // Make sure the element has 0 child nodes
+            while (el.firstChild) {
+                el.remove(el.firstChild);
+            }
+            selectElementContents(el);
+            MediumEditor.util.insertHTMLCommand(document, '<p>some pasted html</p>', true);
+
+            expect(el.innerHTML).toBe('<p>some pasted html</p>');
+            expect(document.body.contains(el)).toBe(true, 'The editor element has been removed from the page');
+        });
+    });
 });
