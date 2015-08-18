@@ -1,4 +1,4 @@
-/*global Extension, Util */
+/*global Extension, Util, MediumEditor */
 
 var AutoLink,
     WHITESPACE_CHARS,
@@ -83,7 +83,7 @@ LINK_REGEXP_TEXT =
             // "link." and the next paragraph beginning with "my" is interpreted into "link.my" and the code tries to create
             // a link across blockElements - which doesn't work and is terrible.
             // (Medium deletes the spaces/returns between P tags so the textContent ends up without paragraph spacing)
-            var blockElements = contenteditable.querySelectorAll(MediumEditor.util.blockContainerElementNames.join(',')),
+            var blockElements = contenteditable.querySelectorAll(MediumEditor.util.parentElements.join(',')),
                 documentModified = false;
             if (blockElements.length === 0) {
                 blockElements = [contenteditable];

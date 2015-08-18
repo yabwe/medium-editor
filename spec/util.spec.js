@@ -1,5 +1,5 @@
 /*global MediumEditor, Util, describe, it, expect, spyOn,
-         afterEach, beforeEach, setupTestHelpers */
+         afterEach, beforeEach, setupTestHelpers, selectElementContents */
 
 describe('Util', function () {
     'use strict';
@@ -404,7 +404,7 @@ describe('Util', function () {
             });
             // Mimic an editor element
             el.setAttribute('contenteditable', true);
-            el.setAttribute('data-medium-editor-element', true);
+            el.setAttribute('data-medium-element', true);
 
             // Make sure the element has 0 child nodes
             while (el.firstChild) {
