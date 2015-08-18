@@ -341,11 +341,18 @@
             if (selection.rangeCount) {
                 range = selection.getRangeAt(0);
                 toReplace = range.commonAncestorContainer;
-                // Ensure range covers maximum amount of nodes as possible
-                // By moving up the DOM and selecting ancestors whose only child is the range
-                if ((toReplace.nodeType === 3 && range.startOffset === 0 && range.endOffset === toReplace.nodeValue.length) ||
+
+                // https://github.com/yabwe/medium-editor/issues/748
+                // If the selection is an empty editor element, create a temporary text node inside of the editor
+                // and select it so that we don't delete the editor element
+                if (Util.isMediumEditorElement(toReplace) && !toReplace.firstChild) {
+                    range.selectNode(toReplace.appendChild(doc.createTextNode('')));
+                } else if ((toReplace.nodeType === 3 && range.startOffset === 0 && range.endOffset === toReplace.nodeValue.length) ||
                         (toReplace.nodeType !== 3 && toReplace.innerHTML === range.toString())) {
-                    while (toReplace.parentNode &&
+                    // Ensure range covers maximum amount of nodes as possible
+                    // By moving up the DOM and selecting ancestors whose only child is the range
+                    while (!Util.isMediumEditorElement(toReplace) &&
+                            toReplace.parentNode &&
                             toReplace.parentNode.childNodes.length === 1 &&
                             !Util.isMediumEditorElement(toReplace.parentNode)) {
                         toReplace = toReplace.parentNode;
