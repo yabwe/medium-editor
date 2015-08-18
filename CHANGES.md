@@ -1,3 +1,11 @@
+4.12.10 / 2015-08-18
+==================
+* Ensure all attributes are copied from textareas to divs
+* Ensure textarea ids are unique on entire page
+* Fix broken auto-link within block elements other than paragraphs
+* Fix issue with editor element being removed in IE11
+
+
 4.12.9 / 2015-08-12
 ==================
 * Fix a regression in the paste extension related to `pasteHTML` function

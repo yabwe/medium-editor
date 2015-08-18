@@ -672,11 +672,18 @@ var Util;
             if (selection.getRangeAt && selection.rangeCount) {
                 range = selection.getRangeAt(0);
                 toReplace = range.commonAncestorContainer;
-                // Ensure range covers maximum amount of nodes as possible
-                // By moving up the DOM and selecting ancestors whose only child is the range
-                if ((toReplace.nodeType === 3 && toReplace.nodeValue === range.toString()) ||
+
+                // https://github.com/yabwe/medium-editor/issues/748
+                // If the selection is an empty editor element, create a temporary text node inside of the editor
+                // and select it so that we don't delete the editor element
+                if (Util.isMediumEditorElement(toReplace) && !toReplace.firstChild) {
+                    range.selectNode(toReplace.appendChild(doc.createTextNode('')));
+                } else if ((toReplace.nodeType === 3 && range.startOffset === 0 && range.endOffset === toReplace.nodeValue.length) ||
                         (toReplace.nodeType !== 3 && toReplace.innerHTML === range.toString())) {
-                    while (toReplace.parentNode &&
+                    // Ensure range covers maximum amount of nodes as possible
+                    // By moving up the DOM and selecting ancestors whose only child is the range
+                    while (!Util.isMediumEditorElement(toReplace) &&
+                            toReplace.parentNode &&
                             toReplace.parentNode.childNodes.length === 1 &&
                             !toReplace.parentNode.getAttribute('data-medium-element')) {
                         toReplace = toReplace.parentNode;
@@ -4239,16 +4246,16 @@ LINK_REGEXP_TEXT =
             // Perform linking on a paragraph level basis as otherwise the detection can wrongly find the end
             // of one paragraph and the beginning of another paragraph to constitute a link, such as a paragraph ending
             // "link." and the next paragraph beginning with "my" is interpreted into "link.my" and the code tries to create
-            // a link across paragraphs - which doesn't work and is terrible.
+            // a link across blockElements - which doesn't work and is terrible.
             // (Medium deletes the spaces/returns between P tags so the textContent ends up without paragraph spacing)
-            var paragraphs = contenteditable.querySelectorAll('p'),
+            var blockElements = contenteditable.querySelectorAll(MediumEditor.util.parentElements.join(',')),
                 documentModified = false;
-            if (paragraphs.length === 0) {
-                paragraphs = [contenteditable];
+            if (blockElements.length === 0) {
+                blockElements = [contenteditable];
             }
-            for (var i = 0; i < paragraphs.length; i++) {
-                documentModified = this.removeObsoleteAutoLinkSpans(paragraphs[i]) || documentModified;
-                documentModified = this.performLinkingWithinElement(paragraphs[i]) || documentModified;
+            for (var i = 0; i < blockElements.length; i++) {
+                documentModified = this.removeObsoleteAutoLinkSpans(blockElements[i]) || documentModified;
+                documentModified = this.performLinkingWithinElement(blockElements[i]) || documentModified;
             }
             return documentModified;
         },
@@ -5906,29 +5913,32 @@ function MediumEditor(elements, options) {
 
     function createContentEditable(textarea, id) {
         var div = this.options.ownerDocument.createElement('div'),
-            uniqueId = 'medium-editor-' + Date.now() + '-' + id,
-            attributesToClone = [
-                'data-disable-editing',
-                'data-disable-toolbar',
-                'data-placeholder',
-                'data-disable-return',
-                'data-disable-double-return',
-                'data-disable-preview',
-                'spellcheck'
-            ];
+            now = Date.now(),
+            uniqueId = 'medium-editor-' + now + '-' + id,
+            atts = textarea.attributes;
+
+        // Some browsers can move pretty fast, since we're using a timestamp
+        // to make a unique-id, ensure that the id is actually unique on the page
+        while (this.options.ownerDocument.getElementById(uniqueId)) {
+            now++;
+            uniqueId = 'medium-editor-' + now + '-' + id;
+        }
 
         div.className = textarea.className;
         div.id = uniqueId;
         div.innerHTML = textarea.value;
-        div.setAttribute('medium-editor-textarea-id', id);
-        attributesToClone.forEach(function (attr) {
-            if (textarea.hasAttribute(attr)) {
-                div.setAttribute(attr, textarea.getAttribute(attr));
+
+        textarea.setAttribute('medium-editor-textarea-id', id);
+
+        // re-create all attributes from the textearea to the new created div
+        for (var i = 0, n = atts.length; i < n; i++) {
+            // do not re-create existing attributes
+            if (!div.hasAttribute(atts[i].nodeName)) {
+                div.setAttribute(atts[i].nodeName, atts[i].nodeValue);
             }
-        });
+        }
 
         textarea.classList.add('medium-editor-hidden');
-        textarea.setAttribute('medium-editor-textarea-id', id);
         textarea.parentNode.insertBefore(
             div,
             textarea
@@ -6701,7 +6711,7 @@ MediumEditor.version = (function (major, minor, revision) {
     };
 }).apply(this, ({
     // grunt-bump looks for this:
-    'version': '4.12.9'
+    'version': '4.12.10'
 }).version.split('.'));
 
     return MediumEditor;
