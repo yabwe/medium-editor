@@ -1,3 +1,11 @@
+5.6.3 / 2015-08-18
+==================
+* Ensure textarea ids are unique on entire page
+* Fix broken auto-link within block elements other than paragraphs
+* Fix issue with editor element being removed in IE11
+* Remove references to global variables from internal code
+
+
 5.6.2 / 2015-08-11
 ==================
 * Fix a regression in the paste extension related to `pasteHTML` function
