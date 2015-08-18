@@ -5928,7 +5928,7 @@ function MediumEditor(elements, options) {
         div.id = uniqueId;
         div.innerHTML = textarea.value;
 
-        textarea.setAttribute('medium-editor-textarea-id', id);
+        textarea.setAttribute('medium-editor-textarea-id', uniqueId);
 
         // re-create all attributes from the textearea to the new created div
         for (var i = 0, n = atts.length; i < n; i++) {
@@ -6711,7 +6711,7 @@ MediumEditor.version = (function (major, minor, revision) {
     };
 }).apply(this, ({
     // grunt-bump looks for this:
-    'version': '4.12.10'
+    'version': '4.12.11'
 }).version.split('.'));
 
     return MediumEditor;

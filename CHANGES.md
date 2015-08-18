@@ -1,4 +1,4 @@
-4.12.10 / 2015-08-18
+4.12.11 / 2015-08-18
 ==================
 * Ensure all attributes are copied from textareas to divs
 * Ensure textarea ids are unique on entire page
