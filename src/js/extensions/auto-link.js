@@ -80,16 +80,16 @@ LINK_REGEXP_TEXT =
             // Perform linking on a paragraph level basis as otherwise the detection can wrongly find the end
             // of one paragraph and the beginning of another paragraph to constitute a link, such as a paragraph ending
             // "link." and the next paragraph beginning with "my" is interpreted into "link.my" and the code tries to create
-            // a link across paragraphs - which doesn't work and is terrible.
+            // a link across blockElements - which doesn't work and is terrible.
             // (Medium deletes the spaces/returns between P tags so the textContent ends up without paragraph spacing)
-            var paragraphs = contenteditable.querySelectorAll('p'),
+            var blockElements = contenteditable.querySelectorAll(MediumEditor.util.blockContainerElementNames.join(',')),
                 documentModified = false;
-            if (paragraphs.length === 0) {
-                paragraphs = [contenteditable];
+            if (blockElements.length === 0) {
+                blockElements = [contenteditable];
             }
-            for (var i = 0; i < paragraphs.length; i++) {
-                documentModified = this.removeObsoleteAutoLinkSpans(paragraphs[i]) || documentModified;
-                documentModified = this.performLinkingWithinElement(paragraphs[i]) || documentModified;
+            for (var i = 0; i < blockElements.length; i++) {
+                documentModified = this.removeObsoleteAutoLinkSpans(blockElements[i]) || documentModified;
+                documentModified = this.performLinkingWithinElement(blockElements[i]) || documentModified;
             }
             return documentModified;
         },
