@@ -93,18 +93,35 @@ describe('KeyboardCommands TestCase', function () {
                             key: 'p',
                             meta: true,
                             shift: false
+                        },
+                        {
+                            command: 'subscript',
+                            key: 'r',
+                            meta: true,
+                            shift: false
                         }
                     ]
                 }
             });
             selectElementContentsAndFire(editor.elements[0]);
             jasmine.clock().tick(1);
+            // If alt-key is not pressed, command should still be executed
             fireEvent(editor.elements[0], 'keydown', {
                 keyCode: 'p'.charCodeAt(0),
                 ctrlKey: true,
-                metaKey: true
+                metaKey: true,
+                altKey: false
             });
             expect(editor.execAction).toHaveBeenCalledWith('superscript');
+
+            // If alt-key is pressed, command should stil be executed
+            fireEvent(editor.elements[0], 'keydown', {
+                keyCode: 'r'.charCodeAt(0),
+                ctrlKey: true,
+                metaKey: true,
+                altKey: true
+            });
+            expect(editor.execAction).toHaveBeenCalledWith('subscript');
         });
 
         it('should support the use of Alt key', function () {
