@@ -64,6 +64,10 @@
                 isAlt = !!event.altKey;
 
             this.keys[keyCode].forEach(function (data) {
+                if (undefined === data.alt) {
+                    data.alt = false;
+                }
+
                 if (data.meta === isMeta &&
                     data.shift === isShift &&
                     data.alt === isAlt) {
