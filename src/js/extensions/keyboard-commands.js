@@ -66,7 +66,8 @@
             this.keys[keyCode].forEach(function (data) {
                 if (data.meta === isMeta &&
                     data.shift === isShift &&
-                    data.alt === isAlt) {
+                    (data.alt === isAlt ||
+                     undefined === data.alt)) { // TODO deprecated: remove check for undefined === data.alt when jumping to 6.0.0
                     event.preventDefault();
                     event.stopPropagation();
 
