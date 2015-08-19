@@ -82,6 +82,31 @@ describe('KeyboardCommands TestCase', function () {
             expect(editor.execAction).toHaveBeenCalledWith('superscript');
         });
 
+        // TODO: remove this test when jumping in 6.0.0
+        it('should be executed for custom command without alt defined', function () {
+            spyOn(MediumEditor.prototype, 'execAction');
+            var editor = this.newMediumEditor('.editor', {
+                keyboardCommands: {
+                    commands: [
+                        {
+                            command: 'superscript',
+                            key: 'p',
+                            meta: true,
+                            shift: false
+                        }
+                    ]
+                }
+            });
+            selectElementContentsAndFire(editor.elements[0]);
+            jasmine.clock().tick(1);
+            fireEvent(editor.elements[0], 'keydown', {
+                keyCode: 'p'.charCodeAt(0),
+                ctrlKey: true,
+                metaKey: true
+            });
+            expect(editor.execAction).toHaveBeenCalledWith('superscript');
+        });
+
         it('should support the use of Alt key', function () {
             spyOn(MediumEditor.prototype, 'execAction');
             var editor = this.newMediumEditor('.editor', {

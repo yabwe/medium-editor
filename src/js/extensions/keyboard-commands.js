@@ -64,6 +64,7 @@
                 isAlt = !!event.altKey;
 
             this.keys[keyCode].forEach(function (data) {
+                // TODO, deprecated: remove that when jumping to 6.0.0
                 if (undefined === data.alt) {
                     data.alt = false;
                 }
