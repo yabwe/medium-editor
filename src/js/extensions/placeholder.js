@@ -52,15 +52,13 @@
             }
         },
 
-        updatePlaceholder: function (el) {
+        updatePlaceholder: function (el, dontShow) {
             // If the element has content, hide the placeholder
-            if (el.querySelector('img, blockquote, ul, ol') || el.textContent.replace(/^\s+|\s+$/g, '') !== '') {
+            if (el.querySelector('img, blockquote, ul, ol') || (el.textContent.replace(/^\s+|\s+$/g, '') !== '')) {
                 return this.hidePlaceholder(el);
             }
 
-            // The element is empty. The placeholder should be shown except
-            // for cases where the placeholder should not be visible while the editor has focus
-            if (this.hideOnClick || el !== this.base.getFocusedElement()) {
+            if (!dontShow) {
                 this.showPlaceholder(el);
             }
         },
@@ -79,8 +77,12 @@
         },
 
         handleInput: function (event, element) {
+            // If the placeholder should be hidden on focus and the
+            // element has focus, don't show the placeholder
+            var dontShow = this.hideOnClick && (element === this.base.getFocusedElement());
+
             // Editor's content has changed, check if the placeholder should be hidden
-            this.updatePlaceholder(element);
+            this.updatePlaceholder(element, dontShow);
         },
 
         handleFocus: function (event, element) {
@@ -89,7 +91,7 @@
         },
 
         handleBlur: function (event, element) {
-            // Editor has lost focus, check the placeholder should be shown
+            // Editor has lost focus, check if the placeholder should be shown
             this.updatePlaceholder(element);
         }
     });

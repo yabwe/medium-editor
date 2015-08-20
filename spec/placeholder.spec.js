@@ -117,6 +117,19 @@ describe('MediumEditor.extensions.placeholder TestCase', function () {
         expect(editor.elements[0].className).not.toContain('medium-editor-placeholder');
     });
 
+    // https://github.com/yabwe/medium-editor/issues/783
+    it('should not show a placeholder when input changes but editor is still empty', function () {
+        var editor = this.newMediumEditor('.editor');
+        expect(editor.elements[0].className).toContain('medium-editor-placeholder');
+        fireEvent(editor.elements[0], 'click');
+        editor.elements[0].focus();
+        expect(editor.elements[0].className).not.toContain('medium-editor-placeholder');
+        var toolbar = editor.getExtensionByName('toolbar');
+        fireEvent(editor.elements[0], 'blur');
+        fireEvent(toolbar.getToolbarElement().querySelector('[data-action="append-h2"]'), 'click');
+        expect(editor.elements[0].className).not.toContain('medium-editor-placeholder');
+    });
+
     /*jslint regexp: true*/
     function validatePlaceholderContent(element, expectedValue) {
         var placeholder = window.getComputedStyle(element, ':after').getPropertyValue('content'),
