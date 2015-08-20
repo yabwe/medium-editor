@@ -142,7 +142,9 @@ describe('MediumEditor.Events TestCase', function () {
     describe('ExecCommand Listener', function () {
         it('should only wrap document.execCommand when required', function () {
             var origExecCommand = document.execCommand;
-            this.newMediumEditor('.editor');
+            this.newMediumEditor('.editor', {
+                placeholder: false
+            });
             expect(document.execCommand).toBe(origExecCommand);
         });
 

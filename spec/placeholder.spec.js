@@ -78,10 +78,10 @@ describe('MediumEditor.extensions.placeholder TestCase', function () {
         fireEvent(document.body, 'click');
         expect(editor.elements[0].className).toContain('medium-editor-placeholder');
         this.el.innerHTML = '<p>lorem</p><p id="target">ipsum</p><p>dolor</p>';
-        fireEvent(editor.elements[0], 'input');
+        editor.trigger('editableInput', {}, editor.elements[0]);
         expect(editor.elements[0].className).not.toContain('medium-editor-placeholder');
         this.el.innerHTML = '';
-        fireEvent(editor.elements[0], 'input');
+        editor.trigger('editableInput', {}, editor.elements[0]);
         expect(editor.elements[0].className).toContain('medium-editor-placeholder');
     });
 
