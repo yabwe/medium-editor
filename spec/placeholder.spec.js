@@ -109,6 +109,14 @@ describe('MediumEditor.extensions.placeholder TestCase', function () {
         expect(editor.elements[0].className).not.toContain('medium-editor-placeholder');
     });
 
+    // https://github.com/yabwe/medium-editor/issues/768
+    it('should remove the placeholder when the content is updated manually', function () {
+        var editor = this.newMediumEditor('.editor');
+        expect(editor.elements[0].className).toContain('medium-editor-placeholder');
+        editor.setContent('<p>lorem ipsum</p>');
+        expect(editor.elements[0].className).not.toContain('medium-editor-placeholder');
+    });
+
     /*jslint regexp: true*/
     function validatePlaceholderContent(element, expectedValue) {
         var placeholder = window.getComputedStyle(element, ':after').getPropertyValue('content'),

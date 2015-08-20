@@ -53,24 +53,28 @@
         },
 
         updatePlaceholder: function (el) {
-            // if one of these element ('img, blockquote, ul, ol') are found inside the given element, we won't display the placeholder
-            if (!(el.querySelector('img, blockquote, ul, ol')) && el.textContent.replace(/^\s+|\s+$/g, '') === '') {
-                return this.showPlaceholder(el);
+            // If the element has content, hide the placeholder
+            if (el.querySelector('img, blockquote, ul, ol') || el.textContent.replace(/^\s+|\s+$/g, '') !== '') {
+                return this.hidePlaceholder(el);
             }
 
-            this.hidePlaceholder(el);
+            // The element is empty. The placeholder should be shown except
+            // for cases where the placeholder should not be visible while the editor has focus
+            if (this.hideOnClick || el !== this.base.getFocusedElement()) {
+                this.showPlaceholder(el);
+            }
         },
 
         attachEventHandlers: function () {
             if (this.hideOnClick) {
-                // We want to always hide the placeholder when it gets focus
+                // For the 'hideOnClick' option, the placeholder should always be hidden on focus
                 this.subscribe('focus', this.handleFocus.bind(this));
-            } else {
-                // We want to hide/show the placeholder each time something changes
-                this.subscribe('editableInput', this.handleInput.bind(this));
             }
 
-            // When the editor loses focus, we should always check if the placeholder shoudl be visible
+            // If the editor has content, it should always hide the placeholder
+            this.subscribe('editableInput', this.handleInput.bind(this));
+
+            // When the editor loses focus, check if the placeholder should be visible
             this.subscribe('blur', this.handleBlur.bind(this));
         },
 
