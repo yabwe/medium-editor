@@ -142,7 +142,9 @@ describe('MediumEditor.Events TestCase', function () {
     describe('ExecCommand Listener', function () {
         it('should only wrap document.execCommand when required', function () {
             var origExecCommand = document.execCommand;
-            this.newMediumEditor('.editor');
+            this.newMediumEditor('.editor', {
+                placeholder: false
+            });
             expect(document.execCommand).toBe(origExecCommand);
         });
 
@@ -233,12 +235,12 @@ describe('MediumEditor.Events TestCase', function () {
         });
 
         it('should wrap and unwrap execCommand when using MediumEditor methods', function () {
+            var originalInputSupport = MediumEditor.Events.prototype.InputEventOnContenteditableSupported;
+            MediumEditor.Events.prototype.InputEventOnContenteditableSupported = false;
+
             spyOn(document, 'execCommand').and.callThrough();
             var origExecCommand = document.execCommand,
-                editor = this.newMediumEditor('.editor'),
-                originalInputSupport = MediumEditor.Events.prototype.InputEventOnContenteditableSupported;
-
-            MediumEditor.Events.prototype.InputEventOnContenteditableSupported = false;
+                editor = this.newMediumEditor('.editor');
 
             editor.subscribe('editableInput', function () { });
             expect(document.execCommand).not.toBe(origExecCommand);
@@ -260,16 +262,17 @@ describe('MediumEditor.Events TestCase', function () {
             var namePrefix = inputSupported ? 'when Input is supported' : 'when Input is NOT supported';
 
             it(namePrefix + ' should trigger with the corresponding editor element passed as an argument', function () {
+                var originalInputSupport = MediumEditor.Events.prototype.InputEventOnContenteditableSupported;
+                MediumEditor.Events.prototype.InputEventOnContenteditableSupported = inputSupported;
+
                 var editableTwo = this.createElement('div', 'editor', 'lore ipsum'),
                     firedTarget,
                     editor = this.newMediumEditor('.editor'),
                     handler = function (event, editable) {
                         firedTarget = editable;
-                    },
-                    originalInputSupport = MediumEditor.Events.prototype.InputEventOnContenteditableSupported;
+                    };
                 expect(editor.elements.length).toBe(2);
 
-                MediumEditor.Events.prototype.InputEventOnContenteditableSupported = inputSupported;
                 editor.subscribe('editableInput', handler);
                 editor.selectElement(editableTwo.firstChild);
 
@@ -288,16 +291,17 @@ describe('MediumEditor.Events TestCase', function () {
             });
 
             it(namePrefix + ' should only trigger when the content has actually changed', function () {
+                var originalInputSupport = MediumEditor.Events.prototype.InputEventOnContenteditableSupported;
+                MediumEditor.Events.prototype.InputEventOnContenteditableSupported = inputSupported;
+
                 var editableTwo = this.createElement('div', 'editor', 'lore ipsum'),
                     firedTarget,
                     editor = this.newMediumEditor('.editor'),
                     handler = function (event, editable) {
                         firedTarget = editable;
-                    },
-                    originalInputSupport = MediumEditor.Events.prototype.InputEventOnContenteditableSupported;
+                    };
                 expect(editor.elements.length).toBe(2);
 
-                MediumEditor.Events.prototype.InputEventOnContenteditableSupported = inputSupported;
                 editor.subscribe('editableInput', handler);
 
                 // If content hasn't changed, custom event won't fire
@@ -316,12 +320,12 @@ describe('MediumEditor.Events TestCase', function () {
             });
 
             it(namePrefix + ',setContent should fire editableInput when content changes', function () {
+                var originalInputSupport = MediumEditor.Events.prototype.InputEventOnContenteditableSupported;
+                MediumEditor.Events.prototype.InputEventOnContenteditableSupported = inputSupported;
+
                 var newHTML = 'Lorem ipsum dolor',
                     editor = this.newMediumEditor('.editor'),
-                    spy = jasmine.createSpy('handler'),
-                    originalInputSupport = MediumEditor.Events.prototype.InputEventOnContenteditableSupported;
-
-                MediumEditor.Events.prototype.InputEventOnContenteditableSupported = inputSupported;
+                    spy = jasmine.createSpy('handler');
 
                 editor.subscribe('editableInput', spy);
                 expect(spy).not.toHaveBeenCalled();
@@ -333,12 +337,12 @@ describe('MediumEditor.Events TestCase', function () {
             });
 
             it(namePrefix + ', setContent should not fire editableInput when content doesn\'t change', function () {
+                var originalInputSupport = MediumEditor.Events.prototype.InputEventOnContenteditableSupported;
+                MediumEditor.Events.prototype.InputEventOnContenteditableSupported = inputSupported;
+
                 var sameHTML = 'lore ipsum',
                     editor = this.newMediumEditor('.editor'),
-                    spy = jasmine.createSpy('handler'),
-                    originalInputSupport = MediumEditor.Events.prototype.InputEventOnContenteditableSupported;
-
-                MediumEditor.Events.prototype.InputEventOnContenteditableSupported = inputSupported;
+                    spy = jasmine.createSpy('handler');
 
                 editor.subscribe('editableInput', spy);
                 expect(spy).not.toHaveBeenCalled();
@@ -353,6 +357,9 @@ describe('MediumEditor.Events TestCase', function () {
         runEditableInputTests(false);
 
         it('should trigger when bolding text when input event is NOT supported', function () {
+            var originalInputSupport = MediumEditor.Events.prototype.InputEventOnContenteditableSupported;
+            MediumEditor.Events.prototype.InputEventOnContenteditableSupported = false;
+
             var editableTwo = this.createElement('div', 'editor', 'lore ipsum'),
                 firedTarget,
                 editor = this.newMediumEditor('.editor'),
@@ -360,11 +367,9 @@ describe('MediumEditor.Events TestCase', function () {
                 button = toolbar.getToolbarElement().querySelector('[data-action="bold"]'),
                 handler = function (event, editable) {
                     firedTarget = editable;
-                },
-                originalInputSupport = MediumEditor.Events.prototype.InputEventOnContenteditableSupported;
+                };
             expect(editor.elements.length).toBe(2);
 
-            MediumEditor.Events.prototype.InputEventOnContenteditableSupported = false;
             editor.subscribe('editableInput', handler);
 
             selectElementContentsAndFire(editableTwo.firstChild);

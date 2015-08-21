@@ -479,11 +479,11 @@ describe('Anchor Button TestCase', function () {
         });
 
         it('should unlink when selection is a link', function () {
-            spyOn(document, 'execCommand').and.callThrough();
             this.el.innerHTML = '<a href="#">link</a>';
             var button,
                 editor = this.newMediumEditor('.editor'),
                 toolbar = editor.getExtensionByName('toolbar');
+            spyOn(document, 'execCommand').and.callThrough();
             selectElementContentsAndFire(editor.elements[0]);
             jasmine.clock().tick(11); // checkSelection delay
             button = toolbar.getToolbarElement().querySelector('[data-action="createLink"]');

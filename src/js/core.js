@@ -889,7 +889,13 @@
         },
 
         createLink: function (opts) {
-            var currentEditor, customEvent, i;
+            var currentEditor = MediumEditor.selection.getSelectionElement(this.options.contentWindow),
+                customEvent = {};
+
+            // Make sure the selection is within an element this editor is tracking
+            if (this.elements.indexOf(currentEditor) === -1) {
+                return;
+            }
 
             try {
                 this.events.disableCustomEvent('editableInput');
@@ -924,8 +930,6 @@
                         // we want to make sure we create a single link, and not multiple links
                         // which can happen with the built in browser functionality
                         if (commonAncestorContainer.nodeType !== 3 && startContainerParentElement === endContainerParentElement) {
-
-                            currentEditor = MediumEditor.selection.getSelectionElement(this.options.contentWindow);
                             var parentElement = (startContainerParentElement || currentEditor),
                                 fragment = this.options.ownerDocument.createDocumentFragment();
 
@@ -1007,7 +1011,7 @@
                 if (this.options.targetBlank || opts.target === '_blank' || opts.buttonClass) {
                     customEvent = this.options.ownerDocument.createEvent('HTMLEvents');
                     customEvent.initEvent('input', true, true, this.options.contentWindow);
-                    for (i = 0; i < this.elements.length; i += 1) {
+                    for (var i = 0; i < this.elements.length; i += 1) {
                         this.elements[i].dispatchEvent(customEvent);
                     }
                 }

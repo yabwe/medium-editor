@@ -325,10 +325,10 @@ describe('Buttons TestCase', function () {
 
     describe('AppendEl', function () {
         it('should call the document.execCommand method when button action is append', function () {
-            spyOn(document, 'execCommand');
             var button,
                 editor = this.newMediumEditor('.editor'),
                 toolbar = editor.getExtensionByName('toolbar');
+            spyOn(document, 'execCommand');
             selectElementContentsAndFire(editor.elements[0]);
             jasmine.clock().tick(1);
             button = toolbar.getToolbarElement().querySelector('[data-action="append-h3"]');
@@ -444,10 +444,10 @@ describe('Buttons TestCase', function () {
 
     describe('Italics', function () {
         it('should call the execCommand for native actions', function () {
-            spyOn(document, 'execCommand').and.callThrough();
             var button,
                 editor = this.newMediumEditor('.editor'),
                 toolbar = editor.getExtensionByName('toolbar');
+            spyOn(document, 'execCommand').and.callThrough();
             selectElementContentsAndFire(editor.elements[0]);
             button = toolbar.getToolbarElement().querySelector('[data-action="italic"]');
             fireEvent(button, 'click');
@@ -727,7 +727,6 @@ describe('Buttons TestCase', function () {
 
     describe('Image', function () {
         it('should create an image', function () {
-            spyOn(document, 'execCommand').and.callThrough();
             var editor = this.newMediumEditor('.editor', {
                     toolbar: {
                         buttons: ['image']
@@ -735,6 +734,7 @@ describe('Buttons TestCase', function () {
                 }),
                 toolbar = editor.getExtensionByName('toolbar'),
                 button = toolbar.getToolbarElement().querySelector('[data-action="image"]');
+            spyOn(document, 'execCommand').and.callThrough();
 
             this.el.innerHTML = '<span id="span-image">http://i.imgur.com/twlXfUq.jpg</span>';
             selectElementContentsAndFire(document.getElementById('span-image'));
