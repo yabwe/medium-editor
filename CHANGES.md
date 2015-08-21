@@ -1,3 +1,11 @@
+5.7.0 / 2015-08-21
+==================
+* Fix backwards compatability issue with how keyboard commands extension handles 'alt'
+* Rewrite which event placeholder extension listens to for hiding/showing placeholder
+  * Fix issue where placeholder is not hidden when calling setContent()
+  * Fix issue where placeholder is displayed incorrectly when hideOnClick option is true
+
+
 5.6.3 / 2015-08-18
 ==================
 * Ensure textarea ids are unique on entire page

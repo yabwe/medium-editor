@@ -3995,7 +3995,8 @@ LINK_REGEXP_TEXT =
             this.keys[keyCode].forEach(function (data) {
                 if (data.meta === isMeta &&
                     data.shift === isShift &&
-                    data.alt === isAlt) {
+                    (data.alt === isAlt ||
+                     undefined === data.alt)) { // TODO deprecated: remove check for undefined === data.alt when jumping to 6.0.0
                     event.preventDefault();
                     event.stopPropagation();
 
@@ -4528,47 +4529,47 @@ LINK_REGEXP_TEXT =
             }
         },
 
-        updatePlaceholder: function (el) {
-            // if one of these element ('img, blockquote, ul, ol') are found inside the given element, we won't display the placeholder
-            if (!(el.querySelector('img, blockquote, ul, ol')) && el.textContent.replace(/^\s+|\s+$/g, '') === '') {
-                return this.showPlaceholder(el);
+        updatePlaceholder: function (el, dontShow) {
+            // If the element has content, hide the placeholder
+            if (el.querySelector('img, blockquote, ul, ol') || (el.textContent.replace(/^\s+|\s+$/g, '') !== '')) {
+                return this.hidePlaceholder(el);
             }
 
-            this.hidePlaceholder(el);
+            if (!dontShow) {
+                this.showPlaceholder(el);
+            }
         },
 
         attachEventHandlers: function () {
-            // Custom events
-            this.subscribe('blur', this.handleExternalInteraction.bind(this));
-
-            // Check placeholder on blur
-            this.subscribe('editableBlur', this.handleBlur.bind(this));
-
-            // if we don't want the placeholder to be removed on click but when user start typing
             if (this.hideOnClick) {
-                this.subscribe('editableClick', this.handleHidePlaceholderEvent.bind(this));
-            } else {
-                this.subscribe('editableKeyup', this.handleBlur.bind(this));
+                // For the 'hideOnClick' option, the placeholder should always be hidden on focus
+                this.subscribe('focus', this.handleFocus.bind(this));
             }
 
-            // Events where we always hide the placeholder
-            this.subscribe('editableKeypress', this.handleHidePlaceholderEvent.bind(this));
-            this.subscribe('editablePaste', this.handleHidePlaceholderEvent.bind(this));
+            // If the editor has content, it should always hide the placeholder
+            this.subscribe('editableInput', this.handleInput.bind(this));
+
+            // When the editor loses focus, check if the placeholder should be visible
+            this.subscribe('blur', this.handleBlur.bind(this));
         },
 
-        handleHidePlaceholderEvent: function (event, element) {
-            // Events where we hide the placeholder
+        handleInput: function (event, element) {
+            // If the placeholder should be hidden on focus and the
+            // element has focus, don't show the placeholder
+            var dontShow = this.hideOnClick && (element === this.base.getFocusedElement());
+
+            // Editor's content has changed, check if the placeholder should be hidden
+            this.updatePlaceholder(element, dontShow);
+        },
+
+        handleFocus: function (event, element) {
+            // Editor has focus, hide the placeholder
             this.hidePlaceholder(element);
         },
 
         handleBlur: function (event, element) {
-            // Update placeholder for element that lost focus
+            // Editor has lost focus, check if the placeholder should be shown
             this.updatePlaceholder(element);
-        },
-
-        handleExternalInteraction: function () {
-            // Update all placeholders
-            this.initPlaceholders();
         }
     });
 
@@ -6145,7 +6146,13 @@ LINK_REGEXP_TEXT =
         },
 
         createLink: function (opts) {
-            var currentEditor, customEvent, i;
+            var currentEditor = MediumEditor.selection.getSelectionElement(this.options.contentWindow),
+                customEvent = {};
+
+            // Make sure the selection is within an element this editor is tracking
+            if (this.elements.indexOf(currentEditor) === -1) {
+                return;
+            }
 
             try {
                 this.events.disableCustomEvent('editableInput');
@@ -6180,8 +6187,6 @@ LINK_REGEXP_TEXT =
                         // we want to make sure we create a single link, and not multiple links
                         // which can happen with the built in browser functionality
                         if (commonAncestorContainer.nodeType !== 3 && startContainerParentElement === endContainerParentElement) {
-
-                            currentEditor = MediumEditor.selection.getSelectionElement(this.options.contentWindow);
                             var parentElement = (startContainerParentElement || currentEditor),
                                 fragment = this.options.ownerDocument.createDocumentFragment();
 
@@ -6263,7 +6268,7 @@ LINK_REGEXP_TEXT =
                 if (this.options.targetBlank || opts.target === '_blank' || opts.buttonClass) {
                     customEvent = this.options.ownerDocument.createEvent('HTMLEvents');
                     customEvent.initEvent('input', true, true, this.options.contentWindow);
-                    for (i = 0; i < this.elements.length; i += 1) {
+                    for (var i = 0; i < this.elements.length; i += 1) {
                         this.elements[i].dispatchEvent(customEvent);
                     }
                 }
@@ -6331,7 +6336,7 @@ MediumEditor.parseVersionString = function (release) {
 
 MediumEditor.version = MediumEditor.parseVersionString.call(this, ({
     // grunt-bump looks for this:
-    'version': '5.6.3'
+    'version': '5.7.0'
 }).version);
 
     return MediumEditor;
