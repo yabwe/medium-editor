@@ -930,8 +930,6 @@
                         // we want to make sure we create a single link, and not multiple links
                         // which can happen with the built in browser functionality
                         if (commonAncestorContainer.nodeType !== 3 && startContainerParentElement === endContainerParentElement) {
-
-                            currentEditor = MediumEditor.selection.getSelectionElement(this.options.contentWindow);
                             var parentElement = (startContainerParentElement || currentEditor),
                                 fragment = this.options.ownerDocument.createDocumentFragment();
 
