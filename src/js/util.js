@@ -22,6 +22,18 @@
         return dest;
     }
 
+    // https://developer.mozilla.org/en-US/docs/Web/API/Node/contains
+    // Some browsers (including phantom) don't return true for Node.contains(child)
+    // if child is a text node.  Detect these cases here and use a fallback
+    // for calls to Util.isDescendant()
+    var nodeContainsWorksWithTextNodes = false;
+    try {
+        var testParent = document.createElement('div'),
+            testText = document.createTextNode(' ');
+        testParent.appendChild(testText);
+        nodeContainsWorksWithTextNodes = testParent.contains(testText);
+    } catch (exc) {}
+
     var Util = {
 
         // http://stackoverflow.com/questions/17907445/how-to-detect-ie11#comment30165888_17907562
@@ -239,6 +251,9 @@
             }
             if (checkEquality && parent === child) {
                 return true;
+            }
+            if (nodeContainsWorksWithTextNodes || child.nodeType !== 3) {
+                return parent.contains(child);
             }
             var node = child.parentNode;
             while (node !== null) {
