@@ -530,4 +530,36 @@ describe('MediumEditor.extensions.toolbar TestCase', function () {
             expect(toolbar.style.left).not.toBe('');
         });
     });
+
+    describe('Relative Toolbars', function () {
+        it('should contain relative toolbar class', function () {
+            var relativeContainer = window.document.createElement('div');
+            relativeContainer.setAttribute('id', 'someRelativeDiv');
+            window.document.body.appendChild(relativeContainer);
+
+            var editor = this.newMediumEditor('.editor', {
+                    toolbar: {
+                        relativeContainer: document.getElementById('someRelativeDiv')
+                    }
+                }),
+                toolbar = editor.getExtensionByName('toolbar');
+
+            expect(toolbar.getToolbarElement().classList.contains('medium-editor-relative-toolbar')).toBe(true);
+        });
+
+        it('should be included in relative node', function () {
+            var relativeContainer = window.document.createElement('div');
+            relativeContainer.setAttribute('id', 'someRelativeDiv');
+            window.document.body.appendChild(relativeContainer);
+
+            var editor = this.newMediumEditor('.editor', {
+                  toolbar: {
+                      relativeContainer: document.getElementById('someRelativeDiv')
+                  }
+              }),
+              toolbarHTML = editor.getExtensionByName('toolbar').getToolbarElement().outerHTML;
+
+            expect(document.getElementById('someRelativeDiv').innerHTML).toBe(toolbarHTML);
+        });
+    });
 });
