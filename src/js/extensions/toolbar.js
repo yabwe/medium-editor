@@ -69,11 +69,21 @@
          */
         updateOnEmptySelection: false,
 
+        /* relativeContainer: [node]
+         * appending the toolbar to a given node instead of body
+         */
+        relativeContainer: null,
+
         init: function () {
             MediumEditor.Extension.prototype.init.apply(this, arguments);
 
             this.initThrottledMethods();
-            this.getEditorOption('elementsContainer').appendChild(this.getToolbarElement());
+
+            if (!this.relativeContainer) {
+                this.getEditorOption('elementsContainer').appendChild(this.getToolbarElement());
+            } else {
+                this.relativeContainer.appendChild(this.getToolbarElement());
+            }
         },
 
         // Helper method to execute method for every extension, but ignoring the toolbar extension
@@ -96,6 +106,8 @@
 
             if (this.static) {
                 toolbar.className += ' static-toolbar';
+            } else if (this.relativeContainer) {
+                toolbar.className += ' medium-editor-relative-toolbar';
             } else {
                 toolbar.className += ' medium-editor-stalker-toolbar';
             }
@@ -505,12 +517,16 @@
                 return this;
             }
 
-            if (this.static) {
+            if (this.static && !this.relativeContainer) {
                 this.showToolbar();
                 this.positionStaticToolbar(container);
             } else if (!selection.isCollapsed) {
                 this.showToolbar();
-                this.positionToolbar(selection);
+
+                // we don't need any absolute positioning if relativeContainer is set
+                if (!this.relativeContainer) {
+                    this.positionToolbar(selection);
+                }
             }
 
             anchorPreview = this.base.getExtensionByName('anchor-preview');
