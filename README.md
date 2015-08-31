@@ -158,7 +158,8 @@ var editor = new MediumEditor('.editable', {
 * __standardizeSelectionStart__: enables/disables standardizing how the beginning of a range is decided between browsers whenever the selected text is analyzed for updating toolbar buttons status. Default: `false`
 * __static__: enable/disable the toolbar always displaying in the same location relative to the medium-editor element. Default: `false`
 * __relativeContainer__: Toolbar is appended relative to a given DOM-Node instead of appending it to the body and position it absolute.
-##### Options which only apply when the `static` option is being used
+
+##### Options which only apply when the `static` option is being used:
 * __align__: `left`|`center`|`right` - When the __static__ option is `true`, this aligns the static toolbar relative to the medium-editor element. Default: `center`
 * __sticky__: When the __static__ option is `true`, this enables/disables the toolbar "sticking" to the viewport and staying visible on the screen while the page scrolls. Default: `false`
 * __updateOnEmptySelection__: When the __static__ option is `true`, this enables/disables updating the state of the toolbar buttons even when the selection is collapsed (there is no selection, just a cursor). Default: `false`
