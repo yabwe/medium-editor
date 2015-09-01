@@ -11,7 +11,8 @@
 
             // if current text selection is empty OR previous sibling text is empty
             if ((node && node.textContent.trim() === '') ||
-                (node.previousElementSibling && node.previousElementSibling.textContent.trim() === '')) {
+                (node.previousElementSibling && node.previousElementSibling.textContent.trim() === '') ||
+                (MediumEditor.selection.getCaretOffsets(node).left === 0) {
                 event.preventDefault();
             }
         }
