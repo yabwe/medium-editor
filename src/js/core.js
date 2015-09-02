@@ -592,6 +592,51 @@
             return this.setup();
         },
 
+        /**
+         * We setup an observer on all "mutations" that happen in the contenteditable.
+         * So we can catch the moment where a node is coverted to a span when inserted in a paragraph
+         * and unwrap it to remove the span node but keep its content
+         *
+         * @see https://developer.mozilla.org/en-US/docs/Web/API/MutationObserver
+         * @see http://www.neotericdesign.com/blog/2013/3/working-around-chrome-s-contenteditable-span-bug
+         */
+        setupWatch: function () {
+            // grab the MutationObserver
+            var DOMMutationObserver, observer,
+                instance = this;
+
+            if (typeof window.WebKitMutationObserver !== 'undefined') {
+                DOMMutationObserver = window.WebKitMutationObserver;
+            } else {
+                DOMMutationObserver = window.MutationObserver;
+            }
+
+            // should be the case for Phantom :(
+            if (DOMMutationObserver === undefined) {
+                // window.console.error('DOM Mutation Observers are required.');
+                // window.console.error('https://developer.mozilla.org/en-US/docs/Web/API/MutationObserver');
+
+                return;
+            }
+
+            observer = new DOMMutationObserver(function (mutations) {
+                mutations.forEach(function (mutation) {
+                    // for a 'childList' change we check that we merged this into a paragraph
+                    if (mutation.type === 'childList' && mutation.target.nodeName.toLowerCase() === 'p') {
+                        // we loop on all inserted node
+                        for (var i = 0; i < mutation.addedNodes.length; i++) {
+                            // if one a them is a span, we need to unwrap it to insert the plain text inside the paragraph
+                            if (mutation.addedNodes[i].nodeName.toLowerCase() === 'span') {
+                                MediumEditor.util.unwrap(mutation.addedNodes[i], instance.options.ownerDocument);
+                            }
+                        }
+                    }
+                });
+            });
+
+            observer.observe(this.elements[0], { childList: true, subtree: true });
+        },
+
         setup: function () {
             if (this.isActive) {
                 return;
@@ -612,6 +657,7 @@
             initElements.call(this);
             initExtensions.call(this);
             attachHandlers.call(this);
+            this.setupWatch();
         },
 
         destroy: function () {
