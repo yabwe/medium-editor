@@ -2,11 +2,11 @@
 $medium-editor-bgcolor: #2f1e07;
 $medium-editor-border-color: lighten($medium-editor-bgcolor, 10);
 $medium-editor-button-size: 60px;
-$medium-editor-button-active-text-color: #fff;
+$medium-editor-button-active-text-color: #ffedd5;
 $medium-editor-hover-color: darken($medium-editor-bgcolor, 10);
-$medium-editor-link-color: #fff;
+$medium-editor-link-color: #ffedd5;
 $medium-editor-border-radius: 4px;
-$medium-editor-placeholder-color: #fff;
+$medium-editor-placeholder-color: #ffedd5;
 
 // theme rules
 .medium-toolbar-arrow-under:after {
@@ -60,7 +60,7 @@ $medium-editor-placeholder-color: #fff;
 .medium-editor-toolbar-form {
     background: $medium-editor-bgcolor;
     border-radius: $medium-editor-border-radius;
-    color: #fff;
+    color: #ffedd5;
 
     .medium-editor-toolbar-input {
         background: $medium-editor-bgcolor;
