@@ -439,6 +439,32 @@ describe('Autolink', function () {
                 expect(links[0].getAttribute('href')).toBe('http://www.example.com');
                 expect(links[0].firstChild.getAttribute('data-auto-link')).toBe('true');
             });
+
+            // https://github.com/yabwe/medium-editor/issues/790
+            it('should not create a link when text in consecutive list items could be a valid url when combined', function () {
+                this.el.innerHTML = '<ul><li>text ending in a period.</li><li>name - text starting with a TLD</li></ul>';
+
+                selectElementContentsAndFire(this.el);
+                triggerAutolinking(this.el);
+                var links = this.el.getElementsByTagName('a');
+                expect(links.length).toBe(0, 'A link was created without a valid url being in the text');
+                expect(this.el.innerHTML).toBe('<ul><li>text ending in a period.</li><li>name - text starting with a TLD</li></ul>',
+                    'Content does not contain a valid url, but auto-link caused the content to change');
+            });
+
+            // https://github.com/yabwe/medium-editor/issues/790
+            it('should not create a link which spans multiple list items', function () {
+                this.el.innerHTML = '<ol><li>abc</li><li>www.example.com</li></ol>';
+
+                selectElementContentsAndFire(this.el);
+                triggerAutolinking(this.el);
+                var links = this.el.getElementsByTagName('a'),
+                    lastLi = this.el.querySelector('ol').lastChild;
+                expect(links.length).toBe(1, 'There should have been exactly 1 link created');
+                expect(links[0].getAttribute('href')).toBe('http://www.example.com');
+                expect(lastLi.firstChild).toBe(links[0]);
+                expect(lastLi.textContent).toBe('www.example.com');
+            });
         });
     });
 
