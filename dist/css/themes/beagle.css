@@ -42,6 +42,7 @@
   overflow: hidden; }
   .medium-editor-toolbar-form .medium-editor-toolbar-input {
     background: #000;
+    box-sizing: border-box;
     color: #ccc;
     height: 40px;
     padding-left: 16px;
