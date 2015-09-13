@@ -33,7 +33,10 @@
     <script>
         var editor = new MediumEditor('.editable', {
             buttonLabels: 'fontawesome',
-            autoLink: true
+            autoLink: true,
+            toolbar: {
+                buttons: ['bold', 'italic', 'unorderedlist', 'orderedlist', 'anchor']
+            }
         }),
         cssLink = document.getElementById('medium-editor-theme');
 
