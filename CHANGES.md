@@ -1,3 +1,8 @@
+5.8.1 / 2015-09-16
+==================
+* Fix inconsistancies and errors in isDescendant utility method
+
+
 5.8.0 / 2015-09-13
 ==================
 * Added relativeContainer options for the toolbar
