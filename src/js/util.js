@@ -249,8 +249,12 @@
             if (!parent || !child) {
                 return false;
             }
-            if (checkEquality && parent === child) {
-                return true;
+            if (parent === child) {
+                return !!checkEquality;
+            }
+            // If parent is not an element, it can't have any descendants
+            if (parent.nodeType !== 1) {
+                return false;
             }
             if (nodeContainsWorksWithTextNodes || child.nodeType !== 3) {
                 return parent.contains(child);
