@@ -405,4 +405,41 @@ describe('MediumEditor.util', function () {
             expect(document.body.contains(el)).toBe(true, 'The editor element has been removed from the page');
         });
     });
+
+    describe('isDescendant', function () {
+        it('should return true for an element which is a descendant of another', function () {
+            var parent = this.createElement('div'),
+                child = parent.appendChild(document.createTextNode('text'));
+            expect(MediumEditor.util.isDescendant(parent, child)).toBe(true);
+        });
+
+        it('should return false for an element which is not a descendant of another', function () {
+            var parent = this.createElement('div'),
+                child = document.createTextNode('text');
+            expect(MediumEditor.util.isDescendant(parent, child)).toBe(false);
+        });
+
+        it('should return false when checking the same element', function () {
+            var parent = this.createElement('div');
+            expect(MediumEditor.util.isDescendant(parent, parent)).toBe(false);
+        });
+
+        it('should return true when checking the same element but using the equality param', function () {
+            var parent = this.createElement('div');
+            expect(MediumEditor.util.isDescendant(parent, parent, true)).toBe(true);
+        });
+
+        it('should return false when the elements are null', function () {
+            var parent = this.createElement('div');
+            expect(MediumEditor.util.isDescendant(parent, null)).toBe(false);
+            expect(MediumEditor.util.isDescendant(null, parent)).toBe(false);
+            expect(MediumEditor.util.isDescendant(null, null)).toBe(false);
+        });
+
+        it('should return false when the parent element is a text node', function () {
+            var parent = document.createTextNode('text'),
+                child = this.createElement('div');
+            expect(MediumEditor.util.isDescendant(parent, child)).toBe(false);
+        });
+    });
 });
