@@ -238,11 +238,11 @@
          * </blockquote>
          *
          * This function would return these elements as an array:
-         *   [ <p>Some</p>, <li>List Item 1</li>, <li>List Item 2</li> ]
+         *   [ <p>Some Text</p>, <li>List Item 1</li>, <li>List Item 2</li> ]
          *
-         * Since the <blockquote> and <ol> elements contain blocks within them
-         * They are not returned.  Since the <p> and <li>'s cover all text content,
-         * that is what is returned
+         * Since the <blockquote> and <ol> elements contain blocks within them they are not returned.
+         * Since the <p> and <li>'s don't contain block elements and cover all the text content of the
+         * <blockquote> container, they are the elements returned.
          */
         splitByBlockElements: function (element) {
             var toRet = [],
