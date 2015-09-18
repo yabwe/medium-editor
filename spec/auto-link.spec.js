@@ -454,7 +454,7 @@ describe('Autolink', function () {
 
             // https://github.com/yabwe/medium-editor/issues/790
             it('should not create a link which spans multiple list items', function () {
-                this.el.innerHTML = '<ol><li>abc</li><li>www.example.com</li></ol>';
+                this.el.innerHTML = '<blockquote><ol><li>abc</li><li>www.example.com</li></ol></li>';
 
                 selectElementContentsAndFire(this.el);
                 triggerAutolinking(this.el);
