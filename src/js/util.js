@@ -105,7 +105,8 @@
             // all other known block elements
             'address', 'article', 'aside', 'audio', 'canvas', 'dd', 'dl', 'dt', 'fieldset',
             'figcaption', 'figure', 'footer', 'form', 'header', 'hgroup', 'main', 'nav',
-            'noscript', 'output', 'section', 'table', 'tbody', 'tfoot', 'video'
+            'noscript', 'output', 'section', 'video',
+            'table', 'thead', 'tbody', 'tfoot', 'tr', 'th', 'td'
         ],
 
         emptyElementNames: ['br', 'col', 'colgroup', 'hr', 'img', 'input', 'source', 'wbr'],
@@ -214,6 +215,58 @@
                     endSplitPoint !== 0) {
                 (newNode || currentNode).splitText(endSplitPoint);
             }
+        },
+
+        /*
+        * Take an element, and break up all of its text content into unique pieces such that:
+         * 1) All text content of the elements are in separate blocks. No piece of text content should span
+         *    span multiple blocks. This means no element return by this function should have
+         *    any blocks as children.
+         * 2) The union of the textcontent of all of the elements returned here covers all
+         *    of the text within the element.
+         *
+         *
+         * EXAMPLE:
+         * In the event that we have something like:
+         *
+         * <blockquote>
+         *   <p>Some Text</p>
+         *   <ol>
+         *     <li>List Item 1</li>
+         *     <li>List Item 2</li>
+         *   </ol>
+         * </blockquote>
+         *
+         * This function would return these elements as an array:
+         *   [ <p>Some</p>, <li>List Item 1</li>, <li>List Item 2</li> ]
+         *
+         * Since the <blockquote> and <ol> elements contain blocks within them
+         * They are not returned.  Since the <p> and <li>'s cover all text content,
+         * that is what is returned
+         */
+        splitByBlockElements: function (element) {
+            var toRet = [],
+                blockElementQuery = MediumEditor.util.blockContainerElementNames.join(',');
+
+            if (element.nodeType === 3 || element.querySelectorAll(blockElementQuery).length === 0) {
+                return [element];
+            }
+
+            for (var i = 0; i < element.childNodes.length; i++) {
+                var child = element.childNodes[i];
+                if (child.nodeType === 3) {
+                    toRet.push(child);
+                } else {
+                    var blockElements = child.querySelectorAll(blockElementQuery);
+                    if (blockElements.length === 0) {
+                        toRet.push(child);
+                    } else {
+                        toRet = toRet.concat(MediumEditor.util.splitByBlockElements(child));
+                    }
+                }
+            }
+
+            return toRet;
         },
 
         // Find the next node in the DOM tree that represents any text that is being

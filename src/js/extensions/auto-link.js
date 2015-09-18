@@ -4,9 +4,7 @@
     var WHITESPACE_CHARS,
         KNOWN_TLDS_FRAGMENT,
         LINK_REGEXP_TEXT,
-        IGNORED_BLOCK_ELEMENTS,
-        KNOWN_TLDS_REGEXP,
-        AUTO_LINK_BLOCK_ELEMENTS;
+        KNOWN_TLDS_REGEXP;
 
     WHITESPACE_CHARS = [' ', '\t', '\n', '\r', '\u00A0', '\u2000', '\u2001', '\u2002', '\u2003',
                                     '\u2028', '\u2029'];
@@ -26,18 +24,7 @@
         // Addition to above Regexp to support bare domains/one level subdomains with common non-i18n TLDs and without www prefix:
         ')|(([a-z0-9\\-]+\\.)?[a-z0-9\\-]+\\.(' + KNOWN_TLDS_FRAGMENT + '))';
 
-    // Block elements to ignore when querying all block elements for whether they contain auto-linkable text
-    // These are elements whose text content should be ignored, but instead the text of their child nodes
-    // should be evaluated for auto-link text
-    // (ie don't check the text of an <ol>, check the <li>'s inside of it instead)
-    IGNORED_BLOCK_ELEMENTS = ['ol', 'ul', 'dl', 'table', 'tbody', 'tfoot', 'tr'];
-
     KNOWN_TLDS_REGEXP = new RegExp('^(' + KNOWN_TLDS_FRAGMENT + ')$', 'i');
-
-    // List of block elements to search for when trying to find auto-linkable text
-    AUTO_LINK_BLOCK_ELEMENTS = MediumEditor.util.blockContainerElementNames.filter(function (name) {
-        return (IGNORED_BLOCK_ELEMENTS.indexOf(name) === -1);
-    });
 
     function nodeIsNotInsideAnchorTag(node) {
         return !MediumEditor.util.getClosestTag(node, 'a');
@@ -97,7 +84,7 @@
             // "link." and the next paragraph beginning with "my" is interpreted into "link.my" and the code tries to create
             // a link across blockElements - which doesn't work and is terrible.
             // (Medium deletes the spaces/returns between P tags so the textContent ends up without paragraph spacing)
-            var blockElements = contenteditable.querySelectorAll(AUTO_LINK_BLOCK_ELEMENTS.join(',')),
+            var blockElements = MediumEditor.util.splitByBlockElements(contenteditable),
                 documentModified = false;
             if (blockElements.length === 0) {
                 blockElements = [contenteditable];
@@ -110,6 +97,10 @@
         },
 
         removeObsoleteAutoLinkSpans: function (element) {
+            if (!element || element.nodeType === 3) {
+                return false;
+            }
+
             var spans = element.querySelectorAll('span[data-auto-link="true"]'),
                 documentModified = false;
 
