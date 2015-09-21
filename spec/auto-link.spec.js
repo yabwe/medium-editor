@@ -465,6 +465,15 @@ describe('Autolink', function () {
                 expect(lastLi.firstChild).toBe(links[0]);
                 expect(lastLi.textContent).toBe('www.example.com');
             });
+
+            it('should not create a link which spans multiple list items', function () {
+                this.el.innerHTML = '<blockquote><ol><li>www</li><li>.example.com</li></ol></blockquote>';
+
+                selectElementContentsAndFire(this.el);
+                triggerAutolinking(this.el);
+                var links = this.el.getElementsByTagName('a');
+                expect(links.length).toBe(0, 'There should not have been any links created');
+            });
         });
     });
 
