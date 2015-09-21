@@ -442,4 +442,52 @@ describe('MediumEditor.util', function () {
             expect(MediumEditor.util.isDescendant(parent, child)).toBe(false);
         });
     });
+
+    describe('splitByBlockElements', function () {
+        it('should return block elements without block elements as children', function () {
+            var el = this.createElement('div');
+            el.innerHTML = '' +
+                '<blockquote><ol>' +
+                        '<li><div><table><thead><tr><th>Head</th></tr></thead></table></div></li>' +
+                        '<li>List Item</li>' +
+                    '</ol>' +
+                    '<p>paragraph</p>' +
+                '</blockquote>';
+
+            var parts = MediumEditor.util.splitByBlockElements(el);
+            expect(parts.length).toBe(3);
+
+            // <th>Head</th>
+            expect(parts[0].nodeName.toLowerCase()).toBe('th');
+            expect(parts[0].textContent).toBe('Head');
+            // <li>List Item</li>
+            expect(parts[1].nodeName.toLowerCase()).toBe('li');
+            expect(parts[1].textContent).toBe('List Item');
+            // <p>paragraph</p>
+            expect(parts[2].nodeName.toLowerCase()).toBe('p');
+            expect(parts[2].textContent).toBe('paragraph');
+        });
+
+        it('should return inline elements and text nodes if they are siblings of blocks', function () {
+            var el = this.createElement('div');
+            el.innerHTML = '' +
+                '<blockquote>' +
+                    '<span>Text <b>bold <i>bold + italics</i></b> <u>underlined</u></span>' +
+                    '<ol><li>List Item</li></ol>' +
+                    'Text Node' +
+                '</blockquote>';
+            var parts = MediumEditor.util.splitByBlockElements(el);
+            expect(parts.length).toBe(3);
+
+            // <span>Text <b>bold <i>bold + italics</i></b> <u>underlined</u></span>
+            expect(parts[0].nodeName.toLowerCase()).toBe('span');
+            expect(parts[0].textContent).toBe('Text bold bold + italics underlined');
+            // <li>List Item</li>
+            expect(parts[1].nodeName.toLowerCase()).toBe('li');
+            expect(parts[1].textContent).toBe('List Item');
+            // Text Node
+            expect(parts[2].nodeName.toLowerCase()).toBe('#text');
+            expect(parts[2].textContent).toBe('Text Node');
+        });
+    });
 });
