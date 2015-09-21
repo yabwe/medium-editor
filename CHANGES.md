@@ -1,3 +1,8 @@
+5.8.2 / 2015-09-21
+==================
+* Fix type of elements which can contain auto-links
+
+
 5.8.1 / 2015-09-16
 ==================
 * Fix inconsistancies and errors in isDescendant utility method

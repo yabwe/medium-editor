@@ -510,7 +510,8 @@ MediumEditor.extensions = {};
             // all other known block elements
             'address', 'article', 'aside', 'audio', 'canvas', 'dd', 'dl', 'dt', 'fieldset',
             'figcaption', 'figure', 'footer', 'form', 'header', 'hgroup', 'main', 'nav',
-            'noscript', 'output', 'section', 'table', 'tbody', 'tfoot', 'video'
+            'noscript', 'output', 'section', 'video',
+            'table', 'thead', 'tbody', 'tfoot', 'tr', 'th', 'td'
         ],
 
         emptyElementNames: ['br', 'col', 'colgroup', 'hr', 'img', 'input', 'source', 'wbr'],
@@ -619,6 +620,58 @@ MediumEditor.extensions = {};
                     endSplitPoint !== 0) {
                 (newNode || currentNode).splitText(endSplitPoint);
             }
+        },
+
+        /*
+        * Take an element, and break up all of its text content into unique pieces such that:
+         * 1) All text content of the elements are in separate blocks. No piece of text content should span
+         *    span multiple blocks. This means no element return by this function should have
+         *    any blocks as children.
+         * 2) The union of the textcontent of all of the elements returned here covers all
+         *    of the text within the element.
+         *
+         *
+         * EXAMPLE:
+         * In the event that we have something like:
+         *
+         * <blockquote>
+         *   <p>Some Text</p>
+         *   <ol>
+         *     <li>List Item 1</li>
+         *     <li>List Item 2</li>
+         *   </ol>
+         * </blockquote>
+         *
+         * This function would return these elements as an array:
+         *   [ <p>Some Text</p>, <li>List Item 1</li>, <li>List Item 2</li> ]
+         *
+         * Since the <blockquote> and <ol> elements contain blocks within them they are not returned.
+         * Since the <p> and <li>'s don't contain block elements and cover all the text content of the
+         * <blockquote> container, they are the elements returned.
+         */
+        splitByBlockElements: function (element) {
+            var toRet = [],
+                blockElementQuery = MediumEditor.util.blockContainerElementNames.join(',');
+
+            if (element.nodeType === 3 || element.querySelectorAll(blockElementQuery).length === 0) {
+                return [element];
+            }
+
+            for (var i = 0; i < element.childNodes.length; i++) {
+                var child = element.childNodes[i];
+                if (child.nodeType === 3) {
+                    toRet.push(child);
+                } else {
+                    var blockElements = child.querySelectorAll(blockElementQuery);
+                    if (blockElements.length === 0) {
+                        toRet.push(child);
+                    } else {
+                        toRet = toRet.concat(MediumEditor.util.splitByBlockElements(child));
+                    }
+                }
+            }
+
+            return toRet;
         },
 
         // Find the next node in the DOM tree that represents any text that is being
@@ -3646,9 +3699,7 @@ MediumEditor.extensions = {};
     var WHITESPACE_CHARS,
         KNOWN_TLDS_FRAGMENT,
         LINK_REGEXP_TEXT,
-        IGNORED_BLOCK_ELEMENTS,
-        KNOWN_TLDS_REGEXP,
-        AUTO_LINK_BLOCK_ELEMENTS;
+        KNOWN_TLDS_REGEXP;
 
     WHITESPACE_CHARS = [' ', '\t', '\n', '\r', '\u00A0', '\u2000', '\u2001', '\u2002', '\u2003',
                                     '\u2028', '\u2029'];
@@ -3668,18 +3719,7 @@ MediumEditor.extensions = {};
         // Addition to above Regexp to support bare domains/one level subdomains with common non-i18n TLDs and without www prefix:
         ')|(([a-z0-9\\-]+\\.)?[a-z0-9\\-]+\\.(' + KNOWN_TLDS_FRAGMENT + '))';
 
-    // Block elements to ignore when querying all block elements for whether they contain auto-linkable text
-    // These are elements whose text content should be ignored, but instead the text of their child nodes
-    // should be evaluated for auto-link text
-    // (ie don't check the text of an <ol>, check the <li>'s inside of it instead)
-    IGNORED_BLOCK_ELEMENTS = ['ol', 'ul', 'dl', 'table', 'tbody', 'tfoot', 'tr'];
-
     KNOWN_TLDS_REGEXP = new RegExp('^(' + KNOWN_TLDS_FRAGMENT + ')$', 'i');
-
-    // List of block elements to search for when trying to find auto-linkable text
-    AUTO_LINK_BLOCK_ELEMENTS = MediumEditor.util.blockContainerElementNames.filter(function (name) {
-        return (IGNORED_BLOCK_ELEMENTS.indexOf(name) === -1);
-    });
 
     function nodeIsNotInsideAnchorTag(node) {
         return !MediumEditor.util.getClosestTag(node, 'a');
@@ -3739,7 +3779,7 @@ MediumEditor.extensions = {};
             // "link." and the next paragraph beginning with "my" is interpreted into "link.my" and the code tries to create
             // a link across blockElements - which doesn't work and is terrible.
             // (Medium deletes the spaces/returns between P tags so the textContent ends up without paragraph spacing)
-            var blockElements = contenteditable.querySelectorAll(AUTO_LINK_BLOCK_ELEMENTS.join(',')),
+            var blockElements = MediumEditor.util.splitByBlockElements(contenteditable),
                 documentModified = false;
             if (blockElements.length === 0) {
                 blockElements = [contenteditable];
@@ -3752,6 +3792,10 @@ MediumEditor.extensions = {};
         },
 
         removeObsoleteAutoLinkSpans: function (element) {
+            if (!element || element.nodeType === 3) {
+                return false;
+            }
+
             var spans = element.querySelectorAll('span[data-auto-link="true"]'),
                 documentModified = false;
 
@@ -6386,7 +6430,7 @@ MediumEditor.parseVersionString = function (release) {
 
 MediumEditor.version = MediumEditor.parseVersionString.call(this, ({
     // grunt-bump looks for this:
-    'version': '5.8.1'
+    'version': '5.8.2'
 }).version);
 
     return MediumEditor;
