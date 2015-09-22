@@ -981,6 +981,14 @@
                                     editableElementIndex: exportedSelection.editableElementIndex
                                 }
                             );
+                            // If textNodes are not present, when changing link on images
+                            // ex: <a><img src="http://image.test.com"></a>, change fragment to currRange.startContainer
+                            // and set textNodes array to [imageElement, imageElement]
+                            if (textNodes.length === 0) {
+                                fragment = this.options.ownerDocument.createDocumentFragment();
+                                fragment.appendChild(currRange.startContainer.cloneNode(true));
+                                textNodes = [fragment.firstChild.firstChild, fragment.firstChild.lastChild];
+                            }
 
                             // Creates the link in the document fragment
                             MediumEditor.util.createLink(this.options.ownerDocument, textNodes, opts.url.trim());
