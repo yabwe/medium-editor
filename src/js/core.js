@@ -986,7 +986,7 @@
                             // and set textNodes array to [imageElement, imageElement]
                             if (textNodes.length === 0) {
                                 fragment = this.options.ownerDocument.createDocumentFragment();
-                                fragment.appendChild(currRange.startContainer.cloneNode(true));
+                                fragment.appendChild(commonAncestorContainer.cloneNode(true));
                                 textNodes = [fragment.firstChild.firstChild, fragment.firstChild.lastChild];
                             }
 
