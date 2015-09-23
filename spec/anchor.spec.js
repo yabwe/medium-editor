@@ -434,8 +434,10 @@ describe('Anchor Button TestCase', function () {
             spyOn(MediumEditor.prototype, 'createLink').and.callThrough();
             var editor = this.newMediumEditor('.editor'),
                 toolbar = editor.getExtensionByName('toolbar'),
-                button, input;
-            selectElementContents(editor.elements[0]);
+                button, input,
+                aTag = this.el.childNodes[0];
+
+            selectElementContents(aTag);
             button = toolbar.getToolbarElement().querySelector('[data-action="createLink"]');
             fireEvent(button, 'click');
             input = editor.getExtensionByName('anchor').getInput();
@@ -444,7 +446,7 @@ describe('Anchor Button TestCase', function () {
                 keyCode: MediumEditor.util.keyCode.ENTER
             });
             expect(editor.createLink).toHaveBeenCalled();
-            expect(this.el.innerHTML.indexOf('<a href="test"><img src="http://image.test.com"></a>')).toBe(0);
+            expect(this.el.innerHTML).toContain('<a href="test"><img src="http://image.test.com"></a>');
         });
     });
 
