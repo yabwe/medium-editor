@@ -304,6 +304,25 @@ describe('Anchor Button TestCase', function () {
             expect(selectionWhenEventsFired[0]).toBe('ipsum', 'selected text should have been the same when event fired');
         });
 
+        // https://github.com/yabwe/medium-editor/issues/824
+        it('should remove leading and trailing whitespaces in a link', function () {
+            var editor = this.newMediumEditor('.editor', {
+                anchor: {
+                    linkValidation: true
+                }
+            }),
+                link,
+                anchorExtension = editor.getExtensionByName('anchor');
+
+            selectElementContentsAndFire(editor.elements[0]);
+            anchorExtension.showForm('  test.com  ');
+            fireEvent(anchorExtension.getForm().querySelector('a.medium-editor-toolbar-save'), 'click');
+
+            link = editor.elements[0].querySelector('a');
+            expect(link).not.toBeNull();
+            expect(link.href).toBe('http://test.com/');
+        });
+
         // https://github.com/yabwe/medium-editor/issues/757
         it('should not select empty paragraphs when link is created at beginning of paragraph after empty paragraphs', function () {
             spyOn(MediumEditor.prototype, 'createLink').and.callThrough();
