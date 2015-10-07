@@ -141,7 +141,9 @@
                 this.options.ownerDocument.execCommand('unlink', false, null);
             } else if (!event.shiftKey && !event.ctrlKey) {
                 // only format block if this is not a header tag
-                if (!/h\d/.test(tagName)) {
+                // calling formatBlock on firefox will cause incoorect layout if pressed enter in the figcaption
+                // #https://github.com/orthes/medium-editor-insert-plugin/issues/230
+                if (!/h\d|figCaption/i.test(tagName)) {
                     this.options.ownerDocument.execCommand('formatBlock', false, 'p');
                 }
             }
