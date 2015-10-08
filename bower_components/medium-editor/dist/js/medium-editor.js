@@ -427,6 +427,18 @@ MediumEditor.extensions = {};
         return dest;
     }
 
+    // https://developer.mozilla.org/en-US/docs/Web/API/Node/contains
+    // Some browsers (including phantom) don't return true for Node.contains(child)
+    // if child is a text node.  Detect these cases here and use a fallback
+    // for calls to Util.isDescendant()
+    var nodeContainsWorksWithTextNodes = false;
+    try {
+        var testParent = document.createElement('div'),
+            testText = document.createTextNode(' ');
+        testParent.appendChild(testText);
+        nodeContainsWorksWithTextNodes = testParent.contains(testText);
+    } catch (exc) {}
+
     var Util = {
 
         // http://stackoverflow.com/questions/17907445/how-to-detect-ie11#comment30165888_17907562
@@ -498,7 +510,8 @@ MediumEditor.extensions = {};
             // all other known block elements
             'address', 'article', 'aside', 'audio', 'canvas', 'dd', 'dl', 'dt', 'fieldset',
             'figcaption', 'figure', 'footer', 'form', 'header', 'hgroup', 'main', 'nav',
-            'noscript', 'output', 'section', 'table', 'tbody', 'tfoot', 'video'
+            'noscript', 'output', 'section', 'video',
+            'table', 'thead', 'tbody', 'tfoot', 'tr', 'th', 'td'
         ],
 
         emptyElementNames: ['br', 'col', 'colgroup', 'hr', 'img', 'input', 'source', 'wbr'],
@@ -609,6 +622,58 @@ MediumEditor.extensions = {};
             }
         },
 
+        /*
+        * Take an element, and break up all of its text content into unique pieces such that:
+         * 1) All text content of the elements are in separate blocks. No piece of text content should span
+         *    span multiple blocks. This means no element return by this function should have
+         *    any blocks as children.
+         * 2) The union of the textcontent of all of the elements returned here covers all
+         *    of the text within the element.
+         *
+         *
+         * EXAMPLE:
+         * In the event that we have something like:
+         *
+         * <blockquote>
+         *   <p>Some Text</p>
+         *   <ol>
+         *     <li>List Item 1</li>
+         *     <li>List Item 2</li>
+         *   </ol>
+         * </blockquote>
+         *
+         * This function would return these elements as an array:
+         *   [ <p>Some Text</p>, <li>List Item 1</li>, <li>List Item 2</li> ]
+         *
+         * Since the <blockquote> and <ol> elements contain blocks within them they are not returned.
+         * Since the <p> and <li>'s don't contain block elements and cover all the text content of the
+         * <blockquote> container, they are the elements returned.
+         */
+        splitByBlockElements: function (element) {
+            var toRet = [],
+                blockElementQuery = MediumEditor.util.blockContainerElementNames.join(',');
+
+            if (element.nodeType === 3 || element.querySelectorAll(blockElementQuery).length === 0) {
+                return [element];
+            }
+
+            for (var i = 0; i < element.childNodes.length; i++) {
+                var child = element.childNodes[i];
+                if (child.nodeType === 3) {
+                    toRet.push(child);
+                } else {
+                    var blockElements = child.querySelectorAll(blockElementQuery);
+                    if (blockElements.length === 0) {
+                        toRet.push(child);
+                    } else {
+                        toRet = toRet.concat(MediumEditor.util.splitByBlockElements(child));
+                    }
+                }
+            }
+
+            return toRet;
+        },
+
         // Find the next node in the DOM tree that represents any text that is being
         // displayed directly next to the targetNode (passed as an argument)
         // Text that appears directly next to the current node can be:
@@ -642,8 +707,15 @@ MediumEditor.extensions = {};
             if (!parent || !child) {
                 return false;
             }
-            if (checkEquality && parent === child) {
-                return true;
+            if (parent === child) {
+                return !!checkEquality;
+            }
+            // If parent is not an element, it can't have any descendants
+            if (parent.nodeType !== 1) {
+                return false;
+            }
+            if (nodeContainsWorksWithTextNodes || child.nodeType !== 3) {
+                return parent.contains(child);
             }
             var node = child.parentNode;
             while (node !== null) {
@@ -3621,31 +3693,33 @@ MediumEditor.extensions = {};
     MediumEditor.extensions.anchorPreview = AnchorPreview;
 }());
 
-var WHITESPACE_CHARS,
-    KNOWN_TLDS_FRAGMENT,
-    LINK_REGEXP_TEXT;
-
-WHITESPACE_CHARS = [' ', '\t', '\n', '\r', '\u00A0', '\u2000', '\u2001', '\u2002', '\u2003',
-                                    '\u2028', '\u2029'];
-KNOWN_TLDS_FRAGMENT = 'com|net|org|edu|gov|mil|aero|asia|biz|cat|coop|info|int|jobs|mobi|museum|name|post|pro|tel|travel|' +
-    'xxx|ac|ad|ae|af|ag|ai|al|am|an|ao|aq|ar|as|at|au|aw|ax|az|ba|bb|bd|be|bf|bg|bh|bi|bj|bm|bn|bo|br|bs|bt|bv|bw|by|' +
-    'bz|ca|cc|cd|cf|cg|ch|ci|ck|cl|cm|cn|co|cr|cs|cu|cv|cx|cy|cz|dd|de|dj|dk|dm|do|dz|ec|ee|eg|eh|er|es|et|eu|fi|fj|' +
-    'fk|fm|fo|fr|ga|gb|gd|ge|gf|gg|gh|gi|gl|gm|gn|gp|gq|gr|gs|gt|gu|gw|gy|hk|hm|hn|hr|ht|hu|id|ie|il|im|in|io|iq|ir|' +
-    'is|it|je|jm|jo|jp|ke|kg|kh|ki|km|kn|kp|kr|kw|ky|kz|la|lb|lc|li|lk|lr|ls|lt|lu|lv|ly|ma|mc|md|me|mg|mh|mk|ml|mm|' +
-    'mn|mo|mp|mq|mr|ms|mt|mu|mv|mw|mx|my|mz|na|nc|ne|nf|ng|ni|nl|no|np|nr|nu|nz|om|pa|pe|pf|pg|ph|pk|pl|pm|pn|pr|ps|' +
-    'pt|pw|py|qa|re|ro|rs|ru|rw|sa|sb|sc|sd|se|sg|sh|si|sj|ja|sk|sl|sm|sn|so|sr|ss|st|su|sv|sx|sy|sz|tc|td|tf|tg|th|' +
-    'tj|tk|tl|tm|tn|to|tp|tr|tt|tv|tw|tz|ua|ug|uk|us|uy|uz|va|vc|ve|vg|vi|vn|vu|wf|ws|ye|yt|yu|za|zm|zw';
-LINK_REGEXP_TEXT =
-    '(' +
-    // Version of Gruber URL Regexp optimized for JS: http://stackoverflow.com/a/17733640
-    '((?:(https?://|ftps?://|nntp://)|www\\d{0,3}[.]|[a-z0-9.\\-]+[.](' + KNOWN_TLDS_FRAGMENT + ')\\\/)\\S+(?:[^\\s`!\\[\\]{};:\'\".,?\u00AB\u00BB\u201C\u201D\u2018\u2019]))' +
-    // Addition to above Regexp to support bare domains/one level subdomains with common non-i18n TLDs and without www prefix:
-    ')|(([a-z0-9\\-]+\\.)?[a-z0-9\\-]+\\.(' + KNOWN_TLDS_FRAGMENT + '))';
-
 (function () {
     'use strict';
 
-    var KNOWN_TLDS_REGEXP = new RegExp('^(' + KNOWN_TLDS_FRAGMENT + ')$', 'i');
+    var WHITESPACE_CHARS,
+        KNOWN_TLDS_FRAGMENT,
+        LINK_REGEXP_TEXT,
+        KNOWN_TLDS_REGEXP;
+
+    WHITESPACE_CHARS = [' ', '\t', '\n', '\r', '\u00A0', '\u2000', '\u2001', '\u2002', '\u2003',
+                                    '\u2028', '\u2029'];
+    KNOWN_TLDS_FRAGMENT = 'com|net|org|edu|gov|mil|aero|asia|biz|cat|coop|info|int|jobs|mobi|museum|name|post|pro|tel|travel|' +
+        'xxx|ac|ad|ae|af|ag|ai|al|am|an|ao|aq|ar|as|at|au|aw|ax|az|ba|bb|bd|be|bf|bg|bh|bi|bj|bm|bn|bo|br|bs|bt|bv|bw|by|' +
+        'bz|ca|cc|cd|cf|cg|ch|ci|ck|cl|cm|cn|co|cr|cs|cu|cv|cx|cy|cz|dd|de|dj|dk|dm|do|dz|ec|ee|eg|eh|er|es|et|eu|fi|fj|' +
+        'fk|fm|fo|fr|ga|gb|gd|ge|gf|gg|gh|gi|gl|gm|gn|gp|gq|gr|gs|gt|gu|gw|gy|hk|hm|hn|hr|ht|hu|id|ie|il|im|in|io|iq|ir|' +
+        'is|it|je|jm|jo|jp|ke|kg|kh|ki|km|kn|kp|kr|kw|ky|kz|la|lb|lc|li|lk|lr|ls|lt|lu|lv|ly|ma|mc|md|me|mg|mh|mk|ml|mm|' +
+        'mn|mo|mp|mq|mr|ms|mt|mu|mv|mw|mx|my|mz|na|nc|ne|nf|ng|ni|nl|no|np|nr|nu|nz|om|pa|pe|pf|pg|ph|pk|pl|pm|pn|pr|ps|' +
+        'pt|pw|py|qa|re|ro|rs|ru|rw|sa|sb|sc|sd|se|sg|sh|si|sj|ja|sk|sl|sm|sn|so|sr|ss|st|su|sv|sx|sy|sz|tc|td|tf|tg|th|' +
+        'tj|tk|tl|tm|tn|to|tp|tr|tt|tv|tw|tz|ua|ug|uk|us|uy|uz|va|vc|ve|vg|vi|vn|vu|wf|ws|ye|yt|yu|za|zm|zw';
+
+    LINK_REGEXP_TEXT =
+        '(' +
+        // Version of Gruber URL Regexp optimized for JS: http://stackoverflow.com/a/17733640
+        '((?:(https?://|ftps?://|nntp://)|www\\d{0,3}[.]|[a-z0-9.\\-]+[.](' + KNOWN_TLDS_FRAGMENT + ')\\\/)\\S+(?:[^\\s`!\\[\\]{};:\'\".,?\u00AB\u00BB\u201C\u201D\u2018\u2019]))' +
+        // Addition to above Regexp to support bare domains/one level subdomains with common non-i18n TLDs and without www prefix:
+        ')|(([a-z0-9\\-]+\\.)?[a-z0-9\\-]+\\.(' + KNOWN_TLDS_FRAGMENT + '))';
+
+    KNOWN_TLDS_REGEXP = new RegExp('^(' + KNOWN_TLDS_FRAGMENT + ')$', 'i');
 
     function nodeIsNotInsideAnchorTag(node) {
         return !MediumEditor.util.getClosestTag(node, 'a');
@@ -3705,7 +3779,7 @@ LINK_REGEXP_TEXT =
             // "link." and the next paragraph beginning with "my" is interpreted into "link.my" and the code tries to create
             // a link across blockElements - which doesn't work and is terrible.
             // (Medium deletes the spaces/returns between P tags so the textContent ends up without paragraph spacing)
-            var blockElements = contenteditable.querySelectorAll(MediumEditor.util.blockContainerElementNames.join(',')),
+            var blockElements = MediumEditor.util.splitByBlockElements(contenteditable),
                 documentModified = false;
             if (blockElements.length === 0) {
                 blockElements = [contenteditable];
@@ -3718,6 +3792,10 @@ LINK_REGEXP_TEXT =
         },
 
         removeObsoleteAutoLinkSpans: function (element) {
+            if (!element || element.nodeType === 3) {
+                return false;
+            }
+
             var spans = element.querySelectorAll('span[data-auto-link="true"]'),
                 documentModified = false;
 
@@ -4647,11 +4725,21 @@ LINK_REGEXP_TEXT =
          */
         updateOnEmptySelection: false,
 
+        /* relativeContainer: [node]
+         * appending the toolbar to a given node instead of body
+         */
+        relativeContainer: null,
+
         init: function () {
             MediumEditor.Extension.prototype.init.apply(this, arguments);
 
             this.initThrottledMethods();
-            this.getEditorOption('elementsContainer').appendChild(this.getToolbarElement());
+
+            if (!this.relativeContainer) {
+                this.getEditorOption('elementsContainer').appendChild(this.getToolbarElement());
+            } else {
+                this.relativeContainer.appendChild(this.getToolbarElement());
+            }
         },
 
         // Helper method to execute method for every extension, but ignoring the toolbar extension
@@ -4674,6 +4762,8 @@ LINK_REGEXP_TEXT =
 
             if (this.static) {
                 toolbar.className += ' static-toolbar';
+            } else if (this.relativeContainer) {
+                toolbar.className += ' medium-editor-relative-toolbar';
             } else {
                 toolbar.className += ' medium-editor-stalker-toolbar';
             }
@@ -5083,12 +5173,16 @@ LINK_REGEXP_TEXT =
                 return this;
             }
 
-            if (this.static) {
+            if (this.static && !this.relativeContainer) {
                 this.showToolbar();
                 this.positionStaticToolbar(container);
             } else if (!selection.isCollapsed) {
                 this.showToolbar();
-                this.positionToolbar(selection);
+
+                // we don't need any absolute positioning if relativeContainer is set
+                if (!this.relativeContainer) {
+                    this.positionToolbar(selection);
+                }
             }
 
             anchorPreview = this.base.getExtensionByName('anchor-preview');
@@ -6238,6 +6332,14 @@ LINK_REGEXP_TEXT =
                                     editableElementIndex: exportedSelection.editableElementIndex
                                 }
                             );
+                            // If textNodes are not present, when changing link on images
+                            // ex: <a><img src="http://image.test.com"></a>, change fragment to currRange.startContainer
+                            // and set textNodes array to [imageElement, imageElement]
+                            if (textNodes.length === 0) {
+                                fragment = this.options.ownerDocument.createDocumentFragment();
+                                fragment.appendChild(commonAncestorContainer.cloneNode(true));
+                                textNodes = [fragment.firstChild.firstChild, fragment.firstChild.lastChild];
+                            }
 
                             // Creates the link in the document fragment
                             MediumEditor.util.createLink(this.options.ownerDocument, textNodes, opts.url.trim());
@@ -6336,7 +6438,7 @@ MediumEditor.parseVersionString = function (release) {
 
 MediumEditor.version = MediumEditor.parseVersionString.call(this, ({
     // grunt-bump looks for this:
-    'version': '5.7.0'
+    'version': '5.8.3'
 }).version);
 
     return MediumEditor;
