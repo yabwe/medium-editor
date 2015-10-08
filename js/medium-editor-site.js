@@ -78,7 +78,7 @@
 				}
 			);
 
-			carousel.style.width = width + 'px';
+			carousel.style.width = (width + 100) + 'px';
 		}
 
 		function handleClick(e) {
