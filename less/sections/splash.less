@@ -1,0 +1,44 @@
+section.splash {
+	background: @color-light;
+	display: flex;
+	text-align: center;
+	align-items: center;
+	justify-content: center;
+	min-height: 48vh;
+	line-height: 1;
+
+	.content {
+		flex: 1;
+	}
+
+	.demo {
+		font-size: 1.25rem;
+		margin-top: 50px;
+	}
+
+	h1 span {
+		color: @color-bright;
+	}
+
+	span.highlight {
+		border-bottom: 1px dotted @color-dark;
+	}
+
+	.shake {
+		animation-delay: 1s;
+		animation-duration: 1s;
+	}
+
+}
+
+.github-fork-ribbon {
+	background: @color-dark;
+	font-weight: 500;
+	line-height: 23px;
+	box-shadow: none;
+	font-family: "ff-meta-serif-web-pro",serif;
+
+	a, a:hover {
+		border: 0;
+	}
+}

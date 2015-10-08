@@ -1,0 +1,154 @@
+section.selling-points {
+	padding: 20vw 0;
+	background: @color-bright;
+	display: flex;
+	text-align: center;
+	align-items: center;
+	justify-content: center;
+
+	ul {
+		display: flex;
+		flex-wrap: wrap;
+		margin: 0;
+		padding: 0;
+	}
+
+	li {
+		font-size: 1.25rem;
+		margin-bottom: 0;
+		text-align: center;
+		list-style-type: none;
+		line-height: 1.75rem;
+		flex: 1 0 100%;
+
+		&:not(:last-child) {
+			margin-bottom: 2rem;
+		}
+
+		svg {
+			clear: both;
+			margin-bottom: 1.25rem;
+		}
+
+		span {
+			display: block;
+		}
+
+	}
+
+	.fadeIn {
+		animation-delay: .25s;
+	}
+
+
+	@media only screen and (min-width: 480px) {
+		padding: 11.8vw 0;
+		
+		ul {
+			width: 80vw;			
+		}
+
+		li {
+			flex: 1 1 20%;
+			font-size: 1rem;
+			line-height: 1.5;
+
+			&:not(:last-child) {
+				margin-bottom: 0rem;
+			}
+		}
+
+
+		svg {
+			width: 12vw;
+			height: 12vw;
+		}
+
+	}
+	@media only screen and (min-width: 600px) {
+		padding: 9.4vw;
+		
+		ul {
+			width: 82vw;			
+		}
+
+		svg {
+			width: 9.6vw;
+			height: 9.6vw;
+		}
+	}
+
+	@media only screen and (min-width: 768px) {
+		padding: 7.6vw;
+		
+		ul {
+			width: 67vw;			
+		}
+
+		svg {
+			width: 7.8vw;
+			height: 7.8vw;
+		}
+	}
+
+	@media only screen and (min-width: 992px) {
+		padding: 6.6vw;
+		
+		ul {
+			width: 59vw;			
+		}
+
+		li {
+			font-size: 1.25rem;
+		}
+
+		svg {
+			width: 6.8vw;
+			height: 6.8vw;
+		}
+	}
+
+	@media only screen and (min-width: 1382px) {
+		padding: 5.9vw;
+		
+		ul {
+			width: 53vw;			
+		}
+
+		svg {
+			width: 6.2vw;
+			height: 6.2vw;
+		}
+	}
+
+
+	@media only screen and (min-width: 1600px) {
+		padding: 5.1vw;
+		
+		ul {
+			width: 46vw;			
+		}
+
+		li {
+			font-size: 1.5rem;
+		}
+
+		svg {
+			width: 5.4vw;
+			height: 5.4vw;
+		}
+	}
+
+	@media only screen and (min-width: 2000px) {
+		padding: 4vw;
+		
+		ul {
+			width: 36vw;			
+		}
+
+		svg {
+			width: 4.2vw;
+			height: 4.2vw;
+		}
+	}
+}

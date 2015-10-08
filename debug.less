@@ -1,0 +1,115 @@
+section.debug {
+	padding: 0;
+	position: fixed;
+	right: 0;
+
+	div {
+		display: none;
+		padding: 0px 12px;
+	}
+
+	h1 {
+		font-size: 2rem;
+		padding: 0;
+	}
+
+
+	@media only screen and (max-width: 480px) {
+		div:not(.sizeSmall) {
+			display: none;
+		}
+
+		div.sizeSmall {
+			display: block;
+			background: red;
+			color: white;
+		}
+	}
+
+	@media only screen and (min-width: 480px) {
+		div:not(.size480) {
+			display: none;
+		}
+
+		div.size480 {
+			display: block;
+			background: yellow;
+			color: black;
+		}
+	}
+
+	@media only screen and (min-width: 600px) {
+		
+		div:not(.size600) {
+			display: none;
+		}
+
+		div.size600 {
+			display: block;
+			background: purple;
+			color: white;
+		}
+	}
+
+	@media only screen and (min-width: 768px) {
+		div:not(.size768) {
+			display: none;
+		}
+
+		div.size768 {
+			display: block;
+			background: yellow;
+			color: black;
+		}
+	}
+
+	@media only screen and (min-width: 992px) {
+		div:not(.size992) {
+			display: none;
+		}
+
+		div.size992 {
+			display: block;
+			background: orange;
+			color: black;
+		}
+
+	}
+
+	@media only screen and (min-width: 1382px) {
+		div:not(.size1382) {
+			display: none;
+		}
+
+		div.size1382 {
+			display: block;
+			background: khaki;
+			color: black;
+		}
+
+	}
+
+	@media only screen and (min-width: 1600px) {
+		div:not(.size1600) {
+			display: none;
+		}
+
+		div.size1600 {
+			display: block;
+			background: salmon;
+			color: white;
+		}
+	}
+
+	@media only screen and (min-width: 2000px) {
+		div:not(.size2000) {
+			display: none;
+		}
+
+		div.size2000 {
+			display: block;
+			background: teal;
+			color: white;
+		}
+	}
+}

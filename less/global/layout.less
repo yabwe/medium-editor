@@ -1,0 +1,53 @@
+*, *::after, *::before {
+	box-sizing: border-box;
+}
+
+.body {
+	display: flex;
+	align-items: center;
+}
+
+.clearfix{
+  zoom:1;
+  &:before, &:after{ content:""; display:table; }
+  &:after{ clear: both; }
+}
+
+section {
+	padding: 16vw 2vw;
+	display: flex;
+	text-align: center;
+	align-items: center;
+	justify-content: center;
+
+	@media only screen and (min-width: 480px) {
+		padding: 11.8vw 0;
+	}
+
+	@media only screen and (min-width: 600px) {
+		padding: 9.4vw;
+
+	}
+
+	@media only screen and (min-width: 768px) {
+		padding: 7.6vw;
+	}
+
+	@media only screen and (min-width: 992px) {
+		padding: 6.6vw;
+
+	}
+
+	@media only screen and (min-width: 1382px) {
+		padding: 5.9vw;
+	}
+
+
+	@media only screen and (min-width: 1600px) {
+		padding: 5.1vw;
+	}
+
+	@media only screen and (min-width: 2000px) {
+		padding: 4vw;
+	}
+}

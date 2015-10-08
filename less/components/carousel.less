@@ -1,0 +1,23 @@
+@easing: cubic-bezier(.49, -0.22, .48, 1.18);
+
+.theme-carousel-wrapper {
+	margin: 0 auto;
+	overflow: hidden;
+	width: 30vw;
+}
+
+.theme-carousel {
+	&:extend(.clearfix all);
+	overflow: hidden;
+	transition: transform .65s @easing;
+	width: 10000px; // js?
+}
+
+.theme {
+	float: left;
+	width: 30vw;
+	img {
+		display: block;
+		width: 100%;
+	}
+}

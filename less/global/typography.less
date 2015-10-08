@@ -1,0 +1,135 @@
+body {
+	font-family: "ff-meta-serif-web-pro",serif;
+	color: @color-dark;
+	font-size:100%;
+	line-height:1.5;
+}
+
+
+h1, h2, h3, p {
+	margin-top: 0;
+}
+
+h1, h2 {
+	font-weight: 700;
+}
+
+h3, p {
+	font-weight: 500;
+}
+
+h1 {
+	font-size: 3rem;
+}
+
+h2 {
+	font-size: 2.5rem;
+}
+
+h3 {
+	font-weight: 500;
+	font-size: 1.5rem;
+}
+
+p {
+	font-size: 1.25rem;
+}
+
+p:last-child, li:last-child, h3:last-child {
+	margin-bottom: 0;
+}
+
+a {
+	color: @color-bright;
+	text-decoration: none;
+
+	&:hover {
+		color: lighten(@color-bright, 15%);
+	}
+}
+
+code, pre {
+	font-size: 1rem;
+	display: inline-block;
+	border-radius: 4px;
+	padding: 10px 20px;
+	background: darken(@color-dark, 3%);
+	margin-top: 0;
+	text-align: left;
+	overflow: hidden; // TODO hide scrollbars, but make scrollable
+
+	&.small {
+		text-align: left;
+		font-size: .75vw;
+	}
+}
+
+pre, code {
+	color: #FFE7A9;
+	max-width: 40vw;
+
+
+}
+
+.color-1 {
+	color: #fec328;
+}
+
+.color-2 {
+	color: #FF9200;
+}
+
+.note {
+	font-size: .75rem;
+	width: 100%;
+	text-align: center;
+	padding-top: 12px;
+}
+
+::selection {
+  background: fade(@color-bright, 33%);
+}
+
+@media only screen and (min-width: 600px) {
+	h1 {
+		font-size: 3.5rem;
+	}
+
+	h2 {
+		font-size: 2.75rem;
+	}
+
+	p {
+		font-size: 1.5rem;
+	}
+}
+
+@media only screen and (min-width: 992px) {
+	h1 {
+		font-size: 4rem;
+	}
+
+	h2 {
+		font-size: 3rem;
+	}
+
+	p {
+		font-size: 1.75rem;
+	}
+}
+
+@media only screen and (min-width: 1600px) {
+
+	h1 {
+		font-size: 5rem;
+	}
+
+	h2 {
+		font-size: 3.5rem;
+	}
+
+	p {
+		font-size: 2rem;
+	}
+
+}

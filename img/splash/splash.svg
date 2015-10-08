@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg width="357px" height="55px" viewBox="0 0 357 55" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <defs></defs>
+    <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g>
+            <rect fill="#2F1E08" x="0" y="0" width="357" height="55" rx="6"></rect>
+            <path d="M102,0 L103,0 L103,55 L102,55 L102,0 Z M204,0 L205,0 L205,55 L204,55 L204,0 Z M305,0 L306,0 L306,55 L305,55 L305,0 Z M51,0 L52,0 L52,55 L51,55 L51,0 Z M153,0 L154,0 L154,55 L153,55 L153,0 Z M255,0 L256,0 L256,55 L255,55 L255,0 Z" fill="#4E3515"></path>
+            <g transform="translate(21.000000, 17.000000)" font-family="Helvetica Neue" fill="#FFEDD5">
+                <text font-size="16" font-weight="420">
+                    <tspan x="0" y="16">B</tspan>
+                </text>
+                <text font-size="16" font-weight="420">
+                    <tspan x="199" y="16">H2</tspan>
+                </text>
+                <text font-size="16" font-weight="420">
+                    <tspan x="248" y="16">H3</tspan>
+                </text>
+                <text font-size="20" font-weight="420">
+                    <tspan x="305" y="20">“</tspan>
+                </text>
+                <text font-size="16" font-weight="420" text-decoration="underline">
+                    <tspan x="101" y="16">U</tspan>
+                </text>
+                <text font-size="16" font-weight="420">
+                    <tspan x="152" y="16">#</tspan>
+                </text>
+                <text font-size="16" font-style="italic" font-weight="473">
+                    <tspan x="53" y="16">I</tspan>
+                </text>
+            </g>
+        </g>
+    </g>
+</svg>

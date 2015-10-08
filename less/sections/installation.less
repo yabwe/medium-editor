@@ -1,0 +1,97 @@
+.tooltipped:after {
+    position: absolute;
+    z-index: 1000000;
+    display: none;
+    padding: 5px 12px;
+    font: normal normal 11px/1.5;
+    color: #fff;
+    text-align: center;
+    text-decoration: none;
+    text-shadow: none;
+    text-transform: none;
+    letter-spacing: normal;
+    word-wrap: break-word;
+    white-space: pre;
+    pointer-events: none;
+    content: attr(aria-label);
+    background: darken(@color-dark,4%);
+    border-radius: 3px;
+    -webkit-font-smoothing: subpixel-antialiased;
+		left: 0;
+		top: 120%;
+}
+
+.tooltipped:before {
+    position: absolute;
+    z-index: 1000001;
+    display: none;
+    width: 0;
+    height: 0;
+    color: rgba(0, 0, 0, 0.8);
+    pointer-events: none;
+    content: "";
+    border: 5px solid transparent;
+}
+
+.tooltipped:hover:before,
+.tooltipped:hover:after,
+.tooltipped:active:before,
+.tooltipped:active:after,
+.tooltipped:focus:before,
+.tooltipped:focus:after {
+    display: inline-block;
+    text-decoration: none;
+}
+
+section.installation {
+	color: @color-light;
+	background: @color-dark;
+
+	.install-type {
+		margin-bottom: 3.5vw;
+
+		&:last-child {
+			margin-bottom: 0;
+		}
+	}
+
+	.arrow {
+		font-size: 18px;
+	}
+
+	.install-wrapper {
+		display: inline-block;
+		position: relative;
+	}
+
+    .tooltipped + code, .tooltipped + pre {
+        animation: copied-pulse .25s 2;
+    }
+
+    @keyframes copied-pulse {
+        0% {
+            background: darken(@color-dark, 3%);
+        }
+
+        100% {
+            background: lighten(@color-dark, 5%);
+        }
+    }
+
+	.copy {
+		cursor: pointer;
+		position: absolute;
+        height: 30px;
+        width: 30px;
+        right: -40px;
+        top: 0;
+        margin-left: 6px;
+        border-radius: 4px;
+        background: url(img/installation/clippy.svg) @color-bright no-repeat 55% 40%;
+
+
+        &:hover {
+            background: url(img/installation/clippy.svg) lighten(@color-bright, 7.5%) no-repeat 55% 40%;
+        }
+	}
+}

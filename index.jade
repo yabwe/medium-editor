@@ -1,0 +1,30 @@
+doctype html
+html(lang="en")
+	head
+		title= pageTitle
+		<script src="//use.typekit.net/rmp4ctu.js"></script>
+		<script>try{Typekit.load();}catch(e){}</script>
+		link(rel='stylesheet' href='//maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css')
+		link(rel='stylesheet' href='//cdnjs.cloudflare.com/ajax/libs/github-fork-ribbon-css/0.1.1/gh-fork-ribbon.min.css')
+		link(rel='stylesheet' href='bower_components/medium-editor/dist/css/medium-editor.min.css')
+		link(rel='stylesheet' href='bower_components/medium-editor/dist/css/themes/tim.min.css')
+		link(rel='stylesheet' href='screen.css')
+	body
+		// include ./debug.jade
+		div.github-fork-ribbon-wrapper.right
+			div.github-fork-ribbon
+				a(href="https://github.com/yabwe/medium-editor") Fork me on GitHub
+		div.container
+				p.note Note: We're not affiliated with Medium.com, just fans!
+				include ./sections/splash.jade
+				include ./sections/selling-points.jade
+				include ./sections/installation.jade
+				include ./sections/extensions.jade
+				include ./sections/themes.jade
+				include ./sections/documentation.jade
+				// include ./sections/who-is-using-it.jade
+				include ./sections/attributions.jade
+				// include ./sections/footer.jade
+		<script src="bower_components/clipboard/dist/clipboard.min.js"></script>
+		<script src="bower_components/medium-editor/dist/js/medium-editor.min.js"></script>
+		<script src="js/medium-editor-site.js"></script>

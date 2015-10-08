@@ -1,0 +1,61 @@
+section.documentation {
+	background: @color-dark;
+	color: @color-light;
+	flex-direction: column;
+
+	p {
+		font-size: 1.25rem;
+
+		a {
+			color: @color-bright;
+		}
+	}
+
+	a {
+		font-size: 1.25rem;
+	}
+
+	.documentation-container {
+	  text-align: left;
+	  margin-left: 6vw;
+	  margin-bottom: 2vw;
+
+		@media only screen and (min-width: 768px) {
+	    display: flex;
+	    flex-direction: row;
+	    width: 60vw;
+		}
+
+		@media only screen and (min-width: 992px) {
+			width: 55vw;
+
+		}
+
+		@media only screen and (min-width: 1382px) {
+			width: 40vw;
+		}
+
+		@media only screen and (min-width: 1800px) {
+			width: 30vw;
+		}
+	}
+
+	.documentation-container-col {
+	  flex: 1;
+
+	  article {
+		margin-bottom: 20px;
+	    padding: 20px;
+
+	    @media only screen and (min-width: 768px) {
+			margin-bottom: 50px;
+	    	padding: 0 20px;
+
+			&:last-child {
+				margin-bottom :0;
+			}
+	    }
+	  	}
+	}
+}
+

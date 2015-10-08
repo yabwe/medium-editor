@@ -1,0 +1,55 @@
+@easing: cubic-bezier(.49, -0.22, .48, 1.18);
+
+.editable {
+  outline: none;
+}
+
+.toolbar-placeholder {
+  margin-bottom: 3em;
+}
+
+.medium-editor-toolbar.fade-in {
+  animation: fadeIn .3s @easing;
+  animation-fill-mode: forwards;
+  animation-delay: .6s;
+}
+
+.medium-editor-toolbar.placeholder {
+  opacity: 0;
+  pointer-events: none;
+  transform: scale(1.2);
+  visibility: hidden;
+
+  @media only screen and (max-width: 767px) {
+    transform: scale(.9);
+  }
+
+  &::after {
+    display: none;
+  }
+}
+
+.medium-editor-toolbar.toolbar-placeholder-clone {
+  filter: grayscale(100%);
+  opacity: .05 ;
+  visibility: visible;
+
+  li button {
+    visibility: hidden;
+  }
+}
+
+.medium-editor-toolbar {
+    transition: all .45s @easing;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    visibility: hidden;
+  }
+  to {
+    opacity: 1;
+    visibility: visible;
+  }
+}
