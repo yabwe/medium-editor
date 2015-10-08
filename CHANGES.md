@@ -1,3 +1,8 @@
+5.8.3 / 2015-10-08
+==================
+* Fix changing link on images
+
+
 5.8.2 / 2015-09-21
 ==================
 * Fix type of elements which can contain auto-links

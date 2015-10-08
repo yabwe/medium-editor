@@ -6332,6 +6332,14 @@ MediumEditor.extensions = {};
                                     editableElementIndex: exportedSelection.editableElementIndex
                                 }
                             );
+                            // If textNodes are not present, when changing link on images
+                            // ex: <a><img src="http://image.test.com"></a>, change fragment to currRange.startContainer
+                            // and set textNodes array to [imageElement, imageElement]
+                            if (textNodes.length === 0) {
+                                fragment = this.options.ownerDocument.createDocumentFragment();
+                                fragment.appendChild(commonAncestorContainer.cloneNode(true));
+                                textNodes = [fragment.firstChild.firstChild, fragment.firstChild.lastChild];
+                            }
 
                             // Creates the link in the document fragment
                             MediumEditor.util.createLink(this.options.ownerDocument, textNodes, opts.url.trim());
@@ -6430,7 +6438,7 @@ MediumEditor.parseVersionString = function (release) {
 
 MediumEditor.version = MediumEditor.parseVersionString.call(this, ({
     // grunt-bump looks for this:
-    'version': '5.8.2'
+    'version': '5.8.3'
 }).version);
 
     return MediumEditor;
