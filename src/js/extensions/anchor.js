@@ -201,7 +201,7 @@
             var targetCheckbox = this.getAnchorTargetCheckbox(),
                 buttonCheckbox = this.getAnchorButtonCheckbox(),
                 opts = {
-                    url: this.getInput().value
+                    url: this.getInput().value.trim()
                 };
 
             if (this.linkValidation) {
