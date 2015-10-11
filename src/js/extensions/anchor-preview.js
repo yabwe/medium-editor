@@ -17,7 +17,7 @@
         previewValueSelector: 'a',
 
         /* showWhenToolbarIsVisible: [boolean]
-         * determine if the preview shows up when the toolbar is visible
+         * determines whether the anchor tag preview shows up when the toolbar is visible
          */
         showWhenToolbarIsVisible: false,
 

@@ -105,7 +105,7 @@ CSS class added to active buttons in the toolbar.
 #### `buttonLabels`
 **Default:** `false`
 
-Custom content for the toolbar buttons. 
+Custom content for the toolbar buttons.
 
 **Valid Values:**
 * `false`
@@ -318,6 +318,12 @@ Time in milliseconds to show the anchor tag preview after the mouse has left the
 **Default:** `'a'`
 
 The default selector to locate where to put the activeAnchor value in the preview. You should only need to override this if you've modified the way in which the anchor-preview extension renders.
+
+***
+#### `showWhenToolbarIsVisible`
+**Default:** `false`
+
+Determines whether the anchor tag preview shows up when the toolbar is visible. You should set this value to true if the static option for the toolbar is true and you want the preview to show at the same time.
 
 ### Disabling Anchor Preview
 
