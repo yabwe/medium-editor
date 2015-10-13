@@ -122,7 +122,7 @@ describe('Content TestCase', function () {
             expect(evt.preventDefault).toHaveBeenCalled();
         });
 
-        it ('should allow to get out of list when enter is pressed twice', function(){
+        it('should allow to get out of list when enter is pressed twice', function () {
             this.el.innerHTML = '<li><br></li>';
             var editor = this.newMediumEditor('.editor', { disableDoubleReturn: true }),
                 p = editor.elements[0].querySelector('li'),
