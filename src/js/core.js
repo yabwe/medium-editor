@@ -9,8 +9,8 @@
         } else if (this.options.disableDoubleReturn || element.getAttribute('data-disable-double-return')) {
             var node = MediumEditor.selection.getSelectionStart(this.options.ownerDocument);
 
-            // if current text selection is empty OR previous sibling text is empty
-            if ((node && node.textContent.trim() === '') ||
+            // if current text selection is empty OR previous sibling text is empty OR it is not a list
+            if ((node && node.textContent.trim() === '' && node.nodeName.toLowerCase() !== 'li') ||
                 (node.previousElementSibling && node.previousElementSibling.textContent.trim() === '')) {
                 event.preventDefault();
             }

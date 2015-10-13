@@ -122,6 +122,25 @@ describe('Content TestCase', function () {
             expect(evt.preventDefault).toHaveBeenCalled();
         });
 
+        it ('should allow to get out of list when enter is pressed twice', function(){
+            this.el.innerHTML = '<li><br></li>';
+            var editor = this.newMediumEditor('.editor', { disableDoubleReturn: true }),
+                p = editor.elements[0].querySelector('li'),
+                evt;
+
+            placeCursorInsideElement(p, 0);
+
+            evt = prepareEvent(p, 'keydown', {
+                keyCode: MediumEditor.util.keyCode.ENTER
+            });
+
+            spyOn(evt, 'preventDefault').and.callThrough();
+
+            firePreparedEvent(evt, p, 'keydown');
+
+            expect(evt.preventDefault).not.toHaveBeenCalled();
+        });
+
         it('should prevent consecutive new lines from being inserted when disableDoubleReturn is true', function () {
             this.el.innerHTML = '<p><br></p>';
             var editor = this.newMediumEditor('.editor', { disableDoubleReturn: true }),
