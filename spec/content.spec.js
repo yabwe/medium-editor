@@ -141,6 +141,38 @@ describe('Content TestCase', function () {
             expect(evt.preventDefault).not.toHaveBeenCalled();
         });
 
+        it('should allow a line to be added when pressed enter at end of the <p> tag when disableDoubleReturn is true and contains <br> as the previous sibling', function () {
+
+            this.el.innerHTML = '<p>it is a test</p><br><p>because tests are great..!!</p>';
+            var editor = this.newMediumEditor('.editor', {disableDoubleReturn: true}),
+                targetNode = editor.elements[0].querySelector('p:last-child');
+
+            //to place the cursor at the end of last p tag
+            placeCursorInsideElement(targetNode.firstChild, 'because tests are great..!!'.length);
+
+            fireEvent(targetNode, 'keydown', {
+                keyCode: MediumEditor.util.keyCode.ENTER
+            });
+
+            expect(this.el.innerHTML).toBe('<p>it is a test</p><br><p>because tests are great..!!</p><p><br></p>')
+        });
+
+        it('should allow a line to be added when pressed enter at start of the <p> tag when disableDoubleReturn is true and contains <br> as the previous sibling', function () {
+
+            this.el.innerHTML = '<p>it is a test</p><br><p>because tests are great..!!</p>';
+            var editor = this.newMediumEditor('.editor', {disableDoubleReturn: true}),
+                targetNode = editor.elements[0].querySelector('p:last-child');
+
+            //to place the cursor at the start of last p tag
+            placeCursorInsideElement(targetNode.firstChild, 0);
+
+            fireEvent(targetNode, 'keydown', {
+                keyCode: MediumEditor.util.keyCode.ENTER
+            });
+
+            expect(this.el.innerHTML).toBe('<p>it is a test</p><br><p><br></p><p>because tests are great..!!</p>')
+        });
+
         it('should prevent consecutive new lines from being inserted when disableDoubleReturn is true', function () {
             this.el.innerHTML = '<p><br></p>';
             var editor = this.newMediumEditor('.editor', { disableDoubleReturn: true }),
