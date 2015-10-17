@@ -80,6 +80,7 @@
 
         doFormCancel: function () {
             this.base.restoreSelection();
+            this.clearFontName();
             this.base.checkSelection();
         },
 
@@ -143,9 +144,21 @@
             return this.getForm().querySelector('select.medium-editor-toolbar-select');
         },
 
+        clearFontName: function () {
+            MediumEditor.selection.getSelectedElements(this.document).forEach(function (el) {
+                if (el.nodeName.toLowerCase() === 'font' && el.hasAttribute('face')) {
+                    el.removeAttribute('face');
+                }
+            });
+        },
+
         handleFontChange: function () {
             var font = this.getSelect().value;
-            this.execAction('fontName', { name: font });
+            if (font === '') {
+                this.clearFontName();
+            } else {
+                this.execAction('fontName', { name: font });
+            }
         },
 
         handleFormClick: function (event) {
