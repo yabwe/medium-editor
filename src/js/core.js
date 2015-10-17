@@ -477,6 +477,10 @@
             return this.options.ownerDocument.execCommand('fontSize', false, opts.size);
         }
 
+        if (action === 'fontName') {
+            return this.options.ownerDocument.execCommand('fontName', false, opts.name);
+        }
+
         if (action === 'createLink') {
             return this.createLink(opts);
         }
@@ -705,6 +709,9 @@
                     break;
                 case 'fileDragging':
                     extension = new MediumEditor.extensions.fileDragging(opts);
+                    break;
+                case 'fontname':
+                    extension = new MediumEditor.extensions.fontName(opts);
                     break;
                 case 'fontsize':
                     extension = new MediumEditor.extensions.fontSize(opts);
