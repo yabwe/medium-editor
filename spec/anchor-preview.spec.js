@@ -1,4 +1,4 @@
-/*global fireEvent */
+/*global fireEvent, selectElementContentsAndFire */
 
 describe('Anchor Preview TestCase', function () {
     'use strict';
@@ -232,6 +232,58 @@ describe('Anchor Preview TestCase', function () {
             expect(anchorPreview.showPreview).toHaveBeenCalled();
 
             // showPreview is called but the preview isn't displayed
+            expect(anchorPreview.getPreviewElement().classList.contains('medium-toolbar-arrow-over')).toBe(false);
+        });
+
+        it('should be displayed when the option showWhenToolbarIsVisible is set to true and toolbar is visible', function () {
+            var editor = this.newMediumEditor('.editor', {
+                delay: 200,
+                anchorPreview: {
+                      showWhenToolbarIsVisible: true
+                  },
+                toolbar: {
+                      static: true
+                  }
+            }),
+            anchorPreview = editor.getExtensionByName('anchor-preview'),
+            toolbar = editor.getExtensionByName('toolbar');
+
+            selectElementContentsAndFire(editor.elements[0].firstChild);
+
+            // show preview
+            spyOn(MediumEditor.extensions.anchorPreview.prototype, 'showPreview').and.callThrough();
+            fireEvent(document.getElementById('test-link'), 'mouseover');
+
+            // preview shows only after delay
+            jasmine.clock().tick(250);
+            expect(anchorPreview.showPreview).toHaveBeenCalled();
+            expect(toolbar.isDisplayed()).toBe(true);
+            expect(anchorPreview.getPreviewElement().classList.contains('medium-toolbar-arrow-over')).toBe(true);
+        });
+
+        it('should be displayed when the option showWhenToolbarIsVisible is set to true and toolbar is visible', function () {
+            var editor = this.newMediumEditor('.editor', {
+                delay: 200,
+                anchorPreview: {
+                      showWhenToolbarIsVisible: false
+                  },
+                toolbar: {
+                      static: true
+                  }
+            }),
+            anchorPreview = editor.getExtensionByName('anchor-preview'),
+            toolbar = editor.getExtensionByName('toolbar');
+
+            selectElementContentsAndFire(editor.elements[0].firstChild);
+
+            // show preview
+            spyOn(MediumEditor.extensions.anchorPreview.prototype, 'showPreview').and.callThrough();
+            fireEvent(document.getElementById('test-link'), 'mouseover');
+
+            // preview shows only after delay
+            jasmine.clock().tick(250);
+            expect(anchorPreview.showPreview).not.toHaveBeenCalled();
+            expect(toolbar.isDisplayed()).toBe(true);
             expect(anchorPreview.getPreviewElement().classList.contains('medium-toolbar-arrow-over')).toBe(false);
         });
 

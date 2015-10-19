@@ -16,6 +16,11 @@
          */
         previewValueSelector: 'a',
 
+        /* showWhenToolbarIsVisible: [boolean]
+         * determines whether the anchor tag preview shows up when the toolbar is visible
+         */
+        showWhenToolbarIsVisible: false,
+
         init: function () {
             this.anchorPreview = this.createPreview();
 
@@ -167,7 +172,7 @@
 
             // only show when toolbar is not present
             var toolbar = this.base.getExtensionByName('toolbar');
-            if (toolbar && toolbar.isDisplayed && toolbar.isDisplayed()) {
+            if (!this.showWhenToolbarIsVisible && toolbar && toolbar.isDisplayed && toolbar.isDisplayed()) {
                 return true;
             }
 
