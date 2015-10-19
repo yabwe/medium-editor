@@ -220,7 +220,7 @@
         /*
         * Take an element, and break up all of its text content into unique pieces such that:
          * 1) All text content of the elements are in separate blocks. No piece of text content should span
-         *    span multiple blocks. This means no element return by this function should have
+         *    across multiple blocks. This means no element return by this function should have
          *    any blocks as children.
          * 2) The union of the textcontent of all of the elements returned here covers all
          *    of the text within the element.
