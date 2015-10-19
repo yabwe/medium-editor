@@ -625,7 +625,7 @@ MediumEditor.extensions = {};
         /*
         * Take an element, and break up all of its text content into unique pieces such that:
          * 1) All text content of the elements are in separate blocks. No piece of text content should span
-         *    span multiple blocks. This means no element return by this function should have
+         *    across multiple blocks. This means no element return by this function should have
          *    any blocks as children.
          * 2) The union of the textcontent of all of the elements returned here covers all
          *    of the text within the element.
@@ -3322,7 +3322,7 @@ MediumEditor.extensions = {};
             var targetCheckbox = this.getAnchorTargetCheckbox(),
                 buttonCheckbox = this.getAnchorButtonCheckbox(),
                 opts = {
-                    url: this.getInput().value
+                    url: this.getInput().value.trim()
                 };
 
             if (this.linkValidation) {
@@ -3442,6 +3442,7 @@ MediumEditor.extensions = {};
 
     MediumEditor.extensions.anchor = AnchorForm;
 }());
+
 (function () {
     'use strict';
 
@@ -3459,6 +3460,11 @@ MediumEditor.extensions = {};
          * the default selector to locate where to put the activeAnchor value in the preview
          */
         previewValueSelector: 'a',
+
+        /* showWhenToolbarIsVisible: [boolean]
+         * determines whether the anchor tag preview shows up when the toolbar is visible
+         */
+        showWhenToolbarIsVisible: false,
 
         init: function () {
             this.anchorPreview = this.createPreview();
@@ -3611,7 +3617,7 @@ MediumEditor.extensions = {};
 
             // only show when toolbar is not present
             var toolbar = this.base.getExtensionByName('toolbar');
-            if (toolbar && toolbar.isDisplayed && toolbar.isDisplayed()) {
+            if (!this.showWhenToolbarIsVisible && toolbar && toolbar.isDisplayed && toolbar.isDisplayed()) {
                 return true;
             }
 
@@ -3774,11 +3780,26 @@ MediumEditor.extensions = {};
         },
 
         performLinking: function (contenteditable) {
-            // Perform linking on a paragraph level basis as otherwise the detection can wrongly find the end
-            // of one paragraph and the beginning of another paragraph to constitute a link, such as a paragraph ending
-            // "link." and the next paragraph beginning with "my" is interpreted into "link.my" and the code tries to create
-            // a link across blockElements - which doesn't work and is terrible.
-            // (Medium deletes the spaces/returns between P tags so the textContent ends up without paragraph spacing)
+            /*
+            Perform linking on blockElement basis, blockElements are HTML elements with text content and without
+            child element.
+
+            Example:
+            - HTML content
+            <blockquote>
+              <p>link.</p>
+              <p>my</p>
+            </blockquote>
+
+            - blockElements
+            [<p>link.</p>, <p>my</p>]
+
+            otherwise the detection can wrongly find the end of one paragraph and the beginning of another paragraph
+            to constitute a link, such as a paragraph ending "link." and the next paragraph beginning with "my" is
+            interpreted into "link.my" and the code tries to create a link across blockElements - which doesn't work
+            and is terrible.
+            (Medium deletes the spaces/returns between P tags so the textContent ends up without paragraph spacing)
+            */
             var blockElements = MediumEditor.util.splitByBlockElements(contenteditable),
                 documentModified = false;
             if (blockElements.length === 0) {
@@ -3917,6 +3938,7 @@ MediumEditor.extensions = {};
 
     MediumEditor.extensions.autoLink = AutoLink;
 }());
+
 (function () {
     'use strict';
 
@@ -5360,8 +5382,8 @@ MediumEditor.extensions = {};
         } else if (this.options.disableDoubleReturn || element.getAttribute('data-disable-double-return')) {
             var node = MediumEditor.selection.getSelectionStart(this.options.ownerDocument);
 
-            // if current text selection is empty OR previous sibling text is empty
-            if ((node && node.textContent.trim() === '') ||
+            // if current text selection is empty OR previous sibling text is empty OR it is not a list
+            if ((node && node.textContent.trim() === '' && node.nodeName.toLowerCase() !== 'li') ||
                 (node.previousElementSibling && node.previousElementSibling.textContent.trim() === '')) {
                 event.preventDefault();
             }
@@ -6438,7 +6460,7 @@ MediumEditor.parseVersionString = function (release) {
 
 MediumEditor.version = MediumEditor.parseVersionString.call(this, ({
     // grunt-bump looks for this:
-    'version': '5.8.3'
+    'version': '5.9.0'
 }).version);
 
     return MediumEditor;

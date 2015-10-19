@@ -1,3 +1,12 @@
+5.9.0 / 2015-10-19
+==================
+* Add showWhenToolbarIsVisible option for displaying anchor-preview when toolbar is visible
+* Remove trailing whitespace when creating links via anchor extension
+* Fix issue with escaping list items via pressing enter
+* Fix font-awesome links in demo pages
+* Updates to documentation around creating links
+
+
 5.8.3 / 2015-10-08
 ==================
 * Fix changing link on images
