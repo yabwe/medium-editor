@@ -9,6 +9,8 @@
         contentDefault: '&#xB1;', // ±
         contentFA: '<i class="fa fa-font"></i>',
 
+        fonts: ['', 'Arial', 'Verdana', 'Times New Roman'],
+
         init: function () {
             MediumEditor.extensions.form.prototype.init.apply(this, arguments);
         },
@@ -91,8 +93,7 @@
                 select = doc.createElement('select'),
                 close = doc.createElement('a'),
                 save = doc.createElement('a'),
-                option,
-                fonts = ['', 'Arial', 'Helvetica', 'Times New Roman'];
+                option;
 
             // Font Name Form (div)
             form.className = 'medium-editor-toolbar-form';
@@ -102,10 +103,10 @@
             this.on(form, 'click', this.handleFormClick.bind(this));
 
             // Add font names
-            for (var i = 0; i<fonts.length; i++) {
+            for (var i = 0; i<this.fonts.length; i++) {
                 option = doc.createElement('option');
-                option.innerHTML = fonts[i];
-                option.value = fonts[i];
+                option.innerHTML = this.fonts[i];
+                option.value = this.fonts[i];
                 select.appendChild(option);
             }
 

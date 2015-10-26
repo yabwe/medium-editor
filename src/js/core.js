@@ -711,7 +711,7 @@
                     extension = new MediumEditor.extensions.fileDragging(opts);
                     break;
                 case 'fontname':
-                    extension = new MediumEditor.extensions.fontName(opts);
+                    extension = new MediumEditor.extensions.fontName(this.options.fontName);
                     break;
                 case 'fontsize':
                     extension = new MediumEditor.extensions.fontSize(opts);
