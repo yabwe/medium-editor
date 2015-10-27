@@ -269,6 +269,10 @@
                     // Detecting keydown on the contenteditables
                     this.attachToEachElement('keydown', this.handleKeydown);
                     break;
+                case 'editableKeydownSpace':
+                    // Detecting keydown for SPACE on the contenteditables
+                    this.setupListener('editableKeydown');
+                    break;
                 case 'editableKeydownEnter':
                     // Detecting keydown for ENTER on the contenteditables
                     this.setupListener('editableKeydown');
@@ -481,7 +485,12 @@
         },
 
         handleKeydown: function (event) {
+
             this.triggerCustomEvent('editableKeydown', event, event.currentTarget);
+
+            if (MediumEditor.util.isKey(event, MediumEditor.util.keyCode.SPACE)) {
+                return this.triggerCustomEvent('editableKeydownSpace', event, event.currentTarget);
+            }
 
             if (MediumEditor.util.isKey(event, MediumEditor.util.keyCode.ENTER) || (event.ctrlKey && MediumEditor.util.isKey(event, MediumEditor.util.keyCode.M))) {
                 return this.triggerCustomEvent('editableKeydownEnter', event, event.currentTarget);
