@@ -6,18 +6,25 @@
     function handleDisableDoubleSpaces(event) {
         var node = MediumEditor.selection.getSelectionStart(this.options.ownerDocument),
             textContent = node.textContent,
-            lastSpaceIndex = -1;
+            caretPositions = MediumEditor.selection.getCaretOffsets(node);
+
+        if ((textContent[caretPositions.left - 1] === undefined) || (textContent[caretPositions.left - 1] === ' ') || (textContent[caretPositions.left] === undefined)) {
+            event.preventDefault();
+        }
+
+        /*
         for (var i = 0; i < textContent.length; i++) {
-            if (textContent[i] === ' ' && (lastSpaceIndex + 1 === i)) {
+            if (textContent[i].trim() === '' && textContent[i+1].trim() === '') {
                 lastSpaceIndex = -2;
+                console.log('1---1');
+                console.log(lastSpaceIndex);
                 break;
-            } else if (textContent[i] === ' ') {
-                lastSpaceIndex = i;
             }
         }
         if (lastSpaceIndex === -2) {
             event.preventDefault();
         }
+        */
     }
 
     function handleDisabledEnterKeydown(event, element) {
