@@ -138,8 +138,7 @@ var editor = new MediumEditor('.editable', {
         lastButtonClass: 'medium-editor-button-last',
         standardizeSelectionStart: false,
         static: false,
-        relativeContainer: null
-
+        relativeContainer: null,
         /* options which only apply when static is true */
         align: 'center',
         sticky: false,
