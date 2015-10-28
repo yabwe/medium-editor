@@ -3,7 +3,7 @@
 
     // Event handlers that shouldn't be exposed externally
 
-    function handleDisableDoubleSpaces(event) {
+    function handleDisableExtraSpaces(event) {
         var node = MediumEditor.selection.getSelectionStart(this.options.ownerDocument),
             textContent = node.textContent,
             caretPositions = MediumEditor.selection.getCaretOffsets(node);
@@ -377,7 +377,7 @@
 
         // Bind double space event
         if (this.options.disableExtraSpaces) {
-            this.subscribe('editableKeydownSpace', handleDisableDoubleSpaces.bind(this));
+            this.subscribe('editableKeydownSpace', handleDisableExtraSpaces.bind(this));
         }
 
         // disabling return or double return
