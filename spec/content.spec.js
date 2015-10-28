@@ -82,6 +82,59 @@ describe('Content TestCase', function () {
         });
     });
 
+    describe('when the space key is pressed', function () {
+        it('should not prevent new spaces from being inserted when disableExtraSpaces options is false', function () {
+            this.el.innerHTML = '<p>lorem ipsum</p>';
+
+            var editor = this.newMediumEditor('.editor', { disableExtraSpaces: false }),
+                evt;
+
+            placeCursorInsideElement(editor.elements[0], 0);
+
+            evt = prepareEvent(editor.elements[0], 'keydown', {
+                keyCode: MediumEditor.util.keyCode.SPACE
+            });
+
+            spyOn(evt, 'preventDefault').and.callThrough();
+
+            firePreparedEvent(evt, editor.elements[0], 'keydown');
+
+            expect(evt.preventDefault).not.toHaveBeenCalled();
+
+            /*
+            this.el.innerHTML = '<p>ab</p>';
+            var editor = this.newMediumEditor('.editor'),
+                targetNode = editor.elements[0].querySelector('p');
+            placeCursorInsideElement(targetNode, 0);
+            fireEvent(targetNode, 'keydown', {
+                keyCode: MediumEditor.util.keyCode.SPACE
+            });
+            console.log(targetNode)
+            console.log(this.el.innerHTML);
+            console.log(this.el.innerHTML.length);
+            */
+        });
+
+        it('should prevent new spaces from being inserted when disableExtraSpaces options is true', function () {
+            this.el.innerHTML = '<p>lorem ipsum</p>';
+
+            var editor = this.newMediumEditor('.editor', { disableExtraSpaces: true }),
+                evt;
+
+            placeCursorInsideElement(editor.elements[0], 0);
+
+            evt = prepareEvent(editor.elements[0], 'keydown', {
+                keyCode: MediumEditor.util.keyCode.SPACE
+            });
+
+            spyOn(evt, 'preventDefault').and.callThrough();
+
+            firePreparedEvent(evt, editor.elements[0], 'keydown');
+
+            expect(evt.preventDefault).toHaveBeenCalled();
+        });
+    });
+
     describe('when the enter key is pressed', function () {
         it('should prevent new lines from being inserted when disableReturn options is true', function () {
             this.el.innerHTML = 'lorem ipsum';
