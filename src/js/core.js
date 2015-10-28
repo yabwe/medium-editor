@@ -11,20 +11,6 @@
         if ((textContent[caretPositions.left - 1] === undefined) || (textContent[caretPositions.left - 1] === ' ') || (textContent[caretPositions.left] === undefined)) {
             event.preventDefault();
         }
-
-        /*
-        for (var i = 0; i < textContent.length; i++) {
-            if (textContent[i].trim() === '' && textContent[i+1].trim() === '') {
-                lastSpaceIndex = -2;
-                console.log('1---1');
-                console.log(lastSpaceIndex);
-                break;
-            }
-        }
-        if (lastSpaceIndex === -2) {
-            event.preventDefault();
-        }
-        */
     }
 
     function handleDisabledEnterKeydown(event, element) {

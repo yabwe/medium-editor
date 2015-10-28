@@ -100,19 +100,6 @@ describe('Content TestCase', function () {
             firePreparedEvent(evt, editor.elements[0], 'keydown');
 
             expect(evt.preventDefault).not.toHaveBeenCalled();
-
-            /*
-            this.el.innerHTML = '<p>ab</p>';
-            var editor = this.newMediumEditor('.editor'),
-                targetNode = editor.elements[0].querySelector('p');
-            placeCursorInsideElement(targetNode, 0);
-            fireEvent(targetNode, 'keydown', {
-                keyCode: MediumEditor.util.keyCode.SPACE
-            });
-            console.log(targetNode)
-            console.log(this.el.innerHTML);
-            console.log(this.el.innerHTML.length);
-            */
         });
 
         it('should prevent new spaces from being inserted when disableExtraSpaces options is true', function () {
