@@ -114,6 +114,7 @@ Using `'fontawesome'` as the buttonLabels requires version 4.1.0 of the fontawes
 * __delay__: time in milliseconds to show the toolbar or anchor tag preview. Default: `0`
 * __disableReturn__:  enables/disables the use of the return-key. You can also set specific element behavior by using setting a data-disable-return attribute. Default: `false`
 * __disableDoubleReturn__:  allows/disallows two (or more) empty new lines. You can also set specific element behavior by using setting a data-disable-double-return attribute. Default: `false`
+* __disableExtraSpaces__:  when set to true, it disallows spaces at the beginning and end of the element. Also it disallows entering 2 consecutive spaces between 2 words. Default: `false`
 * __disableEditing__: enables/disables adding the contenteditable behavior. Useful for using the toolbar with customized buttons/actions. You can also set specific element behavior by using setting a data-disable-editing attribute. Default: `false`
 * __elementsContainer__: specifies a DOM node to contain MediumEditor's toolbar and anchor preview elements. Default: `document.body`
 * __extensions__: extension to use (see [Custom Buttons and Extensions](src/js/extensions)) for more. Default: `{}`

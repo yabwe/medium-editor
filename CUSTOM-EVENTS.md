@@ -33,6 +33,7 @@ If you need to override the editor's bult-in behavior, try overriding the built-
       - [`editableKeydownEnter`](#editablekeydownenter)
       - [`editableKeydownTab`](#editablekeydowntab)
       - [`editableKeydownDelete`](#editablekeydowndelete)
+      - [`editableKeydownSpace`](#editablekeydownspace)
       - [`editableMouseover`](#editablemouseover)
       - [`editableDrag`](#editabledrag)
       - [`editableDrop`](#editabledrop)
@@ -176,6 +177,8 @@ native `keydown` event for each element, but only triggered if the key is `ENTER
 native `keydown` event for each element, but only triggered if the key is `TAB` (keycode 9).
 ##### `editableKeydownDelete`
 native `keydown` event for each element, but only triggered if the key is `DELETE` (keycode 46).
+##### `editableKeydownSpace`
+native `keydown` event for each element, but only triggered if the key is `SPACE` (keycode 32).
 ##### `editableMouseover`
 native `mouseover` event for each element.
 ##### `editableDrag`

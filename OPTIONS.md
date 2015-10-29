@@ -18,6 +18,7 @@ var editor = new MediumEditor('.editor', {
     - [`delay`](#delay)
     - [`disableReturn`](#disablereturn)
     - [`disableDoubleReturn`](#disabledoublereturn)
+    - [`disableExtraSpaces`](#disableextraspaces)
     - [`disableEditing`](#disableediting)
     - [`elementsContainer`](#elementscontainer)
     - [`extensions`](#extensions)
@@ -87,6 +88,7 @@ var editor = new MediumEditor('.editable', {
     delay: 0,
     disableReturn: false,
     disableDoubleReturn: false,
+    disableExtraSpaces: false,
     disableEditing: false,
     elementsContainer: false,
     extensions: {},
@@ -140,6 +142,12 @@ Enables/disables the use of the return-key. You can also set specific element be
 **Default:** `false`
 
 Allows/disallows two (or more) empty new lines. You can also set specific element behavior by using setting a data-disable-double-return attribute.
+
+***
+#### `disableExtraSpaces`
+**Default:** `false`
+
+When set to true, it disallows spaces at the beginning and end of the element. Also it disallows entering 2 consecutive spaces between 2 words.
 
 ***
 #### `disableEditing`

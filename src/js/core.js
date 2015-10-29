@@ -3,6 +3,16 @@
 
     // Event handlers that shouldn't be exposed externally
 
+    function handleDisableExtraSpaces(event) {
+        var node = MediumEditor.selection.getSelectionStart(this.options.ownerDocument),
+            textContent = node.textContent,
+            caretPositions = MediumEditor.selection.getCaretOffsets(node);
+
+        if ((textContent[caretPositions.left - 1] === undefined) || (textContent[caretPositions.left - 1] === ' ') || (textContent[caretPositions.left] === undefined)) {
+            event.preventDefault();
+        }
+    }
+
     function handleDisabledEnterKeydown(event, element) {
         if (this.options.disableReturn || element.getAttribute('data-disable-return')) {
             event.preventDefault();
@@ -350,6 +360,11 @@
         // Bind keys which can create or destroy a block element: backspace, delete, return
         this.subscribe('editableKeydownDelete', handleBlockDeleteKeydowns.bind(this));
         this.subscribe('editableKeydownEnter', handleBlockDeleteKeydowns.bind(this));
+
+        // Bind double space event
+        if (this.options.disableExtraSpaces) {
+            this.subscribe('editableKeydownSpace', handleDisableExtraSpaces.bind(this));
+        }
 
         // disabling return or double return
         if (this.options.disableReturn || this.options.disableDoubleReturn) {

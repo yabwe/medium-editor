@@ -7,6 +7,7 @@
         delay: 0,
         disableReturn: false,
         disableDoubleReturn: false,
+        disableExtraSpaces: false,
         disableEditing: false,
         autoLink: false,
         elementsContainer: false,
