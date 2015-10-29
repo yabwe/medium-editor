@@ -20,7 +20,7 @@ If you need to override the editor's bult-in behavior, try overriding the built-
   - [`editableInput`](#editableinput)
   - [`externalInteraction`](#externalinteraction)
   - [`focus`](#focus)
-- [Toolbar Custom Evenst](#toolbar-custom-evenst)
+- [Toolbar Custom Events](#toolbar-custom-events)
   - [`hideToolbar`](#hidetoolbar)
   - [`positionToolbar`](#positiontoolbar)
   - [`showToolbar`](#showtoolbar)
