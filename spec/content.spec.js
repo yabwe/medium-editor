@@ -144,33 +144,22 @@ describe('Content TestCase', function () {
         it('should allow a line to be added when pressed enter at end of the <p> tag when disableDoubleReturn is true and contains <br> as the previous sibling', function () {
 
             this.el.innerHTML = '<p>it is a test</p><br><p>because tests are great..!!</p>';
-            var editor = this.newMediumEditor('.editor', {disableDoubleReturn: true}),
-                targetNode = editor.elements[0].querySelector('p:last-child');
+            var editor = this.newMediumEditor('.editor', { disableDoubleReturn: true }),
+                targetNode = editor.elements[0].querySelector('p:last-child'),
+                evt;
 
-            //to place the cursor at the end of last p tag
-            placeCursorInsideElement(targetNode.firstChild, 'because tests are great..!!'.length);
+            placeCursorInsideElement(targetNode, 0);
 
-            fireEvent(targetNode, 'keydown', {
+            evt = prepareEvent(targetNode, 'keydown', {
                 keyCode: MediumEditor.util.keyCode.ENTER
             });
 
-            expect(this.el.innerHTML).toBe('<p>it is a test</p><br><p>because tests are great..!!</p><p><br></p>')
-        });
+            spyOn(evt, 'preventDefault').and.callThrough();
 
-        it('should allow a line to be added when pressed enter at start of the <p> tag when disableDoubleReturn is true and contains <br> as the previous sibling', function () {
+            firePreparedEvent(evt, targetNode, 'keydown');
 
-            this.el.innerHTML = '<p>it is a test</p><br><p>because tests are great..!!</p>';
-            var editor = this.newMediumEditor('.editor', {disableDoubleReturn: true}),
-                targetNode = editor.elements[0].querySelector('p:last-child');
+            expect(evt.preventDefault).not.toHaveBeenCalled();
 
-            //to place the cursor at the start of last p tag
-            placeCursorInsideElement(targetNode.firstChild, 0);
-
-            fireEvent(targetNode, 'keydown', {
-                keyCode: MediumEditor.util.keyCode.ENTER
-            });
-
-            expect(this.el.innerHTML).toBe('<p>it is a test</p><br><p><br></p><p>because tests are great..!!</p>')
         });
 
         it('should prevent consecutive new lines from being inserted when disableDoubleReturn is true', function () {
