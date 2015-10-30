@@ -20,7 +20,7 @@ If you need to override the editor's bult-in behavior, try overriding the built-
   - [`editableInput`](#editableinput)
   - [`externalInteraction`](#externalinteraction)
   - [`focus`](#focus)
-- [Toolbar Custom Evenst](#toolbar-custom-evenst)
+- [Toolbar Custom Events](#toolbar-custom-events)
   - [`hideToolbar`](#hidetoolbar)
   - [`positionToolbar`](#positiontoolbar)
   - [`showToolbar`](#showtoolbar)
@@ -141,7 +141,7 @@ Example:
 
 `focus` is triggered whenver a `contentedtiable` element within an editor receives focus. If the user interacts with any editor maintained elements (ie toolbar), `blur` is NOT triggered because focus has not been lost.  Thus, `focus` will only be triggered when an `contenteditable` element (or the editor that contains it) is first interacted with.
 
-## Toolbar Custom Evenst
+## Toolbar Custom Events
 
 These events are triggered by the toolbar when the toolbar extension has not been disabled.
 
