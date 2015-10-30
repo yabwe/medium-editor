@@ -21,7 +21,8 @@
 
             // if current text selection is empty OR previous sibling text is empty OR it is not a list
             if ((node && node.textContent.trim() === '' && node.nodeName.toLowerCase() !== 'li') ||
-                (node.previousElementSibling && node.previousElementSibling.textContent.trim() === '')) {
+                (node.previousElementSibling && node.previousElementSibling.nodeName.toLowerCase() !== 'br' &&
+                 node.previousElementSibling.textContent.trim() === '')) {
                 event.preventDefault();
             }
         }

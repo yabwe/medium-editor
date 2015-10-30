@@ -181,6 +181,27 @@ describe('Content TestCase', function () {
             expect(evt.preventDefault).not.toHaveBeenCalled();
         });
 
+        it('should allow a line to be added when pressed enter at end of the <p> tag when disableDoubleReturn is true and contains <br> as the previous sibling', function () {
+
+            this.el.innerHTML = '<p>it is a test</p><br><p>because tests are great..!!</p>';
+            var editor = this.newMediumEditor('.editor', { disableDoubleReturn: true }),
+                targetNode = editor.elements[0].querySelector('p:last-child'),
+                evt;
+
+            placeCursorInsideElement(targetNode, 0);
+
+            evt = prepareEvent(targetNode, 'keydown', {
+                keyCode: MediumEditor.util.keyCode.ENTER
+            });
+
+            spyOn(evt, 'preventDefault').and.callThrough();
+
+            firePreparedEvent(evt, targetNode, 'keydown');
+
+            expect(evt.preventDefault).not.toHaveBeenCalled();
+
+        });
+
         it('should prevent consecutive new lines from being inserted when disableDoubleReturn is true', function () {
             this.el.innerHTML = '<p><br></p>';
             var editor = this.newMediumEditor('.editor', { disableDoubleReturn: true }),
