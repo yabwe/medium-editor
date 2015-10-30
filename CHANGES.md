@@ -1,3 +1,12 @@
+5.10.0 / 2015-10-30
+==================
+* Added disableExtraSpaces option for preventing errant spaces
+* Added editalbeKeydownSpace event
+* Fix issue with return key at the end of text with bad formatting
+* Added new font name extension (beta)
+* Documentation updates and cleanup
+
+
 5.9.0 / 2015-10-19
 ==================
 * Add showWhenToolbarIsVisible option for displaying anchor-preview when toolbar is visible
