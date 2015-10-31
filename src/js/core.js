@@ -14,16 +14,33 @@
     }
 
     function handleDisabledEnterKeydown(event, element) {
-        if (this.options.disableReturn || element.getAttribute('data-disable-return')) {
-            event.preventDefault();
-        } else if (this.options.disableDoubleReturn || element.getAttribute('data-disable-double-return')) {
-            var node = MediumEditor.selection.getSelectionStart(this.options.ownerDocument);
+        if (!this.options.singleEnterBlockElement) {
+            var p = MediumEditor.selection.getSelectionStart(this.options.ownerDocument),
+                br = document.createElement('br');
+            //p_tag = document.createElement('p');
 
-            // if current text selection is empty OR previous sibling text is empty OR it is not a list
-            if ((node && node.textContent.trim() === '' && node.nodeName.toLowerCase() !== 'li') ||
-                (node.previousElementSibling && node.previousElementSibling.nodeName.toLowerCase() !== 'br' &&
-                 node.previousElementSibling.textContent.trim() === '')) {
+            if (p.nextSibling.nodeName.toLowerCase() === 'br') {
+
+                p.parentNode.removeChild(p.nextSibling);
+                //p.parentNode.insertBefore(p_tag, p.nextSibling);
+                //MediumEditor.selection.moveCursor(this.options.ownerDocument, p_tag);
+            } else {
                 event.preventDefault();
+                p.parentNode.insertBefore(br, p.nextSibling);
+                //MediumEditor.selection.moveCursor(this.options.ownerDocument, br);
+            }
+        } else {
+            if (this.options.disableReturn || element.getAttribute('data-disable-return')) {
+                event.preventDefault();
+            } else if (this.options.disableDoubleReturn || element.getAttribute('data-disable-double-return')) {
+                var node = MediumEditor.selection.getSelectionStart(this.options.ownerDocument);
+
+                // if current text selection is empty OR previous sibling text is empty OR it is not a list
+                if ((node && node.textContent.trim() === '' && node.nodeName.toLowerCase() !== 'li') ||
+                    (node.previousElementSibling && node.previousElementSibling.nodeName.toLowerCase() !== 'br' &&
+                    node.previousElementSibling.textContent.trim() === '')) {
+                    event.preventDefault();
+                }
             }
         }
     }

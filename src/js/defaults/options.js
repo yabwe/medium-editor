@@ -8,6 +8,7 @@
         disableReturn: false,
         disableDoubleReturn: false,
         disableExtraSpaces: false,
+        singleEnterBlockElement: true,
         disableEditing: false,
         autoLink: false,
         elementsContainer: false,
