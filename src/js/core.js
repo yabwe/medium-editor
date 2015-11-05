@@ -22,15 +22,25 @@
                 textRight,
                 newEl;
 
+            if (p.nodeName.toLowerCase() !== 'p') {
+                return;
+            }
+
             textLeft = nodeHtml.substring(0, caretPositions.left);
             textRight = nodeHtml.substring(caretPositions.left, nodeHtml.length);
+
+            event.preventDefault();
 
             //if enter is being pressed twice
             if (textRight.substring(0, 4) === '<br>') {
                 //need to remove the last added br tag, and add a new p tag
-                event.preventDefault();
+                p.innerHTML = textLeft;
+                var newPElement = document.createElement('p');
+                textRight = textRight.substring(4, textRight.length);
+                newPElement.innerHTML = textRight;
+                p.parentNode.insertBefore(newPElement, p.nextSibling);
+                MediumEditor.selection.moveCursor(this.options.ownerDocument, newPElement, 1);
             } else {
-                event.preventDefault();
                 newEl = textLeft + '<br/>' + textRight;
                 p.innerHTML = newEl;
                 MediumEditor.selection.moveCursor(this.options.ownerDocument, p, 1);
