@@ -16,18 +16,24 @@
     function handleDisabledEnterKeydown(event, element) {
         if (!this.options.singleEnterBlockElement) {
             var p = MediumEditor.selection.getSelectionStart(this.options.ownerDocument),
-                br = document.createElement('br');
-            //p_tag = document.createElement('p');
+                caretPositions = MediumEditor.selection.getCaretOffsets(p),
+                nodeHtml = p.innerHTML,
+                textLeft,
+                textRight,
+                newEl;
 
-            if (p.nextSibling.nodeName.toLowerCase() === 'br') {
+            textLeft = nodeHtml.substring(0, caretPositions.left);
+            textRight = nodeHtml.substring(caretPositions.left, nodeHtml.length);
 
-                p.parentNode.removeChild(p.nextSibling);
-                //p.parentNode.insertBefore(p_tag, p.nextSibling);
-                //MediumEditor.selection.moveCursor(this.options.ownerDocument, p_tag);
+            //if enter is being pressed twice
+            if (textRight.substring(0, 4) === '<br>') {
+                //need to remove the last added br tag, and add a new p tag
+                event.preventDefault();
             } else {
                 event.preventDefault();
-                p.parentNode.insertBefore(br, p.nextSibling);
-                //MediumEditor.selection.moveCursor(this.options.ownerDocument, br);
+                newEl = textLeft + '<br/>' + textRight;
+                p.innerHTML = newEl;
+                MediumEditor.selection.moveCursor(this.options.ownerDocument, p, 1);
             }
         } else {
             if (this.options.disableReturn || element.getAttribute('data-disable-return')) {
@@ -151,6 +157,10 @@
     }
 
     function handleKeyup(event) {
+        if (!this.options.singleEnterBlockElement) {
+            return;
+        }
+
         var node = MediumEditor.selection.getSelectionStart(this.options.ownerDocument),
             tagName;
 
@@ -385,7 +395,7 @@
         }
 
         // disabling return or double return
-        if (this.options.disableReturn || this.options.disableDoubleReturn) {
+        if (this.options.disableReturn || this.options.disableDoubleReturn || !this.options.singleEnterBlockElement) {
             this.subscribe('editableKeydownEnter', handleDisabledEnterKeydown.bind(this));
         } else {
             for (i = 0; i < this.elements.length; i += 1) {

@@ -102,6 +102,7 @@ describe('Initialization TestCase', function () {
                 disableDoubleReturn: false,
                 disableExtraSpaces: false,
                 disableEditing: false,
+                singleEnterBlockElement: true,
                 autoLink: false,
                 elementsContainer: document.body,
                 contentWindow: window,
