@@ -233,16 +233,14 @@
 
         checkLinkFormat: function (value) {
             // var re is a regex for checking if the string is a web or email link
-            var re = /^(https?|ftps?|rtmpt?):\/\/|mailto:/;
+            var re = /^(https?|ftps?|rtmpt?):\/\/|mailto:/,
             // var te is a regex for checking if the string is a telephone number
-            var te = /^\+?\s?\(?(?:\d\s?\-?\)?){3,20}$/;
-            
-            if (te.test(value)){
-		return 'tel:' + value;
-	    } 
-	    else {
-		return (re.test(value) ? '' : 'http://') + value;
-	    }
+            te = /^\+?\s?\(?(?:\d\s?\-?\)?){3,20}$/;
+            if (te.test(value)) {
+                return 'tel:' + value;
+            } else {
+                return (re.test(value) ? '' : 'http://') + value;
+            }
         },
 
         doFormCancel: function () {
