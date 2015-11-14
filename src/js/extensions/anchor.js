@@ -237,10 +237,12 @@
             // var te is a regex for checking if the string is a telephone number
             var te = /^\+?\s?\(?(?:\d\s?\-?\)?){3,20}$/;
             
-            if (te.test(value))
+            if (te.test(value)){
 		return 'tel:' + value;
-	    else
+	    } 
+	    else {
 		return (re.test(value) ? '' : 'http://') + value;
+	    }
         },
 
         doFormCancel: function () {
