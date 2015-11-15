@@ -232,8 +232,13 @@
         },
 
         checkLinkFormat: function (value) {
-            var re = /^(https?|ftps?|rtmpt?):\/\/|mailto:/;
-            return (re.test(value) ? '' : 'http://') + value;
+            // Matches any alphabetical characters followed by ://
+            // Matches protocol relative "//"
+            // Matches common external protocols "mailto:" "tel:" "maps:"
+            var urlSchemeRegex = /^([a-z]+:)?\/\/|^(mailto|tel|maps):/i;
+
+            // Check for URL scheme and default to http:// if none found
+            return (urlSchemeRegex.test(value) ? '' : 'http://') + value;
         },
 
         doFormCancel: function () {
