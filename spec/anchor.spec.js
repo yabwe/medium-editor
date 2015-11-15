@@ -200,7 +200,7 @@ describe('Anchor Button TestCase', function () {
             expect(link).not.toBeNull();
             expect(link.href).toBe('http://test.com/');
         });
- 	it('should add tel: if need be and linkValidation option is set to true', function () {
+        it('should add tel: if need be and linkValidation option is set to true', function () {
             var editor = this.newMediumEditor('.editor', {
                 anchor: {
                     linkValidation: true
