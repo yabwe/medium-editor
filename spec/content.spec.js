@@ -475,6 +475,32 @@ describe('Content TestCase', function () {
         expect(this.el.innerHTML).toMatch(/(<p><br><\/p>)?/);
     });
 
+    describe('when pressing backspace key on blockquote element', function () {
+        it('should remove the blockquote tag and replace it with p tag when cursor is at the start of the blockquote content', function () {
+            this.el.innerHTML = '<blockquote>lorem ipsum</blockquote>';
+            var editor = this.newMediumEditor('.editor'),
+                target = editor.elements[0].querySelector('blockquote');
+
+            placeCursorInsideElement(target, 0);
+            fireEvent(target, 'keydown', {
+                keyCode: MediumEditor.util.keyCode.BACKSPACE
+            });
+            expect(this.el.innerHTML).toBe('<p>lorem ipsum</p>');
+        });
+
+        it('should not change any formatting when cursor is not at the start of the blockquote content', function () {
+            this.el.innerHTML = '<blockquote>lorem ipsum</blockquote>';
+            var editor = this.newMediumEditor('.editor'),
+                target = editor.elements[0].querySelector('blockquote');
+
+            placeCursorInsideElement(target, 1);
+            fireEvent(target, 'keydown', {
+                keyCode: MediumEditor.util.keyCode.BACKSPACE
+            });
+            expect(this.el.innerHTML).toBe('<blockquote>lorem ipsum</blockquote>');
+        });
+    });
+
     describe('when deleting an empty first list item via backspace', function () {
         it('should insert a paragraph before the list if it is the first element in the editor', function () {
             this.el.innerHTML = '<ul><li></li><li>lorem ipsum</li></ul>';
