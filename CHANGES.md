@@ -1,3 +1,8 @@
+4.12.12 / 2015-11-19
+==================
+* Fix appearance of anchor form when checkboxes are present
+
+
 4.12.11 / 2015-08-18
 ==================
 * Ensure all attributes are copied from textareas to divs
