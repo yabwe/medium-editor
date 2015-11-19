@@ -131,23 +131,13 @@
 
             event.preventDefault();
         } else if (MediumEditor.util.isKey(event, MediumEditor.util.keyCode.BACKSPACE) &&
-                (tagName === 'blockquote' || node.parentElement.nodeName.toLowerCase() === 'blockquote') &&
+                (MediumEditor.util.getClosestTag(node, 'blockquote') !== false) &&
                 MediumEditor.selection.getCaretOffsets(node).left === 0) {
 
             // when cursor is at the begining of the element and the element is <blockquote>
             // then pressing backspace key should change the <blockquote> to a <p> tag
             event.preventDefault();
-
-            //if <blockquote> is the parent element, then make it the current node
-            if (node.parentElement.nodeName.toLowerCase() === 'blockquote') {
-                node = node.parentElement;
-            }
-
-            p = this.options.ownerDocument.createElement('p');
-            p.innerHTML = node.innerHTML;
-            node.parentElement.insertBefore(p, node);
-            node.parentElement.removeChild(node);
-            MediumEditor.selection.moveCursor(this.options.ownerDocument, p, 0);
+            MediumEditor.util.execFormatBlock(this.options.ownerDocument, 'p');
         }
     }
 

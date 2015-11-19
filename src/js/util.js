@@ -40,6 +40,9 @@
         // by rg89
         isIE: ((navigator.appName === 'Microsoft Internet Explorer') || ((navigator.appName === 'Netscape') && (new RegExp('Trident/.*rv:([0-9]{1,}[.0-9]{0,})').exec(navigator.userAgent) !== null))),
 
+        // if firefox
+        isFF: (navigator.userAgent.toLowerCase().indexOf('firefox') > -1),
+
         // http://stackoverflow.com/a/11752084/569101
         isMac: (window.navigator.platform.toUpperCase().indexOf('MAC') >= 0),
 
@@ -490,6 +493,13 @@
             if (Util.isIE) {
                 tagName = '<' + tagName + '>';
             }
+
+            // When FF, we have to handle blockquote node seperately as 'formatblock' does not work.
+            // https://developer.mozilla.org/en-US/docs/Web/API/Document/execCommand#Commands
+            if (Util.isFF && blockContainer && blockContainer.nodeName.toLowerCase() === 'blockquote' && tagName === 'p') {
+                return doc.execCommand('outdent', false, tagName);
+            }
+
             return doc.execCommand('formatBlock', false, tagName);
         },
 
