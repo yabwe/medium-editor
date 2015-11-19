@@ -5,7 +5,7 @@
   "eqeqeq": true,
   "eqnull": true,
   "immed": true,
-  "latedef": true,
+  "latedef": "nofunc",
   "newcap": false,
   "noarg": true,
   "sub": true,
