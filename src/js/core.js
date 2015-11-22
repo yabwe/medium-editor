@@ -339,17 +339,14 @@
             element.setAttribute('role', 'textbox');
             element.setAttribute('aria-multiline', true);
             element.setAttribute('medium-editor-index', index);
-
-            if (element.hasAttribute('medium-editor-textarea-id')) {
-                this.on(element, 'input', function (event) {
-                    var target = event.target,
-                        textarea = target.parentNode.querySelector('textarea[medium-editor-textarea-id="' + target.getAttribute('medium-editor-textarea-id') + '"]');
-                    if (textarea) {
-                        textarea.value = this.serialize()[target.id].value;
-                    }
-                }.bind(this));
-            }
         }, this);
+
+        this.subscribe('editableInput', function (event, editable) {
+            var textarea = editable.parentNode.querySelector('textarea[medium-editor-textarea-id="' + editable.getAttribute('medium-editor-textarea-id') + '"]');
+            if (textarea) {
+                textarea.value = this.serialize()[editable.id].value;
+            }
+        }.bind(this));
     }
 
     function attachHandlers() {
