@@ -3362,8 +3362,18 @@ MediumEditor.extensions = {};
         },
 
         checkLinkFormat: function (value) {
-            var re = /^(https?|ftps?|rtmpt?):\/\/|mailto:/;
-            return (re.test(value) ? '' : 'http://') + value;
+            // Matches any alphabetical characters followed by ://
+            // Matches protocol relative "//"
+            // Matches common external protocols "mailto:" "tel:" "maps:"
+            var urlSchemeRegex = /^([a-z]+:)?\/\/|^(mailto|tel|maps):/i,
+            // var te is a regex for checking if the string is a telephone number
+            telRegex = /^\+?\s?\(?(?:\d\s?\-?\)?){3,20}$/;
+            if (telRegex.test(value)) {
+                return 'tel:' + value;
+            } else {
+                // Check for URL scheme and default to http:// if none found
+                return (urlSchemeRegex.test(value) ? '' : 'http://') + value;
+            }
         },
 
         doFormCancel: function () {

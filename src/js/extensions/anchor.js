@@ -237,8 +237,8 @@
             // Matches common external protocols "mailto:" "tel:" "maps:"
             var urlSchemeRegex = /^([a-z]+:)?\/\/|^(mailto|tel|maps):/i,
             // var te is a regex for checking if the string is a telephone number
-            te = /^\+?\s?\(?(?:\d\s?\-?\)?){3,20}$/;
-            if (te.test(value)) {
+            telRegex = /^\+?\s?\(?(?:\d\s?\-?\)?){3,20}$/;
+            if (telRegex.test(value)) {
                 return 'tel:' + value;
             } else {
                 // Check for URL scheme and default to http:// if none found
