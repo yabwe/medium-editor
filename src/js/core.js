@@ -330,6 +330,8 @@
     }
 
     function initElements() {
+        var isTextareaUsed = false;
+
         this.elements.forEach(function (element, index) {
             if (!this.options.disableEditing && !element.getAttribute('data-disable-editing')) {
                 element.setAttribute('contentEditable', true);
@@ -339,14 +341,20 @@
             element.setAttribute('role', 'textbox');
             element.setAttribute('aria-multiline', true);
             element.setAttribute('medium-editor-index', index);
+
+            if (element.hasAttribute('medium-editor-textarea-id')) {
+                isTextareaUsed = true;
+            }
         }, this);
 
-        this.subscribe('editableInput', function (event, editable) {
-            var textarea = editable.parentNode.querySelector('textarea[medium-editor-textarea-id="' + editable.getAttribute('medium-editor-textarea-id') + '"]');
-            if (textarea) {
-                textarea.value = this.serialize()[editable.id].value;
-            }
-        }.bind(this));
+        if (isTextareaUsed) {
+            this.subscribe('editableInput', function (event, editable) {
+                var textarea = editable.parentNode.querySelector('textarea[medium-editor-textarea-id="' + editable.getAttribute('medium-editor-textarea-id') + '"]');
+                if (textarea) {
+                    textarea.value = this.serialize()[editable.id].value;
+                }
+            }.bind(this));
+        }
     }
 
     function attachHandlers() {
