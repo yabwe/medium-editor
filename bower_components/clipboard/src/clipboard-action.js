@@ -1,3 +1,5 @@
+import select from 'select';
+
 /**
  * Inner class which performs selection from either `text` or `target`
  * properties and then executes copy or cut operations.
@@ -56,20 +58,19 @@ class ClipboardAction {
         this.fakeElem = document.createElement('textarea');
         this.fakeElem.style.position = 'absolute';
         this.fakeElem.style.left = '-9999px';
-        this.fakeElem.style.top = document.body.scrollTop + 'px';
+        this.fakeElem.style.top = (window.pageYOffset || document.documentElement.scrollTop) + 'px';
         this.fakeElem.setAttribute('readonly', '');
         this.fakeElem.value = this.text;
-        this.selectedText = this.text;
 
         document.body.appendChild(this.fakeElem);
 
-        this.fakeElem.select();
+        this.selectedText = select(this.fakeElem);
         this.copyText();
     }
 
     /**
      * Only removes the fake element after another click event, that way
-     * an user can hit `Ctrl+C` to copy because selection still exists.
+     * a user can hit `Ctrl+C` to copy because selection still exists.
      */
     removeFake() {
         if (this.fakeHandler) {
@@ -87,19 +88,7 @@ class ClipboardAction {
      * Selects the content from element passed on `target` property.
      */
     selectTarget() {
-        if (this.target.nodeName === 'INPUT' || this.target.nodeName === 'TEXTAREA') {
-            this.target.select();
-            this.selectedText = this.target.value;
-        }
-        else {
-            let range = document.createRange();
-            let selection = window.getSelection();
-
-            range.selectNodeContents(this.target);
-            selection.addRange(range);
-            this.selectedText = selection.toString();
-        }
-
+        this.selectedText = select(this.target);
         this.copyText();
     }
 
