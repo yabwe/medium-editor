@@ -232,14 +232,17 @@
         },
 
         checkLinkFormat: function (value) {
-            // var re is a regex for checking if the string is a web or email link
-            var re = /^(https?|ftps?|rtmpt?):\/\/|mailto:/,
+            // Matches any alphabetical characters followed by ://
+            // Matches protocol relative "//"
+            // Matches common external protocols "mailto:" "tel:" "maps:"
+            var urlSchemeRegex = /^([a-z]+:)?\/\/|^(mailto|tel|maps):/i,
             // var te is a regex for checking if the string is a telephone number
-            te = /^\+?\s?\(?(?:\d\s?\-?\)?){3,20}$/;
-            if (te.test(value)) {
+            telRegex = /^\+?\s?\(?(?:\d\s?\-?\)?){3,20}$/;
+            if (telRegex.test(value)) {
                 return 'tel:' + value;
             } else {
-                return (re.test(value) ? '' : 'http://') + value;
+                // Check for URL scheme and default to http:// if none found
+                return (urlSchemeRegex.test(value) ? '' : 'http://') + value;
             }
         },
 
