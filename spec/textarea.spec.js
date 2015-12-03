@@ -48,6 +48,8 @@ describe('Textarea TestCase', function () {
         expect(this.el.value).toEqual('test content');
         editor.elements[0].innerHTML = 'new content';
         fireEvent(editor.elements[0], 'input');
+        fireEvent(editor.elements[0], 'keypress');
+        jasmine.clock().tick(1);
         expect(this.el.value).toEqual('new content');
     });
 
