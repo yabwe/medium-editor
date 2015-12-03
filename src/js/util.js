@@ -496,7 +496,8 @@
 
             // When FF, we have to handle blockquote node seperately as 'formatblock' does not work.
             // https://developer.mozilla.org/en-US/docs/Web/API/Document/execCommand#Commands
-            if (Util.isFF && blockContainer && blockContainer.nodeName.toLowerCase() === 'blockquote' && tagName === 'p') {
+            if (blockContainer && blockContainer.nodeName.toLowerCase() === 'blockquote' && ((Util.isFF && tagName === 'p') ||
+              (Util.isIE && tagName === '<p>'))) {
                 return doc.execCommand('outdent', false, tagName);
             }
 
