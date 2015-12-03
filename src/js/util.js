@@ -248,6 +248,10 @@
          * <blockquote> container, they are the elements returned.
          */
         splitByBlockElements: function (element) {
+            if (element.nodeType !== 3 && element.nodeType !== 1) {
+                return [];
+            }
+
             var toRet = [],
                 blockElementQuery = MediumEditor.util.blockContainerElementNames.join(',');
 
@@ -259,7 +263,7 @@
                 var child = element.childNodes[i];
                 if (child.nodeType === 3) {
                     toRet.push(child);
-                } else {
+                } else if (child.nodeType === 1) {
                     var blockElements = child.querySelectorAll(blockElementQuery);
                     if (blockElements.length === 0) {
                         toRet.push(child);
