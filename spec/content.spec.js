@@ -481,11 +481,16 @@ describe('Content TestCase', function () {
             var editor = this.newMediumEditor('.editor'),
                 target = editor.elements[0].querySelector('blockquote');
 
+            spyOn(document, 'execCommand').and.callThrough();
             placeCursorInsideElement(target, 0);
             fireEvent(target, 'keydown', {
                 keyCode: MediumEditor.util.keyCode.BACKSPACE
             });
-            expect(this.el.innerHTML).toBe('<p>lorem ipsum</p>');
+            if (MediumEditor.util.isFF === true || MediumEditor.util.isIE === true) {
+                expect(document.execCommand).toHaveBeenCalledWith('outdent', false, 'p');
+            } else {
+                expect(document.execCommand).toHaveBeenCalledWith('formatBlock', false, 'p');
+            }
         });
 
         it('should not change any formatting when cursor is not at the start of the blockquote content', function () {
@@ -493,10 +498,16 @@ describe('Content TestCase', function () {
             var editor = this.newMediumEditor('.editor'),
                 target = editor.elements[0].querySelector('blockquote');
 
+            spyOn(document, 'execCommand').and.callThrough();
             placeCursorInsideElement(target, 1);
             fireEvent(target, 'keydown', {
                 keyCode: MediumEditor.util.keyCode.BACKSPACE
             });
+            if (MediumEditor.util.isFF === true || MediumEditor.util.isIE === true) {
+                expect(document.execCommand).not.toHaveBeenCalledWith('outdent', false, 'p');
+            } else {
+                expect(document.execCommand).not.toHaveBeenCalledWith('formatBlock', false, 'p');
+            }
             expect(this.el.innerHTML).toBe('<blockquote>lorem ipsum</blockquote>');
         });
     });
