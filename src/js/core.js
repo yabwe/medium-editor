@@ -130,6 +130,14 @@
             node.parentElement.removeChild(node);
 
             event.preventDefault();
+        } else if (MediumEditor.util.isKey(event, MediumEditor.util.keyCode.BACKSPACE) &&
+                (MediumEditor.util.getClosestTag(node, 'blockquote') !== false) &&
+                MediumEditor.selection.getCaretOffsets(node).left === 0) {
+
+            // when cursor is at the begining of the element and the element is <blockquote>
+            // then pressing backspace key should change the <blockquote> to a <p> tag
+            event.preventDefault();
+            MediumEditor.util.execFormatBlock(this.options.ownerDocument, 'p');
         }
     }
 
