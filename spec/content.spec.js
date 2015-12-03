@@ -120,6 +120,44 @@ describe('Content TestCase', function () {
 
             expect(evt.preventDefault).toHaveBeenCalled();
         });
+
+        it('should allow one space at the end of a line when disableExtraSpaces options is true', function () {
+            this.el.innerHTML = '<p>lorem ipsum</p>';
+
+            var editor = this.newMediumEditor('.editor', { disableExtraSpaces: true }),
+                evt;
+
+            placeCursorInsideElement(editor.elements[0].getElementsByTagName('p')[0], 1);
+
+            evt = prepareEvent(editor.elements[0], 'keydown', {
+                keyCode: MediumEditor.util.keyCode.SPACE
+            });
+
+            spyOn(evt, 'preventDefault').and.callThrough();
+
+            firePreparedEvent(evt, editor.elements[0], 'keydown');
+
+            expect(evt.preventDefault).not.toHaveBeenCalled();
+        });
+
+        it('should prevent more spaces from being inserted at the end of a line when disableExtraSpaces options is true', function () {
+            this.el.innerHTML = '<p>lorem ipsum    <br /></p>';
+
+            var editor = this.newMediumEditor('.editor', { disableExtraSpaces: true }),
+                evt;
+
+            placeCursorInsideElement(editor.elements[0].getElementsByTagName('p')[0], 1);
+
+            evt = prepareEvent(editor.elements[0], 'keydown', {
+                keyCode: MediumEditor.util.keyCode.SPACE
+            });
+
+            spyOn(evt, 'preventDefault').and.callThrough();
+
+            firePreparedEvent(evt, editor.elements[0], 'keydown');
+
+            expect(evt.preventDefault).toHaveBeenCalled();
+        });
     });
 
     describe('when the enter key is pressed', function () {
