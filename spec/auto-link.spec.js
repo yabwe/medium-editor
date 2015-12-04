@@ -115,7 +115,7 @@ describe('Autolink', function () {
                     var selection = window.getSelection(),
                         newRange = document.createRange();
                     this.el.innerHTML = '<p>' + link + ' </p>';
-                    selection.removeAllRanges();
+                    MediumEditor.util.removeAllRanges(selection);
                     newRange.setStart(this.el.firstChild.childNodes[0], link.length + 1);
                     newRange.setEnd(this.el.firstChild.childNodes[0], link.length + 1);
                     selection.addRange(newRange);
@@ -147,7 +147,7 @@ describe('Autolink', function () {
                     var selection = window.getSelection(),
                         newRange = document.createRange();
                     this.el.innerHTML = '<p>' + link + ' </p>';
-                    selection.removeAllRanges();
+                    MediumEditor.util.removeAllRanges(selection);
                     newRange.setStart(this.el.firstChild.childNodes[0], link.length + 1);
                     newRange.setEnd(this.el.firstChild.childNodes[0], link.length + 1);
                     selection.addRange(newRange);
@@ -245,7 +245,7 @@ describe('Autolink', function () {
                 var selection = window.getSelection(),
                     newRange = document.createRange();
                 this.el.innerHTML = '<p><span class="a"><b>Here is the link: http://www.</b>exa</span>mple.com </p>';
-                selection.removeAllRanges();
+                MediumEditor.util.removeAllRanges(selection);
                 newRange.setStart(this.el.firstChild.lastChild, this.el.firstChild.lastChild.nodeValue.length);
                 newRange.setEnd(this.el.firstChild.lastChild, this.el.firstChild.lastChild.nodeValue.length);
                 selection.addRange(newRange);
@@ -267,7 +267,7 @@ describe('Autolink', function () {
                 var selection = window.getSelection(),
                     newRange = document.createRange();
                 this.el.innerHTML = '<p><b>Here is the link: http://www.</b>exampl<b>e</b>.com </p>';
-                selection.removeAllRanges();
+                MediumEditor.util.removeAllRanges(selection);
                 newRange.setStart(this.el.firstChild.lastChild, this.el.firstChild.lastChild.nodeValue.length);
                 newRange.setEnd(this.el.firstChild.lastChild, this.el.firstChild.lastChild.nodeValue.length);
                 selection.addRange(newRange);

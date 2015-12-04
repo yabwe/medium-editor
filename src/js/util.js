@@ -965,6 +965,12 @@
             } else {
                 el.parentNode.removeChild(el);
             }
+        },
+
+        removeAllRanges: function (sel) {
+            if (sel.getRangeAt(0).getClientRects.length < 0) {
+                sel.removeAllRanges();
+            }
         }
     };
 
