@@ -375,7 +375,11 @@
                 sel = doc.getSelection();
 
             range.selectNodeContents(node);
-            sel.removeAllRanges();
+            
+            if (sel.getRangeAt(0).getClientRects.length > 0) {
+              sel.removeAllRanges();
+            }
+            
             sel.addRange(range);
         },
 
