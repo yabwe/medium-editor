@@ -53,7 +53,7 @@ describe('Anchor Preview TestCase', function () {
             spyOn(MediumEditor.extensions.toolbar.prototype, 'hideToolbar').and.callThrough();
             nextRange = document.createRange();
             nextRange.selectNodeContents(document.getElementById('another-element'));
-            sel.removeAllRanges();
+            MediumEditor.util.removeAllRanges(sel);
             sel.addRange(nextRange);
             fireEvent(document.getElementById('another-element'), 'click');
             jasmine.clock().tick(200);

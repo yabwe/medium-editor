@@ -126,7 +126,7 @@
             }
 
             var sel = doc.getSelection();
-            sel.removeAllRanges();
+            MediumEditor.util.removeAllRanges(sel);
             sel.addRange(range);
         },
 
@@ -375,16 +375,12 @@
                 sel = doc.getSelection();
 
             range.selectNodeContents(node);
-            
-            if (sel.getRangeAt(0).getClientRects.length > 0) {
-              sel.removeAllRanges();
-            }
-            
+            MediumEditor.util.removeAllRanges(sel);
             sel.addRange(range);
         },
 
         select: function (doc, startNode, startOffset, endNode, endOffset) {
-            doc.getSelection().removeAllRanges();
+            MediumEditor.util.removeAllRanges(doc.getSelection());
             var range = doc.createRange();
             range.setStart(startNode, startOffset);
             if (endNode) {

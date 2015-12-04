@@ -135,7 +135,7 @@ describe('MediumEditor.extensions.toolbar TestCase', function () {
 
             // Remove selection and call check selection, which should make the toolbar be hidden
             jasmine.clock().tick(1);
-            window.getSelection().removeAllRanges();
+            MediumEditor.util.removeAllRanges(window.getSelection());
             editor.checkSelection();
 
             expect(callback).toHaveBeenCalledWith({}, this.el);
@@ -162,7 +162,7 @@ describe('MediumEditor.extensions.toolbar TestCase', function () {
 
             // Remove selection and call check selection, which should make the toolbar be hidden
             jasmine.clock().tick(1);
-            window.getSelection().removeAllRanges();
+            MediumEditor.util.removeAllRanges(window.getSelection());
             editor.checkSelection();
 
             expect(callbackHide).toHaveBeenCalledWith({}, this.el);
@@ -252,7 +252,7 @@ describe('MediumEditor.extensions.toolbar TestCase', function () {
                 toolbar = editor.getExtensionByName('toolbar');
 
             selectElementContentsAndFire(this.el.querySelector('b'));
-            window.getSelection().removeAllRanges();
+            MediumEditor.util.removeAllRanges(window.getSelection());
             editor.checkSelection();
             jasmine.clock().tick(1); // checkSelection delay
             expect(toolbar.getToolbarElement().classList.contains('medium-editor-toolbar-active')).toBe(true);
@@ -271,7 +271,7 @@ describe('MediumEditor.extensions.toolbar TestCase', function () {
                 toolbar = editor.getExtensionByName('toolbar');
 
             selectElementContentsAndFire(this.el.querySelector('b'));
-            window.getSelection().removeAllRanges();
+            MediumEditor.util.removeAllRanges(window.getSelection());
             editor.checkSelection();
             jasmine.clock().tick(1); // checkSelection delay
             expect(toolbar.getToolbarElement().classList.contains('medium-editor-toolbar-active')).toBe(true);
