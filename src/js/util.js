@@ -970,7 +970,9 @@
         // https://github.com/Voog/wysihtml/issues/231
         // fixes IE 11 bug with removeAllRanges
         removeAllRanges: function (sel) {
-            if (sel.getRangeAt(0).getClientRects.length < 0) {
+            if (sel.rangeCount > 0 &&
+                sel.getRangeAt(0).getClientRects.length < 0) {
+
                 sel.removeAllRanges();
             }
         }
