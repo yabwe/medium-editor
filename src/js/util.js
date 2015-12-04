@@ -977,7 +977,7 @@
         },
 
         replaceRange: function (sel, replacement) {
-            this.removeAllRanges(sel);
+            Util.removeAllRanges(sel);
 
             sel.addRange(replacement);
         }
