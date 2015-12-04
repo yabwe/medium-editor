@@ -450,8 +450,7 @@
                     range = range.cloneRange();
                     range.setStartAfter(lastNode);
                     range.collapse(true);
-                    selection.removeAllRanges();
-                    selection.addRange(range);
+                    MediumEditor.util.replaceRange(selection, range);
                 }
             }
         },
@@ -975,6 +974,12 @@
 
                 sel.removeAllRanges();
             }
+        },
+
+        replaceRange: function (sel, replacement) {
+            this.removeAllRanges(sel);
+
+            sel.addRange(replacement);
         }
     };
 

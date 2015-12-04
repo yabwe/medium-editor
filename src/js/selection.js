@@ -126,8 +126,7 @@
             }
 
             var sel = doc.getSelection();
-            MediumEditor.util.removeAllRanges(sel);
-            sel.addRange(range);
+            MediumEditor.util.replaceRange(sel, range);
         },
 
         // Utility method called from importSelection only
@@ -375,8 +374,7 @@
                 sel = doc.getSelection();
 
             range.selectNodeContents(node);
-            MediumEditor.util.removeAllRanges(sel);
-            sel.addRange(range);
+            MediumEditor.util.replaceRange(sel, range);
         },
 
         select: function (doc, startNode, startOffset, endNode, endOffset) {
