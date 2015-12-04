@@ -524,7 +524,7 @@ describe('MediumEditor.selection TestCase', function () {
             range.setStart(document, 0);
             range.setEnd(this.el.querySelector('b').firstChild, 2);
 
-            MediumEditor.util.removeAllRanges(sel);
+            sel.removeAllRanges();
             sel.addRange(range);
 
             element = MediumEditor.selection.getSelectedParentElement(range);

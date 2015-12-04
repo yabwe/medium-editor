@@ -398,7 +398,7 @@ describe('Pasting content', function () {
 
                 range = document.createRange();
                 range.selectNodeContents(editorEl.firstChild);
-                MediumEditor.util.removeAllRanges(sel);
+                sel.removeAllRanges();
                 sel.addRange(range);
 
                 evt.clipboardData.pasteText = textTests[i].paste;

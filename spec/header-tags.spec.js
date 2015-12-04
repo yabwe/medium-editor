@@ -23,7 +23,7 @@ describe('Protect Header Tags TestCase', function () {
 
             range.setStart(el, 0);
             range.collapse(true);
-            MediumEditor.util.removeAllRanges(sel);
+            sel.removeAllRanges();
             sel.addRange(range);
 
             // hit return
@@ -44,7 +44,7 @@ describe('Protect Header Tags TestCase', function () {
                 sel = window.getSelection();
             range.setStart(el, 0);
             range.collapse(true);
-            MediumEditor.util.removeAllRanges(sel);
+            sel.removeAllRanges();
             sel.addRange(range);
 
             // hit return
@@ -66,7 +66,7 @@ describe('Protect Header Tags TestCase', function () {
                 sel = window.getSelection();
             range.setStart(el, 0);
             range.collapse(true);
-            MediumEditor.util.removeAllRanges(sel);
+            sel.removeAllRanges();
             sel.addRange(range);
 
             // hit backspace
