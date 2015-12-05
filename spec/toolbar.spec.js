@@ -168,8 +168,8 @@ describe('MediumEditor.extensions.toolbar TestCase', function () {
             expect(callbackHide).toHaveBeenCalledWith({}, this.el);
         });
 
-        it('should not hide when selecting an image', function () {
-            this.el.innerHTML = '<p>Here is an <a href="#"><img style="width: 100px; heigth: 100px;" src="../demo/img/medium-editor.jpg"></a> image</p>';
+        it('should not hide when selecting a link containing only an image', function () {
+            this.el.innerHTML = '<p>Here is an <a href="#"><img src="../demo/img/medium-editor.jpg"></a> image</p>';
             var editor = this.newMediumEditor('.editor'),
                 toolbar = editor.getExtensionByName('toolbar');
 
