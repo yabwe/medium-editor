@@ -965,7 +965,7 @@
                         // but the selection is contained within the same block element
                         // we want to make sure we create a single link, and not multiple links
                         // which can happen with the built in browser functionality
-                        if (commonAncestorContainer.nodeType !== 3 && startContainerParentElement === endContainerParentElement) {
+                        if (commonAncestorContainer.nodeType !== 3 && commonAncestorContainer.textContent.length !== 0 && startContainerParentElement === endContainerParentElement) {
                             var parentElement = (startContainerParentElement || currentEditor),
                                 fragment = this.options.ownerDocument.createDocumentFragment();
 

@@ -54,6 +54,11 @@
                     start: start,
                     end: start + range.toString().length
                 };
+
+                if (selectionState.start === selectionState.end && MediumEditor.selection.selectionContainsContent(doc)) {
+                    selectionState.emptyContentSelection = true;
+                }
+
                 // If start = 0 there may still be an empty paragraph before it, but we don't care.
                 if (start !== 0) {
                     var emptyBlocksIndex = this.getIndexRelativeToAdjacentEmptyBlocks(doc, root, range.startContainer, range.startOffset);
@@ -90,25 +95,36 @@
                 charIndex = 0,
                 foundStart = false,
                 stop = false,
+                onNext = false,
                 nextCharIndex;
 
             while (!stop && node) {
-                if (node.nodeType === 3) {
-                    nextCharIndex = charIndex + node.length;
-                    if (!foundStart && selectionState.start >= charIndex && selectionState.start <= nextCharIndex) {
-                        range.setStart(node, selectionState.start - charIndex);
-                        foundStart = true;
-                    }
-                    if (foundStart && selectionState.end >= charIndex && selectionState.end <= nextCharIndex) {
-                        range.setEnd(node, selectionState.end - charIndex);
-                        stop = true;
-                    }
-                    charIndex = nextCharIndex;
-                } else {
-                    var i = node.childNodes.length - 1;
-                    while (i >= 0) {
-                        nodeStack.push(node.childNodes[i]);
-                        i -= 1;
+                if (node.nodeType <= 3) {
+                    if (node.nodeType === 3 || (selectionState.emptyContentSelection && (node.nodeName.toLowerCase() === 'img' || (onNext && node.querySelector('img'))))) {
+                        nextCharIndex = charIndex + (node.nodeType === 3 ? node.length : 0);
+                        if (!foundStart && selectionState.start >= charIndex && selectionState.start <= nextCharIndex) {
+                            if (!onNext && selectionState.emptyContentSelection) {
+                                onNext = true;
+                            } else {
+                                range.setStart(node, selectionState.start - charIndex);
+                                foundStart = true;
+                            }
+                        }
+                        if (foundStart && selectionState.end >= charIndex && selectionState.end <= nextCharIndex) {
+                            if (onNext) {
+                                range.setEnd(node, node.nodeName.toLowerCase() === 'img' ? 0 : 1);
+                            } else {
+                                range.setEnd(node, selectionState.end - charIndex);
+                            }
+                            stop = true;
+                        }
+                        charIndex = nextCharIndex;
+                    } else {
+                        var i = node.childNodes.length - 1;
+                        while (i >= 0) {
+                            nodeStack.push(node.childNodes[i]);
+                            i -= 1;
+                        }
                     }
                 }
                 if (!stop) {
@@ -250,6 +266,28 @@
             }
 
             return emptyBlocksCount;
+        },
+
+        selectionContainsContent: function (doc) {
+            var sel = doc.getSelection();
+
+            if (!sel || sel.isCollapsed || !sel.rangeCount) {
+                return false;
+            }
+
+            if (sel.toString().trim() !== '') {
+                return true;
+            }
+
+            var selectionNode = this.getSelectedParentElement(sel.getRangeAt(0));
+            if (selectionNode) {
+                if (selectionNode.nodeName.toLowerCase() === 'img' ||
+                    (selectionNode.nodeType === 1 && selectionNode.querySelector('img'))) {
+                    return true;
+                }
+            }
+
+            return false;
         },
 
         selectionInContentEditableFalse: function (contentWindow) {
