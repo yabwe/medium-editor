@@ -1,3 +1,14 @@
+5.11.0 / 2015-12-05
+==================
+* Updated table extension demo
+* Removed the carriage return character from a demo file
+* Updated checkLinkFormat function to support more schemes
+* Fixed issue with disableExtraSpaces option to allow space at the end of line
+* Use editableInput instead of input event for textarea syncing
+* Fixed style for correct positioning of placeholder
+* Allowed to remove blockquote by pressing delete at beginning of the quote
+* Fixed failing test cases in IE9 and IE10
+
 5.10.0 / 2015-10-30
 ==================
 * Added disableExtraSpaces option for preventing errant spaces

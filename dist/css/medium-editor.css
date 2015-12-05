@@ -89,7 +89,9 @@
     left: 0;
     position: absolute;
     top: 0;
-    white-space: pre; }
+    white-space: pre;
+    padding: inherit;
+    margin: inherit; }
 
 .medium-toolbar-arrow-under:after, .medium-toolbar-arrow-over:before {
   border-style: solid;
