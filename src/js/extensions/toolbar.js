@@ -601,8 +601,15 @@
 
             var range = selection.getRangeAt(0),
                 boundary = range.getBoundingClientRect();
+
+            // Handle selections with just images
             if (!boundary || ((boundary.height === 0 && boundary.width === 0) && range.startContainer === range.endContainer)) {
-                boundary = range.startContainer.getBoundingClientRect();
+                // If there's a nested image, use that for the bounding rectangle
+                if (range.startContainer.nodeType === 1 && range.startContainer.querySelector('img')) {
+                    boundary = range.startContainer.querySelector('img').getBoundingClientRect();
+                } else {
+                    boundary = range.startContainer.getBoundingClientRect();
+                }
             }
 
             var windowWidth = this.window.innerWidth,
