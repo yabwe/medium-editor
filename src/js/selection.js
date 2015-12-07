@@ -55,7 +55,7 @@
                     end: start + range.toString().length
                 };
 
-                if (selectionState.start === selectionState.end && MediumEditor.selection.selectionContainsContent(doc)) {
+                if (selectionState.start === selectionState.end && this.selectionContainsContent(doc)) {
                     selectionState.emptyContentSelection = true;
                 }
 
@@ -268,17 +268,23 @@
             return emptyBlocksCount;
         },
 
+        // determine if the current selection contains any 'content'
+        // content being and non-white space text or an image
         selectionContainsContent: function (doc) {
             var sel = doc.getSelection();
 
+            // collapsed selection or selection withour range doesn't contain content
             if (!sel || sel.isCollapsed || !sel.rangeCount) {
                 return false;
             }
 
+            // if toString() contains any text, the selection contains some content
             if (sel.toString().trim() !== '') {
                 return true;
             }
 
+            // if selection contains only image(s), it will return empty for toString()
+            // so check for an image manually
             var selectionNode = this.getSelectedParentElement(sel.getRangeAt(0));
             if (selectionNode) {
                 if (selectionNode.nodeName.toLowerCase() === 'img' ||

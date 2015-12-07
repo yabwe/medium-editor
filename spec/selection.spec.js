@@ -335,4 +335,27 @@ describe('MediumEditor.selection TestCase', function () {
             expect(element).toBe(document);
         });
     });
+
+    describe('selectionContainsContent', function () {
+        it('should return true for non-empty text', function () {
+            this.el.innerHTML = '<p>this is<span> </span>text</p>';
+            selectElementContents(this.el.querySelector('p'));
+
+            expect(MediumEditor.selection.selectionContainsContent(document)).toBe(true);
+        });
+
+        it('should return false for white-space only selections', function () {
+            this.el.innerHTML = '<p>this is<span> </span>text</p>';
+            selectElementContents(this.el.querySelector('span'));
+
+            expect(MediumEditor.selection.selectionContainsContent(document)).toBe(false);
+        });
+
+        it('should return true for image with link selections', function () {
+            this.el.innerHTML = '<p>this is <a href="#"><img src="../demo/img/medium-editor.jpg" /></a> image test</p>';
+            selectElementContents(this.el.querySelector('a'));
+
+            expect(MediumEditor.selection.selectionContainsContent(document)).toBe(true);
+        });
+    });
 });
