@@ -1,6 +1,4 @@
-/*global fireEvent, selectElementContents,
-         selectElementContentsAndFire,
-         placeCursorInsideElement */
+/*global selectElementContents, placeCursorInsideElement */
 
 describe('MediumEditor.selection TestCase', function () {
     'use strict';
@@ -20,72 +18,7 @@ describe('MediumEditor.selection TestCase', function () {
         });
     });
 
-    describe('Export/Import Selection', function () {
-        it('should be able to import an exported selection', function () {
-            this.el.innerHTML = 'lorem <i>ipsum</i> dolor';
-            var editor = this.newMediumEditor('.editor', {
-                toolbar: {
-                    buttons: ['italic', 'underline', 'strikethrough']
-                }
-            });
-
-            selectElementContents(editor.elements[0].querySelector('i'));
-            var exportedSelection = editor.exportSelection();
-            expect(Object.keys(exportedSelection).sort()).toEqual(['end', 'start']);
-
-            selectElementContents(editor.elements[0]);
-            expect(exportedSelection).not.toEqual(editor.exportSelection());
-
-            editor.importSelection(exportedSelection);
-            expect(exportedSelection).toEqual(editor.exportSelection());
-        });
-
-        it('should import an exported selection outside any anchor tag', function () {
-            this.el.innerHTML = '<p id=1>Hello world: <a href="#">http://www.example.com</a></p><p id=2><br></p>';
-            var editor = this.newMediumEditor('.editor', {
-                toolbar: {
-                    buttons: ['italic', 'underline', 'strikethrough']
-                }
-            }),
-                link = editor.elements[0].getElementsByTagName('a')[0];
-
-            placeCursorInsideElement(link.childNodes[0], link.childNodes[0].nodeValue.length);
-
-            var exportedSelection = editor.exportSelection();
-            editor.importSelection(exportedSelection, true);
-            var range = window.getSelection().getRangeAt(0),
-                node = range.startContainer;
-            // Even though we set the range to use the P tag as the start container, Safari normalizes the range
-            // down to the text node. Setting the range to use the P tag for the start is necessary to support
-            // MSIE, where it removes the link when the cursor is placed at the end of the text node in the anchor.
-            while (node.nodeName.toLowerCase() !== 'p') {
-                node = node.parentNode;
-            }
-            expect(node.nodeName.toLowerCase()).toBe('p');
-            expect(node.getAttribute('id')).toBe('1');
-        });
-
-        // https://github.com/yabwe/medium-editor/issues/738
-        it('should import an exported non-collapsed selection after an empty paragraph', function () {
-            this.el.innerHTML = '<p>This is <a href="#">a link</a></p><p><br/></p><p>not a link</p>';
-            var editor = this.newMediumEditor('.editor'),
-                lastTextNode = this.el.childNodes[2].firstChild;
-
-            MediumEditor.selection.select(document, lastTextNode, 0, lastTextNode, 'not a link'.length);
-
-            var exportedSelection = editor.exportSelection();
-            expect(exportedSelection).toEqual({ start: 14, end: 24, emptyBlocksIndex: 2 });
-            editor.importSelection(exportedSelection);
-
-            var range = window.getSelection().getRangeAt(0);
-            expect(range.startContainer === lastTextNode || range.startContainer === lastTextNode.parentNode)
-                .toBe(true, 'The selection is starting at the wrong element');
-            expect(range.startOffset).toBe(0, 'The start of the selection is not at the beginning of the text node');
-            expect(range.endContainer === lastTextNode || range.endContainer === lastTextNode.parentNode)
-                .toBe(true, 'The selection is ending at the wrong element');
-            expect(range.endOffset).toBe('not a link'.length, 'The end of the selection is not at the end of the text node');
-        });
-
+    describe('exportSelection', function () {
         it('should have an index in the exported selection when it is in the second contenteditable', function () {
             this.createElement('div', 'editor', 'lorem <i>ipsum</i> dolor');
             var editor = this.newMediumEditor('.editor', {
@@ -186,6 +119,73 @@ describe('MediumEditor.selection TestCase', function () {
             placeCursorInsideElement(editor.elements[0].querySelector('h2'), 0);
             var exportedSelection = editor.exportSelection();
             expect(exportedSelection.emptyBlocksIndex).toEqual(2);
+        });
+    });
+
+    describe('importSelection', function () {
+        it('should be able to import an exported selection', function () {
+            this.el.innerHTML = 'lorem <i>ipsum</i> dolor';
+            var editor = this.newMediumEditor('.editor', {
+                toolbar: {
+                    buttons: ['italic', 'underline', 'strikethrough']
+                }
+            });
+
+            selectElementContents(editor.elements[0].querySelector('i'));
+            var exportedSelection = editor.exportSelection();
+            expect(Object.keys(exportedSelection).sort()).toEqual(['end', 'start']);
+
+            selectElementContents(editor.elements[0]);
+            expect(exportedSelection).not.toEqual(editor.exportSelection());
+
+            editor.importSelection(exportedSelection);
+            expect(exportedSelection).toEqual(editor.exportSelection());
+        });
+
+        it('should import an exported selection outside any anchor tag', function () {
+            this.el.innerHTML = '<p id=1>Hello world: <a href="#">http://www.example.com</a></p><p id=2><br></p>';
+            var editor = this.newMediumEditor('.editor', {
+                toolbar: {
+                    buttons: ['italic', 'underline', 'strikethrough']
+                }
+            }),
+                link = editor.elements[0].getElementsByTagName('a')[0];
+
+            placeCursorInsideElement(link.childNodes[0], link.childNodes[0].nodeValue.length);
+
+            var exportedSelection = editor.exportSelection();
+            editor.importSelection(exportedSelection, true);
+            var range = window.getSelection().getRangeAt(0),
+                node = range.startContainer;
+            // Even though we set the range to use the P tag as the start container, Safari normalizes the range
+            // down to the text node. Setting the range to use the P tag for the start is necessary to support
+            // MSIE, where it removes the link when the cursor is placed at the end of the text node in the anchor.
+            while (node.nodeName.toLowerCase() !== 'p') {
+                node = node.parentNode;
+            }
+            expect(node.nodeName.toLowerCase()).toBe('p');
+            expect(node.getAttribute('id')).toBe('1');
+        });
+
+        // https://github.com/yabwe/medium-editor/issues/738
+        it('should import an exported non-collapsed selection after an empty paragraph', function () {
+            this.el.innerHTML = '<p>This is <a href="#">a link</a></p><p><br/></p><p>not a link</p>';
+            var editor = this.newMediumEditor('.editor'),
+                lastTextNode = this.el.childNodes[2].firstChild;
+
+            MediumEditor.selection.select(document, lastTextNode, 0, lastTextNode, 'not a link'.length);
+
+            var exportedSelection = editor.exportSelection();
+            expect(exportedSelection).toEqual({ start: 14, end: 24, emptyBlocksIndex: 2 });
+            editor.importSelection(exportedSelection);
+
+            var range = window.getSelection().getRangeAt(0);
+            expect(range.startContainer === lastTextNode || range.startContainer === lastTextNode.parentNode)
+                .toBe(true, 'The selection is starting at the wrong element');
+            expect(range.startOffset).toBe(0, 'The start of the selection is not at the beginning of the text node');
+            expect(range.endContainer === lastTextNode || range.endContainer === lastTextNode.parentNode)
+                .toBe(true, 'The selection is ending at the wrong element');
+            expect(range.endOffset).toBe('not a link'.length, 'The end of the selection is not at the end of the text node');
         });
 
         it('should import a position with the cursor in an empty paragraph', function () {
@@ -358,121 +358,6 @@ describe('MediumEditor.selection TestCase', function () {
             expect(range.toString()).toBe('target', 'The selection is around the wrong element');
             expect(MediumEditor.util.isDescendant(lastLi, range.startContainer, true)).toBe(true, 'The start of the selection is invalid');
             expect(MediumEditor.util.isDescendant(lastLi, range.endContainer, true)).toBe(true, 'The end of the selection is invalid');
-        });
-    });
-
-    describe('Saving Selection', function () {
-        it('should be applicable if html changes but text does not', function () {
-            this.el.innerHTML = 'lorem <i>ipsum</i> dolor';
-
-            var editor = this.newMediumEditor('.editor', {
-                    toolbar: {
-                        buttons: ['italic', 'underline', 'strikethrough']
-                    }
-                }),
-                toolbar = editor.getExtensionByName('toolbar'),
-                button,
-                regex;
-
-            // Save selection around <i> tag
-            selectElementContents(editor.elements[0].querySelector('i'));
-            editor.saveSelection();
-
-            // Underline entire element
-            selectElementContents(editor.elements[0]);
-            button = toolbar.getToolbarElement().querySelector('[data-action="underline"]');
-            fireEvent(button, 'click');
-
-            // Restore selection back to <i> tag and add a <strike> tag
-            regex = new RegExp('^<u>lorem (<i><strike>|<strike><i>)ipsum(</i></strike>|</strike></i>) dolor</u>$');
-            editor.restoreSelection();
-            button = toolbar.getToolbarElement().querySelector('[data-action="strikethrough"]');
-            fireEvent(button, 'click');
-            expect(regex.test(editor.elements[0].innerHTML)).toBe(true);
-        });
-    });
-
-    describe('CheckSelection', function () {
-        it('should check for selection on mouseup event', function () {
-            spyOn(MediumEditor.extensions.toolbar.prototype, 'checkState');
-            var editor = this.newMediumEditor('.editor'),
-                toolbar = editor.getExtensionByName('toolbar');
-            fireEvent(editor.elements[0], 'mouseup');
-            expect(toolbar.checkState).toHaveBeenCalled();
-        });
-
-        it('should check for selection on keyup', function () {
-            spyOn(MediumEditor.extensions.toolbar.prototype, 'checkState');
-            var editor = this.newMediumEditor('.editor'),
-                toolbar = editor.getExtensionByName('toolbar');
-            fireEvent(editor.elements[0], 'keyup');
-            expect(toolbar.checkState).toHaveBeenCalled();
-        });
-
-        it('should hide the toolbar if selection is empty', function () {
-            spyOn(MediumEditor.extensions.toolbar.prototype, 'setToolbarPosition').and.callThrough();
-            spyOn(MediumEditor.extensions.toolbar.prototype, 'setToolbarButtonStates').and.callThrough();
-            spyOn(MediumEditor.extensions.toolbar.prototype, 'showAndUpdateToolbar').and.callThrough();
-            var editor = this.newMediumEditor('.editor'),
-                toolbar = editor.getExtensionByName('toolbar');
-            toolbar.getToolbarElement().style.display = 'block';
-            toolbar.getToolbarElement().classList.add('medium-editor-toolbar-active');
-            expect(toolbar.getToolbarElement().classList.contains('medium-editor-toolbar-active')).toBe(true);
-            editor.checkSelection();
-            expect(toolbar.getToolbarElement().classList.contains('medium-editor-toolbar-active')).toBe(false);
-            expect(toolbar.setToolbarPosition).not.toHaveBeenCalled();
-            expect(toolbar.setToolbarButtonStates).not.toHaveBeenCalled();
-            expect(toolbar.showAndUpdateToolbar).not.toHaveBeenCalled();
-        });
-
-        it('should hide the toolbar when selecting multiple paragraphs and the deprecated allowMultiParagraphSelection option is false', function () {
-            this.el.innerHTML = '<p id="p-one">lorem ipsum</p><p id="p-two">lorem ipsum</p>';
-            var editor = this.newMediumEditor('.editor', {
-                    allowMultiParagraphSelection: false
-                }),
-                toolbar = editor.getExtensionByName('toolbar');
-            selectElementContentsAndFire(document.getElementById('p-one'), { eventToFire: 'focus' });
-            expect(toolbar.getToolbarElement().classList.contains('medium-editor-toolbar-active')).toBe(true);
-            selectElementContentsAndFire(this.el, { eventToFire: 'mouseup' });
-            expect(toolbar.getToolbarElement().classList.contains('medium-editor-toolbar-active')).toBe(false);
-        });
-
-        it('should show the toolbar when something is selected', function () {
-            var editor = this.newMediumEditor('.editor'),
-                toolbar = editor.getExtensionByName('toolbar');
-            expect(toolbar.getToolbarElement().classList.contains('medium-editor-toolbar-active')).toBe(false);
-            selectElementContentsAndFire(this.el);
-            jasmine.clock().tick(501);
-            expect(toolbar.getToolbarElement().classList.contains('medium-editor-toolbar-active')).toBe(true);
-        });
-
-        it('should update toolbar position and button states when something is selected', function () {
-            spyOn(MediumEditor.extensions.toolbar.prototype, 'setToolbarPosition').and.callThrough();
-            spyOn(MediumEditor.extensions.toolbar.prototype, 'setToolbarButtonStates').and.callThrough();
-            spyOn(MediumEditor.extensions.toolbar.prototype, 'showAndUpdateToolbar').and.callThrough();
-            var editor = this.newMediumEditor('.editor'),
-                toolbar = editor.getExtensionByName('toolbar');
-            selectElementContentsAndFire(this.el);
-            jasmine.clock().tick(51);
-            expect(toolbar.setToolbarPosition).toHaveBeenCalled();
-            expect(toolbar.setToolbarButtonStates).toHaveBeenCalled();
-            expect(toolbar.showAndUpdateToolbar).toHaveBeenCalled();
-        });
-
-        it('should update button states for static toolbar when updateOnEmptySelection is true and the selection is empty', function () {
-            spyOn(MediumEditor.extensions.toolbar.prototype, 'setToolbarButtonStates').and.callThrough();
-
-            var editor = this.newMediumEditor('.editor', {
-                toolbar: {
-                    updateOnEmptySelection: true,
-                    static: true
-                }
-            });
-
-            selectElementContentsAndFire(this.el, { collapse: 'toStart' });
-            jasmine.clock().tick(51);
-
-            expect(editor.getExtensionByName('toolbar').setToolbarButtonStates).toHaveBeenCalled();
         });
     });
 

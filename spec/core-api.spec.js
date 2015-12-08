@@ -1,3 +1,5 @@
+/*global fireEvent, selectElementContents */
+
 describe('Core-API', function () {
     'use strict';
 
@@ -49,6 +51,37 @@ describe('Core-API', function () {
             editor.setContent(otherHTML, 1);
             expect(elementOne.innerHTML).toEqual(otherHTML);
             expect(this.el.innerHTML).not.toEqual(otherHTML);
+        });
+    });
+
+    describe('saveSelection/restorSelection', function () {
+        it('should be applicable if html changes but text does not', function () {
+            this.el.innerHTML = 'lorem <i>ipsum</i> dolor';
+
+            var editor = this.newMediumEditor('.editor', {
+                    toolbar: {
+                        buttons: ['italic', 'underline', 'strikethrough']
+                    }
+                }),
+                toolbar = editor.getExtensionByName('toolbar'),
+                button,
+                regex;
+
+            // Save selection around <i> tag
+            selectElementContents(editor.elements[0].querySelector('i'));
+            editor.saveSelection();
+
+            // Underline entire element
+            selectElementContents(editor.elements[0]);
+            button = toolbar.getToolbarElement().querySelector('[data-action="underline"]');
+            fireEvent(button, 'click');
+
+            // Restore selection back to <i> tag and add a <strike> tag
+            regex = new RegExp('^<u>lorem (<i><strike>|<strike><i>)ipsum(</i></strike>|</strike></i>) dolor</u>$');
+            editor.restoreSelection();
+            button = toolbar.getToolbarElement().querySelector('[data-action="strikethrough"]');
+            fireEvent(button, 'click');
+            expect(regex.test(editor.elements[0].innerHTML)).toBe(true);
         });
     });
 });
