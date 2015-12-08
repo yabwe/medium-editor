@@ -19,6 +19,7 @@ var editor = new MediumEditor('.editor', {
     - [`disableReturn`](#disablereturn)
     - [`disableDoubleReturn`](#disabledoublereturn)
     - [`disableExtraSpaces`](#disableextraspaces)
+    - [`singleEnterBlockElement`](#singleenterblockelement)
     - [`disableEditing`](#disableediting)
     - [`elementsContainer`](#elementscontainer)
     - [`extensions`](#extensions)
@@ -89,6 +90,7 @@ var editor = new MediumEditor('.editable', {
     disableReturn: false,
     disableDoubleReturn: false,
     disableExtraSpaces: false,
+    singleEnterBlockElement: true,
     disableEditing: false,
     elementsContainer: false,
     extensions: {},
@@ -148,6 +150,12 @@ Allows/disallows two (or more) empty new lines. You can also set specific elemen
 **Default:** `false`
 
 When set to true, it disallows spaces at the beginning and end of the element. Also it disallows entering 2 consecutive spaces between 2 words.
+
+***
+#### `singleEnterBlockElement`
+**Default:** `true`
+
+When set to false, upon using the return-key for first time it will add a `br` tag. Upon pressing the return-key twice, it adds a `p` tag.
 
 ***
 #### `disableEditing`
