@@ -19,49 +19,26 @@ describe('MediumEditor.selection TestCase', function () {
     });
 
     describe('exportSelection', function () {
-        it('should have an index in the exported selection when it is in the second contenteditable', function () {
-            this.createElement('div', 'editor', 'lorem <i>ipsum</i> dolor');
-            var editor = this.newMediumEditor('.editor', {
-                toolbar: {
-                    buttons: ['italic', 'underline', 'strikethrough']
-                }
-            });
-
-            selectElementContents(editor.elements[1].querySelector('i'));
-            var exportedSelection = editor.exportSelection();
-            expect(Object.keys(exportedSelection).sort()).toEqual(['editableElementIndex', 'end', 'start']);
-            expect(exportedSelection.editableElementIndex).toEqual(1);
-        });
-
         it('should not export a position indicating the cursor is before an empty paragraph', function () {
             this.el.innerHTML = '<p><span>www.google.com</span></p><p><br /></p><p>Whatever</p>';
-            var editor = this.newMediumEditor('.editor', {
-                buttons: ['italic', 'underline', 'strikethrough']
-            });
-            placeCursorInsideElement(editor.elements[0].querySelector('span'), 1); // end of first span
-            var exportedSelection = editor.exportSelection();
+            placeCursorInsideElement(this.el.querySelector('span'), 1); // end of first span
+            var exportedSelection = MediumEditor.selection.exportSelection(this.el, document);
             expect(exportedSelection.emptyBlocksIndex).toEqual(undefined);
         });
 
         it('should export a position indicating the cursor is at the beginning of a paragraph', function () {
             this.el.innerHTML = '<p><span>www.google.com</span></p><p><b>Whatever</b></p>';
-            var editor = this.newMediumEditor('.editor', {
-                buttons: ['italic', 'underline', 'strikethrough']
-            });
-            placeCursorInsideElement(editor.elements[0].querySelector('b'), 0); // beginning of <b> tag
-            var exportedSelection = editor.exportSelection();
+            placeCursorInsideElement(this.el.querySelector('b'), 0); // beginning of <b> tag
+            var exportedSelection = MediumEditor.selection.exportSelection(this.el, document);
             expect(exportedSelection.emptyBlocksIndex).toEqual(0);
         });
 
         it('should not export a position indicating the cursor is after an empty paragraph', function () {
             this.el.innerHTML = '<p><span>www.google.com</span></p><p><br /></p>' +
                 '<p class="target">Whatever</p>';
-            var editor = this.newMediumEditor('.editor', {
-                buttons: ['italic', 'underline', 'strikethrough']
-            });
             // After the 'W' in whatever
-            placeCursorInsideElement(editor.elements[0].querySelector('p.target').firstChild, 1);
-            var exportedSelection = editor.exportSelection();
+            placeCursorInsideElement(this.el.querySelector('p.target').firstChild, 1);
+            var exportedSelection = MediumEditor.selection.exportSelection(this.el, document);
             expect(exportedSelection.emptyBlocksIndex).toEqual(undefined);
         });
 
@@ -69,12 +46,9 @@ describe('MediumEditor.selection TestCase', function () {
                 function () {
             this.el.innerHTML = '<p><span>www.google.com</span></p><p><br /></p>' +
                 '<p>What<span class="target">ever</span></p>';
-            var editor = this.newMediumEditor('.editor', {
-                buttons: ['italic', 'underline', 'strikethrough']
-            });
             // Before the 'e' in whatever
-            placeCursorInsideElement(editor.elements[0].querySelector('span.target').firstChild, 0);
-            var exportedSelection = editor.exportSelection();
+            placeCursorInsideElement(this.el.querySelector('span.target').firstChild, 0);
+            var exportedSelection = MediumEditor.selection.exportSelection(this.el, document);
             expect(exportedSelection.emptyBlocksIndex).toEqual(undefined);
         });
 
@@ -82,42 +56,30 @@ describe('MediumEditor.selection TestCase', function () {
                 '(in a complicated markup with selection on the element)', function () {
             this.el.innerHTML = '<p><span>www.google.com</span></p><p><br /></p>' +
                 '<p>What<span class="target">ever</span></p>';
-            var editor = this.newMediumEditor('.editor', {
-                buttons: ['italic', 'underline', 'strikethrough']
-            });
             // Before the 'e' in whatever
-            placeCursorInsideElement(editor.elements[0].querySelector('span.target'), 0);
-            var exportedSelection = editor.exportSelection();
+            placeCursorInsideElement(this.el.querySelector('span.target'), 0);
+            var exportedSelection = MediumEditor.selection.exportSelection(this.el, document);
             expect(exportedSelection.emptyBlocksIndex).toEqual(undefined);
         });
 
         it('should export a position indicating the cursor is in an empty paragraph', function () {
             this.el.innerHTML = '<p><span>www.google.com</span></p><p><br /></p><p>Whatever</p>';
-            var editor = this.newMediumEditor('.editor', {
-                buttons: ['italic', 'underline', 'strikethrough']
-            });
-            placeCursorInsideElement(editor.elements[0].getElementsByTagName('p')[1], 0);
-            var exportedSelection = editor.exportSelection();
+            placeCursorInsideElement(this.el.getElementsByTagName('p')[1], 0);
+            var exportedSelection = MediumEditor.selection.exportSelection(this.el, document);
             expect(exportedSelection.emptyBlocksIndex).toEqual(1);
         });
 
         it('should export a position indicating the cursor is after an empty paragraph', function () {
             this.el.innerHTML = '<p><span>www.google.com</span></p><p><br /></p><p>Whatever</p>';
-            var editor = this.newMediumEditor('.editor', {
-                buttons: ['italic', 'underline', 'strikethrough']
-            });
-            placeCursorInsideElement(editor.elements[0].getElementsByTagName('p')[2], 0);
-            var exportedSelection = editor.exportSelection();
+            placeCursorInsideElement(this.el.getElementsByTagName('p')[2], 0);
+            var exportedSelection = MediumEditor.selection.exportSelection(this.el, document);
             expect(exportedSelection.emptyBlocksIndex).toEqual(2);
         });
 
         it('should export a position indicating the cursor is after an empty block element', function () {
             this.el.innerHTML = '<p><span>www.google.com</span></p><h1><br /></h1><h2><br /></h2><p>Whatever</p>';
-            var editor = this.newMediumEditor('.editor', {
-                buttons: ['italic', 'underline', 'strikethrough']
-            });
-            placeCursorInsideElement(editor.elements[0].querySelector('h2'), 0);
-            var exportedSelection = editor.exportSelection();
+            placeCursorInsideElement(this.el.querySelector('h2'), 0);
+            var exportedSelection = MediumEditor.selection.exportSelection(this.el, document);
             expect(exportedSelection.emptyBlocksIndex).toEqual(2);
         });
     });
@@ -125,36 +87,26 @@ describe('MediumEditor.selection TestCase', function () {
     describe('importSelection', function () {
         it('should be able to import an exported selection', function () {
             this.el.innerHTML = 'lorem <i>ipsum</i> dolor';
-            var editor = this.newMediumEditor('.editor', {
-                toolbar: {
-                    buttons: ['italic', 'underline', 'strikethrough']
-                }
-            });
 
-            selectElementContents(editor.elements[0].querySelector('i'));
-            var exportedSelection = editor.exportSelection();
+            selectElementContents(this.el.querySelector('i'));
+            var exportedSelection = MediumEditor.selection.exportSelection(this.el, document);
             expect(Object.keys(exportedSelection).sort()).toEqual(['end', 'start']);
 
-            selectElementContents(editor.elements[0]);
-            expect(exportedSelection).not.toEqual(editor.exportSelection());
+            selectElementContents(this.el);
+            expect(exportedSelection).not.toEqual(MediumEditor.selection.exportSelection(this.el, document));
 
-            editor.importSelection(exportedSelection);
-            expect(exportedSelection).toEqual(editor.exportSelection());
+            MediumEditor.selection.importSelection(exportedSelection, this.el, document);
+            expect(exportedSelection).toEqual(MediumEditor.selection.exportSelection(this.el, document));
         });
 
         it('should import an exported selection outside any anchor tag', function () {
             this.el.innerHTML = '<p id=1>Hello world: <a href="#">http://www.example.com</a></p><p id=2><br></p>';
-            var editor = this.newMediumEditor('.editor', {
-                toolbar: {
-                    buttons: ['italic', 'underline', 'strikethrough']
-                }
-            }),
-                link = editor.elements[0].getElementsByTagName('a')[0];
+            var link = this.el.getElementsByTagName('a')[0];
 
             placeCursorInsideElement(link.childNodes[0], link.childNodes[0].nodeValue.length);
 
-            var exportedSelection = editor.exportSelection();
-            editor.importSelection(exportedSelection, true);
+            var exportedSelection = MediumEditor.selection.exportSelection(this.el, document);
+            MediumEditor.selection.importSelection(exportedSelection, this.el, document, true);
             var range = window.getSelection().getRangeAt(0),
                 node = range.startContainer;
             // Even though we set the range to use the P tag as the start container, Safari normalizes the range
@@ -170,14 +122,13 @@ describe('MediumEditor.selection TestCase', function () {
         // https://github.com/yabwe/medium-editor/issues/738
         it('should import an exported non-collapsed selection after an empty paragraph', function () {
             this.el.innerHTML = '<p>This is <a href="#">a link</a></p><p><br/></p><p>not a link</p>';
-            var editor = this.newMediumEditor('.editor'),
-                lastTextNode = this.el.childNodes[2].firstChild;
+            var lastTextNode = this.el.childNodes[2].firstChild;
 
             MediumEditor.selection.select(document, lastTextNode, 0, lastTextNode, 'not a link'.length);
 
-            var exportedSelection = editor.exportSelection();
+            var exportedSelection = MediumEditor.selection.exportSelection(this.el, document);
             expect(exportedSelection).toEqual({ start: 14, end: 24, emptyBlocksIndex: 2 });
-            editor.importSelection(exportedSelection);
+            MediumEditor.selection.importSelection(exportedSelection, this.el, document);
 
             var range = window.getSelection().getRangeAt(0);
             expect(range.startContainer === lastTextNode || range.startContainer === lastTextNode.parentNode)
@@ -190,106 +141,85 @@ describe('MediumEditor.selection TestCase', function () {
 
         it('should import a position with the cursor in an empty paragraph', function () {
             this.el.innerHTML = '<p><span>www.google.com</span></p><p><br /></p><p>Whatever</p>';
-            var editor = this.newMediumEditor('.editor', {
-                buttons: ['italic', 'underline', 'strikethrough']
-            });
-            editor.importSelection({
+            MediumEditor.selection.importSelection({
                 'start': 14,
                 'end': 14,
                 'emptyBlocksIndex': 1
-            });
+            }, this.el, document);
 
             var startParagraph = MediumEditor.util.getClosestTag(window.getSelection().getRangeAt(0).startContainer, 'p');
-            expect(startParagraph).toBe(editor.elements[0].getElementsByTagName('p')[1], 'empty paragraph');
+            expect(startParagraph).toBe(this.el.getElementsByTagName('p')[1], 'empty paragraph');
         });
 
         it('should import a position with the cursor after an empty paragraph', function () {
             this.el.innerHTML = '<p><span>www.google.com</span></p><p><br /></p><p>Whatever</p>';
-            var editor = this.newMediumEditor('.editor', {
-                buttons: ['italic', 'underline', 'strikethrough']
-            });
-            editor.importSelection({
+            MediumEditor.selection.importSelection({
                 'start': 14,
                 'end': 14,
                 'emptyBlocksIndex': 2
-            });
+            }, this.el, document);
 
             var startParagraph = MediumEditor.util.getClosestTag(window.getSelection().getRangeAt(0).startContainer, 'p');
-            expect(startParagraph).toBe(editor.elements[0].getElementsByTagName('p')[2], 'paragraph after empty paragraph');
+            expect(startParagraph).toBe(this.el.getElementsByTagName('p')[2], 'paragraph after empty paragraph');
         });
 
         it('should import a position with the cursor after an empty paragraph when there are multipled editable elements', function () {
-            this.createElement('div', 'editor', '<p><span>www.google.com</span></p><p><br /></p><p>Whatever</p>');
-            var editor = this.newMediumEditor('.editor', {
-                buttons: ['italic', 'underline', 'strikethrough']
-            });
-            editor.importSelection({
+            var el = this.createElement('div', 'editor', '<p><span>www.google.com</span></p><p><br /></p><p>Whatever</p>');
+            MediumEditor.selection.importSelection({
                 'start': 14,
                 'end': 14,
                 'editableElementIndex': 1,
                 'emptyBlocksIndex': 2
-            });
+            }, el, document);
 
             var startParagraph = MediumEditor.util.getClosestTag(window.getSelection().getRangeAt(0).startContainer, 'p');
-            expect(startParagraph).toBe(editor.elements[1].getElementsByTagName('p')[2], 'paragraph after empty paragraph');
+            expect(startParagraph).toBe(el.getElementsByTagName('p')[2], 'paragraph after empty paragraph');
         });
 
         it('should import a position with the cursor after an empty block element', function () {
             this.el.innerHTML = '<p><span>www.google.com</span></p><h1><br /></h1><h2><br /></h2><p>Whatever</p>';
-            var editor = this.newMediumEditor('.editor', {
-                buttons: ['italic', 'underline', 'strikethrough']
-            });
-            editor.importSelection({
+            MediumEditor.selection.importSelection({
                 'start': 14,
                 'end': 14,
                 'emptyBlocksIndex': 2
-            });
+            }, this.el, document);
 
             var startParagraph = MediumEditor.util.getClosestTag(window.getSelection().getRangeAt(0).startContainer, 'h2');
-            expect(startParagraph).toBe(editor.elements[0].querySelector('h2'), 'block element after empty block element');
+            expect(startParagraph).toBe(this.el.querySelector('h2'), 'block element after empty block element');
         });
 
         it('should import a position with the cursor after an empty block element when there are nested block elements', function () {
             this.el.innerHTML = '<blockquote><p><span>www.google.com</span></p></blockquote><h1><br /></h1><h2><br /></h2><p>Whatever</p>';
-            var editor = this.newMediumEditor('.editor', {
-                buttons: ['italic', 'underline', 'strikethrough']
-            });
-            editor.importSelection({
+            MediumEditor.selection.importSelection({
                 'start': 14,
                 'end': 14,
                 'emptyBlocksIndex': 2
-            });
+            }, this.el, document);
 
             var startParagraph = MediumEditor.util.getClosestTag(window.getSelection().getRangeAt(0).startContainer, 'h2');
-            expect(startParagraph).toBe(editor.elements[0].querySelector('h2'), 'block element after empty block element');
+            expect(startParagraph).toBe(this.el.querySelector('h2'), 'block element after empty block element');
         });
 
         it('should import a position with the cursor after an empty block element inside an element with various children', function () {
             this.el.innerHTML = '<p><span>www.google.com</span></p><h1><br /></h1><h2><br /></h2><p><b><i>Whatever</i></b></p>';
-            var editor = this.newMediumEditor('.editor', {
-                buttons: ['italic', 'underline', 'strikethrough']
-            });
-            editor.importSelection({
+            MediumEditor.selection.importSelection({
                 'start': 14,
                 'end': 14,
                 'emptyBlocksIndex': 3
-            });
+            }, this.el, document);
 
             var innerElement = window.getSelection().getRangeAt(0).startContainer;
-            expect(MediumEditor.util.isDescendant(editor.elements[0].querySelector('i'), innerElement, true)).toBe(true, 'nested inline elment inside block element after empty block element');
+            expect(MediumEditor.util.isDescendant(this.el.querySelector('i'), innerElement, true)).toBe(true, 'nested inline elment inside block element after empty block element');
         });
 
         ['br', 'img'].forEach(function (tagName) {
             it('should not import a selection into focusing on the element \'' + tagName + '\' that cannot have children', function () {
                 this.el.innerHTML = '<p>Hello</p><p><' + tagName + ' /></p><p>World<p>';
-                var editor = this.newMediumEditor('.editor', {
-                    buttons: ['italic', 'underline', 'strikethrough']
-                });
-                editor.importSelection({
+                MediumEditor.selection.importSelection({
                     'start': 5,
                     'end': 5,
                     'emptyBlocksIndex': 1
-                });
+                }, this.el, document);
 
                 var innerElement = window.getSelection().getRangeAt(0).startContainer;
                 expect(innerElement.nodeName.toLowerCase()).toBe('p', 'focused element nodeName');
@@ -303,37 +233,31 @@ describe('MediumEditor.selection TestCase', function () {
             this.el.innerHTML = '<p>Hello</p><table><colgroup><col /></colgroup>' +
                 '<thead><tr><th>Head</th></tr></thead>' +
                 '<tbody><tr><td>Body</td></tr></tbody></table><p>World<p>';
-            var editor = this.newMediumEditor('.editor', {
-                buttons: ['italic', 'underline', 'strikethrough']
-            });
-            editor.importSelection({
+            MediumEditor.selection.importSelection({
                 'start': 5,
                 'end': 5,
                 'emptyBlocksIndex': 1
-            });
+            }, this.el, document);
 
             var innerElement = window.getSelection().getRangeAt(0).startContainer;
             // The behavior varies from browser to browser for this case, some select TH, some #textNode
-            expect(MediumEditor.util.isDescendant(editor.elements[0].querySelector('th'), innerElement, true))
+            expect(MediumEditor.util.isDescendant(this.el.querySelector('th'), innerElement, true))
                 .toBe(true, 'expect selection to be of TH or a descendant');
             expect(innerElement).toBe(window.getSelection().getRangeAt(0).endContainer);
         });
 
         it('should not import a selection beyond any block elements that have text, even when emptyBlocksIndex indicates it should ', function () {
             this.el.innerHTML = '<p><span>www.google.com</span></p><h1><br /></h1><h2>Not Empty</h2><p><b><i>Whatever</i></b></p>';
-            var editor = this.newMediumEditor('.editor', {
-                buttons: ['italic', 'underline', 'strikethrough']
-            });
             // Import a selection that indicates the text should be at the end of the 'www.google.com' word, but in the 3rd paragraph (at the beginning of 'Whatever')
-            editor.importSelection({
+            MediumEditor.selection.importSelection({
                 'start': 14,
                 'end': 14,
                 'emptyBlocksIndex': 3
-            });
+            }, this.el, document);
 
             var innerElement = window.getSelection().getRangeAt(0).startContainer;
-            expect(MediumEditor.util.isDescendant(editor.elements[0].querySelectorAll('p')[1], innerElement, true)).toBe(false, 'moved selection beyond non-empty block element');
-            expect(MediumEditor.util.isDescendant(editor.elements[0].querySelector('h2'), innerElement, true)).toBe(true, 'moved selection to element to incorrect block element');
+            expect(MediumEditor.util.isDescendant(this.el.querySelectorAll('p')[1], innerElement, true)).toBe(false, 'moved selection beyond non-empty block element');
+            expect(MediumEditor.util.isDescendant(this.el.querySelector('h2'), innerElement, true)).toBe(true, 'moved selection to element to incorrect block element');
         });
 
         // https://github.com/yabwe/medium-editor/issues/732
@@ -343,16 +267,15 @@ describe('MediumEditor.selection TestCase', function () {
                                 '    <li>a list item</li>\n' +
                                 '    <li>target</li>\n' +
                                 '</ul>';
-            var editor = this.newMediumEditor('.editor'),
-                lastLi = this.el.querySelectorAll('ul > li')[2];
+            var lastLi = this.el.querySelectorAll('ul > li')[2];
 
             // Select the <li> with 'target'
             selectElementContents(lastLi.firstChild);
 
-            var selectionData = editor.exportSelection();
+            var selectionData = MediumEditor.selection.exportSelection(this.el, document);
             expect(selectionData.emptyBlocksIndex).toBe(0);
 
-            editor.importSelection(selectionData);
+            MediumEditor.selection.importSelection(selectionData, this.el, document);
             var range = window.getSelection().getRangeAt(0);
 
             expect(range.toString()).toBe('target', 'The selection is around the wrong element');
@@ -370,11 +293,8 @@ describe('MediumEditor.selection TestCase', function () {
 
         it('should select element from selection', function () {
             this.el.innerHTML = 'lorem <i>ipsum</i> dolor';
-            var editor = this.newMediumEditor('.editor'),
-                elements;
-
-            selectElementContents(editor.elements[0].querySelector('i').firstChild);
-            elements = MediumEditor.selection.getSelectedElements(document);
+            selectElementContents(this.el.querySelector('i').firstChild);
+            var elements = MediumEditor.selection.getSelectedElements(document);
 
             expect(elements.length).toBe(1);
             expect(elements[0].nodeName.toLowerCase()).toBe('i');
@@ -383,10 +303,8 @@ describe('MediumEditor.selection TestCase', function () {
 
         it('should select first element when selection is global (ie: all the editor)', function () {
             this.el.innerHTML = 'lorem <i>ipsum</i> dolor';
-            var elements;
-
             selectElementContents(this.el);
-            elements = MediumEditor.selection.getSelectedElements(document);
+            var elements = MediumEditor.selection.getSelectedElements(document);
 
             expect(elements.length).toBe(1);
             expect(elements[0].nodeName.toLowerCase()).toBe('i');

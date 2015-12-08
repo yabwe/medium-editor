@@ -54,7 +54,7 @@ describe('Core-API', function () {
         });
     });
 
-    describe('saveSelection/restorSelection', function () {
+    describe('saveSelection/restoreSelection', function () {
         it('should be applicable if html changes but text does not', function () {
             this.el.innerHTML = 'lorem <i>ipsum</i> dolor';
 
@@ -82,6 +82,22 @@ describe('Core-API', function () {
             button = toolbar.getToolbarElement().querySelector('[data-action="strikethrough"]');
             fireEvent(button, 'click');
             expect(regex.test(editor.elements[0].innerHTML)).toBe(true);
+        });
+    });
+
+    describe('exportSelection', function () {
+        it('should have an index in the exported selection when it is in the second contenteditable', function () {
+            this.createElement('div', 'editor', 'lorem <i>ipsum</i> dolor');
+            var editor = this.newMediumEditor('.editor', {
+                toolbar: {
+                    buttons: ['italic', 'underline', 'strikethrough']
+                }
+            });
+
+            selectElementContents(editor.elements[1].querySelector('i'));
+            var exportedSelection = editor.exportSelection();
+            expect(Object.keys(exportedSelection).sort()).toEqual(['editableElementIndex', 'end', 'start']);
+            expect(exportedSelection.editableElementIndex).toEqual(1);
         });
     });
 });
