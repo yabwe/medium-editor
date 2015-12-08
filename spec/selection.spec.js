@@ -82,6 +82,24 @@ describe('MediumEditor.selection TestCase', function () {
             var exportedSelection = MediumEditor.selection.exportSelection(this.el, document);
             expect(exportedSelection.emptyBlocksIndex).toEqual(2);
         });
+
+        it('should export a selection that specifies an image is the selection', function () {
+            this.el.innerHTML = '<p>lorem ipsum <a href="#"><img src="../img/medium-editor.png" /></a> dolor</p>';
+            selectElementContents(this.el.querySelector('a'));
+            var exportedSelection = MediumEditor.selection.exportSelection(this.el, document);
+            expect(exportedSelection.emptyTextSelection).toBe(true);
+            expect(exportedSelection.start).toBe(12);
+            expect(exportedSelection.end).toBe(12);
+        });
+
+        it('should not export a selection that specifies an image is the selection when there is text also selected', function () {
+            this.el.innerHTML = '<p>lorem ipsum<a href="#"> <img src="../img/medium-editor.png" /></a> dolor</p>';
+            selectElementContents(this.el.querySelector('a'));
+            var exportedSelection = MediumEditor.selection.exportSelection(this.el, document);
+            expect(exportedSelection.emptyTextSelection).toBe(undefined);
+            expect(exportedSelection.start).toBe(11);
+            expect(exportedSelection.end).toBe(12);
+        });
     });
 
     describe('importSelection', function () {
