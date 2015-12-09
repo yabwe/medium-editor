@@ -92,13 +92,34 @@ describe('MediumEditor.selection TestCase', function () {
             expect(exportedSelection.end).toBe(12);
         });
 
-        it('should not export a selection that specifies an image is the selection when there is text also selected', function () {
-            this.el.innerHTML = '<p>lorem ipsum<a href="#"> <img src="../img/medium-editor.png" /></a> dolor</p>';
+        it('should export a selection that can be imported when the selection starts with an image', function () {
+            this.el.innerHTML = '<p>lorem ipsum <a href="#"><img src="../img/medium-editor.png" />img</a> dolor</p>';
             selectElementContents(this.el.querySelector('a'));
             var exportedSelection = MediumEditor.selection.exportSelection(this.el, document);
             expect(exportedSelection.emptyTextSelection).toBe(undefined);
-            expect(exportedSelection.start).toBe(11);
-            expect(exportedSelection.end).toBe(12);
+            expect(exportedSelection.start).toBe(12);
+            expect(exportedSelection.end).toBe(15);
+
+            selectElementContents(this.el);
+            MediumEditor.selection.importSelection(exportedSelection, this.el, document);
+            var range = window.getSelection().getRangeAt(0);
+            expect(range.toString()).toBe('img');
+            if (range.startContainer.nodeName.toLowerCase() === 'a') {
+                expect(range.startContainer).toBe(this.el.querySelector('a'));
+                expect(range.startOffset).toBe(0);
+            } else {
+                expect(range.startContainer.nextSibling).toBe(this.el.querySelector('a'));
+                expect(range.startOffset).toBe(12);
+            }
+        });
+
+        it('should export a selection that specifies an image is at the end of a selection', function () {
+            this.el.innerHTML = '<p>lorem ipsum <a href="#">img<img src="../img/medium-editor.png" /></a> dolor</p>';
+            selectElementContents(this.el.querySelector('a'));
+            var exportedSelection = MediumEditor.selection.exportSelection(this.el, document);
+            expect(exportedSelection.emptyTextSelection).toBe(true);
+            expect(exportedSelection.start).toBe(12);
+            expect(exportedSelection.end).toBe(15);
         });
     });
 
@@ -299,6 +320,36 @@ describe('MediumEditor.selection TestCase', function () {
             expect(range.toString()).toBe('target', 'The selection is around the wrong element');
             expect(MediumEditor.util.isDescendant(lastLi, range.startContainer, true)).toBe(true, 'The start of the selection is invalid');
             expect(MediumEditor.util.isDescendant(lastLi, range.endContainer, true)).toBe(true, 'The end of the selection is invalid');
+        });
+
+        it('should support a selection that specifies an image is the selection', function () {
+            this.el.innerHTML = '<p>lorem ipsum <a href="#"><img src="../img/medium-editor.png" /></a> dolor</p>';
+            MediumEditor.selection.importSelection({ start: 12, end: 12, emptyTextSelection: true }, this.el, document);
+            var range = window.getSelection().getRangeAt(0);
+            expect(range.toString()).toBe('');
+            expect(MediumEditor.util.isDescendant(range.startContainer, this.el.querySelector('img'), true)).toBe(true, 'the image is not within the selection');
+        });
+
+        it('should support a selection that starts with an image', function () {
+            this.el.innerHTML = '<p>lorem ipsum <a href="#"><img src="../img/medium-editor.png" />img</a> dolor</p>';
+            MediumEditor.selection.importSelection({ start: 12, end: 15 }, this.el, document);
+            var range = window.getSelection().getRangeAt(0);
+            expect(range.toString()).toBe('img');
+            if (range.startContainer.nodeName.toLowerCase() === 'a') {
+                expect(range.startContainer).toBe(this.el.querySelector('a'));
+                expect(range.startOffset).toBe(0);
+            } else {
+                expect(range.startContainer.nextSibling).toBe(this.el.querySelector('a'));
+                expect(range.startOffset).toBe(12);
+            }
+        });
+
+        it('should support a selection that ends with an image', function () {
+            this.el.innerHTML = '<p>lorem ipsum <a href="#">img<img src="../img/medium-editor.png" /></a> dolor</p>';
+            MediumEditor.selection.importSelection({ start: 12, end: 15, emptyTextSelection: true }, this.el, document);
+            var range = window.getSelection().getRangeAt(0);
+            expect(range.toString()).toBe('img');
+            expect(MediumEditor.util.isDescendant(range.endContainer, this.el.querySelector('img'), true)).toBe(true, 'the image is not within the selection');
         });
     });
 

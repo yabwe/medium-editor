@@ -55,8 +55,10 @@
                     end: start + range.toString().length
                 };
 
+                // If the start and end point are at the same character, but the selection is not empty
+                // then selection contains a non-text element that counts as content (ie an image)
                 if (selectionState.start === selectionState.end && this.selectionContainsContent(doc)) {
-                    selectionState.emptyContentSelection = true;
+                    selectionState.emptyTextSelection = true;
                 }
 
                 // If start = 0 there may still be an empty paragraph before it, but we don't care.
@@ -99,11 +101,14 @@
                 nextCharIndex;
 
             while (!stop && node) {
+                // Only iterate over elements and text nodes
                 if (node.nodeType <= 3) {
-                    if (node.nodeType === 3 || (selectionState.emptyContentSelection && (node.nodeName.toLowerCase() === 'img' || (onNext && node.querySelector('img'))))) {
+                    // If we hit a text node, we need to add the amount of characters to the overall count
+                    // If we're importing a emptyTextSelection, we need to account for images
+                    if (node.nodeType === 3 || (selectionState.emptyTextSelection && (node.nodeName.toLowerCase() === 'img' || (onNext && node.querySelector('img'))))) {
                         nextCharIndex = charIndex + (node.nodeType === 3 ? node.length : 0);
                         if (!foundStart && selectionState.start >= charIndex && selectionState.start <= nextCharIndex) {
-                            if (!onNext && selectionState.emptyContentSelection) {
+                            if (!onNext && selectionState.emptyTextSelection) {
                                 onNext = true;
                             } else {
                                 range.setStart(node, selectionState.start - charIndex);
@@ -120,6 +125,8 @@
                         }
                         charIndex = nextCharIndex;
                     } else {
+                        // this is an element
+                        // add all its children to the stack
                         var i = node.childNodes.length - 1;
                         while (i >= 0) {
                             nodeStack.push(node.childNodes[i]);
