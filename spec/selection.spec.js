@@ -84,19 +84,19 @@ describe('MediumEditor.selection TestCase', function () {
         });
 
         it('should export a selection that specifies an image is the selection', function () {
-            this.el.innerHTML = '<p>lorem ipsum <a href="#"><img src="../img/medium-editor.png" /></a> dolor</p>';
+            this.el.innerHTML = '<p>lorem ipsum <a href="#"><img src="../demo/img/medium-editor.jpg" /></a> dolor</p>';
             selectElementContents(this.el.querySelector('a'));
             var exportedSelection = MediumEditor.selection.exportSelection(this.el, document);
-            expect(exportedSelection.emptyTextSelection).toBe(true);
+            expect(exportedSelection.trailingImageCount).toBe(1);
             expect(exportedSelection.start).toBe(12);
             expect(exportedSelection.end).toBe(12);
         });
 
         it('should export a selection that can be imported when the selection starts with an image', function () {
-            this.el.innerHTML = '<p>lorem ipsum <a href="#"><img src="../img/medium-editor.png" />img</a> dolor</p>';
+            this.el.innerHTML = '<p>lorem ipsum <a href="#"><img src="../demo/img/medium-editor.jpg" />img</a> dolor</p>';
             selectElementContents(this.el.querySelector('a'));
             var exportedSelection = MediumEditor.selection.exportSelection(this.el, document);
-            expect(exportedSelection.emptyTextSelection).toBe(undefined);
+            expect(exportedSelection.trailingImageCount).toBe(undefined);
             expect(exportedSelection.start).toBe(12);
             expect(exportedSelection.end).toBe(15);
 
@@ -114,10 +114,10 @@ describe('MediumEditor.selection TestCase', function () {
         });
 
         it('should export a selection that specifies an image is at the end of a selection', function () {
-            this.el.innerHTML = '<p>lorem ipsum <a href="#">img<img src="../img/medium-editor.png" /></a> dolor</p>';
+            this.el.innerHTML = '<p>lorem ipsum <a href="#">img<b><img src="../demo/img/medium-editor.jpg" /><img src="../demo/img/roman.jpg" /></b></a> dolor</p>';
             selectElementContents(this.el.querySelector('a'));
             var exportedSelection = MediumEditor.selection.exportSelection(this.el, document);
-            expect(exportedSelection.emptyTextSelection).toBe(true);
+            expect(exportedSelection.trailingImageCount).toBe(2);
             expect(exportedSelection.start).toBe(12);
             expect(exportedSelection.end).toBe(15);
         });
@@ -323,15 +323,15 @@ describe('MediumEditor.selection TestCase', function () {
         });
 
         it('should support a selection that specifies an image is the selection', function () {
-            this.el.innerHTML = '<p>lorem ipsum <a href="#"><img src="../img/medium-editor.png" /></a> dolor</p>';
-            MediumEditor.selection.importSelection({ start: 12, end: 12, emptyTextSelection: true }, this.el, document);
+            this.el.innerHTML = '<p>lorem ipsum <a href="#"><img src="../demo/img/medium-editor.jpg" /></a> dolor</p>';
+            MediumEditor.selection.importSelection({ start: 12, end: 12, trailingImageCount: 1 }, this.el, document);
             var range = window.getSelection().getRangeAt(0);
             expect(range.toString()).toBe('');
-            expect(MediumEditor.util.isDescendant(range.startContainer, this.el.querySelector('img'), true)).toBe(true, 'the image is not within the selection');
+            expect(MediumEditor.util.isDescendant(range.endContainer, this.el.querySelector('img'), true)).toBe(true, 'the image is not within the selection');
         });
 
         it('should support a selection that starts with an image', function () {
-            this.el.innerHTML = '<p>lorem ipsum <a href="#"><img src="../img/medium-editor.png" />img</a> dolor</p>';
+            this.el.innerHTML = '<p>lorem ipsum <a href="#"><img src="../demo/img/medium-editor.jpg" />img</a> dolor</p>';
             MediumEditor.selection.importSelection({ start: 12, end: 15 }, this.el, document);
             var range = window.getSelection().getRangeAt(0);
             expect(range.toString()).toBe('img');
@@ -345,8 +345,8 @@ describe('MediumEditor.selection TestCase', function () {
         });
 
         it('should support a selection that ends with an image', function () {
-            this.el.innerHTML = '<p>lorem ipsum <a href="#">img<img src="../img/medium-editor.png" /></a> dolor</p>';
-            MediumEditor.selection.importSelection({ start: 12, end: 15, emptyTextSelection: true }, this.el, document);
+            this.el.innerHTML = '<p>lorem ipsum <a href="#">img<img src="../demo/img/medium-editor.jpg" /><img src="../img/roman.jpg" /></a> dolor</p>';
+            MediumEditor.selection.importSelection({ start: 12, end: 15, trailingImageCount: 2 }, this.el, document);
             var range = window.getSelection().getRangeAt(0);
             expect(range.toString()).toBe('img');
             expect(MediumEditor.util.isDescendant(range.endContainer, this.el.querySelector('img'), true)).toBe(true, 'the image is not within the selection');
