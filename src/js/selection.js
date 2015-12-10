@@ -128,7 +128,12 @@
                                 trailingImageCount++;
                             }
                             if (trailingImageCount === selectionState.trailingImageCount) {
-                                range.setEnd(node, 0);
+                                // Find which index the image is in its parent's children
+                                var endIndex = 0;
+                                while (node.parentNode.childNodes[endIndex] !== node) {
+                                    endIndex++;
+                                }
+                                range.setEnd(node.parentNode, endIndex + 1);
                                 stop = true;
                             }
                         }
