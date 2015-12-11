@@ -184,8 +184,13 @@
                         treeWalker.nextNode();
                     }
                     newNode = null;
-                } else if (startReached && currentNode.tagName.toLowerCase() === 'img') {
-                    matchedNodes.push(currentNode);
+                } else if (currentNode.tagName.toLowerCase() === 'img') {
+                    if (!startReached && (match.start <= currentTextIndex)) {
+                        startReached = true;
+                    }
+                    if (startReached) {
+                        matchedNodes.push(currentNode);
+                    }
                 }
             }
             return matchedNodes;
