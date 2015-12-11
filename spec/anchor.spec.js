@@ -557,7 +557,7 @@ describe('Anchor Button TestCase', function () {
 
         // https://github.com/yabwe/medium-editor/issues/803
         it('should update the href of a link containing only an image', function () {
-            this.el.innerHTML = '<a><img src="../demo/img/medium-editor.jpg"></a>';
+            this.el.innerHTML = '<a href="#"><img src="../demo/img/medium-editor.jpg"></a>';
 
             spyOn(MediumEditor.prototype, 'createLink').and.callThrough();
             var editor = this.newMediumEditor('.editor'),

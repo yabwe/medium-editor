@@ -551,5 +551,15 @@ describe('MediumEditor.util', function () {
             expect(textNodes.length).toBe(1);
             expect(textNodes[0].nodeName.toLowerCase()).toBe('img');
         });
+
+        it('should return images when they are at the beginning of the specified range', function () {
+            var el = this.createElement('div');
+            el.innerHTML = '<p>Plain <b>bold</b> <a href="#"><img src="../demo.img/medium-editor.jpg" /><img src="../demo.img/roman.jpg" />link</a> <i>italic</i> <u>underline</u> <span>span1 <span>span2</span></span></p>';
+            var textNodes = MediumEditor.util.findOrCreateMatchingTextNodes(document, el, { start: 11, end: 15 });
+            expect(textNodes.length).toBe(3);
+            expect(textNodes[0].nodeName.toLowerCase()).toBe('img');
+            expect(textNodes[1].nodeName.toLowerCase()).toBe('img');
+            expect(textNodes[2].nodeValue).toBe('link');
+        });
     });
 });
