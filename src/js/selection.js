@@ -378,7 +378,6 @@
         },
 
         select: function (doc, startNode, startOffset, endNode, endOffset) {
-            MediumEditor.util.removeAllRanges(doc.getSelection());
             var range = doc.createRange();
             range.setStart(startNode, startOffset);
             if (endNode) {
@@ -386,7 +385,7 @@
             } else {
                 range.collapse(true);
             }
-            doc.getSelection().addRange(range);
+            MediumEditor.util.replaceRange(doc.getSelection(), range);
             return range;
         },
 
