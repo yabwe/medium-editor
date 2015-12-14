@@ -34,8 +34,6 @@ function setupTestHelpers() {
             }
         });
 
-        window.getSelection().removeAllRanges();
-
         jasmine.clock().uninstall();
 
         delete this.createElement;

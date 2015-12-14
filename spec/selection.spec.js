@@ -355,6 +355,7 @@ describe('MediumEditor.selection TestCase', function () {
 
     describe('getSelectedElements', function () {
         it('no selected elements on empty selection', function () {
+            window.getSelection().removeAllRanges();
             var elements = MediumEditor.selection.getSelectedElements(document);
 
             expect(elements.length).toBe(0);
