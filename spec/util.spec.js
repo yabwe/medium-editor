@@ -489,5 +489,20 @@ describe('MediumEditor.util', function () {
             expect(parts[2].nodeName.toLowerCase()).toBe('#text');
             expect(parts[2].textContent).toBe('Text Node');
         });
+
+        it('should ignore comments', function () {
+            var comment = document.createComment('comment'),
+                parts = MediumEditor.util.splitByBlockElements(comment);
+            expect(parts.length).toBe(0);
+        });
+
+        it('should ignore nested comments', function () {
+            var el = this.createElement('div');
+            el.innerHTML = '' +
+                  '<p>Text</p>' +
+                  '<!---->';
+            var parts = MediumEditor.util.splitByBlockElements(el);
+            expect(parts.length).toBe(1);
+        });
     });
 });
