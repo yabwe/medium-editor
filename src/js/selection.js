@@ -105,50 +105,53 @@
 
             while (!stop && node) {
                 // Only iterate over elements and text nodes
-                if (node.nodeType <= 3) {
-                    // If we hit a text node, we need to add the amount of characters to the overall count
-                    if (node.nodeType === 3 && !foundEnd) {
-                        nextCharIndex = charIndex + node.length;
-                        if (!foundStart && selectionState.start >= charIndex && selectionState.start <= nextCharIndex) {
-                            range.setStart(node, selectionState.start - charIndex);
-                            foundStart = true;
-                        }
-                        if (foundStart && selectionState.end >= charIndex && selectionState.end <= nextCharIndex) {
-                            if (!selectionState.trailingImageCount) {
-                                range.setEnd(node, selectionState.end - charIndex);
-                                stop = true;
-                            } else {
-                                foundEnd = true;
-                            }
-                        }
-                        charIndex = nextCharIndex;
-                    } else {
-                        if (selectionState.trailingImageCount && foundEnd) {
-                            if (node.nodeName.toLowerCase() === 'img') {
-                                trailingImageCount++;
-                            }
-                            if (trailingImageCount === selectionState.trailingImageCount) {
-                                // Find which index the image is in its parent's children
-                                var endIndex = 0;
-                                while (node.parentNode.childNodes[endIndex] !== node) {
-                                    endIndex++;
-                                }
-                                range.setEnd(node.parentNode, endIndex + 1);
-                                stop = true;
-                            }
-                        }
+                if (node.nodeType > 3) {
+                    continue;
+                }
 
-                        if (!stop && node.nodeType === 1) {
-                            // this is an element
-                            // add all its children to the stack
-                            var i = node.childNodes.length - 1;
-                            while (i >= 0) {
-                                nodeStack.push(node.childNodes[i]);
-                                i -= 1;
+                // If we hit a text node, we need to add the amount of characters to the overall count
+                if (node.nodeType === 3 && !foundEnd) {
+                    nextCharIndex = charIndex + node.length;
+                    if (!foundStart && selectionState.start >= charIndex && selectionState.start <= nextCharIndex) {
+                        range.setStart(node, selectionState.start - charIndex);
+                        foundStart = true;
+                    }
+                    if (foundStart && selectionState.end >= charIndex && selectionState.end <= nextCharIndex) {
+                        if (!selectionState.trailingImageCount) {
+                            range.setEnd(node, selectionState.end - charIndex);
+                            stop = true;
+                        } else {
+                            foundEnd = true;
+                        }
+                    }
+                    charIndex = nextCharIndex;
+                } else {
+                    if (selectionState.trailingImageCount && foundEnd) {
+                        if (node.nodeName.toLowerCase() === 'img') {
+                            trailingImageCount++;
+                        }
+                        if (trailingImageCount === selectionState.trailingImageCount) {
+                            // Find which index the image is in its parent's children
+                            var endIndex = 0;
+                            while (node.parentNode.childNodes[endIndex] !== node) {
+                                endIndex++;
                             }
+                            range.setEnd(node.parentNode, endIndex + 1);
+                            stop = true;
+                        }
+                    }
+
+                    if (!stop && node.nodeType === 1) {
+                        // this is an element
+                        // add all its children to the stack
+                        var i = node.childNodes.length - 1;
+                        while (i >= 0) {
+                            nodeStack.push(node.childNodes[i]);
+                            i -= 1;
                         }
                     }
                 }
+
                 if (!stop) {
                     node = nodeStack.pop();
                 }
@@ -307,35 +310,38 @@
 
             while (!stop && node) {
                 // Only iterate over elements and text nodes
-                if (node.nodeType <= 3) {
-                    if (node.nodeType === 3 && !foundEnd) {
-                        trailingImages = 0;
-                        nextCharIndex = charIndex + node.length;
-                        if (!foundStart && selectionState.start >= charIndex && selectionState.start <= nextCharIndex) {
-                            foundStart = true;
-                        }
-                        if (foundStart && selectionState.end >= charIndex && selectionState.end <= nextCharIndex) {
-                            foundEnd = true;
-                        }
-                        charIndex = nextCharIndex;
-                    } else {
-                        if (node.nodeName.toLowerCase() === 'img') {
-                            trailingImages++;
-                        }
+                if (node.nodeType > 3) {
+                    continue;
+                }
 
-                        if (node === lastNode) {
-                            stop = true;
-                        } else if (node.nodeType === 1) {
-                            // this is an element
-                            // add all its children to the stack
-                            var i = node.childNodes.length - 1;
-                            while (i >= 0) {
-                                nodeStack.push(node.childNodes[i]);
-                                i -= 1;
-                            }
+                if (node.nodeType === 3 && !foundEnd) {
+                    trailingImages = 0;
+                    nextCharIndex = charIndex + node.length;
+                    if (!foundStart && selectionState.start >= charIndex && selectionState.start <= nextCharIndex) {
+                        foundStart = true;
+                    }
+                    if (foundStart && selectionState.end >= charIndex && selectionState.end <= nextCharIndex) {
+                        foundEnd = true;
+                    }
+                    charIndex = nextCharIndex;
+                } else {
+                    if (node.nodeName.toLowerCase() === 'img') {
+                        trailingImages++;
+                    }
+
+                    if (node === lastNode) {
+                        stop = true;
+                    } else if (node.nodeType === 1) {
+                        // this is an element
+                        // add all its children to the stack
+                        var i = node.childNodes.length - 1;
+                        while (i >= 0) {
+                            nodeStack.push(node.childNodes[i]);
+                            i -= 1;
                         }
                     }
                 }
+
                 if (!stop) {
                     node = nodeStack.pop();
                 }
