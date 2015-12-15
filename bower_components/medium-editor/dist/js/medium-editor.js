@@ -445,6 +445,9 @@ MediumEditor.extensions = {};
         // by rg89
         isIE: ((navigator.appName === 'Microsoft Internet Explorer') || ((navigator.appName === 'Netscape') && (new RegExp('Trident/.*rv:([0-9]{1,}[.0-9]{0,})').exec(navigator.userAgent) !== null))),
 
+        // if firefox
+        isFF: (navigator.userAgent.toLowerCase().indexOf('firefox') > -1),
+
         // http://stackoverflow.com/a/11752084/569101
         isMac: (window.navigator.platform.toUpperCase().indexOf('MAC') >= 0),
 
@@ -860,12 +863,13 @@ MediumEditor.extensions = {};
 
         execFormatBlock: function (doc, tagName) {
             // Get the top level block element that contains the selection
-            var blockContainer = Util.getTopBlockContainer(MediumEditor.selection.getSelectionStart(doc));
+            var blockContainer = Util.getTopBlockContainer(MediumEditor.selection.getSelectionStart(doc)),
+                childNodes;
 
             // Special handling for blockquote
             if (tagName === 'blockquote') {
                 if (blockContainer) {
-                    var childNodes = Array.prototype.slice.call(blockContainer.childNodes);
+                    childNodes = Array.prototype.slice.call(blockContainer.childNodes);
                     // Check if the blockquote has a block element as a child (nested blocks)
                     if (childNodes.some(function (childNode) {
                         return Util.isBlockContainer(childNode);
@@ -895,6 +899,28 @@ MediumEditor.extensions = {};
             if (Util.isIE) {
                 tagName = '<' + tagName + '>';
             }
+
+            // When FF or IE, we have to handle blockquote node seperately as 'formatblock' does not work.
+            // https://developer.mozilla.org/en-US/docs/Web/API/Document/execCommand#Commands
+            if (blockContainer && blockContainer.nodeName.toLowerCase() === 'blockquote') {
+                // For IE, just use outdent
+                if (Util.isIE && tagName === '<p>') {
+                    return doc.execCommand('outdent', false, tagName);
+                }
+
+                // For Firefox, make sure there's a nested block element before calling outdent
+                if (Util.isFF && tagName === 'p') {
+                    childNodes = Array.prototype.slice.call(blockContainer.childNodes);
+                    // If there are some non-block elements we need to wrap everything in a <p> before we outdent
+                    if (childNodes.some(function (childNode) {
+                        return !Util.isBlockContainer(childNode);
+                    })) {
+                        doc.execCommand('formatBlock', false, tagName);
+                    }
+                    return doc.execCommand('outdent', false, tagName);
+                }
+            }
+
             return doc.execCommand('formatBlock', false, tagName);
         },
 
@@ -3362,8 +3388,18 @@ MediumEditor.extensions = {};
         },
 
         checkLinkFormat: function (value) {
-            var re = /^(https?|ftps?|rtmpt?):\/\/|mailto:/;
-            return (re.test(value) ? '' : 'http://') + value;
+            // Matches any alphabetical characters followed by ://
+            // Matches protocol relative "//"
+            // Matches common external protocols "mailto:" "tel:" "maps:"
+            var urlSchemeRegex = /^([a-z]+:)?\/\/|^(mailto|tel|maps):/i,
+            // var te is a regex for checking if the string is a telephone number
+            telRegex = /^\+?\s?\(?(?:\d\s?\-?\)?){3,20}$/;
+            if (telRegex.test(value)) {
+                return 'tel:' + value;
+            } else {
+                // Check for URL scheme and default to http:// if none found
+                return (urlSchemeRegex.test(value) ? '' : 'http://') + value;
+            }
         },
 
         doFormCancel: function () {
@@ -5575,7 +5611,7 @@ MediumEditor.extensions = {};
             textContent = node.textContent,
             caretPositions = MediumEditor.selection.getCaretOffsets(node);
 
-        if ((textContent[caretPositions.left - 1] === undefined) || (textContent[caretPositions.left - 1] === ' ') || (textContent[caretPositions.left] === undefined)) {
+        if ((textContent[caretPositions.left - 1] === undefined) || (textContent[caretPositions.left - 1].trim() === '')) {
             event.preventDefault();
         }
     }
@@ -5697,6 +5733,14 @@ MediumEditor.extensions = {};
             node.parentElement.removeChild(node);
 
             event.preventDefault();
+        } else if (MediumEditor.util.isKey(event, MediumEditor.util.keyCode.BACKSPACE) &&
+                (MediumEditor.util.getClosestTag(node, 'blockquote') !== false) &&
+                MediumEditor.selection.getCaretOffsets(node).left === 0) {
+
+            // when cursor is at the begining of the element and the element is <blockquote>
+            // then pressing backspace key should change the <blockquote> to a <p> tag
+            event.preventDefault();
+            MediumEditor.util.execFormatBlock(this.options.ownerDocument, 'p');
         }
     }
 
@@ -5897,6 +5941,8 @@ MediumEditor.extensions = {};
     }
 
     function initElements() {
+        var isTextareaUsed = false;
+
         this.elements.forEach(function (element, index) {
             if (!this.options.disableEditing && !element.getAttribute('data-disable-editing')) {
                 element.setAttribute('contentEditable', true);
@@ -5908,15 +5954,18 @@ MediumEditor.extensions = {};
             element.setAttribute('medium-editor-index', index);
 
             if (element.hasAttribute('medium-editor-textarea-id')) {
-                this.on(element, 'input', function (event) {
-                    var target = event.target,
-                        textarea = target.parentNode.querySelector('textarea[medium-editor-textarea-id="' + target.getAttribute('medium-editor-textarea-id') + '"]');
-                    if (textarea) {
-                        textarea.value = this.serialize()[target.id].value;
-                    }
-                }.bind(this));
+                isTextareaUsed = true;
             }
         }, this);
+
+        if (isTextareaUsed) {
+            this.subscribe('editableInput', function (event, editable) {
+                var textarea = editable.parentNode.querySelector('textarea[medium-editor-textarea-id="' + editable.getAttribute('medium-editor-textarea-id') + '"]');
+                if (textarea) {
+                    textarea.value = this.serialize()[editable.id].value;
+                }
+            }.bind(this));
+        }
     }
 
     function attachHandlers() {
@@ -6678,7 +6727,7 @@ MediumEditor.parseVersionString = function (release) {
 
 MediumEditor.version = MediumEditor.parseVersionString.call(this, ({
     // grunt-bump looks for this:
-    'version': '5.10.0'
+    'version': '5.11.0'
 }).version);
 
     return MediumEditor;
