@@ -1,3 +1,11 @@
+5.12.0 / 2015-12-15
+==================
+* Fix issue with image-only selections
+* Trim src when using the image toolbar button
+* Fix auto linking with comments
+* Documented the process of releasing a new version
+
+
 5.11.0 / 2015-12-05
 ==================
 * Updated table extension demo
@@ -8,6 +16,7 @@
 * Fixed style for correct positioning of placeholder
 * Allowed to remove blockquote by pressing delete at beginning of the quote
 * Fixed failing test cases in IE9 and IE10
+
 
 5.10.0 / 2015-10-30
 ==================
