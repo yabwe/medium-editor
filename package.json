@@ -1,5 +1,5 @@
 {
-  "name": "medium-editor-site",
+  "name": "medium-editor",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -8,14 +8,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/daviferreira/medium-editor-site.git"
+    "url": "git+https://github.com/yabwe/medium-editor.git"
   },
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/daviferreira/medium-editor-site/issues"
+    "url": "https://github.com/yabwe/medium-editor/issues"
   },
-  "homepage": "https://github.com/daviferreira/medium-editor-site#readme",
+  "homepage": "https://yabwe.github.io/medium-editor",
   "devDependencies": {
     "gulp": "^3.9.0",
     "gulp-autoprefixer": "^2.3.1",
