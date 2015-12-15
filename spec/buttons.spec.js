@@ -736,13 +736,13 @@ describe('Buttons TestCase', function () {
                 button = toolbar.getToolbarElement().querySelector('[data-action="image"]');
             spyOn(document, 'execCommand').and.callThrough();
 
-            this.el.innerHTML = '<span id="span-image">http://i.imgur.com/twlXfUq.jpg</span>';
+            this.el.innerHTML = '<span id="span-image">http://i.imgur.com/twlXfUq.jpg  \n\n</span>';
             selectElementContentsAndFire(document.getElementById('span-image'));
 
             fireEvent(button, 'click');
 
             expect(this.el.innerHTML).toContain('<img src="http://i.imgur.com/twlXfUq.jpg">');
-            expect(document.execCommand).toHaveBeenCalledWith('insertImage', false, window.getSelection());
+            expect(document.execCommand).toHaveBeenCalledWith('insertImage', false, 'http://i.imgur.com/twlXfUq.jpg');
         });
     });
 

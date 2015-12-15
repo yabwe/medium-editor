@@ -515,7 +515,8 @@
         }
 
         if (action === 'image') {
-            return this.options.ownerDocument.execCommand('insertImage', false, this.options.contentWindow.getSelection());
+            var src = this.options.contentWindow.getSelection().toString().trim();
+            return this.options.ownerDocument.execCommand('insertImage', false, src);
         }
 
         /* Issue: https://github.com/yabwe/medium-editor/issues/595
