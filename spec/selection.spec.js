@@ -82,6 +82,45 @@ describe('MediumEditor.selection TestCase', function () {
             var exportedSelection = MediumEditor.selection.exportSelection(this.el, document);
             expect(exportedSelection.emptyBlocksIndex).toEqual(2);
         });
+
+        it('should export a selection that specifies an image is the selection', function () {
+            this.el.innerHTML = '<p>lorem ipsum <a href="#"><img src="../demo/img/medium-editor.jpg" /></a> dolor</p>';
+            selectElementContents(this.el.querySelector('a'));
+            var exportedSelection = MediumEditor.selection.exportSelection(this.el, document);
+            expect(exportedSelection.trailingImageCount).toBe(1);
+            expect(exportedSelection.start).toBe(12);
+            expect(exportedSelection.end).toBe(12);
+        });
+
+        it('should export a selection that can be imported when the selection starts with an image', function () {
+            this.el.innerHTML = '<p>lorem ipsum <a href="#"><img src="../demo/img/medium-editor.jpg" />img</a> dolor</p>';
+            selectElementContents(this.el.querySelector('a'));
+            var exportedSelection = MediumEditor.selection.exportSelection(this.el, document);
+            expect(exportedSelection.trailingImageCount).toBe(undefined);
+            expect(exportedSelection.start).toBe(12);
+            expect(exportedSelection.end).toBe(15);
+
+            selectElementContents(this.el);
+            MediumEditor.selection.importSelection(exportedSelection, this.el, document);
+            var range = window.getSelection().getRangeAt(0);
+            expect(range.toString()).toBe('img');
+            if (range.startContainer.nodeName.toLowerCase() === 'a') {
+                expect(range.startContainer).toBe(this.el.querySelector('a'));
+                expect(range.startOffset).toBe(0);
+            } else {
+                expect(range.startContainer.nextSibling).toBe(this.el.querySelector('a'));
+                expect(range.startOffset).toBe(12);
+            }
+        });
+
+        it('should export a selection that specifies an image is at the end of a selection', function () {
+            this.el.innerHTML = '<p>lorem ipsum <a href="#">img<b><img src="../demo/img/medium-editor.jpg" /><img src="../demo/img/roman.jpg" /></b></a> dolor</p>';
+            selectElementContents(this.el.querySelector('a'));
+            var exportedSelection = MediumEditor.selection.exportSelection(this.el, document);
+            expect(exportedSelection.trailingImageCount).toBe(2);
+            expect(exportedSelection.start).toBe(12);
+            expect(exportedSelection.end).toBe(15);
+        });
     });
 
     describe('importSelection', function () {
@@ -282,10 +321,41 @@ describe('MediumEditor.selection TestCase', function () {
             expect(MediumEditor.util.isDescendant(lastLi, range.startContainer, true)).toBe(true, 'The start of the selection is invalid');
             expect(MediumEditor.util.isDescendant(lastLi, range.endContainer, true)).toBe(true, 'The end of the selection is invalid');
         });
+
+        it('should support a selection that specifies an image is the selection', function () {
+            this.el.innerHTML = '<p>lorem ipsum <a href="#"><img src="../demo/img/medium-editor.jpg" /></a> dolor</p>';
+            MediumEditor.selection.importSelection({ start: 12, end: 12, trailingImageCount: 1 }, this.el, document);
+            var range = window.getSelection().getRangeAt(0);
+            expect(range.toString()).toBe('');
+            expect(MediumEditor.util.isDescendant(range.endContainer, this.el.querySelector('img'), true)).toBe(true, 'the image is not within the selection');
+        });
+
+        it('should support a selection that starts with an image', function () {
+            this.el.innerHTML = '<p>lorem ipsum <a href="#"><img src="../demo/img/medium-editor.jpg" />img</a> dolor</p>';
+            MediumEditor.selection.importSelection({ start: 12, end: 15 }, this.el, document);
+            var range = window.getSelection().getRangeAt(0);
+            expect(range.toString()).toBe('img');
+            if (range.startContainer.nodeName.toLowerCase() === 'a') {
+                expect(range.startContainer).toBe(this.el.querySelector('a'));
+                expect(range.startOffset).toBe(0);
+            } else {
+                expect(range.startContainer.nextSibling).toBe(this.el.querySelector('a'));
+                expect(range.startOffset).toBe(12);
+            }
+        });
+
+        it('should support a selection that ends with an image', function () {
+            this.el.innerHTML = '<p>lorem ipsum <a href="#">img<img src="../demo/img/medium-editor.jpg" /><img src="../img/roman.jpg" /></a> dolor</p>';
+            MediumEditor.selection.importSelection({ start: 12, end: 15, trailingImageCount: 2 }, this.el, document);
+            var range = window.getSelection().getRangeAt(0);
+            expect(range.toString()).toBe('img');
+            expect(MediumEditor.util.isDescendant(range.endContainer, this.el.querySelector('img'), true)).toBe(true, 'the image is not within the selection');
+        });
     });
 
     describe('getSelectedElements', function () {
         it('no selected elements on empty selection', function () {
+            window.getSelection().removeAllRanges();
             var elements = MediumEditor.selection.getSelectedElements(document);
 
             expect(elements.length).toBe(0);
@@ -333,6 +403,29 @@ describe('MediumEditor.selection TestCase', function () {
             element = MediumEditor.selection.getSelectedParentElement(range);
 
             expect(element).toBe(document);
+        });
+    });
+
+    describe('selectionContainsContent', function () {
+        it('should return true for non-empty text', function () {
+            this.el.innerHTML = '<p>this is<span> </span>text</p>';
+            selectElementContents(this.el.querySelector('p'));
+
+            expect(MediumEditor.selection.selectionContainsContent(document)).toBe(true);
+        });
+
+        it('should return false for white-space only selections', function () {
+            this.el.innerHTML = '<p>this is<span> </span>text</p>';
+            selectElementContents(this.el.querySelector('span'));
+
+            expect(MediumEditor.selection.selectionContainsContent(document)).toBe(false);
+        });
+
+        it('should return true for image with link selections', function () {
+            this.el.innerHTML = '<p>this is <a href="#"><img src="../demo/img/medium-editor.jpg" /></a> image test</p>';
+            selectElementContents(this.el.querySelector('a'));
+
+            expect(MediumEditor.selection.selectionContainsContent(document)).toBe(true);
         });
     });
 });

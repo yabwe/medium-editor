@@ -556,8 +556,8 @@ describe('Anchor Button TestCase', function () {
         });
 
         // https://github.com/yabwe/medium-editor/issues/803
-        it('should update link on image', function () {
-            this.el.innerHTML = '<a><img src="http://image.test.com"></a>';
+        it('should update the href of a link containing only an image', function () {
+            this.el.innerHTML = '<a href="#"><img src="../demo/img/medium-editor.jpg"></a>';
 
             spyOn(MediumEditor.prototype, 'createLink').and.callThrough();
             var editor = this.newMediumEditor('.editor'),
@@ -569,12 +569,12 @@ describe('Anchor Button TestCase', function () {
             button = toolbar.getToolbarElement().querySelector('[data-action="createLink"]');
             fireEvent(button, 'click');
             input = editor.getExtensionByName('anchor').getInput();
-            input.value = 'test';
+            input.value = 'http://www.google.com';
             fireEvent(input, 'keyup', {
                 keyCode: MediumEditor.util.keyCode.ENTER
             });
             expect(editor.createLink).toHaveBeenCalled();
-            expect(this.el.innerHTML).toContain('<a href="test"><img src="http://image.test.com"></a>');
+            expect(this.el.innerHTML).toContain('<a href="http://www.google.com"><img src="../demo/img/medium-editor.jpg"></a>');
         });
     });
 

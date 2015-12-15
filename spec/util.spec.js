@@ -505,4 +505,76 @@ describe('MediumEditor.util', function () {
             expect(parts.length).toBe(1);
         });
     });
+
+    describe('findOrCreateMatchingTextNodes', function () {
+        it('should return text nodes within an element', function () {
+            var el = this.createElement('div');
+            el.innerHTML = '<p>Plain <b>bold</b> <a href="#">link</a> <i>italic</i> <u>underline</u> <span>span1 <span>span2</span></span></p>';
+            var textNodes = MediumEditor.util.findOrCreateMatchingTextNodes(document, el, { start: 0, end: el.textContent.length });
+            expect(textNodes.length).toBe(11);
+            expect(textNodes[0].nodeValue).toBe('Plain ');
+            expect(textNodes[9].nodeValue).toBe('span1 ');
+            expect(textNodes[10].nodeValue).toBe('span2');
+        });
+
+        it('should return text nodes within an element given a start and end range', function () {
+            var el = this.createElement('div');
+            el.innerHTML = '<p>Plain <b>bold</b> <a href="#">link</a> <i>italic</i> <u>underline</u> <span>span1 <span>span2</span></span></p>';
+            var textNodes = MediumEditor.util.findOrCreateMatchingTextNodes(document, el, { start: 11, end: 22 });
+            expect(textNodes.length).toBe(3);
+            expect(textNodes[0].nodeValue).toBe('link');
+            expect(textNodes[1].nodeValue).toBe(' ');
+            expect(textNodes[2].nodeValue).toBe('italic');
+        });
+
+        it('should split text nodes if start and end range are in the middle of a text node', function () {
+            var el = this.createElement('div');
+            el.innerHTML = '<p>Plain <b>bold</b> <a href="#">link</a> <i>italic</i> <u>underline</u> <span>span1 <span>span2</span></span></p>';
+            var textNodes = MediumEditor.util.findOrCreateMatchingTextNodes(document, el, { start: 13, end: 19 });
+
+            expect(el.querySelector('a').childNodes.length).toBe(2);
+            expect(el.querySelector('i').childNodes.length).toBe(2);
+            expect(textNodes.length).toBe(3);
+            expect(textNodes[0].nodeValue).toBe('nk');
+            expect(textNodes[1].nodeValue).toBe(' ');
+            expect(textNodes[2].nodeValue).toBe('ita');
+        });
+
+        it('should return an image when it falls within the specified range', function () {
+            var el = this.createElement('div');
+            el.innerHTML = '<p>Plain <b>bold</b> <a href="#">li<img src="../demo.img/medium-editor.jpg" />nk</a> <i>italic</i> <u>underline</u> <span>span1 <span>span2</span></span></p>';
+            var textNodes = MediumEditor.util.findOrCreateMatchingTextNodes(document, el, { start: 11, end: 15 });
+            expect(textNodes.length).toBe(3);
+            expect(textNodes[0].nodeValue).toBe('li');
+            expect(textNodes[1].nodeName.toLowerCase()).toBe('img');
+            expect(textNodes[2].nodeValue).toBe('nk');
+        });
+
+        it('should return an image when it is at the end of the specified range', function () {
+            var el = this.createElement('div');
+            el.innerHTML = '<p>Plain <b>bold</b> <a href="#">link<img src="../demo.img/medium-editor.jpg" /></a> <i>italic</i> <u>underline</u> <span>span1 <span>span2</span></span></p>';
+            var textNodes = MediumEditor.util.findOrCreateMatchingTextNodes(document, el, { start: 11, end: 15 });
+            expect(textNodes.length).toBe(2);
+            expect(textNodes[0].nodeValue).toBe('link');
+            expect(textNodes[1].nodeName.toLowerCase()).toBe('img');
+        });
+
+        it('should return an image when it is the only content in the specified range', function () {
+            var el = this.createElement('div');
+            el.innerHTML = '<p>Plain <b>bold</b> <a href="#"><img src="../demo.img/medium-editor.jpg" /></a> <i>italic</i> <u>underline</u> <span>span1 <span>span2</span></span></p>';
+            var textNodes = MediumEditor.util.findOrCreateMatchingTextNodes(document, el, { start: 11, end: 11 });
+            expect(textNodes.length).toBe(1);
+            expect(textNodes[0].nodeName.toLowerCase()).toBe('img');
+        });
+
+        it('should return images when they are at the beginning of the specified range', function () {
+            var el = this.createElement('div');
+            el.innerHTML = '<p>Plain <b>bold</b> <a href="#"><img src="../demo.img/medium-editor.jpg" /><img src="../demo.img/roman.jpg" />link</a> <i>italic</i> <u>underline</u> <span>span1 <span>span2</span></span></p>';
+            var textNodes = MediumEditor.util.findOrCreateMatchingTextNodes(document, el, { start: 11, end: 15 });
+            expect(textNodes.length).toBe(3);
+            expect(textNodes[0].nodeName.toLowerCase()).toBe('img');
+            expect(textNodes[1].nodeName.toLowerCase()).toBe('img');
+            expect(textNodes[2].nodeValue).toBe('link');
+        });
+    });
 });
