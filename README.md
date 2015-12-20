@@ -630,6 +630,13 @@ Looking for something simple for a first contribution? Try fixing an [easy first
 
 [https://github.com/yabwe/medium-editor/graphs/contributors](https://github.com/yabwe/medium-editor/graphs/contributors)
 
+## Known  issues
+
+### Internet Explorer 8-11
+
+* Dimensions applied to any of the elements (width, height, min-width, min-height) will enable controllers on each of the tags that are within the editor. Those controllers add the ability to resize them and move them around - one of the downside: it makes it difficult to edit the text as you can't go anymore from one section to another.
+
+
 ## License
 
 MIT: https://github.com/yabwe/medium-editor/blob/master/LICENSE
