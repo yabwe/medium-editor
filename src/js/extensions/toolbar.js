@@ -62,6 +62,11 @@
          */
         sticky: false,
 
+        /* stickyTopOffset: [Number]
+         * Value in pixel of the top offset above the toolbar
+         */
+        stickyTopOffset: 0,
+
         /* updateOnEmptySelection: [boolean]
          * When the __static__ option is true, this enables/disables updating
          * the state of the toolbar buttons even when the selection is collapsed
@@ -554,15 +559,13 @@
 
             if (this.sticky) {
                 // If it's beyond the height of the editor, position it at the bottom of the editor
-                if (scrollTop > (containerTop + container.offsetHeight - toolbarHeight)) {
+                if (scrollTop > (containerTop + container.offsetHeight - toolbarHeight - this.stickyTopOffset)) {
                     toolbarElement.style.top = (containerTop + container.offsetHeight - toolbarHeight) + 'px';
                     toolbarElement.classList.remove('medium-editor-sticky-toolbar');
-
                 // Stick the toolbar to the top of the window
-                } else if (scrollTop > (containerTop - toolbarHeight)) {
+                } else if (scrollTop > (containerTop - toolbarHeight - this.stickyTopOffset)) {
                     toolbarElement.classList.add('medium-editor-sticky-toolbar');
-                    toolbarElement.style.top = '0px';
-
+                    toolbarElement.style.top = this.stickyTopOffset + 'px';
                 // Normal static toolbar position
                 } else {
                     toolbarElement.classList.remove('medium-editor-sticky-toolbar');
