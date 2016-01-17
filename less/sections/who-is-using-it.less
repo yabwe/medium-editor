@@ -1,0 +1,43 @@
+section.who-is-using {
+  flex-direction: column;
+}
+
+.who-is-using-container {
+  text-align: center;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+
+}
+
+.who-is-using-container-row {
+  flex: 1;
+
+  article {
+    margin-bottom: 30px;
+    text-align: center;
+
+    a {
+      text-align: center;
+    }
+
+    img {
+      height: 75px;
+    }
+
+    svg {
+      width: 250px;
+    }
+
+    @media only screen and (min-width: 768px) {
+      margin-bottom: 50px;
+      padding: 0 20px;
+      display: inline-block;
+      width: 33%;
+
+      img {
+        height: 50px;
+      }
+    }
+  }
+}
