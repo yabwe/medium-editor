@@ -630,6 +630,10 @@ Looking for something simple for a first contribution? Try fixing an [easy first
 
 [https://github.com/yabwe/medium-editor/graphs/contributors](https://github.com/yabwe/medium-editor/graphs/contributors)
 
+## Is Your Org Using MediumEditor?
+
+Add your org [here](https://github.com/yabwe/medium-editor/issues/828) and we can add you to our [landing page](https://yabwe.github.io/medium-editor/#who-is-using-it)!
+
 ## License
 
 MIT: https://github.com/yabwe/medium-editor/blob/master/LICENSE
