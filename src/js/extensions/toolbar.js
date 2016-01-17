@@ -598,6 +598,7 @@
         positionToolbar: function (selection) {
             // position the toolbar at left 0, so we can get the real width of the toolbar
             this.getToolbarElement().style.left = '0';
+            this.getToolbarElement().style.right = 'initial';
 
             var range = selection.getRangeAt(0),
                 boundary = range.getBoundingClientRect();
@@ -633,10 +634,13 @@
 
             if (middleBoundary < halfOffsetWidth) {
                 toolbarElement.style.left = defaultLeft + halfOffsetWidth + 'px';
+                toolbarElement.style.right = 'initial';
             } else if ((windowWidth - middleBoundary) < halfOffsetWidth) {
-                toolbarElement.style.left = windowWidth + defaultLeft - halfOffsetWidth + 'px';
+                toolbarElement.style.left = 'auto';
+                toolbarElement.style.right = 0;
             } else {
                 toolbarElement.style.left = defaultLeft + middleBoundary + 'px';
+                toolbarElement.style.right = 'initial';
             }
         }
     });

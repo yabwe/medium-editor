@@ -110,12 +110,16 @@
             defaultLeft = diffLeft - halfOffsetWidth;
 
             this.anchorPreview.style.top = Math.round(buttonHeight + boundary.bottom - diffTop + this.window.pageYOffset - this.anchorPreview.offsetHeight) + 'px';
+            this.anchorPreview.style.right = 'initial';
             if (middleBoundary < halfOffsetWidth) {
                 this.anchorPreview.style.left = defaultLeft + halfOffsetWidth + 'px';
+                this.anchorPreview.style.right = 'initial';
             } else if ((this.window.innerWidth - middleBoundary) < halfOffsetWidth) {
-                this.anchorPreview.style.left = this.window.innerWidth + defaultLeft - halfOffsetWidth + 'px';
+                this.anchorPreview.style.left = 'auto';
+                this.anchorPreview.style.right = 0;
             } else {
                 this.anchorPreview.style.left = defaultLeft + middleBoundary + 'px';
+                this.anchorPreview.style.right = 'initial';
             }
         },
 
