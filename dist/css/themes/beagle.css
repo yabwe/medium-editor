@@ -64,7 +64,6 @@
   .medium-editor-toolbar-form a {
     color: #ccc;
     -webkit-transform: translateY(2px);
-        -ms-transform: translateY(2px);
             transform: translateY(2px); }
   .medium-editor-toolbar-form .medium-editor-toolbar-close {
     margin-right: 16px; }

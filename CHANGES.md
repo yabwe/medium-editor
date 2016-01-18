@@ -1,3 +1,10 @@
+5.13.0 / 2016-01-18
+==================
+* Added stickyTopOffset option to keep on the screen a sticky toolbar
+* Fixed misplacement of buttons when selection is near to the right edge
+* Updated dev dependencies
+* Added reference to README for who is using medium-editor
+
 5.12.0 / 2015-12-15
 ==================
 * Fix issue with image-only selections

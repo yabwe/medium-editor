@@ -3741,12 +3741,16 @@ MediumEditor.extensions = {};
             defaultLeft = diffLeft - halfOffsetWidth;
 
             this.anchorPreview.style.top = Math.round(buttonHeight + boundary.bottom - diffTop + this.window.pageYOffset - this.anchorPreview.offsetHeight) + 'px';
+            this.anchorPreview.style.right = 'initial';
             if (middleBoundary < halfOffsetWidth) {
                 this.anchorPreview.style.left = defaultLeft + halfOffsetWidth + 'px';
+                this.anchorPreview.style.right = 'initial';
             } else if ((this.window.innerWidth - middleBoundary) < halfOffsetWidth) {
-                this.anchorPreview.style.left = this.window.innerWidth + defaultLeft - halfOffsetWidth + 'px';
+                this.anchorPreview.style.left = 'auto';
+                this.anchorPreview.style.right = 0;
             } else {
                 this.anchorPreview.style.left = defaultLeft + middleBoundary + 'px';
+                this.anchorPreview.style.right = 'initial';
             }
         },
 
@@ -5111,6 +5115,11 @@ MediumEditor.extensions = {};
          */
         sticky: false,
 
+        /* stickyTopOffset: [Number]
+         * Value in pixel of the top offset above the toolbar
+         */
+        stickyTopOffset: 0,
+
         /* updateOnEmptySelection: [boolean]
          * When the __static__ option is true, this enables/disables updating
          * the state of the toolbar buttons even when the selection is collapsed
@@ -5603,15 +5612,13 @@ MediumEditor.extensions = {};
 
             if (this.sticky) {
                 // If it's beyond the height of the editor, position it at the bottom of the editor
-                if (scrollTop > (containerTop + container.offsetHeight - toolbarHeight)) {
+                if (scrollTop > (containerTop + container.offsetHeight - toolbarHeight - this.stickyTopOffset)) {
                     toolbarElement.style.top = (containerTop + container.offsetHeight - toolbarHeight) + 'px';
                     toolbarElement.classList.remove('medium-editor-sticky-toolbar');
-
                 // Stick the toolbar to the top of the window
-                } else if (scrollTop > (containerTop - toolbarHeight)) {
+                } else if (scrollTop > (containerTop - toolbarHeight - this.stickyTopOffset)) {
                     toolbarElement.classList.add('medium-editor-sticky-toolbar');
-                    toolbarElement.style.top = '0px';
-
+                    toolbarElement.style.top = this.stickyTopOffset + 'px';
                 // Normal static toolbar position
                 } else {
                     toolbarElement.classList.remove('medium-editor-sticky-toolbar');
@@ -5647,6 +5654,7 @@ MediumEditor.extensions = {};
         positionToolbar: function (selection) {
             // position the toolbar at left 0, so we can get the real width of the toolbar
             this.getToolbarElement().style.left = '0';
+            this.getToolbarElement().style.right = 'initial';
 
             var range = selection.getRangeAt(0),
                 boundary = range.getBoundingClientRect();
@@ -5682,10 +5690,13 @@ MediumEditor.extensions = {};
 
             if (middleBoundary < halfOffsetWidth) {
                 toolbarElement.style.left = defaultLeft + halfOffsetWidth + 'px';
+                toolbarElement.style.right = 'initial';
             } else if ((windowWidth - middleBoundary) < halfOffsetWidth) {
-                toolbarElement.style.left = windowWidth + defaultLeft - halfOffsetWidth + 'px';
+                toolbarElement.style.left = 'auto';
+                toolbarElement.style.right = 0;
             } else {
                 toolbarElement.style.left = defaultLeft + middleBoundary + 'px';
+                toolbarElement.style.right = 'initial';
             }
         }
     });
@@ -6880,7 +6891,7 @@ MediumEditor.parseVersionString = function (release) {
 
 MediumEditor.version = MediumEditor.parseVersionString.call(this, ({
     // grunt-bump looks for this:
-    'version': '5.12.0'
+    'version': '5.13.0'
 }).version);
 
     return MediumEditor;
