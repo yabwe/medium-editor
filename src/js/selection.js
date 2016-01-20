@@ -246,6 +246,10 @@
                 }
             }
 
+            if (!targetNode) {
+                targetNode = startBlock;
+            }
+
             // We're selecting a high-level block node, so make sure the cursor gets moved into the deepest
             // element at the beginning of the block
             range.setStart(MediumEditor.util.getFirstSelectableLeafNode(targetNode), 0);
