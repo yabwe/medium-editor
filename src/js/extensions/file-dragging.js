@@ -68,18 +68,17 @@
         insertImageFile: function (file) {
             var fileReader = new FileReader();
             fileReader.readAsDataURL(file);
+            fileReader.onload = this.ConvertedImageDataURL.bind(this);
+        },
 
-            var id = 'medium-img-' + (+new Date());
-            MediumEditor.util.insertHTMLCommand(this.document, '<img class="medium-editor-image-loading" id="' + id + '" />');
+        onConvertedImageDataURL: function(e) {
+            this.appendImage(e.currentTarget.result);
+        },
 
-            fileReader.onload = function () {
-                var img = this.document.getElementById(id);
-                if (img) {
-                    img.removeAttribute('id');
-                    img.removeAttribute('class');
-                    img.src = fileReader.result;
-                }
-            }.bind(this);
+        appendImage: function(imageSrc) {
+            var addImageElement = document.createElement('img');
+            addImageElement.src = imageSrc;
+            MediumEditor.util.insertHTMLCommand(this.document, addImageElement.outerHTML);
         }
     });
 

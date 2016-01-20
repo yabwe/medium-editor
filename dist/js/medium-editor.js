@@ -4200,16 +4200,10 @@ MediumEditor.extensions = {};
             var fileReader = new FileReader();
             fileReader.readAsDataURL(file);
 
-            var id = 'medium-img-' + (+new Date());
-            MediumEditor.util.insertHTMLCommand(this.document, '<img class="medium-editor-image-loading" id="' + id + '" />');
-
             fileReader.onload = function () {
-                var img = this.document.getElementById(id);
-                if (img) {
-                    img.removeAttribute('id');
-                    img.removeAttribute('class');
-                    img.src = fileReader.result;
-                }
+                var addImageElement = document.createElement('img');
+                addImageElement.src = fileReader.result;
+                MediumEditor.util.insertHTMLCommand(this.document, addImageElement.outerHTML);
             }.bind(this);
         }
     });
