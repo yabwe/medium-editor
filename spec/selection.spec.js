@@ -365,6 +365,18 @@ describe('MediumEditor.selection TestCase', function () {
             expect(range.toString()).toBe('img');
             expect(MediumEditor.util.isDescendant(range.endContainer, this.el.querySelector('img'), true)).toBe(true, 'the image is not within the selection');
         });
+
+        // https://github.com/yabwe/medium-editor/issues/935
+        it('should support a selection that is after white-space at the beginning of a paragraph', function () {
+            this.el.innerHTML = ' <p>one two<br><a href="transindex.hu">three</a><br></p><p><a href="amazon.com">one</a> two three</p>';
+            this.newMediumEditor(this.el);
+            var firstText = this.el.querySelector('p').firstChild;
+            MediumEditor.selection.select(document, firstText, 0, firstText, 'one'.length);
+            var exported = MediumEditor.selection.exportSelection(this.el, document);
+            MediumEditor.selection.importSelection(exported, this.el, document);
+            var range = window.getSelection().getRangeAt(0);
+            expect(range.toString()).toBe('one');
+        });
     });
 
     describe('getSelectedElements', function () {

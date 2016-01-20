@@ -506,6 +506,40 @@ describe('MediumEditor.util', function () {
         });
     });
 
+    describe('getClosestBlockContainer', function () {
+        it('should return the closest block container', function () {
+            var el = this.createElement('div', '', '<blockquote><p>paragraph</p><ul><li><span>list item</span></li></ul></blockquote>'),
+                span = el.querySelector('span'),
+                container = MediumEditor.util.getClosestBlockContainer(span);
+            expect(container).toBe(el.querySelector('li'));
+        });
+
+        it('should return the parent editable if element is a text node child of the editor', function () {
+            var el = this.createElement('div', 'editable', ' <p>text</p>'),
+                emptyTextNode = el.firstChild;
+            this.newMediumEditor('.editable');
+            var container = MediumEditor.util.getClosestBlockContainer(emptyTextNode);
+            expect(container).toBe(el);
+        });
+    });
+
+    describe('getTopBlockContainer', function () {
+        it('should return the highest level block container', function () {
+            var el = this.createElement('div', '', '<blockquote><p>paragraph</p><ul><li><span>list item</span></li></ul></blockquote>'),
+                span = el.querySelector('span'),
+                container = MediumEditor.util.getTopBlockContainer(span);
+            expect(container).toBe(el.querySelector('blockquote'));
+        });
+
+        it('should return the parent editable if element is a text node child of the editor', function () {
+            var el = this.createElement('div', 'editable', ' <p>text</p>'),
+                emptyTextNode = el.firstChild;
+            this.newMediumEditor('.editable');
+            var container = MediumEditor.util.getTopBlockContainer(emptyTextNode);
+            expect(container).toBe(el);
+        });
+    });
+
     describe('findOrCreateMatchingTextNodes', function () {
         it('should return text nodes within an element', function () {
             var el = this.createElement('div');
