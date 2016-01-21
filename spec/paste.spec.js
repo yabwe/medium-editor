@@ -285,6 +285,26 @@ describe('Pasting content', function () {
             expect(this.el.innerHTML).toMatch(new RegExp('^Before(&nbsp;|\\s)(<span id="editor-inner">)?<sub>div one</sub><sub>div two</sub>(</span>)?(&nbsp;|\\s)after\\.$'));
         });
 
+        it('should respect custom replacements before builtin replacements.', function () {
+            var editor = this.newMediumEditor('.editor', {
+                paste: {
+                    forcePlainText: false,
+                    cleanPastedHTML: true,
+                    preCleanReplacements: [[new RegExp(/<\/?o:[a-z]*>/gi), 'foo']]
+                }
+            });
+
+            this.el.innerHTML = 'Before&nbsp;<span id="editor-inner">&nbsp;</span>&nbsp;after.';
+            selectElementContents(document.getElementById('editor-inner'));
+
+            // Normally, the paste extension's regular expressions would clear the `<o:p></o:p>` tags,
+            // but our `preCleanReplacements` should transform them each to "foo" before the default
+            // cleanReplacement has a chance to see it.
+            editor.cleanPaste('<div><o:p></o:p></div>');
+
+            expect(this.el.innerHTML).toMatch(new RegExp('foofoo'));
+        });
+
         it('should cleanup only pasted element on multi-line when nothing is selected', function () {
             var editor = this.newMediumEditor('.editor', {
                 paste: {
