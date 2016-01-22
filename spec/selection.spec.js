@@ -139,17 +139,17 @@ describe('MediumEditor.selection TestCase', function () {
         });
 
         it('should be able to import an exported selection that contain nodeTypes > 3', function (done) {
-                this.el.innerHTML = '<div><p>stuff here <!-- comment nodeType is 8 --> additional stuff here </p></div>';
-                selectElementContents(this.el.querySelector('p'));
-                var exportedSelection = MediumEditor.selection.exportSelection(this.el, document);
-                expect(Object.keys(exportedSelection).sort()).toEqual(['end', 'start']);
+            this.el.innerHTML = '<div><p>stuff here <!-- comment nodeType is 8 --> additional stuff here </p></div>';
+            selectElementContents(this.el.querySelector('p'));
+            var exportedSelection = MediumEditor.selection.exportSelection(this.el, document);
+            expect(Object.keys(exportedSelection).sort()).toEqual(['end', 'start']);
 
-                selectElementContents(this.el);
-                expect(exportedSelection).toEqual(MediumEditor.selection.exportSelection(this.el, document));
+            selectElementContents(this.el);
+            expect(exportedSelection).toEqual(MediumEditor.selection.exportSelection(this.el, document));
 
-                MediumEditor.selection.importSelection(exportedSelection, this.el, document);
-                expect(exportedSelection).toEqual(MediumEditor.selection.exportSelection(this.el, document));
-                done();
+            MediumEditor.selection.importSelection(exportedSelection, this.el, document);
+            expect(exportedSelection).toEqual(MediumEditor.selection.exportSelection(this.el, document));
+            done();
         });
 
         it('should import an exported selection outside any anchor tag', function () {
