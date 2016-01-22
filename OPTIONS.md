@@ -282,6 +282,12 @@ When the __static__ option is `true`, this aligns the static toolbar relative to
 When the __static__ option is `true`, this enables/disables the toolbar "sticking" to the viewport and staying visible on the screen while the page scrolls.
 
 ***
+#### `stickyTopOffset`
+**Default:** `0`
+
+When the __sticky__ option is `true`, this set in pixel a top offset above the toolbar.
+
+***
 #### `updateOnEmptySelection`
 **Default:** `false`
 

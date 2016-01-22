@@ -62,6 +62,11 @@
          */
         sticky: false,
 
+        /* stickyTopOffset: [Number]
+         * Value in pixel of the top offset above the toolbar
+         */
+        stickyTopOffset: 0,
+
         /* updateOnEmptySelection: [boolean]
          * When the __static__ option is true, this enables/disables updating
          * the state of the toolbar buttons even when the selection is collapsed
@@ -554,15 +559,13 @@
 
             if (this.sticky) {
                 // If it's beyond the height of the editor, position it at the bottom of the editor
-                if (scrollTop > (containerTop + container.offsetHeight - toolbarHeight)) {
+                if (scrollTop > (containerTop + container.offsetHeight - toolbarHeight - this.stickyTopOffset)) {
                     toolbarElement.style.top = (containerTop + container.offsetHeight - toolbarHeight) + 'px';
                     toolbarElement.classList.remove('medium-editor-sticky-toolbar');
-
                 // Stick the toolbar to the top of the window
-                } else if (scrollTop > (containerTop - toolbarHeight)) {
+                } else if (scrollTop > (containerTop - toolbarHeight - this.stickyTopOffset)) {
                     toolbarElement.classList.add('medium-editor-sticky-toolbar');
-                    toolbarElement.style.top = '0px';
-
+                    toolbarElement.style.top = this.stickyTopOffset + 'px';
                 // Normal static toolbar position
                 } else {
                     toolbarElement.classList.remove('medium-editor-sticky-toolbar');
@@ -598,6 +601,7 @@
         positionToolbar: function (selection) {
             // position the toolbar at left 0, so we can get the real width of the toolbar
             this.getToolbarElement().style.left = '0';
+            this.getToolbarElement().style.right = 'initial';
 
             var range = selection.getRangeAt(0),
                 boundary = range.getBoundingClientRect();
@@ -633,10 +637,13 @@
 
             if (middleBoundary < halfOffsetWidth) {
                 toolbarElement.style.left = defaultLeft + halfOffsetWidth + 'px';
+                toolbarElement.style.right = 'initial';
             } else if ((windowWidth - middleBoundary) < halfOffsetWidth) {
-                toolbarElement.style.left = windowWidth + defaultLeft - halfOffsetWidth + 'px';
+                toolbarElement.style.left = 'auto';
+                toolbarElement.style.right = 0;
             } else {
                 toolbarElement.style.left = defaultLeft + middleBoundary + 'px';
+                toolbarElement.style.right = 'initial';
             }
         }
     });

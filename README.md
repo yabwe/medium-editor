@@ -338,7 +338,8 @@ var editor = new MediumEditor('.editable', {
 
 * __forcePlainText__: Forces pasting as plain text. Default: `true`
 * __cleanPastedHTML__: cleans pasted content from different sources, like google docs etc. Default: `false`
-* __cleanReplacements__: custom pairs (2 element arrays) of RegExp and replacement text to use during paste when __forcePlainText__ or __cleanPastedHTML__ are `true` OR when calling `cleanPaste(text)` helper method. Default: `[]`
+* __preCleanReplacements__: custom pairs (2 element arrays) of RegExp and replacement text to use during paste when __forcePlainText__ or __cleanPastedHTML__ are `true` OR when calling `cleanPaste(text)` helper method.  These replacements are executed _before_ builtin replacements.  Default: `[]`
+* __cleanReplacements__: custom pairs (2 element arrays) of RegExp and replacement text to use during paste when __forcePlainText__ or __cleanPastedHTML__ are `true` OR when calling `cleanPaste(text)` helper method.  These replacements are executed _after_ builtin replacements.  Default: `[]`
 * __cleanAttrs__: list of element attributes to remove during paste when __cleanPastedHTML__ is `true` or when calling `cleanPaste(text)` or `pasteHTML(html,options)` helper methods. Default: `['class', 'style', 'dir']`
 * __cleanTags__: list of element tag names to remove during paste when __cleanPastedHTML__ is `true` or when calling `cleanPaste(text)` or `pasteHTML(html,options)` helper methods. Default: `['meta']`
 
@@ -629,6 +630,10 @@ Looking for something simple for a first contribution? Try fixing an [easy first
 ## Contributors (100+ and counting!)
 
 [https://github.com/yabwe/medium-editor/graphs/contributors](https://github.com/yabwe/medium-editor/graphs/contributors)
+
+## Is Your Org Using MediumEditor?
+
+Add your org [here](https://github.com/yabwe/medium-editor/issues/828) and we can add you to our [landing page](https://yabwe.github.io/medium-editor/#who-is-using-it)!
 
 ## License
 
