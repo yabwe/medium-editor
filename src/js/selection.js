@@ -312,7 +312,7 @@
             while (!stop && node) {
                 // Only iterate over elements and text nodes
                 if (node.nodeType > 3) {
-                    node = nodeStack.pop;
+                    node = nodeStack.pop();
                     continue;
                 }
 
