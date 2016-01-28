@@ -583,7 +583,7 @@ var editor = new MediumEditor('.editable', {
 #### `imageDragging`
 **Default:** `true`
 
-The image dragging handler is a built-in extenson for handling dragging & dropping images into the contenteditable.  This feature is ON by default.
+The image dragging handler is a built-in extension for handling dragging & dropping images into the contenteditable.  This feature is ON by default.
 
 ### Disabling Image Dragging
 
