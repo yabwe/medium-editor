@@ -1759,6 +1759,7 @@ MediumEditor.extensions = {};
             while (!stop && node) {
                 // Only iterate over elements and text nodes
                 if (node.nodeType > 3) {
+                    node = nodeStack.pop();
                     continue;
                 }
 
@@ -1964,6 +1965,7 @@ MediumEditor.extensions = {};
             while (!stop && node) {
                 // Only iterate over elements and text nodes
                 if (node.nodeType > 3) {
+                    node = nodeStack.pop();
                     continue;
                 }
 
@@ -4726,9 +4728,17 @@ MediumEditor.extensions = {};
          */
         cleanPastedHTML: false,
 
+        /* preCleanReplacements: [Array]
+         * custom pairs (2 element arrays) of RegExp and replacement text to use during past when
+         * __forcePlainText__ or __cleanPastedHTML__ are `true` OR when calling `cleanPaste(text)` helper method.
+         * These replacements are executed before any medium editor defined replacements.
+         */
+        preCleanReplacements: [],
+
         /* cleanReplacements: [Array]
          * custom pairs (2 element arrays) of RegExp and replacement text to use during paste when
          * __forcePlainText__ or __cleanPastedHTML__ are `true` OR when calling `cleanPaste(text)` helper method.
+         * These replacements are executed after any medium editor defined replacements.
          */
         cleanReplacements: [],
 
@@ -4806,7 +4816,10 @@ MediumEditor.extensions = {};
         cleanPaste: function (text) {
             var i, elList, tmp, workEl,
                 multiline = /<p|<br|<div/.test(text),
-                replacements = createReplacements().concat(this.cleanReplacements || []);
+                replacements = [].concat(
+                    this.preCleanReplacements || [],
+                    createReplacements(),
+                    this.cleanReplacements || []);
 
             for (i = 0; i < replacements.length; i += 1) {
                 text = text.replace(replacements[i][0], replacements[i][1]);
@@ -5836,7 +5849,7 @@ MediumEditor.extensions = {};
                 // instead delete previous node and cancel the event.
                 node.previousElementSibling.parentNode.removeChild(node.previousElementSibling);
                 event.preventDefault();
-            } else if (MediumEditor.util.isKey(event, MediumEditor.util.keyCode.ENTER)) {
+            } else if (!this.options.disableDoubleReturn && MediumEditor.util.isKey(event, MediumEditor.util.keyCode.ENTER)) {
                 // hitting return in the begining of a header will create empty header elements before the current one
                 // instead, make "<p><br></p>" element, which are what happens if you hit return in an empty paragraph
                 p = this.options.ownerDocument.createElement('p');
@@ -6891,7 +6904,7 @@ MediumEditor.parseVersionString = function (release) {
 
 MediumEditor.version = MediumEditor.parseVersionString.call(this, ({
     // grunt-bump looks for this:
-    'version': '5.13.0'
+    'version': '5.14.0'
 }).version);
 
     return MediumEditor;

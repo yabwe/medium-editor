@@ -1,9 +1,17 @@
+5.14.0 / 2016-01-31
+==================
+* Added pre clean replacements
+* Fixed an infinite loop
+* Handled enter event for empty h2/h3 tag
+
+
 5.13.0 / 2016-01-18
 ==================
 * Added stickyTopOffset option to keep on the screen a sticky toolbar
 * Fixed misplacement of buttons when selection is near to the right edge
 * Updated dev dependencies
 * Added reference to README for who is using medium-editor
+
 
 5.12.0 / 2015-12-15
 ==================
