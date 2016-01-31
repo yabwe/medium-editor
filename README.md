@@ -173,9 +173,9 @@ var editor = new MediumEditor('.editable', {
 
 #### Button Options
 
-Button behavior can be modified by passing an object into the buttons array instead of a string. This allow for overriding some of the default behavior of buttons. The following options are some of the basic parts of buttons that you may override, but any part of the `MediumEditor.Extension.prototype` can be overriden via these button options. (Check out the [source code for buttons](src/js/extensions/button.js) to see what all can be overriden).
+Button behavior can be modified by passing an object into the buttons array instead of a string. This allow for overriding some of the default behavior of buttons. The following options are some of the basic parts of buttons that you may override, but any part of the `MediumEditor.Extension.prototype` can be overridden via these button options. (Check out the [source code for buttons](src/js/extensions/button.js) to see what all can be overridden).
 
-* __name__: name of the button being overriden
+* __name__: name of the button being overridden
 * __action__: argument to pass to `MediumEditor.execAction()` when the button is clicked.
 * __aria__: value to add as the aria-label attribute of the button element displayed in the toolbar. This is also used as the tooltip for the button.
 * __tagNames__: array of element tag names that would indicate that this button has already been applied. If this action has already been applied, the button will be displayed as 'active' in the toolbar.
