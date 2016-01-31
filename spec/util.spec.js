@@ -540,6 +540,32 @@ describe('MediumEditor.util', function () {
         });
     });
 
+    describe('findPreviousSibling', function () {
+        it('should return the previous sibling of an element if it exists', function () {
+            var el = this.createElement('div', '', '<p>first <b>second </b><i>third</i></p><ul><li>fourth</li></ul>'),
+                second = el.querySelector('b'),
+                third = el.querySelector('i'),
+                prevSibling = MediumEditor.util.findPreviousSibling(third);
+            expect(prevSibling).toBe(second);
+        });
+
+        it('should return the previous sibling on an ancestor if a previous sibling does not exist', function () {
+            var el = this.createElement('div', '', '<p>first <b>second </b><i>third</i></p><ul><li>fourth</li></ul>'),
+                fourth = el.querySelector('li').firstChild,
+                p = el.querySelector('p'),
+                prevSibling = MediumEditor.util.findPreviousSibling(fourth);
+            expect(prevSibling).toBe(p);
+        });
+
+        it('should not find a previous sibling if the element is at the beginning of an editor element', function () {
+            var el = this.createElement('div', 'editable', '<p>first <b>second </b><i>third</i></p><ul><li>fourth</li></ul>'),
+                first = el.querySelector('p').firstChild;
+            this.newMediumEditor('.editable');
+            var prevSibling = MediumEditor.util.findPreviousSibling(first);
+            expect(prevSibling).toBeFalsy();
+        });
+    });
+
     describe('findOrCreateMatchingTextNodes', function () {
         it('should return text nodes within an element', function () {
             var el = this.createElement('div');
