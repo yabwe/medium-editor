@@ -114,8 +114,13 @@
                 if (node.nodeType === 3 && !foundEnd) {
                     nextCharIndex = charIndex + node.length;
                     if (!foundStart && selectionState.start >= charIndex && selectionState.start <= nextCharIndex) {
-                        range.setStart(node, selectionState.start - charIndex);
-                        foundStart = true;
+                        if (node.parentNode === root && selectionState.start === nextCharIndex && node.nextSibling) {
+                            range.setStart(node.nextSibling, 0);
+                            foundStart = true;
+                        } else {
+                            range.setStart(node, selectionState.start - charIndex);
+                            foundStart = true;
+                        }
                     }
                     if (foundStart && selectionState.end >= charIndex && selectionState.end <= nextCharIndex) {
                         if (!selectionState.trailingImageCount) {
@@ -273,8 +278,21 @@
             if (node.nodeType !== 3) {
                 node = cursorContainer.childNodes[cursorOffset];
             }
-            if (node && !MediumEditor.util.isElementAtBeginningOfBlock(node)) {
-                return -1;
+            if (node) {
+                // The element isn't at the beginning of a block, so it has content before it
+                if (!MediumEditor.util.isElementAtBeginningOfBlock(node)) {
+                    return -1;
+                }
+
+                var previousSibling = MediumEditor.util.findPreviousSibling(node);
+                // If there is no previous sibling, this is the first text element in the editor
+                if (!previousSibling) {
+                    return -1;
+                }
+                // If the previous sibling has text, then there are no empty blocks before this
+                else if (previousSibling.nodeValue) {
+                    return -1;
+                }
             }
 
             // Walk over block elements, counting number of empty blocks between last piece of text

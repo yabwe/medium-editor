@@ -326,7 +326,7 @@ describe('MediumEditor.selection TestCase', function () {
             selectElementContents(lastLi.firstChild);
 
             var selectionData = MediumEditor.selection.exportSelection(this.el, document);
-            expect(selectionData.emptyBlocksIndex).toBe(0);
+            expect(selectionData.emptyBlocksIndex).toBeUndefined();
 
             MediumEditor.selection.importSelection(selectionData, this.el, document);
             var range = window.getSelection().getRangeAt(0);
@@ -368,7 +368,7 @@ describe('MediumEditor.selection TestCase', function () {
 
         // https://github.com/yabwe/medium-editor/issues/935
         it('should support a selection that is after white-space at the beginning of a paragraph', function () {
-            this.el.innerHTML = ' <p>one two<br><a href="transindex.hu">three</a><br></p><p><a href="amazon.com">one</a> two three</p>';
+            this.el.innerHTML = '   <p>one two<br><a href="transindex.hu">three</a><br></p><p><a href="amazon.com">one</a> two three</p>';
             this.newMediumEditor(this.el);
             var firstText = this.el.querySelector('p').firstChild;
             MediumEditor.selection.select(document, firstText, 0, firstText, 'one'.length);
