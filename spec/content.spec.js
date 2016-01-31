@@ -434,6 +434,45 @@ describe('Content TestCase', function () {
 
             expect(evt.preventDefault).toHaveBeenCalled();
         });
+
+        it('should add a new line when selected node is an h2/h3 tag with text in it and when disableDoubleReturn is true', function () {
+            this.el.innerHTML = '<p>lorem</p><h2>ipsum<br></h2>';
+            var editor = this.newMediumEditor('.editor', { disableDoubleReturn: true }),
+                p = editor.elements[0].getElementsByTagName('h2')[0],
+                evt;
+
+            placeCursorInsideElement(p, 0);
+
+            evt = prepareEvent(p, 'keydown', {
+                keyCode: MediumEditor.util.keyCode.ENTER
+            });
+
+            spyOn(evt, 'preventDefault').and.callThrough();
+
+            firePreparedEvent(evt, p, 'keydown');
+
+            expect(evt.preventDefault).not.toHaveBeenCalled();
+        });
+
+        it('should prevent new line being added when selected node is an empty h2/h3 tag and when disableDoubleReturn is true', function () {
+            this.el.innerHTML = '<p>lorem</p><h2><br></h2>';
+            var editor = this.newMediumEditor('.editor', { disableDoubleReturn: true }),
+                p = editor.elements[0].getElementsByTagName('h2')[0],
+                evt;
+
+            placeCursorInsideElement(p, 1);
+
+            evt = prepareEvent(p, 'keydown', {
+                keyCode: MediumEditor.util.keyCode.ENTER
+            });
+
+            spyOn(evt, 'preventDefault').and.callThrough();
+
+            firePreparedEvent(evt, p, 'keydown');
+
+            expect(evt.preventDefault).toHaveBeenCalled();
+            expect(this.el.innerHTML).toBe('<p>lorem</p><h2><br></h2>');
+        });
     });
 
     describe('should unlink anchors', function () {
