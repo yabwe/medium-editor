@@ -113,8 +113,12 @@
                 // If we hit a text node, we need to add the amount of characters to the overall count
                 if (node.nodeType === 3 && !foundEnd) {
                     nextCharIndex = charIndex + node.length;
+                    // Check if we're at or beyond the start of the selection we're importing
                     if (!foundStart && selectionState.start >= charIndex && selectionState.start <= nextCharIndex) {
-                        if (node.parentNode === root && selectionState.start === nextCharIndex && node.nextSibling) {
+                        // If the start of the selection we're importing is at the end of this text node,
+                        // it's more desirable to have the selection beging at the front of the next node
+                        // rather than the end of this node.
+                        if (selectionState.start === nextCharIndex && node.nextSibling) {
                             range.setStart(node.nextSibling, 0);
                             foundStart = true;
                         } else {
@@ -122,6 +126,7 @@
                             foundStart = true;
                         }
                     }
+                    // We've found the start of the selection, check if we're at or beyond the end of the selection we're importing
                     if (foundStart && selectionState.end >= charIndex && selectionState.end <= nextCharIndex) {
                         if (!selectionState.trailingImageCount) {
                             range.setEnd(node, selectionState.end - charIndex);
@@ -375,7 +380,7 @@
         },
 
         // determine if the current selection contains any 'content'
-        // content being and non-white space text or an image
+        // content being any non-white space text or an image
         selectionContainsContent: function (doc) {
             var sel = doc.getSelection();
 
