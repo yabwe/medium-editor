@@ -1,4 +1,4 @@
-/*global selectElementContents, placeCursorInsideElement */
+/*global selectElementContents, placeCursorInsideElement, isPhantom */
 
 describe('MediumEditor.selection TestCase', function () {
     'use strict';
@@ -157,11 +157,19 @@ describe('MediumEditor.selection TestCase', function () {
             var link = this.el.getElementsByTagName('a')[0];
 
             placeCursorInsideElement(link.childNodes[0], link.childNodes[0].nodeValue.length);
+            expect(MediumEditor.util.isDescendant(link, window.getSelection().getRangeAt(0).startContainer, true)).toBe(true);
 
             var exportedSelection = MediumEditor.selection.exportSelection(this.el, document);
             MediumEditor.selection.importSelection(exportedSelection, this.el, document, true);
             var range = window.getSelection().getRangeAt(0),
                 node = range.startContainer;
+
+            // For some reason, phantom mucks with the selection range and makes this case not hold
+            // since we only really care about whether this works in actual browsers, it's ok to
+            // skip this assertion unless we're running in a real browser
+            if (!isPhantom()) {
+                expect(MediumEditor.util.isDescendant(link, node, true)).toBe(false);
+            }
             // Even though we set the range to use the P tag as the start container, Safari normalizes the range
             // down to the text node. Setting the range to use the P tag for the start is necessary to support
             // MSIE, where it removes the link when the cursor is placed at the end of the text node in the anchor.
@@ -338,7 +346,7 @@ describe('MediumEditor.selection TestCase', function () {
 
         it('should support a selection that specifies an image is the selection', function () {
             this.el.innerHTML = '<p>lorem ipsum <a href="#"><img src="../demo/img/medium-editor.jpg" /></a> dolor</p>';
-            MediumEditor.selection.importSelection({ start: 12, end: 12, trailingImageCount: 1 }, this.el, document);
+            MediumEditor.selection.importSelection({ start: 12, end: 12, startsWithImage: true, trailingImageCount: 1 }, this.el, document);
             var range = window.getSelection().getRangeAt(0);
             expect(range.toString()).toBe('');
             expect(MediumEditor.util.isDescendant(range.endContainer, this.el.querySelector('img'), true)).toBe(true, 'the image is not within the selection');
@@ -346,7 +354,7 @@ describe('MediumEditor.selection TestCase', function () {
 
         it('should support a selection that starts with an image', function () {
             this.el.innerHTML = '<p>lorem ipsum <a href="#"><img src="../demo/img/medium-editor.jpg" />img</a> dolor</p>';
-            MediumEditor.selection.importSelection({ start: 12, end: 15 }, this.el, document);
+            MediumEditor.selection.importSelection({ start: 12, end: 15, startsWithImage: true }, this.el, document);
             var range = window.getSelection().getRangeAt(0);
             expect(range.toString()).toBe('img');
             if (range.startContainer.nodeName.toLowerCase() === 'a') {

@@ -55,12 +55,18 @@
                     end: start + range.toString().length
                 };
 
-                // Range contains an image, check to see if the selection ends with that image
-                if (range.endOffset !== 0 && (range.endContainer.nodeName.toLowerCase() === 'img' || (range.endContainer.nodeType === 1 && range.endContainer.querySelector('img')))) {
-                    var trailingImageCount = this.getTrailingImageCount(root, selectionState, range.endContainer, range.endOffset);
-                    if (trailingImageCount) {
-                        selectionState.trailingImageCount = trailingImageCount;
-                    }
+                // Check to see if the selection starts with any images
+                // if so we need to make sure the the beginning of the selection is
+                // set correctly when importing selection
+                if (this.doesRangeStartWithImages(range, doc)) {
+                    selectionState.startsWithImage = true;
+                }
+
+                // Check to see if the selection has any trailing images
+                // if so, this this means we need to look for them when we import selection
+                var trailingImageCount = this.getTrailingImageCount(root, selectionState, range.endContainer, range.endOffset);
+                if (trailingImageCount) {
+                    selectionState.trailingImageCount = trailingImageCount;
                 }
 
                 // If start = 0 there may still be an empty paragraph before it, but we don't care.
@@ -101,7 +107,25 @@
                 foundEnd = false,
                 trailingImageCount = 0,
                 stop = false,
-                nextCharIndex;
+                nextCharIndex,
+                allowRangeToStartAtEndOfNode = false;
+
+            // When importing selection, the start of the selection may lie at the end of an element
+            // or at the beginning of an element.  Since visually there is no difference between these 2
+            // we will try to move the selection to the beginning of an element since this is generally
+            // what users will expect and it's a more predictable behavior.
+            //
+            // However, there are some specific cases when we don't want to do this:
+            //  1) We're attempting to move the cursor outside of the end of an anchor [favorLaterSelectionAnchor = true]
+            //  2) The selection starts with an image, which is special since an image doesn't have any 'content'
+            //     as far as selection and ranges are concerned
+            //  3) The selection starts after a specified number of empty block elements (selectionState.emptyBlocksIndex)
+            //
+            // For these cases, we want the selection to start at a very specific location, so we should NOT
+            // automatically move the cursor to the beginning of the first actual chunk of text
+            if (favorLaterSelectionAnchor || selectionState.startsWithImage || typeof selectionState.emptyBlocksIndex !== 'undefined') {
+                allowRangeToStartAtEndOfNode = true;
+            }
 
             while (!stop && node) {
                 // Only iterate over elements and text nodes
@@ -114,17 +138,13 @@
                 if (node.nodeType === 3 && !foundEnd) {
                     nextCharIndex = charIndex + node.length;
                     // Check if we're at or beyond the start of the selection we're importing
-                    if (!foundStart && selectionState.start >= charIndex && selectionState.start <= nextCharIndex) {
-                        // If the start of the selection we're importing is at the end of this text node,
-                        // it's more desirable to have the selection beging at the front of the next node
-                        // rather than the end of this node.
-                        if (selectionState.start === nextCharIndex && node.nextSibling) {
-                            range.setStart(node.nextSibling, 0);
-                            foundStart = true;
-                        } else {
-                            range.setStart(node, selectionState.start - charIndex);
-                            foundStart = true;
-                        }
+                    if (!foundStart &&
+                        selectionState.start >= charIndex &&
+                        (selectionState.start < nextCharIndex || (allowRangeToStartAtEndOfNode && selectionState.start === nextCharIndex))) {
+                        // NOTE: We only want to allow a selection to start at the END of an element if
+                        //  allowRangeToStartAtEndOfNode is true
+                        range.setStart(node, selectionState.start - charIndex);
+                        foundStart = true;
                     }
                     // We've found the start of the selection, check if we're at or beyond the end of the selection we're importing
                     if (foundStart && selectionState.end >= charIndex && selectionState.end <= nextCharIndex) {
@@ -321,7 +341,53 @@
             return emptyBlocksCount;
         },
 
+        // Returns true if the selection range begins with an image tag
+        // Returns false if the range starts with any non empty text nodes
+        doesRangeStartWithImages: function (range, doc) {
+            if (range.startOffset !== 0 || range.startContainer.nodeType !== 1) {
+                return false;
+            }
+
+            if (range.startContainer.nodeName.toLowerCase() === 'img') {
+                return true;
+            }
+
+            var img = range.startContainer.querySelector('img');
+            if (!img) {
+                return false;
+            }
+
+            var treeWalker = doc.createTreeWalker(range.startContainer, NodeFilter.SHOW_ALL, null, false);
+            while (treeWalker.nextNode()) {
+                var next = treeWalker.currentNode;
+                // If we hit the image, then there isn't any text before the image so
+                // the image is at the beginning of the range
+                if (next === img) {
+                    break;
+                }
+                // If we haven't hit the iamge, but found text that contains content
+                // then the range doesn't start with an image
+                if (next.nodeValue) {
+                    return false;
+                }
+            }
+
+            return true;
+        },
+
         getTrailingImageCount: function (root, selectionState, endContainer, endOffset) {
+            // If the endOffset of a range is 0, the endContainer doesn't contain images
+            // If the endContainer is a text node, there are no trailing images
+            if (endOffset === 0 || endContainer.nodeType !== 1) {
+                return 0;
+            }
+
+            // If the endContainer isn't an image, and doesn't have an image descendants
+            // there are no trailing images
+            if (endContainer.nodeName.toLowerCase() !== 'img' && !endContainer.querySelector('img')) {
+                return 0;
+            }
+
             var lastNode = endContainer.childNodes[endOffset - 1];
             while (lastNode.hasChildNodes()) {
                 lastNode = lastNode.lastChild;
