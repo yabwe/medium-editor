@@ -385,6 +385,29 @@ describe('MediumEditor.selection TestCase', function () {
             var range = window.getSelection().getRangeAt(0);
             expect(range.toString()).toBe('one');
         });
+
+        it('should support importing a collapsed selection at the end of all content', function () {
+            this.el.innerHTML = '<p>lorem ipsum <b>dolor</b></p>';
+            var boldText = this.el.querySelector('b').firstChild;
+
+            placeCursorInsideElement(boldText, boldText.length);
+            var range = window.getSelection().getRangeAt(0);
+            expect(range.collapsed).toBe(true);
+            expect(MediumEditor.util.isDescendant(boldText.parentNode, range.startContainer, true)).toBe(true);
+            expect(MediumEditor.util.isDescendant(boldText.parentNode, range.endContainer, true)).toBe(true);
+
+            var exported = MediumEditor.selection.exportSelection(this.el, document);
+            expect(exported.start).toBe('lorem ipsum dolor'.length);
+            expect(exported.end).toBe('lorem ipsum dolor'.length);
+
+            MediumEditor.selection.importSelection(exported, this.el, document);
+            range = window.getSelection().getRangeAt(0);
+            expect(range.collapsed).toBe(true);
+            window.console.log('Start: ' + range.startContainer.nodeName + ' | ' + range.startContainer.nodeValue + ' | ' + range.startOffset);
+            window.console.log('End: ' + range.endContainer.nodeName + ' | ' + range.endContainer.nodeValue + ' | ' + range.endOffset);
+            expect(MediumEditor.util.isDescendant(boldText.parentNode, range.startContainer, true)).toBe(true);
+            expect(MediumEditor.util.isDescendant(boldText.parentNode, range.endContainer, true)).toBe(true);
+        });
     });
 
     describe('getSelectedElements', function () {

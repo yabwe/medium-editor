@@ -108,7 +108,8 @@
                 trailingImageCount = 0,
                 stop = false,
                 nextCharIndex,
-                allowRangeToStartAtEndOfNode = false;
+                allowRangeToStartAtEndOfNode = false,
+                lastTextNode = null;
 
             // When importing selection, the start of the selection may lie at the end of an element
             // or at the beginning of an element.  Since visually there is no difference between these 2
@@ -138,13 +139,20 @@
                 if (node.nodeType === 3 && !foundEnd) {
                     nextCharIndex = charIndex + node.length;
                     // Check if we're at or beyond the start of the selection we're importing
-                    if (!foundStart &&
-                        selectionState.start >= charIndex &&
-                        (selectionState.start < nextCharIndex || (allowRangeToStartAtEndOfNode && selectionState.start === nextCharIndex))) {
+                    if (!foundStart && selectionState.start >= charIndex && selectionState.start <= nextCharIndex) {
                         // NOTE: We only want to allow a selection to start at the END of an element if
                         //  allowRangeToStartAtEndOfNode is true
-                        range.setStart(node, selectionState.start - charIndex);
-                        foundStart = true;
+                        if (allowRangeToStartAtEndOfNode || selectionState.start < nextCharIndex) {
+                            range.setStart(node, selectionState.start - charIndex);
+                            foundStart = true;
+                        }
+                        // We're at the end of a text node where the selection could start but we shouldn't
+                        // make the selection start here because allowRangeToStartAtEndOfNode is false.
+                        // However, we should keep a reference to this node in case there aren't any more
+                        // text nodes after this, so that we have somewhere to import the selection to
+                        else {
+                            lastTextNode = node;
+                        }
                     }
                     // We've found the start of the selection, check if we're at or beyond the end of the selection we're importing
                     if (foundStart && selectionState.end >= charIndex && selectionState.end <= nextCharIndex) {
@@ -186,6 +194,14 @@
                 if (!stop) {
                     node = nodeStack.pop();
                 }
+            }
+
+            // If we've gone through the entire text but didn't find the beginning of a text node
+            // to make the selection start at, we should fall back to starting the selection
+            // at the END of the last text node we found
+            if (!foundStart && lastTextNode) {
+                range.setStart(lastTextNode, lastTextNode.length);
+                range.setEnd(lastTextNode, lastTextNode.length);
             }
 
             if (typeof selectionState.emptyBlocksIndex !== 'undefined') {
