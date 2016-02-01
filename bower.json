@@ -32,6 +32,7 @@
     "package.json",
     "src",
     "README.md",
-    "CHANGES.md"
+    "CHANGES.md",
+    "RELEASE-PROCESS.md"
   ]
 }
