@@ -554,7 +554,7 @@ MediumEditor.extensions = {};
          * not affected in any way.
          */
         findOrCreateMatchingTextNodes: function (document, element, match) {
-            var treeWalker = document.createTreeWalker(element, NodeFilter.SHOW_TEXT, null, false),
+            var treeWalker = document.createTreeWalker(element, NodeFilter.SHOW_ALL, null, false),
                 matchedNodes = [],
                 currentTextIndex = 0,
                 startReached = false,
@@ -562,30 +562,41 @@ MediumEditor.extensions = {};
                 newNode = null;
 
             while ((currentNode = treeWalker.nextNode()) !== null) {
-                if (!startReached && match.start < (currentTextIndex + currentNode.nodeValue.length)) {
-                    startReached = true;
-                    newNode = Util.splitStartNodeIfNeeded(currentNode, match.start, currentTextIndex);
-                }
-                if (startReached) {
-                    Util.splitEndNodeIfNeeded(currentNode, newNode, match.end, currentTextIndex);
-                }
-                if (startReached && currentTextIndex === match.end) {
-                    break; // Found the node(s) corresponding to the link. Break out and move on to the next.
-                } else if (startReached && currentTextIndex > (match.end + 1)) {
-                    throw new Error('PerformLinking overshot the target!'); // should never happen...
-                }
+                if (currentNode.nodeType > 3) {
+                    continue;
+                } else if (currentNode.nodeType === 3) {
+                    if (!startReached && match.start < (currentTextIndex + currentNode.nodeValue.length)) {
+                        startReached = true;
+                        newNode = Util.splitStartNodeIfNeeded(currentNode, match.start, currentTextIndex);
+                    }
+                    if (startReached) {
+                        Util.splitEndNodeIfNeeded(currentNode, newNode, match.end, currentTextIndex);
+                    }
+                    if (startReached && currentTextIndex === match.end) {
+                        break; // Found the node(s) corresponding to the link. Break out and move on to the next.
+                    } else if (startReached && currentTextIndex > (match.end + 1)) {
+                        throw new Error('PerformLinking overshot the target!'); // should never happen...
+                    }
 
-                if (startReached) {
-                    matchedNodes.push(newNode || currentNode);
-                }
+                    if (startReached) {
+                        matchedNodes.push(newNode || currentNode);
+                    }
 
-                currentTextIndex += currentNode.nodeValue.length;
-                if (newNode !== null) {
-                    currentTextIndex += newNode.nodeValue.length;
-                    // Skip the newNode as we'll already have pushed it to the matches
-                    treeWalker.nextNode();
+                    currentTextIndex += currentNode.nodeValue.length;
+                    if (newNode !== null) {
+                        currentTextIndex += newNode.nodeValue.length;
+                        // Skip the newNode as we'll already have pushed it to the matches
+                        treeWalker.nextNode();
+                    }
+                    newNode = null;
+                } else if (currentNode.tagName.toLowerCase() === 'img') {
+                    if (!startReached && (match.start <= currentTextIndex)) {
+                        startReached = true;
+                    }
+                    if (startReached) {
+                        matchedNodes.push(currentNode);
+                    }
                 }
-                newNode = null;
             }
             return matchedNodes;
         },
@@ -653,6 +664,10 @@ MediumEditor.extensions = {};
          * <blockquote> container, they are the elements returned.
          */
         splitByBlockElements: function (element) {
+            if (element.nodeType !== 3 && element.nodeType !== 1) {
+                return [];
+            }
+
             var toRet = [],
                 blockElementQuery = MediumEditor.util.blockContainerElementNames.join(',');
 
@@ -664,7 +679,7 @@ MediumEditor.extensions = {};
                 var child = element.childNodes[i];
                 if (child.nodeType === 3) {
                     toRet.push(child);
-                } else {
+                } else if (child.nodeType === 1) {
                     var blockElements = child.querySelectorAll(blockElementQuery);
                     if (blockElements.length === 0) {
                         toRet.push(child);
@@ -1692,6 +1707,15 @@ MediumEditor.extensions = {};
                     start: start,
                     end: start + range.toString().length
                 };
+
+                // Range contains an image, check to see if the selection ends with that image
+                if (range.endOffset !== 0 && (range.endContainer.nodeName.toLowerCase() === 'img' || (range.endContainer.nodeType === 1 && range.endContainer.querySelector('img')))) {
+                    var trailingImageCount = this.getTrailingImageCount(root, selectionState, range.endContainer, range.endOffset);
+                    if (trailingImageCount) {
+                        selectionState.trailingImageCount = trailingImageCount;
+                    }
+                }
+
                 // If start = 0 there may still be an empty paragraph before it, but we don't care.
                 if (start !== 0) {
                     var emptyBlocksIndex = this.getIndexRelativeToAdjacentEmptyBlocks(doc, root, range.startContainer, range.startOffset);
@@ -1727,28 +1751,61 @@ MediumEditor.extensions = {};
                 nodeStack = [],
                 charIndex = 0,
                 foundStart = false,
+                foundEnd = false,
+                trailingImageCount = 0,
                 stop = false,
                 nextCharIndex;
 
             while (!stop && node) {
-                if (node.nodeType === 3) {
+                // Only iterate over elements and text nodes
+                if (node.nodeType > 3) {
+                    node = nodeStack.pop();
+                    continue;
+                }
+
+                // If we hit a text node, we need to add the amount of characters to the overall count
+                if (node.nodeType === 3 && !foundEnd) {
                     nextCharIndex = charIndex + node.length;
                     if (!foundStart && selectionState.start >= charIndex && selectionState.start <= nextCharIndex) {
                         range.setStart(node, selectionState.start - charIndex);
                         foundStart = true;
                     }
                     if (foundStart && selectionState.end >= charIndex && selectionState.end <= nextCharIndex) {
-                        range.setEnd(node, selectionState.end - charIndex);
-                        stop = true;
+                        if (!selectionState.trailingImageCount) {
+                            range.setEnd(node, selectionState.end - charIndex);
+                            stop = true;
+                        } else {
+                            foundEnd = true;
+                        }
                     }
                     charIndex = nextCharIndex;
                 } else {
-                    var i = node.childNodes.length - 1;
-                    while (i >= 0) {
-                        nodeStack.push(node.childNodes[i]);
-                        i -= 1;
+                    if (selectionState.trailingImageCount && foundEnd) {
+                        if (node.nodeName.toLowerCase() === 'img') {
+                            trailingImageCount++;
+                        }
+                        if (trailingImageCount === selectionState.trailingImageCount) {
+                            // Find which index the image is in its parent's children
+                            var endIndex = 0;
+                            while (node.parentNode.childNodes[endIndex] !== node) {
+                                endIndex++;
+                            }
+                            range.setEnd(node.parentNode, endIndex + 1);
+                            stop = true;
+                        }
+                    }
+
+                    if (!stop && node.nodeType === 1) {
+                        // this is an element
+                        // add all its children to the stack
+                        var i = node.childNodes.length - 1;
+                        while (i >= 0) {
+                            nodeStack.push(node.childNodes[i]);
+                            i -= 1;
+                        }
                     }
                 }
+
                 if (!stop) {
                     node = nodeStack.pop();
                 }
@@ -1888,6 +1945,92 @@ MediumEditor.extensions = {};
             }
 
             return emptyBlocksCount;
+        },
+
+        getTrailingImageCount: function (root, selectionState, endContainer, endOffset) {
+            var lastNode = endContainer.childNodes[endOffset - 1];
+            while (lastNode.hasChildNodes()) {
+                lastNode = lastNode.lastChild;
+            }
+
+            var node = root,
+                nodeStack = [],
+                charIndex = 0,
+                foundStart = false,
+                foundEnd = false,
+                stop = false,
+                nextCharIndex,
+                trailingImages = 0;
+
+            while (!stop && node) {
+                // Only iterate over elements and text nodes
+                if (node.nodeType > 3) {
+                    node = nodeStack.pop();
+                    continue;
+                }
+
+                if (node.nodeType === 3 && !foundEnd) {
+                    trailingImages = 0;
+                    nextCharIndex = charIndex + node.length;
+                    if (!foundStart && selectionState.start >= charIndex && selectionState.start <= nextCharIndex) {
+                        foundStart = true;
+                    }
+                    if (foundStart && selectionState.end >= charIndex && selectionState.end <= nextCharIndex) {
+                        foundEnd = true;
+                    }
+                    charIndex = nextCharIndex;
+                } else {
+                    if (node.nodeName.toLowerCase() === 'img') {
+                        trailingImages++;
+                    }
+
+                    if (node === lastNode) {
+                        stop = true;
+                    } else if (node.nodeType === 1) {
+                        // this is an element
+                        // add all its children to the stack
+                        var i = node.childNodes.length - 1;
+                        while (i >= 0) {
+                            nodeStack.push(node.childNodes[i]);
+                            i -= 1;
+                        }
+                    }
+                }
+
+                if (!stop) {
+                    node = nodeStack.pop();
+                }
+            }
+
+            return trailingImages;
+        },
+
+        // determine if the current selection contains any 'content'
+        // content being and non-white space text or an image
+        selectionContainsContent: function (doc) {
+            var sel = doc.getSelection();
+
+            // collapsed selection or selection withour range doesn't contain content
+            if (!sel || sel.isCollapsed || !sel.rangeCount) {
+                return false;
+            }
+
+            // if toString() contains any text, the selection contains some content
+            if (sel.toString().trim() !== '') {
+                return true;
+            }
+
+            // if selection contains only image(s), it will return empty for toString()
+            // so check for an image manually
+            var selectionNode = this.getSelectedParentElement(sel.getRangeAt(0));
+            if (selectionNode) {
+                if (selectionNode.nodeName.toLowerCase() === 'img' ||
+                    (selectionNode.nodeType === 1 && selectionNode.querySelector('img'))) {
+                    return true;
+                }
+            }
+
+            return false;
         },
 
         selectionInContentEditableFalse: function (contentWindow) {
@@ -3600,12 +3743,16 @@ MediumEditor.extensions = {};
             defaultLeft = diffLeft - halfOffsetWidth;
 
             this.anchorPreview.style.top = Math.round(buttonHeight + boundary.bottom - diffTop + this.window.pageYOffset - this.anchorPreview.offsetHeight) + 'px';
+            this.anchorPreview.style.right = 'initial';
             if (middleBoundary < halfOffsetWidth) {
                 this.anchorPreview.style.left = defaultLeft + halfOffsetWidth + 'px';
+                this.anchorPreview.style.right = 'initial';
             } else if ((this.window.innerWidth - middleBoundary) < halfOffsetWidth) {
-                this.anchorPreview.style.left = this.window.innerWidth + defaultLeft - halfOffsetWidth + 'px';
+                this.anchorPreview.style.left = 'auto';
+                this.anchorPreview.style.right = 0;
             } else {
                 this.anchorPreview.style.left = defaultLeft + middleBoundary + 'px';
+                this.anchorPreview.style.right = 'initial';
             }
         },
 
@@ -4581,9 +4728,17 @@ MediumEditor.extensions = {};
          */
         cleanPastedHTML: false,
 
+        /* preCleanReplacements: [Array]
+         * custom pairs (2 element arrays) of RegExp and replacement text to use during past when
+         * __forcePlainText__ or __cleanPastedHTML__ are `true` OR when calling `cleanPaste(text)` helper method.
+         * These replacements are executed before any medium editor defined replacements.
+         */
+        preCleanReplacements: [],
+
         /* cleanReplacements: [Array]
          * custom pairs (2 element arrays) of RegExp and replacement text to use during paste when
          * __forcePlainText__ or __cleanPastedHTML__ are `true` OR when calling `cleanPaste(text)` helper method.
+         * These replacements are executed after any medium editor defined replacements.
          */
         cleanReplacements: [],
 
@@ -4661,7 +4816,10 @@ MediumEditor.extensions = {};
         cleanPaste: function (text) {
             var i, elList, tmp, workEl,
                 multiline = /<p|<br|<div/.test(text),
-                replacements = createReplacements().concat(this.cleanReplacements || []);
+                replacements = [].concat(
+                    this.preCleanReplacements || [],
+                    createReplacements(),
+                    this.cleanReplacements || []);
 
             for (i = 0; i < replacements.length; i += 1) {
                 text = text.replace(replacements[i][0], replacements[i][1]);
@@ -4969,6 +5127,11 @@ MediumEditor.extensions = {};
          * the page scrolls.
          */
         sticky: false,
+
+        /* stickyTopOffset: [Number]
+         * Value in pixel of the top offset above the toolbar
+         */
+        stickyTopOffset: 0,
 
         /* updateOnEmptySelection: [boolean]
          * When the __static__ option is true, this enables/disables updating
@@ -5318,7 +5481,7 @@ MediumEditor.extensions = {};
             }
 
             // If we don't have a 'valid' selection -> hide toolbar
-            if (this.window.getSelection().toString().trim() === '' ||
+            if (!MediumEditor.selection.selectionContainsContent(this.document) ||
                 (this.allowMultiParagraphSelection === false && this.multipleBlockElementsSelected())) {
                 return this.hideToolbar();
             }
@@ -5462,15 +5625,13 @@ MediumEditor.extensions = {};
 
             if (this.sticky) {
                 // If it's beyond the height of the editor, position it at the bottom of the editor
-                if (scrollTop > (containerTop + container.offsetHeight - toolbarHeight)) {
+                if (scrollTop > (containerTop + container.offsetHeight - toolbarHeight - this.stickyTopOffset)) {
                     toolbarElement.style.top = (containerTop + container.offsetHeight - toolbarHeight) + 'px';
                     toolbarElement.classList.remove('medium-editor-sticky-toolbar');
-
                 // Stick the toolbar to the top of the window
-                } else if (scrollTop > (containerTop - toolbarHeight)) {
+                } else if (scrollTop > (containerTop - toolbarHeight - this.stickyTopOffset)) {
                     toolbarElement.classList.add('medium-editor-sticky-toolbar');
-                    toolbarElement.style.top = '0px';
-
+                    toolbarElement.style.top = this.stickyTopOffset + 'px';
                 // Normal static toolbar position
                 } else {
                     toolbarElement.classList.remove('medium-editor-sticky-toolbar');
@@ -5506,10 +5667,22 @@ MediumEditor.extensions = {};
         positionToolbar: function (selection) {
             // position the toolbar at left 0, so we can get the real width of the toolbar
             this.getToolbarElement().style.left = '0';
+            this.getToolbarElement().style.right = 'initial';
+
+            var range = selection.getRangeAt(0),
+                boundary = range.getBoundingClientRect();
+
+            // Handle selections with just images
+            if (!boundary || ((boundary.height === 0 && boundary.width === 0) && range.startContainer === range.endContainer)) {
+                // If there's a nested image, use that for the bounding rectangle
+                if (range.startContainer.nodeType === 1 && range.startContainer.querySelector('img')) {
+                    boundary = range.startContainer.querySelector('img').getBoundingClientRect();
+                } else {
+                    boundary = range.startContainer.getBoundingClientRect();
+                }
+            }
 
             var windowWidth = this.window.innerWidth,
-                range = selection.getRangeAt(0),
-                boundary = range.getBoundingClientRect(),
                 middleBoundary = (boundary.left + boundary.right) / 2,
                 toolbarElement = this.getToolbarElement(),
                 toolbarHeight = toolbarElement.offsetHeight,
@@ -5530,10 +5703,13 @@ MediumEditor.extensions = {};
 
             if (middleBoundary < halfOffsetWidth) {
                 toolbarElement.style.left = defaultLeft + halfOffsetWidth + 'px';
+                toolbarElement.style.right = 'initial';
             } else if ((windowWidth - middleBoundary) < halfOffsetWidth) {
-                toolbarElement.style.left = windowWidth + defaultLeft - halfOffsetWidth + 'px';
+                toolbarElement.style.left = 'auto';
+                toolbarElement.style.right = 0;
             } else {
                 toolbarElement.style.left = defaultLeft + middleBoundary + 'px';
+                toolbarElement.style.right = 'initial';
             }
         }
     });
@@ -5673,7 +5849,7 @@ MediumEditor.extensions = {};
                 // instead delete previous node and cancel the event.
                 node.previousElementSibling.parentNode.removeChild(node.previousElementSibling);
                 event.preventDefault();
-            } else if (MediumEditor.util.isKey(event, MediumEditor.util.keyCode.ENTER)) {
+            } else if (!this.options.disableDoubleReturn && MediumEditor.util.isKey(event, MediumEditor.util.keyCode.ENTER)) {
                 // hitting return in the begining of a header will create empty header elements before the current one
                 // instead, make "<p><br></p>" element, which are what happens if you hit return in an empty paragraph
                 p = this.options.ownerDocument.createElement('p');
@@ -6118,7 +6294,8 @@ MediumEditor.extensions = {};
         }
 
         if (action === 'image') {
-            return this.options.ownerDocument.execCommand('insertImage', false, this.options.contentWindow.getSelection());
+            var src = this.options.contentWindow.getSelection().toString().trim();
+            return this.options.ownerDocument.execCommand('insertImage', false, src);
         }
 
         /* Issue: https://github.com/yabwe/medium-editor/issues/595
@@ -6568,7 +6745,7 @@ MediumEditor.extensions = {};
                         // but the selection is contained within the same block element
                         // we want to make sure we create a single link, and not multiple links
                         // which can happen with the built in browser functionality
-                        if (commonAncestorContainer.nodeType !== 3 && startContainerParentElement === endContainerParentElement) {
+                        if (commonAncestorContainer.nodeType !== 3 && commonAncestorContainer.textContent.length !== 0 && startContainerParentElement === endContainerParentElement) {
                             var parentElement = (startContainerParentElement || currentEditor),
                                 fragment = this.options.ownerDocument.createDocumentFragment();
 
@@ -6727,7 +6904,7 @@ MediumEditor.parseVersionString = function (release) {
 
 MediumEditor.version = MediumEditor.parseVersionString.call(this, ({
     // grunt-bump looks for this:
-    'version': '5.11.0'
+    'version': '5.14.0'
 }).version);
 
     return MediumEditor;
