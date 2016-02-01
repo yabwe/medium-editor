@@ -1,4 +1,4 @@
-/*global selectElementContents, placeCursorInsideElement, isPhantom */
+/*global selectElementContents, placeCursorInsideElement */
 
 describe('MediumEditor.selection TestCase', function () {
     'use strict';
@@ -164,12 +164,6 @@ describe('MediumEditor.selection TestCase', function () {
             var range = window.getSelection().getRangeAt(0),
                 node = range.startContainer;
 
-            // For some reason, phantom mucks with the selection range and makes this case not hold
-            // since we only really care about whether this works in actual browsers, it's ok to
-            // skip this assertion unless we're running in a real browser
-            if (!isPhantom()) {
-                expect(MediumEditor.util.isDescendant(link, node, true)).toBe(false);
-            }
             // Even though we set the range to use the P tag as the start container, Safari normalizes the range
             // down to the text node. Setting the range to use the P tag for the start is necessary to support
             // MSIE, where it removes the link when the cursor is placed at the end of the text node in the anchor.

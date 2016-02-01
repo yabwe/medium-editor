@@ -64,10 +64,6 @@ function isFirefox() {
     return navigator.userAgent.toLowerCase().indexOf('firefox') !== -1;
 }
 
-function isPhantom() {
-    return navigator.userAgent.toLowerCase().indexOf('phantomjs') !== -1;
-}
-
 function dataURItoBlob(dataURI) {
     // convert base64/URLEncoded data component to raw binary data held in a string
     var byteString,
