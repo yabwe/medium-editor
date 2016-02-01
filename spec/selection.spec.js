@@ -1,4 +1,4 @@
-/*global selectElementContents, placeCursorInsideElement */
+/*global selectElementContents, placeCursorInsideElement, isSafari */
 
 describe('MediumEditor.selection TestCase', function () {
     'use strict';
@@ -164,6 +164,12 @@ describe('MediumEditor.selection TestCase', function () {
             var range = window.getSelection().getRangeAt(0),
                 node = range.startContainer;
 
+            // For some reason, Safari mucks with the selection range and makes this case not hold
+            // since we only really care about whether this works in IE, and it works as expected
+            // in other browsers, just skip this assertion for Safari
+            if (!isSafari()) {
+                expect(MediumEditor.util.isDescendant(link, node, true)).toBe(false);
+            }
             // Even though we set the range to use the P tag as the start container, Safari normalizes the range
             // down to the text node. Setting the range to use the P tag for the start is necessary to support
             // MSIE, where it removes the link when the cursor is placed at the end of the text node in the anchor.
@@ -397,8 +403,6 @@ describe('MediumEditor.selection TestCase', function () {
             MediumEditor.selection.importSelection(exported, this.el, document);
             range = window.getSelection().getRangeAt(0);
             expect(range.collapsed).toBe(true);
-            window.console.log('Start: ' + range.startContainer.nodeName + ' | ' + range.startContainer.nodeValue + ' | ' + range.startOffset);
-            window.console.log('End: ' + range.endContainer.nodeName + ' | ' + range.endContainer.nodeValue + ' | ' + range.endOffset);
             expect(MediumEditor.util.isDescendant(boldText.parentNode, range.startContainer, true)).toBe(true);
             expect(MediumEditor.util.isDescendant(boldText.parentNode, range.endContainer, true)).toBe(true);
         });
