@@ -928,7 +928,13 @@
             return element;
         },
 
+        // TODO: remove getFirstTextNode AND _getFirstTextNode when jumping in 6.0.0 (no code references)
         getFirstTextNode: function (element) {
+            Util.warn('getFirstTextNode is deprecated and will be removed in version 6.0.0');
+            return Util._getFirstTextNode(element);
+        },
+
+        _getFirstTextNode: function (element) {
             if (element.nodeType === 3) {
                 return element;
             }
