@@ -637,4 +637,30 @@ describe('MediumEditor.util', function () {
             expect(textNodes[2].nodeValue).toBe('link');
         });
     });
+
+    // TODO: Remove these tests when getFirstTextNode is deprecated in 6.0.0
+    describe('getFirstTextNode', function () {
+        it('should find the first text node within an element', function () {
+            var el = this.createElement('div', '', '<p><b><i><u><a href="#">First</a> text</u> in</i> editor</b>!</p>'),
+                anchorText = el.querySelector('a').firstChild,
+                firstText = MediumEditor.util.getFirstTextNode(el);
+
+            expect(firstText).toBe(anchorText);
+        });
+
+        it('should return the text node if passed a text node', function () {
+            var el = this.createElement('div', '', '<p>text</p>'),
+                textNode = el.querySelector('p').firstChild,
+                firstText = MediumEditor.util.getFirstTextNode(textNode);
+
+            expect(firstText).toBe(textNode);
+        });
+
+        it('should return null if no text node exists in element', function () {
+            var el = this.createElement('div'),
+                firstText = MediumEditor.util.getFirstTextNode(el);
+
+            expect(firstText).toBeNull();
+        });
+    });
 });
