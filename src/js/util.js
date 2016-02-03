@@ -940,7 +940,7 @@
             }
 
             for (var i = 0; i < element.childNodes.length; i++) {
-                var textNode = Util.getFirstTextNode(element.childNodes[i]);
+                var textNode = Util._getFirstTextNode(element.childNodes[i]);
                 if (textNode !== null) {
                     return textNode;
                 }
