@@ -506,6 +506,66 @@ describe('MediumEditor.util', function () {
         });
     });
 
+    describe('getClosestBlockContainer', function () {
+        it('should return the closest block container', function () {
+            var el = this.createElement('div', '', '<blockquote><p>paragraph</p><ul><li><span>list item</span></li></ul></blockquote>'),
+                span = el.querySelector('span'),
+                container = MediumEditor.util.getClosestBlockContainer(span);
+            expect(container).toBe(el.querySelector('li'));
+        });
+
+        it('should return the parent editable if element is a text node child of the editor', function () {
+            var el = this.createElement('div', 'editable', ' <p>text</p>'),
+                emptyTextNode = el.firstChild;
+            this.newMediumEditor('.editable');
+            var container = MediumEditor.util.getClosestBlockContainer(emptyTextNode);
+            expect(container).toBe(el);
+        });
+    });
+
+    describe('getTopBlockContainer', function () {
+        it('should return the highest level block container', function () {
+            var el = this.createElement('div', '', '<blockquote><p>paragraph</p><ul><li><span>list item</span></li></ul></blockquote>'),
+                span = el.querySelector('span'),
+                container = MediumEditor.util.getTopBlockContainer(span);
+            expect(container).toBe(el.querySelector('blockquote'));
+        });
+
+        it('should return the parent editable if element is a text node child of the editor', function () {
+            var el = this.createElement('div', 'editable', ' <p>text</p>'),
+                emptyTextNode = el.firstChild;
+            this.newMediumEditor('.editable');
+            var container = MediumEditor.util.getTopBlockContainer(emptyTextNode);
+            expect(container).toBe(el);
+        });
+    });
+
+    describe('findPreviousSibling', function () {
+        it('should return the previous sibling of an element if it exists', function () {
+            var el = this.createElement('div', '', '<p>first <b>second </b><i>third</i></p><ul><li>fourth</li></ul>'),
+                second = el.querySelector('b'),
+                third = el.querySelector('i'),
+                prevSibling = MediumEditor.util.findPreviousSibling(third);
+            expect(prevSibling).toBe(second);
+        });
+
+        it('should return the previous sibling on an ancestor if a previous sibling does not exist', function () {
+            var el = this.createElement('div', '', '<p>first <b>second </b><i>third</i></p><ul><li>fourth</li></ul>'),
+                fourth = el.querySelector('li').firstChild,
+                p = el.querySelector('p'),
+                prevSibling = MediumEditor.util.findPreviousSibling(fourth);
+            expect(prevSibling).toBe(p);
+        });
+
+        it('should not find a previous sibling if the element is at the beginning of an editor element', function () {
+            var el = this.createElement('div', 'editable', '<p>first <b>second </b><i>third</i></p><ul><li>fourth</li></ul>'),
+                first = el.querySelector('p').firstChild;
+            this.newMediumEditor('.editable');
+            var prevSibling = MediumEditor.util.findPreviousSibling(first);
+            expect(prevSibling).toBeFalsy();
+        });
+    });
+
     describe('findOrCreateMatchingTextNodes', function () {
         it('should return text nodes within an element', function () {
             var el = this.createElement('div');

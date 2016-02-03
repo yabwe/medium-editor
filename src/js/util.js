@@ -316,6 +316,22 @@
             return nextNode;
         },
 
+        // Find an element's previous sibling within a medium-editor element
+        // If one doesn't exist, find the closest ancestor's previous sibling
+        findPreviousSibling: function (node) {
+            if (!node || Util.isMediumEditorElement(node)) {
+                return false;
+            }
+
+            var previousSibling = node.previousSibling;
+            while (!previousSibling && !Util.isMediumEditorElement(node.parentNode)) {
+                node = node.parentNode;
+                previousSibling = node.previousSibling;
+            }
+
+            return previousSibling;
+        },
+
         isDescendant: function isDescendant(parent, child, checkEquality) {
             if (!parent || !child) {
                 return false;
@@ -864,17 +880,29 @@
             return element && element.nodeType !== 3 && Util.blockContainerElementNames.indexOf(element.nodeName.toLowerCase()) !== -1;
         },
 
+        /* Finds the closest ancestor which is a block container element
+         * If element is within editor element but not within any other block element,
+         * the editor element is returned
+         */
         getClosestBlockContainer: function (node) {
             return Util.traverseUp(node, function (node) {
-                return Util.isBlockContainer(node);
+                return Util.isBlockContainer(node) || Util.isMediumEditorElement(node);
             });
         },
 
+        /* Finds highest level ancestor element which is a block container element
+         * If element is within editor element but not within any other block element,
+         * the editor element is returned
+         */
         getTopBlockContainer: function (element) {
-            var topBlock = element;
+            var topBlock = Util.isBlockContainer(element) ? element : false;
             Util.traverseUp(element, function (el) {
                 if (Util.isBlockContainer(el)) {
                     topBlock = el;
+                }
+                if (!topBlock && Util.isMediumEditorElement(el)) {
+                    topBlock = el;
+                    return true;
                 }
                 return false;
             });
