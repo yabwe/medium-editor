@@ -1,3 +1,12 @@
+5.14.1 / 2016-02-05
+==================
+* Fix issue with saving selection after newline and whitespace text nodes
+* Fix import/export selection to prefer start of nodes over end of nodes
+* Fix for getClosestBlockContainer utility function
+* Fix for getTopBlockContainer utility function
+* Deprecate getFirstTextNode utility function
+
+
 5.14.0 / 2016-01-31
 ==================
 * Added pre clean replacements
