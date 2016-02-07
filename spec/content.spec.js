@@ -2,7 +2,7 @@
          prepareEvent, selectElementContents,
          selectElementContentsAndFire,
          placeCursorInsideElement,
-         isIE, isFirefox */
+         isFirefox */
 
 describe('Content TestCase', function () {
     'use strict';
