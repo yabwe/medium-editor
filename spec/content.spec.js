@@ -16,7 +16,7 @@ describe('Content TestCase', function () {
         this.cleanupTest();
     });
 
-    it('should removing paragraphs when a list is inserted inside of it', function () {
+    it('should remove paragraphs when a list is inserted inside of it', function () {
         this.el.innerHTML = '<p>lorem ipsum<ul><li>dolor</li></ul></p>';
         var editor = this.newMediumEditor('.editor', {
                 toolbar: {
@@ -30,15 +30,23 @@ describe('Content TestCase', function () {
         fireEvent(toolbar.getToolbarElement().querySelector('[data-action="insertorderedlist"]'), 'click');
         expect(this.el.innerHTML).toMatch(/^<ol><li>lorem ipsum(<br>)?<\/li><\/ol><ul><li>dolor<\/li><\/ul>?/);
 
-        // for Chrome & Safari we manually moved the caret so let's check it
-        if (!isFirefox() && !isIE()) {
-            // ensure the cursor is positioned right after the text
-            sel = document.getSelection();
-            expect(sel.rangeCount).toBe(1);
+        sel = document.getSelection();
+        expect(sel.rangeCount).toBe(1);
+        range = sel.getRangeAt(0);
 
-            range = sel.getRangeAt(0);
-            expect(range.endOffset).toBe('lorem ipsum'.length);
+        // Chrome and Safari collapse the range at the end of the 'lorem ipsum' li
+        // Firefox, IE, and Edge select the 'lorem ipsum' contents
+        if (range.collapsed) {
+            expect(range.startContainer.nodeValue).toBe('lorem ipsum');
+            expect(range.endContainer.nodeValue).toBe('lorem ipsum');
             expect(range.startOffset).toBe('lorem ipsum'.length);
+            expect(range.endOffset).toBe('lorem ipsum'.length);
+        } else {
+            expect(range.toString()).toBe('lorem ipsum');
+            expect(range.startContainer.nodeName.toLowerCase()).toBe('li');
+            expect(range.endContainer.nodeName.toLowerCase()).toBe('li');
+            expect(range.startOffset).toBe(0);
+            expect(range.endOffset).toBe(1);
         }
     });
 
