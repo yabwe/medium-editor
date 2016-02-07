@@ -1,5 +1,5 @@
 /*global selectElementContents,
-         selectElementContentsAndFire, isEdge */
+         selectElementContentsAndFire */
 
 describe('Pasting content', function () {
     'use strict';
