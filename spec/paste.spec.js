@@ -72,8 +72,7 @@ describe('Pasting content', function () {
             {
                 source: 'Text single word with leading/trailing space',
                 paste: ' supercalifragilisticexpalidocious ',
-                // Edge incorrectly remove the leading whitespace >:(
-                output: isEdge() ? '<div id="editor-inner">supercalifragilisticexpalidocious </div>' : '<div id="editor-inner"> supercalifragilisticexpalidocious </div>'
+                output: '<div id="editor-inner"> supercalifragilisticexpalidocious </div>'
             },
             {
                 source: 'Text multi-word with no line breaks',
@@ -282,14 +281,7 @@ describe('Pasting content', function () {
             selectElementContents(document.getElementById('editor-inner'));
 
             editor.cleanPaste('<label>div one</label><label>div two</label>');
-
-            // Edge adds a <font size="2"> tag in here!?!?!
-            // TODO: Is this just completely wrong?
-            if (isEdge()) {
-                expect(this.el.innerHTML).toEqual('Before&nbsp;<span id="editor-inner"><sub><font size="2">div one</font></sub><sub>div two</sub></span>&nbsp;after.');
-            } else {
-                expect(this.el.innerHTML).toMatch(new RegExp('^Before(&nbsp;|\\s)(<span id="editor-inner">)?<sub>div one</sub><sub>div two</sub>(</span>)?(&nbsp;|\\s)after\\.$'));
-            }
+            expect(this.el.innerHTML).toMatch(new RegExp('^Before(&nbsp;|\\s)(<span id="editor-inner">)?<sub>div one</sub><sub>div two</sub>(</span>)?(&nbsp;|\\s)after\\.$'));
         });
 
         it('should respect custom replacements before builtin replacements.', function () {

@@ -35,9 +35,7 @@
 
         if (tag === 'pre') {
             event.preventDefault();
-            // Edge doesn't allow for adding leading whitespace via the 'insertHTML' command
-            // so for Edge, we'll have to inject the 'tab' manually
-            MediumEditor.util.insertHTMLCommand(this.options.ownerDocument, '    ', MediumEditor.util.isEdge);
+            MediumEditor.util.insertHTMLCommand(this.options.ownerDocument, '    ');
         }
 
         // Tab to indent list structures!
