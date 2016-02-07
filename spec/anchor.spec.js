@@ -149,14 +149,25 @@ describe('Anchor Button TestCase', function () {
                 keyCode: MediumEditor.util.keyCode.ENTER
             });
             expect(editor.createLink).toHaveBeenCalled();
-            var expectedHTML = '<p>Hello <a href="http://test.com"><span>world</span>.</a></p>';
-            // Different browser's native createLink implement this differently.
-            if (this.el.innerHTML.indexOf('<strong><a') !== -1) {
-                expectedHTML += '<p><strong><a href="http://test.com">Let us make a link</a></strong> across paragraphs.</p>';
-            } else {
-                expectedHTML += '<p><a href="http://test.com"><strong>Let us make a link</strong></a> across paragraphs.</p>';
-            }
-            expect(this.el.innerHTML).toBe(expectedHTML);
+
+            var anchors = this.el.querySelectorAll('a');
+            // Edge creates 3 links, other browsers create 2
+            expect(anchors.length).toBeGreaterThan(1);
+            expect(anchors.length).toBeLessThan(4);
+
+            var linkText = '';
+            Array.prototype.slice.call(anchors).forEach(function (anchor) {
+                linkText += anchor.textContent;
+            });
+            expect(linkText).toBe('world.Let us make a link');
+
+            var spans = this.el.querySelectorAll('span');
+            expect(spans.length).toBe(1);
+            expect(spans[0].textContent).toBe('world');
+
+            var strongs = this.el.querySelectorAll('strong');
+            expect(strongs.length).toBe(1);
+            expect(strongs[0].textContent).toBe('Let us make a link');
         });
 
         it('shouldn\'t create a link when user presses enter without value', function () {
