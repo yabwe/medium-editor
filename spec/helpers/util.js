@@ -60,6 +60,10 @@ function isIE() {
     return ((navigator.appName === 'Microsoft Internet Explorer') || ((navigator.appName === 'Netscape') && (new RegExp('Trident/.*rv:([0-9]{1,}[.0-9]{0,})').exec(navigator.userAgent) !== null)));
 }
 
+function isEdge() {
+    return new RegExp('Edge/\\d+').exec(navigator.userAgent) !== null;
+}
+
 function isFirefox() {
     return navigator.userAgent.toLowerCase().indexOf('firefox') !== -1;
 }

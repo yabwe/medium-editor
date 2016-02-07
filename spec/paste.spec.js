@@ -72,7 +72,8 @@ describe('Pasting content', function () {
             {
                 source: 'Text single word with leading/trailing space',
                 paste: ' supercalifragilisticexpalidocious ',
-                output: '<div id="editor-inner"> supercalifragilisticexpalidocious </div>'
+                // Edge incorrectly remove the leading whitespace >:(
+                output: isEdge() ? '<div id="editor-inner">supercalifragilisticexpalidocious </div>' : '<div id="editor-inner"> supercalifragilisticexpalidocious </div>'
             },
             {
                 source: 'Text multi-word with no line breaks',
@@ -414,7 +415,7 @@ describe('Pasting content', function () {
                 };
 
             for (i = 0; i < textTests.length; i += 1) {
-                editorEl.innerHTML = '<div id="editor-inner">&nbsp</div>';
+                editorEl.innerHTML = '<div id="editor-inner">&nbsp;</div>';
 
                 range = document.createRange();
                 range.selectNodeContents(editorEl.firstChild);
