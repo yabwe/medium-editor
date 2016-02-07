@@ -10,7 +10,7 @@ MediumEditor has been written using vanilla JavaScript, no additional frameworks
 
 [![Sauce Test Status](https://saucelabs.com/browser-matrix/mediumeditor.svg)](https://saucelabs.com/u/mediumeditor)
 
-![Supportd Browsers](https://cloud.githubusercontent.com/assets/2444240/7519189/a819e426-f4ad-11e4-8740-626396c5d61b.png)
+![Supportd Browsers](https://cloud.githubusercontent.com/assets/2444240/12874138/d3960a04-cd9b-11e5-8cc5-8136d82cf5f6.png)
 
 [![NPM info](https://nodei.co/npm/medium-editor.png?downloads=true)](https://www.npmjs.com/package/medium-editor)
 
