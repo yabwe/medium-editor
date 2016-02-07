@@ -436,10 +436,10 @@
         },
 
         // http://stackoverflow.com/questions/6690752/insert-html-at-caret-in-a-contenteditable-div
-        insertHTMLCommand: function (doc, html) {
+        insertHTMLCommand: function (doc, html, skipExecCommand) {
             var selection, range, el, fragment, node, lastNode, toReplace;
 
-            if (doc.queryCommandSupported('insertHTML')) {
+            if (!skipExecCommand && doc.queryCommandSupported('insertHTML')) {
                 try {
                     return doc.execCommand('insertHTML', false, html);
                 } catch (ignore) {}
