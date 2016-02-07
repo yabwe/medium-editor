@@ -248,7 +248,7 @@ describe('Anchor Preview TestCase', function () {
             anchorPreview = editor.getExtensionByName('anchor-preview'),
             toolbar = editor.getExtensionByName('toolbar');
 
-            selectElementContentsAndFire(editor.elements[0].firstChild);
+            selectElementContentsAndFire(editor.elements[0].firstChild, { eventToFire: 'click' });
 
             // show preview
             spyOn(MediumEditor.extensions.anchorPreview.prototype, 'showPreview').and.callThrough();
@@ -282,6 +282,7 @@ describe('Anchor Preview TestCase', function () {
 
             // preview shows only after delay
             jasmine.clock().tick(250);
+
             expect(anchorPreview.showPreview).not.toHaveBeenCalled();
             expect(toolbar.isDisplayed()).toBe(true);
             expect(anchorPreview.getPreviewElement().classList.contains('medium-toolbar-arrow-over')).toBe(false);
