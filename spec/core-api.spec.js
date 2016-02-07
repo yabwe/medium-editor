@@ -64,8 +64,7 @@ describe('Core-API', function () {
                     }
                 }),
                 toolbar = editor.getExtensionByName('toolbar'),
-                button,
-                regex;
+                button;
 
             // Save selection around <i> tag
             selectElementContents(editor.elements[0].querySelector('i'));
@@ -77,11 +76,13 @@ describe('Core-API', function () {
             fireEvent(button, 'click');
 
             // Restore selection back to <i> tag and add a <strike> tag
-            regex = new RegExp('^<u>lorem (<i><strike>|<strike><i>)ipsum(</i></strike>|</strike></i>) dolor</u>$');
             editor.restoreSelection();
             button = toolbar.getToolbarElement().querySelector('[data-action="strikethrough"]');
             fireEvent(button, 'click');
-            expect(regex.test(editor.elements[0].innerHTML)).toBe(true);
+
+            // Edge breaks this into 3 separate <u> tags for some reason...
+            var regex = new RegExp('^<u>lorem (<i><strike>|<strike><i>|</u><i><u><strike>)ipsum(</i></strike>|</strike></i>|</strike></u></i><u>) dolor</u>$');
+            expect(editor.elements[0].innerHTML).toMatch(regex);
         });
     });
 
