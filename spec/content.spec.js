@@ -636,7 +636,8 @@ describe('Content TestCase', function () {
             selectElementContentsAndFire(blockquote);
             editor.execAction('justifyCenter');
             blockquote = this.el.querySelector('blockquote');
-            expect(blockquote.querySelectorAll('br').length).toBe(3, 'Some of the <br> elements have been removed from the <blockquote>');
+            // Edge adds another <br /> automatically for some reason...
+            expect(blockquote.querySelectorAll('br').length).toBeGreaterThan(2, 'Some of the <br> elements have been removed from the <blockquote>');
             expect(blockquote.querySelectorAll('div').length).toBe(0, 'Some <br> elements were replaced with <div> elements within the <blckquote>');
         });
 
