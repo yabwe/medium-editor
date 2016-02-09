@@ -90,32 +90,6 @@ describe('Setup/Destroy TestCase', function () {
             expect(editor.checkSelection).not.toHaveBeenCalled();
         });
 
-        // regression test for https://github.com/yabwe/medium-editor/issues/390
-        it('should work with multiple elements of the same class', function () {
-            var editor,
-                el,
-                i;
-
-            for (i = 0; i < 3; i += 1) {
-                el = this.createElement('div', 'editor');
-                el.textContent = i;
-            }
-
-            editor = this.newMediumEditor('.editor');
-            var toolbar = editor.getExtensionByName('toolbar');
-
-            spyOn(toolbar, 'hideToolbar').and.callThrough(); // via: handleBlur
-
-            selectElementContentsAndFire(editor.elements[0]);
-            expect(toolbar.hideToolbar).not.toHaveBeenCalled();
-
-            selectElementContentsAndFire(editor.elements[1]);
-            expect(toolbar.hideToolbar).not.toHaveBeenCalled();
-
-            selectElementContentsAndFire(editor.elements[2]);
-            expect(toolbar.hideToolbar).not.toHaveBeenCalled();
-        });
-
         // regression test for https://github.com/yabwe/medium-editor/issues/197
         it('should not crash when destroy immediately after a mouse click', function () {
             var editor = this.newMediumEditor('.editor');

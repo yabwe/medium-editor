@@ -174,6 +174,33 @@ describe('MediumEditor.extensions.toolbar TestCase', function () {
             expect(callbackHide).toHaveBeenCalledWith({}, this.el);
         });
 
+        // regression test for https://github.com/yabwe/medium-editor/issues/390
+        it('should work with multiple elements of the same class', function () {
+            var editor,
+                el,
+                i;
+
+            this.el.textContent = '0';
+            for (i = 1; i < 3; i += 1) {
+                el = this.createElement('div', 'editor');
+                el.textContent = i;
+            }
+
+            expect(document.querySelectorAll('.editor').length).toBe(3);
+
+            editor = this.newMediumEditor('.editor');
+            var toolbar = editor.getExtensionByName('toolbar');
+
+            selectElementContentsAndFire(editor.elements[0]);
+            expect(toolbar.isDisplayed()).toBe(true);
+
+            selectElementContentsAndFire(editor.elements[1]);
+            expect(toolbar.isDisplayed()).toBe(true);
+
+            selectElementContentsAndFire(editor.elements[2]);
+            expect(toolbar.isDisplayed()).toBe(true);
+        });
+
         it('should not hide when selecting a link containing only an image', function () {
             this.el.innerHTML = '<p>Here is an <a href="#"><img src="../demo/img/medium-editor.jpg"></a> image</p>';
             var editor = this.newMediumEditor('.editor'),
@@ -627,7 +654,7 @@ describe('MediumEditor.extensions.toolbar TestCase', function () {
 
     describe('Relative Toolbars', function () {
         it('should contain relative toolbar class', function () {
-            var relativeContainer = window.document.createElement('div');
+            var relativeContainer = this.createElement('div');
             relativeContainer.setAttribute('id', 'someRelativeDiv');
             window.document.body.appendChild(relativeContainer);
 
@@ -642,7 +669,7 @@ describe('MediumEditor.extensions.toolbar TestCase', function () {
         });
 
         it('should be included in relative node', function () {
-            var relativeContainer = window.document.createElement('div');
+            var relativeContainer = this.createElement('div');
             relativeContainer.setAttribute('id', 'someRelativeDiv');
             window.document.body.appendChild(relativeContainer);
 
