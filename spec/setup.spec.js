@@ -94,16 +94,11 @@ describe('Setup/Destroy TestCase', function () {
         it('should work with multiple elements of the same class', function () {
             var editor,
                 el,
-                elements = [],
                 i;
 
             for (i = 0; i < 3; i += 1) {
-                el = document.createElement('div');
-                el.className = 'editor';
+                el = this.createElement('div', 'editor');
                 el.textContent = i;
-                elements.push(
-                    document.body.appendChild(el)
-                );
             }
 
             editor = this.newMediumEditor('.editor');
@@ -119,10 +114,6 @@ describe('Setup/Destroy TestCase', function () {
 
             selectElementContentsAndFire(editor.elements[2]);
             expect(toolbar.hideToolbar).not.toHaveBeenCalled();
-
-            elements.forEach(function (element) {
-                document.body.removeChild(element);
-            });
         });
 
         // regression test for https://github.com/yabwe/medium-editor/issues/197
