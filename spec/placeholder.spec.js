@@ -24,7 +24,7 @@ describe('MediumEditor.extensions.placeholder TestCase', function () {
     });
 
     it('should not set a placeholder for elements with images only', function () {
-        this.el.innerHTML = '<img src="foo.jpg">';
+        this.el.innerHTML = '<img src="../demo/img/roman.jpg">';
         var editor = this.newMediumEditor('.editor');
         expect(editor.elements[0].className).not.toContain('medium-editor-placeholder');
     });

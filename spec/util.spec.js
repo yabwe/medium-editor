@@ -602,7 +602,7 @@ describe('MediumEditor.util', function () {
 
         it('should return an image when it falls within the specified range', function () {
             var el = this.createElement('div');
-            el.innerHTML = '<p>Plain <b>bold</b> <a href="#">li<img src="../demo.img/medium-editor.jpg" />nk</a> <i>italic</i> <u>underline</u> <span>span1 <span>span2</span></span></p>';
+            el.innerHTML = '<p>Plain <b>bold</b> <a href="#">li<img src="../demo/img/medium-editor.jpg" />nk</a> <i>italic</i> <u>underline</u> <span>span1 <span>span2</span></span></p>';
             var textNodes = MediumEditor.util.findOrCreateMatchingTextNodes(document, el, { start: 11, end: 15 });
             expect(textNodes.length).toBe(3);
             expect(textNodes[0].nodeValue).toBe('li');
@@ -612,7 +612,7 @@ describe('MediumEditor.util', function () {
 
         it('should return an image when it is at the end of the specified range', function () {
             var el = this.createElement('div');
-            el.innerHTML = '<p>Plain <b>bold</b> <a href="#">link<img src="../demo.img/medium-editor.jpg" /></a> <i>italic</i> <u>underline</u> <span>span1 <span>span2</span></span></p>';
+            el.innerHTML = '<p>Plain <b>bold</b> <a href="#">link<img src="../demo/img/medium-editor.jpg" /></a> <i>italic</i> <u>underline</u> <span>span1 <span>span2</span></span></p>';
             var textNodes = MediumEditor.util.findOrCreateMatchingTextNodes(document, el, { start: 11, end: 15 });
             expect(textNodes.length).toBe(2);
             expect(textNodes[0].nodeValue).toBe('link');
@@ -621,7 +621,7 @@ describe('MediumEditor.util', function () {
 
         it('should return an image when it is the only content in the specified range', function () {
             var el = this.createElement('div');
-            el.innerHTML = '<p>Plain <b>bold</b> <a href="#"><img src="../demo.img/medium-editor.jpg" /></a> <i>italic</i> <u>underline</u> <span>span1 <span>span2</span></span></p>';
+            el.innerHTML = '<p>Plain <b>bold</b> <a href="#"><img src="../demo/img/medium-editor.jpg" /></a> <i>italic</i> <u>underline</u> <span>span1 <span>span2</span></span></p>';
             var textNodes = MediumEditor.util.findOrCreateMatchingTextNodes(document, el, { start: 11, end: 11 });
             expect(textNodes.length).toBe(1);
             expect(textNodes[0].nodeName.toLowerCase()).toBe('img');
@@ -629,7 +629,7 @@ describe('MediumEditor.util', function () {
 
         it('should return images when they are at the beginning of the specified range', function () {
             var el = this.createElement('div');
-            el.innerHTML = '<p>Plain <b>bold</b> <a href="#"><img src="../demo.img/medium-editor.jpg" /><img src="../demo.img/roman.jpg" />link</a> <i>italic</i> <u>underline</u> <span>span1 <span>span2</span></span></p>';
+            el.innerHTML = '<p>Plain <b>bold</b> <a href="#"><img src="../demo/img/medium-editor.jpg" /><img src="../demo/img/roman.jpg" />link</a> <i>italic</i> <u>underline</u> <span>span1 <span>span2</span></span></p>';
             var textNodes = MediumEditor.util.findOrCreateMatchingTextNodes(document, el, { start: 11, end: 15 });
             expect(textNodes.length).toBe(3);
             expect(textNodes[0].nodeName.toLowerCase()).toBe('img');

@@ -367,7 +367,7 @@ describe('MediumEditor.selection TestCase', function () {
         });
 
         it('should support a selection that ends with an image', function () {
-            this.el.innerHTML = '<p>lorem ipsum <a href="#">img<img src="../demo/img/medium-editor.jpg" /><img src="../img/roman.jpg" /></a> dolor</p>';
+            this.el.innerHTML = '<p>lorem ipsum <a href="#">img<img src="../demo/img/medium-editor.jpg" /><img src="../demo/img/roman.jpg" /></a> dolor</p>';
             MediumEditor.selection.importSelection({ start: 12, end: 15, trailingImageCount: 2 }, this.el, document);
             var range = window.getSelection().getRangeAt(0);
             expect(range.toString()).toBe('img');
