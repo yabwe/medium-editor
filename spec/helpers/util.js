@@ -220,5 +220,5 @@ function selectElementContents(el, options) {
 function selectElementContentsAndFire(el, options) {
     options = options || {};
     selectElementContents(el, options);
-    fireEvent(el, options.eventToFire || 'focus');
+    fireEvent(el, options.eventToFire || 'click');
 }

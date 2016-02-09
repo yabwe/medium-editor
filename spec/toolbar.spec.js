@@ -333,7 +333,7 @@ describe('MediumEditor.extensions.toolbar TestCase', function () {
                 }),
                 toolbar = editor.getExtensionByName('toolbar');
 
-            selectElementContentsAndFire(this.el.querySelector('b'));
+            selectElementContentsAndFire(this.el.querySelector('b'), { eventToFire: 'focus' });
             window.getSelection().removeAllRanges();
             editor.checkSelection();
             jasmine.clock().tick(1); // checkSelection delay
@@ -352,7 +352,7 @@ describe('MediumEditor.extensions.toolbar TestCase', function () {
                 }),
                 toolbar = editor.getExtensionByName('toolbar');
 
-            selectElementContentsAndFire(this.el.querySelector('b'));
+            selectElementContentsAndFire(this.el.querySelector('b'), { eventToFire: 'focus' });
             window.getSelection().removeAllRanges();
             editor.checkSelection();
             jasmine.clock().tick(1); // checkSelection delay

@@ -248,7 +248,7 @@ describe('Anchor Preview TestCase', function () {
             anchorPreview = editor.getExtensionByName('anchor-preview'),
             toolbar = editor.getExtensionByName('toolbar');
 
-            selectElementContentsAndFire(editor.elements[0].firstChild, { eventToFire: 'click' });
+            selectElementContentsAndFire(editor.elements[0].firstChild);
 
             // show preview
             spyOn(MediumEditor.extensions.anchorPreview.prototype, 'showPreview').and.callThrough();
