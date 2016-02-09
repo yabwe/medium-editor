@@ -55,7 +55,6 @@ describe('MediumEditor.extensions.toolbar TestCase', function () {
             var toolbar = editor.getExtensionByName('toolbar');
             selectElementContentsAndFire(document.getElementById('bold_dolorOne'));
 
-            jasmine.clock().tick(51);
             expect(toolbar.getToolbarElement().querySelector('button[data-action="bold"]').classList.contains('medium-editor-button-active')).toBe(true);
         });
 
@@ -67,14 +66,10 @@ describe('MediumEditor.extensions.toolbar TestCase', function () {
 
             editor.stopSelectionUpdates();
             selectElementContentsAndFire(document.getElementById('bold_dolorTwo'));
-
-            jasmine.clock().tick(51);
             expect(toolbar.getToolbarElement().querySelector('button[data-action="bold"]').classList.contains('medium-editor-button-active')).toBe(false);
 
             editor.startSelectionUpdates();
             selectElementContentsAndFire(document.getElementById('bold_dolorTwo'), { eventToFire: 'mouseup' });
-
-            jasmine.clock().tick(51);
             expect(toolbar.getToolbarElement().querySelector('button[data-action="bold"]').classList.contains('medium-editor-button-active')).toBe(true);
         });
 
@@ -134,7 +129,6 @@ describe('MediumEditor.extensions.toolbar TestCase', function () {
             selectElementContentsAndFire(this.el, { eventToFire: 'focus' });
 
             // Remove selection and call check selection, which should make the toolbar be hidden
-            jasmine.clock().tick(1);
             window.getSelection().removeAllRanges();
             editor.checkSelection();
 
@@ -161,7 +155,6 @@ describe('MediumEditor.extensions.toolbar TestCase', function () {
             expect(callbackShow).toHaveBeenCalledWith({}, this.el);
 
             // Remove selection and call check selection, which should make the toolbar be hidden
-            jasmine.clock().tick(1);
             window.getSelection().removeAllRanges();
             editor.checkSelection();
 
@@ -205,7 +198,6 @@ describe('MediumEditor.extensions.toolbar TestCase', function () {
             outsideElement.setAttribute('style', '-webkit-user-select: none; -moz-user-select: none; -ms-user-select: none; user-select: none;');
 
             selectElementContentsAndFire(editor.elements[0].firstChild);
-            jasmine.clock().tick(51);
             expect(toolbar.isDisplayed()).toBe(true);
 
             fireEvent(outsideElement, 'mousedown');
@@ -281,7 +273,6 @@ describe('MediumEditor.extensions.toolbar TestCase', function () {
                 toolbar = editor.getExtensionByName('toolbar');
             expect(toolbar.getToolbarElement().classList.contains('medium-editor-toolbar-active')).toBe(false);
             selectElementContentsAndFire(this.el);
-            jasmine.clock().tick(51);
             expect(toolbar.getToolbarElement().classList.contains('medium-editor-toolbar-active')).toBe(true);
         });
 
@@ -293,7 +284,6 @@ describe('MediumEditor.extensions.toolbar TestCase', function () {
             var editor = this.newMediumEditor('.editor'),
                 toolbar = editor.getExtensionByName('toolbar');
             selectElementContentsAndFire(this.el);
-            jasmine.clock().tick(51);
             expect(toolbar.setToolbarPosition).toHaveBeenCalled();
             expect(toolbar.setToolbarButtonStates).toHaveBeenCalled();
             expect(toolbar.showAndUpdateToolbar).toHaveBeenCalled();
@@ -333,7 +323,7 @@ describe('MediumEditor.extensions.toolbar TestCase', function () {
                 }),
                 toolbar = editor.getExtensionByName('toolbar');
 
-            selectElementContentsAndFire(this.el.querySelector('b'), { eventToFire: 'focus' });
+            selectElementContentsAndFire(this.el.querySelector('b'), { eventToFire: 'focus', testDelay: -1 });
             window.getSelection().removeAllRanges();
             editor.checkSelection();
             jasmine.clock().tick(1); // checkSelection delay
@@ -352,7 +342,7 @@ describe('MediumEditor.extensions.toolbar TestCase', function () {
                 }),
                 toolbar = editor.getExtensionByName('toolbar');
 
-            selectElementContentsAndFire(this.el.querySelector('b'), { eventToFire: 'focus' });
+            selectElementContentsAndFire(this.el.querySelector('b'), { eventToFire: 'focus', testDelay: -1 });
             window.getSelection().removeAllRanges();
             editor.checkSelection();
             jasmine.clock().tick(1); // checkSelection delay
@@ -415,8 +405,6 @@ describe('MediumEditor.extensions.toolbar TestCase', function () {
             });
 
             selectElementContentsAndFire(this.el, { collapse: 'toStart' });
-            jasmine.clock().tick(51);
-
             expect(editor.getExtensionByName('toolbar').setToolbarButtonStates).toHaveBeenCalled();
         });
     });
@@ -460,7 +448,6 @@ describe('MediumEditor.extensions.toolbar TestCase', function () {
             expect(editor.elements.length).toBe(2);
             expect(toolbar.getToolbarElement().style.display).toBe('');
             selectElementContentsAndFire(element);
-            jasmine.clock().tick(51);
 
             expect(toolbar.getToolbarElement().style.display).toBe('');
         });
@@ -473,8 +460,6 @@ describe('MediumEditor.extensions.toolbar TestCase', function () {
                 toolbar = editor.getExtensionByName('toolbar');
 
             selectElementContentsAndFire(document.getElementById('cef_el'));
-
-            jasmine.clock().tick(51);
             expect(toolbar.getToolbarElement().classList.contains('medium-editor-toolbar-active')).toBe(false);
         });
 
@@ -533,7 +518,6 @@ describe('MediumEditor.extensions.toolbar TestCase', function () {
             var editor = this.newMediumEditor('.editor'),
                 toolbar = editor.getExtensionByName('toolbar');
             selectElementContentsAndFire(editor.elements[0]);
-            jasmine.clock().tick(1);
             expect(toolbar.getToolbarElement().className.indexOf('active')).toBeGreaterThan(-1);
             spyOn(toolbar, 'setToolbarPosition');
             fireEvent(window, 'resize');
@@ -558,7 +542,6 @@ describe('MediumEditor.extensions.toolbar TestCase', function () {
                 totalTicks;
 
             selectElementContentsAndFire(editor.elements[0]);
-            jasmine.clock().tick(1);
             expect(toolbar.getToolbarElement().className.indexOf('active')).toBeGreaterThan(-1);
 
             spyOn(toolbar, 'setToolbarPosition').and.callThrough();

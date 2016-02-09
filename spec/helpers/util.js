@@ -221,4 +221,11 @@ function selectElementContentsAndFire(el, options) {
     options = options || {};
     selectElementContents(el, options);
     fireEvent(el, options.eventToFire || 'click');
+    if (options.testDelay !== -1) {
+        if (!options.testDelay) {
+            jasmine.clock().tick(1);
+        } else {
+            jasmine.clock().tick(options.testDelay);
+        }
+    }
 }

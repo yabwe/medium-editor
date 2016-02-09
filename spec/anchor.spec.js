@@ -40,7 +40,6 @@ describe('Anchor Button TestCase', function () {
                 code = 'K'.charCodeAt(0);
 
             selectElementContentsAndFire(editor.elements[0]);
-            jasmine.clock().tick(1);
             fireEvent(editor.elements[0], 'keydown', {
                 keyCode: code,
                 ctrlKey: true,
@@ -623,8 +622,8 @@ describe('Anchor Button TestCase', function () {
                 editor = this.newMediumEditor('.editor'),
                 anchorExtension = editor.getExtensionByName('anchor'),
                 toolbar = editor.getExtensionByName('toolbar');
+
             selectElementContentsAndFire(editor.elements[0]);
-            jasmine.clock().tick(1);
             button = toolbar.getToolbarElement().querySelector('[data-action="createLink"]');
             fireEvent(button, 'click');
             expect(toolbar.getToolbarActionsElement().style.display).toBe('none');
@@ -638,8 +637,8 @@ describe('Anchor Button TestCase', function () {
                 editor = this.newMediumEditor('.editor'),
                 toolbar = editor.getExtensionByName('toolbar');
             spyOn(document, 'execCommand').and.callThrough();
+
             selectElementContentsAndFire(editor.elements[0]);
-            jasmine.clock().tick(11); // checkSelection delay
             button = toolbar.getToolbarElement().querySelector('[data-action="createLink"]');
             fireEvent(button, 'click');
             expect(this.el.innerHTML).toBe('link');

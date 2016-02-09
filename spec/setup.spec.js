@@ -1,5 +1,4 @@
-/*global fireEvent, selectElementContents,
-         selectElementContentsAndFire */
+/*global fireEvent, selectElementContentsAndFire */
 
 describe('Setup/Destroy TestCase', function () {
     'use strict';
@@ -113,16 +112,12 @@ describe('Setup/Destroy TestCase', function () {
             spyOn(toolbar, 'hideToolbar').and.callThrough(); // via: handleBlur
 
             selectElementContentsAndFire(editor.elements[0]);
-            jasmine.clock().tick(51);
             expect(toolbar.hideToolbar).not.toHaveBeenCalled();
 
             selectElementContentsAndFire(editor.elements[1]);
-            jasmine.clock().tick(51);
             expect(toolbar.hideToolbar).not.toHaveBeenCalled();
 
-            selectElementContents(editor.elements[2]);
             selectElementContentsAndFire(editor.elements[2]);
-            jasmine.clock().tick(51);
             expect(toolbar.hideToolbar).not.toHaveBeenCalled();
 
             elements.forEach(function (element) {
@@ -134,8 +129,7 @@ describe('Setup/Destroy TestCase', function () {
         it('should not crash when destroy immediately after a mouse click', function () {
             var editor = this.newMediumEditor('.editor');
             // selected some content and let the toolbar appear
-            selectElementContents(editor.elements[0]);
-            jasmine.clock().tick(501);
+            selectElementContentsAndFire(editor.elements[0], { testDelay: 501 });
 
             // fire a mouse up somewhere else (i.e. a button which click handler could have called destroy() )
             fireEvent(document.documentElement, 'mouseup');
