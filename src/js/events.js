@@ -11,7 +11,7 @@
     };
 
     Events.prototype = {
-        InputEventOnContenteditableSupported: !MediumEditor.util.isIE,
+        InputEventOnContenteditableSupported: !MediumEditor.util.isIE && !MediumEditor.util.isEdge,
 
         // Helpers for event handling
 
