@@ -60,7 +60,7 @@ function isIE() {
     return ((navigator.appName === 'Microsoft Internet Explorer') || ((navigator.appName === 'Netscape') && (new RegExp('Trident/.*rv:([0-9]{1,}[.0-9]{0,})').exec(navigator.userAgent) !== null)));
 }
 
-function isEdge() {
+function getEdgeVersion() {
     var match = /Edge\/(\d+)/.exec(navigator.userAgent);
     if (match !== null) {
         return new Number(match[1]);

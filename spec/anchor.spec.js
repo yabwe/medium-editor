@@ -1,5 +1,5 @@
 /*global fireEvent, selectElementContents,
-         selectElementContentsAndFire, isEdge */
+         selectElementContentsAndFire, getEdgeVersion */
 
 describe('Anchor Button TestCase', function () {
     'use strict';
@@ -580,7 +580,7 @@ describe('Anchor Button TestCase', function () {
             // This appears to be broken in Edge < 13, but works correctly in Edge 13 or higher
             // So for the sake of sanity, disabling this check for Edge 12.
             // TODO: Find a better way to fix this issue if Edge 12 is going to matter
-            var edgeVersion = isEdge();
+            var edgeVersion = getEdgeVersion();
             if (!edgeVersion || edgeVersion >= 13) {
                 expect(this.el.innerHTML).toContain('<a href="http://www.google.com"><img src="../demo/img/medium-editor.jpg"></a>');
             }
