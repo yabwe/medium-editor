@@ -55,7 +55,7 @@ describe('Buttons TestCase', function () {
                 editor = this.newMediumEditor('.editor'),
                 toolbar = editor.getExtensionByName('toolbar');
             selectElementContentsAndFire(editor.elements[0]);
-            jasmine.clock().tick(11); // checkSelection delay
+            jasmine.clock().tick(1); // checkSelection delay
             button = toolbar.getToolbarElement().querySelector('[data-action="bold"]');
             expect(button.className).toContain('medium-editor-button-active');
             fireEvent(button, 'click');
@@ -392,6 +392,7 @@ describe('Buttons TestCase', function () {
 
             this.el.innerHTML = '<b>lorem ipsum</b>';
             selectElementContentsAndFire(editor.elements[0]);
+            jasmine.clock().tick(1); // checkSelection delay
             expect(button.classList.contains('medium-editor-button-active')).toBe(true);
 
             fireEvent(button, 'click');
@@ -415,6 +416,7 @@ describe('Buttons TestCase', function () {
 
             this.el.innerHTML = '<b><i><u>lorem ipsum</u></i></b>';
             selectElementContentsAndFire(editor.elements[0].querySelector('u'));
+            jasmine.clock().tick(1); // checkSelection delay
             expect(button.classList.contains('medium-editor-button-active')).toBe(true);
 
             fireEvent(button, 'click');
@@ -432,6 +434,7 @@ describe('Buttons TestCase', function () {
 
             this.el.innerHTML = '<p><span id="bold-span" style="font-weight: bold">lorem ipsum</span></p>';
             selectElementContentsAndFire(document.getElementById('bold-span'));
+            jasmine.clock().tick(1); // checkSelection delay
             expect(button.classList.contains('medium-editor-button-active')).toBe(true);
 
             fireEvent(button, 'click');
@@ -467,6 +470,7 @@ describe('Buttons TestCase', function () {
 
             this.el.innerHTML = '<i>lorem ipsum</i>';
             selectElementContentsAndFire(editor.elements[0]);
+            jasmine.clock().tick(1); // checkSelection delay
             expect(button.classList.contains('medium-editor-button-active')).toBe(true);
 
             fireEvent(button, 'click');
@@ -490,6 +494,7 @@ describe('Buttons TestCase', function () {
 
             this.el.innerHTML = '<i><b><u>lorem ipsum</u></b></i>';
             selectElementContentsAndFire(editor.elements[0].querySelector('u'));
+            jasmine.clock().tick(1); // checkSelection delay
             expect(button.classList.contains('medium-editor-button-active')).toBe(true);
 
             fireEvent(button, 'click');
@@ -507,6 +512,7 @@ describe('Buttons TestCase', function () {
 
             this.el.innerHTML = '<p><span id="italic-span" style="font-style: italic">lorem ipsum</span></p>';
             selectElementContentsAndFire(document.getElementById('italic-span'));
+            jasmine.clock().tick(1); // checkSelection delay
             expect(button.classList.contains('medium-editor-button-active')).toBe(true);
 
             fireEvent(button, 'click');
@@ -529,6 +535,7 @@ describe('Buttons TestCase', function () {
 
             this.el.innerHTML = '<u>lorem ipsum</u>';
             selectElementContentsAndFire(editor.elements[0]);
+            jasmine.clock().tick(1); // checkSelection delay
             expect(button.classList.contains('medium-editor-button-active')).toBe(true);
 
             fireEvent(button, 'click');
@@ -549,6 +556,7 @@ describe('Buttons TestCase', function () {
 
             this.el.innerHTML = '<u><b><i>lorem ipsum</i></b></u>';
             selectElementContentsAndFire(editor.elements[0].querySelector('i'));
+            jasmine.clock().tick(1); // checkSelection delay
             expect(button.classList.contains('medium-editor-button-active')).toBe(true);
 
             fireEvent(button, 'click');
@@ -566,6 +574,7 @@ describe('Buttons TestCase', function () {
 
             this.el.innerHTML = '<p><span id="underline-span" style="text-decoration: underline">lorem ipsum</span></p>';
             selectElementContentsAndFire(document.getElementById('underline-span'));
+            jasmine.clock().tick(1); // checkSelection delay
             expect(button.classList.contains('medium-editor-button-active')).toBe(true);
 
             fireEvent(button, 'click');
@@ -588,6 +597,7 @@ describe('Buttons TestCase', function () {
 
             this.el.innerHTML = '<strike>lorem ipsum</strike>';
             selectElementContentsAndFire(editor.elements[0]);
+            jasmine.clock().tick(1); // checkSelection delay
             expect(button.classList.contains('medium-editor-button-active')).toBe(true);
 
             fireEvent(button, 'click');
@@ -608,6 +618,7 @@ describe('Buttons TestCase', function () {
 
             this.el.innerHTML = '<strike><b><i>lorem ipsum</i></b></strike>';
             selectElementContentsAndFire(editor.elements[0].querySelector('i'));
+            jasmine.clock().tick(1); // checkSelection delay
             expect(button.classList.contains('medium-editor-button-active')).toBe(true);
 
             fireEvent(button, 'click');
@@ -625,6 +636,7 @@ describe('Buttons TestCase', function () {
 
             this.el.innerHTML = '<p><span id="strike-span" style="text-decoration: line-through">lorem ipsum</span></p>';
             selectElementContentsAndFire(document.getElementById('strike-span'));
+            jasmine.clock().tick(1); // checkSelection delay
             expect(button.classList.contains('medium-editor-button-active')).toBe(true);
 
             fireEvent(button, 'click');
@@ -647,6 +659,7 @@ describe('Buttons TestCase', function () {
 
             this.el.innerHTML = '<sup>lorem ipsum</sub>';
             selectElementContentsAndFire(editor.elements[0]);
+            jasmine.clock().tick(1); // checkSelection delay
             expect(button.classList.contains('medium-editor-button-active')).toBe(true);
 
             fireEvent(button, 'click');
@@ -667,6 +680,7 @@ describe('Buttons TestCase', function () {
 
             this.el.innerHTML = '<sub>lorem ipsum</sub>';
             selectElementContentsAndFire(editor.elements[0]);
+            jasmine.clock().tick(1); // checkSelection delay
             expect(button.classList.contains('medium-editor-button-active')).toBe(true);
 
             fireEvent(button, 'click');
@@ -687,6 +701,7 @@ describe('Buttons TestCase', function () {
 
             this.el.innerHTML = '<p><span id="span-lorem">lorem</span> <a href="#" id="link">ipsum</a></p>';
             selectElementContentsAndFire(document.getElementById('link'));
+            jasmine.clock().tick(1); // checkSelection delay
             expect(button.classList.contains('medium-editor-button-active')).toBe(true);
 
             selectElementContentsAndFire(document.getElementById('span-lorem'), { eventToFire: 'mouseup' });
@@ -758,6 +773,7 @@ describe('Buttons TestCase', function () {
 
             this.el.innerHTML = '<ol><li id="li-lorem">lorem ipsum</li></ol>';
             selectElementContentsAndFire(document.getElementById('li-lorem'));
+            jasmine.clock().tick(1); // checkSelection delay
             expect(button.classList.contains('medium-editor-button-active')).toBe(true);
             // Unordered list should not be active
             expect(toolbar.getToolbarElement().querySelector('[data-action="insertunorderedlist"]').classList.contains('medium-editor-button-active')).toBe(false);
@@ -781,6 +797,7 @@ describe('Buttons TestCase', function () {
 
             this.el.innerHTML = '<ul><li id="li-lorem">lorem ipsum</li></ul>';
             selectElementContentsAndFire(document.getElementById('li-lorem'));
+            jasmine.clock().tick(1); // checkSelection delay
             expect(button.classList.contains('medium-editor-button-active')).toBe(true);
             // Ordered list button should not be active
             expect(toolbar.getToolbarElement().querySelector('[data-action="insertorderedlist"]').classList.contains('medium-editor-button-active')).toBe(false);
@@ -804,6 +821,7 @@ describe('Buttons TestCase', function () {
 
             this.el.innerHTML = '<pre><span id="span-lorem">lorem ipsum</span></pre>';
             selectElementContentsAndFire(document.getElementById('span-lorem'));
+            jasmine.clock().tick(1); // checkSelection delay
             expect(button.classList.contains('medium-editor-button-active')).toBe(true);
 
             fireEvent(button, 'click');
@@ -826,6 +844,7 @@ describe('Buttons TestCase', function () {
                     centerButton = toolbar.getToolbarElement().querySelector('[data-action="justifyCenter"]');
 
                 selectElementContentsAndFire(document.getElementById('justify-para-one'));
+                jasmine.clock().tick(1); // checkSelection delay
                 expect(rightButton.classList.contains('medium-editor-button-active')).toBe(false);
                 expect(centerButton.classList.contains('medium-editor-button-active')).toBe(true);
 
@@ -992,6 +1011,7 @@ describe('Buttons TestCase', function () {
 
             this.el.innerHTML = '<h1>lorem</h1><h3>ipsum</h3><h5>dolor</h5>';
             selectElementContentsAndFire(editor.elements[0].querySelector('h1'));
+            jasmine.clock().tick(1); // checkSelection delay
             expect(buttonOne.classList.contains('medium-editor-button-active')).toBe(true);
             expect(buttonTwo.classList.contains('medium-editor-button-active')).toBe(false);
 
