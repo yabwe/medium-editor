@@ -60,10 +60,11 @@ function isIE() {
     return ((navigator.appName === 'Microsoft Internet Explorer') || ((navigator.appName === 'Netscape') && (new RegExp('Trident/.*rv:([0-9]{1,}[.0-9]{0,})').exec(navigator.userAgent) !== null)));
 }
 
+// If the browser is Edge, returns the version number as a float, otherwise returns 0
 function getEdgeVersion() {
-    var match = /Edge\/(\d+)/.exec(navigator.userAgent);
+    var match = /Edge\/(\d+[,.]\d+)/.exec(navigator.userAgent);
     if (match !== null) {
-        return new Number(match[1]);
+        return +match[1];
     }
     return 0;
 }
