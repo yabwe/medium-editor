@@ -611,14 +611,6 @@
                 DOMMutationObserver = window.MutationObserver;
             }
 
-            // should be the case for Phantom :(
-            if (DOMMutationObserver === undefined) {
-                // window.console.error('DOM Mutation Observers are required.');
-                // window.console.error('https://developer.mozilla.org/en-US/docs/Web/API/MutationObserver');
-
-                return;
-            }
-
             observer = new DOMMutationObserver(function (mutations) {
                 mutations.forEach(function (mutation) {
                     // for a 'childList' change we check that we merged this into a paragraph

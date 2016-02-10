@@ -1018,6 +1018,10 @@
                 fragment.appendChild(nodes[i]);
             }
 
+            if (null === el.parentNode) {
+                return;
+            }
+
             if (fragment.childNodes.length) {
                 el.parentNode.replaceChild(fragment, el);
             } else {
