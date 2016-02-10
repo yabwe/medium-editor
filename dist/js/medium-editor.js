@@ -445,6 +445,8 @@ MediumEditor.extensions = {};
         // by rg89
         isIE: ((navigator.appName === 'Microsoft Internet Explorer') || ((navigator.appName === 'Netscape') && (new RegExp('Trident/.*rv:([0-9]{1,}[.0-9]{0,})').exec(navigator.userAgent) !== null))),
 
+        isEdge: (/Edge\/\d+/).exec(navigator.userAgent) !== null,
+
         // if firefox
         isFF: (navigator.userAgent.toLowerCase().indexOf('firefox') > -1),
 
@@ -842,7 +844,14 @@ MediumEditor.extensions = {};
         insertHTMLCommand: function (doc, html) {
             var selection, range, el, fragment, node, lastNode, toReplace;
 
-            if (doc.queryCommandSupported('insertHTML')) {
+            /* Edge's implementation of insertHTML is just buggy right now:
+             * - Doesn't allow leading white space at the beginning of an element
+             * - Found a case when a <font size="2"> tag was inserted when calling alignCenter inside a blockquote
+             *
+             * There are likely many other bugs, these are just the ones we found so far.
+             * For now, let's just use the same fallback we did for IE
+             */
+            if (!MediumEditor.util.isEdge && doc.queryCommandSupported('insertHTML')) {
                 try {
                     return doc.execCommand('insertHTML', false, html);
                 } catch (ignore) {}
@@ -931,7 +940,7 @@ MediumEditor.extensions = {};
                 tagName = '<' + tagName + '>';
             }
 
-            // When FF or IE, we have to handle blockquote node seperately as 'formatblock' does not work.
+            // When FF, IE and Edge, we have to handle blockquote node seperately as 'formatblock' does not work.
             // https://developer.mozilla.org/en-US/docs/Web/API/Document/execCommand#Commands
             if (blockContainer && blockContainer.nodeName.toLowerCase() === 'blockquote') {
                 // For IE, just use outdent
@@ -939,8 +948,8 @@ MediumEditor.extensions = {};
                     return doc.execCommand('outdent', false, tagName);
                 }
 
-                // For Firefox, make sure there's a nested block element before calling outdent
-                if (Util.isFF && tagName === 'p') {
+                // For Firefox and Edge, make sure there's a nested block element before calling outdent
+                if ((Util.isFF || Util.isEdge) && tagName === 'p') {
                     childNodes = Array.prototype.slice.call(blockContainer.childNodes);
                     // If there are some non-block elements we need to wrap everything in a <p> before we outdent
                     if (childNodes.some(function (childNode) {
@@ -2361,7 +2370,7 @@ MediumEditor.extensions = {};
     };
 
     Events.prototype = {
-        InputEventOnContenteditableSupported: !MediumEditor.util.isIE,
+        InputEventOnContenteditableSupported: !MediumEditor.util.isIE && !MediumEditor.util.isEdge,
 
         // Helpers for event handling
 
@@ -7047,7 +7056,7 @@ MediumEditor.parseVersionString = function (release) {
 
 MediumEditor.version = MediumEditor.parseVersionString.call(this, ({
     // grunt-bump looks for this:
-    'version': '5.14.1'
+    'version': '5.14.2'
 }).version);
 
     return MediumEditor;

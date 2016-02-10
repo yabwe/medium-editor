@@ -1,3 +1,12 @@
+5.14.2 / 2016-02-10
+==================
+* Support Microsoft Edge
+  * Fallback to custom insertHTML command instead of built-in command for Edge
+  * Use shim code for detecting input on contenteditable for Edge
+  * Fix issue with converting blockquotes to paragraphs in Edge
+  * Update documentation, fix tests, and include Edge in browser testing
+
+
 5.14.1 / 2016-02-05
 ==================
 * Fix issue with saving selection after newline and whitespace text nodes
