@@ -18,6 +18,9 @@
         allowedTypes: ['image'],
 
         init: function () {
+            if (!this.allowedTypes || this.allowedTypes.length === 0) {
+                MediumEditor.util.warn('File Dragging Extension has no allowed file types');
+            }
             MediumEditor.Extension.prototype.init.apply(this, arguments);
 
             this.subscribe('editableDrag', this.handleDrag.bind(this));
