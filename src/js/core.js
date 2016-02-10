@@ -607,14 +607,17 @@
 
             if (typeof window.WebKitMutationObserver !== 'undefined') {
                 DOMMutationObserver = window.WebKitMutationObserver;
-            } else {
+            } else if (typeof window.MutationObserver !== 'undefined') {
                 DOMMutationObserver = window.MutationObserver;
+            } else {
+                // DOM Mutation Observers doesn't exist (should be for IE < 11)
+                return;
             }
 
             observer = new DOMMutationObserver(function (mutations) {
                 mutations.forEach(function (mutation) {
                     // for a 'childList' change we check that we merged this into a paragraph
-                    if (mutation.type === 'childList' && mutation.target.nodeName.toLowerCase() === 'p') {
+                    if (mutation.type.toLowerCase() === 'childlist' && mutation.target.nodeName.toLowerCase() === 'p') {
                         // we loop on all inserted node
                         for (var i = 0; i < mutation.addedNodes.length; i++) {
                             // if one a them is a span, we need to unwrap it to insert the plain text inside the paragraph
