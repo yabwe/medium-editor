@@ -436,7 +436,10 @@
                     opts.allowedTypes = [];
                 }
             }
-            this.addBuiltInExtension('fileDragging', opts);
+            // Don't add fileDragging is no file type is allowed
+            if (!opts.allowedTypes || opts.allowedTypes.length > 0) {
+                this.addBuiltInExtension('fileDragging', opts);
+            }
         }
 
         // Built-in extensions
