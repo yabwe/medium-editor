@@ -10,7 +10,7 @@ MediumEditor has been written using vanilla JavaScript, no additional frameworks
 
 [![Sauce Test Status](https://saucelabs.com/browser-matrix/mediumeditor.svg)](https://saucelabs.com/u/mediumeditor)
 
-![Supportd Browsers](https://cloud.githubusercontent.com/assets/2444240/7519189/a819e426-f4ad-11e4-8740-626396c5d61b.png)
+![Supportd Browsers](https://cloud.githubusercontent.com/assets/2444240/12874138/d3960a04-cd9b-11e5-8cc5-8136d82cf5f6.png)
 
 [![NPM info](https://nodei.co/npm/medium-editor.png?downloads=true)](https://www.npmjs.com/package/medium-editor)
 
@@ -552,7 +552,7 @@ editor.subscribe('editableInput', function (event, editable) {
 });
 ```
 
-This event is supported in all browsers supported by MediumEditor (including IE9+)!  To help with cases when one instance of MediumEditor is monitoring multiple elements, the 2nd argument passed to the event handler (`editable` in the example above) will be a reference to the contenteditable element that has actually changed.
+This event is supported in all browsers supported by MediumEditor (including IE9+ and Edge)!  To help with cases when one instance of MediumEditor is monitoring multiple elements, the 2nd argument passed to the event handler (`editable` in the example above) will be a reference to the contenteditable element that has actually changed.
 
 This is handy when you need to capture any modifications to the contenteditable element including:
 * Typing
@@ -562,9 +562,9 @@ This is handy when you need to capture any modifications to the contenteditable 
 
 Why is this interesting and why should you use this event instead of just attaching to the `input` event on the contenteditable element?
 
-So for most modern browsers (Chrome, Firefox, Safari, etc.), the `input` event works just fine. Infact, `editableInput` is just a proxy for the `input` event in those browsers. However, the `input` event [is not supported for contenteditable elements in IE 9-11](https://connect.microsoft.com/IE/feedback/details/794285/ie10-11-input-event-does-not-fire-on-div-with-contenteditable-set).
+So for most modern browsers (Chrome, Firefox, Safari, etc.), the `input` event works just fine. Infact, `editableInput` is just a proxy for the `input` event in those browsers. However, the `input` event [is not supported for contenteditable elements in IE 9-11](https://connect.microsoft.com/IE/feedback/details/794285/ie10-11-input-event-does-not-fire-on-div-with-contenteditable-set) and is _mostly_ supported in Microsoft Edge, but not fully.
 
-So, to properly support the `editableInput` event in Internet Explorer, MediumEditor uses a combination of the `selectionchange` and `keypress` events, as well as monitoring calls to `document.execCommand`.
+So, to properly support the `editableInput` event in Internet Explorer and Microsoft Edge, MediumEditor uses a combination of the `selectionchange` and `keypress` events, as well as monitoring calls to `document.execCommand`.
 
 ## Extensions & Plugins
 

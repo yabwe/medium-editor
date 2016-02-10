@@ -16,8 +16,8 @@ describe('KeyboardCommands TestCase', function () {
         it('should be executed when the keys are pressed', function () {
             spyOn(MediumEditor.prototype, 'execAction');
             var editor = this.newMediumEditor('.editor');
+
             selectElementContentsAndFire(editor.elements[0]);
-            jasmine.clock().tick(1);
             // bold
             fireEvent(editor.elements[0], 'keydown', {
                 keyCode: 'B'.charCodeAt(0),
@@ -65,8 +65,8 @@ describe('KeyboardCommands TestCase', function () {
                     ]
                 }
             });
+
             selectElementContentsAndFire(editor.elements[0]);
-            jasmine.clock().tick(1);
             fireEvent(editor.elements[0], 'keydown', {
                 keyCode: 'p'.charCodeAt(0),
                 ctrlKey: true,
@@ -103,8 +103,8 @@ describe('KeyboardCommands TestCase', function () {
                     ]
                 }
             });
+
             selectElementContentsAndFire(editor.elements[0]);
-            jasmine.clock().tick(1);
             // If alt-key is not pressed, command should still be executed
             fireEvent(editor.elements[0], 'keydown', {
                 keyCode: 'p'.charCodeAt(0),
@@ -174,8 +174,8 @@ describe('KeyboardCommands TestCase', function () {
                     ]
                 }
             });
+
             selectElementContentsAndFire(editor.elements[0]);
-            jasmine.clock().tick(1);
             ['1', '2', '3', '4', '5', '6'].forEach(function (heading) {
                 fireEvent(editor.elements[0], 'keydown', {
                     keyCode: (heading).toString().charCodeAt(0),
@@ -190,8 +190,8 @@ describe('KeyboardCommands TestCase', function () {
         it('should not execute the button action when shift key is pressed', function () {
             spyOn(MediumEditor.prototype, 'execAction');
             var editor = this.newMediumEditor('.editor');
+
             selectElementContentsAndFire(editor.elements[0]);
-            jasmine.clock().tick(1);
             fireEvent(editor.elements[0], 'keydown', {
                 keyCode: 'B'.charCodeAt(0),
                 ctrlKey: true,
@@ -206,8 +206,8 @@ describe('KeyboardCommands TestCase', function () {
             var editor = this.newMediumEditor('.editor', {
                 keyboardCommands: false
             });
+
             selectElementContentsAndFire(editor.elements[0]);
-            jasmine.clock().tick(1);
             fireEvent(editor.elements[0], 'keydown', {
                 keyCode: 'B'.charCodeAt(0),
                 ctrlKey: true,
@@ -231,9 +231,8 @@ describe('KeyboardCommands TestCase', function () {
                     ]
                 }
             });
-            selectElementContentsAndFire(editor.elements[0]);
-            jasmine.clock().tick(1);
 
+            selectElementContentsAndFire(editor.elements[0]);
             fireEvent(editor.elements[0], 'keydown', {
                 keyCode: 'J'.charCodeAt(0),
                 ctrlKey: true,

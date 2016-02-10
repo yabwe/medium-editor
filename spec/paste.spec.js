@@ -281,7 +281,6 @@ describe('Pasting content', function () {
             selectElementContents(document.getElementById('editor-inner'));
 
             editor.cleanPaste('<label>div one</label><label>div two</label>');
-
             expect(this.el.innerHTML).toMatch(new RegExp('^Before(&nbsp;|\\s)(<span id="editor-inner">)?<sub>div one</sub><sub>div two</sub>(</span>)?(&nbsp;|\\s)after\\.$'));
         });
 
@@ -414,7 +413,7 @@ describe('Pasting content', function () {
                 };
 
             for (i = 0; i < textTests.length; i += 1) {
-                editorEl.innerHTML = '<div id="editor-inner">&nbsp</div>';
+                editorEl.innerHTML = '<div id="editor-inner">&nbsp;</div>';
 
                 range = document.createRange();
                 range.selectNodeContents(editorEl.firstChild);

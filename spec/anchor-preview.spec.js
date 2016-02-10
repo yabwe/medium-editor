@@ -282,6 +282,7 @@ describe('Anchor Preview TestCase', function () {
 
             // preview shows only after delay
             jasmine.clock().tick(250);
+
             expect(anchorPreview.showPreview).not.toHaveBeenCalled();
             expect(toolbar.isDisplayed()).toBe(true);
             expect(anchorPreview.getPreviewElement().classList.contains('medium-toolbar-arrow-over')).toBe(false);

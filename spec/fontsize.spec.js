@@ -34,8 +34,8 @@ describe('Font Size Button TestCase', function () {
                 editor = this.newMediumEditor('.editor', this.mediumOpts),
                 fontSizeExtension = editor.getExtensionByName('fontsize'),
                 toolbar = editor.getExtensionByName('toolbar');
+
             selectElementContentsAndFire(editor.elements[0]);
-            jasmine.clock().tick(1);
             button = toolbar.getToolbarElement().querySelector('[data-action="fontSize"]');
             fireEvent(button, 'click');
             expect(toolbar.getToolbarActionsElement().style.display).toBe('none');

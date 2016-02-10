@@ -60,6 +60,15 @@ function isIE() {
     return ((navigator.appName === 'Microsoft Internet Explorer') || ((navigator.appName === 'Netscape') && (new RegExp('Trident/.*rv:([0-9]{1,}[.0-9]{0,})').exec(navigator.userAgent) !== null)));
 }
 
+// If the browser is Edge, returns the version number as a float, otherwise returns 0
+function getEdgeVersion() {
+    var match = /Edge\/(\d+[,.]\d+)/.exec(navigator.userAgent);
+    if (match !== null) {
+        return +match[1];
+    }
+    return 0;
+}
+
 function isFirefox() {
     return navigator.userAgent.toLowerCase().indexOf('firefox') !== -1;
 }
@@ -220,5 +229,12 @@ function selectElementContents(el, options) {
 function selectElementContentsAndFire(el, options) {
     options = options || {};
     selectElementContents(el, options);
-    fireEvent(el, options.eventToFire || 'focus');
+    fireEvent(el, options.eventToFire || 'click');
+    if (options.testDelay !== -1) {
+        if (!options.testDelay) {
+            jasmine.clock().tick(1);
+        } else {
+            jasmine.clock().tick(options.testDelay);
+        }
+    }
 }

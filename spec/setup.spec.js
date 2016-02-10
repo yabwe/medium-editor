@@ -1,5 +1,4 @@
-/*global fireEvent, selectElementContents,
-         selectElementContentsAndFire */
+/*global fireEvent, selectElementContentsAndFire */
 
 describe('Setup/Destroy TestCase', function () {
     'use strict';
@@ -91,51 +90,11 @@ describe('Setup/Destroy TestCase', function () {
             expect(editor.checkSelection).not.toHaveBeenCalled();
         });
 
-        // regression test for https://github.com/yabwe/medium-editor/issues/390
-        it('should work with multiple elements of the same class', function () {
-            var editor,
-                el,
-                elements = [],
-                i;
-
-            for (i = 0; i < 3; i += 1) {
-                el = document.createElement('div');
-                el.className = 'editor';
-                el.textContent = i;
-                elements.push(
-                    document.body.appendChild(el)
-                );
-            }
-
-            editor = this.newMediumEditor('.editor');
-            var toolbar = editor.getExtensionByName('toolbar');
-
-            spyOn(toolbar, 'hideToolbar').and.callThrough(); // via: handleBlur
-
-            selectElementContentsAndFire(editor.elements[0], { eventToFire: 'click' });
-            jasmine.clock().tick(51);
-            expect(toolbar.hideToolbar).not.toHaveBeenCalled();
-
-            selectElementContentsAndFire(editor.elements[1], { eventToFire: 'click' });
-            jasmine.clock().tick(51);
-            expect(toolbar.hideToolbar).not.toHaveBeenCalled();
-
-            selectElementContents(editor.elements[2]);
-            selectElementContentsAndFire(editor.elements[2], { eventToFire: 'click' });
-            jasmine.clock().tick(51);
-            expect(toolbar.hideToolbar).not.toHaveBeenCalled();
-
-            elements.forEach(function (element) {
-                document.body.removeChild(element);
-            });
-        });
-
         // regression test for https://github.com/yabwe/medium-editor/issues/197
         it('should not crash when destroy immediately after a mouse click', function () {
             var editor = this.newMediumEditor('.editor');
             // selected some content and let the toolbar appear
-            selectElementContents(editor.elements[0]);
-            jasmine.clock().tick(501);
+            selectElementContentsAndFire(editor.elements[0], { testDelay: 501 });
 
             // fire a mouse up somewhere else (i.e. a button which click handler could have called destroy() )
             fireEvent(document.documentElement, 'mouseup');

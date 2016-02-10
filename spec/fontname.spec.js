@@ -34,8 +34,8 @@ describe('Font Name Button TestCase', function () {
                 editor = this.newMediumEditor('.editor', this.mediumOpts),
                 fontNameExtension = editor.getExtensionByName('fontname'),
                 toolbar = editor.getExtensionByName('toolbar');
+
             selectElementContentsAndFire(editor.elements[0]);
-            jasmine.clock().tick(1);
             button = toolbar.getToolbarElement().querySelector('[data-action="fontName"]');
             fireEvent(button, 'click');
             expect(toolbar.getToolbarActionsElement().style.display).toBe('none');

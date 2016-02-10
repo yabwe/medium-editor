@@ -324,7 +324,7 @@ describe('Extensions TestCase', function () {
                         'dummy': ExtensionWithElement
                     }
                 });
-            selectElementContentsAndFire(editor.elements[0].firstChild);
+            selectElementContentsAndFire(editor.elements[0].firstChild, { eventToFire: 'focus' });
             spyOn(ExtensionWithElement, 'checkState').and.callThrough();
             editor.checkSelection();
             jasmine.clock().tick(51);
