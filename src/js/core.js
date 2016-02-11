@@ -1045,6 +1045,8 @@
 
                         if (this.options.targetBlank || opts.target === '_blank') {
                             MediumEditor.util.setTargetBlank(MediumEditor.selection.getSelectionStart(this.options.ownerDocument), opts.url);
+                        } else {
+                            MediumEditor.util.setTargetSelf(MediumEditor.selection.getSelectionStart(this.options.ownerDocument), opts.url);
                         }
 
                         if (opts.buttonClass) {

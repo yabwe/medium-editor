@@ -99,6 +99,28 @@ describe('MediumEditor.util', function () {
         });
     });
 
+    describe('settargetself', function () {
+        it('sets target self on a A element from a A element', function () {
+            var el = this.createElement('a', '', 'lorem ipsum');
+            el.attributes.href = 'http://0.0.0.0/bar.html';
+
+            MediumEditor.util.setTargetSelf(el, 'http://0.0.0.0/bar.html');
+
+            expect(el.target).toBe('_self');
+        });
+
+        it('sets target blank on a A element from a DIV element', function () {
+            var el = this.createElement('div', '', '<a href="http://1.1.1.1/foo.html">foo</a> <a href="http://0.0.0.0/bar.html">bar</a>');
+
+            MediumEditor.util.setTargetSelf(el, 'http://0.0.0.0/bar.html');
+
+            var nodes = el.getElementsByTagName('a');
+
+            expect(nodes[0].target).not.toBe('_self');
+            expect(nodes[1].target).toBe('_self');
+        });
+    });
+
     describe('addClassToAnchors', function () {
         it('add class to anchors on a A element from a A element', function () {
             var el = this.createElement('a', '', 'lorem ipsum');
