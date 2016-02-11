@@ -1,5 +1,5 @@
 /*global fireEvent, selectElementContents,
-         selectElementContentsAndFire, getEdgeVersion*/
+         selectElementContentsAndFire, getEdgeVersion */
 
 describe('Anchor Button TestCase', function () {
     'use strict';

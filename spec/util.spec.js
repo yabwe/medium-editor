@@ -100,7 +100,7 @@ describe('MediumEditor.util', function () {
     });
 
     describe('removetargetblank', function () {
-        it('sets target self on a A element from a A element', function () {
+        it('removes target blank from a A element', function () {
             var el = this.createElement('a', '', 'lorem ipsum');
             el.attributes.href = 'http://0.0.0.0/bar.html';
             el.attributes.target = '_blank';
@@ -110,7 +110,7 @@ describe('MediumEditor.util', function () {
             expect(el.target).toBe('');
         });
 
-        it('sets target blank on a A element from a DIV element', function () {
+        it('removes target blank on a A element from a DIV element', function () {
             var el = this.createElement('div', '', '<a href="http://1.1.1.1/foo.html" target="_blank">foo</a> <a href="http://0.0.0.0/bar.html" target="_blank">bar</a>');
 
             MediumEditor.util.removeTargetBlank(el, 'http://0.0.0.0/bar.html');
