@@ -99,25 +99,26 @@ describe('MediumEditor.util', function () {
         });
     });
 
-    describe('settargetself', function () {
+    describe('removetargetblank', function () {
         it('sets target self on a A element from a A element', function () {
             var el = this.createElement('a', '', 'lorem ipsum');
             el.attributes.href = 'http://0.0.0.0/bar.html';
+            el.attributes.target = '_blank';
 
-            MediumEditor.util.setTargetSelf(el, 'http://0.0.0.0/bar.html');
+            MediumEditor.util.removeTargetBlank(el, 'http://0.0.0.0/bar.html');
 
-            expect(el.target).toBe('_self');
+            expect(el.target).toBe('');
         });
 
         it('sets target blank on a A element from a DIV element', function () {
-            var el = this.createElement('div', '', '<a href="http://1.1.1.1/foo.html">foo</a> <a href="http://0.0.0.0/bar.html">bar</a>');
+            var el = this.createElement('div', '', '<a href="http://1.1.1.1/foo.html" target="_blank">foo</a> <a href="http://0.0.0.0/bar.html" target="_blank">bar</a>');
 
-            MediumEditor.util.setTargetSelf(el, 'http://0.0.0.0/bar.html');
+            MediumEditor.util.removeTargetBlank(el, 'http://0.0.0.0/bar.html');
 
             var nodes = el.getElementsByTagName('a');
 
-            expect(nodes[0].target).not.toBe('_self');
-            expect(nodes[1].target).toBe('_self');
+            expect(nodes[0].target).toBe('_blank');
+            expect(nodes[1].target).toBe('');
         });
     });
 

@@ -1,6 +1,5 @@
 /*global fireEvent, selectElementContents,
-         selectElementContentsAndFire, getEdgeVersion,
-         isFirefox*/
+         selectElementContentsAndFire, getEdgeVersion*/
 
 describe('Anchor Button TestCase', function () {
     'use strict';
@@ -69,11 +68,7 @@ describe('Anchor Button TestCase', function () {
             });
             expect(editor.createLink).toHaveBeenCalled();
             // A trailing <br> may be added when insertHTML is used to add the link internally.
-            if (!isFirefox()) {
-                expect(this.el.innerHTML.indexOf('<a href="http://test.com" target="_self">lorem ipsum</a>')).toBe(0);
-            } else {
-                expect(this.el.innerHTML.indexOf('<a target="_self" href="http://test.com">lorem ipsum</a>')).toBe(0);
-            }
+            expect(this.el.innerHTML.indexOf('<a href="http://test.com">lorem ipsum</a>')).toBe(0);
         });
 
         it('should remove the extra white spaces in the link when user presses enter', function () {
@@ -92,11 +87,7 @@ describe('Anchor Button TestCase', function () {
             });
             expect(editor.createLink).toHaveBeenCalled();
             // A trailing <br> may be added when insertHTML is used to add the link internally.
-            if (!isFirefox()) {
-                expect(this.el.innerHTML.indexOf('<a href="test" target="_self">lorem ipsum</a>')).toBe(0);
-            } else {
-                expect(this.el.innerHTML.indexOf('<a target="_self" href="test">lorem ipsum</a>')).toBe(0);
-            }
+            expect(this.el.innerHTML.indexOf('<a href="test">lorem ipsum</a>')).toBe(0);
         });
 
         it('should not set any href if all user passes is spaces in the link when user presses enter', function () {
@@ -135,11 +126,7 @@ describe('Anchor Button TestCase', function () {
                 keyCode: MediumEditor.util.keyCode.ENTER
             });
             expect(editor.createLink).toHaveBeenCalled();
-            if (!isFirefox()) {
-                expect(this.el.innerHTML).toMatch(/^Hello world, <a href="http:\/\/test\.com\/?" target="_self">this <strong>will become a link<\/strong><\/a><strong>, but this part won\'t\.<\/strong>(<br>|<strong><\/strong>)?$/);
-            } else {
-                expect(this.el.innerHTML).toMatch(/^Hello world, <a target="_self" href="http:\/\/test\.com\/?">this <strong>will become a link<\/strong><\/a><strong>, but this part won\'t\.<\/strong>(<br>|<strong><\/strong>)?$/);
-            }
+            expect(this.el.innerHTML).toMatch(/^Hello world, <a href="http:\/\/test\.com\/?">this <strong>will become a link<\/strong><\/a><strong>, but this part won\'t\.<\/strong>(<br>|<strong><\/strong>)?$/);
         });
 
         it('should create a link when the user selects text within two paragraphs', function () {
@@ -594,10 +581,8 @@ describe('Anchor Button TestCase', function () {
             // So for the sake of sanity, disabling this check for Edge 12.
             // TODO: Find a better way to fix this issue if Edge 12 is going to matter
             var edgeVersion = getEdgeVersion();
-            if (isFirefox()) {
-                expect(this.el.innerHTML).toContain('<a target="_self" href="http://www.google.com"><img src="../demo/img/medium-editor.jpg"></a>');
-            } else if (!edgeVersion || edgeVersion >= 13) {
-                expect(this.el.innerHTML).toContain('<a href="http://www.google.com" target="_self"><img src="../demo/img/medium-editor.jpg"></a>');
+            if (!edgeVersion || edgeVersion >= 13) {
+                expect(this.el.innerHTML).toContain('<a href="http://www.google.com"><img src="../demo/img/medium-editor.jpg"></a>');
             }
         });
     });

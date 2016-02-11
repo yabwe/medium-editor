@@ -588,16 +588,16 @@
          * this function is called to explicitly remove the target='_blank' and set it to '_self'
          * as FF holds on to _blank value even after unchecking the checkbox on anchor form
          */
-        setTargetSelf: function (el, anchorUrl) {
+        removeTargetBlank: function (el, anchorUrl) {
             var i;
             if (el.nodeName.toLowerCase() === 'a') {
-                el.target = '_self';
+                el.removeAttribute('target');
             } else {
                 el = el.getElementsByTagName('a');
 
                 for (i = 0; i < el.length; i += 1) {
                     if (anchorUrl === el[i].attributes.href.value) {
-                        el[i].target = '_self';
+                        el[i].removeAttribute('target');
                     }
                 }
             }
