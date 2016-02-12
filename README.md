@@ -418,6 +418,18 @@ var editor = new MediumEditor('.editable', {
 });
 ```
 
+#### Disable File Dragging
+To stop preventing drag & drop events and disable file dragging in general, provide a dummy ImageDragging extension.
+```javascript
+var editor = new MediumEditor('.editor', {
+    extensions: {
+        'imageDragging': {}
+    }
+});
+```
+Due to the [state of code](https://github.com/yabwe/medium-editor/issues/966) in 5.0.0, the editor *ALWAYS* prevented any drag and drop actions. 
+We will have a better way to disable file dragging in 6.*
+
 ### Options Example:
 
 ```javascript
