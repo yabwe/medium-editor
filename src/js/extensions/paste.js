@@ -1,12 +1,11 @@
 /*global Util, Selection, Extension */
 
-'use strict';
-
 var PasteHandler,
     keyboardPasteTimeStamp = 0,
     pasteBinDefaultContent = '%ME_PASTEBIN%';
 
 (function () {
+    'use strict';
     /*jslint regexp: true*/
     /*
         jslint does not allow character negation, because the negation
