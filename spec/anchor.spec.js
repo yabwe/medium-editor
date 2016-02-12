@@ -392,6 +392,35 @@ describe('Anchor Button TestCase', function () {
             expect(link.classList.contains('btn-default')).toBe(true);
         });
 
+        it('should remove the target _blank from the anchor tag when the open in a new window checkbox,' +
+                ' is unchecked and the form is saved', function () {
+            var editor = this.newMediumEditor('.editor', {
+                anchor: {
+                    targetCheckbox: true
+                }
+            }),
+                anchorExtension = editor.getExtensionByName('anchor'),
+                targetCheckbox,
+                link;
+
+            selectElementContentsAndFire(editor.elements[0]);
+            anchorExtension.showForm('http://test.com');
+            expect(anchorExtension.isDisplayed()).toBe(true);
+            targetCheckbox = anchorExtension.getForm().querySelector('input.medium-editor-toolbar-anchor-target');
+            targetCheckbox.checked = true;
+            fireEvent(anchorExtension.getForm().querySelector('a.medium-editor-toolbar-save'), 'click');
+            link = editor.elements[0].querySelector('a');
+            expect(link.target).toBe('_blank');
+
+            selectElementContentsAndFire(editor.elements[0]);
+            anchorExtension.showForm('http://test.com');
+            targetCheckbox = anchorExtension.getForm().querySelector('input.medium-editor-toolbar-anchor-target');
+            targetCheckbox.checked = false;
+            fireEvent(anchorExtension.getForm().querySelector('a.medium-editor-toolbar-save'), 'click');
+            link = editor.elements[0].querySelector('a');
+            expect(link.target).toBe('');
+        });
+
         it('should fire editableInput only once when the user creates a link open to a new window,' +
                 ' and it should fire at the end of the DOM and selection modifications', function () {
             spyOn(MediumEditor.prototype, 'createLink').and.callThrough();
