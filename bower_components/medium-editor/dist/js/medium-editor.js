@@ -445,6 +445,8 @@ MediumEditor.extensions = {};
         // by rg89
         isIE: ((navigator.appName === 'Microsoft Internet Explorer') || ((navigator.appName === 'Netscape') && (new RegExp('Trident/.*rv:([0-9]{1,}[.0-9]{0,})').exec(navigator.userAgent) !== null))),
 
+        isEdge: (/Edge\/\d+/).exec(navigator.userAgent) !== null,
+
         // if firefox
         isFF: (navigator.userAgent.toLowerCase().indexOf('firefox') > -1),
 
@@ -721,6 +723,22 @@ MediumEditor.extensions = {};
             return nextNode;
         },
 
+        // Find an element's previous sibling within a medium-editor element
+        // If one doesn't exist, find the closest ancestor's previous sibling
+        findPreviousSibling: function (node) {
+            if (!node || Util.isMediumEditorElement(node)) {
+                return false;
+            }
+
+            var previousSibling = node.previousSibling;
+            while (!previousSibling && !Util.isMediumEditorElement(node.parentNode)) {
+                node = node.parentNode;
+                previousSibling = node.previousSibling;
+            }
+
+            return previousSibling;
+        },
+
         isDescendant: function isDescendant(parent, child, checkEquality) {
             if (!parent || !child) {
                 return false;
@@ -826,7 +844,14 @@ MediumEditor.extensions = {};
         insertHTMLCommand: function (doc, html) {
             var selection, range, el, fragment, node, lastNode, toReplace;
 
-            if (doc.queryCommandSupported('insertHTML')) {
+            /* Edge's implementation of insertHTML is just buggy right now:
+             * - Doesn't allow leading white space at the beginning of an element
+             * - Found a case when a <font size="2"> tag was inserted when calling alignCenter inside a blockquote
+             *
+             * There are likely many other bugs, these are just the ones we found so far.
+             * For now, let's just use the same fallback we did for IE
+             */
+            if (!MediumEditor.util.isEdge && doc.queryCommandSupported('insertHTML')) {
                 try {
                     return doc.execCommand('insertHTML', false, html);
                 } catch (ignore) {}
@@ -915,7 +940,7 @@ MediumEditor.extensions = {};
                 tagName = '<' + tagName + '>';
             }
 
-            // When FF or IE, we have to handle blockquote node seperately as 'formatblock' does not work.
+            // When FF, IE and Edge, we have to handle blockquote node seperately as 'formatblock' does not work.
             // https://developer.mozilla.org/en-US/docs/Web/API/Document/execCommand#Commands
             if (blockContainer && blockContainer.nodeName.toLowerCase() === 'blockquote') {
                 // For IE, just use outdent
@@ -923,8 +948,8 @@ MediumEditor.extensions = {};
                     return doc.execCommand('outdent', false, tagName);
                 }
 
-                // For Firefox, make sure there's a nested block element before calling outdent
-                if (Util.isFF && tagName === 'p') {
+                // For Firefox and Edge, make sure there's a nested block element before calling outdent
+                if ((Util.isFF || Util.isEdge) && tagName === 'p') {
                     childNodes = Array.prototype.slice.call(blockContainer.childNodes);
                     // If there are some non-block elements we need to wrap everything in a <p> before we outdent
                     if (childNodes.some(function (childNode) {
@@ -1269,17 +1294,29 @@ MediumEditor.extensions = {};
             return element && element.nodeType !== 3 && Util.blockContainerElementNames.indexOf(element.nodeName.toLowerCase()) !== -1;
         },
 
+        /* Finds the closest ancestor which is a block container element
+         * If element is within editor element but not within any other block element,
+         * the editor element is returned
+         */
         getClosestBlockContainer: function (node) {
             return Util.traverseUp(node, function (node) {
-                return Util.isBlockContainer(node);
+                return Util.isBlockContainer(node) || Util.isMediumEditorElement(node);
             });
         },
 
+        /* Finds highest level ancestor element which is a block container element
+         * If element is within editor element but not within any other block element,
+         * the editor element is returned
+         */
         getTopBlockContainer: function (element) {
-            var topBlock = element;
+            var topBlock = Util.isBlockContainer(element) ? element : false;
             Util.traverseUp(element, function (el) {
                 if (Util.isBlockContainer(el)) {
                     topBlock = el;
+                }
+                if (!topBlock && Util.isMediumEditorElement(el)) {
+                    topBlock = el;
+                    return true;
                 }
                 return false;
             });
@@ -1305,13 +1342,19 @@ MediumEditor.extensions = {};
             return element;
         },
 
+        // TODO: remove getFirstTextNode AND _getFirstTextNode when jumping in 6.0.0 (no code references)
         getFirstTextNode: function (element) {
+            Util.warn('getFirstTextNode is deprecated and will be removed in version 6.0.0');
+            return Util._getFirstTextNode(element);
+        },
+
+        _getFirstTextNode: function (element) {
             if (element.nodeType === 3) {
                 return element;
             }
 
             for (var i = 0; i < element.childNodes.length; i++) {
-                var textNode = Util.getFirstTextNode(element.childNodes[i]);
+                var textNode = Util._getFirstTextNode(element.childNodes[i]);
                 if (textNode !== null) {
                     return textNode;
                 }
@@ -1708,12 +1751,18 @@ MediumEditor.extensions = {};
                     end: start + range.toString().length
                 };
 
-                // Range contains an image, check to see if the selection ends with that image
-                if (range.endOffset !== 0 && (range.endContainer.nodeName.toLowerCase() === 'img' || (range.endContainer.nodeType === 1 && range.endContainer.querySelector('img')))) {
-                    var trailingImageCount = this.getTrailingImageCount(root, selectionState, range.endContainer, range.endOffset);
-                    if (trailingImageCount) {
-                        selectionState.trailingImageCount = trailingImageCount;
-                    }
+                // Check to see if the selection starts with any images
+                // if so we need to make sure the the beginning of the selection is
+                // set correctly when importing selection
+                if (this.doesRangeStartWithImages(range, doc)) {
+                    selectionState.startsWithImage = true;
+                }
+
+                // Check to see if the selection has any trailing images
+                // if so, this this means we need to look for them when we import selection
+                var trailingImageCount = this.getTrailingImageCount(root, selectionState, range.endContainer, range.endOffset);
+                if (trailingImageCount) {
+                    selectionState.trailingImageCount = trailingImageCount;
                 }
 
                 // If start = 0 there may still be an empty paragraph before it, but we don't care.
@@ -1754,7 +1803,26 @@ MediumEditor.extensions = {};
                 foundEnd = false,
                 trailingImageCount = 0,
                 stop = false,
-                nextCharIndex;
+                nextCharIndex,
+                allowRangeToStartAtEndOfNode = false,
+                lastTextNode = null;
+
+            // When importing selection, the start of the selection may lie at the end of an element
+            // or at the beginning of an element.  Since visually there is no difference between these 2
+            // we will try to move the selection to the beginning of an element since this is generally
+            // what users will expect and it's a more predictable behavior.
+            //
+            // However, there are some specific cases when we don't want to do this:
+            //  1) We're attempting to move the cursor outside of the end of an anchor [favorLaterSelectionAnchor = true]
+            //  2) The selection starts with an image, which is special since an image doesn't have any 'content'
+            //     as far as selection and ranges are concerned
+            //  3) The selection starts after a specified number of empty block elements (selectionState.emptyBlocksIndex)
+            //
+            // For these cases, we want the selection to start at a very specific location, so we should NOT
+            // automatically move the cursor to the beginning of the first actual chunk of text
+            if (favorLaterSelectionAnchor || selectionState.startsWithImage || typeof selectionState.emptyBlocksIndex !== 'undefined') {
+                allowRangeToStartAtEndOfNode = true;
+            }
 
             while (!stop && node) {
                 // Only iterate over elements and text nodes
@@ -1766,10 +1834,23 @@ MediumEditor.extensions = {};
                 // If we hit a text node, we need to add the amount of characters to the overall count
                 if (node.nodeType === 3 && !foundEnd) {
                     nextCharIndex = charIndex + node.length;
+                    // Check if we're at or beyond the start of the selection we're importing
                     if (!foundStart && selectionState.start >= charIndex && selectionState.start <= nextCharIndex) {
-                        range.setStart(node, selectionState.start - charIndex);
-                        foundStart = true;
+                        // NOTE: We only want to allow a selection to start at the END of an element if
+                        //  allowRangeToStartAtEndOfNode is true
+                        if (allowRangeToStartAtEndOfNode || selectionState.start < nextCharIndex) {
+                            range.setStart(node, selectionState.start - charIndex);
+                            foundStart = true;
+                        }
+                        // We're at the end of a text node where the selection could start but we shouldn't
+                        // make the selection start here because allowRangeToStartAtEndOfNode is false.
+                        // However, we should keep a reference to this node in case there aren't any more
+                        // text nodes after this, so that we have somewhere to import the selection to
+                        else {
+                            lastTextNode = node;
+                        }
                     }
+                    // We've found the start of the selection, check if we're at or beyond the end of the selection we're importing
                     if (foundStart && selectionState.end >= charIndex && selectionState.end <= nextCharIndex) {
                         if (!selectionState.trailingImageCount) {
                             range.setEnd(node, selectionState.end - charIndex);
@@ -1809,6 +1890,14 @@ MediumEditor.extensions = {};
                 if (!stop) {
                     node = nodeStack.pop();
                 }
+            }
+
+            // If we've gone through the entire text but didn't find the beginning of a text node
+            // to make the selection start at, we should fall back to starting the selection
+            // at the END of the last text node we found
+            if (!foundStart && lastTextNode) {
+                range.setStart(lastTextNode, lastTextNode.length);
+                range.setEnd(lastTextNode, lastTextNode.length);
             }
 
             if (typeof selectionState.emptyBlocksIndex !== 'undefined') {
@@ -1899,6 +1988,10 @@ MediumEditor.extensions = {};
                 }
             }
 
+            if (!targetNode) {
+                targetNode = startBlock;
+            }
+
             // We're selecting a high-level block node, so make sure the cursor gets moved into the deepest
             // element at the beginning of the block
             range.setStart(MediumEditor.util.getFirstSelectableLeafNode(targetNode), 0);
@@ -1922,8 +2015,21 @@ MediumEditor.extensions = {};
             if (node.nodeType !== 3) {
                 node = cursorContainer.childNodes[cursorOffset];
             }
-            if (node && !MediumEditor.util.isElementAtBeginningOfBlock(node)) {
-                return -1;
+            if (node) {
+                // The element isn't at the beginning of a block, so it has content before it
+                if (!MediumEditor.util.isElementAtBeginningOfBlock(node)) {
+                    return -1;
+                }
+
+                var previousSibling = MediumEditor.util.findPreviousSibling(node);
+                // If there is no previous sibling, this is the first text element in the editor
+                if (!previousSibling) {
+                    return -1;
+                }
+                // If the previous sibling has text, then there are no empty blocks before this
+                else if (previousSibling.nodeValue) {
+                    return -1;
+                }
             }
 
             // Walk over block elements, counting number of empty blocks between last piece of text
@@ -1947,7 +2053,53 @@ MediumEditor.extensions = {};
             return emptyBlocksCount;
         },
 
+        // Returns true if the selection range begins with an image tag
+        // Returns false if the range starts with any non empty text nodes
+        doesRangeStartWithImages: function (range, doc) {
+            if (range.startOffset !== 0 || range.startContainer.nodeType !== 1) {
+                return false;
+            }
+
+            if (range.startContainer.nodeName.toLowerCase() === 'img') {
+                return true;
+            }
+
+            var img = range.startContainer.querySelector('img');
+            if (!img) {
+                return false;
+            }
+
+            var treeWalker = doc.createTreeWalker(range.startContainer, NodeFilter.SHOW_ALL, null, false);
+            while (treeWalker.nextNode()) {
+                var next = treeWalker.currentNode;
+                // If we hit the image, then there isn't any text before the image so
+                // the image is at the beginning of the range
+                if (next === img) {
+                    break;
+                }
+                // If we haven't hit the iamge, but found text that contains content
+                // then the range doesn't start with an image
+                if (next.nodeValue) {
+                    return false;
+                }
+            }
+
+            return true;
+        },
+
         getTrailingImageCount: function (root, selectionState, endContainer, endOffset) {
+            // If the endOffset of a range is 0, the endContainer doesn't contain images
+            // If the endContainer is a text node, there are no trailing images
+            if (endOffset === 0 || endContainer.nodeType !== 1) {
+                return 0;
+            }
+
+            // If the endContainer isn't an image, and doesn't have an image descendants
+            // there are no trailing images
+            if (endContainer.nodeName.toLowerCase() !== 'img' && !endContainer.querySelector('img')) {
+                return 0;
+            }
+
             var lastNode = endContainer.childNodes[endOffset - 1];
             while (lastNode.hasChildNodes()) {
                 lastNode = lastNode.lastChild;
@@ -2006,7 +2158,7 @@ MediumEditor.extensions = {};
         },
 
         // determine if the current selection contains any 'content'
-        // content being and non-white space text or an image
+        // content being any non-white space text or an image
         selectionContainsContent: function (doc) {
             var sel = doc.getSelection();
 
@@ -2218,7 +2370,7 @@ MediumEditor.extensions = {};
     };
 
     Events.prototype = {
-        InputEventOnContenteditableSupported: !MediumEditor.util.isIE,
+        InputEventOnContenteditableSupported: !MediumEditor.util.isIE && !MediumEditor.util.isEdge,
 
         // Helpers for event handling
 
@@ -6904,7 +7056,7 @@ MediumEditor.parseVersionString = function (release) {
 
 MediumEditor.version = MediumEditor.parseVersionString.call(this, ({
     // grunt-bump looks for this:
-    'version': '5.14.0'
+    'version': '5.14.2'
 }).version);
 
     return MediumEditor;

@@ -126,7 +126,7 @@ Example:
 ***
 ### `editableInput`
 
-`editableInput` is triggered whenever the content of a `contenteditable` changes, including keypresses, toolbar actions, or any other user interaction that changes the html within the element.  For non-IE browsers, this is just a proxied version of the native `input` event.  However, Internet Explorer has never supported the `input` event on `contenteditable` elements so for these browsers the `editableInput` event is triggered through a combination of:
+`editableInput` is triggered whenever the content of a `contenteditable` changes, including keypresses, toolbar actions, or any other user interaction that changes the html within the element.  For non-IE browsers, this is just a proxied version of the native `input` event.  However, Internet Explorer and has never supported the `input` event on `contenteditable` elements, and Edge has some support for `input` on `contenteditable` (which may be fixed in upcoming release of Edge) so for these browsers the `editableInput` event is triggered through a combination of:
 * native `keypress` event on the element
 * native `selectionchange` event on the document
 * monitoring calls the `document.execCommand()`
@@ -139,7 +139,7 @@ Example:
 ***
 ### `focus`
 
-`focus` is triggered whenver a `contentedtiable` element within an editor receives focus. If the user interacts with any editor maintained elements (ie toolbar), `blur` is NOT triggered because focus has not been lost.  Thus, `focus` will only be triggered when an `contenteditable` element (or the editor that contains it) is first interacted with.
+`focus` is triggered whenver a `contenteditable` element within an editor receives focus. If the user interacts with any editor maintained elements (ie toolbar), `blur` is NOT triggered because focus has not been lost.  Thus, `focus` will only be triggered when an `contenteditable` element (or the editor that contains it) is first interacted with.
 
 ## Toolbar Custom Events
 
