@@ -1,5 +1,8 @@
 var keyboardPasteTimeStamp = 0,
-    pasteBinDefaultContent = '%ME_PASTEBIN%';
+    pasteBinDefaultContent = '%ME_PASTEBIN%',
+    stopProp = function (event) {
+        event.stopPropagation();
+    };
 
 (function () {
     'use strict';
@@ -110,7 +113,6 @@ var keyboardPasteTimeStamp = 0,
             event.stopImmediatePropagation();
 
             keyboardPasteTimeStamp = new Date().getTime();
-            this.lastRange = MediumEditor.selection.getSelectionRange(this.document);
 
             this.removePasteBin();
             this.createPasteBin();
@@ -155,6 +157,8 @@ var keyboardPasteTimeStamp = 0,
                     content = clipboardContent['text/html'];
                 } else {
                     content = that.getPasteBinHtml();
+                    window.console.log('PASTE BIN CONTENT');
+                    window.console.log(content);
 
                     // If paste bin is empty try using plain text mode
                     // since that is better than nothing right
@@ -292,6 +296,8 @@ var keyboardPasteTimeStamp = 0,
                 }
             }
 
+            this.lastRange = range;
+
             window.console.log('createPasteBin > top', top);
 
             this.pasteBinElm = this.document.createElement('div');
@@ -303,15 +309,9 @@ var keyboardPasteTimeStamp = 0,
             this.getEditorOption('elementsContainer').appendChild(this.pasteBinElm);
 
             // avoid .focus() to stop other event (actually the paste event)
-            this.on(this.pasteBinElm, 'focus', function (event) {
-                event.stopPropagation();
-            });
-            this.on(this.pasteBinElm, 'focusin', function (event) {
-                event.stopPropagation();
-            });
-            this.on(this.pasteBinElm, 'focusout', function (event) {
-                event.stopPropagation();
-            });
+            this.on(this.pasteBinElm, 'focus', stopProp);
+            this.on(this.pasteBinElm, 'focusin', stopProp);
+            this.on(this.pasteBinElm, 'focusout', stopProp);
 
             this.pasteBinElm.focus();
 
@@ -319,27 +319,34 @@ var keyboardPasteTimeStamp = 0,
 
             window.console.log('createPasteBin > pasteBinElm', this.pasteBinElm);
 
-            this.on(this.pasteBinElm, 'paste', this.handlePaste.bind(this));
+            if (!this.boundHandlePaste) {
+                this.boundHandlePaste = this.handlePaste.bind(this);
+            }
+
+            this.on(this.pasteBinElm, 'paste', this.boundHandlePaste);
         },
 
         removePasteBin: function () {
             window.console.log('Remove paste bin');
-
-            if (!this.pasteBinElm) {
-                this.pasteBinElm = null;
-                return;
-            }
 
             if (null !== this.lastRange) {
                 MediumEditor.selection.selectRange(this.document, this.lastRange);
                 this.lastRange = null;
             }
 
-            // this.getEditorOption('elementsContainer').removeChild(this.pasteBinElm);
+            if (!this.pasteBinElm) {
+                this.pasteBinElm = null;
+                return;
+            }
 
-            var pasteBin = this.document.getElementById('medium-editor-pastebin');
+            var pasteBin = this.pasteBinElm;
             if (pasteBin) {
-                this.getEditorOption('elementsContainer').removeChild(pasteBin);
+                this.off(pasteBin, 'focus', stopProp);
+                this.off(pasteBin, 'focusin', stopProp);
+                this.off(pasteBin, 'focusout', stopProp);
+                this.off(pasteBin, 'paste', this.boundHandlePaste);
+                pasteBin.parentElement.removeChild(pasteBin);
+                this.pasteBinElm = null;
             }
         },
 
@@ -429,7 +436,7 @@ var keyboardPasteTimeStamp = 0,
 
             var res = MediumEditor.util.insertHTMLCommand(this.document, fragmentBody.innerHTML.replace(/&nbsp;/g, ' '));
 
-            window.console.log('handlePaste > insertHTMLCommand', res);
+            window.console.log('pasteHTML > insertHTMLCommand', res);
         },
 
         isCommonBlock: function (el) {
