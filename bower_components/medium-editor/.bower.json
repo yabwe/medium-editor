@@ -4,8 +4,10 @@
   "authors": [
     "Davi Ferreira <hi@daviferreira.com>",
     "Nate Mielnik <nathan@outlook.com>",
+    "Jeremy Benoist <jeremy.benoist@gmail.com>",
+    "Rishi Jain <jainrishi.37@gmail.com>",
     "Noah Chase <nchase@gmail.com>",
-    "Jeremy Benoist <jeremy.benoist@gmail.com>"
+    "Pavel Linkesch <pavel.linkesch@gmail.com>"
   ],
   "description": "Medium.com WYSIWYG editor clone written in pure JavaScript.",
   "main": [
