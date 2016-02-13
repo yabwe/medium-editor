@@ -1,7 +1,4 @@
-/*global Util, Selection, Extension */
-
-var PasteHandler,
-    keyboardPasteTimeStamp = 0,
+var keyboardPasteTimeStamp = 0,
     pasteBinDefaultContent = '%ME_PASTEBIN%';
 
 (function () {
@@ -106,20 +103,20 @@ var PasteHandler,
 
         handleKeydown: function (event) {
             // if it's not Ctrl+V, do nothing
-            if (!(Util.isKey(event, Util.keyCode.V) && Util.isMetaCtrlKey(event))) {
+            if (!(MediumEditor.util.isKey(event, MediumEditor.util.keyCode.V) && MediumEditor.util.isMetaCtrlKey(event))) {
                 return;
             }
 
             event.stopImmediatePropagation();
 
             keyboardPasteTimeStamp = new Date().getTime();
-            this.lastRange = Selection.getSelectionRange(this.document);
+            this.lastRange = MediumEditor.selection.getSelectionRange(this.document);
 
             this.removePasteBin();
             this.createPasteBin();
         },
 
-        handlePaste: function (event, element) {
+        handlePaste: function (event) {
             var clipboardTimer, clipboardContent, clipboardDelay,
                 isKeyBoardPaste, plainTextMode,
                 paragraphs, content,
@@ -127,9 +124,9 @@ var PasteHandler,
                 that = this,
                 p;
 
-            clipboardTimer   = new Date().getTime();
+            clipboardTimer = new Date().getTime();
             clipboardContent = this.getClipboardContent(event);
-            clipboardDelay   = new Date().getTime() - clipboardTimer;
+            clipboardDelay = new Date().getTime() - clipboardTimer;
 
             window.console.log('handlePaste > clipboardContent', clipboardContent);
             window.console.log('handlePaste > delay', new Date().getTime() - keyboardPasteTimeStamp - clipboardDelay);
@@ -150,7 +147,7 @@ var PasteHandler,
                 event.preventDefault();
             }
 
-            setTimeout(function() {
+            setTimeout(function () {
                 window.console.log('handlePaste > hasContentType', that.hasContentType(clipboardContent, 'text/html'));
 
                 // Grab HTML from Clipboard API or paste bin as a fallback
@@ -190,7 +187,9 @@ var PasteHandler,
                     if (that.hasContentType(clipboardContent, 'text/plain') && content.indexOf('</p>') === -1) {
                         content = clipboardContent['text/plain'];
                     } else {
-                        content = Util.innerText(content);
+                        // What is innerText supposed to do? (It isn't defined)
+                        //content = MediumEditor.util.innerText(content);
+                        window.console.log('INNER TEXT: ' + content);
                     }
                 }
 
@@ -216,24 +215,24 @@ var PasteHandler,
                     if (paragraphs.length > 1) {
                         for (p = 0; p < paragraphs.length; p += 1) {
                             if (paragraphs[p] !== '') {
-                                html += '<p>' + Util.htmlEntities(paragraphs[p]) + '</p>';
+                                html += '<p>' + MediumEditor.util.htmlEntities(paragraphs[p]) + '</p>';
                             }
                         }
                     } else {
-                        html = Util.htmlEntities(paragraphs[0]);
+                        html = MediumEditor.util.htmlEntities(paragraphs[0]);
                     }
                 } else {
-                    html = Util.htmlEntities(content);
+                    html = MediumEditor.util.htmlEntities(content);
                 }
 
                 window.console.log('handlePaste > html', html);
 
-                var res = Util.insertHTMLCommand(that.document, html);
+                var res = MediumEditor.util.insertHTMLCommand(that.document, html);
 
                 window.console.log('handlePaste > insertHTMLCommand', res);
 
                 return;
-            }, 0);
+            }.bind(this), 0);
         },
 
         /**
@@ -275,7 +274,7 @@ var PasteHandler,
 
             window.console.log('createPasteBin > Create paste bin');
 
-            range = Selection.getSelectionRange(this.document);
+            range = MediumEditor.selection.getSelectionRange(this.document);
             window.console.log('createPasteBin > range', range);
             window.console.log('createPasteBin > collapsed', range.collapsed);
             window.console.log('createPasteBin > startContainer', range.startContainer.nodeType);
@@ -316,7 +315,7 @@ var PasteHandler,
 
             this.pasteBinElm.focus();
 
-            Selection.selectNode(this.pasteBinElm, this.document);
+            MediumEditor.selection.selectNode(this.pasteBinElm, this.document);
 
             window.console.log('createPasteBin > pasteBinElm', this.pasteBinElm);
 
@@ -332,7 +331,7 @@ var PasteHandler,
             }
 
             if (null !== this.lastRange) {
-                Selection.selectRange(this.document, this.lastRange);
+                MediumEditor.selection.selectRange(this.document, this.lastRange);
                 this.lastRange = null;
             }
 
@@ -345,7 +344,7 @@ var PasteHandler,
         },
 
         getPasteBinHtml: function () {
-            return this.pasteBinElm.innerHTML;
+            return this.pasteBinElm ? this.pasteBinElm.innerHTML : pasteBinDefaultContent;
         },
 
         cleanPaste: function (text) {
@@ -428,7 +427,7 @@ var PasteHandler,
 
             window.console.log('pasteHTML > innerHTML', fragmentBody.innerHTML.replace(/&nbsp;/g, ' '));
 
-            var res = Util.insertHTMLCommand(this.document, fragmentBody.innerHTML.replace(/&nbsp;/g, ' '));
+            var res = MediumEditor.util.insertHTMLCommand(this.document, fragmentBody.innerHTML.replace(/&nbsp;/g, ' '));
 
             window.console.log('handlePaste > insertHTMLCommand', res);
         },
