@@ -231,6 +231,7 @@
             while (anchor.childNodes.length > 1) {
                 span.appendChild(anchor.childNodes[1]);
             }
+            this.base.trigger('editableInput', {}, this.base.elements[0]);
         }
 
     });
