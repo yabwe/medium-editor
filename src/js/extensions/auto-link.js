@@ -108,6 +108,9 @@
                 documentModified = this.removeObsoleteAutoLinkSpans(blockElements[i]) || documentModified;
                 documentModified = this.performLinkingWithinElement(blockElements[i]) || documentModified;
             }
+            if (documentModified) {
+                this.base.events.updateInput(contenteditable, { target: contenteditable, currentTarget: contenteditable });
+            }
             return documentModified;
         },
 
@@ -231,7 +234,6 @@
             while (anchor.childNodes.length > 1) {
                 span.appendChild(anchor.childNodes[1]);
             }
-            this.base.trigger('editableInput', {}, this.base.elements[0]);
         }
 
     });
