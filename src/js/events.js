@@ -302,6 +302,10 @@
                     // Detecting paste on the contenteditables
                     this.attachToEachElement('paste', this.handlePaste);
                     break;
+                case 'editableMousedown':
+                    // Detect mousedown on the contenteditables
+                    this.attachToEachElement('mousedown', this.handleMousedown);
+                    break;
             }
             this.listeners[name] = true;
         },
@@ -482,6 +486,10 @@
 
         handlePaste: function (event) {
             this.triggerCustomEvent('editablePaste', event, event.currentTarget);
+        },
+
+        handleMousedown: function (event) {
+            this.triggerCustomEvent('editableMousedown', event, event.currentTarget);
         },
 
         handleKeydown: function (event) {

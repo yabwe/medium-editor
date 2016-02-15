@@ -1,9 +1,3 @@
-var keyboardPasteTimeStamp = 0,
-    pasteBinDefaultContent = '%ME_PASTEBIN%',
-    stopProp = function (event) {
-        event.stopPropagation();
-    };
-
 (function () {
     'use strict';
     /*jslint regexp: true*/
@@ -53,7 +47,13 @@ var keyboardPasteTimeStamp = 0,
     }
     /*jslint regexp: false*/
 
-    var PasteHandler = MediumEditor.Extension.extend({
+    function stopProp(event) {
+        event.stopPropagation();
+    }
+
+    var keyboardPasteTimeStamp = 0,
+        pasteBinDefaultContent = '%ME_PASTEBIN%',
+        PasteHandler = MediumEditor.Extension.extend({
         /* Paste Options */
 
         /* forcePlainText: [boolean]
@@ -100,6 +100,7 @@ var keyboardPasteTimeStamp = 0,
 
             if (this.forcePlainText || this.cleanPastedHTML) {
                 this.subscribe('editableKeydown', this.handleKeydown.bind(this));
+                this.subscribe('editableMousedown', this.handleMousedown.bind(this));
                 // this.subscribe('editablePaste', this.handlePaste.bind(this));
             }
         },
@@ -118,6 +119,30 @@ var keyboardPasteTimeStamp = 0,
             this.createPasteBin();
         },
 
+        handleMousedown: function (event) {
+            // If it's not a right click, do nothing
+            if (event.button !== 2) {
+                return;
+            }
+
+            this.removeRCTarget();
+            this.createRCTarget(event);
+        },
+
+        handleRCPaste: function (event) {
+            window.console.log('Paste detected!');
+            if (event.isDefaultPrevented) {
+                this.removeRCTarget();
+                return;
+            }
+
+            setTimeout(function () {
+                var content = this.getRCTargetHtml();
+                window.console.log('Right Click Paste Html:');
+                window.console.log(content);
+            }.bind(this), 0);
+        },
+
         handlePaste: function (event) {
             var clipboardTimer, clipboardContent, clipboardDelay,
                 isKeyBoardPaste, plainTextMode,
@@ -130,14 +155,9 @@ var keyboardPasteTimeStamp = 0,
             clipboardContent = this.getClipboardContent(event);
             clipboardDelay = new Date().getTime() - clipboardTimer;
 
-            window.console.log('handlePaste > clipboardContent', clipboardContent);
-            window.console.log('handlePaste > delay', new Date().getTime() - keyboardPasteTimeStamp - clipboardDelay);
-
             isKeyBoardPaste = (new Date().getTime() - keyboardPasteTimeStamp - clipboardDelay) < 1000;
 
             plainTextMode = !this.cleanPastedHTML || this.forcePlainText;
-
-            window.console.log('handlePaste > plainTextMode', plainTextMode);
 
             if (event.isDefaultPrevented) {
                 this.removePasteBin();
@@ -150,15 +170,11 @@ var keyboardPasteTimeStamp = 0,
             }
 
             setTimeout(function () {
-                window.console.log('handlePaste > hasContentType', that.hasContentType(clipboardContent, 'text/html'));
-
                 // Grab HTML from Clipboard API or paste bin as a fallback
                 if (that.hasContentType(clipboardContent, 'text/html')) {
                     content = clipboardContent['text/html'];
                 } else {
                     content = that.getPasteBinHtml();
-                    window.console.log('PASTE BIN CONTENT');
-                    window.console.log(content);
 
                     // If paste bin is empty try using plain text mode
                     // since that is better than nothing right
@@ -168,8 +184,6 @@ var keyboardPasteTimeStamp = 0,
                 }
 
                 content = that.trimHtml(content);
-
-                window.console.log('handlePaste > content', content);
 
                 // WebKit has a nice bug where it clones the paste bin if you paste from for example notepad
                 // so we need to force plain text mode in this case
@@ -207,8 +221,6 @@ var keyboardPasteTimeStamp = 0,
                     return;
                 }
 
-                window.console.log('handlePaste > plainTextMode', plainTextMode);
-
                 if (false === plainTextMode) {
                     return that.cleanPaste(content);
                 }
@@ -229,13 +241,7 @@ var keyboardPasteTimeStamp = 0,
                     html = MediumEditor.util.htmlEntities(content);
                 }
 
-                window.console.log('handlePaste > html', html);
-
-                var res = MediumEditor.util.insertHTMLCommand(that.document, html);
-
-                window.console.log('handlePaste > insertHTMLCommand', res);
-
-                return;
+                return MediumEditor.util.insertHTMLCommand(that.document, html);
             }.bind(this), 0);
         },
 
@@ -272,24 +278,100 @@ var keyboardPasteTimeStamp = 0,
             return data;
         },
 
+        createRCTarget: function () {
+            var range = this.lastRange = MediumEditor.selection.getSelectionRange(this.document),
+                top = this.window.pageYOffset,
+                left = this.window.pageXOffset,
+                rects;
+
+            if (range) {
+                rects = range.getClientRects();
+
+                // on empty line, rects is empty so we grab information from the first container of the range
+                if (rects.length) {
+                    top += rects[0].top;
+                    left += rects[0].left;
+                } else {
+                    top += range.startContainer.getBoundingClientRect().top;
+                    left += range.startContainer.getBoundingClientRect().left;
+                }
+            }
+
+            var targetElm = this.document.createElement('div');
+            targetElm.id = 'medium-editor-rctarget';
+            //targetElm.setAttribute('style', 'z-index: 9003; width: 100px; height: 100px; margin: -50px; opacity: 0; border: 1px red solid; padding: 0; position: absolute; left: -1000px; right: -1000px');
+            targetElm.setAttribute('style', 'border: 1px red solid; position: absolute; top: ' + top + 'px; width: 100px; height: 100px; margin: -50px; overflow: hidden; opacity: 0;');
+            targetElm.setAttribute('contentEditable', true);
+            targetElm.style.left = left + 'px';
+            targetElm.style.top = top + 'px';
+            targetElm.innerHTML = pasteBinDefaultContent;
+
+            this.getEditorOption('elementsContainer').appendChild(targetElm);
+
+            this.on(targetElm, 'focus', stopProp);
+            this.on(targetElm, 'focusin', stopProp);
+            this.on(targetElm, 'focusout', stopProp);
+
+            targetElm.focus();
+
+            MediumEditor.selection.selectNode(targetElm, this.document);
+
+            if (!this.boundHandleRCPaste) {
+                this.boundHandleRCPaste = this.handleRCPaste.bind(this);
+            }
+            this.on(targetElm, 'paste', this.boundHandleRCPaste);
+
+            if (!this.boundHandleContextMenu) {
+                this.boundHandleContextMenu = this.handleContextMenu.bind(this);
+            }
+            this.on(this.document, 'contextmenu', this.boundHandleContextMenu);
+        },
+
+        handleContextMenu: function () {
+            setTimeout(function () {
+                if (!this.boundHandleDocumentMousemove) {
+                    this.boundHandleDocumentMousemove = this.handleDocumentMousemove.bind(this);
+                }
+                this.on(this.document, 'mousemove', this.boundHandleDocumentMousemove);
+            }.bind(this), 0);
+        },
+
+        handleDocumentMousemove: function () {
+            this.off(this.document, 'mousemove', this.boundHandleDocumentMousemove);
+            setTimeout(function () {
+                this.removeRCTarget();
+            }.bind(this), 0);
+        },
+
+        removeRCTarget: function () {
+            if (null !== this.lastRange) {
+                MediumEditor.selection.selectRange(this.document, this.lastRange);
+                this.lastRange = null;
+            }
+
+            var rcTarget = this.document.getElementById('medium-editor-rctarget');
+            if (!rcTarget) {
+                return;
+            }
+
+            this.off(rcTarget, 'focus', stopProp);
+            this.off(rcTarget, 'focusin', stopProp);
+            this.off(rcTarget, 'focusout', stopProp);
+            this.off(rcTarget, 'paste', this.boundHandleRCPaste);
+            rcTarget.parentElement.removeChild(rcTarget);
+        },
+
         createPasteBin: function () {
             var range, rects,
                 top = this.window.pageYOffset;
 
-            window.console.log('createPasteBin > Create paste bin');
-
             range = MediumEditor.selection.getSelectionRange(this.document);
-            window.console.log('createPasteBin > range', range);
-            window.console.log('createPasteBin > collapsed', range.collapsed);
-            window.console.log('createPasteBin > startContainer', range.startContainer.nodeType);
 
             if (range) {
                 rects = range.getClientRects();
-                window.console.log('createPasteBin > rects', rects);
 
                 // on empty line, rects is empty so we grab information from the first container of the range
                 if (rects.length) {
-                    window.console.log('createPasteBin > rects.length', rects.length);
                     top += rects[0].top;
                 } else {
                     top += range.startContainer.getBoundingClientRect().top;
@@ -297,8 +379,6 @@ var keyboardPasteTimeStamp = 0,
             }
 
             this.lastRange = range;
-
-            window.console.log('createPasteBin > top', top);
 
             this.pasteBinElm = this.document.createElement('div');
             this.pasteBinElm.id = 'medium-editor-pastebin';
@@ -317,8 +397,6 @@ var keyboardPasteTimeStamp = 0,
 
             MediumEditor.selection.selectNode(this.pasteBinElm, this.document);
 
-            window.console.log('createPasteBin > pasteBinElm', this.pasteBinElm);
-
             if (!this.boundHandlePaste) {
                 this.boundHandlePaste = this.handlePaste.bind(this);
             }
@@ -327,8 +405,6 @@ var keyboardPasteTimeStamp = 0,
         },
 
         removePasteBin: function () {
-            window.console.log('Remove paste bin');
-
             if (null !== this.lastRange) {
                 MediumEditor.selection.selectRange(this.document, this.lastRange);
                 this.lastRange = null;
@@ -354,6 +430,11 @@ var keyboardPasteTimeStamp = 0,
             return this.pasteBinElm ? this.pasteBinElm.innerHTML : pasteBinDefaultContent;
         },
 
+        getRCTargetHtml: function () {
+            var rcTarget = this.document.getElementById('medium-editor-rctarget');
+            return (rcTarget) ? rcTarget.innerHTML : pasteBinDefaultContent;
+        },
+
         cleanPaste: function (text) {
             var i, elList, tmp, workEl,
                 multiline = /<p|<br|<div/.test(text),
@@ -365,9 +446,6 @@ var keyboardPasteTimeStamp = 0,
             for (i = 0; i < replacements.length; i += 1) {
                 text = text.replace(replacements[i][0], replacements[i][1]);
             }
-
-            window.console.log('cleanPaste > multiline', multiline);
-            window.console.log('cleanPaste > text', text);
 
             if (!multiline) {
                 return this.pasteHTML(text);
@@ -409,8 +487,6 @@ var keyboardPasteTimeStamp = 0,
                 cleanTags: this.cleanTags
             });
 
-            window.console.log('pasteHTML > html', html);
-
             var elList, workEl, i, fragmentBody, pasteBlock = this.document.createDocumentFragment();
 
             pasteBlock.appendChild(this.document.createElement('body'));
@@ -432,11 +508,7 @@ var keyboardPasteTimeStamp = 0,
                 MediumEditor.util.cleanupTags(workEl, options.cleanTags);
             }
 
-            window.console.log('pasteHTML > innerHTML', fragmentBody.innerHTML.replace(/&nbsp;/g, ' '));
-
-            var res = MediumEditor.util.insertHTMLCommand(this.document, fragmentBody.innerHTML.replace(/&nbsp;/g, ' '));
-
-            window.console.log('pasteHTML > insertHTMLCommand', res);
+            return MediumEditor.util.insertHTMLCommand(this.document, fragmentBody.innerHTML.replace(/&nbsp;/g, ' '));
         },
 
         isCommonBlock: function (el) {
