@@ -42,7 +42,12 @@
             // Prevent file from opening in the current window
             event.preventDefault();
             event.stopPropagation();
-
+            // Select the dropping target, and set the selection to the end of the target
+            // https://github.com/yabwe/medium-editor/issues/980
+            this.base.selectElement(event.target);
+            var selection = this.base.exportSelection();
+            selection.start = selection.end;
+            this.base.importSelection(selection);
             // IE9 does not support the File API, so prevent file from opening in the window
             // but also don't try to actually get the file
             if (event.dataTransfer.files) {
