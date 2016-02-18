@@ -490,8 +490,7 @@
                     range = range.cloneRange();
                     range.setStartAfter(lastNode);
                     range.collapse(true);
-                    selection.removeAllRanges();
-                    selection.addRange(range);
+                    MediumEditor.util.replaceRange(selection, range);
                 }
             }
         },
@@ -1042,6 +1041,18 @@
             } else {
                 el.parentNode.removeChild(el);
             }
+        },
+
+        // https://github.com/Voog/wysihtml/issues/231
+        // fixes IE 11 bug with removeAllRanges
+        replaceRange: function (sel, replacement) {
+            if (sel.rangeCount > 0 &&
+                sel.getRangeAt(0).getClientRects.length < 0) {
+
+                sel.removeAllRanges();
+            }
+
+            sel.addRange(replacement);
         }
     };
 

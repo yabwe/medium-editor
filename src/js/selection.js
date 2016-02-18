@@ -214,8 +214,7 @@
             }
 
             var sel = doc.getSelection();
-            sel.removeAllRanges();
-            sel.addRange(range);
+            MediumEditor.util.replaceRange(sel, range);
         },
 
         // Utility method called from importSelection only
@@ -612,12 +611,10 @@
                 sel = doc.getSelection();
 
             range.selectNodeContents(node);
-            sel.removeAllRanges();
-            sel.addRange(range);
+            MediumEditor.util.replaceRange(sel, range);
         },
 
         select: function (doc, startNode, startOffset, endNode, endOffset) {
-            doc.getSelection().removeAllRanges();
             var range = doc.createRange();
             range.setStart(startNode, startOffset);
             if (endNode) {
@@ -625,7 +622,7 @@
             } else {
                 range.collapse(true);
             }
-            doc.getSelection().addRange(range);
+            MediumEditor.util.replaceRange(doc.getSelection(), range);
             return range;
         },
 
