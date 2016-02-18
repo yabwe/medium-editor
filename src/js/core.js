@@ -873,6 +873,16 @@
             }
         },
 
+        clearSelection: function (toEnd) {
+            var selection = this.options.ownerDocument.getSelection();
+
+            if (toEnd) {
+                return selection.collapseToEnd();
+            }
+
+            selection.collapseToStart();
+        },
+
         getFocusedElement: function () {
             var focused;
             this.elements.some(function (element) {
