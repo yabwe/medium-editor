@@ -286,6 +286,13 @@ var editor = new MediumEditor('.editable', {
 });
 ```
 
+To make placeholder disappear only after starting to type (not already when field gets focus), and to appear as soon as field is empty (not only if field loses focus):
+```javascript
+var editor = new MediumEditor('.editable', {
+    hideOnClick: false
+});
+```
+
 ### Anchor Form options
 
 The anchor form is a built-in button extension which allows the user to add/edit/remove links from within the editor.  When 'anchor' is passed in as a button in the list of buttons, this extension will be enabled and can be triggered by clicking the corresponding button in the toolbar.
@@ -427,7 +434,7 @@ var editor = new MediumEditor('.editor', {
     }
 });
 ```
-Due to the [state of code](https://github.com/yabwe/medium-editor/issues/966) in 5.0.0, the editor *ALWAYS* prevented any drag and drop actions. 
+Due to the [state of code](https://github.com/yabwe/medium-editor/issues/966) in 5.0.0, the editor *ALWAYS* prevented any drag and drop actions.
 We will have a better way to disable file dragging in 6.*
 
 ### Options Example:
