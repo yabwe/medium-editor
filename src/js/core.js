@@ -165,9 +165,7 @@
             if (tagName === 'a') {
                 this.options.ownerDocument.execCommand('unlink', false, null);
             } else if (!event.shiftKey && !event.ctrlKey) {
-                if (!/h\d|figCaption/i.test(tagName)) {
-                    this.options.ownerDocument.execCommand('formatBlock', false, 'p');
-                }
+                this.options.ownerDocument.execCommand('formatBlock', false, 'p');
             }
         }
     }
