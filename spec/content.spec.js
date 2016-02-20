@@ -308,16 +308,58 @@ describe('Content TestCase', function () {
         });
 
         it('should call formatBlock when inside a non-header and non-anchor', function () {
-            this.el.innerHTML = '<p>lorem ipsum</p>';
+            this.el.innerHTML = '<p>lorem <span>ipsum</span></p>';
             var editor = this.newMediumEditor('.editor'),
-                targetNode = editor.elements[0].querySelector('p');
+                targetNode = editor.elements[0].querySelector('span').firstChild;
             spyOn(document, 'execCommand').and.callThrough();
-            placeCursorInsideElement(targetNode, 0);
+            placeCursorInsideElement(targetNode, targetNode.textContent.length - 1);
             fireEvent(targetNode, 'keyup', {
                 keyCode: MediumEditor.util.keyCode.ENTER
             });
             expect(document.execCommand).toHaveBeenCalledWith('formatBlock', false, 'p');
-            expect(this.el.innerHTML).toBe('<p>lorem ipsum</p>');
+        });
+
+        it('should not call formatBlock when inside an anchor', function () {
+            var html = '<p>lorem <a href="#">ipsum</a></p>';
+            this.el.innerHTML = html;
+            var editor = this.newMediumEditor('.editor'),
+                targetNode = editor.elements[0].querySelector('a').firstChild;
+            spyOn(document, 'execCommand').and.callThrough();
+            placeCursorInsideElement(targetNode, targetNode.textContent.length - 1);
+            fireEvent(targetNode, 'keyup', {
+                keyCode: MediumEditor.util.keyCode.ENETER
+            });
+            expect(document.execCommand).not.toHaveBeenCalled();
+            expect(this.el.innerHTML).toBe(html);
+        });
+
+        // https://github.com/yabwe/medium-editor/issues/834
+        it('should not call formatBlock when inside a figCaption', function () {
+            var html = '<figure><img src="../demo/img/medium-editor.jpg"><figcaption>ipsum</figcaption></figure>';
+            this.el.innerHTML = html;
+            var editor = this.newMediumEditor('.editor'),
+                targetNode = editor.elements[0].querySelector('figCaption').firstChild;
+            spyOn(document, 'execCommand').and.callThrough();
+            placeCursorInsideElement(targetNode, targetNode.textContent.length - 1);
+            fireEvent(targetNode, 'keyup', {
+                keyCode: MediumEditor.util.keyCode.ENETER
+            });
+            expect(document.execCommand).not.toHaveBeenCalled();
+            expect(this.el.innerHTML).toBe(html);
+        });
+
+        it('should not call formatBlock when inside a header', function () {
+            var html = '<h1>lorem ipsum</h1>';
+            this.el.innerHTML = html;
+            var editor = this.newMediumEditor('.editor'),
+                targetNode = editor.elements[0].querySelector('h1').firstChild;
+            spyOn(document, 'execCommand').and.callThrough();
+            placeCursorInsideElement(targetNode, targetNode.textContent.length - 1);
+            fireEvent(targetNode, 'keyup', {
+                keyCode: MediumEditor.util.keyCode.ENETER
+            });
+            expect(document.execCommand).not.toHaveBeenCalled();
+            expect(this.el.innerHTML).toBe(html);
         });
 
         it('with ctrl key, should not call formatBlock', function () {
