@@ -8,7 +8,7 @@
             textContent = node.textContent,
             caretPositions = MediumEditor.selection.getCaretOffsets(node);
 
-        if ((textContent[caretPositions.left - 1] === undefined) || (textContent[caretPositions.left - 1].trim() === '')) {
+        if ((textContent[caretPositions.left - 1] === undefined) || (textContent[caretPositions.left - 1].trim() === '') || (textContent[caretPositions.left] !== undefined && textContent[caretPositions.left].trim() === '')) {
             event.preventDefault();
         }
     }

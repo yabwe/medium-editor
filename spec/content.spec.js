@@ -166,6 +166,25 @@ describe('Content TestCase', function () {
 
             expect(evt.preventDefault).toHaveBeenCalled();
         });
+
+        it('should prevent more spaces from being inserted when a space already exists and disableExtraSpaces options is true', function () {
+            this.el.innerHTML = '<p>lorem<span> ipsum</span></p>';
+
+            var editor = this.newMediumEditor('.editor', { disableExtraSpaces: true }),
+                evt;
+
+            placeCursorInsideElement(editor.elements[0].getElementsByTagName('p')[0], 1);
+
+            evt = prepareEvent(editor.elements[0], 'keydown', {
+                keyCode: MediumEditor.util.keyCode.SPACE
+            });
+
+            spyOn(evt, 'preventDefault').and.callThrough();
+
+            firePreparedEvent(evt, editor.elements[0], 'keydown');
+
+            expect(evt.preventDefault).toHaveBeenCalled();
+        });
     });
 
     describe('when the enter key is pressed', function () {
