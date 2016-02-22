@@ -167,6 +167,7 @@ describe('Content TestCase', function () {
             expect(evt.preventDefault).toHaveBeenCalled();
         });
 
+        //This test case replicates https://github.com/yabwe/medium-editor/issues/982
         it('should prevent more spaces from being inserted when a space already exists and disableExtraSpaces options is true', function () {
             this.el.innerHTML = '<p>lorem<span> ipsum</span></p>';
 
