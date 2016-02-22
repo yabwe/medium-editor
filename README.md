@@ -272,24 +272,22 @@ var editor = new MediumEditor('.editable', {
     placeholder: {
         /* This example includes the default options for placeholder,
            if nothing is passed this is what it used */
-        text: 'Type your text'
+        text: 'Type your text',
+        hideOnClick: true
     }
 });
 ```
 
 * __text__: Defines the default placeholder for empty contenteditables when __placeholder__ is not set to false. You can overwrite it by setting a `data-placeholder` attribute on the editor elements. Default: `'Type your text'`
 
+* __hideOnClick__: Causes the placeholder to disappear as soon as the field gains focus. Default: `true`.
+To hide the placeholder only after starting to type, and to show it again as soon as field is empty, set this option to `false`.
+
+
 To disable the placeholder, set the value of the `placeholder` option to `false`:
 ```javascript
 var editor = new MediumEditor('.editable', {
     placeholder: false
-});
-```
-
-To make placeholder disappear only after starting to type (not already when field gets focus), and to appear as soon as field is empty (not only if field loses focus):
-```javascript
-var editor = new MediumEditor('.editable', {
-    hideOnClick: false
 });
 ```
 
