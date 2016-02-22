@@ -45,6 +45,7 @@ var editor = new MediumEditor('.editor', {
   - [Disabling Anchor Preview](#disabling-anchor-preview)
 - [Placeholder Options](#placeholder-options)
     - [`text`](#text)
+    - [`hideOnClick`](#hideonclick)
   - [Disabling Placeholders](#disabling-placeholders)
 - [Anchor Form options](#anchor-form-options)
     - [`customClassOption`](#customclassoption)
@@ -363,7 +364,8 @@ var editor = new MediumEditor('.editable', {
     placeholder: {
         /* This example includes the default options for placeholder,
            if nothing is passed this is what it used */
-        text: 'Type your text'
+        text: 'Type your text',
+        hideOnClick: true
     }
 });
 ```
@@ -374,6 +376,13 @@ var editor = new MediumEditor('.editable', {
 **Default:** `'Type your text'`
 
 Defines the default placeholder for empty contenteditables when __placeholder__ is not set to false. You can overwrite it by setting a `data-placeholder` attribute on the editor elements.
+
+***
+#### `hideOnClick`
+**Default:** `true`
+
+Causes the placeholder to disappear as soon as the field gains focus. To hide the placeholder only after starting to type, and to show it again as soon as field is empty, set this option to `false`.
+
 
 ### Disabling Placeholders
 
