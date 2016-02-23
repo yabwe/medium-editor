@@ -213,6 +213,20 @@ describe('Autolink', function () {
                 expect(links[0].textContent).toBe('http://www.example.blur');
             });
 
+            it('should fire editableInput after autolinking', function () {
+                var spy = jasmine.createSpy('handler');
+                this.el.innerHTML = 'http://www.example.com';
+
+                selectElementContentsAndFire(this.el);
+                this.editor.subscribe('editableInput', spy);
+                expect(spy).not.toHaveBeenCalled();
+
+                fireEvent(this.el, 'blur');
+                jasmine.clock().tick(1);
+
+                expect(spy).toHaveBeenCalled();
+            });
+
             it('should auto-link link within basic text', function () {
                 this.el.innerHTML = 'Text with http://www.example.com inside!';
 
