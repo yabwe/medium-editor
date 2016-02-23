@@ -108,6 +108,7 @@
                 documentModified = this.removeObsoleteAutoLinkSpans(blockElements[i]) || documentModified;
                 documentModified = this.performLinkingWithinElement(blockElements[i]) || documentModified;
             }
+            this.base.events.updateInput(contenteditable, { target: contenteditable, currentTarget: contenteditable });
             return documentModified;
         },
 
