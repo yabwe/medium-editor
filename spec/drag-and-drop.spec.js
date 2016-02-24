@@ -37,26 +37,55 @@ describe('Drag and Drop TestCase', function () {
     });
 
     describe('drop', function () {
-        it('should remove medium-editor-dragover class and add the image to the editor content', function () {
+        var eventListener;
+
+        beforeEach(function () {
+            eventListener = jasmine.createSpy();
+
+            // Spy on the FileReader and use the spy for any added event listeners
+            spyOn(window, 'FileReader').and.returnValue({
+                addEventListener: eventListener,
+                readAsDataURL: function () {
+                }
+            });
+            // Spy to ensure that image is inserted
             spyOn(MediumEditor.util, 'insertHTMLCommand').and.callThrough();
+        });
+
+        it('should remove medium-editor-dragover class and add the image to the editor content', function () {
             var editor = this.newMediumEditor(this.el);
             fireEvent(editor.elements[0], 'dragover');
             expect(editor.elements[0].className).toContain('medium-editor-dragover');
             fireEvent(editor.elements[0], 'drop');
             expect(editor.elements[0].className).not.toContain('medium-editor-dragover');
+
             // File API just doesn't work in IE9, so only verify this functionality if it's not IE9
             if (!isIE9()) {
+                // Ensure that the load event is bound to the FileReader
+                expect(eventListener.calls.mostRecent().args[0]).toEqual('load');
+                // Pass into the event handler our dummy image source
+                eventListener.calls.mostRecent().args[1]({
+                    target: {
+                        result: 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7'
+                    }
+                });
+
+                // Expect that the image is inserted
                 expect(MediumEditor.util.insertHTMLCommand).toHaveBeenCalled();
             }
         });
 
         it('should remove medium-editor-dragover class and NOT add the image to the editor content', function () {
-            spyOn(MediumEditor.util, 'insertHTMLCommand').and.callThrough();
             var editor = this.newMediumEditor(this.el, { imageDragging: false });
             fireEvent(editor.elements[0], 'dragover');
             expect(editor.elements[0].className).toContain('medium-editor-dragover');
             fireEvent(editor.elements[0], 'drop');
             expect(editor.elements[0].className).not.toContain('medium-editor-dragover');
+
+            //The following ensures that MediumEditor.Extension.insertImageFile is not called:
+            // 1. Ensure that a load event is not bound to the FileReader
+            expect(eventListener.calls.mostRecent()).toEqual(undefined);
+            // 2. Expect that the image is not inserted
             expect(MediumEditor.util.insertHTMLCommand).not.toHaveBeenCalled();
         });
     });
