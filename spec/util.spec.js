@@ -1,4 +1,4 @@
-/*global selectElementContents*/
+/*global selectElementContents, selectElementContentsAndFire */
 
 describe('MediumEditor.util', function () {
     'use strict';
@@ -426,6 +426,38 @@ describe('MediumEditor.util', function () {
 
             expect(el.innerHTML).toBe('<p>some pasted html</p>');
             expect(document.body.contains(el)).toBe(true, 'The editor element has been removed from the page');
+        });
+
+        // https://github.com/yabwe/medium-editor/issues/992
+        it('should trigger editableInput when using custom insertHTML implementation and contenteditable does not support input event', function () {
+            // Ensure custom implementation
+            var originalInputSupport = MediumEditor.Events.prototype.InputEventOnContenteditableSupported;
+            MediumEditor.Events.prototype.InputEventOnContenteditableSupported = false;
+
+            var el = this.createElement('div', 'editable', '<p>orig text</p>'),
+                origQCS = document.queryCommandSupported;
+            // Force our custom implementation to run
+            spyOn(document, 'queryCommandSupported').and.callFake(function (command) {
+                if (command === 'insertHTML') {
+                    return false;
+                }
+                return origQCS.apply(document, arguments);
+            });
+
+            var editor = this.newMediumEditor('.editable'),
+                spy = jasmine.createSpy('handler');
+
+            editor.subscribe('editableInput', spy);
+            selectElementContentsAndFire(el.firstChild);
+            MediumEditor.util.insertHTMLCommand(document, '<p>some pasted html</p>', true);
+
+            var obj = { target: el, currentTarget: el };
+            expect(spy).toHaveBeenCalledWith(obj, el);
+
+            expect(el.innerHTML).toBe('<p>some pasted html</p>');
+            expect(document.body.contains(el)).toBe(true, 'The editor element has been removed from the page');
+
+            MediumEditor.Events.prototype.InputEventOnContenteditableSupported = originalInputSupport;
         });
     });
 

@@ -254,6 +254,48 @@ describe('MediumEditor.Events TestCase', function () {
 
             MediumEditor.Events.prototype.InputEventOnContenteditableSupported = originalInputSupport;
         });
+
+        it('should expose a method for calling all listeners manually', function () {
+            var originalInputSupport = MediumEditor.Events.prototype.InputEventOnContenteditableSupported;
+            MediumEditor.Events.prototype.InputEventOnContenteditableSupported = false;
+
+            spyOn(document, 'execCommand').and.callThrough();
+            var origExecCommand = document.execCommand,
+                mockInstance = {
+                    options: { ownerDocument: document }
+                },
+                eventsOne = new MediumEditor.Events(mockInstance),
+                eventsTwo = new MediumEditor.Events(mockInstance),
+                handlerOne = spyOn(eventsOne, 'handleDocumentExecCommand'),
+                handlerTwo = spyOn(eventsTwo, 'handleDocumentExecCommand'),
+                args = ['bold', false, 'something'];
+
+            eventsOne.attachToExecCommand();
+            eventsTwo.attachToExecCommand();
+            expect(document.execCommand).not.toBe(origExecCommand);
+            expect(document.execCommand.listeners.length).toBe(2);
+            expect(document.execCommand.callListeners).not.toBeUndefined();
+            expect(handlerOne).not.toHaveBeenCalled();
+            expect(handlerTwo).not.toHaveBeenCalled();
+
+            document.execCommand.callListeners(args, true);
+
+            var expectedObj = {
+                command: 'bold',
+                value: 'something',
+                args: args,
+                result: true
+            };
+
+            expect(handlerOne).toHaveBeenCalledWith(expectedObj);
+            expect(handlerTwo).toHaveBeenCalledWith(expectedObj);
+            expect(origExecCommand).not.toHaveBeenCalled();
+
+            eventsOne.destroy();
+            eventsTwo.destroy();
+
+            MediumEditor.Events.prototype.InputEventOnContenteditableSupported = originalInputSupport;
+        });
     });
 
     describe('Custom EditableInput Listener', function () {
