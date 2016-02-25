@@ -53,7 +53,12 @@ describe('Drag and Drop TestCase', function () {
         });
 
         it('should remove medium-editor-dragover class and add the image to the editor content', function () {
-            var editor = this.newMediumEditor(this.el);
+            var editor = this.newMediumEditor(this.el),
+                editableInputListener = jasmine.createSpy();
+
+            editor.subscribe('editableInput', editableInputListener);
+            expect(editableInputListener).not.toHaveBeenCalled();
+
             fireEvent(editor.elements[0], 'dragover');
             expect(editor.elements[0].className).toContain('medium-editor-dragover');
             fireEvent(editor.elements[0], 'drop');
@@ -72,11 +77,16 @@ describe('Drag and Drop TestCase', function () {
 
                 // Expect that the image is inserted
                 expect(MediumEditor.util.insertHTMLCommand).toHaveBeenCalled();
+                // Expect that the editableInput event is fired
+                expect(editableInputListener).toHaveBeenCalled();
             }
         });
 
         it('should remove medium-editor-dragover class and NOT add the image to the editor content', function () {
-            var editor = this.newMediumEditor(this.el, { imageDragging: false });
+            var editor = this.newMediumEditor(this.el, { imageDragging: false }),
+                editableInputListener = jasmine.createSpy();
+
+            editor.subscribe('editableInput', editableInputListener);
             fireEvent(editor.elements[0], 'dragover');
             expect(editor.elements[0].className).toContain('medium-editor-dragover');
             fireEvent(editor.elements[0], 'drop');
@@ -87,6 +97,8 @@ describe('Drag and Drop TestCase', function () {
             expect(eventListener.calls.mostRecent()).toEqual(undefined);
             // 2. Expect that the image is not inserted
             expect(MediumEditor.util.insertHTMLCommand).not.toHaveBeenCalled();
+            // 3. Expect that the editableInput event is not fired
+            expect(editableInputListener).not.toHaveBeenCalled();
         });
     });
 });

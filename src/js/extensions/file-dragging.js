@@ -76,7 +76,7 @@
 
             // attach the onload event handler, makes it easier to listen in with jasmine
             fileReader.addEventListener('load', function (e) {
-                var addImageElement = document.createElement('img');
+                var addImageElement = this.document.createElement('img');
                 addImageElement.src = e.target.result;
                 MediumEditor.util.insertHTMLCommand(this.document, addImageElement.outerHTML);
             }.bind(this));
