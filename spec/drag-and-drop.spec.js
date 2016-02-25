@@ -1,4 +1,4 @@
-/*global fireEvent, isIE9 */
+/*global fireEvent */
 
 describe('Drag and Drop TestCase', function () {
     'use strict';
@@ -42,12 +42,15 @@ describe('Drag and Drop TestCase', function () {
         beforeEach(function () {
             eventListener = jasmine.createSpy();
 
-            // Spy on the FileReader and use the spy for any added event listeners
-            spyOn(window, 'FileReader').and.returnValue({
-                addEventListener: eventListener,
-                readAsDataURL: function () {
-                }
-            });
+            // File API just doesn't work in IE9, so only verify this functionality if it's not IE9
+            if (typeof FileReader === 'function') {
+                // Spy on the FileReader and use the spy for any added event listeners
+                spyOn(window, 'FileReader').and.returnValue({
+                    addEventListener: eventListener,
+                    readAsDataURL: function () {
+                    }
+                });
+            }
             // Spy to ensure that image is inserted
             spyOn(MediumEditor.util, 'insertHTMLCommand').and.callThrough();
         });
@@ -65,7 +68,7 @@ describe('Drag and Drop TestCase', function () {
             expect(editor.elements[0].className).not.toContain('medium-editor-dragover');
 
             // File API just doesn't work in IE9, so only verify this functionality if it's not IE9
-            if (!isIE9()) {
+            if (typeof FileReader === 'function') {
                 // Ensure that the load event is bound to the FileReader
                 expect(eventListener.calls.mostRecent().args[0]).toEqual('load');
                 // Pass into the event handler our dummy image source

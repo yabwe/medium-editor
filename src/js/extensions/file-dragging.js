@@ -71,6 +71,9 @@
         },
 
         insertImageFile: function (file) {
+            if (typeof FileReader !== 'function') {
+                return;
+            }
             var fileReader = new FileReader();
             fileReader.readAsDataURL(file);
 
