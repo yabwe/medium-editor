@@ -437,18 +437,20 @@
 
         // http://stackoverflow.com/questions/6690752/insert-html-at-caret-in-a-contenteditable-div
         insertHTMLCommand: function (doc, html) {
-            var selection, range, el, fragment, node, lastNode, toReplace;
+            var selection, range, el, fragment, node, lastNode, toReplace,
+                res = false,
+                ecArgs = ['insertHTML', false, html];
 
             /* Edge's implementation of insertHTML is just buggy right now:
              * - Doesn't allow leading white space at the beginning of an element
              * - Found a case when a <font size="2"> tag was inserted when calling alignCenter inside a blockquote
              *
-             * There are likely many other bugs, these are just the ones we found so far.
+             * There are likely other bugs, these are just the ones we found so far.
              * For now, let's just use the same fallback we did for IE
              */
             if (!MediumEditor.util.isEdge && doc.queryCommandSupported('insertHTML')) {
                 try {
-                    return doc.execCommand('insertHTML', false, html);
+                    return doc.execCommand.apply(doc, ecArgs);
                 } catch (ignore) {}
             }
 
@@ -493,7 +495,15 @@
                     selection.removeAllRanges();
                     selection.addRange(range);
                 }
+                res = true;
             }
+
+            // https://github.com/yabwe/medium-editor/issues/992
+            // If we're monitoring calls to execCommand, notify listeners as if a real call had happened
+            if (doc.execCommand.callListeners) {
+                doc.execCommand.callListeners(ecArgs, res);
+            }
+            return res;
         },
 
         execFormatBlock: function (doc, tagName) {

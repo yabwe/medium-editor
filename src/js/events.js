@@ -160,36 +160,46 @@
                 return;
             }
 
+            // Helper method to call all listeners to execCommand
+            var callListeners = function (args, result) {
+                    if (doc.execCommand.listeners) {
+                        doc.execCommand.listeners.forEach(function (listener) {
+                            listener({
+                                command: args[0],
+                                value: args[2],
+                                args: args,
+                                result: result
+                            });
+                        });
+                    }
+                },
+
             // Create a wrapper method for execCommand which will:
             // 1) Call document.execCommand with the correct arguments
             // 2) Loop through any listeners and notify them that execCommand was called
             //    passing extra info on the call
             // 3) Return the result
-            var wrapper = function (aCommandName, aShowDefaultUI, aValueArgument) {
-                var result = doc.execCommand.orig.apply(this, arguments);
+                wrapper = function () {
+                    var result = doc.execCommand.orig.apply(this, arguments);
 
-                if (!doc.execCommand.listeners) {
+                    if (!doc.execCommand.listeners) {
+                        return result;
+                    }
+
+                    var args = Array.prototype.slice.call(arguments);
+                    callListeners(args, result);
+
                     return result;
-                }
-
-                var args = Array.prototype.slice.call(arguments);
-                doc.execCommand.listeners.forEach(function (listener) {
-                    listener({
-                        command: aCommandName,
-                        value: aValueArgument,
-                        args: args,
-                        result: result
-                    });
-                });
-
-                return result;
-            };
+                };
 
             // Store a reference to the original execCommand
             wrapper.orig = doc.execCommand;
 
             // Attach an array for storing listeners
             wrapper.listeners = [];
+
+            // Helper for notifying listeners
+            wrapper.callListeners = callListeners;
 
             // Overwrite execCommand
             doc.execCommand = wrapper;
