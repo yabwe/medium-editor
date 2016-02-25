@@ -842,18 +842,20 @@ MediumEditor.extensions = {};
 
         // http://stackoverflow.com/questions/6690752/insert-html-at-caret-in-a-contenteditable-div
         insertHTMLCommand: function (doc, html) {
-            var selection, range, el, fragment, node, lastNode, toReplace;
+            var selection, range, el, fragment, node, lastNode, toReplace,
+                res = false,
+                ecArgs = ['insertHTML', false, html];
 
             /* Edge's implementation of insertHTML is just buggy right now:
              * - Doesn't allow leading white space at the beginning of an element
              * - Found a case when a <font size="2"> tag was inserted when calling alignCenter inside a blockquote
              *
-             * There are likely many other bugs, these are just the ones we found so far.
+             * There are likely other bugs, these are just the ones we found so far.
              * For now, let's just use the same fallback we did for IE
              */
             if (!MediumEditor.util.isEdge && doc.queryCommandSupported('insertHTML')) {
                 try {
-                    return doc.execCommand('insertHTML', false, html);
+                    return doc.execCommand.apply(doc, ecArgs);
                 } catch (ignore) {}
             }
 
@@ -898,7 +900,15 @@ MediumEditor.extensions = {};
                     selection.removeAllRanges();
                     selection.addRange(range);
                 }
+                res = true;
             }
+
+            // https://github.com/yabwe/medium-editor/issues/992
+            // If we're monitoring calls to execCommand, notify listeners as if a real call had happened
+            if (doc.execCommand.callListeners) {
+                doc.execCommand.callListeners(ecArgs, res);
+            }
+            return res;
         },
 
         execFormatBlock: function (doc, tagName) {
@@ -2538,36 +2548,46 @@ MediumEditor.extensions = {};
                 return;
             }
 
+            // Helper method to call all listeners to execCommand
+            var callListeners = function (args, result) {
+                    if (doc.execCommand.listeners) {
+                        doc.execCommand.listeners.forEach(function (listener) {
+                            listener({
+                                command: args[0],
+                                value: args[2],
+                                args: args,
+                                result: result
+                            });
+                        });
+                    }
+                },
+
             // Create a wrapper method for execCommand which will:
             // 1) Call document.execCommand with the correct arguments
             // 2) Loop through any listeners and notify them that execCommand was called
             //    passing extra info on the call
             // 3) Return the result
-            var wrapper = function (aCommandName, aShowDefaultUI, aValueArgument) {
-                var result = doc.execCommand.orig.apply(this, arguments);
+                wrapper = function () {
+                    var result = doc.execCommand.orig.apply(this, arguments);
 
-                if (!doc.execCommand.listeners) {
+                    if (!doc.execCommand.listeners) {
+                        return result;
+                    }
+
+                    var args = Array.prototype.slice.call(arguments);
+                    callListeners(args, result);
+
                     return result;
-                }
-
-                var args = Array.prototype.slice.call(arguments);
-                doc.execCommand.listeners.forEach(function (listener) {
-                    listener({
-                        command: aCommandName,
-                        value: aValueArgument,
-                        args: args,
-                        result: result
-                    });
-                });
-
-                return result;
-            };
+                };
 
             // Store a reference to the original execCommand
             wrapper.orig = doc.execCommand;
 
             // Attach an array for storing listeners
             wrapper.listeners = [];
+
+            // Helper for notifying listeners
+            wrapper.callListeners = callListeners;
 
             // Overwrite execCommand
             doc.execCommand = wrapper;
@@ -4172,6 +4192,7 @@ MediumEditor.extensions = {};
                 documentModified = this.removeObsoleteAutoLinkSpans(blockElements[i]) || documentModified;
                 documentModified = this.performLinkingWithinElement(blockElements[i]) || documentModified;
             }
+            this.base.events.updateInput(contenteditable, { target: contenteditable, currentTarget: contenteditable });
             return documentModified;
         },
 
@@ -4375,20 +4396,18 @@ MediumEditor.extensions = {};
         },
 
         insertImageFile: function (file) {
+            if (typeof FileReader !== 'function') {
+                return;
+            }
             var fileReader = new FileReader();
             fileReader.readAsDataURL(file);
 
-            var id = 'medium-img-' + (+new Date());
-            MediumEditor.util.insertHTMLCommand(this.document, '<img class="medium-editor-image-loading" id="' + id + '" />');
-
-            fileReader.onload = function () {
-                var img = this.document.getElementById(id);
-                if (img) {
-                    img.removeAttribute('id');
-                    img.removeAttribute('class');
-                    img.src = fileReader.result;
-                }
-            }.bind(this);
+            // attach the onload event handler, makes it easier to listen in with jasmine
+            fileReader.addEventListener('load', function (e) {
+                var addImageElement = this.document.createElement('img');
+                addImageElement.src = e.target.result;
+                MediumEditor.util.insertHTMLCommand(this.document, addImageElement.outerHTML);
+            }.bind(this));
         }
     });
 
@@ -6108,16 +6127,19 @@ MediumEditor.extensions = {};
             this.options.ownerDocument.execCommand('formatBlock', false, 'p');
         }
 
-        if (MediumEditor.util.isKey(event, MediumEditor.util.keyCode.ENTER) && !MediumEditor.util.isListItem(node)) {
+        // https://github.com/yabwe/medium-editor/issues/834
+        // https://github.com/yabwe/medium-editor/pull/382
+        // Don't call format block if this is a block element (ie h1, figCaption, etc.)
+        if (MediumEditor.util.isKey(event, MediumEditor.util.keyCode.ENTER) &&
+            !MediumEditor.util.isListItem(node) &&
+            !MediumEditor.util.isBlockContainer(node)) {
+
             tagName = node.nodeName.toLowerCase();
             // For anchor tags, unlink
             if (tagName === 'a') {
                 this.options.ownerDocument.execCommand('unlink', false, null);
             } else if (!event.shiftKey && !event.ctrlKey) {
-                // only format block if this is not a header tag
-                if (!/h\d/.test(tagName)) {
-                    this.options.ownerDocument.execCommand('formatBlock', false, 'p');
-                }
+                this.options.ownerDocument.execCommand('formatBlock', false, 'p');
             }
         }
     }
@@ -7082,7 +7104,7 @@ MediumEditor.parseVersionString = function (release) {
 
 MediumEditor.version = MediumEditor.parseVersionString.call(this, ({
     // grunt-bump looks for this:
-    'version': '5.14.3'
+    'version': '5.14.4'
 }).version);
 
     return MediumEditor;

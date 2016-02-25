@@ -1,9 +1,19 @@
+5.14.4 / 2016-02-25
+==================
+* editableInput event fixes
+  * Fix issue with event not triggering when dragging in images
+  * Fix issue with event not triggering on autolink
+  * Fix issue with event not triggering on insertHTML in Edge
+* Fix issue with hitting enter when directly inside figcaption and other block elements
+
+
 5.14.3 / 2016-02-22
 ==================
 * Fix behaviour of "Open in new window" checkbox for Firefox
 * Added instruction to disable file dragging all together
 * Fix issue with image dragging and dropping at end of target
 * Fix issue with extra space when space already exists
+
 
 5.14.2 / 2016-02-10
 ==================
