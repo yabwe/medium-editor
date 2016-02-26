@@ -1,11 +1,13 @@
-var keyboardPasteTimeStamp = 0,
-    pasteBinDefaultContent = '%ME_PASTEBIN%',
-    stopProp = function (event) {
-        event.stopPropagation();
-    };
-
 (function () {
     'use strict';
+
+    var keyboardPasteTimeStamp = 0,
+        pasteBinDefaultContent = '%ME_PASTEBIN%',
+        lastRange = null,
+        stopProp = function (event) {
+            event.stopPropagation();
+        };
+
     /*jslint regexp: true*/
     /*
         jslint does not allow character negation, because the negation
@@ -92,9 +94,6 @@ var keyboardPasteTimeStamp = 0,
          */
         cleanTags: ['meta'],
 
-        pasteBinElm: null,
-        lastRange: null,
-
         init: function () {
             MediumEditor.Extension.prototype.init.apply(this, arguments);
 
@@ -162,7 +161,8 @@ var keyboardPasteTimeStamp = 0,
 
                 // WebKit has a nice bug where it clones the paste bin if you paste from for example notepad
                 // so we need to force plain text mode in this case
-                if (this.pasteBinElm && this.pasteBinElm.firstChild && this.pasteBinElm.firstChild.id === 'mcepastebin') {
+                var pasteBinElm = this.getPasteBin();
+                if (pasteBinElm && pasteBinElm.firstChild && pasteBinElm.firstChild.id === 'mcepastebin') {
                     plainTextMode = true;
                 }
 
@@ -216,9 +216,7 @@ var keyboardPasteTimeStamp = 0,
                     html = MediumEditor.util.htmlEntities(content);
                 }
 
-                var res = MediumEditor.util.insertHTMLCommand(that.document, html);
-
-                return;
+                return MediumEditor.util.insertHTMLCommand(that.document, html);
             }.bind(this), 0);
         },
 
@@ -272,56 +270,59 @@ var keyboardPasteTimeStamp = 0,
                 }
             }
 
-            this.lastRange = range;
+            lastRange = range;
 
-            this.pasteBinElm = this.document.createElement('div');
-            this.pasteBinElm.id = 'medium-editor-pastebin';
-            this.pasteBinElm.setAttribute('style', 'border: 1px red solid; position: absolute; top: ' + top + 'px; width: 10px; height: 10px; overflow: hidden; opacity: 0');
-            this.pasteBinElm.setAttribute('contentEditable', true);
-            this.pasteBinElm.innerHTML = pasteBinDefaultContent;
+            var pasteBinElm = this.document.createElement('div');
+            pasteBinElm.id = this.pasteBinId = 'medium-editor-pastebin-' + (+Date.now());
+            pasteBinElm.setAttribute('style', 'border: 1px red solid; position: absolute; top: ' + top + 'px; width: 10px; height: 10px; overflow: hidden; opacity: 0');
+            pasteBinElm.setAttribute('contentEditable', true);
+            pasteBinElm.innerHTML = pasteBinDefaultContent;
 
-            this.getEditorOption('elementsContainer').appendChild(this.pasteBinElm);
+            this.document.body.appendChild(pasteBinElm);
 
             // avoid .focus() to stop other event (actually the paste event)
-            this.on(this.pasteBinElm, 'focus', stopProp);
-            this.on(this.pasteBinElm, 'focusin', stopProp);
-            this.on(this.pasteBinElm, 'focusout', stopProp);
+            this.on(pasteBinElm, 'focus', stopProp);
+            this.on(pasteBinElm, 'focusin', stopProp);
+            this.on(pasteBinElm, 'focusout', stopProp);
 
-            this.pasteBinElm.focus();
+            pasteBinElm.focus();
 
-            MediumEditor.selection.selectNode(this.pasteBinElm, this.document);
+            MediumEditor.selection.selectNode(pasteBinElm, this.document);
 
             if (!this.boundHandlePaste) {
                 this.boundHandlePaste = this.handlePaste.bind(this);
             }
 
-            this.on(this.pasteBinElm, 'paste', this.boundHandlePaste);
+            this.on(pasteBinElm, 'paste', this.boundHandlePaste);
         },
 
         removePasteBin: function () {
-            if (null !== this.lastRange) {
-                MediumEditor.selection.selectRange(this.document, this.lastRange);
-                this.lastRange = null;
+            if (null !== lastRange) {
+                MediumEditor.selection.selectRange(this.document, lastRange);
+                lastRange = null;
             }
 
-            if (!this.pasteBinElm) {
-                this.pasteBinElm = null;
+            var pasteBinElm = this.getPasteBin();
+            if (!pasteBinElm) {
                 return;
             }
 
-            var pasteBin = this.pasteBinElm;
-            if (pasteBin) {
-                this.off(pasteBin, 'focus', stopProp);
-                this.off(pasteBin, 'focusin', stopProp);
-                this.off(pasteBin, 'focusout', stopProp);
-                this.off(pasteBin, 'paste', this.boundHandlePaste);
-                pasteBin.parentElement.removeChild(pasteBin);
-                this.pasteBinElm = null;
+            if (pasteBinElm) {
+                this.off(pasteBinElm, 'focus', stopProp);
+                this.off(pasteBinElm, 'focusin', stopProp);
+                this.off(pasteBinElm, 'focusout', stopProp);
+                this.off(pasteBinElm, 'paste', this.boundHandlePaste);
+                pasteBinElm.parentElement.removeChild(pasteBinElm);
             }
         },
 
+        getPasteBin: function () {
+            return this.document.getElementById(this.pasteBinId);
+        },
+
         getPasteBinHtml: function () {
-            return this.pasteBinElm ? this.pasteBinElm.innerHTML : pasteBinDefaultContent;
+            var pasteBinElm = this.getPasteBin();
+            return pasteBinElm ? pasteBinElm.innerHTML : pasteBinDefaultContent;
         },
 
         cleanPaste: function (text) {
