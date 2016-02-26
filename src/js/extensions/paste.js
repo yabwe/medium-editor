@@ -106,29 +106,27 @@
             var paragraphs,
                 html = '',
                 p,
-                dataFormatHTML = 'text/html',
-                dataFormatPlain = 'text/plain',
                 pastedHTML,
-                pastedPlain;
+                pastedPlain,
+                clipboardContent = this.getClipboardContent(event);
 
-            if (this.window.clipboardData && event.clipboardData === undefined) {
-                event.clipboardData = this.window.clipboardData;
+            if (this.window.clipboardData &&
+                event.clipboardData === undefined &&
+                !clipboardContent['text/html'] &&
+                clipboardContent['text/plain']) {
                 // If window.clipboardData exists, but event.clipboardData doesn't exist,
                 // we're probably in IE. IE only has two possibilities for clipboard
                 // data format: 'Text' and 'URL'.
                 //
-                // Of the two, we want 'Text':
-                dataFormatHTML = 'Text';
-                dataFormatPlain = 'Text';
+                // For IE, we'll fallback to 'Text' for text/html
+                clipboardContent['text/html'] = clipboardContent['text/plain'];
             }
 
-            if (event.clipboardData &&
-                    event.clipboardData.getData &&
-                    !event.defaultPrevented) {
+            if (!event.defaultPrevented && Object.keys(clipboardContent).length > 0) {
                 event.preventDefault();
 
-                pastedHTML = event.clipboardData.getData(dataFormatHTML);
-                pastedPlain = event.clipboardData.getData(dataFormatPlain);
+                pastedHTML = clipboardContent['text/html'];
+                pastedPlain = clipboardContent['text/plain'];
 
                 if (this.cleanPastedHTML && pastedHTML) {
                     return this.cleanPaste(pastedHTML);
@@ -184,7 +182,7 @@
 
             setTimeout(function () {
                 // Grab HTML from Clipboard API or paste bin as a fallback
-                if (that.hasContentType(clipboardContent, 'text/html')) {
+                if (clipboardContent['text/html']) {
                     content = clipboardContent['text/html'];
                 } else {
                     content = that.getPasteBinHtml();
@@ -216,7 +214,7 @@
                 if (plainTextMode) {
                     // Use plain text contents from Clipboard API unless the HTML contains paragraphs then
                     // we should convert the HTML to plain text since works better when pasting HTML/Word contents as plain text
-                    if (that.hasContentType(clipboardContent, 'text/plain') && content.indexOf('</p>') === -1) {
+                    if (clipboardContent['text/plain'] && content.indexOf('</p>') === -1) {
                         content = clipboardContent['text/plain'];
                     } else {
                         // What is innerText supposed to do? (It isn't defined)
@@ -263,7 +261,7 @@
          * @return {Object} Object with mime types and data for those mime types.
          */
         getClipboardContent: function (event) {
-            var dataTransfer = event.clipboardData || this.document.dataTransfer,
+            var dataTransfer = event.clipboardData || this.window.clipboardData || this.document.dataTransfer,
                 data = {};
 
             if (!dataTransfer) {
@@ -504,10 +502,6 @@
                 // remove empty spans, replace others with their contents
                 MediumEditor.util.unwrap(el, this.document);
             }
-        },
-
-        hasContentType: function (clipboardContent, mimeType) {
-            return mimeType in clipboardContent && clipboardContent[mimeType].length > 0;
         },
 
         /**

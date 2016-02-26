@@ -117,6 +117,7 @@ describe('Pasting content', function () {
                         return;
                     },
                     clipboardData: {
+                        types: ['text/plain', 'text/html'],
                         getData: function () {
                             // do we need to return different results for the different types? text/plain, text/html
                             return this.pasteText;
@@ -156,6 +157,7 @@ describe('Pasting content', function () {
                         return;
                     },
                     clipboardData: {
+                        types: ['text/plain'],
                         getData: function (clipboardType) {
                             if (clipboardType === 'text/plain') {
                                 return 'One\n\nTwo\n\nThree';
@@ -405,6 +407,7 @@ describe('Pasting content', function () {
                         return;
                     },
                     clipboardData: {
+                        types: ['text/plain', 'text/html'],
                         getData: function () {
                             // do we need to return different results for the different types? text/plain, text/html
                             return this.pasteText;
