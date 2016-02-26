@@ -98,58 +98,98 @@
             MediumEditor.Extension.prototype.init.apply(this, arguments);
 
             if (this.forcePlainText || this.cleanPastedHTML) {
-                this.subscribe('editableKeydown', this.handleKeydown.bind(this));
                 this.subscribe('editablePaste', this.handlePaste.bind(this));
+                this.subscribe('editableKeydown', this.handleKeydown.bind(this));
             }
         },
 
-        handlePaste: function (event, element) {
-            var paragraphs,
-                html = '',
-                p,
-                pastedHTML,
-                pastedPlain,
-                clipboardContent = this.getClipboardContent(event);
+        handlePaste: function (event, editable) {
+            if (event.defaultPrevented) {
+                return;
+            }
 
-            if (this.window.clipboardData &&
-                event.clipboardData === undefined &&
-                !clipboardContent['text/html'] &&
-                clipboardContent['text/plain']) {
+            var clipboardContent = this.getClipboardContent(event),
+                pastedHTML = clipboardContent['text/html'],
+                pastedPlain = clipboardContent['text/plain'];
+
+            if (this.window.clipboardData && event.clipboardData === undefined && !pastedHTML) {
                 // If window.clipboardData exists, but event.clipboardData doesn't exist,
                 // we're probably in IE. IE only has two possibilities for clipboard
                 // data format: 'Text' and 'URL'.
                 //
                 // For IE, we'll fallback to 'Text' for text/html
-                clipboardContent['text/html'] = clipboardContent['text/plain'];
+                pastedHTML = pastedPlain;
             }
 
-            if (!event.defaultPrevented && Object.keys(clipboardContent).length > 0) {
+            if (pastedHTML || pastedPlain) {
                 event.preventDefault();
 
-                pastedHTML = clipboardContent['text/html'];
-                pastedPlain = clipboardContent['text/plain'];
+                this.doPaste(pastedHTML, pastedPlain, editable);
+            }
+        },
 
-                if (this.cleanPastedHTML && pastedHTML) {
-                    return this.cleanPaste(pastedHTML);
-                }
+        doPaste: function (pastedHTML, pastedPlain, editable) {
+            var paragraphs,
+                html = '',
+                p;
 
-                if (!(this.getEditorOption('disableReturn') || element.getAttribute('data-disable-return'))) {
-                    paragraphs = pastedPlain.split(/[\r\n]+/g);
-                    // If there are no \r\n in data, don't wrap in <p>
-                    if (paragraphs.length > 1) {
-                        for (p = 0; p < paragraphs.length; p += 1) {
-                            if (paragraphs[p] !== '') {
-                                html += '<p>' + MediumEditor.util.htmlEntities(paragraphs[p]) + '</p>';
-                            }
+            if (this.cleanPastedHTML && pastedHTML) {
+                return this.cleanPaste(pastedHTML);
+            }
+
+            if (!(this.getEditorOption('disableReturn') || (editable && editable.getAttribute('data-disable-return')))) {
+                paragraphs = pastedPlain.split(/[\r\n]+/g);
+                // If there are no \r\n in data, don't wrap in <p>
+                if (paragraphs.length > 1) {
+                    for (p = 0; p < paragraphs.length; p += 1) {
+                        if (paragraphs[p] !== '') {
+                            html += '<p>' + MediumEditor.util.htmlEntities(paragraphs[p]) + '</p>';
                         }
-                    } else {
-                        html = MediumEditor.util.htmlEntities(paragraphs[0]);
                     }
                 } else {
-                    html = MediumEditor.util.htmlEntities(pastedPlain);
+                    html = MediumEditor.util.htmlEntities(paragraphs[0]);
                 }
-                MediumEditor.util.insertHTMLCommand(this.document, html);
+            } else {
+                html = MediumEditor.util.htmlEntities(pastedPlain);
             }
+            MediumEditor.util.insertHTMLCommand(this.document, html);
+        },
+
+        handlePasteBinPaste: function (event) {
+            if (event.isDefaultPrevented) {
+                this.removePasteBin();
+                return;
+            }
+
+            var clipboardContent = this.getClipboardContent(event),
+                pastedHTML = clipboardContent['text/html'],
+                pastedPlain = clipboardContent['text/plain'],
+                editable = keyboardPasteEditable;
+
+            // If we have valid html already, or we're not in cleanPastedHTML mode
+            // we can ignore the paste bin and just paste now
+            if (!this.cleanPastedHTML || pastedHTML) {
+                event.preventDefault();
+                this.removePasteBin();
+                this.doPaste(pastedHTML, pastedPlain, editable);
+                return;
+            }
+
+            // We need to look at the paste bin, so do a setTimeout to let the paste
+            // fall through into the paste bin
+            setTimeout(function () {
+                // Only look for HTML if we're in cleanPastedHTML mode
+                if (this.cleanPastedHTML) {
+                    // If clipboard didn't have HTML, try the paste bin
+                    pastedHTML = this.getPasteBinHtml();
+                }
+
+                // If we needed the paste bin, we're done with it now, remove it
+                this.removePasteBin();
+
+                // Handle the paste with the html from the paste bin
+                this.doPaste(pastedHTML, pastedPlain, editable);
+            }.bind(this), 0);
         },
 
         handleKeydown: function (event, editable) {
@@ -162,61 +202,6 @@
 
             this.removePasteBin();
             this.createPasteBin(editable);
-        },
-
-        handlePasteBinPaste: function (event) {
-            var clipboardContent = this.getClipboardContent(event);
-
-            if (event.isDefaultPrevented) {
-                this.removePasteBin();
-                return;
-            }
-
-            setTimeout(function () {
-                var paragraphs,
-                    html = '',
-                    p,
-                    pastedHTML,
-                    pastedPlain = clipboardContent['text/plain'];
-
-                // Only look for HTML if we're in cleanPastedHTML mode
-                if (this.cleanPastedHTML) {
-                    // First try to grab the html from Clipboard API
-                    if (clipboardContent['text/html']) {
-                        pastedHTML = clipboardContent['text/html'];
-                    }
-
-                    // If clipboard didn't have HTML, try the paste bin
-                    if (!pastedHTML) {
-                        pastedHTML = this.getPasteBinHtml();
-                    }
-                }
-
-                // If we needed the paste bin, we're done with it now, remove it
-                this.removePasteBin();
-
-                if (this.cleanPastedHTML && pastedHTML) {
-                    return this.cleanPaste(pastedHTML);
-                }
-
-                if (!(this.getEditorOption('disableReturn') || (keyboardPasteEditable && keyboardPasteEditable.getAttribute('data-disable-return')))) {
-                    paragraphs = pastedPlain.split(/[\r\n]+/g);
-                    // If there are no \r\n in data, don't wrap in <p>
-                    if (paragraphs.length > 1) {
-                        for (p = 0; p < paragraphs.length; p += 1) {
-                            if (paragraphs[p] !== '') {
-                                html += '<p>' + MediumEditor.util.htmlEntities(paragraphs[p]) + '</p>';
-                            }
-                        }
-                    } else {
-                        html = MediumEditor.util.htmlEntities(paragraphs[0]);
-                    }
-                } else {
-                    html = MediumEditor.util.htmlEntities(pastedPlain);
-                }
-
-                return MediumEditor.util.insertHTMLCommand(this.document, html);
-            }.bind(this), 0);
         },
 
         /**
