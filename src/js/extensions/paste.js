@@ -3,6 +3,7 @@
 
     var pasteBinDefaultContent = '%ME_PASTEBIN%',
         lastRange = null,
+        keyboardPasteEditable = null,
         stopProp = function (event) {
             event.stopPropagation();
         };
@@ -151,7 +152,7 @@
             }
         },
 
-        handleKeydown: function (event) {
+        handleKeydown: function (event, editable) {
             // if it's not Ctrl+V, do nothing
             if (!(MediumEditor.util.isKey(event, MediumEditor.util.keyCode.V) && MediumEditor.util.isMetaCtrlKey(event))) {
                 return;
@@ -160,20 +161,11 @@
             event.stopImmediatePropagation();
 
             this.removePasteBin();
-            this.createPasteBin();
+            this.createPasteBin(editable);
         },
 
         handlePasteBinPaste: function (event) {
-            var clipboardContent,
-                plainTextMode,
-                paragraphs, content,
-                html = '',
-                that = this,
-                p;
-
-            clipboardContent = this.getClipboardContent(event);
-
-            plainTextMode = !this.cleanPastedHTML || this.forcePlainText;
+            var clipboardContent = this.getClipboardContent(event);
 
             if (event.isDefaultPrevented) {
                 this.removePasteBin();
@@ -181,60 +173,34 @@
             }
 
             setTimeout(function () {
-                // Grab HTML from Clipboard API or paste bin as a fallback
-                if (clipboardContent['text/html']) {
-                    content = clipboardContent['text/html'];
-                } else {
-                    content = that.getPasteBinHtml();
+                var paragraphs,
+                    html = '',
+                    p,
+                    pastedHTML,
+                    pastedPlain = clipboardContent['text/plain'];
 
-                    // If paste bin is empty try using plain text mode
-                    // since that is better than nothing right
-                    if (content === pasteBinDefaultContent) {
-                        plainTextMode = true;
+                // Only look for HTML if we're in cleanPastedHTML mode
+                if (this.cleanPastedHTML) {
+                    // First try to grab the html from Clipboard API
+                    if (clipboardContent['text/html']) {
+                        pastedHTML = clipboardContent['text/html'];
+                    }
+
+                    // If clipboard didn't have HTML, try the paste bin
+                    if (!pastedHTML) {
+                        pastedHTML = this.getPasteBinHtml();
                     }
                 }
 
-                content = that.trimHtml(content);
+                // If we needed the paste bin, we're done with it now, remove it
+                this.removePasteBin();
 
-                // WebKit has a nice bug where it clones the paste bin if you paste from for example notepad
-                // so we need to force plain text mode in this case
-                var pasteBinElm = this.getPasteBin();
-                if (pasteBinElm && pasteBinElm.firstChild && pasteBinElm.firstChild.id === 'mcepastebin') {
-                    plainTextMode = true;
+                if (this.cleanPastedHTML && pastedHTML) {
+                    return this.cleanPaste(pastedHTML);
                 }
 
-                that.removePasteBin();
-
-                // If we got nothing from clipboard API and pastebin then we could try the last resort: plain/text
-                if (!content.length) {
-                    plainTextMode = true;
-                }
-
-                // Grab plain text from Clipboard API or convert existing HTML to plain text
-                if (plainTextMode) {
-                    // Use plain text contents from Clipboard API unless the HTML contains paragraphs then
-                    // we should convert the HTML to plain text since works better when pasting HTML/Word contents as plain text
-                    if (clipboardContent['text/plain'] && content.indexOf('</p>') === -1) {
-                        content = clipboardContent['text/plain'];
-                    } else {
-                        // What is innerText supposed to do? (It isn't defined)
-                        //content = MediumEditor.util.innerText(content);
-                        window.console.log('INNER TEXT: ' + content);
-                    }
-                }
-
-                // If the content is the paste bin default HTML then it was
-                // impossible to get the cliboard data out.
-                if (content === pasteBinDefaultContent) {
-                    return;
-                }
-
-                if (false === plainTextMode) {
-                    return that.cleanPaste(content);
-                }
-
-                if (!(that.getEditorOption('disableReturn')/* || element.getAttribute('data-disable-return')*/)) {
-                    paragraphs = content.split(/[\r\n]+/g);
+                if (!(this.getEditorOption('disableReturn') || (keyboardPasteEditable && keyboardPasteEditable.getAttribute('data-disable-return')))) {
+                    paragraphs = pastedPlain.split(/[\r\n]+/g);
                     // If there are no \r\n in data, don't wrap in <p>
                     if (paragraphs.length > 1) {
                         for (p = 0; p < paragraphs.length; p += 1) {
@@ -246,10 +212,10 @@
                         html = MediumEditor.util.htmlEntities(paragraphs[0]);
                     }
                 } else {
-                    html = MediumEditor.util.htmlEntities(content);
+                    html = MediumEditor.util.htmlEntities(pastedPlain);
                 }
 
-                return MediumEditor.util.insertHTMLCommand(that.document, html);
+                return MediumEditor.util.insertHTMLCommand(this.document, html);
             }.bind(this), 0);
         },
 
@@ -286,11 +252,12 @@
             return data;
         },
 
-        createPasteBin: function () {
-            var range, rects,
+        createPasteBin: function (editable) {
+            var rects,
+                range = MediumEditor.selection.getSelectionRange(this.document),
                 top = this.window.pageYOffset;
 
-            range = MediumEditor.selection.getSelectionRange(this.document);
+            keyboardPasteEditable = editable;
 
             if (range) {
                 rects = range.getClientRects();
@@ -335,6 +302,10 @@
                 lastRange = null;
             }
 
+            if (null !== keyboardPasteEditable) {
+                keyboardPasteEditable = null;
+            }
+
             var pasteBinElm = this.getPasteBin();
             if (!pasteBinElm) {
                 return;
@@ -355,7 +326,26 @@
 
         getPasteBinHtml: function () {
             var pasteBinElm = this.getPasteBin();
-            return pasteBinElm ? pasteBinElm.innerHTML : pasteBinDefaultContent;
+
+            if (!pasteBinElm) {
+                return false;
+            }
+
+            // WebKit has a nice bug where it clones the paste bin if you paste from for example notepad
+            // so we need to force plain text mode in this case
+            if (pasteBinElm.firstChild && pasteBinElm.firstChild.id === 'mcepastebin') {
+                return false;
+            }
+
+            var pasteBinHtml = pasteBinElm.innerHTML;
+
+            // If paste bin is empty try using plain text mode
+            // since that is better than nothing right
+            if (!pasteBinHtml || pasteBinHtml === pasteBinDefaultContent) {
+                return false;
+            }
+
+            return pasteBinHtml;
         },
 
         cleanPaste: function (text) {
