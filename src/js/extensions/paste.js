@@ -1,8 +1,7 @@
 (function () {
     'use strict';
 
-    var keyboardPasteTimeStamp = 0,
-        pasteBinDefaultContent = '%ME_PASTEBIN%',
+    var pasteBinDefaultContent = '%ME_PASTEBIN%',
         lastRange = null,
         stopProp = function (event) {
             event.stopPropagation();
@@ -99,7 +98,58 @@
 
             if (this.forcePlainText || this.cleanPastedHTML) {
                 this.subscribe('editableKeydown', this.handleKeydown.bind(this));
-                // this.subscribe('editablePaste', this.handlePaste.bind(this));
+                this.subscribe('editablePaste', this.handlePaste.bind(this));
+            }
+        },
+
+        handlePaste: function (event, element) {
+            var paragraphs,
+                html = '',
+                p,
+                dataFormatHTML = 'text/html',
+                dataFormatPlain = 'text/plain',
+                pastedHTML,
+                pastedPlain;
+
+            if (this.window.clipboardData && event.clipboardData === undefined) {
+                event.clipboardData = this.window.clipboardData;
+                // If window.clipboardData exists, but event.clipboardData doesn't exist,
+                // we're probably in IE. IE only has two possibilities for clipboard
+                // data format: 'Text' and 'URL'.
+                //
+                // Of the two, we want 'Text':
+                dataFormatHTML = 'Text';
+                dataFormatPlain = 'Text';
+            }
+
+            if (event.clipboardData &&
+                    event.clipboardData.getData &&
+                    !event.defaultPrevented) {
+                event.preventDefault();
+
+                pastedHTML = event.clipboardData.getData(dataFormatHTML);
+                pastedPlain = event.clipboardData.getData(dataFormatPlain);
+
+                if (this.cleanPastedHTML && pastedHTML) {
+                    return this.cleanPaste(pastedHTML);
+                }
+
+                if (!(this.getEditorOption('disableReturn') || element.getAttribute('data-disable-return'))) {
+                    paragraphs = pastedPlain.split(/[\r\n]+/g);
+                    // If there are no \r\n in data, don't wrap in <p>
+                    if (paragraphs.length > 1) {
+                        for (p = 0; p < paragraphs.length; p += 1) {
+                            if (paragraphs[p] !== '') {
+                                html += '<p>' + MediumEditor.util.htmlEntities(paragraphs[p]) + '</p>';
+                            }
+                        }
+                    } else {
+                        html = MediumEditor.util.htmlEntities(paragraphs[0]);
+                    }
+                } else {
+                    html = MediumEditor.util.htmlEntities(pastedPlain);
+                }
+                MediumEditor.util.insertHTMLCommand(this.document, html);
             }
         },
 
@@ -111,36 +161,25 @@
 
             event.stopImmediatePropagation();
 
-            keyboardPasteTimeStamp = new Date().getTime();
-
             this.removePasteBin();
             this.createPasteBin();
         },
 
-        handlePaste: function (event) {
-            var clipboardTimer, clipboardContent, clipboardDelay,
-                isKeyBoardPaste, plainTextMode,
+        handlePasteBinPaste: function (event) {
+            var clipboardContent,
+                plainTextMode,
                 paragraphs, content,
                 html = '',
                 that = this,
                 p;
 
-            clipboardTimer = new Date().getTime();
             clipboardContent = this.getClipboardContent(event);
-            clipboardDelay = new Date().getTime() - clipboardTimer;
-
-            isKeyBoardPaste = (new Date().getTime() - keyboardPasteTimeStamp - clipboardDelay) < 1000;
 
             plainTextMode = !this.cleanPastedHTML || this.forcePlainText;
 
             if (event.isDefaultPrevented) {
                 this.removePasteBin();
                 return;
-            }
-
-            // Not a keyboard paste prevent default paste and try to grab the clipboard contents using different APIs
-            if (!isKeyBoardPaste) {
-                event.preventDefault();
             }
 
             setTimeout(function () {
@@ -189,10 +228,6 @@
                 // If the content is the paste bin default HTML then it was
                 // impossible to get the cliboard data out.
                 if (content === pasteBinDefaultContent) {
-                    if (!isKeyBoardPaste) {
-                        that.window.alert('Please use Ctrl+V/Cmd+V keyboard shortcuts to paste contents.');
-                    }
-
                     return;
                 }
 
@@ -290,7 +325,7 @@
             MediumEditor.selection.selectNode(pasteBinElm, this.document);
 
             if (!this.boundHandlePaste) {
-                this.boundHandlePaste = this.handlePaste.bind(this);
+                this.boundHandlePaste = this.handlePasteBinPaste.bind(this);
             }
 
             this.on(pasteBinElm, 'paste', this.boundHandlePaste);
