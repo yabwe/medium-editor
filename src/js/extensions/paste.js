@@ -130,14 +130,9 @@ var keyboardPasteTimeStamp = 0,
             clipboardContent = this.getClipboardContent(event);
             clipboardDelay = new Date().getTime() - clipboardTimer;
 
-            window.console.log('handlePaste > clipboardContent', clipboardContent);
-            window.console.log('handlePaste > delay', new Date().getTime() - keyboardPasteTimeStamp - clipboardDelay);
-
             isKeyBoardPaste = (new Date().getTime() - keyboardPasteTimeStamp - clipboardDelay) < 1000;
 
             plainTextMode = !this.cleanPastedHTML || this.forcePlainText;
-
-            window.console.log('handlePaste > plainTextMode', plainTextMode);
 
             if (event.isDefaultPrevented) {
                 this.removePasteBin();
@@ -150,15 +145,11 @@ var keyboardPasteTimeStamp = 0,
             }
 
             setTimeout(function () {
-                window.console.log('handlePaste > hasContentType', that.hasContentType(clipboardContent, 'text/html'));
-
                 // Grab HTML from Clipboard API or paste bin as a fallback
                 if (that.hasContentType(clipboardContent, 'text/html')) {
                     content = clipboardContent['text/html'];
                 } else {
                     content = that.getPasteBinHtml();
-                    window.console.log('PASTE BIN CONTENT');
-                    window.console.log(content);
 
                     // If paste bin is empty try using plain text mode
                     // since that is better than nothing right
@@ -168,8 +159,6 @@ var keyboardPasteTimeStamp = 0,
                 }
 
                 content = that.trimHtml(content);
-
-                window.console.log('handlePaste > content', content);
 
                 // WebKit has a nice bug where it clones the paste bin if you paste from for example notepad
                 // so we need to force plain text mode in this case
@@ -207,8 +196,6 @@ var keyboardPasteTimeStamp = 0,
                     return;
                 }
 
-                window.console.log('handlePaste > plainTextMode', plainTextMode);
-
                 if (false === plainTextMode) {
                     return that.cleanPaste(content);
                 }
@@ -229,11 +216,7 @@ var keyboardPasteTimeStamp = 0,
                     html = MediumEditor.util.htmlEntities(content);
                 }
 
-                window.console.log('handlePaste > html', html);
-
                 var res = MediumEditor.util.insertHTMLCommand(that.document, html);
-
-                window.console.log('handlePaste > insertHTMLCommand', res);
 
                 return;
             }.bind(this), 0);
@@ -276,20 +259,13 @@ var keyboardPasteTimeStamp = 0,
             var range, rects,
                 top = this.window.pageYOffset;
 
-            window.console.log('createPasteBin > Create paste bin');
-
             range = MediumEditor.selection.getSelectionRange(this.document);
-            window.console.log('createPasteBin > range', range);
-            window.console.log('createPasteBin > collapsed', range.collapsed);
-            window.console.log('createPasteBin > startContainer', range.startContainer.nodeType);
 
             if (range) {
                 rects = range.getClientRects();
-                window.console.log('createPasteBin > rects', rects);
 
                 // on empty line, rects is empty so we grab information from the first container of the range
                 if (rects.length) {
-                    window.console.log('createPasteBin > rects.length', rects.length);
                     top += rects[0].top;
                 } else {
                     top += range.startContainer.getBoundingClientRect().top;
@@ -297,8 +273,6 @@ var keyboardPasteTimeStamp = 0,
             }
 
             this.lastRange = range;
-
-            window.console.log('createPasteBin > top', top);
 
             this.pasteBinElm = this.document.createElement('div');
             this.pasteBinElm.id = 'medium-editor-pastebin';
@@ -317,8 +291,6 @@ var keyboardPasteTimeStamp = 0,
 
             MediumEditor.selection.selectNode(this.pasteBinElm, this.document);
 
-            window.console.log('createPasteBin > pasteBinElm', this.pasteBinElm);
-
             if (!this.boundHandlePaste) {
                 this.boundHandlePaste = this.handlePaste.bind(this);
             }
@@ -327,8 +299,6 @@ var keyboardPasteTimeStamp = 0,
         },
 
         removePasteBin: function () {
-            window.console.log('Remove paste bin');
-
             if (null !== this.lastRange) {
                 MediumEditor.selection.selectRange(this.document, this.lastRange);
                 this.lastRange = null;
@@ -365,9 +335,6 @@ var keyboardPasteTimeStamp = 0,
             for (i = 0; i < replacements.length; i += 1) {
                 text = text.replace(replacements[i][0], replacements[i][1]);
             }
-
-            window.console.log('cleanPaste > multiline', multiline);
-            window.console.log('cleanPaste > text', text);
 
             if (!multiline) {
                 return this.pasteHTML(text);
@@ -409,8 +376,6 @@ var keyboardPasteTimeStamp = 0,
                 cleanTags: this.cleanTags
             });
 
-            window.console.log('pasteHTML > html', html);
-
             var elList, workEl, i, fragmentBody, pasteBlock = this.document.createDocumentFragment();
 
             pasteBlock.appendChild(this.document.createElement('body'));
@@ -432,11 +397,7 @@ var keyboardPasteTimeStamp = 0,
                 MediumEditor.util.cleanupTags(workEl, options.cleanTags);
             }
 
-            window.console.log('pasteHTML > innerHTML', fragmentBody.innerHTML.replace(/&nbsp;/g, ' '));
-
-            var res = MediumEditor.util.insertHTMLCommand(this.document, fragmentBody.innerHTML.replace(/&nbsp;/g, ' '));
-
-            window.console.log('pasteHTML > insertHTMLCommand', res);
+            MediumEditor.util.insertHTMLCommand(this.document, fragmentBody.innerHTML.replace(/&nbsp;/g, ' '));
         },
 
         isCommonBlock: function (el) {
