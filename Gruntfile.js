@@ -63,7 +63,7 @@ module.exports = function (grunt) {
             platform: 'Windows 10'
         }, {
             browserName: 'googlechrome',
-            platform: 'OS X 10.10'
+            platform: 'OS X 10.11'
         }, {
             browserName: 'firefox',
             platform: 'WIN8.1'
@@ -72,10 +72,13 @@ module.exports = function (grunt) {
             platform: 'Windows 10'
         }, {
             browserName: 'firefox',
-            platform: 'OS X 10.10'
+            platform: 'OS X 10.11'
         }, {
             browserName: 'safari',
             platform: 'OS X 10.10'
+        }, {
+            browserName: 'safari',
+            platform: 'OS X 10.11'
         }];
 
     gruntConfig.connect = {
