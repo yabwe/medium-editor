@@ -14,6 +14,23 @@ describe('Anchor Button TestCase', function () {
     });
 
     describe('Anchor Form', function () {
+        it('should add class for visible state and remove it for invisivble', function () {
+            var editor = this.newMediumEditor('.editor', {
+                    buttonLabels: 'fontawesome'
+                }),
+                anchorExtension = editor.getExtensionByName('anchor'),
+                toolbar = editor.getExtensionByName('toolbar'),
+                activeClass = anchorExtension.activeClass;
+
+            selectElementContentsAndFire(editor.elements[0]);
+            var button = toolbar.getToolbarElement().querySelector('[data-action="createLink"]');
+            fireEvent(button, 'click');
+            expect(anchorExtension.getForm().classList.contains(activeClass)).toBe(true);
+
+            fireEvent(anchorExtension.getForm().querySelector('a.medium-editor-toolbar-save'), 'click');
+            expect(anchorExtension.getForm().classList.contains(activeClass)).toBe(false);
+        });
+
         it('should not hide the toolbar when mouseup fires inside the anchor form', function () {
             var editor = this.newMediumEditor('.editor', {
                     buttonLabels: 'fontawesome'

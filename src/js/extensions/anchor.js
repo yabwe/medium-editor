@@ -137,11 +137,11 @@
 
         // Used by medium-editor when the default toolbar is to be displayed
         isDisplayed: function () {
-            return this.getForm().style.display === 'block';
+            return MediumEditor.extensions.form.prototype.isDisplayed.apply(this);
         },
 
         hideForm: function () {
-            this.getForm().style.display = 'none';
+            MediumEditor.extensions.form.prototype.hideForm.apply(this);
             this.getInput().value = '';
         },
 
@@ -161,7 +161,6 @@
 
             this.base.saveSelection();
             this.hideToolbarDefaultActions();
-            this.getForm().style.display = 'block';
             this.setToolbarPosition();
 
             input.value = opts.url;
@@ -179,6 +178,7 @@
                 var classList = opts.buttonClass ? opts.buttonClass.split(' ') : [];
                 buttonCheckbox.checked = (classList.indexOf(this.customClassOption) !== -1);
             }
+            MediumEditor.extensions.form.prototype.showForm.apply(this);
         },
 
         // Called by core when tearing down medium-editor (destroy)
