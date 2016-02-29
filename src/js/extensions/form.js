@@ -14,6 +14,11 @@
         formSaveLabel: '&#10003;',
         formCloseLabel: '&times;',
 
+        /* activeClass: [string]
+         * set class which added to shown form
+         */
+        activeClass: 'medium-editor-toolbar-form-active',
+
         /* hasForm: [boolean]
          *
          * Setting this to true will cause getForm() to be called
@@ -36,14 +41,34 @@
          * This function should return true/false reflecting
          * whether the form is currently displayed
          */
-        isDisplayed: function () {},
+        isDisplayed: function () {
+            if (this.hasForm) {
+                return this.getForm().classList.contains(this.activeClass);
+            }
+            return false;
+        },
+
+        /* hideForm: [function ()]
+         *
+         * This function should show the form element inside
+         * the toolbar container
+         */
+        showForm: function () {
+            if (this.hasForm) {
+                this.getForm().classList.add(this.activeClass);
+            }
+        },
 
         /* hideForm: [function ()]
          *
          * This function should hide the form element inside
          * the toolbar container
          */
-        hideForm: function () {},
+        hideForm: function () {
+            if (this.hasForm) {
+                this.getForm().classList.remove(this.activeClass);
+            }
+        },
 
         /************************ Helpers ************************
          * The following are helpers that are either set by MediumEditor
