@@ -155,7 +155,7 @@
             !MediumEditor.util.isKey(event, MediumEditor.util.keyCode.DELETE) &&
             !MediumEditor.util.isKey(event, MediumEditor.util.keyCode.BACKSPACE) &&
             node.innerText.length === 0) {
-            
+
             node.setAttribute('data-empty-element', 'true');
         }
 
