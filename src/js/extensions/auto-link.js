@@ -41,9 +41,20 @@
             this.document.execCommand('AutoUrlDetect', false, false);
         },
 
+        isLastInstance: function () {
+            var activeInstances = 0;
+            for (var i = 0; i < window._mediumEditors.length; i++) {
+                var editor = window._mediumEditors[i];
+                if (editor !== null && editor.getExtensionByName('autoLink') !== undefined) {
+                    activeInstances++;
+                }
+            }
+            return activeInstances === 1;
+        },
+
         destroy: function () {
             // Turn AutoUrlDetect back on
-            if (this.document.queryCommandSupported('AutoUrlDetect')) {
+            if (this.document.queryCommandSupported('AutoUrlDetect') && this.isLastInstance()) {
                 this.document.execCommand('AutoUrlDetect', false, true);
             }
         },
