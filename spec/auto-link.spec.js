@@ -54,6 +54,39 @@ describe('Autolink', function () {
             editor.destroy();
             expect(autoUrlDetectTurnedOn).toBe(true);
         });
+
+        it('should not reset multiple browser auto-links (if supported) during destroy', function () {
+            var autoUrlDetectTurnedOn = true,
+                origExecCommand = document.execCommand,
+                origQCS = document.queryCommandSupported;
+            this.el = this.createElement('div', 'editor2', '');
+            spyOn(document, 'execCommand').and.callFake(function (command, showUi, val) {
+                if (command === 'AutoUrlDetect') {
+                    autoUrlDetectTurnedOn = val;
+                }
+                return origExecCommand.apply(document, arguments);
+            });
+            spyOn(document, 'queryCommandSupported').and.callFake(function (command) {
+                if (command === 'AutoUrlDetect') {
+                    return true;
+                }
+                return origQCS.apply(document, arguments);
+            });
+
+            var
+                editor = this.newMediumEditor('.editor', {
+                    autoLink: true
+                }),
+                editor2 = this.newMediumEditor('.editor2', {
+                    autoLink: true
+                });
+
+            expect(autoUrlDetectTurnedOn).toBe(false);
+            editor.destroy();
+            expect(autoUrlDetectTurnedOn).toBe(false);
+            editor2.destroy();
+            expect(autoUrlDetectTurnedOn).toBe(true);
+        });
     });
 
     describe('integration', function () {
