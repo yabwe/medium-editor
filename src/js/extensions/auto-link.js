@@ -43,8 +43,8 @@
 
         isLastInstance: function () {
             var activeInstances = 0;
-            for (var i = 0; i < window._mediumEditors.length; i++) {
-                var editor = window._mediumEditors[i];
+            for (var i = 0; i < this.window._mediumEditors.length; i++) {
+                var editor = this.window._mediumEditors[i];
                 if (editor !== null && editor.getExtensionByName('autoLink') !== undefined) {
                     activeInstances++;
                 }
