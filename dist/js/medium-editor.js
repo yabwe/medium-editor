@@ -7103,11 +7103,9 @@ MediumEditor.extensions = {};
         },
 
         addElements: function (elements) {
-            var _localElements = this.elements;
-
-            elements.forEach(function (element) {
-                _localElements.push(element);
-            });
+            for (var i = 0, len = elements.length; i < len; i += 1) {
+                this.elements.push(elements[i]);
+            }
 
             initElements.call(this);
         },
