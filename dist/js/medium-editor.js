@@ -3409,6 +3409,11 @@ MediumEditor.extensions = {};
         formSaveLabel: '&#10003;',
         formCloseLabel: '&times;',
 
+        /* activeClass: [string]
+         * set class which added to shown form
+         */
+        activeClass: 'medium-editor-toolbar-form-active',
+
         /* hasForm: [boolean]
          *
          * Setting this to true will cause getForm() to be called
@@ -3431,14 +3436,34 @@ MediumEditor.extensions = {};
          * This function should return true/false reflecting
          * whether the form is currently displayed
          */
-        isDisplayed: function () {},
+        isDisplayed: function () {
+            if (this.hasForm) {
+                return this.getForm().classList.contains(this.activeClass);
+            }
+            return false;
+        },
+
+        /* hideForm: [function ()]
+         *
+         * This function should show the form element inside
+         * the toolbar container
+         */
+        showForm: function () {
+            if (this.hasForm) {
+                this.getForm().classList.add(this.activeClass);
+            }
+        },
 
         /* hideForm: [function ()]
          *
          * This function should hide the form element inside
          * the toolbar container
          */
-        hideForm: function () {},
+        hideForm: function () {
+            if (this.hasForm) {
+                this.getForm().classList.remove(this.activeClass);
+            }
+        },
 
         /************************ Helpers ************************
          * The following are helpers that are either set by MediumEditor
@@ -3627,11 +3652,11 @@ MediumEditor.extensions = {};
 
         // Used by medium-editor when the default toolbar is to be displayed
         isDisplayed: function () {
-            return this.getForm().style.display === 'block';
+            return MediumEditor.extensions.form.prototype.isDisplayed.apply(this);
         },
 
         hideForm: function () {
-            this.getForm().style.display = 'none';
+            MediumEditor.extensions.form.prototype.hideForm.apply(this);
             this.getInput().value = '';
         },
 
@@ -3651,7 +3676,6 @@ MediumEditor.extensions = {};
 
             this.base.saveSelection();
             this.hideToolbarDefaultActions();
-            this.getForm().style.display = 'block';
             this.setToolbarPosition();
 
             input.value = opts.url;
@@ -3669,6 +3693,7 @@ MediumEditor.extensions = {};
                 var classList = opts.buttonClass ? opts.buttonClass.split(' ') : [];
                 buttonCheckbox.checked = (classList.indexOf(this.customClassOption) !== -1);
             }
+            MediumEditor.extensions.form.prototype.showForm.apply(this);
         },
 
         // Called by core when tearing down medium-editor (destroy)
@@ -4125,9 +4150,20 @@ MediumEditor.extensions = {};
             this.document.execCommand('AutoUrlDetect', false, false);
         },
 
+        isLastInstance: function () {
+            var activeInstances = 0;
+            for (var i = 0; i < this.window._mediumEditors.length; i++) {
+                var editor = this.window._mediumEditors[i];
+                if (editor !== null && editor.getExtensionByName('autoLink') !== undefined) {
+                    activeInstances++;
+                }
+            }
+            return activeInstances === 1;
+        },
+
         destroy: function () {
             // Turn AutoUrlDetect back on
-            if (this.document.queryCommandSupported('AutoUrlDetect')) {
+            if (this.document.queryCommandSupported('AutoUrlDetect') && this.isLastInstance()) {
                 this.document.execCommand('AutoUrlDetect', false, true);
             }
         },
@@ -6318,17 +6354,19 @@ MediumEditor.extensions = {};
         var isTextareaUsed = false;
 
         this.elements.forEach(function (element, index) {
-            if (!this.options.disableEditing && !element.getAttribute('data-disable-editing')) {
-                element.setAttribute('contentEditable', true);
-                element.setAttribute('spellcheck', this.options.spellcheck);
-            }
-            element.setAttribute('data-medium-editor-element', true);
-            element.setAttribute('role', 'textbox');
-            element.setAttribute('aria-multiline', true);
-            element.setAttribute('medium-editor-index', index);
+            if (element.getAttribute('contentEditable') === null) {
+                if (!this.options.disableEditing && !element.getAttribute('data-disable-editing')) {
+                    element.setAttribute('contentEditable', true);
+                    element.setAttribute('spellcheck', this.options.spellcheck);
+                }
+                element.setAttribute('data-medium-editor-element', true);
+                element.setAttribute('role', 'textbox');
+                element.setAttribute('aria-multiline', true);
+                element.setAttribute('medium-editor-index', index);
 
-            if (element.hasAttribute('medium-editor-textarea-id')) {
-                isTextareaUsed = true;
+                if (element.hasAttribute('medium-editor-textarea-id')) {
+                    isTextareaUsed = true;
+                }
             }
         }, this);
 
@@ -7062,6 +7100,34 @@ MediumEditor.extensions = {};
                 target.innerHTML = html;
                 this.events.updateInput(target, { target: target, currentTarget: target });
             }
+        },
+
+        addElements: function (elements) {
+            for (var i = 0, len = elements.length; i < len; i += 1) {
+                this.elements.push(elements[i]);
+            }
+
+            initElements.call(this);
+        },
+
+        cleanupElements: function () {
+            var filtered = [],
+                _findParent = function (element, tagName) {
+                    if (element.parentNode.tagName.toLowerCase() === tagName) {
+                        return element.parentNode;
+                    } else if (element.parentNode) {
+                        _findParent(element.parentNode);
+                    } else {
+                        return null;
+                    }
+                };
+
+            this.elements.forEach(function (element) {
+                if (_findParent(element, 'body') !== null) {
+                    filtered.push(element);
+                }
+            });
+            this.elements = filtered;
         }
     };
 }());

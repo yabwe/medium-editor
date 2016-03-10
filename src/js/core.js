@@ -344,17 +344,19 @@
         var isTextareaUsed = false;
 
         this.elements.forEach(function (element, index) {
-            if (!this.options.disableEditing && !element.getAttribute('data-disable-editing')) {
-                element.setAttribute('contentEditable', true);
-                element.setAttribute('spellcheck', this.options.spellcheck);
-            }
-            element.setAttribute('data-medium-editor-element', true);
-            element.setAttribute('role', 'textbox');
-            element.setAttribute('aria-multiline', true);
-            element.setAttribute('medium-editor-index', index);
+            if (element.getAttribute('contentEditable') === null) {
+                if (!this.options.disableEditing && !element.getAttribute('data-disable-editing')) {
+                    element.setAttribute('contentEditable', true);
+                    element.setAttribute('spellcheck', this.options.spellcheck);
+                }
+                element.setAttribute('data-medium-editor-element', true);
+                element.setAttribute('role', 'textbox');
+                element.setAttribute('aria-multiline', true);
+                element.setAttribute('medium-editor-index', index);
 
-            if (element.hasAttribute('medium-editor-textarea-id')) {
-                isTextareaUsed = true;
+                if (element.hasAttribute('medium-editor-textarea-id')) {
+                    isTextareaUsed = true;
+                }
             }
         }, this);
 
@@ -1088,6 +1090,40 @@
                 target.innerHTML = html;
                 this.events.updateInput(target, { target: target, currentTarget: target });
             }
+        },
+
+        addElements: function (elements) {
+            var _localElements = this.elements;
+
+            if (typeof elements.forEach !== 'undefined') {
+                elements.forEach(function (element) {
+                    _localElements.push(element);
+                });
+            } else if (elements) {
+                _localElements.push(elements);
+            }
+
+            initElements.call(this);
+        },
+
+        cleanupElements: function () {
+            var filtered = [],
+                _findParent = function (element, tagName) {
+                    if (element.parentNode.tagName.toLowerCase() === tagName) {
+                        return element.parentNode;
+                    } else if (element.parentNode) {
+                        _findParent(element.parentNode);
+                    } else {
+                        return null;
+                    }
+                };
+
+            this.elements.forEach(function (element) {
+                if (_findParent(element, 'body') !== null) {
+                    filtered.push(element);
+                }
+            });
+            this.elements = filtered;
         }
     };
 }());
