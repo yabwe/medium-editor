@@ -344,24 +344,20 @@
         var isTextareaUsed = false;
 
         this.elements.forEach(function (element, index) {
-            if (element.getAttribute('medium-initialized') != null) {
-                return; // init elements only once (we can come here more than once trough "addElements")
-            }
-            if (!this.options.disableEditing && !element.getAttribute('data-disable-editing')) {
-                element.setAttribute('contentEditable', true);
-                element.setAttribute('spellcheck', this.options.spellcheck);
-            }
-            element.setAttribute('data-medium-editor-element', true);
-            element.setAttribute('role', 'textbox');
-            element.setAttribute('aria-multiline', true);
-            element.setAttribute('medium-editor-index', index);
+            if (element.getAttribute('contentEditable') === null) {
+                if (!this.options.disableEditing && !element.getAttribute('data-disable-editing')) {
+                    element.setAttribute('contentEditable', true);
+                    element.setAttribute('spellcheck', this.options.spellcheck);
+                }
+                element.setAttribute('data-medium-editor-element', true);
+                element.setAttribute('role', 'textbox');
+                element.setAttribute('aria-multiline', true);
+                element.setAttribute('medium-editor-index', index);
 
-            if (element.hasAttribute('medium-editor-textarea-id')) {
-                isTextareaUsed = true;
+                if (element.hasAttribute('medium-editor-textarea-id')) {
+                    isTextareaUsed = true;
+                }
             }
-
-            // mark element as initialized
-            element.setAttribute('medium-initialized', true);
         }, this);
 
         if (isTextareaUsed) {
@@ -1099,7 +1095,7 @@
         addElements: function (elements) {
             var _localElements = this.elements;
 
-            elements.forEach(function (element, index) {
+            elements.forEach(function (element) {
                 _localElements.push(element);
             });
 
@@ -1107,19 +1103,18 @@
         },
 
         cleanupElements: function () {
-            // find a parent node by tag-name, recursively - return null if not found
-            var _findParent = function(element, tagName) {
-                if (element.parentNode.tagName.toLowerCase() == tagName) {
-                    return element.parentNode;
-                } else if (element.parentNode) {
-                    _findParent(element.parentNode);
-                } else {
-                    return null;
-                }
-            };
+            var filtered = [],
+                _findParent = function (element, tagName) {
+                    if (element.parentNode.tagName.toLowerCase() === tagName) {
+                        return element.parentNode;
+                    } else if (element.parentNode) {
+                        _findParent(element.parentNode);
+                    } else {
+                        return null;
+                    }
+                };
 
-            var filtered = [];
-            this.elements.forEach(function (element, index) {
+            this.elements.forEach(function (element) {
                 if (_findParent(element, 'body') !== null) {
                     filtered.push(element);
                 }
