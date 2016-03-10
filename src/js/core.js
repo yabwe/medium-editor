@@ -1093,8 +1093,14 @@
         },
 
         addElements: function (elements) {
-            for (var i = 0, len = elements.length; i < len; i += 1) {
-                this.elements.push(elements[i]);
+            var _localElements = this.elements;
+
+            if (typeof elements.forEach !== 'undefined') {
+                elements.forEach(function (element) {
+                    _localElements.push(element);
+                });
+            } else if (elements) {
+                _localElements.push(elements);
             }
 
             initElements.call(this);
