@@ -7224,7 +7224,7 @@ MediumEditor.extensions = {};
                 if (findParentElementByTagName(element, this.options.checkExistenceTagName) !== null) {
                     filtered.push(element);
                 }
-            });
+            }.bind(this));
 
             this.elements = filtered;
         }
