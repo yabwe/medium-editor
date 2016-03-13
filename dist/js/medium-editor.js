@@ -6485,7 +6485,7 @@ MediumEditor.extensions = {};
     }
 
     function findParentElementByTagName(element, tagName) {
-        if (tagName.indexOf(element.parentNode.tagName.toLowerCase()) > -1) {
+        if (element.parentNode && tagName.indexOf(element.parentNode.tagName.toLowerCase()) > -1) {
             return element.parentNode;
         } else if (element.parentNode) {
             return findParentElementByTagName(element.parentNode, tagName);
