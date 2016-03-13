@@ -198,6 +198,9 @@
     margin: 0 10px;
     text-decoration: none; }
 
+.medium-editor-toolbar-form-active {
+  display: block; }
+
 .medium-editor-toolbar-actions:after {
   clear: both;
   content: "";
