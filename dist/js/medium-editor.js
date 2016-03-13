@@ -6391,6 +6391,10 @@ MediumEditor.extensions = {};
         var isTextareaUsed = false;
 
         this.elements.forEach(function (element, index) {
+            if (element.getAttribute('data-medium-editor-element')) {
+                return;
+            }
+
             if (!this.options.disableEditing && !element.getAttribute('data-disable-editing')) {
                 element.setAttribute('contentEditable', true);
                 element.setAttribute('spellcheck', this.options.spellcheck);
@@ -6416,7 +6420,8 @@ MediumEditor.extensions = {};
     }
 
     function attachHandlers() {
-        var i;
+        var i,
+            len = this.elements.length;
 
         // attach to tabs
         this.subscribe('editableKeydownTab', handleTabKeydown.bind(this));
@@ -6434,7 +6439,7 @@ MediumEditor.extensions = {};
         if (this.options.disableReturn || this.options.disableDoubleReturn) {
             this.subscribe('editableKeydownEnter', handleDisabledEnterKeydown.bind(this));
         } else {
-            for (i = 0; i < this.elements.length; i += 1) {
+            for (i = 0; i < len; i += 1) {
                 if (this.elements[i].getAttribute('data-disable-return') || this.elements[i].getAttribute('data-disable-double-return')) {
                     this.subscribe('editableKeydownEnter', handleDisabledEnterKeydown.bind(this));
                     break;
@@ -6450,6 +6455,42 @@ MediumEditor.extensions = {};
                     this.on(element, 'keyup', handleKeyup.bind(this));
                 }
             }, this);
+        }
+    }
+
+    function reAttachHandlers() {
+        if (!this.options.disableReturn || !this.options.disableDoubleReturn) {
+            for (var i = 0, len = this.elements.length; i < len; i += 1) {
+                if (this.elements[i].getAttribute('data-medium-editor-element')) {
+                    continue;
+                }
+
+                if (this.elements[i].getAttribute('data-disable-return') || this.elements[i].getAttribute('data-disable-double-return')) {
+                    this.subscribe('editableKeydownEnter', handleDisabledEnterKeydown.bind(this));
+                    break;
+                }
+            }
+        }
+        if (!this.options.disableReturn) {
+            this.elements.forEach(function (element) {
+                if (element.getAttribute('data-medium-editor-element')) {
+                    return;
+                }
+
+                if (!element.getAttribute('data-disable-return')) {
+                    this.on(element, 'keyup', handleKeyup.bind(this));
+                }
+            }, this);
+        }
+    }
+
+    function findParentElementByTagName(element, tagName) {
+        if (element.parentNode.tagName.toLowerCase() === tagName) {
+            return element.parentNode;
+        } else if (element.parentNode) {
+            return findParentElementByTagName(element.parentNode, tagName);
+        } else {
+            return null;
         }
     }
 
@@ -6742,8 +6783,10 @@ MediumEditor.extensions = {};
         serialize: function () {
             var i,
                 elementid,
-                content = {};
-            for (i = 0; i < this.elements.length; i += 1) {
+                content = {},
+                len = this.elements.length;
+
+            for (i = 0; i < len; i += 1) {
                 elementid = (this.elements[i].id !== '') ? this.elements[i].id : 'element-' + i;
                 content[elementid] = {
                     value: this.elements[i].innerHTML.trim()
@@ -7108,7 +7151,7 @@ MediumEditor.extensions = {};
                 if (this.options.targetBlank || opts.target === '_blank' || opts.buttonClass) {
                     customEvent = this.options.ownerDocument.createEvent('HTMLEvents');
                     customEvent.initEvent('input', true, true, this.options.contentWindow);
-                    for (var i = 0; i < this.elements.length; i += 1) {
+                    for (var i = 0, len = this.elements.length; i < len; i += 1) {
                         this.elements[i].dispatchEvent(customEvent);
                     }
                 }
@@ -7135,6 +7178,30 @@ MediumEditor.extensions = {};
                 target.innerHTML = html;
                 this.events.updateInput(target, { target: target, currentTarget: target });
             }
+        },
+
+        addElements: function (elements) {
+            if (elements.length) {
+                this.elements = this.elements.concat(elements);
+            } else {
+                this.elements.push(elements);
+            }
+
+            initElements.call(this);
+            reAttachHandlers.call(this);
+        },
+
+        cleanupElements: function () {
+            var filtered = [];
+
+            this.elements.forEach(function (element) {
+                // check if element still exists in DOM
+                if (findParentElementByTagName(element, 'body') !== null) {
+                    filtered.push(element);
+                }
+            });
+
+            this.elements = filtered;
         }
     };
 }());
