@@ -1134,12 +1134,31 @@
         },
 
         addElements: function (elements) {
-            if (elements.length) {
-                this.elements = this.elements.concat(elements);
-            } else {
-                this.elements.push(elements);
+            var filtered = [];
+
+            // We want always an array with our input
+            if (!elements.length) {
+                elements = [elements];
             }
 
+            // Filter the input, we want to include every element only once!
+            elements.forEach(function (element) {
+                if (element.getAttribute('data-medium-editor-element')) {
+                    return;
+                }
+
+                filtered.push(element);
+            });
+
+            // Do we have elements to add now?
+            if (filtered.length === 0) {
+                return false;
+            }
+
+            // Add new elements to our internal elements array
+            this.elements = this.elements.concat(filtered);
+
+            // Initialize all new elements (we check that in those functions don't worry)
             initElements.call(this);
             reAttachHandlers.call(this);
         },
@@ -1147,6 +1166,8 @@
         cleanupElements: function () {
             var filtered = [];
 
+            // filter all elements to prevent memory-leaks
+            // -> references of elements in js-memory which don't exists in DOM anymore
             this.elements.forEach(function (element) {
                 // check if element still exists in DOM
                 if (findParentElementByTagName(element, 'body') !== null) {
