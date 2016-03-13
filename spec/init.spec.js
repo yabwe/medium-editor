@@ -110,7 +110,8 @@ describe('Initialization TestCase', function () {
                 targetBlank: false,
                 extensions: {},
                 activeButtonClass: 'medium-editor-button-active',
-                spellcheck: true
+                spellcheck: true,
+                checkExistenceTagName: 'body'
             },
                 editor = this.newMediumEditor('.editor');
             expect(Object.keys(editor.options).length).toBe(Object.keys(defaultOptions).length);

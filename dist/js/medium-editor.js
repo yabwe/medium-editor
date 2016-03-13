@@ -6485,7 +6485,7 @@ MediumEditor.extensions = {};
     }
 
     function findParentElementByTagName(element, tagName) {
-        if (element.parentNode.tagName.toLowerCase() === tagName) {
+        if (tagName.indexOf(element.parentNode.tagName.toLowerCase()) > -1) {
             return element.parentNode;
         } else if (element.parentNode) {
             return findParentElementByTagName(element.parentNode, tagName);
@@ -6678,6 +6678,10 @@ MediumEditor.extensions = {};
 
             if (!this.options.elementsContainer) {
                 this.options.elementsContainer = this.options.ownerDocument.body;
+            }
+
+            if (!this.options.checkExistenceTagName) {
+                this.options.checkExistenceTagName = 'body';
             }
 
             return this.setup();
@@ -7217,7 +7221,7 @@ MediumEditor.extensions = {};
             // -> references of elements in js-memory which don't exists in DOM anymore
             this.elements.forEach(function (element) {
                 // check if element still exists in DOM
-                if (findParentElementByTagName(element, 'body') !== null) {
+                if (findParentElementByTagName(element, this.options.checkExistenceTagName) !== null) {
                     filtered.push(element);
                 }
             });
