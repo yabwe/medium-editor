@@ -5376,6 +5376,15 @@ MediumEditor.extensions = {};
          */
         relativeContainer: null,
 
+        /* supportTouch: [boolean]
+         * When the _supportTouch_ option is true, additional touch-events will be
+         * attached and a new class 'medium-toolbar-touch' will be added. For better user experience
+         * we set the _static_ option also to true. But it is not enough to just enable _supportTouch_.
+         * Additionally, we also check if we're on a real touch device with "isTouchDevice()".
+         * So if isTouchDevice() === true and _supportTouch_ === true -> then we enable touch!
+         */
+        supportTouch: false,
+
         init: function () {
             MediumEditor.Extension.prototype.init.apply(this, arguments);
 
@@ -5385,6 +5394,11 @@ MediumEditor.extensions = {};
                 this.getEditorOption('elementsContainer').appendChild(this.getToolbarElement());
             } else {
                 this.relativeContainer.appendChild(this.getToolbarElement());
+            }
+
+            if (this.isTouchDevice() && typeof arguments['static'] === 'undefined') {
+                // Always make static when we're on a real touch device (smartphones, tablets)
+                this.static = true;
             }
         },
 
@@ -5412,6 +5426,10 @@ MediumEditor.extensions = {};
                 toolbar.className += ' medium-editor-relative-toolbar';
             } else {
                 toolbar.className += ' medium-editor-stalker-toolbar';
+            }
+
+            if (this.isTouchDevice()) {
+                toolbar.className += ' touch-toolbar';
             }
 
             toolbar.appendChild(this.createToolbarButtons());
@@ -5511,6 +5529,7 @@ MediumEditor.extensions = {};
             }.bind(this));
         },
 
+        _selectionEndTimer: null,
         attachEventHandlers: function () {
             // MediumEditor custom events for when user beings and ends interaction with a contenteditable and its elements
             this.subscribe('blur', this.handleBlur.bind(this));
@@ -5522,6 +5541,20 @@ MediumEditor.extensions = {};
 
             // Handle mouseup on document for updating the selection in the toolbar
             this.on(this.document.documentElement, 'mouseup', this.handleDocumentMouseup.bind(this));
+
+            // Check if we are on real touch device and attach touch-event if so
+            if (this.isTouchDevice()) {
+                // Support selectionchange: http://stackoverflow.com/questions/15076173/end-of-text-selection-event
+                document.onselectionchange = function (event) {
+                    clearTimeout(this._selectionEndTimer);
+                    this._selectionEndTimer = setTimeout(function () {
+                        this.handleDocumentMouseup(event);
+                    }.bind(this), 500);
+                }.bind(this);
+
+                // Capture keyboard hide event: http://stackoverflow.com/questions/9819240/how-to-capture-the-hide-keyboard-event-on-ios-using-javascript
+                document.addEventListener('focusout', this.handleBlur.bind(this));
+            }
 
             // Add a scroll event for sticky toolbar
             if (this.static && this.sticky) {
@@ -5942,6 +5975,10 @@ MediumEditor.extensions = {};
                 toolbarElement.style.left = defaultLeft + middleBoundary + 'px';
                 toolbarElement.style.right = 'initial';
             }
+        },
+
+        isTouchDevice: function () {
+            return ('ontouchstart' in document.documentElement) && this.supportTouch === true;
         }
     });
 

@@ -86,7 +86,7 @@
          * Additionally, we also check if we're on a real touch device with "isTouchDevice()".
          * So if isTouchDevice() === true and _supportTouch_ === true -> then we enable touch!
          */
-        supportTouch: true,
+        supportTouch: false,
 
         init: function () {
             MediumEditor.Extension.prototype.init.apply(this, arguments);
