@@ -43,6 +43,10 @@
         }),
         cssLink = document.getElementById('medium-editor-theme');
 
+        editor.subscribe('editableInput', function(event, editable) {
+            console.info('editableInput fired!', editable);
+        });
+
         document.getElementById('sel-themes').addEventListener('change', function () {
             cssLink.href = '../dist/css/' + this.value + '.css';
         });
