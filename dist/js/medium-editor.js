@@ -2455,6 +2455,12 @@ MediumEditor.extensions = {};
             this.customEvents[event].push(listener);
         },
 
+        reAttachCustomEvent: function () {
+            if (this.customEvents['editableInput']) {
+                this.reRunSetupListener(event);
+            }
+        },
+
         detachCustomEvent: function (event, listener) {
             var index = this.indexOfCustomListener(event, listener);
             if (index !== -1) {
@@ -2604,9 +2610,45 @@ MediumEditor.extensions = {};
             doc.execCommand = doc.execCommand.orig;
         },
 
+        reRunSetupListener: function () {
+            // rerun the part of setupListeners which is bound to every containter (this.elements) - only run once per element!
+
+            var key;
+            for (key in this.listeners) {
+                if (this.listeners.hasOwnProperty(key)) {
+                    // for some cases we want to have our special re-run implementation here
+                    // -> it covers those cases which would attach events to ownerDocument (and they should only run once)
+                    if (key === 'editableInput') {
+                        this.base.elements.forEach(function (element) {
+                            if (this.contentCache[element.getAttribute('medium-editor-index')]) {
+                                // if it already exists in contentCache - skip
+                                return;
+                            }
+                            this.contentCache[element.getAttribute('medium-editor-index')] = element.innerHTML;
+
+                            // Attach to the 'oninput' event, handled correctly by most browsers
+                            if (this.InputEventOnContenteditableSupported) {
+                                this.attachDOMEvent(element, 'input', this.handleInput.bind(this));
+                            }
+                        }.bind(this));
+
+                        // For browsers which don't support the input event on contenteditable (IE)
+                        // we'll attach to 'selectionchange' on the document and 'keypress' on the editables
+                        if (!this.InputEventOnContenteditableSupported) {
+                            this.setupListener('editableKeypress', true);
+                        }
+                    } else {
+                        // all the rest of the cases could just execute the normal "setupListener"
+                        // -> because all of them just run "attachToEachElement" internally which will check to attach to an element only once
+                        this.setupListener(key, true);
+                    }
+                }
+            }
+        },
+
         // Listening to browser events to emit events medium-editor cares about
-        setupListener: function (name) {
-            if (this.listeners[name]) {
+        setupListener: function (name, force) {
+            if (this.listeners[name] && (typeof force === 'undefined' || force !== true)) {
                 return;
             }
 
@@ -2705,9 +2747,34 @@ MediumEditor.extensions = {};
         },
 
         attachToEachElement: function (name, handler) {
+            // build our internal cache to know which element got already what handler attached
+            if (!this.eventsCache) {
+                this.eventsCache = [];
+            }
+
             this.base.elements.forEach(function (element) {
+                var existingCache = this.eventsCache[element.getAttribute('medium-editor-index')];
+                if (existingCache && existingCache[name]) {
+                    // we have already attached this event 'name' to this element, skip
+                    return;
+                }
+
                 this.attachDOMEvent(element, name, handler.bind(this));
+
+                if (!this.eventsCache[element.getAttribute('medium-editor-index')]) {
+                    this.eventsCache[element.getAttribute('medium-editor-index')] = {};
+                }
+
+                this.eventsCache[element.getAttribute('medium-editor-index')][name] = true;
             }, this);
+        },
+
+        cleanupElement: function (element) {
+            var index = element.getAttribute('medium-editor-index');
+            if (index && index > -1) {
+                this.contentCache.slice(index, 1);
+                this.eventsCache.slice(index, 1);
+            }
         },
 
         focusElement: function (element) {
@@ -6482,6 +6549,8 @@ MediumEditor.extensions = {};
                 }
             }, this);
         }
+
+        this.events.reAttachCustomEvent();
     }
 
     function findParentElementByTagName(element, tagName) {
@@ -7223,6 +7292,9 @@ MediumEditor.extensions = {};
                 // check if element still exists in DOM
                 if (findParentElementByTagName(element, this.options.checkExistenceTagName) !== null) {
                     filtered.push(element);
+                } else {
+                    // found an obsolete element, not existing in DOM anymore
+                    this.events.cleanupElement(element);
                 }
             }.bind(this));
 

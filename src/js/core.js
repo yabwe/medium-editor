@@ -1178,6 +1178,9 @@
                 // check if element still exists in DOM
                 if (findParentElementByTagName(element, this.options.checkExistenceTagName) !== null) {
                     filtered.push(element);
+                } else {
+                    // found an obsolete element, not existing in DOM anymore
+                    this.events.cleanupElement(element);
                 }
             }.bind(this));
 
