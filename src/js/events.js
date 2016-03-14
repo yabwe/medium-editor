@@ -67,6 +67,12 @@
             this.customEvents[event].push(listener);
         },
 
+        reAttachCustomEvent: function() {
+            if (this.customEvents['editableInput']) {
+                this.reRunSetupListener(event);
+            }
+        },
+
         detachCustomEvent: function (event, listener) {
             var index = this.indexOfCustomListener(event, listener);
             if (index !== -1) {
@@ -214,6 +220,11 @@
 
             // Use the reference to the original execCommand to revert back
             doc.execCommand = doc.execCommand.orig;
+        },
+
+        // Listening to browser events to emit events medium-editor cares about
+        reRunSetupListener: function (name) {
+            // only rerun setup listeners which are bound to each element -> check for every element to run only once
         },
 
         // Listening to browser events to emit events medium-editor cares about

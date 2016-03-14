@@ -435,6 +435,8 @@
                 }
             }, this);
         }
+
+        this.events.reAttachCustomEvent();
     }
 
     function findParentElementByTagName(element, tagName) {
