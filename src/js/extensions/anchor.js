@@ -161,6 +161,7 @@
 
             this.base.saveSelection();
             this.hideToolbarDefaultActions();
+            MediumEditor.extensions.form.prototype.showForm.apply(this);
             this.setToolbarPosition();
 
             input.value = opts.url;
@@ -178,7 +179,6 @@
                 var classList = opts.buttonClass ? opts.buttonClass.split(' ') : [];
                 buttonCheckbox.checked = (classList.indexOf(this.customClassOption) !== -1);
             }
-            MediumEditor.extensions.form.prototype.showForm.apply(this);
         },
 
         // Called by core when tearing down medium-editor (destroy)
