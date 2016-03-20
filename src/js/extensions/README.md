@@ -88,6 +88,8 @@
   * Enables users to add multiple placeholders with specific HTML tags.
 * [MediumEditor TCMention Plugin](https://github.com/tomchentw/medium-editor-tc-mention)
   * A Medium Editor extension for adding custom 'mention' support, circa Medium 2.0.
+* [MediumEditor AutoList](https://github.com/varun-raj/medium-editor-autolist)
+  * A Medium Editor extension for converting `1.` and `*` into ordered lists and unordered lists.
 
 
 ## What is a Button?
