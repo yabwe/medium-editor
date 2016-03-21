@@ -113,9 +113,13 @@
 * [MediumEditor tables](https://github.com/yabwe/medium-editor-tables)
   * Extension to add a table button/behavior to MediumEditor
 * [MediumEditor Custom HTML](https://github.com/jillix/medium-editor-custom-html)
-  * An extension that inserts custom HTML using a new button in the Medium Editor toolbar
+  * An extension that inserts custom HTML using a new button in the MediumEditor toolbar
 * [MediumButton](https://github.com/arcs-/MediumButton)
   * Extends your Medium Editor with the possibility add buttons.
+* [MediumEditor Handsontable](https://github.com/asselinpaul/medium-editor-handsontable)
+  * Supports adding [handsontable](https://handsontable.com/) spreadsheets to MediumEditor.
+* [MediumEditor Lists](https://github.com/mkawczynski07/medium-editor-list)
+  * Adds a "Add Paragraph" button which allows for inserting customized paragraphs to MediumEditor
 
 
 ## What is a Form Extension?
