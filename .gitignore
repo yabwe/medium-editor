@@ -10,3 +10,5 @@ _SpecRunner.html
 reports/
 coverage/
 ._*
+
+.idea
