@@ -71,8 +71,12 @@
                     event.preventDefault();
                     event.stopPropagation();
 
+                    // command can be a function to execute
+                    if (typeof data.command === 'function') {
+                        data.command.apply(this);
+                    }
                     // command can be false so the shortcut is just disabled
-                    if (false !== data.command) {
+                    else if (false !== data.command) {
                         this.execAction(data.command);
                     }
                 }
