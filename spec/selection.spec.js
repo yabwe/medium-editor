@@ -483,4 +483,30 @@ describe('MediumEditor.selection TestCase', function () {
             expect(MediumEditor.selection.selectionContainsContent(document)).toBe(true);
         });
     });
+
+    describe('clearSelection', function () {
+        it('should clear the selection and set the caret to the start of the prior range when specified', function () {
+            this.el.innerHTML = '<p>this is<span> </span>text</p>';
+            selectElementContents(this.el.querySelector('p'));
+            var selectionStart = document.getSelection().anchorOffset;
+
+            MediumEditor.selection.clearSelection(document, true);
+            expect(document.getSelection().focusOffset).toBe(selectionStart);
+
+            var newSelectionEnd = document.getSelection().focusOffset;
+            expect(newSelectionEnd).toBe(selectionStart);
+        });
+
+        it('should clear the selection and set the caret to the end of the prior range by default', function () {
+            this.el.innerHTML = '<p>this is<span> </span>text</p>';
+            selectElementContents(this.el.querySelector('p'));
+            var selectionEnd = document.getSelection().focusOffset;
+
+            MediumEditor.selection.clearSelection(document);
+            expect(document.getSelection().anchorOffset).toBe(selectionEnd);
+
+            var newSelectionStart = document.getSelection().anchorOffset;
+            expect(newSelectionStart).toBe(selectionEnd);
+        });
+    });
 });
