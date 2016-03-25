@@ -391,12 +391,14 @@
             }
             // An event triggered which signifies that the user may have changed someting
             // Look in our cache of input for the contenteditables to see if something changed
-            var index = target.getAttribute('medium-editor-index');
-            if (target.innerHTML !== this.contentCache[index]) {
+            var index = target.getAttribute('medium-editor-index'),
+                html = target.innerHTML;
+
+            if (html !== this.contentCache[index]) {
                 // The content has changed since the last time we checked, fire the event
                 this.triggerCustomEvent('editableInput', eventObj, target);
             }
-            this.contentCache[index] = target.innerHTML;
+            this.contentCache[index] = html;
         },
 
         handleDocumentSelectionChange: function (event) {
