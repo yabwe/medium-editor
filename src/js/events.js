@@ -237,18 +237,7 @@
                                 return;
                             }
                             this.contentCache[element.getAttribute('medium-editor-index')] = element.innerHTML;
-
-                            // Attach to the 'oninput' event, handled correctly by most browsers
-                            if (this.InputEventOnContenteditableSupported) {
-                                this.attachDOMEvent(element, 'input', this.handleInput.bind(this));
-                            }
                         }.bind(this));
-
-                        // For browsers which don't support the input event on contenteditable (IE)
-                        // we'll attach to 'selectionchange' on the document and 'keypress' on the editables
-                        if (!this.InputEventOnContenteditableSupported) {
-                            this.setupListener('editableKeypress', true);
-                        }
                     } else {
                         // all the rest of the cases could just execute the normal "setupListener"
                         // -> because all of them just run "attachToEachElement" internally which will check to attach to an element only once
