@@ -343,7 +343,7 @@
     function initElements() {
         var isTextareaUsed = false;
 
-        this.elements.forEach(function (element, index) {
+        this.elements.forEach(function (element) {
             if (element.getAttribute('data-medium-editor-element')) {
                 return;
             }
@@ -355,7 +355,7 @@
             element.setAttribute('data-medium-editor-element', true);
             element.setAttribute('role', 'textbox');
             element.setAttribute('aria-multiline', true);
-            element.setAttribute('medium-editor-index', index);
+            element.setAttribute('medium-editor-index', this.guid());
 
             if (element.hasAttribute('medium-editor-textarea-id')) {
                 isTextareaUsed = true;
@@ -692,6 +692,7 @@
                 element.removeAttribute('role');
                 element.removeAttribute('aria-multiline');
                 element.removeAttribute('medium-editor-index');
+                element.removeAttribute('medium-editor-uid');
 
                 // Remove any elements created for textareas
                 if (element.hasAttribute('medium-editor-textarea-id')) {
@@ -1185,6 +1186,18 @@
             }.bind(this));
 
             this.elements = filtered;
+        },
+
+        guid: function () {
+            function _s4() {
+                return Math
+                    .floor((1 + Math.random()) * 0x10000)
+                    .toString(16)
+                    .substring(1);
+            }
+
+            return _s4() + _s4() + '-' + _s4() + '-' + _s4() + '-' + _s4() + '-' + _s4() + _s4() + _s4();
         }
+
     };
 }());
