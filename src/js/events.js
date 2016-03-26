@@ -384,8 +384,8 @@
         cleanupElement: function (element) {
             var index = element.getAttribute('medium-editor-index');
             if (index && index > -1) {
-                this.contentCache.slice(index, 1);
-                this.eventsCache.slice(index, 1);
+                this.contentCache.splice(index, 1);
+                this.eventsCache.splice(index, 1);
             }
         },
 
