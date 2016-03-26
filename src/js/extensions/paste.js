@@ -17,6 +17,15 @@
     */
     function createReplacements() {
         return [
+            // Remove anything but the contents within the BODY element
+            [new RegExp(/^[\s\S]*<body[^>]*>\s*|\s*<\/body[^>]*>[\s\S]*$/g), ''],
+
+            // cleanup comments added by Chrome when pasting html
+            [new RegExp(/<!--StartFragment-->|<!--EndFragment-->/g), ''],
+
+            // Trailing BR elements
+            [new RegExp(/<br>$/i), ''],
+
             // replace two bogus tags that begin pastes from google docs
             [new RegExp(/<[^>]*docs-internal-guid[^>]*>/gi), ''],
             [new RegExp(/<\/b>(<br[^>]*>)?$/gi), ''],
@@ -46,11 +55,7 @@
             [new RegExp(/\n+<p/gi), '<p'],
 
             // Microsoft Word makes these odd tags, like <o:p></o:p>
-            [new RegExp(/<\/?o:[a-z]*>/gi), ''],
-
-            // cleanup comments added by Chrome when pasting html
-            ['<!--EndFragment-->', ''],
-            ['<!--StartFragment-->', '']
+            [new RegExp(/<\/?o:[a-z]*>/gi), '']
         ];
     }
     /*jslint regexp: false*/
@@ -477,32 +482,6 @@
                 // remove empty spans, replace others with their contents
                 MediumEditor.util.unwrap(el, this.document);
             }
-        },
-
-        /**
-         * Trims the specified HTML by removing all WebKit fragments, all elements wrapping the body trailing BR elements etc.
-         *
-         * @param {String} html Html string to trim contents on.
-         * @return {String} Html contents that got trimmed.
-         */
-        trimHtml: function (html) {
-            // Remove anything but the contents within the BODY element
-            html = html.replace(/^[\s\S]*<body[^>]*>\s*|\s*<\/body[^>]*>[\s\S]*$/g, '');
-            // Inner fragments (tables from excel on mac)
-            html = html.replace(/<!--StartFragment-->|<!--EndFragment-->/g, '');
-            html = html.replace(/( ?)<span class="Apple-converted-space">\u00a0<\/span>( ?)/g, function (all, s1, s2) {
-                // WebKit &nbsp; meant to preserve multiple spaces but instead inserted around all inline tags,
-                // including the spans with inline styles created on paste
-                if (!s1 && !s2) {
-                    return ' ';
-                }
-
-                return '\u00a0';
-            });
-            // Trailing BR elements
-            html = html.replace(/<br>$/i, '');
-
-            return html;
         }
     });
 
