@@ -2437,11 +2437,13 @@ MediumEditor.extensions = {};
         },
 
         detachAllEventsFromElement: function (element) {
-            for (var i = 0, len = this.events.length; i < len; i++) {
-                var e = this.events[i];
-                if (e[0].getAttribute('medium-editor-index') === element.getAttribute('medium-editor-index')) {
-                    this.detachDOMEvent(e[0], e[1], e[2], e[3]);
-                }
+            var filtered = this.events.filter(function (e) {
+                return e && e[0].getAttribute && e[0].getAttribute('medium-editor-index') === element.getAttribute('medium-editor-index');
+            });
+
+            for (var i = 0, len = filtered.length; i < len; i++) {
+                var e = filtered[i];
+                this.detachDOMEvent(e[0], e[1], e[2], e[3]);
             }
         },
 
