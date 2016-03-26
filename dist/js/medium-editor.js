@@ -2436,6 +2436,15 @@ MediumEditor.extensions = {};
             }
         },
 
+        detachAllEventsFromElement: function (element) {
+            for (var i = 0, len = this.events.length; i < len; i++) {
+                var e = this.events[i];
+                if (e[0].getAttribute('medium-editor-index') === element.getAttribute('medium-editor-index')) {
+                    this.detachDOMEvent(e[0], e[1], e[2], e[3]);
+                }
+            }
+        },
+
         enableCustomEvent: function (event) {
             if (this.disabledEvents[event] !== undefined) {
                 delete this.disabledEvents[event];
@@ -2625,8 +2634,24 @@ MediumEditor.extensions = {};
                                 return;
                             }
                             this.contentCache[element.getAttribute('medium-editor-index')] = element.innerHTML;
+
+                            // Attach to the 'oninput' event, handled correctly by most browsers
+                            if (this.InputEventOnContenteditableSupported) {
+                                this.attachDOMEvent(element, 'input', this.handleInput.bind(this));
+                            }
                         }.bind(this));
-                    } else {
+
+                        // For browsers which don't support the input event on contenteditable (IE)
+                        // we'll attach to 'selectionchange' on the document and 'keypress' on the editables
+                        if (!this.InputEventOnContenteditableSupported) {
+                            this.setupListener('editableKeypress', true);
+                        }
+                    } else if (
+                        // only re-bind events that are related to the element itself - not ones that are bound once to the body for example
+                        key !== 'externalInteraction' ||
+                        key !== 'blur' ||
+                        key !== 'focus'
+                    ) {
                         // all the rest of the cases could just execute the normal "setupListener"
                         // -> because all of them just run "attachToEachElement" internally which will check to attach to an element only once
                         this.setupListener(key, true);
@@ -2761,6 +2786,7 @@ MediumEditor.extensions = {};
         cleanupElement: function (element) {
             var index = element.getAttribute('medium-editor-index');
             if (index) {
+                this.detachAllEventsFromElement(element);
                 delete this.contentCache[index];
                 delete this.eventsCache[index];
             }
