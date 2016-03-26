@@ -2669,7 +2669,7 @@ MediumEditor.extensions = {};
                     break;
                 case 'editableInput':
                     // setup cache for knowing when the content has changed
-                    this.contentCache = [];
+                    this.contentCache = {};
                     this.base.elements.forEach(function (element) {
                         this.contentCache[element.getAttribute('medium-editor-index')] = element.innerHTML;
 
@@ -2749,7 +2749,7 @@ MediumEditor.extensions = {};
         attachToEachElement: function (name, handler) {
             // build our internal cache to know which element got already what handler attached
             if (!this.eventsCache) {
-                this.eventsCache = [];
+                this.eventsCache = {};
             }
 
             this.base.elements.forEach(function (element) {
@@ -2772,8 +2772,8 @@ MediumEditor.extensions = {};
         cleanupElement: function (element) {
             var index = element.getAttribute('medium-editor-index');
             if (index && index > -1) {
-                this.contentCache.splice(index, 1);
-                this.eventsCache.splice(index, 1);
+                delete this.contentCache[index];
+                delete this.eventsCache[index];
             }
         },
 
