@@ -2771,7 +2771,7 @@ MediumEditor.extensions = {};
 
         cleanupElement: function (element) {
             var index = element.getAttribute('medium-editor-index');
-            if (index && index > -1) {
+            if (index) {
                 delete this.contentCache[index];
                 delete this.eventsCache[index];
             }
