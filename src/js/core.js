@@ -343,7 +343,11 @@
     function initElements() {
         var isTextareaUsed = false;
 
-        this.elements.forEach(function (element, index) {
+        this.elements.forEach(function (element) {
+            if (element.getAttribute('data-medium-editor-element')) {
+                return;
+            }
+
             if (!this.options.disableEditing && !element.getAttribute('data-disable-editing')) {
                 element.setAttribute('contentEditable', true);
                 element.setAttribute('spellcheck', this.options.spellcheck);
@@ -351,7 +355,7 @@
             element.setAttribute('data-medium-editor-element', true);
             element.setAttribute('role', 'textbox');
             element.setAttribute('aria-multiline', true);
-            element.setAttribute('medium-editor-index', index);
+            element.setAttribute('medium-editor-index', this.guid());
 
             if (element.hasAttribute('medium-editor-textarea-id')) {
                 isTextareaUsed = true;
@@ -369,7 +373,8 @@
     }
 
     function attachHandlers() {
-        var i;
+        var i,
+            len = this.elements.length;
 
         // attach to tabs
         this.subscribe('editableKeydownTab', handleTabKeydown.bind(this));
@@ -387,7 +392,7 @@
         if (this.options.disableReturn || this.options.disableDoubleReturn) {
             this.subscribe('editableKeydownEnter', handleDisabledEnterKeydown.bind(this));
         } else {
-            for (i = 0; i < this.elements.length; i += 1) {
+            for (i = 0; i < len; i += 1) {
                 if (this.elements[i].getAttribute('data-disable-return') || this.elements[i].getAttribute('data-disable-double-return')) {
                     this.subscribe('editableKeydownEnter', handleDisabledEnterKeydown.bind(this));
                     break;
@@ -403,6 +408,44 @@
                     this.on(element, 'keyup', handleKeyup.bind(this));
                 }
             }, this);
+        }
+    }
+
+    function reAttachHandlers() {
+        if (!this.options.disableReturn || !this.options.disableDoubleReturn) {
+            for (var i = 0, len = this.elements.length; i < len; i += 1) {
+                if (this.elements[i].getAttribute('data-medium-editor-element')) {
+                    continue;
+                }
+
+                if (this.elements[i].getAttribute('data-disable-return') || this.elements[i].getAttribute('data-disable-double-return')) {
+                    this.subscribe('editableKeydownEnter', handleDisabledEnterKeydown.bind(this));
+                    break;
+                }
+            }
+        }
+        if (!this.options.disableReturn) {
+            this.elements.forEach(function (element) {
+                if (element.getAttribute('data-medium-editor-element')) {
+                    return;
+                }
+
+                if (!element.getAttribute('data-disable-return')) {
+                    this.on(element, 'keyup', handleKeyup.bind(this));
+                }
+            }, this);
+        }
+
+        this.events.reAttachCustomEvent();
+    }
+
+    function findParentElementByTagName(element, tagName) {
+        if (element.parentNode && tagName.indexOf(element.parentNode.tagName.toLowerCase()) > -1) {
+            return element.parentNode;
+        } else if (element.parentNode) {
+            return findParentElementByTagName(element.parentNode, tagName);
+        } else {
+            return null;
         }
     }
 
@@ -592,6 +635,10 @@
                 this.options.elementsContainer = this.options.ownerDocument.body;
             }
 
+            if (!this.options.checkExistenceTagName) {
+                this.options.checkExistenceTagName = 'body';
+            }
+
             return this.setup();
         },
 
@@ -645,6 +692,7 @@
                 element.removeAttribute('role');
                 element.removeAttribute('aria-multiline');
                 element.removeAttribute('medium-editor-index');
+                element.removeAttribute('medium-editor-uid');
 
                 // Remove any elements created for textareas
                 if (element.hasAttribute('medium-editor-textarea-id')) {
@@ -695,8 +743,10 @@
         serialize: function () {
             var i,
                 elementid,
-                content = {};
-            for (i = 0; i < this.elements.length; i += 1) {
+                content = {},
+                len = this.elements.length;
+
+            for (i = 0; i < len; i += 1) {
                 elementid = (this.elements[i].id !== '') ? this.elements[i].id : 'element-' + i;
                 content[elementid] = {
                     value: this.elements[i].innerHTML.trim()
@@ -1061,7 +1111,7 @@
                 if (this.options.targetBlank || opts.target === '_blank' || opts.buttonClass) {
                     customEvent = this.options.ownerDocument.createEvent('HTMLEvents');
                     customEvent.initEvent('input', true, true, this.options.contentWindow);
-                    for (var i = 0; i < this.elements.length; i += 1) {
+                    for (var i = 0, len = this.elements.length; i < len; i += 1) {
                         this.elements[i].dispatchEvent(customEvent);
                     }
                 }
@@ -1088,6 +1138,66 @@
                 target.innerHTML = html;
                 this.events.updateInput(target, { target: target, currentTarget: target });
             }
+        },
+
+        addElements: function (elements) {
+            var filtered = [];
+
+            // We want always an array with our input
+            if (!elements.length) {
+                elements = [elements];
+            }
+
+            // Filter the input, we want to include every element only once!
+            elements.forEach(function (element) {
+                if (element.getAttribute('data-medium-editor-element')) {
+                    return;
+                }
+
+                filtered.push(element);
+            });
+
+            // Do we have elements to add now?
+            if (filtered.length === 0) {
+                return false;
+            }
+
+            // Add new elements to our internal elements array
+            this.elements = this.elements.concat(filtered);
+
+            // Initialize all new elements (we check that in those functions don't worry)
+            initElements.call(this);
+            reAttachHandlers.call(this);
+        },
+
+        cleanupElements: function () {
+            var filtered = [];
+
+            // filter all elements to prevent memory-leaks
+            // -> references of elements in js-memory which don't exists in DOM anymore
+            this.elements.forEach(function (element) {
+                // check if element still exists in DOM
+                if (findParentElementByTagName(element, this.options.checkExistenceTagName) !== null) {
+                    filtered.push(element);
+                } else {
+                    // found an obsolete element, not existing in DOM anymore
+                    this.events.cleanupElement(element);
+                }
+            }.bind(this));
+
+            this.elements = filtered;
+        },
+
+        guid: function () {
+            function _s4() {
+                return Math
+                    .floor((1 + Math.random()) * 0x10000)
+                    .toString(16)
+                    .substring(1);
+            }
+
+            return _s4() + _s4() + '-' + _s4() + '-' + _s4() + '-' + _s4() + '-' + _s4() + _s4() + _s4();
         }
+
     };
 }());
