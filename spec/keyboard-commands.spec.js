@@ -82,6 +82,41 @@ describe('KeyboardCommands TestCase', function () {
             expect(editor.execAction).toHaveBeenCalledWith('superscript');
         });
 
+        it('should execute custom command functions', function () {
+            var foo, editor;
+
+            foo = {
+                bar: function () {
+                    return true;
+                }
+            };
+
+            spyOn(foo, 'bar');
+
+            editor = this.newMediumEditor('.editor', {
+                keyboardCommands: {
+                    commands: [
+                        {
+                            command: foo.bar,
+                            key: 'f',
+                            meta: true,
+                            shift: false,
+                            alt: false
+                        }
+                    ]
+                }
+            });
+
+            selectElementContentsAndFire(editor.elements[0]);
+            fireEvent(editor.elements[0], 'keydown', {
+                keyCode: 'f'.charCodeAt(0),
+                ctrlKey: true,
+                metaKey: true,
+                shiftKey: false
+            });
+            expect(foo.bar).toHaveBeenCalled();
+        });
+
         // TODO: remove this test when jumping in 6.0.0
         it('should be executed for custom command without alt defined', function () {
             spyOn(MediumEditor.prototype, 'execAction');

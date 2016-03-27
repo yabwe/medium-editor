@@ -1,3 +1,12 @@
+5.15.0 / 2016-03-23
+==================
+* Use class instead of inline style for hiding/showing anchor form
+* Add helpers for hiding/showing form into form extension base class
+* Fix issue where auto-link extension re-enabled IE's built-in auto-link when other instances still existed
+* Fix anchor form to display form before attempting to position correctly
+* Add new selection.clearSelection() helper method for moving cursor to beginning/end of selection
+
+
 5.14.4 / 2016-02-25
 ==================
 * editableInput event fixes
