@@ -2450,17 +2450,6 @@ MediumEditor.extensions = {};
             }
         },
 
-        detachAllEventsFromElement: function (element) {
-            var filtered = this.events.filter(function (e) {
-                return e && e[0].getAttribute && e[0].getAttribute('medium-editor-index') === element.getAttribute('medium-editor-index');
-            });
-
-            for (var i = 0, len = filtered.length; i < len; i++) {
-                var e = filtered[i];
-                this.detachDOMEvent(e[0], e[1], e[2], e[3]);
-            }
-        },
-
         enableCustomEvent: function (event) {
             if (this.disabledEvents[event] !== undefined) {
                 delete this.disabledEvents[event];
@@ -2478,12 +2467,6 @@ MediumEditor.extensions = {};
                 this.customEvents[event] = [];
             }
             this.customEvents[event].push(listener);
-        },
-
-        reAttachCustomEvent: function () {
-            if (this.customEvents['editableInput']) {
-                this.reRunSetupListener(event);
-            }
         },
 
         detachCustomEvent: function (event, listener) {
@@ -2635,50 +2618,9 @@ MediumEditor.extensions = {};
             doc.execCommand = doc.execCommand.orig;
         },
 
-        reRunSetupListener: function () {
-            // rerun the part of setupListeners which is bound to every containter (this.elements) - only run once per element!
-
-            var key;
-            for (key in this.listeners) {
-                if (this.listeners.hasOwnProperty(key)) {
-                    // for some cases we want to have our special re-run implementation here
-                    // -> it covers those cases which would attach events to ownerDocument (and they should only run once)
-                    if (key === 'editableInput') {
-                        this.base.elements.forEach(function (element) {
-                            if (this.contentCache[element.getAttribute('medium-editor-index')]) {
-                                // if it already exists in contentCache - skip
-                                return;
-                            }
-                            this.contentCache[element.getAttribute('medium-editor-index')] = element.innerHTML;
-
-                            // Attach to the 'oninput' event, handled correctly by most browsers
-                            if (this.InputEventOnContenteditableSupported) {
-                                this.attachDOMEvent(element, 'input', this.handleInput.bind(this));
-                            }
-                        }.bind(this));
-
-                        // For browsers which don't support the input event on contenteditable (IE)
-                        // we'll attach to 'selectionchange' on the document and 'keypress' on the editables
-                        if (!this.InputEventOnContenteditableSupported) {
-                            this.setupListener('editableKeypress', true);
-                        }
-                    } else if (
-                        // only re-bind events that are related to the element itself - not ones that are bound once to the body for example
-                        key !== 'externalInteraction' ||
-                        key !== 'blur' ||
-                        key !== 'focus'
-                    ) {
-                        // all the rest of the cases could just execute the normal "setupListener"
-                        // -> because all of them just run "attachToEachElement" internally which will check to attach to an element only once
-                        this.setupListener(key, true);
-                    }
-                }
-            }
-        },
-
         // Listening to browser events to emit events medium-editor cares about
-        setupListener: function (name, force) {
-            if (this.listeners[name] && (typeof force === 'undefined' || force !== true)) {
+        setupListener: function (name) {
+            if (this.listeners[name]) {
                 return;
             }
 
@@ -2699,7 +2641,7 @@ MediumEditor.extensions = {};
                     break;
                 case 'editableInput':
                     // setup cache for knowing when the content has changed
-                    this.contentCache = {};
+                    this.contentCache = [];
                     this.base.elements.forEach(function (element) {
                         this.contentCache[element.getAttribute('medium-editor-index')] = element.innerHTML;
 
@@ -2777,35 +2719,9 @@ MediumEditor.extensions = {};
         },
 
         attachToEachElement: function (name, handler) {
-            // build our internal cache to know which element got already what handler attached
-            if (!this.eventsCache) {
-                this.eventsCache = {};
-            }
-
             this.base.elements.forEach(function (element) {
-                var existingCache = this.eventsCache[element.getAttribute('medium-editor-index')];
-                if (existingCache && existingCache[name]) {
-                    // we have already attached this event 'name' to this element, skip
-                    return;
-                }
-
                 this.attachDOMEvent(element, name, handler.bind(this));
-
-                if (!this.eventsCache[element.getAttribute('medium-editor-index')]) {
-                    this.eventsCache[element.getAttribute('medium-editor-index')] = {};
-                }
-
-                this.eventsCache[element.getAttribute('medium-editor-index')][name] = true;
             }, this);
-        },
-
-        cleanupElement: function (element) {
-            var index = element.getAttribute('medium-editor-index');
-            if (index) {
-                this.detachAllEventsFromElement(element);
-                delete this.contentCache[index];
-                delete this.eventsCache[index];
-            }
         },
 
         focusElement: function (element) {
@@ -2877,14 +2793,12 @@ MediumEditor.extensions = {};
             }
             // An event triggered which signifies that the user may have changed someting
             // Look in our cache of input for the contenteditables to see if something changed
-            var index = target.getAttribute('medium-editor-index'),
-                html = target.innerHTML;
-
-            if (html !== this.contentCache[index]) {
+            var index = target.getAttribute('medium-editor-index');
+            if (target.innerHTML !== this.contentCache[index]) {
                 // The content has changed since the last time we checked, fire the event
                 this.triggerCustomEvent('editableInput', eventObj, target);
             }
-            this.contentCache[index] = html;
+            this.contentCache[index] = target.innerHTML;
         },
 
         handleDocumentSelectionChange: function (event) {
@@ -4623,12 +4537,8 @@ MediumEditor.extensions = {};
                     event.preventDefault();
                     event.stopPropagation();
 
-                    // command can be a function to execute
-                    if (typeof data.command === 'function') {
-                        data.command.apply(this);
-                    }
                     // command can be false so the shortcut is just disabled
-                    else if (false !== data.command) {
+                    if (false !== data.command) {
                         this.execAction(data.command);
                     }
                 }
@@ -6457,11 +6367,7 @@ MediumEditor.extensions = {};
     function initElements() {
         var isTextareaUsed = false;
 
-        this.elements.forEach(function (element) {
-            if (element.getAttribute('data-medium-editor-element')) {
-                return;
-            }
-
+        this.elements.forEach(function (element, index) {
             if (!this.options.disableEditing && !element.getAttribute('data-disable-editing')) {
                 element.setAttribute('contentEditable', true);
                 element.setAttribute('spellcheck', this.options.spellcheck);
@@ -6469,7 +6375,7 @@ MediumEditor.extensions = {};
             element.setAttribute('data-medium-editor-element', true);
             element.setAttribute('role', 'textbox');
             element.setAttribute('aria-multiline', true);
-            element.setAttribute('medium-editor-index', this.guid());
+            element.setAttribute('medium-editor-index', index);
 
             if (element.hasAttribute('medium-editor-textarea-id')) {
                 isTextareaUsed = true;
@@ -6487,8 +6393,7 @@ MediumEditor.extensions = {};
     }
 
     function attachHandlers() {
-        var i,
-            len = this.elements.length;
+        var i;
 
         // attach to tabs
         this.subscribe('editableKeydownTab', handleTabKeydown.bind(this));
@@ -6506,7 +6411,7 @@ MediumEditor.extensions = {};
         if (this.options.disableReturn || this.options.disableDoubleReturn) {
             this.subscribe('editableKeydownEnter', handleDisabledEnterKeydown.bind(this));
         } else {
-            for (i = 0; i < len; i += 1) {
+            for (i = 0; i < this.elements.length; i += 1) {
                 if (this.elements[i].getAttribute('data-disable-return') || this.elements[i].getAttribute('data-disable-double-return')) {
                     this.subscribe('editableKeydownEnter', handleDisabledEnterKeydown.bind(this));
                     break;
@@ -6522,44 +6427,6 @@ MediumEditor.extensions = {};
                     this.on(element, 'keyup', handleKeyup.bind(this));
                 }
             }, this);
-        }
-    }
-
-    function reAttachHandlers() {
-        if (!this.options.disableReturn || !this.options.disableDoubleReturn) {
-            for (var i = 0, len = this.elements.length; i < len; i += 1) {
-                if (this.elements[i].getAttribute('data-medium-editor-element')) {
-                    continue;
-                }
-
-                if (this.elements[i].getAttribute('data-disable-return') || this.elements[i].getAttribute('data-disable-double-return')) {
-                    this.subscribe('editableKeydownEnter', handleDisabledEnterKeydown.bind(this));
-                    break;
-                }
-            }
-        }
-        if (!this.options.disableReturn) {
-            this.elements.forEach(function (element) {
-                if (element.getAttribute('data-medium-editor-element')) {
-                    return;
-                }
-
-                if (!element.getAttribute('data-disable-return')) {
-                    this.on(element, 'keyup', handleKeyup.bind(this));
-                }
-            }, this);
-        }
-
-        this.events.reAttachCustomEvent();
-    }
-
-    function findParentElementByTagName(element, tagName) {
-        if (element.parentNode && tagName.indexOf(element.parentNode.tagName.toLowerCase()) > -1) {
-            return element.parentNode;
-        } else if (element.parentNode) {
-            return findParentElementByTagName(element.parentNode, tagName);
-        } else {
-            return null;
         }
     }
 
@@ -6749,10 +6616,6 @@ MediumEditor.extensions = {};
                 this.options.elementsContainer = this.options.ownerDocument.body;
             }
 
-            if (!this.options.checkExistenceTagName) {
-                this.options.checkExistenceTagName = 'body';
-            }
-
             return this.setup();
         },
 
@@ -6806,7 +6669,6 @@ MediumEditor.extensions = {};
                 element.removeAttribute('role');
                 element.removeAttribute('aria-multiline');
                 element.removeAttribute('medium-editor-index');
-                element.removeAttribute('medium-editor-uid');
 
                 // Remove any elements created for textareas
                 if (element.hasAttribute('medium-editor-textarea-id')) {
@@ -6857,10 +6719,8 @@ MediumEditor.extensions = {};
         serialize: function () {
             var i,
                 elementid,
-                content = {},
-                len = this.elements.length;
-
-            for (i = 0; i < len; i += 1) {
+                content = {};
+            for (i = 0; i < this.elements.length; i += 1) {
                 elementid = (this.elements[i].id !== '') ? this.elements[i].id : 'element-' + i;
                 content[elementid] = {
                     value: this.elements[i].innerHTML.trim()
@@ -7225,7 +7085,7 @@ MediumEditor.extensions = {};
                 if (this.options.targetBlank || opts.target === '_blank' || opts.buttonClass) {
                     customEvent = this.options.ownerDocument.createEvent('HTMLEvents');
                     customEvent.initEvent('input', true, true, this.options.contentWindow);
-                    for (var i = 0, len = this.elements.length; i < len; i += 1) {
+                    for (var i = 0; i < this.elements.length; i += 1) {
                         this.elements[i].dispatchEvent(customEvent);
                     }
                 }
@@ -7252,67 +7112,7 @@ MediumEditor.extensions = {};
                 target.innerHTML = html;
                 this.events.updateInput(target, { target: target, currentTarget: target });
             }
-        },
-
-        addElements: function (elements) {
-            var filtered = [];
-
-            // We want always an array with our input
-            if (!elements.length) {
-                elements = [elements];
-            }
-
-            // Filter the input, we want to include every element only once!
-            elements.forEach(function (element) {
-                if (element.getAttribute('data-medium-editor-element')) {
-                    return;
-                }
-
-                filtered.push(element);
-            });
-
-            // Do we have elements to add now?
-            if (filtered.length === 0) {
-                return false;
-            }
-
-            // Add new elements to our internal elements array
-            this.elements = this.elements.concat(filtered);
-
-            // Initialize all new elements (we check that in those functions don't worry)
-            initElements.call(this);
-            reAttachHandlers.call(this);
-        },
-
-        cleanupElements: function () {
-            var filtered = [];
-
-            // filter all elements to prevent memory-leaks
-            // -> references of elements in js-memory which don't exists in DOM anymore
-            this.elements.forEach(function (element) {
-                // check if element still exists in DOM
-                if (findParentElementByTagName(element, this.options.checkExistenceTagName) !== null) {
-                    filtered.push(element);
-                } else {
-                    // found an obsolete element, not existing in DOM anymore
-                    this.events.cleanupElement(element);
-                }
-            }.bind(this));
-
-            this.elements = filtered;
-        },
-
-        guid: function () {
-            function _s4() {
-                return Math
-                    .floor((1 + Math.random()) * 0x10000)
-                    .toString(16)
-                    .substring(1);
-            }
-
-            return _s4() + _s4() + '-' + _s4() + '-' + _s4() + '-' + _s4() + '-' + _s4() + _s4() + _s4();
         }
-
     };
 }());
 
