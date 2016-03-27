@@ -490,7 +490,7 @@ for a custom event will work on the new added element.
 Even if you know the exact point when an `.editable` element is gone in the DOM or not, you simply call:
 
 ```javascript
-editor.cleanupElements()
+editor.cleanupElements();
 ```
 
 The code will check which elements from his internal array `this.elements` are still referenced in the DOM and which are gone.
