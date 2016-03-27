@@ -491,7 +491,7 @@ Even if you know the exact point when an `.editable` element is gone in the DOM 
 The code will check which elements from his internal array `this.elements` are still referenced in the DOM and which are gone.
 The ones which are gone, he will destroy all references to them and detach all dom events for a clean teardown.
 
-You can even control the reference-check itself by giving him the parent-element he is looking for which must be existent for a sucessfull check:
+You can even control the reference-check itself by giving him the parent-element's tag name he is looking for which must be existent for a sucessfull check:
 
 ```javascript
 var editor = new MediumEditor('.editable', {
