@@ -487,7 +487,12 @@ for a custom event will work on the new added element.
 
 #### Removing elements dynamically
 
-Even if you know the exact point when an `.editable` element is gone in the DOM or not, you simply call `editor.cleanupElements()`.
+Even if you know the exact point when an `.editable` element is gone in the DOM or not, you simply call:
+
+```javascript
+editor.cleanupElements()
+```
+
 The code will check which elements from his internal array `this.elements` are still referenced in the DOM and which are gone.
 The ones which are gone, he will destroy all references to them and detach all dom events for a clean teardown.
 
