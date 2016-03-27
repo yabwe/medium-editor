@@ -1,6 +1,8 @@
 (function () {
     'use strict';
 
+    /* Helpers and internal variables that don't need to be members of actual paste handler */
+
     var pasteBinDefaultContent = '%ME_PASTEBIN%',
         lastRange = null,
         keyboardPasteEditable = null,
@@ -60,6 +62,41 @@
     }
     /*jslint regexp: false*/
 
+    /**
+     * Gets various content types out of the Clipboard API. It will also get the
+     * plain text using older IE and WebKit API.
+     *
+     * @param {event} event Event fired on paste.
+     * @param {win} reference to window
+     * @param {doc} reference to document
+     * @return {Object} Object with mime types and data for those mime types.
+     */
+    function getClipboardContent(event, win, doc) {
+        var dataTransfer = event.clipboardData || win.clipboardData || doc.dataTransfer,
+            data = {};
+
+        if (!dataTransfer) {
+            return data;
+        }
+
+        // Use old WebKit/IE API
+        if (dataTransfer.getData) {
+            var legacyText = dataTransfer.getData('Text');
+            if (legacyText && legacyText.length > 0) {
+                data['text/plain'] = legacyText;
+            }
+        }
+
+        if (dataTransfer.types) {
+            for (var i = 0; i < dataTransfer.types.length; i++) {
+                var contentType = dataTransfer.types[i];
+                data[contentType] = dataTransfer.getData(contentType);
+            }
+        }
+
+        return data;
+    }
+
     var PasteHandler = MediumEditor.Extension.extend({
         /* Paste Options */
 
@@ -113,7 +150,7 @@
                 return;
             }
 
-            var clipboardContent = this.getClipboardContent(event),
+            var clipboardContent = getClipboardContent(event, this.window, this.document),
                 pastedHTML = clipboardContent['text/html'],
                 pastedPlain = clipboardContent['text/plain'];
 
@@ -166,7 +203,7 @@
                 return;
             }
 
-            var clipboardContent = this.getClipboardContent(event),
+            var clipboardContent = getClipboardContent(event, this.window, this.document),
                 pastedHTML = clipboardContent['text/html'],
                 pastedPlain = clipboardContent['text/plain'],
                 editable = keyboardPasteEditable;
@@ -207,39 +244,6 @@
 
             this.removePasteBin();
             this.createPasteBin(editable);
-        },
-
-        /**
-         * Gets various content types out of the Clipboard API. It will also get the
-         * plain text using older IE and WebKit API.
-         *
-         * @param {event} event Event fired on paste.
-         * @return {Object} Object with mime types and data for those mime types.
-         */
-        getClipboardContent: function (event) {
-            var dataTransfer = event.clipboardData || this.window.clipboardData || this.document.dataTransfer,
-                data = {};
-
-            if (!dataTransfer) {
-                return data;
-            }
-
-            // Use old WebKit/IE API
-            if (dataTransfer.getData) {
-                var legacyText = dataTransfer.getData('Text');
-                if (legacyText && legacyText.length > 0) {
-                    data['text/plain'] = legacyText;
-                }
-            }
-
-            if (dataTransfer.types) {
-                for (var i = 0; i < dataTransfer.types.length; i++) {
-                    var contentType = dataTransfer.types[i];
-                    data[contentType] = dataTransfer.getData(contentType);
-                }
-            }
-
-            return data;
         },
 
         createPasteBin: function (editable) {
@@ -414,16 +418,19 @@
             MediumEditor.util.insertHTMLCommand(this.document, fragmentBody.innerHTML.replace(/&nbsp;/g, ' '));
         },
 
+        // TODO (6.0): Make this an internal helper instead of member of paste handler
         isCommonBlock: function (el) {
             return (el && (el.nodeName.toLowerCase() === 'p' || el.nodeName.toLowerCase() === 'div'));
         },
 
+        // TODO (6.0): Make this an internal helper instead of member of paste handler
         filterCommonBlocks: function (el) {
             if (/^\s*$/.test(el.textContent) && el.parentNode) {
                 el.parentNode.removeChild(el);
             }
         },
 
+        // TODO (6.0): Make this an internal helper instead of member of paste handler
         filterLineBreak: function (el) {
             if (this.isCommonBlock(el.previousElementSibling)) {
                 // remove stray br's following common block elements
@@ -437,6 +444,7 @@
             }
         },
 
+        // TODO (6.0): Make this an internal helper instead of member of paste handler
         // remove an element, including its parent, if it is the only element within its parent
         removeWithParent: function (el) {
             if (el && el.parentNode) {
@@ -448,6 +456,7 @@
             }
         },
 
+        // TODO (6.0): Make this an internal helper instead of member of paste handler
         cleanupSpans: function (containerEl) {
             var i,
                 el,
