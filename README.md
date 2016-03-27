@@ -469,13 +469,13 @@ var editor = new MediumEditor('.editable', {
 
 It is possible to dynamically add new elements to your existing MediumtEditor instance:
 
-```
+```javascript
 var editor = new MedtiumEditor('.editable', { ... });
 editor.subscribe('editableInput', this._handleEditableInput.bind(this));
 
 // imagine an ajax fetch/any other dynamic functionality which will add new '.editable' elements to dom
 
-editor.addElements($('.editable'));
+editor.addElements(document.querySelectorAll('.editable'));
 ```
 
 The `addElements` function will add the given element or array of elements to the internal `this.elements` array and he 
@@ -493,11 +493,11 @@ The ones which are gone, he will destroy all references to them and detach all d
 
 You can even control the reference-check itself by giving him the parent-element he is looking for which must be existent for a sucessfull check:
 
-```
+```javascript
 var editor = new MediumEditor('.editable', {
     checkExistenceTagName: 'body'
 });
-``
+```
 
 
 ## Buttons
