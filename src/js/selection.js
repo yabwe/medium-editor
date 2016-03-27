@@ -213,9 +213,7 @@
                 range = this.importSelectionMoveCursorPastAnchor(selectionState, range);
             }
 
-            var sel = doc.getSelection();
-            sel.removeAllRanges();
-            sel.addRange(range);
+            this.selectRange(doc, range);
         },
 
         // Utility method called from importSelection only
@@ -608,16 +606,12 @@
         },
 
         selectNode: function (node, doc) {
-            var range = doc.createRange(),
-                sel = doc.getSelection();
-
+            var range = doc.createRange();
             range.selectNodeContents(node);
-            sel.removeAllRanges();
-            sel.addRange(range);
+            this.selectRange(doc, range);
         },
 
         select: function (doc, startNode, startOffset, endNode, endOffset) {
-            doc.getSelection().removeAllRanges();
             var range = doc.createRange();
             range.setStart(startNode, startOffset);
             if (endNode) {
@@ -625,7 +619,7 @@
             } else {
                 range.collapse(true);
             }
-            doc.getSelection().addRange(range);
+            this.selectRange(doc, range);
             return range;
         },
 

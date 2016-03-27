@@ -492,8 +492,7 @@
                     range = range.cloneRange();
                     range.setStartAfter(lastNode);
                     range.collapse(true);
-                    selection.removeAllRanges();
-                    selection.addRange(range);
+                    MediumEditor.selection.selectRange(doc, range);
                 }
             }
         },
