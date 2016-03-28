@@ -11,5 +11,5 @@ reports/
 coverage/
 ._*
 
-#PhpStorm IDE
+# IDE
 .idea/
