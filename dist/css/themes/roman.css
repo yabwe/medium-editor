@@ -1,4 +1,5 @@
-.medium-toolbar-arrow-under:after, .medium-toolbar-arrow-over:before {
+.medium-toolbar-arrow-under:after,
+.medium-toolbar-arrow-over:before {
   display: none; }
 
 .medium-editor-toolbar {
@@ -14,14 +15,14 @@
     background-color: transparent;
     color: #889aac;
     box-shadow: inset 0 0 3px #f8f8e6;
-    background: -webkit-linear-gradient(top, #fff, rgba(0, 0, 0, 0.1));
-    background: linear-gradient(top, #fff, rgba(0, 0, 0, 0.1));
+    background: -webkit-linear-gradient(top, #fff, rgba(0, 0, 0, 0.2));
+    background: linear-gradient(to bottom, #fff, rgba(0, 0, 0, 0.2));
     text-shadow: 1px 4px 6px #def, 0 0 0 #000, 1px 4px 6px #def;
-    -webkit-transition: background-color 0.2s ease-in;
-            transition: background-color 0.2s ease-in; }
+    -webkit-transition: background-color .2s ease-in;
+            transition: background-color .2s ease-in; }
     .medium-editor-toolbar li button:hover {
       background-color: #fff;
-      color: #000;
+      color: #fff;
       color: rgba(0, 0, 0, 0.8); }
   .medium-editor-toolbar li .medium-editor-button-first {
     border-top-left-radius: 5px;
@@ -33,19 +34,19 @@
     background-color: #ccc;
     color: #000;
     color: rgba(0, 0, 0, 0.8);
-    background: -webkit-linear-gradient(bottom, #fff, rgba(0, 0, 0, 0.2));
-    background: linear-gradient(bottom, #fff, rgba(0, 0, 0, 0.2)); }
+    background: -webkit-linear-gradient(bottom, #fff, rgba(0, 0, 0, 0.1));
+    background: linear-gradient(to top, #fff, rgba(0, 0, 0, 0.1)); }
 
-.medium-editor-toolbar-form-anchor {
+.medium-editor-toolbar-form {
   background: #fff;
   color: #999;
   border-radius: 5px; }
-  .medium-editor-toolbar-form-anchor .medium-editor-toolbar-anchor-input {
+  .medium-editor-toolbar-form .medium-editor-toolbar-input {
     margin: 0;
     height: 50px;
     background: #fff;
     color: #a8a8a8; }
-  .medium-editor-toolbar-form-anchor a {
+  .medium-editor-toolbar-form a {
     color: #889aac; }
 
 .medium-editor-toolbar-anchor-preview {

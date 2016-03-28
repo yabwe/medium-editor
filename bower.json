@@ -1,21 +1,24 @@
 {
   "name": "medium-editor",
-  "version": "1.9.13",
-  "homepage": "http://daviferreira.github.io/medium-editor/",
+  "homepage": "http://yabwe.github.io/medium-editor/",
   "authors": [
-    "Davi Ferreira <hi@daviferreira.com>"
+    "Davi Ferreira <hi@daviferreira.com>",
+    "Nate Mielnik <nathan@outlook.com>",
+    "Noah Chase <nchase@gmail.com>",
+    "Jeremy Benoist <jeremy.benoist@gmail.com>"
   ],
   "description": "Medium.com WYSIWYG editor clone written in pure JavaScript.",
   "main": ["dist/js/medium-editor.js",
            "dist/css/medium-editor.css",
            "dist/css/themes/default.css"],
   "keywords": [
+    "contenteditable",
     "wysiwyg",
     "medium",
     "rich-text",
     "editor"
   ],
-  "license": "THE BEER-WARE LICENSE",
+  "license": "MIT",
   "ignore": [
     "**/.*",
     "node_modules",
@@ -27,8 +30,11 @@
     "Gruntfile.js",
     "demo",
     "package.json",
-    "src/js",
-    "README.md",
-    "CHANGES.md"
+    "src",
+    "CHANGES.md",
+    "RELEASE-PROCESS.md",
+    "CODE_OF_CONDUCT.md",
+    "CONTRIBUTING.md",
+    "UPGRADE-5.md"
   ]
 }

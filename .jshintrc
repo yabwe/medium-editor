@@ -1,0 +1,18 @@
+{
+  "boss": true,
+  "browser": true,
+  "curly": true,
+  "eqeqeq": true,
+  "eqnull": true,
+  "immed": true,
+  "latedef": "nofunc",
+  "newcap": false,
+  "noarg": true,
+  "predef": [ "MediumEditor",
+              "afterAll", "afterEach", "beforeAll", "beforeEach", "describe", "expect", "it", "jasmine", "spyOn",
+              "setupTestHelpers" ],
+  "sub": true,
+  "undef": true,
+  "unused": true,
+  "validthis": true
+}

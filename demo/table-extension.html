@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>medium editor | demo</title>
+    <link rel="stylesheet" href="css/demo.css">
+    <link href="http://netdna.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.css" rel="stylesheet">
+    <link rel="stylesheet" href="../dist/css/medium-editor.css">
+    <link rel="stylesheet" href="../dist/css/themes/default.css">
+</head>
+<body>
+    <a href="https://github.com/yabwe/medium-editor"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_gray_6d6d6d.png" alt="Fork me on GitHub"></a>
+    <div id="container">
+        <h1>Medium Editor Extension Form</h1>
+        <p>Medium Editor allows you to add custom forms for your extensions. This example demonstrates a form for creating a table.</p>
+        <div class="editable">
+
+        </div>
+    </div>
+    <script src="../dist/js/medium-editor.js"></script>
+    <!-- Medium Table Extension -->
+    <script src="js/extension-table.js"></script>
+    <script>
+        var editor = new MediumEditor('.editable', {
+                toolbar: {
+                    buttons: ['bold', 'italic', 'underline', 'anchor', 'table'],
+                    static: true,
+                },
+                buttonLabels: 'fontawesome',
+                extensions: {
+                    'table': new TableExtension(),
+                }
+            });
+    </script>
+</body>
+</html>

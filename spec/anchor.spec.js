@@ -1,181 +1,723 @@
-/*global MediumEditor, describe, it, expect, spyOn,
-         afterEach, beforeEach, selectElementContents,
-         jasmine, fireEvent, console, tearDown*/
+/*global fireEvent, selectElementContents,
+         selectElementContentsAndFire, getEdgeVersion */
 
 describe('Anchor Button TestCase', function () {
     'use strict';
 
     beforeEach(function () {
-        jasmine.clock().install();
-        this.el = document.createElement('div');
-        this.el.className = 'editor';
-        this.el.innerHTML = 'lorem ipsum';
-        document.body.appendChild(this.el);
+        setupTestHelpers.call(this);
+        this.el = this.createElement('div', 'editor', 'lorem ipsum');
     });
 
     afterEach(function () {
-        tearDown(this.el);
-        jasmine.clock().uninstall();
+        this.cleanupTest();
     });
 
-    describe('Click', function () {
-        it('should display the anchor form when toolbar is visible', function () {
-            spyOn(MediumEditor.prototype, 'showAnchorForm').and.callThrough();
-            var button,
-                editor = new MediumEditor('.editor');
-            selectElementContents(editor.elements[0]);
-            fireEvent(editor.elements[0], 'mouseup');
-            jasmine.clock().tick(1);
-            button = editor.toolbar.querySelector('[data-element="a"]');
+    describe('Anchor Form', function () {
+        it('should add class for visible state and remove it for invisivble', function () {
+            var editor = this.newMediumEditor('.editor', {
+                    buttonLabels: 'fontawesome'
+                }),
+                anchorExtension = editor.getExtensionByName('anchor'),
+                toolbar = editor.getExtensionByName('toolbar'),
+                activeClass = anchorExtension.activeClass;
+
+            selectElementContentsAndFire(editor.elements[0]);
+            var button = toolbar.getToolbarElement().querySelector('[data-action="createLink"]');
             fireEvent(button, 'click');
-            expect(editor.toolbarActions.style.display).toBe('none');
-            expect(editor.anchorForm.style.display).toBe('block');
-            expect(editor.showAnchorForm).toHaveBeenCalled();
+            expect(anchorExtension.getForm().classList.contains(activeClass)).toBe(true);
+
+            fireEvent(anchorExtension.getForm().querySelector('a.medium-editor-toolbar-save'), 'click');
+            expect(anchorExtension.getForm().classList.contains(activeClass)).toBe(false);
         });
 
-        it('should display the toolbar actions when anchor form is visible', function () {
-            spyOn(MediumEditor.prototype, 'showToolbarActions').and.callThrough();
-            var button,
-                editor = new MediumEditor('.editor');
-            selectElementContents(editor.elements[0]);
-            fireEvent(editor.elements[0], 'mouseup');
-            jasmine.clock().tick(1);
-            button = editor.toolbar.querySelector('[data-element="a"]');
-            editor.anchorForm.style.display = 'block';
+        it('should not hide the toolbar when mouseup fires inside the anchor form', function () {
+            var editor = this.newMediumEditor('.editor', {
+                    buttonLabels: 'fontawesome'
+                }),
+                anchorExtension = editor.getExtensionByName('anchor'),
+                toolbar = editor.getExtensionByName('toolbar');
+
+            selectElementContentsAndFire(editor.elements[0]);
+            var button = toolbar.getToolbarElement().querySelector('[data-action="createLink"]');
             fireEvent(button, 'click');
-            expect(editor.toolbarActions.style.display).toBe('block');
-            expect(editor.anchorForm.style.display).toBe('none');
-            expect(editor.showToolbarActions).toHaveBeenCalled();
+
+            expect(toolbar.isDisplayed()).toBe(true);
+            expect(anchorExtension.isDisplayed()).toBe(true);
+
+            fireEvent(anchorExtension.getInput(), 'mouseup');
+            expect(toolbar.isDisplayed()).toBe(true);
+            expect(anchorExtension.isDisplayed()).toBe(true);
         });
 
-        it('should unlink when selection is a link', function () {
-            spyOn(document, 'execCommand').and.callThrough();
-            this.el.innerHTML = '<a href="#">link</a>';
-            var button,
-                editor = new MediumEditor('.editor');
-            selectElementContents(editor.elements[0]);
-            fireEvent(editor.elements[0], 'mouseup');
-            jasmine.clock().tick(1);
-            button = editor.toolbar.querySelector('[data-element="a"]');
-            fireEvent(button, 'click');
-            expect(this.el.innerHTML, 'link');
-            expect(document.execCommand).toHaveBeenCalled();
-        });
+        it('should show the form on shortcut', function () {
+            var editor = this.newMediumEditor('.editor'),
+                anchorExtension = editor.getExtensionByName('anchor'),
+                toolbar = editor.getExtensionByName('toolbar'),
+                code = 'K'.charCodeAt(0);
 
+            selectElementContentsAndFire(editor.elements[0]);
+            fireEvent(editor.elements[0], 'keydown', {
+                keyCode: code,
+                ctrlKey: true,
+                metaKey: true
+            });
+
+            expect(toolbar.isDisplayed()).toBe(true);
+            expect(anchorExtension.isDisplayed()).toBe(true);
+        });
     });
 
     describe('Link Creation', function () {
         it('should create a link when user presses enter', function () {
             spyOn(MediumEditor.prototype, 'createLink').and.callThrough();
-            var editor = new MediumEditor('.editor'),
-                button,
-                input;
+            var editor = this.newMediumEditor('.editor'),
+                toolbar = editor.getExtensionByName('toolbar'),
+                button, input;
 
             selectElementContents(editor.elements[0]);
-            button = editor.toolbar.querySelector('[data-element="a"]');
+            button = toolbar.getToolbarElement().querySelector('[data-action="createLink"]');
             fireEvent(button, 'click');
-            input = editor.anchorForm.querySelector('input');
-            input.value = 'test';
-            fireEvent(input, 'keyup', 13);
+            input = editor.getExtensionByName('anchor').getInput();
+            input.value = 'http://test.com';
+            fireEvent(input, 'keyup', {
+                keyCode: MediumEditor.util.keyCode.ENTER
+            });
             expect(editor.createLink).toHaveBeenCalled();
+            // A trailing <br> may be added when insertHTML is used to add the link internally.
+            expect(this.el.innerHTML.indexOf('<a href="http://test.com">lorem ipsum</a>')).toBe(0);
         });
+
+        it('should remove the extra white spaces in the link when user presses enter', function () {
+            spyOn(MediumEditor.prototype, 'createLink').and.callThrough();
+            var editor = this.newMediumEditor('.editor'),
+                toolbar = editor.getExtensionByName('toolbar'),
+                button, input;
+
+            selectElementContents(editor.elements[0]);
+            button = toolbar.getToolbarElement().querySelector('[data-action="createLink"]');
+            fireEvent(button, 'click');
+            input = editor.getExtensionByName('anchor').getInput();
+            input.value = '    test   ';
+            fireEvent(input, 'keyup', {
+                keyCode: MediumEditor.util.keyCode.ENTER
+            });
+            expect(editor.createLink).toHaveBeenCalled();
+            // A trailing <br> may be added when insertHTML is used to add the link internally.
+            expect(this.el.innerHTML.indexOf('<a href="test">lorem ipsum</a>')).toBe(0);
+        });
+
+        it('should not set any href if all user passes is spaces in the link when user presses enter', function () {
+            spyOn(MediumEditor.prototype, 'createLink').and.callThrough();
+            var editor = this.newMediumEditor('.editor'),
+                toolbar = editor.getExtensionByName('toolbar'),
+                button, input;
+
+            selectElementContents(editor.elements[0]);
+            button = toolbar.getToolbarElement().querySelector('[data-action="createLink"]');
+            fireEvent(button, 'click');
+            input = editor.getExtensionByName('anchor').getInput();
+            input.value = '    ';
+            fireEvent(input, 'keyup', {
+                keyCode: MediumEditor.util.keyCode.ENTER
+            });
+            //Since user only passes empty string in the url, there should be no <a> tag created for the element.
+            expect(this.el.innerHTML.indexOf('<a href="">lorem ipsum</a>')).toBe(-1);
+        });
+
+        it('should create only one anchor tag when the user selects across a boundary', function () {
+            this.el.innerHTML = 'Hello world, this <strong>will become a link, but this part won\'t.</strong>';
+
+            spyOn(MediumEditor.prototype, 'createLink').and.callThrough();
+            var editor = this.newMediumEditor('.editor'),
+                toolbar = editor.getExtensionByName('toolbar'),
+                button, input;
+
+            MediumEditor.selection.select(document, this.el.childNodes[0], 'Hello world, '.length,
+                this.el.childNodes[1].childNodes[0], 'will become a link'.length);
+            button = toolbar.getToolbarElement().querySelector('[data-action="createLink"]');
+            fireEvent(button, 'click');
+            input = editor.getExtensionByName('anchor').getInput();
+            input.value = 'http://test.com';
+            fireEvent(input, 'keyup', {
+                keyCode: MediumEditor.util.keyCode.ENTER
+            });
+            expect(editor.createLink).toHaveBeenCalled();
+            expect(this.el.innerHTML).toMatch(/^Hello world, <a href="http:\/\/test\.com\/?">this <strong>will become a link<\/strong><\/a><strong>, but this part won\'t\.<\/strong>(<br>|<strong><\/strong>)?$/);
+        });
+
+        it('should create a link when the user selects text within two paragraphs', function () {
+            this.el.innerHTML = '<p>Hello <span>world</span>.</p>' +
+                '<p><strong>Let us make a link</strong> across paragraphs.</p>';
+
+            spyOn(MediumEditor.prototype, 'createLink').and.callThrough();
+            var editor = this.newMediumEditor('.editor'),
+                toolbar = editor.getExtensionByName('toolbar'),
+                button, input;
+
+            MediumEditor.selection.select(document, this.el.querySelector('span'), 0,
+                this.el.querySelector('strong'), 1);
+            button = toolbar.getToolbarElement().querySelector('[data-action="createLink"]');
+            fireEvent(button, 'click');
+            input = editor.getExtensionByName('anchor').getInput();
+            input.value = 'http://test.com';
+            fireEvent(input, 'keyup', {
+                keyCode: MediumEditor.util.keyCode.ENTER
+            });
+            expect(editor.createLink).toHaveBeenCalled();
+
+            var anchors = this.el.querySelectorAll('a');
+            // Edge creates 3 links, other browsers create 2
+            expect(anchors.length).toBeGreaterThan(1);
+            expect(anchors.length).toBeLessThan(4);
+
+            var linkText = '';
+            Array.prototype.slice.call(anchors).forEach(function (anchor) {
+                linkText += anchor.textContent;
+            });
+            expect(linkText).toBe('world.Let us make a link');
+
+            var spans = this.el.querySelectorAll('span');
+            expect(spans.length).toBe(1);
+            expect(spans[0].textContent).toBe('world');
+
+            var strongs = this.el.querySelectorAll('strong');
+            expect(strongs.length).toBe(1);
+            expect(strongs[0].textContent).toBe('Let us make a link');
+        });
+
         it('shouldn\'t create a link when user presses enter without value', function () {
             spyOn(MediumEditor.prototype, 'createLink').and.callThrough();
-            var editor = new MediumEditor('.editor'),
+            var editor = this.newMediumEditor('.editor'),
+                toolbar = editor.getExtensionByName('toolbar'),
                 button,
                 input;
 
             selectElementContents(editor.elements[0]);
-            button = editor.toolbar.querySelector('[data-element="a"]');
+            button = toolbar.getToolbarElement().querySelector('[data-action="createLink"]');
             fireEvent(button, 'click');
-            input = editor.anchorForm.querySelector('input');
+            input = editor.getExtensionByName('anchor').getInput();
             input.value = '';
-            fireEvent(input, 'keyup', 13);
+            fireEvent(input, 'keyup', {
+                keyCode: MediumEditor.util.keyCode.ENTER
+            });
             expect(editor.elements[0].querySelector('a')).toBeNull();
         });
-        it('should add http:// if need be and checkLinkFormat option is set to true', function () {
-            var editor = new MediumEditor('.editor', {
-                checkLinkFormat: true
+        it('should add http:// if need be and linkValidation option is set to true', function () {
+            var editor = this.newMediumEditor('.editor', {
+                anchor: {
+                    linkValidation: true
+                }
             }),
-                input = editor.anchorForm.querySelector('input');
-            selectElementContents(editor.elements[0]);
-            input.value = 'test.com';
-            editor.createLink(input);
-            expect(editor.elements[0].querySelector('a').href).toBe('http://test.com/');
+                link,
+                anchorExtension = editor.getExtensionByName('anchor');
+
+            selectElementContentsAndFire(editor.elements[0]);
+            anchorExtension.showForm('test.com');
+            fireEvent(anchorExtension.getForm().querySelector('a.medium-editor-toolbar-save'), 'click');
+
+            link = editor.elements[0].querySelector('a');
+            expect(link).not.toBeNull();
+            expect(link.href).toBe('http://test.com/');
+        });
+        it('should add tel: if need be and linkValidation option is set to true', function () {
+            var editor = this.newMediumEditor('.editor', {
+                anchor: {
+                    linkValidation: true
+                }
+            }),
+                link,
+                anchorExtension = editor.getExtensionByName('anchor');
+
+            selectElementContentsAndFire(editor.elements[0]);
+            anchorExtension.showForm('347-999-9999');
+            fireEvent(anchorExtension.getForm().querySelector('a.medium-editor-toolbar-save'), 'click');
+
+            link = editor.elements[0].querySelector('a');
+            expect(link).not.toBeNull();
+            expect(link.href).toBe('tel:347-999-9999');
         });
         it('should not change protocol when a valid one is included', function () {
-            var editor = new MediumEditor('.editor', {
-                checkLinkFormat: true
+            var editor = this.newMediumEditor('.editor', {
+                anchor: {
+                    linkValidation: true
+                }
             }),
-                input = editor.anchorForm.querySelector('input'),
-                validUrl = 'mailto:test.com';
-            selectElementContents(editor.elements[0]);
-            input.value = validUrl;
-            editor.createLink(input);
-            expect(editor.elements[0].querySelector('a').href).toBe(validUrl);
+                validUrl = 'mailto:test.com',
+                link,
+                anchorExtension = editor.getExtensionByName('anchor');
+
+            selectElementContentsAndFire(editor.elements[0]);
+            anchorExtension.showForm(validUrl);
+            fireEvent(anchorExtension.getForm().querySelector('a.medium-editor-toolbar-save'), 'click');
+
+            link = editor.elements[0].querySelector('a');
+            expect(link).not.toBeNull();
+            expect(link.href).toBe(validUrl);
+        });
+        it('should not change protocol when a tel scheme is included', function () {
+            var editor = this.newMediumEditor('.editor', {
+                anchor: {
+                    linkValidation: true
+                }
+            }),
+                // Specifically using a bad phone number to illustrate that what follows tel is not checked
+                validUrl = 'tel:abc123!@#',
+                link,
+                anchorExtension = editor.getExtensionByName('anchor');
+
+            selectElementContentsAndFire(editor.elements[0]);
+            anchorExtension.showForm(validUrl);
+            fireEvent(anchorExtension.getForm().querySelector('a.medium-editor-toolbar-save'), 'click');
+
+            link = editor.elements[0].querySelector('a');
+            expect(link).not.toBeNull();
+            expect(link.href).toBe(validUrl);
+        });
+        it('should not change protocol when a maps scheme is included', function () {
+            var editor = this.newMediumEditor('.editor', {
+                anchor: {
+                    linkValidation: true
+                }
+            }),
+                // Specifically using a non-sensical maps string to illustrate that what follows maps is not checked
+                validUrl = 'maps:abc123!@#',
+                link,
+                anchorExtension = editor.getExtensionByName('anchor');
+
+            selectElementContentsAndFire(editor.elements[0]);
+            anchorExtension.showForm(validUrl);
+            fireEvent(anchorExtension.getForm().querySelector('a.medium-editor-toolbar-save'), 'click');
+
+            link = editor.elements[0].querySelector('a');
+            expect(link).not.toBeNull();
+            expect(link.href).toBe(validUrl);
+        });
+        it('should not change protocol for protocol-relative URLs', function () {
+            var editor = this.newMediumEditor('.editor', {
+                anchor: {
+                    linkValidation: true
+                }
+            }),
+                validUrl = '//test.com/',
+                link,
+                anchorExtension = editor.getExtensionByName('anchor');
+
+            selectElementContentsAndFire(editor.elements[0]);
+            anchorExtension.showForm(validUrl);
+            fireEvent(anchorExtension.getForm().querySelector('a.medium-editor-toolbar-save'), 'click');
+
+            link = editor.elements[0].querySelector('a');
+            expect(link).not.toBeNull();
+            expect(link.href).toBe(window.location.protocol + validUrl);
+        });
+        it('should not change protocol for any alphabetic scheme', function () {
+            var editor = this.newMediumEditor('.editor', {
+                anchor: {
+                    linkValidation: true
+                }
+            }),
+                link,
+                validUrl = 'abcDEFgHi://test.com/',
+                anchorExtension = editor.getExtensionByName('anchor');
+
+            selectElementContentsAndFire(editor.elements[0]);
+            anchorExtension.showForm(validUrl);
+            fireEvent(anchorExtension.getForm().querySelector('a.medium-editor-toolbar-save'), 'click');
+
+            link = editor.elements[0].querySelector('a');
+            expect(link).not.toBeNull();
+            expect(link.href).toBe(validUrl.toLowerCase());
+        });
+        it('should add target="_blank" when "open in a new window" checkbox is checked', function () {
+            var editor = this.newMediumEditor('.editor', {
+                anchor: {
+                    targetCheckbox: true
+                }
+            }),
+                anchorExtension = editor.getExtensionByName('anchor'),
+                targetCheckbox,
+                link;
+
+            selectElementContentsAndFire(editor.elements[0]);
+            anchorExtension.showForm('http://test.com');
+            expect(anchorExtension.isDisplayed()).toBe(true);
+            targetCheckbox = anchorExtension.getForm().querySelector('input.medium-editor-toolbar-anchor-target');
+            expect().not.toBeNull(targetCheckbox);
+            targetCheckbox.checked = true;
+            fireEvent(anchorExtension.getForm().querySelector('a.medium-editor-toolbar-save'), 'click');
+            expect(anchorExtension.isDisplayed()).toBe(false);
+
+            link = editor.elements[0].querySelector('a');
+            expect(link).not.toBeNull();
+            expect(link.target).toBe('_blank');
         });
         it('should add target="_blank" when respective option is set to true', function () {
-            var editor = new MediumEditor('.editor', {
+            var editor = this.newMediumEditor('.editor', {
                 targetBlank: true
             }),
-                input = editor.anchorForm.querySelector('input');
-            selectElementContents(editor.elements[0]);
-            input.value = 'http://test.com';
-            editor.createLink(input);
-            expect(editor.elements[0].querySelector('a').target).toBe('_blank');
+                link,
+                anchorExtension = editor.getExtensionByName('anchor');
+
+            selectElementContentsAndFire(editor.elements[0]);
+            anchorExtension.showForm('http://test.com');
+            fireEvent(anchorExtension.getForm().querySelector('a.medium-editor-toolbar-save'), 'click');
+
+            link = editor.elements[0].querySelector('a');
+            expect(link).not.toBeNull();
+            expect(link.target).toBe('_blank');
         });
         it('should create a button when user selects this option and presses enter', function () {
             spyOn(MediumEditor.prototype, 'createLink').and.callThrough();
-            var editor = new MediumEditor('.editor', {
-                anchorButton: true,
-                anchorButtonClass: 'btn btn-default'
-            }),
+            var editor = this.newMediumEditor('.editor', {
+                    anchor: {
+                        customClassOption: 'btn btn-default'
+                    }
+                }),
                 save,
                 input,
-                button;
+                button,
+                link,
+                opts,
+                anchorExtension = editor.getExtensionByName('anchor'),
+                toolbar = editor.getExtensionByName('toolbar');
 
             selectElementContents(editor.elements[0]);
-            save = editor.toolbar.querySelector('[data-element="a"]');
+            save = toolbar.getToolbarElement().querySelector('[data-action="createLink"]');
             fireEvent(save, 'click');
 
-            input = editor.anchorForm.querySelector('input.medium-editor-toolbar-anchor-input');
-            input.value = 'test';
+            input = anchorExtension.getInput();
+            input.value = 'http://test.com';
 
-            button = editor.anchorForm.querySelector('input.medium-editor-toolbar-anchor-button');
+            button = anchorExtension.getForm().querySelector('input.medium-editor-toolbar-anchor-button');
             button.setAttribute('type', 'checkbox');
             button.checked = true;
 
-            fireEvent(input, 'keyup', 13);
-            expect(editor.createLink).toHaveBeenCalledWith(input, '_self', 'btn btn-default');
+            fireEvent(input, 'keyup', {
+                keyCode: MediumEditor.util.keyCode.ENTER
+            });
+            opts = {
+                url: 'http://test.com',
+                target: '_self',
+                buttonClass: 'btn btn-default'
+            };
+            expect(editor.createLink).toHaveBeenCalledWith(opts);
+
+            link = editor.elements[0].querySelector('a');
+            expect(link).not.toBeNull();
+            expect(link.classList.contains('btn')).toBe(true);
+            expect(link.classList.contains('btn-default')).toBe(true);
         });
-        it('should set class when respective option is set to true and checkbox is checked', function () {
-            var editor = new MediumEditor('.editor'),
-                input = editor.anchorForm.querySelector('input');
 
-            selectElementContents(editor.elements[0]);
-            input.value = 'http://test.com';
+        it('should remove the target _blank from the anchor tag when the open in a new window checkbox,' +
+                ' is unchecked and the form is saved', function () {
+            var editor = this.newMediumEditor('.editor', {
+                anchor: {
+                    targetCheckbox: true
+                }
+            }),
+                anchorExtension = editor.getExtensionByName('anchor'),
+                targetCheckbox,
+                link;
 
-            editor.createLink(input, '_blank', 'btn btn-default');
-            expect(editor.elements[0].querySelector('a').classList.contains('btn')).toBe(true);
-            expect(editor.elements[0].querySelector('a').classList.contains('btn-default')).toBe(true);
+            selectElementContentsAndFire(editor.elements[0]);
+            anchorExtension.showForm('http://test.com');
+            expect(anchorExtension.isDisplayed()).toBe(true);
+            targetCheckbox = anchorExtension.getForm().querySelector('input.medium-editor-toolbar-anchor-target');
+            targetCheckbox.checked = true;
+            fireEvent(anchorExtension.getForm().querySelector('a.medium-editor-toolbar-save'), 'click');
+            link = editor.elements[0].querySelector('a');
+            expect(link.target).toBe('_blank');
+
+            selectElementContentsAndFire(editor.elements[0]);
+            anchorExtension.showForm('http://test.com');
+            targetCheckbox = anchorExtension.getForm().querySelector('input.medium-editor-toolbar-anchor-target');
+            targetCheckbox.checked = false;
+            fireEvent(anchorExtension.getForm().querySelector('a.medium-editor-toolbar-save'), 'click');
+            link = editor.elements[0].querySelector('a');
+            expect(link.target).toBe('');
+        });
+
+        it('should fire editableInput only once when the user creates a link open to a new window,' +
+                ' and it should fire at the end of the DOM and selection modifications', function () {
+            spyOn(MediumEditor.prototype, 'createLink').and.callThrough();
+            this.el.innerHTML = '<p>Lorem ipsum et dolitur sunt.</p>';
+            var editor = this.newMediumEditor('.editor', {
+                    anchor: {
+                        targetCheckbox: true
+                    }
+                }),
+                p = this.el.lastChild,
+                anchorExtension = editor.getExtensionByName('anchor'),
+                toolbar = editor.getExtensionByName('toolbar'),
+                selectionWhenEventsFired = [],
+                listener = function () {
+                    selectionWhenEventsFired.push(window.getSelection().toString());
+                };
+
+            MediumEditor.selection.select(document, p.firstChild, 'Lorem '.length, p.firstChild, 'Lorem ipsum'.length);
+            fireEvent(editor.elements[0], 'focus');
+            jasmine.clock().tick(1);
+
+            // Click the 'anchor' button in the toolbar
+            fireEvent(toolbar.getToolbarElement().querySelector('[data-action="createLink"]'), 'click');
+
+            // Input a url and save
+            var input = anchorExtension.getInput(),
+                checkbox = anchorExtension.getAnchorTargetCheckbox();
+            input.value = 'http://www.example.com';
+            checkbox.checked = true;
+            editor.subscribe('editableInput', listener);
+            fireEvent(input, 'keyup', {
+                keyCode: MediumEditor.util.keyCode.ENTER
+            });
+
+            expect(editor.createLink).toHaveBeenCalledWith({
+                url: 'http://www.example.com',
+                target: '_blank'
+            });
+            expect(window.getSelection().toString()).toBe('ipsum', 'selected text should remain selected');
+            expect(selectionWhenEventsFired.length).toBe(1, 'only one editableInput event should have been registered');
+            expect(selectionWhenEventsFired[0]).toBe('ipsum', 'selected text should have been the same when event fired');
+        });
+
+        // https://github.com/yabwe/medium-editor/issues/757
+        it('should not select empty paragraphs when link is created at beginning of paragraph after empty paragraphs', function () {
+            spyOn(MediumEditor.prototype, 'createLink').and.callThrough();
+            this.el.innerHTML = '<p>Some text</p><p><br/></p><p><br/></p><p>link text more text</p>';
+            var editor = this.newMediumEditor('.editor'),
+                lastP = this.el.lastChild,
+                anchorExtension = editor.getExtensionByName('anchor'),
+                toolbar = editor.getExtensionByName('toolbar');
+
+            // Select the text 'link text' in the last paragraph
+            MediumEditor.selection.select(document, lastP.firstChild, 0, lastP.firstChild, 'link text'.length);
+            fireEvent(editor.elements[0], 'focus');
+            jasmine.clock().tick(1);
+
+            // Click the 'anchor' button in the toolbar
+            fireEvent(toolbar.getToolbarElement().querySelector('[data-action="createLink"]'), 'click');
+
+            // Input a url and save
+            var input = anchorExtension.getInput();
+            input.value = 'http://www.example.com';
+            fireEvent(input, 'keyup', {
+                keyCode: MediumEditor.util.keyCode.ENTER
+            });
+
+            expect(editor.createLink).toHaveBeenCalledWith({
+                url: 'http://www.example.com',
+                target: '_self'
+            });
+
+            // Make sure the <p> wasn't removed, and the <a> was added to the end
+            expect(this.el.lastChild).toBe(lastP);
+            expect(lastP.firstChild.nodeName.toLowerCase()).toBe('a');
+
+            // Make sure selection is only the link
+            var range = window.getSelection().getRangeAt(0);
+            expect(MediumEditor.util.isDescendant(lastP, range.startContainer, true)).toBe(true, 'The start of the selection is incorrect');
+            expect(range.startOffset).toBe(0);
+            expect(MediumEditor.util.isDescendant(lastP.firstChild, range.endContainer, true)).toBe(true, 'The end of the selection is not contained within the link');
+        });
+
+        // https://github.com/yabwe/medium-editor/issues/757
+        it('should not select empty paragraphs when link is created at beginning of paragraph after another paragraph', function () {
+            spyOn(MediumEditor.prototype, 'createLink').and.callThrough();
+            this.el.innerHTML = '<p>Some text</p><p>link text more text</p>';
+            var editor = this.newMediumEditor('.editor'),
+                lastP = this.el.lastChild,
+                anchorExtension = editor.getExtensionByName('anchor'),
+                toolbar = editor.getExtensionByName('toolbar');
+
+            // Select the text 'link text' in the last paragraph
+            MediumEditor.selection.select(document, lastP.firstChild, 0, lastP.firstChild, 'link text'.length);
+            fireEvent(editor.elements[0], 'focus');
+            jasmine.clock().tick(1);
+
+            // Click the 'anchor' button in the toolbar
+            fireEvent(toolbar.getToolbarElement().querySelector('[data-action="createLink"]'), 'click');
+
+            // Input a url and save
+            var input = anchorExtension.getInput();
+            input.value = 'http://www.example.com';
+            fireEvent(input, 'keyup', {
+                keyCode: MediumEditor.util.keyCode.ENTER
+            });
+
+            expect(editor.createLink).toHaveBeenCalledWith({
+                url: 'http://www.example.com',
+                target: '_self'
+            });
+
+            // Make sure the <p> wasn't removed, and the <a> was added to the end
+            expect(this.el.lastChild).toBe(lastP);
+            expect(lastP.firstChild.nodeName.toLowerCase()).toBe('a');
+
+            // Make sure selection is only the link
+            var range = window.getSelection().getRangeAt(0);
+            expect(MediumEditor.util.isDescendant(lastP, range.startContainer, true)).toBe(true, 'The start of the selection is incorrect');
+            expect(range.startOffset).toBe(0);
+            expect(MediumEditor.util.isDescendant(lastP.firstChild, range.endContainer, true)).toBe(true, 'The end of the selection is not contained within the link');
+        });
+
+        it('should not remove the <p> container when adding a link inside a top-level <p> with a single text-node child', function () {
+            spyOn(MediumEditor.prototype, 'createLink').and.callThrough();
+            this.el.innerHTML = '<p>Some text</p><p><br/></p><p><br/></p><p>some text link text</p>';
+            var editor = this.newMediumEditor('.editor'),
+                lastP = this.el.lastChild,
+                anchorExtension = editor.getExtensionByName('anchor'),
+                toolbar = editor.getExtensionByName('toolbar');
+
+            // Select the text 'link text' in the last paragraph
+            MediumEditor.selection.select(document, lastP.firstChild, 'some text '.length, lastP.firstChild, 'some text link text'.length);
+            fireEvent(editor.elements[0], 'focus');
+            jasmine.clock().tick(1);
+
+            // Click the 'anchor' button in the toolbar
+            fireEvent(toolbar.getToolbarElement().querySelector('[data-action="createLink"]'), 'click');
+
+            // Input a url and save
+            var input = anchorExtension.getInput();
+            input.value = 'http://www.example.com';
+            fireEvent(input, 'keyup', {
+                keyCode: MediumEditor.util.keyCode.ENTER
+            });
+
+            expect(editor.createLink).toHaveBeenCalledWith({
+                url: 'http://www.example.com',
+                target: '_self'
+            });
+
+            // Make sure the <p> wasn't removed, and the <a> was added to the end
+            expect(this.el.lastChild).toBe(lastP);
+            expect(lastP.lastChild.nodeName.toLowerCase()).toBe('a');
+
+            // Make sure selection is only the link
+            var range = window.getSelection().getRangeAt(0);
+            if (range.startContainer === lastP.lastChild.firstChild) {
+                expect(range.startOffset).toBe(0, 'The start of the selection is not at the front of the link');
+            } else {
+                expect(range.startContainer).toBe(lastP.firstChild);
+                expect(range.startOffset).toBe('some text '.length, 'The start of the selection is not at the front of the link');
+            }
+            expect(MediumEditor.util.isDescendant(lastP.lastChild, range.endContainer, true)).toBe(true, 'The end of the selection is incorrect');
+        });
+
+        // https://github.com/yabwe/medium-editor/issues/803
+        it('should update the href of a link containing only an image', function () {
+            this.el.innerHTML = '<a href="#"><img src="../demo/img/medium-editor.jpg"></a>';
+
+            spyOn(MediumEditor.prototype, 'createLink').and.callThrough();
+            var editor = this.newMediumEditor('.editor'),
+                toolbar = editor.getExtensionByName('toolbar'),
+                button, input,
+                aTag = this.el.childNodes[0];
+
+            selectElementContents(aTag);
+            button = toolbar.getToolbarElement().querySelector('[data-action="createLink"]');
+            fireEvent(button, 'click');
+            input = editor.getExtensionByName('anchor').getInput();
+            input.value = 'http://www.google.com';
+            fireEvent(input, 'keyup', {
+                keyCode: MediumEditor.util.keyCode.ENTER
+            });
+            expect(editor.createLink).toHaveBeenCalled();
+            // This appears to be broken in Edge < 13, but works correctly in Edge 13 or higher
+            // So for the sake of sanity, disabling this check for Edge 12.
+            // TODO: Find a better way to fix this issue if Edge 12 is going to matter
+            var edgeVersion = getEdgeVersion();
+            if (!edgeVersion || edgeVersion >= 13) {
+                expect(this.el.innerHTML).toContain('<a href="http://www.google.com"><img src="../demo/img/medium-editor.jpg"></a>');
+            }
         });
     });
 
     describe('Cancel', function () {
         it('should close the link form when user clicks on cancel', function () {
-            spyOn(MediumEditor.prototype, 'showToolbarActions').and.callThrough();
-            var editor = new MediumEditor('.editor'),
+            spyOn(MediumEditor.extensions.toolbar.prototype, 'showAndUpdateToolbar').and.callThrough();
+            var editor = this.newMediumEditor('.editor'),
                 button,
-                cancel;
+                cancel,
+                anchorExtension = editor.getExtensionByName('anchor'),
+                toolbar = editor.getExtensionByName('toolbar');
 
-            selectElementContents(editor.elements[0]);
-            button = editor.toolbar.querySelector('[data-element="a"]');
-            cancel = editor.anchorForm.querySelector('a.medium-editor-toobar-anchor-close');
+            selectElementContentsAndFire(editor.elements[0]);
+            button = toolbar.getToolbarElement().querySelector('[data-action="createLink"]');
+            cancel = anchorExtension.getForm().querySelector('a.medium-editor-toolbar-close');
             fireEvent(button, 'click');
-            expect(editor.anchorForm.style.display).toBe('block');
+            expect(anchorExtension.isDisplayed()).toBe(true);
             fireEvent(cancel, 'click');
-            expect(editor.showToolbarActions).toHaveBeenCalled();
-            expect(editor.anchorForm.style.display).toBe('none');
+            expect(toolbar.showAndUpdateToolbar).toHaveBeenCalled();
+            expect(anchorExtension.isDisplayed()).toBe(false);
+        });
+
+        it('should close the link form when user presses escape', function () {
+            var editor = this.newMediumEditor('.editor'),
+                anchorExtension = editor.getExtensionByName('anchor'),
+                toolbar = editor.getExtensionByName('toolbar');
+
+            selectElementContentsAndFire(editor.elements[0]);
+            fireEvent(toolbar.getToolbarElement().querySelector('[data-action="createLink"]'), 'click');
+            expect(anchorExtension.isDisplayed()).toBe(true);
+            fireEvent(anchorExtension.getInput(), 'keyup', {
+                keyCode: MediumEditor.util.keyCode.ESCAPE
+            });
+            expect(anchorExtension.isDisplayed()).toBe(false);
+        });
+    });
+
+    describe('Click', function () {
+        it('should display the anchor form when toolbar is visible', function () {
+            spyOn(MediumEditor.extensions.anchor.prototype, 'showForm').and.callThrough();
+            var button,
+                editor = this.newMediumEditor('.editor'),
+                anchorExtension = editor.getExtensionByName('anchor'),
+                toolbar = editor.getExtensionByName('toolbar');
+
+            selectElementContentsAndFire(editor.elements[0]);
+            button = toolbar.getToolbarElement().querySelector('[data-action="createLink"]');
+            fireEvent(button, 'click');
+            expect(toolbar.getToolbarActionsElement().style.display).toBe('none');
+            expect(anchorExtension.isDisplayed()).toBe(true);
+            expect(anchorExtension.showForm).toHaveBeenCalled();
+        });
+
+        it('should unlink when selection is a link', function () {
+            this.el.innerHTML = '<a href="#">link</a>';
+            var button,
+                editor = this.newMediumEditor('.editor'),
+                toolbar = editor.getExtensionByName('toolbar');
+            spyOn(document, 'execCommand').and.callThrough();
+
+            selectElementContentsAndFire(editor.elements[0]);
+            button = toolbar.getToolbarElement().querySelector('[data-action="createLink"]');
+            fireEvent(button, 'click');
+            expect(this.el.innerHTML).toBe('link');
+            expect(document.execCommand).toHaveBeenCalled();
+        });
+
+        // https://github.com/yabwe/medium-editor/issues/751
+        it('should allow more than one link creation within a paragraph', function () {
+            spyOn(MediumEditor.extensions.anchor.prototype, 'showForm').and.callThrough();
+            this.el.innerHTML = '<p><a href="#">beginning</a> some text middle some text end</p>';
+            var editor = this.newMediumEditor('.editor'),
+                anchorExtension = editor.getExtensionByName('anchor'),
+                toolbar = editor.getExtensionByName('toolbar'),
+                para = this.el.firstChild;
+
+            // Select the text 'middle'
+            MediumEditor.selection.select(document, para.childNodes[1], 11, para.childNodes[1], 18);
+            fireEvent(editor.elements[0], 'focus');
+            jasmine.clock().tick(1);
+
+            // Click the 'anchor' button in the toolbar
+            fireEvent(toolbar.getToolbarElement().querySelector('[data-action="createLink"]'), 'click');
+
+            expect(toolbar.getToolbarActionsElement().style.display).toBe('none');
+            expect(anchorExtension.isDisplayed()).toBe(true);
+            expect(anchorExtension.showForm).toHaveBeenCalled();
+            expect(anchorExtension.getInput().value).toBe('');
         });
     });
 

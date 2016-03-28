@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>medium editor | demo</title>
+    <link rel="stylesheet" href="css/demo.css">
+    <link rel="stylesheet" href="http://netdna.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.css">
+    <link rel="stylesheet" href="../dist/css/medium-editor.css">
+    <link rel="stylesheet" href="../dist/css/themes/default.css" id="medium-editor-theme">
+</head>
+<body>
+    <a href="https://github.com/yabwe/medium-editor" class="github-link"><img style="z-index: 100;position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_gray_6d6d6d.png" alt="Fork me on GitHub"></a>
+    <div id="container">
+        <h1>Medium Editor</h1>
+        <textarea class="editable medium-editor-textarea">&lt;p&gt;Textarea is now supported&lt;/p&gt;</textarea>
+    </div>
+    <script src="../dist/js/medium-editor.js"></script>
+    <script>
+        var editor = new MediumEditor('.editable', {
+            buttonLabels: 'fontawesome'
+        });
+    </script>
+</body>
+</html>

@@ -3,14 +3,27 @@
 }
 
 body {
-    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-family: Helvetica, Arial, sans-serif;
     font-size: 22px;
     line-height: 30px;
 }
 
-#container {
-    width: 960px;
-    margin: 30px auto;
+.top-bar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: auto;
+    z-index: 10;
+    padding: 10px;
+    background-color: #000;
+    background-color: rgba(0, 0, 0, .8);
+    box-shadow: 0 0 4px #000;
+    box-sizing: border-box;
+    color: #ccc;
+    font-size: 12px;
+    font-weight: bold;
+    text-align: center;
+    text-transform: uppercase;
 }
 
 h1 {
@@ -21,6 +34,21 @@ h1 {
     padding-bottom: 40px;
     letter-spacing: -2px;
     border-bottom: 1px solid #dbdbdb;
+}
+
+h2 {
+    font-size: 32px;
+    line-height: 42px;
+}
+
+h3 {
+    font-size: 26px;
+    line-height: 32px;
+}
+
+h4 {
+    font-size: 24px;
+    line-height: 28px;
 }
 
 p {
@@ -35,10 +63,30 @@ a:hover {
     color:green;
 }
 
+pre {
+    font-family: 'Menlo', monospace;
+    font-size: 15px;
+    background-color: #f0f0f0;
+    padding: 15px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    color: #666;
+}
+
+
 blockquote {
     display: block;
     padding-left: 20px;
     border-left: 6px solid #df0d32;
+    margin-left: -15px;
+    padding-left: 15px;
+    font-style: italic;
+    color: #555;
+}
+
+#container {
+    width: 960px;
+    margin: 30px auto;
 }
 
 .editable,
@@ -50,38 +98,19 @@ blockquote {
     border-bottom: 1px solid #dbdbdb;
 }
 
-pre {
-    font-family: 'Menlo', monospace;
-    font-size: 15px;
-    background-color: #f0f0f0;
-    padding: 15px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    color: #666;
-}
-
-#container {
-    width: 960px;
+#columns {
+    width: 90%;
     margin: 30px auto;
 }
 
+.column-container {
 
-h3 {
-    font-size: 32px;
-    line-height: 42px;
 }
 
-h4 {
-    font-size: 26px;
-    line-height: 32px;
-}
-
-
-blockquote {
-    border-left: 5px solid #555;
-    margin-left: -15px;
-    padding-left: 15px;
-    font-style: italic;
-    color: #555;
+.column {
+    vertical-align: top;
+    display: inline-block;
+    width: 30%;
+    margin: 10px 1%;
 }
 

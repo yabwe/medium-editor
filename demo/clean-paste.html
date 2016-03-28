@@ -4,12 +4,12 @@
     <meta charset="UTF-8">
     <title>medium editor | demo</title>
     <link rel="stylesheet" href="css/demo.css">
-    <link rel="stylesheet" href="http://netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css">
+    <link rel="stylesheet" href="http://netdna.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.css">
     <link rel="stylesheet" href="../dist/css/medium-editor.css">
     <link rel="stylesheet" href="../dist/css/themes/default.css">
 </head>
 <body>
-    <a href="https://github.com/daviferreira/medium-editor"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_gray_6d6d6d.png" alt="Fork me on GitHub"></a>
+    <a href="https://github.com/yabwe/medium-editor"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_gray_6d6d6d.png" alt="Fork me on GitHub"></a>
     <div id="container">
         <h1>Medium Editor</h1>
         <div class="editable">
@@ -23,8 +23,10 @@
     <script>
         var editor = new MediumEditor('.editable', {
             buttonLabels: 'fontawesome',
-            cleanPastedHTML: true,
-            forcePlainText: false
+            paste: {
+                cleanPastedHTML: true,
+                forcePlainText: false
+            }
         });
     </script>
 </body>

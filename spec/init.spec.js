@@ -1,168 +1,199 @@
-/*global MediumEditor, describe, it, expect, spyOn,
-         afterEach, beforeEach, tearDown*/
+/*global _ */
 
 describe('Initialization TestCase', function () {
     'use strict';
 
+    beforeEach(function () {
+        setupTestHelpers.call(this);
+        this.el = this.createElement('div', 'editor', 'lorem ipsum');
+    });
+
+    afterEach(function () {
+        this.cleanupTest();
+    });
+
     describe('Objects', function () {
         it('should call init when instantiated', function () {
             spyOn(MediumEditor.prototype, 'init');
-            var editor = new MediumEditor('.test');
+            var editor = this.newMediumEditor('.test');
             expect(editor.init).toHaveBeenCalled();
         });
 
         it('should accept multiple instances', function () {
             spyOn(MediumEditor.prototype, 'init');
-            var editor1 = new MediumEditor('.test'),
-                editor2 = new MediumEditor('.test');
+            var editor1 = this.newMediumEditor('.test'),
+                editor2 = this.newMediumEditor('.test');
             expect(editor1 === editor2).toBe(false);
             expect(MediumEditor.prototype.init).toHaveBeenCalled();
             expect(MediumEditor.prototype.init.calls.count()).toBe(2);
         });
 
         it('should do nothing when selector does not return any elements', function () {
-            spyOn(MediumEditor.prototype, 'initElements');
-            spyOn(MediumEditor.prototype, 'initToolbar');
-            spyOn(MediumEditor.prototype, 'bindSelect');
-            spyOn(MediumEditor.prototype, 'bindButtons');
-            spyOn(MediumEditor.prototype, 'bindAnchorForm');
-            var editor = new MediumEditor('.test');
-            expect(editor.id).toBe(undefined);
-            expect(editor.initElements).not.toHaveBeenCalled();
-            expect(editor.initToolbar).not.toHaveBeenCalled();
-            expect(editor.bindSelect).not.toHaveBeenCalled();
-            expect(editor.bindButtons).not.toHaveBeenCalled();
-            expect(editor.bindAnchorForm).not.toHaveBeenCalled();
-            expect(editor.initElements).not.toHaveBeenCalled();
+            spyOn(MediumEditor.prototype, 'setup');
+            var editor = this.newMediumEditor('.test');
+            expect(editor.isActive).toBeFalsy();
+            expect(editor.events).toBeUndefined();
+            expect(editor.getExtensionByName('toolbar')).toBeUndefined();
+            expect(editor.getExtensionByName('anchor')).toBeUndefined();
+            expect(editor.getExtensionByName('anchor-preview')).toBeUndefined();
         });
     });
 
     describe('Elements', function () {
         it('should allow a string as parameter', function () {
             spyOn(document, 'querySelectorAll').and.callThrough();
-            (function () {
-                return new MediumEditor('.test');
-            }());
+            this.newMediumEditor('.test');
             expect(document.querySelectorAll).toHaveBeenCalled();
         });
 
         it('should allow a list of html elements as parameters', function () {
             var elements = document.querySelectorAll('span'),
-                editor = new MediumEditor(elements);
-            expect(editor.elements).toBe(elements);
+                editor = this.newMediumEditor(elements);
+            expect(editor.elements.length).toEqual(elements.length);
         });
 
         it('should allow a single element as parameter', function () {
             var element = document.querySelector('span'),
-                editor = new MediumEditor(element);
+                editor = this.newMediumEditor(element);
             expect(editor.elements).toEqual([element]);
+        });
+
+        it('should always initalize elements as an Array', function () {
+            var nodeList = document.querySelectorAll('span'),
+                node = document.querySelector('span'),
+                editor = this.newMediumEditor(nodeList);
+
+            // nodeList is a NodeList, similar to an array but not of the same type
+            expect(editor.elements.length).toEqual(nodeList.length);
+            expect(typeof nodeList.forEach).toBe('undefined');
+            expect(typeof editor.elements.forEach).toBe('function');
+            editor.destroy();
+
+            editor = this.newMediumEditor('span');
+            expect(editor.elements.length).toEqual(nodeList.length);
+            editor.destroy();
+
+            editor = this.newMediumEditor(node);
+            expect(editor.elements.length).toEqual(1);
+            expect(editor.elements[0]).toBe(node);
+            editor.destroy();
+
+            editor = this.newMediumEditor();
+            expect(editor.elements).not.toBe(null);
+            expect(editor.elements.length).toBe(0);
+            editor.destroy();
+        });
+
+        it('should be available after destroying and calling setup again', function () {
+            var editor = this.newMediumEditor('.editor');
+            expect(editor.elements.length).toBe(1);
+            editor.destroy();
+            expect(editor.elements.length).toBe(0);
+            editor.setup();
+            expect(editor.elements.length).toBe(1);
         });
     });
 
     describe('With a valid element', function () {
-        beforeEach(function () {
-            this.el = document.createElement('div');
-            this.el.className = 'editor';
-            document.body.appendChild(this.el);
-        });
-
-        afterEach(function () {
-            tearDown(this.el);
-        });
-
         it('should have a default set of options', function () {
             var defaultOptions = {
-                anchorInputPlaceholder: 'Paste or type a link',
                 delay: 0,
-                diffLeft: 0,
-                diffTop: -10,
                 disableReturn: false,
                 disableDoubleReturn: false,
+                disableExtraSpaces: false,
                 disableEditing: false,
-                disableToolbar: false,
+                autoLink: false,
                 elementsContainer: document.body,
                 contentWindow: window,
                 ownerDocument: document,
-                firstHeader: 'h3',
-                forcePlainText: true,
-                cleanPastedHTML: false,
-                allowMultiParagraphSelection: true,
-                placeholder: 'Type your text',
-                secondHeader: 'h4',
-                buttons: ['bold', 'italic', 'underline', 'anchor', 'header1', 'header2', 'quote'],
                 buttonLabels: false,
                 targetBlank: false,
-                anchorTarget: false,
-                anchorButton: false,
-                anchorButtonClass: 'btn',
-                anchorPreviewHideDelay: 500,
-                checkLinkFormat: false,
                 extensions: {},
                 activeButtonClass: 'medium-editor-button-active',
-                firstButtonClass: 'medium-editor-button-first',
-                lastButtonClass: 'medium-editor-button-last'
+                spellcheck: true
             },
-                editor = new MediumEditor('.editor');
-            expect(editor.options).toEqual(defaultOptions);
+                editor = this.newMediumEditor('.editor');
+            expect(Object.keys(editor.options).length).toBe(Object.keys(defaultOptions).length);
+            expect(_.isEqual(editor.options, defaultOptions)).toBe(true);
         });
 
         it('should accept custom options values', function () {
             var options = {
-                anchorInputPlaceholder: 'test',
-                diffLeft: 10,
-                diffTop: 5,
-                firstHeader: 'h2',
-                secondHeader: 'h3',
-                delay: 300
+                delay: 300,
+                toolbar: {
+                    diffLeft: 10,
+                    diffTop: 5
+                },
+                anchor: {
+                    placeholderText: 'test',
+                    targetCheckboxText: 'new window?'
+                },
+                paste: {
+                    forcePlainText: false,
+                    cleanPastedHTML: true
+                }
             },
-                editor = new MediumEditor('.editor', options);
-            expect(editor.options).toEqual(options);
+                editor = this.newMediumEditor('.editor', options);
+            Object.keys(options).forEach(function (customOption) {
+                expect(editor.options[customOption]).toBe(options[customOption]);
+            });
         });
 
         it('should call the default initialization methods', function () {
-            spyOn(MediumEditor.prototype, 'initElements').and.callThrough();
-            spyOn(MediumEditor.prototype, 'initToolbar').and.callThrough();
-            spyOn(MediumEditor.prototype, 'bindSelect').and.callThrough();
-            spyOn(MediumEditor.prototype, 'bindButtons').and.callThrough();
-            spyOn(MediumEditor.prototype, 'bindAnchorForm').and.callThrough();
-            var editor = new MediumEditor('.editor');
-            expect(editor.id).toBe(1);
-            expect(editor.initElements).toHaveBeenCalled();
-            expect(editor.initToolbar).toHaveBeenCalled();
-            expect(editor.bindSelect).toHaveBeenCalled();
-            expect(editor.bindButtons).toHaveBeenCalled();
-            expect(editor.bindAnchorForm).toHaveBeenCalled();
-            expect(editor.initElements).toHaveBeenCalled();
+            spyOn(MediumEditor.prototype, 'setup').and.callThrough();
+            spyOn(MediumEditor.extensions.toolbar.prototype, 'createToolbar').and.callThrough();
+            spyOn(MediumEditor.extensions.anchor.prototype, 'createForm').and.callThrough();
+            spyOn(MediumEditor.extensions.anchorPreview.prototype, 'createPreview').and.callThrough();
+            var editor = this.newMediumEditor('.editor'),
+                anchorExtension = editor.getExtensionByName('anchor'),
+                anchorPreview = editor.getExtensionByName('anchor-preview'),
+                toolbar = editor.getExtensionByName('toolbar');
+            expect(editor.setup).toHaveBeenCalled();
+            expect(toolbar).not.toBeUndefined();
+            expect(toolbar.createToolbar).toHaveBeenCalled();
+            expect(anchorExtension).not.toBeUndefined();
+            expect(anchorExtension.createForm).toHaveBeenCalled();
+            expect(anchorPreview).not.toBeUndefined();
+            expect(anchorPreview.createPreview).toHaveBeenCalled();
         });
 
         it('should set the ID according to the numbers of editors instantiated', function () {
-            var editor1 = new MediumEditor('.editor'),
-                editor2 = new MediumEditor('.editor'),
-                editor3 = new MediumEditor('.editor');
-            expect(editor1.id).toBe(1);
-            expect(editor2.id).toBe(2);
-            expect(editor3.id).toBe(3);
+            var editor1 = this.newMediumEditor('.editor'),
+                firstId = editor1.id,
+                editor2 = this.newMediumEditor('.editor'),
+                editor3 = this.newMediumEditor('.editor');
+
+            expect(editor2.id).toBe(firstId + 1);
+            expect(editor3.id).toBe(firstId + 2);
+        });
+
+        it('should not reset id when destroyed and then re-initialized', function () {
+            var editor1 = this.newMediumEditor('.editor'),
+                origId = editor1.id,
+                editor2;
+
+            this.createElement('div', 'editor-two');
+            editor2 = this.newMediumEditor('.editor-two');
+            editor1.destroy();
+            editor1.init('.editor');
+
+            expect(editor1.id).not.toEqual(editor2.id);
+            expect(editor1.id).toBe(origId);
         });
 
         it('should use document.body as element container when no container element is specified', function () {
             spyOn(document.body, 'appendChild').and.callThrough();
-            (function () {
-                return new MediumEditor('.editor');
-            }());
+            this.newMediumEditor('.editor');
             expect(document.body.appendChild).toHaveBeenCalled();
         });
 
         it('should accept a custom element container for MediumEditor elements', function () {
-            var div = document.createElement('div');
-            document.body.appendChild(div);
+            var div = this.createElement('div');
             spyOn(div, 'appendChild').and.callThrough();
-            (function () {
-                return new MediumEditor('.editor', {
-                    elementsContainer: div
-                });
-            }());
+            this.newMediumEditor('.editor', {
+                elementsContainer: div
+            });
             expect(div.appendChild).toHaveBeenCalled();
-            document.body.removeChild(div);
         });
     });
 });

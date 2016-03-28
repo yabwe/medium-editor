@@ -1,0 +1,44 @@
+.medium-editor-toolbar-form {
+    display: none;
+
+    input,
+    a {
+        font-family: $font-sans-serif;
+    }
+
+    .medium-editor-toolbar-form-row {
+        line-height: 14px;
+        margin-left: 5px;
+        padding-bottom: 5px;
+    }
+
+    .medium-editor-toolbar-input,
+    label {
+        border: none;
+        box-sizing: border-box;
+        font-size: 14px;
+        margin: 0;
+        padding: 6px;
+        width: 316px;
+        display: inline-block;
+
+        &:focus {
+            appearance: none;
+            border: none;
+            box-shadow: none;
+            outline: 0;
+        }
+    }
+
+    a {
+        display: inline-block;
+        font-size: 24px;
+        font-weight: bolder;
+        margin: 0 10px;
+        text-decoration: none;
+    }
+}
+
+.medium-editor-toolbar-form-active {
+    display: block;
+}

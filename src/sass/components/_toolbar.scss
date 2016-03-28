@@ -1,0 +1,98 @@
+%medium-toolbar-arrow {
+    border-style: solid;
+    content: '';
+    display: block;
+    height: 0;
+    left: 50%;
+    margin-left: -8px;
+    position: absolute;
+    width: 0;
+}
+
+.medium-toolbar-arrow-under:after {
+    @extend %medium-toolbar-arrow;
+    border-width: 8px 8px 0 8px;
+}
+
+.medium-toolbar-arrow-over:before {
+    @extend %medium-toolbar-arrow;
+    border-width: 0 8px 8px 8px;
+    top: -8px;
+}
+
+.medium-editor-toolbar {
+    font-family: $font-sans-serif;
+    font-size: 16px;
+    left: 0;
+    position: absolute;
+    top: 0;
+    visibility: hidden;
+    z-index: $z-toolbar;
+
+    ul {
+        margin: 0;
+        padding: 0;
+    }
+
+    li {
+        float: left;
+        list-style: none;
+        margin: 0;
+        padding: 0;
+
+        button {
+            box-sizing: border-box;
+            cursor: pointer;
+            display: block;
+            font-size: 14px;
+            line-height: 1.33;
+            margin: 0;
+            padding: 15px;
+            text-decoration: none;
+
+            &:focus {
+                outline: none;
+            }
+        }
+
+        .medium-editor-action-underline {
+            text-decoration: underline;
+        }
+
+        .medium-editor-action-pre {
+            font-family: $font-fixed;
+            font-size: 12px;
+            font-weight: 100;
+            padding: 15px 0;
+        }
+    }
+}
+
+.medium-editor-toolbar-active {
+    visibility: visible;
+}
+
+.medium-editor-sticky-toolbar {
+    position: fixed;
+    top: 1px;
+}
+
+.medium-editor-relative-toolbar {
+  position: relative;
+}
+
+.medium-editor-toolbar-active.medium-editor-stalker-toolbar {
+    animation: medium-editor-pop-upwards 160ms forwards linear;
+}
+
+.medium-editor-toolbar-actions {
+    @extend %clearfix;
+}
+
+.medium-editor-action-bold {
+    font-weight: bolder;
+}
+
+.medium-editor-action-italic {
+    font-style: italic;
+}
