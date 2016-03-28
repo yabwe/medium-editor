@@ -345,7 +345,25 @@ describe('Anchor Button TestCase', function () {
 
             link = editor.elements[0].querySelector('a');
             expect(link).not.toBeNull();
-            expect(link.href).toBe(validUrl.toLowerCase());
+            expect(link.href).toBe(validUrl);
+        });
+        it('should not change spaces to %20 if linkValidation is set to false', function () {
+            var editor = this.newMediumEditor('.editor', {
+                anchor: {
+                    linkValidation: false
+                }
+            }),
+                link,
+                anchorExtension = editor.getExtensionByName('anchor'),
+                validUrl = 'http://te%20s%20t.com/';
+
+            selectElementContentsAndFire(editor.elements[0]);
+            anchorExtension.showForm('http://te s t.com/');
+            fireEvent(anchorExtension.getForm().querySelector('a.medium-editor-toolbar-save'), 'click');
+
+            link = editor.elements[0].querySelector('a');
+            expect(link).not.toBeNull();
+            expect(link.href).not.toBe(validUrl);
         });
         it('should add target="_blank" when "open in a new window" checkbox is checked', function () {
             var editor = this.newMediumEditor('.editor', {
