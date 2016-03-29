@@ -434,7 +434,7 @@ Text to be shown in the checkbox when the __customClassOption__ is being used.
 #### `linkValidation`
 **Default:** `false`
 
-Enables/disables check for common URL protocols on anchor links.
+Enables/disables check for common URL protocols on anchor links. Converts invalid url characters (ie spaces) to valid characters using `encodeURI`
 
 ***
 #### `placeholderText`
