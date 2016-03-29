@@ -242,7 +242,7 @@
                 return 'tel:' + value;
             } else {
                 // Check for URL scheme and default to http:// if none found
-                return (urlSchemeRegex.test(value) ? '' : 'http://') + value.replace(/\s/g, '%20');
+                return (urlSchemeRegex.test(value) ? '' : 'http://') + encodeURI(value);
             }
         },
 
