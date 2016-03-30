@@ -219,14 +219,20 @@
         var elements = Array.prototype.slice.apply(selector);
 
         // Loop through elements and convert textarea's into divs
-        this.elements = [];
-        elements.forEach(function (element, index) {
+        this.convertTextareas();
+    }
+
+    function convertTextareas() {
+        var converted = [];
+        this.elements.forEach(function (element, index) {
             if (element.nodeName.toLowerCase() === 'textarea') {
-                this.elements.push(createContentEditable.call(this, element, index));
+                converted.push(createContentEditable.call(this, element, index));
             } else {
-                this.elements.push(element);
+                converted.push(element);
             }
         }, this);
+
+        this.elements = converted;
     }
 
     function setExtensionDefaults(extension, defaults) {
@@ -439,16 +445,6 @@
         this.events.reAttachCustomEvent();
     }
 
-    function findParentElementByTagName(element, tagName) {
-        if (element.parentNode && tagName.indexOf(element.parentNode.tagName.toLowerCase()) > -1) {
-            return element.parentNode;
-        } else if (element.parentNode) {
-            return findParentElementByTagName(element.parentNode, tagName);
-        } else {
-            return null;
-        }
-    }
-
     function initExtensions() {
 
         this.extensions = [];
@@ -633,10 +629,6 @@
 
             if (!this.options.elementsContainer) {
                 this.options.elementsContainer = this.options.ownerDocument.body;
-            }
-
-            if (!this.options.checkExistenceTagName) {
-                this.options.checkExistenceTagName = 'body';
             }
 
             return this.setup();
@@ -1140,13 +1132,12 @@
             }
         },
 
+        addElement: function (element) {
+            this.addElements([element]);
+        },
+
         addElements: function (elements) {
             var filtered = [];
-
-            // We want always an array with our input
-            if (!elements.length) {
-                elements = [elements];
-            }
 
             // Filter the input, we want to include every element only once!
             elements.forEach(function (element) {
@@ -1167,25 +1158,28 @@
 
             // Initialize all new elements (we check that in those functions don't worry)
             initElements.call(this);
+            convertTextareas.call(this);
             reAttachHandlers.call(this);
         },
 
-        cleanupElements: function () {
+        removeElement: function (elementToRemove) {
             var filtered = [];
 
-            // filter all elements to prevent memory-leaks
-            // -> references of elements in js-memory which don't exists in DOM anymore
             this.elements.forEach(function (element) {
-                // check if element still exists in DOM
-                if (findParentElementByTagName(element, this.options.checkExistenceTagName) !== null) {
+                if (element.getAttribute('medium-editor-index') !== elementToRemove.getAttribute('medium-editor-index')) {
                     filtered.push(element);
                 } else {
-                    // found an obsolete element, not existing in DOM anymore
                     this.events.cleanupElement(element);
                 }
-            }.bind(this));
+            });
 
             this.elements = filtered;
+        },
+
+        removeElements: function(elements) {
+            elements.forEach(function(element) {
+                this.removeElement(element);
+            });
         },
 
         guid: function () {
