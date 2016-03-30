@@ -340,7 +340,7 @@ describe('Anchor Button TestCase', function () {
                 validUrl = 'http://te%20s%20t.com/';
 
             selectElementContentsAndFire(editor.elements[0]);
-            anchorExtension.showForm('te s t.com');
+            anchorExtension.showForm('http://te s t.com/');
             fireEvent(anchorExtension.getForm().querySelector('a.medium-editor-toolbar-save'), 'click');
 
             link = editor.elements[0].querySelector('a');
