@@ -337,15 +337,22 @@ describe('Anchor Button TestCase', function () {
             }),
                 link,
                 anchorExtension = editor.getExtensionByName('anchor'),
-                validUrl = 'http://te%20s%20t.com/';
+                expectedOpts = {
+                    url: 'http://te%20s%20t.com/',
+                    target: '_self'
+                };
+
+            spyOn(editor, 'execAction').and.callThrough();
 
             selectElementContentsAndFire(editor.elements[0]);
-            anchorExtension.showForm('http://te s t.com/');
+            anchorExtension.showForm('te s t.com/');
             fireEvent(anchorExtension.getForm().querySelector('a.medium-editor-toolbar-save'), 'click');
+
+            expect(editor.execAction).toHaveBeenCalledWith('createLink', expectedOpts);
 
             link = editor.elements[0].querySelector('a');
             expect(link).not.toBeNull();
-            expect(link.href).toBe(validUrl);
+            expect(link.href).toBe(expectedOpts.url);
         });
         it('should not change spaces to %20 if linkValidation is set to false', function () {
             var editor = this.newMediumEditor('.editor', {
@@ -355,15 +362,24 @@ describe('Anchor Button TestCase', function () {
             }),
                 link,
                 anchorExtension = editor.getExtensionByName('anchor'),
-                validUrl = 'http://te%20s%20t.com/';
+                expectedOpts = {
+                    url: 'http://te s t.com/',
+                    target: '_self'
+                };
+
+            spyOn(editor, 'execAction').and.callThrough();
 
             selectElementContentsAndFire(editor.elements[0]);
-            anchorExtension.showForm('http://te s t.com/');
+            anchorExtension.showForm(expectedOpts.url);
             fireEvent(anchorExtension.getForm().querySelector('a.medium-editor-toolbar-save'), 'click');
+
+            // Chrome, Edge, and IE will automatically escape the href once it's set on the link
+            // So for this case, we'll only look at the call to execAction to see what URL it was trying to set
+            // since the value of the link's href could be different values
+            expect(editor.execAction).toHaveBeenCalledWith('createLink', expectedOpts);
 
             link = editor.elements[0].querySelector('a');
             expect(link).not.toBeNull();
-            expect(link.href).not.toBe(validUrl);
         });
         it('should add target="_blank" when "open in a new window" checkbox is checked', function () {
             var editor = this.newMediumEditor('.editor', {
