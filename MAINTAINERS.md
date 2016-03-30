@@ -21,8 +21,8 @@ For this example, let's assume there's a new pull request (#123) from a branch o
   * ```git checkout -b integration-123```
 2. Add a remote that points to the external fork
   * ```git remote add external-user git@github.com:external-user/medium-editor.git```
-3. Fetch the external branch
-  * ```git fetch external-user/new-branch```
+3. Fetch the remote repo
+  * ```git fetch external-user```
 4. Merge the external branch into your local branch
   * ```git merge external-user/new-branch```
 5. Push your local branch up to the main repo
