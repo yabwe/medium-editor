@@ -1,5 +1,6 @@
 /*global selectElementContents,
-         selectElementContentsAndFire */
+         selectElementContentsAndFire,
+         fireEvent */
 
 describe('Pasting content', function () {
     'use strict';
@@ -214,6 +215,39 @@ describe('Pasting content', function () {
 
             editor.cleanPaste('<a href="http://0.0.0.0/bar.html">foo<a>');
             expect(this.el.innerHTML).toContain('target="_blank"');
+        });
+    });
+
+    describe('using keyboard', function () {
+        it('should insert a custom paste-bin on keydown of CTRL + V', function () {
+            var editor = this.newMediumEditor('.editor', {
+                    paste: {
+                        forcePlainText: false,
+                        cleanPastedHTML: true
+                    }
+                });
+
+            selectElementContentsAndFire(editor.elements[0].firstChild);
+
+            var contentEditables = document.body.querySelectorAll('[contentEditable=true]');
+            expect(contentEditables.length).toBe(1);
+
+            fireEvent(this.el, 'keydown', {
+                keyCode: MediumEditor.util.keyCode.V,
+                ctrlKey: true,
+                metaKey: true
+            });
+
+            contentEditables = document.body.querySelectorAll('[contentEditable=true]');
+            expect(contentEditables.length).toBe(2);
+
+            var pasteBin = contentEditables[1];
+            expect(pasteBin.innerHTML).toBe('%ME_PASTEBIN%');
+            expect(pasteBin.parentNode).toBe(document.body);
+
+            var range = document.getSelection().getRangeAt(0);
+            expect(MediumEditor.util.isDescendant(pasteBin, range.commonAncestorContainer, true)).toBe(true, 'Select is not within the paste bin');
+            expect(range.toString()).toBe('%ME_PASTEBIN%');
         });
     });
 
