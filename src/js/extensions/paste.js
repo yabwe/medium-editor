@@ -145,6 +145,13 @@
             }
         },
 
+        destroy: function () {
+            // Make sure pastebin is destroyed in case it's still around for some reason
+            if (this.forcePlainText || this.cleanPastedHTML) {
+                this.removePasteBin();
+            }
+        },
+
         handlePaste: function (event, editable) {
             if (event.defaultPrevented) {
                 return;
@@ -198,7 +205,7 @@
         },
 
         handlePasteBinPaste: function (event) {
-            if (event.isDefaultPrevented) {
+            if (event.defaultPrevented) {
                 this.removePasteBin();
                 return;
             }
