@@ -28,11 +28,11 @@ describe('MediumEditor.DynamicElements TestCase', function () {
             editor.subscribe('focus', focusListener);
             editor.subscribe('blur', blurListener);
 
-            editor.addElements(this.addOne);
+            editor.addElement(this.addOne);
             expect(this.addOne.getAttribute('data-medium-editor-element')).toBeDefined();
             expect(editor.elements.length).toBe(2);
 
-            editor.addElements(this.addOne);
+            editor.addElement(this.addOne);
             expect(editor.elements.length).toBe(2);
 
             editor.selectElement(this.addOne.firstChild);
@@ -67,18 +67,18 @@ describe('MediumEditor.DynamicElements TestCase', function () {
                 editor.subscribe('focus', focusListener);
                 editor.subscribe('editableInput', handler);
 
-                editor.addElements(this.addOne);
+                editor.addElement(this.addOne);
                 expect(this.addOne.getAttribute('data-medium-editor-element')).toBeDefined();
                 expect(editor.elements.length).toBe(2);
 
                 // Detach + exec fn + reattach, asynchronous.
                 detach(this.addOne, true, function (reattach) {
-                    editor.cleanupElements();
+                    editor.removeElement(this.addOne);
                     expect(editor.elements.length).toBe(1);
 
                     reattach();
 
-                    editor.addElements(this.addTwo);
+                    editor.addElement(this.addTwo);
                     expect(editor.elements.length).toBe(2);
                     expect(this.addTwo.getAttribute('data-medium-editor-element')).toBeDefined();
 

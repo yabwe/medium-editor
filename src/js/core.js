@@ -216,10 +216,10 @@
             selector = [selector];
         }
         // Convert NodeList (or other array like object) into an array
-        var elements = Array.prototype.slice.apply(selector);
+        this.elements = Array.prototype.slice.apply(selector);
 
         // Loop through elements and convert textarea's into divs
-        this.convertTextareas();
+        convertTextareas.call(this);
     }
 
     function convertTextareas() {
@@ -417,32 +417,15 @@
         }
     }
 
-    function reAttachHandlers() {
-        if (!this.options.disableReturn || !this.options.disableDoubleReturn) {
-            for (var i = 0, len = this.elements.length; i < len; i += 1) {
-                if (this.elements[i].getAttribute('data-medium-editor-element')) {
-                    continue;
-                }
-
-                if (this.elements[i].getAttribute('data-disable-return') || this.elements[i].getAttribute('data-disable-double-return')) {
-                    this.subscribe('editableKeydownEnter', handleDisabledEnterKeydown.bind(this));
-                    break;
-                }
+    function reAttachHandlers(element) {
+        // rerun the part of attachHandlers which is must be bound to this new element
+        if (!this.options.disableReturn) {
+            if (!element.getAttribute('data-disable-return')) {
+                this.on(element, 'keyup', handleKeyup.bind(this));
             }
         }
-        if (!this.options.disableReturn) {
-            this.elements.forEach(function (element) {
-                if (element.getAttribute('data-medium-editor-element')) {
-                    return;
-                }
 
-                if (!element.getAttribute('data-disable-return')) {
-                    this.on(element, 'keyup', handleKeyup.bind(this));
-                }
-            }, this);
-        }
-
-        this.events.reAttachCustomEvent();
+        this.events.reAttachCustomEvents(element);
     }
 
     function initExtensions() {
@@ -1133,6 +1116,11 @@
         },
 
         addElement: function (element) {
+            if (element.length) {
+                // it is already an array..
+                return this.addElements(element);
+            }
+
             this.addElements([element]);
         },
 
@@ -1159,10 +1147,18 @@
             // Initialize all new elements (we check that in those functions don't worry)
             initElements.call(this);
             convertTextareas.call(this);
-            reAttachHandlers.call(this);
+
+            filtered.forEach(function (element) {
+                reAttachHandlers.apply(this, [element]);
+            }.bind(this));
         },
 
         removeElement: function (elementToRemove) {
+            if (elementToRemove.length) {
+                // it is already an array..
+                return this.removeElements(elementToRemove);
+            }
+
             var filtered = [];
 
             this.elements.forEach(function (element) {
@@ -1171,15 +1167,15 @@
                 } else {
                     this.events.cleanupElement(element);
                 }
-            });
+            }.bind(this));
 
             this.elements = filtered;
         },
 
-        removeElements: function(elements) {
-            elements.forEach(function(element) {
+        removeElements: function (elements) {
+            elements.forEach(function (element) {
                 this.removeElement(element);
-            });
+            }.bind(this));
         },
 
         guid: function () {
