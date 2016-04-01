@@ -376,6 +376,111 @@ describe('Pasting content', function () {
             contentEditables = document.body.querySelectorAll('[contentEditable=true]');
             expect(contentEditables.length).toBe(1);
         });
+
+        it('should use html from the paste bin when clipboard data is not available', function () {
+            var editor = this.newMediumEditor('.editor', {
+                    paste: {
+                        forcePlainText: false,
+                        cleanPastedHTML: true
+                    }
+                }),
+                pasteExtension = editor.getExtensionByName('paste');
+
+            selectElementContentsAndFire(editor.elements[0].firstChild);
+
+            var contentEditables = document.body.querySelectorAll('[contentEditable=true]');
+            expect(contentEditables.length).toBe(1);
+
+            fireEvent(this.el, 'keydown', {
+                keyCode: MediumEditor.util.keyCode.V,
+                ctrlKey: true,
+                metaKey: true
+            });
+
+            contentEditables = document.body.querySelectorAll('[contentEditable=true]');
+            expect(contentEditables.length).toBe(2);
+
+            var evt = {
+                    type: 'paste',
+                    preventDefault: function () {},
+                    clipboardData: {
+                        types: ['text/plain'],
+                        getData: function () {
+                            // do we need to return different results for the different types? text/plain, text/html
+                            return null;
+                        }
+                    }
+                },
+                testHTML = '<b>HTML from <u>paste bin</u></b>',
+                pasteBin = contentEditables[1];
+
+            pasteBin.innerHTML = testHTML;
+            spyOn(evt, 'preventDefault');
+
+            // Paste should not be prevented on the paste bin
+            pasteExtension.handlePasteBinPaste(evt);
+            expect(evt.preventDefault).not.toHaveBeenCalled();
+            jasmine.clock().tick(1);
+
+            // HTML from paste-bin should now be in the editor
+            expect(this.el.innerHTML).toMatch(new RegExp(testHTML + '(<br/?>)?'));
+
+            // paste-bin should be gone
+            contentEditables = document.body.querySelectorAll('[contentEditable=true]');
+            expect(contentEditables.length).toBe(1);
+        });
+
+        it('should use plain text when clipboard data is not available and paste-bin does not have real content', function () {
+            var editor = this.newMediumEditor('.editor', {
+                    paste: {
+                        forcePlainText: false,
+                        cleanPastedHTML: true
+                    }
+                }),
+                pasteExtension = editor.getExtensionByName('paste');
+
+            selectElementContentsAndFire(editor.elements[0].firstChild);
+
+            var contentEditables = document.body.querySelectorAll('[contentEditable=true]');
+            expect(contentEditables.length).toBe(1);
+
+            fireEvent(this.el, 'keydown', {
+                keyCode: MediumEditor.util.keyCode.V,
+                ctrlKey: true,
+                metaKey: true
+            });
+
+            contentEditables = document.body.querySelectorAll('[contentEditable=true]');
+            expect(contentEditables.length).toBe(2);
+
+            var evt = {
+                    type: 'paste',
+                    preventDefault: function () {},
+                    clipboardData: {
+                        types: ['text/plain'],
+                        getData: function () {
+                            // do we need to return different results for the different types? text/plain, text/html
+                            return 'Plain Text';
+                        }
+                    }
+                },
+                pasteBin = contentEditables[1];
+
+            pasteBin.innerHTML = '';
+            spyOn(evt, 'preventDefault');
+
+            // Paste should not be prevented on the paste bin
+            pasteExtension.handlePasteBinPaste(evt);
+            expect(evt.preventDefault).not.toHaveBeenCalled();
+            jasmine.clock().tick(1);
+
+            // plaintext from the clipboard should now be in the editor
+            expect(this.el.innerHTML).toBe('Plain Text');
+
+            // paste-bin should be gone
+            contentEditables = document.body.querySelectorAll('[contentEditable=true]');
+            expect(contentEditables.length).toBe(1);
+        });
     });
 
     describe('using cleanPaste', function () {
