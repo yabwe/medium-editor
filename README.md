@@ -465,6 +465,45 @@ var editor = new MediumEditor('.editable', {
 });
 ```
 
+### Dynamically add elements to your instance
+
+It is possible to dynamically add new elements to your existing MediumtEditor instance:
+
+```javascript
+var editor = new MedtiumEditor('.editable', { ... });
+editor.subscribe('editableInput', this._handleEditableInput.bind(this));
+
+// imagine an ajax fetch/any other dynamic functionality which will add new '.editable' elements to dom
+
+editor.addElements(document.querySelectorAll('.editable'));
+```
+
+The `addElement` function will add the given element or array of elements to the internal `this.elements` array and he 
+will take care of all the attributes and event handler initialization of the newly added element. He is intelligent enough
+to run the necessary code only once on a given element, no matter how often you will call it.
+
+So, every element you pass to `addElement` will turn into a fully supported contenteditable too - even a earlier `editor.subscribe(..)`
+for a custom event will work on the new added element.
+
+#### Removing elements dynamically
+
+Straight forward, just call `removeElement` for the element to want to tear down. The element itself will remain a contenteditable - 
+it will only remove all event handlers and all references to it so you can safely remove it from DOM.
+
+```javascript
+editor.removeElement(document.querySelector('#myElement'));
+
+// in case you have jQuery and don't exactly now when an element was removed, for example after routing state change
+var removedElements = [];
+editor.elements.forEach(function (element) {
+    // check if the element is still available in current DOM
+    if (!$(element).parents('body').length) {
+        removedElements.push(element);
+    }
+});
+
+editor.removeElements(removedElements);
+```
 
 ## Buttons
 

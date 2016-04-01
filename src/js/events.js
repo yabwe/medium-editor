@@ -56,6 +56,17 @@
             }
         },
 
+        detachAllEventsFromElement: function (element) {
+            var filtered = this.events.filter(function (e) {
+                return e && e[0].getAttribute && e[0].getAttribute('medium-editor-index') === element.getAttribute('medium-editor-index');
+            });
+
+            for (var i = 0, len = filtered.length; i < len; i++) {
+                var e = filtered[i];
+                this.detachDOMEvent(e[0], e[1], e[2], e[3]);
+            }
+        },
+
         enableCustomEvent: function (event) {
             if (this.disabledEvents[event] !== undefined) {
                 delete this.disabledEvents[event];
@@ -73,6 +84,10 @@
                 this.customEvents[event] = [];
             }
             this.customEvents[event].push(listener);
+        },
+
+        reAttachCustomEvents: function (element) {
+            this.reRunSetupListener(element);
         },
 
         detachCustomEvent: function (event, listener) {
@@ -224,6 +239,21 @@
             doc.execCommand = doc.execCommand.orig;
         },
 
+        reRunSetupListener: function (element) {
+            // rerun the part of setupListeners which is must be bound to this new element
+
+            if (this.listeners['editableInput']) {
+                this.contentCache[element.getAttribute('medium-editor-index')] = element.innerHTML;
+
+                // Attach to the 'oninput' event, handled correctly by most browsers
+                if (this.InputEventOnContenteditableSupported) {
+                    this.attachDOMEvent(element, 'input', this.handleInput.bind(this));
+                }
+            }
+
+            this.reAttachHandlersToElement(element);
+        },
+
         // Listening to browser events to emit events medium-editor cares about
         setupListener: function (name) {
             if (this.listeners[name]) {
@@ -247,7 +277,7 @@
                     break;
                 case 'editableInput':
                     // setup cache for knowing when the content has changed
-                    this.contentCache = [];
+                    this.contentCache = {};
                     this.base.elements.forEach(function (element) {
                         this.contentCache[element.getAttribute('medium-editor-index')] = element.innerHTML;
 
@@ -325,9 +355,30 @@
         },
 
         attachToEachElement: function (name, handler) {
+            // build our internal cache to know which element got already what handler attached
+            if (!this.eventsCache) {
+                this.eventsCache = [];
+            }
+
             this.base.elements.forEach(function (element) {
                 this.attachDOMEvent(element, name, handler.bind(this));
             }, this);
+
+            this.eventsCache.push({ 'name': name, 'handler': handler });
+        },
+
+        reAttachHandlersToElement: function (element) {
+            this.eventsCache.forEach(function (e) {
+                this.attachDOMEvent(element, e['name'], e['handler'].bind(this));
+            }.bind(this));
+        },
+
+        cleanupElement: function (element) {
+            var index = element.getAttribute('medium-editor-index');
+            if (index) {
+                this.detachAllEventsFromElement(element);
+                delete this.contentCache[index];
+            }
         },
 
         focusElement: function (element) {

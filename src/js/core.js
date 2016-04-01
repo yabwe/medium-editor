@@ -218,17 +218,23 @@
             selector = [selector];
         }
         // Convert NodeList (or other array like object) into an array
-        var elements = Array.prototype.slice.apply(selector);
+        this.elements = Array.prototype.slice.apply(selector);
 
         // Loop through elements and convert textarea's into divs
-        this.elements = [];
-        elements.forEach(function (element, index) {
+        convertTextareas.call(this);
+    }
+
+    function convertTextareas() {
+        var converted = [];
+        this.elements.forEach(function (element, index) {
             if (element.nodeName.toLowerCase() === 'textarea') {
-                this.elements.push(createContentEditable.call(this, element, index));
+                converted.push(createContentEditable.call(this, element, index));
             } else {
-                this.elements.push(element);
+                converted.push(element);
             }
         }, this);
+
+        this.elements = converted;
     }
 
     function setExtensionDefaults(extension, defaults) {
@@ -345,7 +351,11 @@
     function initElements() {
         var isTextareaUsed = false;
 
-        this.elements.forEach(function (element, index) {
+        this.elements.forEach(function (element) {
+            if (element.getAttribute('data-medium-editor-element')) {
+                return;
+            }
+
             if (!this.options.disableEditing && !element.getAttribute('data-disable-editing')) {
                 element.setAttribute('contentEditable', true);
                 element.setAttribute('spellcheck', this.options.spellcheck);
@@ -353,7 +363,7 @@
             element.setAttribute('data-medium-editor-element', true);
             element.setAttribute('role', 'textbox');
             element.setAttribute('aria-multiline', true);
-            element.setAttribute('medium-editor-index', index);
+            element.setAttribute('medium-editor-index', this.guid());
 
             if (element.hasAttribute('medium-editor-textarea-id')) {
                 isTextareaUsed = true;
@@ -371,7 +381,8 @@
     }
 
     function attachHandlers() {
-        var i;
+        var i,
+            len = this.elements.length;
 
         // attach to tabs
         this.subscribe('editableKeydownTab', handleTabKeydown.bind(this));
@@ -389,7 +400,7 @@
         if (this.options.disableReturn || this.options.disableDoubleReturn) {
             this.subscribe('editableKeydownEnter', handleDisabledEnterKeydown.bind(this));
         } else {
-            for (i = 0; i < this.elements.length; i += 1) {
+            for (i = 0; i < len; i += 1) {
                 if (this.elements[i].getAttribute('data-disable-return') || this.elements[i].getAttribute('data-disable-double-return')) {
                     this.subscribe('editableKeydownEnter', handleDisabledEnterKeydown.bind(this));
                     break;
@@ -406,6 +417,17 @@
                 }
             }, this);
         }
+    }
+
+    function reAttachHandlers(element) {
+        // rerun the part of attachHandlers which is must be bound to this new element
+        if (!this.options.disableReturn) {
+            if (!element.getAttribute('data-disable-return')) {
+                this.on(element, 'keyup', handleKeyup.bind(this));
+            }
+        }
+
+        this.events.reAttachCustomEvents(element);
     }
 
     function initExtensions() {
@@ -647,6 +669,7 @@
                 element.removeAttribute('role');
                 element.removeAttribute('aria-multiline');
                 element.removeAttribute('medium-editor-index');
+                element.removeAttribute('medium-editor-uid');
 
                 // Remove any elements created for textareas
                 if (element.hasAttribute('medium-editor-textarea-id')) {
@@ -707,8 +730,10 @@
         serialize: function () {
             var i,
                 elementid,
-                content = {};
-            for (i = 0; i < this.elements.length; i += 1) {
+                content = {},
+                len = this.elements.length;
+
+            for (i = 0; i < len; i += 1) {
                 elementid = (this.elements[i].id !== '') ? this.elements[i].id : 'element-' + i;
                 content[elementid] = {
                     value: this.elements[i].innerHTML.trim()
@@ -1073,7 +1098,7 @@
                 if (this.options.targetBlank || opts.target === '_blank' || opts.buttonClass) {
                     customEvent = this.options.ownerDocument.createEvent('HTMLEvents');
                     customEvent.initEvent('input', true, true, this.options.contentWindow);
-                    for (var i = 0; i < this.elements.length; i += 1) {
+                    for (var i = 0, len = this.elements.length; i < len; i += 1) {
                         this.elements[i].dispatchEvent(customEvent);
                     }
                 }
@@ -1105,6 +1130,80 @@
         checkContentChanged: function (editable) {
             editable = editable || MediumEditor.selection.getSelectionElement(this.options.contentWindow);
             this.events.updateInput(editable, { target: editable, currentTarget: editable });
+        },
+
+        addElement: function (element) {
+            if (element.length) {
+                // it is already an array..
+                return this.addElements(element);
+            }
+
+            this.addElements([element]);
+        },
+
+        addElements: function (elements) {
+            var filtered = [];
+
+            // Filter the input, we want to include every element only once!
+            elements.forEach(function (element) {
+                if (element.getAttribute('data-medium-editor-element')) {
+                    return;
+                }
+
+                filtered.push(element);
+            });
+
+            // Do we have elements to add now?
+            if (filtered.length === 0) {
+                return false;
+            }
+
+            // Add new elements to our internal elements array
+            this.elements = this.elements.concat(filtered);
+
+            // Initialize all new elements (we check that in those functions don't worry)
+            initElements.call(this);
+            convertTextareas.call(this);
+
+            filtered.forEach(function (element) {
+                reAttachHandlers.apply(this, [element]);
+            }.bind(this));
+        },
+
+        removeElement: function (elementToRemove) {
+            if (elementToRemove.length) {
+                // it is already an array..
+                return this.removeElements(elementToRemove);
+            }
+
+            var filtered = [];
+
+            this.elements.forEach(function (element) {
+                if (element.getAttribute('medium-editor-index') !== elementToRemove.getAttribute('medium-editor-index')) {
+                    filtered.push(element);
+                } else {
+                    this.events.cleanupElement(element);
+                }
+            }.bind(this));
+
+            this.elements = filtered;
+        },
+
+        removeElements: function (elements) {
+            elements.forEach(function (element) {
+                this.removeElement(element);
+            }.bind(this));
+        },
+
+        guid: function () {
+            function _s4() {
+                return Math
+                    .floor((1 + Math.random()) * 0x10000)
+                    .toString(16)
+                    .substring(1);
+            }
+
+            return _s4() + _s4() + '-' + _s4() + '-' + _s4() + '-' + _s4() + '-' + _s4() + _s4() + _s4();
         }
     };
 }());
