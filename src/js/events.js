@@ -86,8 +86,12 @@
             this.customEvents[event].push(listener);
         },
 
-        reAttachCustomEvents: function (element) {
-            this.reRunSetupListener(element);
+        reAttachCustomEventsOnElement: function (element) {
+            if (this.listeners['editableInput']) {
+                this.contentCache[element.getAttribute('medium-editor-index')] = element.innerHTML;
+            }
+
+            this.reAttachHandlersToElement(element);
         },
 
         detachCustomEvent: function (event, listener) {
@@ -239,21 +243,6 @@
             doc.execCommand = doc.execCommand.orig;
         },
 
-        reRunSetupListener: function (element) {
-            // rerun the part of setupListeners which is must be bound to this new element
-
-            if (this.listeners['editableInput']) {
-                this.contentCache[element.getAttribute('medium-editor-index')] = element.innerHTML;
-
-                // Attach to the 'oninput' event, handled correctly by most browsers
-                if (this.InputEventOnContenteditableSupported) {
-                    this.attachDOMEvent(element, 'input', this.handleInput.bind(this));
-                }
-            }
-
-            this.reAttachHandlersToElement(element);
-        },
-
         // Listening to browser events to emit events medium-editor cares about
         setupListener: function (name) {
             if (this.listeners[name]) {
@@ -280,12 +269,12 @@
                     this.contentCache = {};
                     this.base.elements.forEach(function (element) {
                         this.contentCache[element.getAttribute('medium-editor-index')] = element.innerHTML;
-
-                        // Attach to the 'oninput' event, handled correctly by most browsers
-                        if (this.InputEventOnContenteditableSupported) {
-                            this.attachDOMEvent(element, 'input', this.handleInput.bind(this));
-                        }
                     }.bind(this));
+
+                    // Attach to the 'oninput' event, handled correctly by most browsers
+                    if (this.InputEventOnContenteditableSupported) {
+                        this.attachToEachElement('input', this.handleInput);
+                    }
 
                     // For browsers which don't support the input event on contenteditable (IE)
                     // we'll attach to 'selectionchange' on the document and 'keypress' on the editables

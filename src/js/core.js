@@ -363,7 +363,7 @@
             element.setAttribute('data-medium-editor-element', true);
             element.setAttribute('role', 'textbox');
             element.setAttribute('aria-multiline', true);
-            element.setAttribute('medium-editor-index', this.guid());
+            element.setAttribute('medium-editor-index', MediumEditor.util.guid());
 
             if (element.hasAttribute('medium-editor-textarea-id')) {
                 isTextareaUsed = true;
@@ -427,7 +427,7 @@
             }
         }
 
-        this.events.reAttachCustomEvents(element);
+        this.events.reAttachCustomEventsOnElement(element);
     }
 
     function initExtensions() {
@@ -669,7 +669,6 @@
                 element.removeAttribute('role');
                 element.removeAttribute('aria-multiline');
                 element.removeAttribute('medium-editor-index');
-                element.removeAttribute('medium-editor-uid');
 
                 // Remove any elements created for textareas
                 if (element.hasAttribute('medium-editor-textarea-id')) {
@@ -1142,6 +1141,8 @@
         },
 
         addElements: function (elements) {
+            elements = elements.length ? elements : [elements];
+
             var filtered = [];
 
             // Filter the input, we want to include every element only once!
@@ -1170,40 +1171,27 @@
             }.bind(this));
         },
 
-        removeElement: function (elementToRemove) {
-            if (elementToRemove.length) {
-                // it is already an array..
-                return this.removeElements(elementToRemove);
-            }
-
-            var filtered = [];
-
-            this.elements.forEach(function (element) {
-                if (element.getAttribute('medium-editor-index') !== elementToRemove.getAttribute('medium-editor-index')) {
-                    filtered.push(element);
-                } else {
-                    this.events.cleanupElement(element);
-                }
-            }.bind(this));
-
-            this.elements = filtered;
-        },
-
         removeElements: function (elements) {
+            elements = elements.length ? elements : [elements];
+
+            var _this = this,
+                _removeElement = function (elementToRemove) {
+                    var filtered = [];
+
+                    _this.elements.forEach(function (element) {
+                        if (element.getAttribute('medium-editor-index') !== elementToRemove.getAttribute('medium-editor-index')) {
+                            filtered.push(element);
+                        } else {
+                            _this.events.cleanupElement(element);
+                        }
+                    });
+
+                    _this.elements = filtered;
+                };
+
             elements.forEach(function (element) {
-                this.removeElement(element);
-            }.bind(this));
-        },
-
-        guid: function () {
-            function _s4() {
-                return Math
-                    .floor((1 + Math.random()) * 0x10000)
-                    .toString(16)
-                    .substring(1);
-            }
-
-            return _s4() + _s4() + '-' + _s4() + '-' + _s4() + '-' + _s4() + '-' + _s4() + _s4() + _s4();
+                _removeElement(element);
+            });
         }
     };
 }());
