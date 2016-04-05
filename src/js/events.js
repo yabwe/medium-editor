@@ -269,7 +269,7 @@
                     this.contentCache = {};
                     this.base.elements.forEach(function (element) {
                         this.contentCache[element.getAttribute('medium-editor-index')] = element.innerHTML;
-                    }.bind(this));
+                    }, this);
 
                     // Attach to the 'oninput' event, handled correctly by most browsers
                     if (this.InputEventOnContenteditableSupported) {
@@ -359,7 +359,7 @@
         reAttachHandlersToElement: function (element) {
             this.eventsCache.forEach(function (e) {
                 this.attachDOMEvent(element, e['name'], e['handler'].bind(this));
-            }.bind(this));
+            }, this);
         },
 
         cleanupElement: function (element) {

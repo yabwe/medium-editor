@@ -218,23 +218,20 @@
             selector = [selector];
         }
         // Convert NodeList (or other array like object) into an array
-        this.elements = Array.prototype.slice.apply(selector);
+        var elements = Array.prototype.slice.apply(selector);
 
         // Loop through elements and convert textarea's into divs
-        convertTextareas.call(this);
+        this.elements = convertTextareas.call(this, elements);
     }
 
-    function convertTextareas() {
-        var converted = [];
-        this.elements.forEach(function (element, index) {
+    function convertTextareas(elements) {
+        return elements.map(function (element, index) {
             if (element.nodeName.toLowerCase() === 'textarea') {
-                converted.push(createContentEditable.call(this, element, index));
+                return createContentEditable.call(this, element, index);
             } else {
-                converted.push(element);
+                return element;
             }
         }, this);
-
-        this.elements = converted;
     }
 
     function setExtensionDefaults(extension, defaults) {
@@ -1143,15 +1140,9 @@
         addElements: function (elements) {
             elements = elements.length ? elements : [elements];
 
-            var filtered = [];
-
             // Filter the input, we want to include every element only once!
-            elements.forEach(function (element) {
-                if (element.getAttribute('data-medium-editor-element')) {
-                    return;
-                }
-
-                filtered.push(element);
+            var filtered = elements.filter(function (element) {
+                return !element.getAttribute('data-medium-editor-element');
             });
 
             // Do we have elements to add now?
@@ -1164,34 +1155,26 @@
 
             // Initialize all new elements (we check that in those functions don't worry)
             initElements.call(this);
-            convertTextareas.call(this);
+            this.elements = convertTextareas.call(this, this.elements);
 
             filtered.forEach(function (element) {
                 reAttachHandlers.apply(this, [element]);
-            }.bind(this));
+            }, this);
         },
 
         removeElements: function (elements) {
             elements = elements.length ? elements : [elements];
 
-            var _this = this,
-                _removeElement = function (elementToRemove) {
-                    var filtered = [];
+            var filtered = this.elements.filter(function (element) {
+                // If this is an element we want to remove
+                if (elements.indexOf(element) === -1) {
+                    this.events.cleanupElement(element);
+                    return false;
+                }
+                return true;
+            }, this);
 
-                    _this.elements.forEach(function (element) {
-                        if (element.getAttribute('medium-editor-index') !== elementToRemove.getAttribute('medium-editor-index')) {
-                            filtered.push(element);
-                        } else {
-                            _this.events.cleanupElement(element);
-                        }
-                    });
-
-                    _this.elements = filtered;
-                };
-
-            elements.forEach(function (element) {
-                _removeElement(element);
-            });
+            this.elements = filtered;
         }
     };
 }());
