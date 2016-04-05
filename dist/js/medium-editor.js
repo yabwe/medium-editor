@@ -2793,12 +2793,14 @@ MediumEditor.extensions = {};
             }
             // An event triggered which signifies that the user may have changed someting
             // Look in our cache of input for the contenteditables to see if something changed
-            var index = target.getAttribute('medium-editor-index');
-            if (target.innerHTML !== this.contentCache[index]) {
+            var index = target.getAttribute('medium-editor-index'),
+                html = target.innerHTML;
+
+            if (html !== this.contentCache[index]) {
                 // The content has changed since the last time we checked, fire the event
                 this.triggerCustomEvent('editableInput', eventObj, target);
             }
-            this.contentCache[index] = target.innerHTML;
+            this.contentCache[index] = html;
         },
 
         handleDocumentSelectionChange: function (event) {
@@ -3771,7 +3773,7 @@ MediumEditor.extensions = {};
                 return 'tel:' + value;
             } else {
                 // Check for URL scheme and default to http:// if none found
-                return (urlSchemeRegex.test(value) ? '' : 'http://') + value;
+                return (urlSchemeRegex.test(value) ? '' : 'http://') + encodeURI(value);
             }
         },
 
@@ -4537,8 +4539,12 @@ MediumEditor.extensions = {};
                     event.preventDefault();
                     event.stopPropagation();
 
+                    // command can be a function to execute
+                    if (typeof data.command === 'function') {
+                        data.command.apply(this);
+                    }
                     // command can be false so the shortcut is just disabled
-                    if (false !== data.command) {
+                    else if (false !== data.command) {
                         this.execAction(data.command);
                     }
                 }
@@ -7154,7 +7160,7 @@ MediumEditor.parseVersionString = function (release) {
 
 MediumEditor.version = MediumEditor.parseVersionString.call(this, ({
     // grunt-bump looks for this:
-    'version': '5.15.0'
+    'version': '5.15.1'
 }).version);
 
     return MediumEditor;

@@ -1,3 +1,10 @@
+5.15.1 / 2016-04-05
+==================
+
+* Fix link validation in anchor extension
+* Improve performance when dealing with a lot of data
+* Enable functions to be used as keyboard commands
+
 5.15.0 / 2016-03-23
 ==================
 * Use class instead of inline style for hiding/showing anchor form
