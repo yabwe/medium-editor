@@ -1138,7 +1138,8 @@
         },
 
         addElements: function (elements) {
-            elements = elements.length ? elements : [elements];
+            // Convert elements into an array
+            elements = elements.length ? Array.prototype.slice.call(elements) : [elements];
 
             // Filter the input, we want to include every element only once!
             var filtered = elements.filter(function (element) {
@@ -1163,7 +1164,8 @@
         },
 
         removeElements: function (elements) {
-            elements = elements.length ? elements : [elements];
+            // Convert elements into an array
+            elements = elements.length ? Array.prototype.slice.call(elements) : [elements];
 
             var filtered = this.elements.filter(function (element) {
                 // If this is an element we want to remove
