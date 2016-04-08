@@ -141,6 +141,26 @@
         }
     }
 
+    function handleKeydown(event) {
+
+        var node = MediumEditor.selection.getSelectionStart(this.options.ownerDocument);
+
+        if (!node) {
+            return;
+        }
+
+        // If the element is empty and user has inputted content,
+        // we'll mark the element with an attribute so we can act based on it on keyup event
+        if (!MediumEditor.util.isKey(event, MediumEditor.util.keyCode.TAB) &&
+            !MediumEditor.util.isKey(event, MediumEditor.util.keyCode.DELETE) &&
+            !MediumEditor.util.isKey(event, MediumEditor.util.keyCode.BACKSPACE) &&
+            node.innerText.length === 0) {
+
+            node.setAttribute('data-empty-element', 'true');
+        }
+
+    }
+
     function handleKeyup(event) {
         var node = MediumEditor.selection.getSelectionStart(this.options.ownerDocument),
             tagName;
@@ -149,7 +169,16 @@
             return;
         }
 
-        if (MediumEditor.util.isMediumEditorElement(node) && node.children.length === 0) {
+        // If editing an empty non-blockcontainer element,
+        // we want to wrap the element with p as explained in:
+        // https://github.com/yabwe/medium-editor/issues/34
+        // Added checks which make sure the element is empty and a non-blockcontainer,
+        // to avoid situations explained in: #907, #829, #865, #149
+        if (MediumEditor.util.isMediumEditorElement(node) &&
+            node.children.length === 0 &&
+            (node.getAttribute('data-empty-element') === 'true' || node.innerText.length === 0) &&
+            !MediumEditor.util.isBlockContainer(node)) {
+
             this.options.ownerDocument.execCommand('formatBlock', false, 'p');
         }
 
@@ -168,6 +197,9 @@
                 this.options.ownerDocument.execCommand('formatBlock', false, 'p');
             }
         }
+
+        // Remove the temporary attribute
+        node.removeAttribute('data-empty-element');
     }
 
     // Internal helper methods which shouldn't be exposed externally
@@ -370,6 +402,9 @@
 
     function attachHandlers() {
         var i;
+
+        // On keydown event
+        this.subscribe('editableKeydown', handleKeydown.bind(this));
 
         // attach to tabs
         this.subscribe('editableKeydownTab', handleTabKeydown.bind(this));
