@@ -24,6 +24,21 @@ describe('MediumEditor.Events TestCase', function () {
             jasmine.clock().tick(1);
             expect(spy).toHaveBeenCalled();
         });
+
+        it('should bind listener even to list of elements', function () {
+            var el1, el2, elements, editor, spy;
+            el1 = this.createElement('div');
+            el1.classList.add('test-element');
+            el2 = this.createElement('div');
+            el2.classList.add('test-element');
+            elements = document.getElementsByClassName('test-element');
+            spy = jasmine.createSpy('handler');
+            editor = this.newMediumEditor('.editor');
+            editor.on(elements, 'click', spy);
+            fireEvent(el1, 'click');
+            jasmine.clock().tick(1);
+            expect(spy).toHaveBeenCalled();
+        });
     });
 
     describe('Off', function () {
@@ -35,6 +50,22 @@ describe('MediumEditor.Events TestCase', function () {
             editor.on(el, 'click', spy);
             editor.off(el, 'click', spy);
             fireEvent(el, 'click');
+            jasmine.clock().tick(1);
+            expect(spy).not.toHaveBeenCalled();
+        });
+
+        it('should unbind listener even from list of elements', function () {
+            var el1, el2, elements, editor, spy;
+            el1 = this.createElement('div');
+            el1.classList.add('test-element');
+            el2 = this.createElement('div');
+            el2.classList.add('test-element');
+            elements = document.getElementsByClassName('test-element');
+            spy = jasmine.createSpy('handler');
+            editor = this.newMediumEditor('.editor');
+            editor.on(elements, 'click', spy);
+            editor.off(elements, 'click', spy);
+            fireEvent(el1, 'click');
             jasmine.clock().tick(1);
             expect(spy).not.toHaveBeenCalled();
         });

@@ -9,8 +9,8 @@
   - [`destroy()`](#destroy)
   - [`setup()`](#setup)
 - [Event Functions](#event-functions)
-  - [`on(target, event, listener, useCapture)`](#ontarget-event-listener-usecapture)
-  - [`off(target, event, listener, useCapture)`](#offtarget-event-listener-usecapture)
+  - [`on(targets, event, listener, useCapture)`](#ontargets-event-listener-usecapture)
+  - [`off(targets, event, listener, useCapture)`](#offtargets-event-listener-usecapture)
   - [`subscribe(name, listener)`](#subscribename-listener)
   - [`unsubscribe(name, listener)`](#unsubscribename-listener)
   - [`trigger(name, data, editable)`](#triggername-data-editable)
@@ -83,15 +83,15 @@ Initialize this instance of the editor if it has been destroyed.  This will reus
 ***
 ## Event Functions
 
-### `on(target, event, listener, useCapture)`
+### `on(targets, event, listener, useCapture)`
 
-Attaches an event listener to specific element via the browser's built-in `addEventListener(type, listener, useCapture)` API.  However, this helper method also ensures that when MediumEditor is destroyed, this event listener will be automatically be detached from the DOM.
+Attaches an event listener to a specific element or elements via the browser's built-in `addEventListener(type, listener, useCapture)` API.  However, this helper method also ensures that when MediumEditor is destroyed, this event listener will be automatically be detached from the DOM.
 
 **Arguments**
 
-1. _**target** (`HTMLElement`)_:
+1. _**targets** (`HTMLElement` / `NodeList`)_:
 
-  * Element to attach listener to via `addEventListener(type, listener, useCapture)`
+  * Element or elements to attach listener to via `addEventListener(type, listener, useCapture)`
 
 2. _**event** (`String`)_:
 
@@ -106,15 +106,15 @@ Attaches an event listener to specific element via the browser's built-in `addEv
    * useCapture argument for `addEventListener(type, listener, useCapture)`
 
 ***
-### `off(target, event, listener, useCapture)`
+### `off(targets, event, listener, useCapture)`
 
-Detach an event listener from a specific element via the browser's built-in `removeEventListener(type, listener, useCapture)` API.
+Detach an event listener from a specific element or elements via the browser's built-in `removeEventListener(type, listener, useCapture)` API.
 
 **Arguments**
 
-1. _**target** (`HTMLElement`)_:
+1. _**targets** (`HTMLElement` / `NodeList`)_:
 
-  * Element to detach listener from via `removeEventListener(type, listener, useCapture)`
+  * Element or elements to detach listener from via `removeEventListener(type, listener, useCapture)`
 
 2. _**event** (`String`)_:
 
