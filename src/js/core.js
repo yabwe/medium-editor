@@ -665,22 +665,32 @@
 
         on: function (target, event, listener, useCapture) {
             this.events.attachDOMEvent(target, event, listener, useCapture);
+
+            return this;
         },
 
         off: function (target, event, listener, useCapture) {
             this.events.detachDOMEvent(target, event, listener, useCapture);
+
+            return this;
         },
 
         subscribe: function (event, listener) {
             this.events.attachCustomEvent(event, listener);
+
+            return this;
         },
 
         unsubscribe: function (event, listener) {
             this.events.detachCustomEvent(event, listener);
+
+            return this;
         },
 
         trigger: function (name, data, editable) {
             this.events.triggerCustomEvent(name, data, editable);
+
+            return this;
         },
 
         delay: function (fn) {
