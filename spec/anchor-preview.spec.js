@@ -287,6 +287,7 @@ describe('Anchor Preview TestCase', function () {
             expect(anchorPreview.getPreviewElement().classList.contains('medium-editor-anchor-preview-active')).toBe(false);
         });
 
+        // https://github.com/yabwe/medium-editor/issues/1047
         it('should display the anchor form in the toolbar when clicked when showWhenToolbarIsVisible is set to true adn toolbar is visible', function () {
             var editor = this.newMediumEditor('.editor', {
                     anchorPreview: {
