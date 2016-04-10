@@ -677,6 +677,36 @@ describe('Content TestCase', function () {
         expect(this.el.innerHTML).toMatch(/(<p><br><\/p>)?/);
     });
 
+    // https://github.com/yabwe/medium-editor/issues/994
+    it('should not throw an error when keyup occurs within a non-div editor', function () {
+        var origEC = document.execCommand,
+            errorCount = 0;
+        // Wrap document.execCommand so we can detect browser errors when it's called
+        document.execCommand = function () {
+            try {
+                origEC.apply(document, arguments);
+            } catch (err) {
+                errorCount++;
+                throw err;
+            }
+        };
+
+        this.el.parentNode.removeChild(this.el);
+        this.el = this.createElement('h1', 'editor', 'M');
+
+        var editor = this.newMediumEditor('h1.editor');
+        editor.elements[0].focus();
+        selectElementContentsAndFire(editor.elements[0]);
+        jasmine.clock().tick(1);
+        fireEvent(editor.elements[0], 'keyup', {
+            keyCode: MediumEditor.util.keyCode.M
+        });
+
+        // Restore original document.execCommand
+        document.execCommand = origEC;
+        expect(errorCount).toBe(0, 'there was an error thrown when calling document.execCommand()');
+    });
+
     describe('spellcheck', function () {
         it('should have spellcheck attribute set to true by default', function () {
             var editor = this.newMediumEditor('.editor');
