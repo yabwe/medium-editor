@@ -34,19 +34,19 @@
     "package.json",
     "src",
     "CHANGES.md",
-    "RELEASE-PROCESS.md",
+    "MAINTAINERS.md",
     "CODE_OF_CONDUCT.md",
     "CONTRIBUTING.md",
     "UPGRADE-5.md"
   ],
-  "version": "5.14.4",
-  "_release": "5.14.4",
+  "version": "5.16.0",
+  "_release": "5.16.0",
   "_resolution": {
     "type": "version",
-    "tag": "5.14.4",
-    "commit": "4da34843ebd1a8abf0957b953e3c78053142e4e0"
+    "tag": "5.16.0",
+    "commit": "55b72924b468100cfedaef64efbc30016ff17bd5"
   },
-  "_source": "git://github.com/daviferreira/medium-editor.git",
+  "_source": "https://github.com/daviferreira/medium-editor.git",
   "_target": "^5.11.0",
   "_originalSource": "medium-editor"
 }
