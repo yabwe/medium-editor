@@ -154,7 +154,7 @@ These events are triggered by the toolbar when the toolbar extension has not bee
 `positionToolbar` is triggered each time the current selection is checked and the toolbar's position is about to be updated. This event is triggered after all of the buttons have had their state updated, but before the toolbar is moved to the correct location.  This event will be triggered even if nothing will be changed about the toolbar's appearance.
 
 ### `positionedToolbar`
-`positionedToolbar` is triggered each time the current selection is checked, the toolbar is displayed, and the toolbar's position was updated. This differs from the `positionToolbar` event in that the visibility and location of the toolbar has already been changed (as opposed to before those changes happene). This event will be triggered even if nothing was changed about the toolbar's appearance.
+`positionedToolbar` is triggered each time the current selection is checked, the toolbar is displayed, and the toolbar's position was updated. This differs from the `positionToolbar` event in that the visibility and location of the toolbar has already been changed (as opposed to the event triggering before those changes occur). This event will be triggered even if nothing was changed about the toolbar's appearance.
 
 ### `showToolbar`
 `showToolbar` is triggered whenever the toolbar was hidden and has just been displayed.
