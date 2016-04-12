@@ -200,6 +200,93 @@ describe('Content TestCase', function () {
     });
 
     describe('when the enter key is pressed', function () {
+        it('should not do anything when singleEnterBlockElement options is true', function () {
+            this.el.innerHTML = '<p>lorem ipsum</p>';
+
+            var editor = this.newMediumEditor('.editor', { singleEnterBlockElement: true }),
+                evt;
+
+            placeCursorInsideElement(editor.elements[0], 1);
+
+            evt = prepareEvent(editor.elements[0], 'keydown', {
+                keyCode: MediumEditor.util.keyCode.ENTER
+            });
+
+            spyOn(evt, 'preventDefault').and.callThrough();
+
+            firePreparedEvent(evt, editor.elements[0], 'keydown');
+            expect(evt.preventDefault).not.toHaveBeenCalled();
+        });
+
+        it('should not add a <br> tag when enter is pressed once, cursor is at the end of the line and singleEnterBlockElement options is false', function () {
+            this.el.innerHTML = '<p>lorem ipsum</p>';
+
+            var editor = this.newMediumEditor('.editor', { singleEnterBlockElement: false }),
+                evt;
+
+            placeCursorInsideElement(editor.elements[0], 1);
+
+            evt = prepareEvent(editor.elements[0], 'keydown', {
+                keyCode: MediumEditor.util.keyCode.ENTER
+            });
+
+            spyOn(evt, 'preventDefault').and.callThrough();
+
+            firePreparedEvent(evt, editor.elements[0], 'keydown');
+            expect(evt.preventDefault).not.toHaveBeenCalled();
+            expect(this.el.innerHTML).toBe('<p>lorem ipsum</p>');
+        });
+
+        it('should add a br tag when enter is pressed once and singleEnterBlockElement options is false', function () {
+            //reason for failure of this test case
+            //this test case is failing because cursor is at the end of the element, need to place cursor in between lorem and ipsum.
+            this.el.innerHTML = '<p>lorem ipsum</p>';
+
+            var editor = this.newMediumEditor('.editor', { singleEnterBlockElement: false }),
+                evt;
+
+            placeCursorInsideElement(editor.elements[0], 1);
+
+            evt = prepareEvent(editor.elements[0], 'keydown', {
+                keyCode: MediumEditor.util.keyCode.ENTER
+            });
+
+            spyOn(evt, 'preventDefault').and.callThrough();
+
+            firePreparedEvent(evt, editor.elements[0], 'keydown');
+            expect(evt.preventDefault).toHaveBeenCalled();
+            expect(this.el.innerHTML).toBe('<p>lorem ipsum<br></p>');
+        });
+
+        it('should add a p tag when enter is pressed twice and singleEnterBlockElement options is false', function () {
+            //reason for failure of this test case
+            //this test case is failing because cursor is at the end of the element, need to place cursor in between lorem and ipsum.
+
+            this.el.innerHTML = '<p>lorem ipsum</p>';
+
+            var editor = this.newMediumEditor('.editor', { singleEnterBlockElement: false }),
+                evt;
+
+            placeCursorInsideElement(editor.elements[0], 1);
+
+            evt = prepareEvent(editor.elements[0], 'keydown', {
+                keyCode: MediumEditor.util.keyCode.ENTER
+            });
+
+            spyOn(evt, 'preventDefault').and.callThrough();
+
+            firePreparedEvent(evt, editor.elements[0], 'keydown');
+            expect(evt.preventDefault).toHaveBeenCalled();
+            expect(this.el.innerHTML).toBe('<p>lorem ipsum<br></p>');
+
+            //placing cursor and firing second enter
+            //it should remove the br tag added by  first enter and add a new p tag
+            placeCursorInsideElement(editor.elements[0], 1);
+            firePreparedEvent(evt, editor.elements[0], 'keydown');
+            expect(evt.preventDefault).toHaveBeenCalled();
+            expect(this.el.innerHTML).toBe('<p>lorem ipsum</p><p></p>');
+        });
+
         it('should prevent new lines from being inserted when disableReturn options is true', function () {
             this.el.innerHTML = 'lorem ipsum';
 
