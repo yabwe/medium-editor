@@ -1,9 +1,18 @@
+5.16.0 / 2016-04-12
+==================
+* Add support for multiple targets for attaching/detach event handlers
+* Add support for chaining calls to attach/detach events
+* Fix issue with click anchor-preview when using showWhenToolbarIsVisible
+* Fix IE issue with line-breaking within editor
+* Fix Firefox error when using elements other than divs as editor
+
+
 5.15.1 / 2016-04-05
 ==================
-
 * Fix link validation in anchor extension
 * Improve performance when dealing with a lot of data
 * Enable functions to be used as keyboard commands
+
 
 5.15.0 / 2016-03-23
 ==================
