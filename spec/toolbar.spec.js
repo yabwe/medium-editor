@@ -96,7 +96,18 @@ describe('MediumEditor.extensions.toolbar TestCase', function () {
             selectElementContentsAndFire(this.el);
 
             expect(callback).toHaveBeenCalledWith({}, this.el);
+        });
 
+        it('should trigger positionedToolbar custom event when toolbar is moved', function () {
+            var editor = this.newMediumEditor('.editor'),
+                callback = jasmine.createSpy();
+
+            this.el.innerHTML = 'specOnUpdateToolbarTest';
+            editor.subscribe('positionedToolbar', callback);
+
+            selectElementContentsAndFire(this.el);
+
+            expect(callback).toHaveBeenCalledWith({}, this.el);
         });
 
         it('should trigger positionToolbar before setToolbarPosition is called', function () {
@@ -126,6 +137,29 @@ describe('MediumEditor.extensions.toolbar TestCase', function () {
             spyOn(toolbar, 'setToolbarPosition').and.callThrough();
             spyOn(temp, 'update').and.callThrough();
             editor.subscribe('positionToolbar', temp.update);
+            selectElementContentsAndFire(this.el);
+            expect(temp.update).toHaveBeenCalled();
+            expect(toolbar.setToolbarPosition).toHaveBeenCalled();
+        });
+
+        it('should trigger positionedToolbar after setToolbarPosition and showToolbar is called', function () {
+            this.el.innerHTML = 'position sanity check';
+            var editor = this.newMediumEditor('.editor'),
+                toolbar = editor.getExtensionByName('toolbar'),
+                temp = {
+                    update: function () {
+                        expect(toolbar.setToolbarPosition).toHaveBeenCalled();
+                        expect(toolbar.showToolbar).toHaveBeenCalled();
+                    }
+                };
+
+            selectElementContents(this.el);
+            jasmine.clock().tick(1);
+
+            spyOn(toolbar, 'setToolbarPosition').and.callThrough();
+            spyOn(toolbar, 'showToolbar').and.callThrough();
+            spyOn(temp, 'update').and.callThrough();
+            editor.subscribe('positionedToolbar', temp.update);
             selectElementContentsAndFire(this.el);
             expect(temp.update).toHaveBeenCalled();
             expect(toolbar.setToolbarPosition).toHaveBeenCalled();

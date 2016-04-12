@@ -237,16 +237,16 @@ describe('Anchor Preview TestCase', function () {
 
         it('should be displayed when the option showWhenToolbarIsVisible is set to true and toolbar is visible', function () {
             var editor = this.newMediumEditor('.editor', {
-                delay: 200,
-                anchorPreview: {
-                      showWhenToolbarIsVisible: true
-                  },
-                toolbar: {
-                      static: true
-                  }
-            }),
-            anchorPreview = editor.getExtensionByName('anchor-preview'),
-            toolbar = editor.getExtensionByName('toolbar');
+                    delay: 200,
+                    anchorPreview: {
+                        showWhenToolbarIsVisible: true
+                    },
+                    toolbar: {
+                        static: true
+                    }
+                }),
+                anchorPreview = editor.getExtensionByName('anchor-preview'),
+                toolbar = editor.getExtensionByName('toolbar');
 
             selectElementContentsAndFire(editor.elements[0].firstChild);
 
@@ -258,21 +258,21 @@ describe('Anchor Preview TestCase', function () {
             jasmine.clock().tick(250);
             expect(anchorPreview.showPreview).toHaveBeenCalled();
             expect(toolbar.isDisplayed()).toBe(true);
-            expect(anchorPreview.getPreviewElement().classList.contains('medium-toolbar-arrow-over')).toBe(true);
+            expect(anchorPreview.getPreviewElement().classList.contains('medium-editor-anchor-preview-active')).toBe(true);
         });
 
-        it('should be displayed when the option showWhenToolbarIsVisible is set to true and toolbar is visible', function () {
+        it('should NOT be displayed when the option showWhenToolbarIsVisible is set to false and toolbar is visible', function () {
             var editor = this.newMediumEditor('.editor', {
-                delay: 200,
-                anchorPreview: {
-                      showWhenToolbarIsVisible: false
-                  },
-                toolbar: {
-                      static: true
-                  }
-            }),
-            anchorPreview = editor.getExtensionByName('anchor-preview'),
-            toolbar = editor.getExtensionByName('toolbar');
+                    delay: 200,
+                    anchorPreview: {
+                        showWhenToolbarIsVisible: false
+                    },
+                    toolbar: {
+                        static: true
+                    }
+                }),
+                anchorPreview = editor.getExtensionByName('anchor-preview'),
+                toolbar = editor.getExtensionByName('toolbar');
 
             selectElementContentsAndFire(editor.elements[0].firstChild);
 
@@ -282,10 +282,58 @@ describe('Anchor Preview TestCase', function () {
 
             // preview shows only after delay
             jasmine.clock().tick(250);
-
             expect(anchorPreview.showPreview).not.toHaveBeenCalled();
             expect(toolbar.isDisplayed()).toBe(true);
-            expect(anchorPreview.getPreviewElement().classList.contains('medium-toolbar-arrow-over')).toBe(false);
+            expect(anchorPreview.getPreviewElement().classList.contains('medium-editor-anchor-preview-active')).toBe(false);
+        });
+
+        // https://github.com/yabwe/medium-editor/issues/1047
+        it('should display the anchor form in the toolbar when clicked when showWhenToolbarIsVisible is set to true adn toolbar is visible', function () {
+            var editor = this.newMediumEditor('.editor', {
+                    anchorPreview: {
+                        showWhenToolbarIsVisible: true
+                    },
+                    toolbar: {
+                        static: true
+                    }
+                }),
+                anchorPreview = editor.getExtensionByName('anchor-preview'),
+                anchor = editor.getExtensionByName('anchor'),
+                toolbar = editor.getExtensionByName('toolbar');
+
+            // show toolbar
+            selectElementContentsAndFire(editor.elements[0].firstChild);
+            jasmine.clock().tick(1);
+            expect(toolbar.isDisplayed()).toBe(true);
+
+            // show preview
+            fireEvent(document.getElementById('test-link'), 'mouseover');
+
+            // load into editor
+            jasmine.clock().tick(1);
+            expect(anchorPreview.getPreviewElement().classList.contains('medium-editor-anchor-preview-active')).toBe(true);
+
+            var clickEvent = {
+                defaultPrevented: false,
+                preventDefault: function () {
+                    this.defaultPrevented = true;
+                }
+            };
+
+            // trigger all events toolbar is listening to on clicks
+            fireEvent(anchorPreview.getPreviewElement(), 'mousedown');
+            fireEvent(anchorPreview.getPreviewElement(), 'mouseup');
+            anchorPreview.handleClick(clickEvent);
+            jasmine.clock().tick(1);
+
+            // click on the link should have called `preventDefault` to stop from navigating away
+            expect(clickEvent.defaultPrevented).toBe(true, 'link navigation was not prevented on click of the anchor-preview');
+
+            // anchor form should be visible in toolbar
+            expect(toolbar.isDisplayed()).toBe(true);
+            expect(anchor.isDisplayed()).toBe(true, 'anchor form to edit link is not visible');
+            expect(anchorPreview.getPreviewElement().classList.contains('medium-editor-anchor-preview-active')).toBe(false,
+                'anchor-preview is still visible after being clicked');
         });
 
         it('should NOT be present when anchorPreview option is set to false', function () {
