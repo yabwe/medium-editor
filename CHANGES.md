@@ -1,3 +1,8 @@
+5.16.1 / 2016-04-14
+==================
+  * Fix incorrect word breaking
+
+
 5.16.0 / 2016-04-12
 ==================
 * Add support for multiple targets for attaching/detach event handlers
