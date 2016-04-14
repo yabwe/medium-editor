@@ -10,7 +10,7 @@
 
 // contenteditable rules
 [data-medium-editor-element] {
-    word-break: break-all;
+    word-wrap: break-word;
     min-height: 30px;
 
     img {
