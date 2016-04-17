@@ -12,7 +12,7 @@
 
 **Actual behavior:** [What actually happened]
 
-**Link to [JSFiddle](https://jsfiddle.net/):** [If you're reporting a bug that's not reproducible on our [demo page](https://yabwe.github.io/medium-editor/demo.html), please try to reproduce it on [JSFiddle](https://jsfiddle.net/) and paste a link here]
+**Link to an example:** [If you're reporting a bug that's not reproducible on our [demo page](https://yabwe.github.io/medium-editor/demo.html), please try to reproduce it on [JSFiddle](https://jsfiddle.net/), [JS Bin](https://jsbin.com), [CodePen](http://codepen.io/) or a similar service and paste a link here]
 
 ### Versions
 
