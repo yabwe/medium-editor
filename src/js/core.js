@@ -205,13 +205,13 @@
         win._mediumEditors[this.id] = null;
     }
 
-    function createElementsArray(selector) {
+    function createElementsArray(selector, doc) {
         if (!selector) {
             selector = [];
         }
         // If string, use as query selector
         if (typeof selector === 'string') {
-            selector = this.options.ownerDocument.querySelectorAll(selector);
+            selector = doc.querySelectorAll(selector);
         }
         // If element, put into array
         if (MediumEditor.util.isElement(selector)) {
@@ -221,17 +221,17 @@
         var elements = Array.prototype.slice.apply(selector);
 
         // Loop through elements and convert textarea's into divs
-        this.elements = convertTextareas.call(this, elements);
+        return convertTextareas(elements, doc);
     }
 
-    function convertTextareas(elements) {
+    function convertTextareas(elements, doc) {
         return elements.map(function (element, index) {
             if (element.nodeName.toLowerCase() === 'textarea') {
-                return createContentEditable.call(this, element, index);
+                return createContentEditable(element, index, doc);
             } else {
                 return element;
             }
-        }, this);
+        });
     }
 
     function setExtensionDefaults(extension, defaults) {
@@ -309,15 +309,15 @@
         return !this.options.extensions['imageDragging'];
     }
 
-    function createContentEditable(textarea, id) {
-        var div = this.options.ownerDocument.createElement('div'),
+    function createContentEditable(textarea, id, doc) {
+        var div = doc.createElement('div'),
             now = Date.now(),
             uniqueId = 'medium-editor-' + now + '-' + id,
             atts = textarea.attributes;
 
         // Some browsers can move pretty fast, since we're using a timestamp
         // to make a unique-id, ensure that the id is actually unique on the page
-        while (this.options.ownerDocument.getElementById(uniqueId)) {
+        while (doc.getElementById(uniqueId)) {
             now++;
             uniqueId = 'medium-editor-' + now + '-' + id;
         }
@@ -621,7 +621,7 @@
                 return;
             }
 
-            createElementsArray.call(this, this.origElements);
+            this.elements = createElementsArray(this.origElements, this.options.ownerDocument);
 
             if (this.elements.length === 0) {
                 return;
@@ -1156,7 +1156,7 @@
 
             // Initialize all new elements (we check that in those functions don't worry)
             initElements.call(this);
-            this.elements = convertTextareas.call(this, this.elements);
+            this.elements = convertTextareas(this.elements, this.options.ownerDocument);
 
             filtered.forEach(function (element) {
                 reAttachHandlers.apply(this, [element]);
