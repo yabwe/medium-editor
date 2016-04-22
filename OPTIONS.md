@@ -190,7 +190,7 @@ Enables/disables automatically adding the `target="_blank"` attribute to anchor 
 
 The toolbar for MediumEditor is implemented as a built-in extension which automatically displays whenever the user selects some text.  The toolbar can hold any set of defined built-in buttons, but can also hold any custom buttons passed in as extensions.
 
-Options for the toolbar are passed as an object taht is a member of the outer options object. Example:
+Options for the toolbar are passed as an object that is a member of the outer options object. Example:
 ```js
 var editor = new MediumEditor('.editable', {
     toolbar: {
