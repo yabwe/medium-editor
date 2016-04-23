@@ -205,7 +205,9 @@
         win._mediumEditors[this.id] = null;
     }
 
-    function createElementsArray(selector, doc) {
+    function createElementsArray(selector, doc, filterEditorElements) {
+        var elements = [];
+
         if (!selector) {
             selector = [];
         }
@@ -217,11 +219,24 @@
         if (MediumEditor.util.isElement(selector)) {
             selector = [selector];
         }
-        // Convert NodeList (or other array like object) into an array
-        var elements = Array.prototype.slice.apply(selector);
 
-        // Loop through elements and convert textarea's into divs
-        return convertTextareas(elements, doc);
+        if (filterEditorElements) {
+            // Remove elements that have already been initialized by the editor
+            // selecotr might not be an array (ie NodeList) so use for loop
+            for (var i = 0; i < selector.length; i++) {
+                var el = selector[i];
+                if (MediumEditor.util.isElement(el) &&
+                    !el.getAttribute('data-medium-editor-element') &&
+                    !el.getAttribute('medium-editor-textarea-id')) {
+                    elements.push(el);
+                }
+            }
+        } else {
+            // Convert NodeList (or other array like object) into an array
+            elements = Array.prototype.slice.apply(selector);
+        }
+
+        return elements;
     }
 
     function convertTextareas(elements, doc) {
@@ -621,7 +636,10 @@
                 return;
             }
 
-            this.elements = createElementsArray(this.origElements, this.options.ownerDocument);
+            this.elements = createElementsArray(this.origElements, this.options.ownerDocument, true);
+
+            // Loop through elements and convert textareas into divs
+            this.elements = convertTextareas(this.elements, this.options.ownerDocument);
 
             if (this.elements.length === 0) {
                 return;
@@ -1137,37 +1155,34 @@
             this.addElements([element]);
         },
 
-        addElements: function (elements) {
+        addElements: function (toAdd) {
             // Convert elements into an array
-            elements = elements.length ? Array.prototype.slice.call(elements) : [elements];
-
-            // Filter the input, we want to include every element only once!
-            var filtered = elements.filter(function (element) {
-                return !element.getAttribute('data-medium-editor-element');
-            });
+            var elements = createElementsArray(toAdd, this.options.ownerDocument, true);
 
             // Do we have elements to add now?
-            if (filtered.length === 0) {
+            if (elements.length === 0) {
                 return false;
             }
 
+            // Convert any textareas into divs
+            elements = convertTextareas(elements, this.options.ownerDocument);
+
             // Add new elements to our internal elements array
-            this.elements = this.elements.concat(filtered);
+            this.elements = this.elements.concat(elements);
 
             // Initialize all new elements (we check that in those functions don't worry)
             initElements.call(this);
-            this.elements = convertTextareas(this.elements, this.options.ownerDocument);
 
-            filtered.forEach(function (element) {
+            elements.forEach(function (element) {
                 reAttachHandlers.apply(this, [element]);
             }, this);
         },
 
-        removeElements: function (elements) {
+        removeElements: function (toRemove) {
             // Convert elements into an array
-            elements = elements.length ? Array.prototype.slice.call(elements) : [elements];
+            var elements = createElementsArray(toRemove, this.options.ownerDocument);
 
-            var filtered = this.elements.filter(function (element) {
+            this.elements = this.elements.filter(function (element) {
                 // If this is an element we want to remove
                 if (elements.indexOf(element) === -1) {
                     this.events.cleanupElement(element);
@@ -1175,8 +1190,6 @@
                 }
                 return true;
             }, this);
-
-            this.elements = filtered;
         }
     };
 }());

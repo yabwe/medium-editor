@@ -14,7 +14,7 @@ describe('MediumEditor.DynamicElements TestCase', function () {
         this.cleanupTest();
     });
 
-    describe('Add elements after creation of MediumEditor instance', function () {
+    describe('addElements', function () {
         it('should initialize dom element properly when adding dynamically', function () {
             var editor = this.newMediumEditor('.editor'),
             focusedEditable,
@@ -43,6 +43,27 @@ describe('MediumEditor.DynamicElements TestCase', function () {
             fireEvent(document.body, 'mouseup');
             fireEvent(document.body, 'click');
             expect(blurredEditable).toBe(this.addOne);
+        });
+
+        it('should accept a selector to specify elements to add', function () {
+            var editor = this.newMediumEditor('.editor');
+            expect(editor.elements.length).toBe(1);
+            editor.addElements('.add-one');
+            expect(editor.elements.length).toBe(2);
+        });
+
+        it('should accept a NodeList to specify elements to add', function () {
+            var editor = this.newMediumEditor('.editor');
+            expect(editor.elements.length).toBe(1);
+            editor.addElements(document.getElementsByClassName('add-one'));
+            expect(editor.elements.length).toBe(2);
+        });
+
+        it('should not add an element that is already an editor element', function () {
+            var editor = this.newMediumEditor('.editor');
+            expect(editor.elements.length).toBe(1);
+            editor.addElements('.editor');
+            expect(editor.elements.length).toBe(1);
         });
 
         function runAddTest(inputSupported) {
@@ -105,6 +126,26 @@ describe('MediumEditor.DynamicElements TestCase', function () {
 
         runAddTest(true);
         runAddTest(false);
+    });
+
+    describe('removeElements', function () {
+        it('should accept a selector to specify elements to remove', function () {
+            var editor = this.newMediumEditor('.editor, .add-one');
+            expect(editor.elements.length).toBe(2);
+            editor.removeElements('.editor');
+            expect(editor.elements.length).toBe(1);
+            editor.removeElements('.add-one');
+            expect(editor.elements.length).toBe(0);
+        });
+
+        it('should accept a NodeList to specify elements to remove', function () {
+            var editor = this.newMediumEditor('.editor, .add-one');
+            expect(editor.elements.length).toBe(2);
+            editor.removeElements(document.getElementsByClassName('editor'));
+            expect(editor.elements.length).toBe(1);
+            editor.removeElements(document.getElementsByClassName('add-one'));
+            expect(editor.elements.length).toBe(0);
+        });
     });
 });
 

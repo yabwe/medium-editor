@@ -186,8 +186,8 @@ describe('Initialization TestCase', function () {
         it('should set the ID according to the numbers of editors instantiated', function () {
             var editor1 = this.newMediumEditor('.editor'),
                 firstId = editor1.id,
-                editor2 = this.newMediumEditor('.editor'),
-                editor3 = this.newMediumEditor('.editor');
+                editor2 = this.newMediumEditor(this.createElement('div')),
+                editor3 = this.newMediumEditor(this.createElement('div'));
 
             expect(editor2.id).toBe(firstId + 1);
             expect(editor3.id).toBe(firstId + 2);
