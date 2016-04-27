@@ -5,6 +5,7 @@
         activeButtonClass: 'medium-editor-button-active',
         buttonLabels: false,
         delay: 0,
+        disable: [],
         disableReturn: false,
         disableDoubleReturn: false,
         disableExtraSpaces: false,

@@ -16,6 +16,7 @@ var editor = new MediumEditor('.editor', {
     - [`buttonLabels`](#buttonlabels)
     - [`contentWindow`](#contentwindow)
     - [`delay`](#delay)
+    - [`disable`](#disable)
     - [`disableReturn`](#disablereturn)
     - [`disableDoubleReturn`](#disabledoublereturn)
     - [`disableExtraSpaces`](#disableextraspaces)
@@ -131,6 +132,13 @@ The contentWindow object that contains the contenteditable element. MediumEditor
 **Default:** `0`
 
 Time in milliseconds to show the toolbar or anchor tag preview.
+
+***
+#### `disable`
+**Default:** `[]`
+
+Disable the Editor over elements that matches listed selectors.
+Can be an array `['selector', `selector2']` or a string `'selector'`.
 
 ***
 #### `disableReturn`

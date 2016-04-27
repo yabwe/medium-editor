@@ -41,6 +41,12 @@ describe('MediumEditor.Events TestCase', function () {
         });
     });
 
+    describe('SelectiveHandlers', function () {
+        it('should not fire listener', function () {
+            // Currently fires at child. Kinda propagation?..
+        });
+    });
+
     describe('Off', function () {
         it('should unbind listener', function () {
             var el, editor, spy;

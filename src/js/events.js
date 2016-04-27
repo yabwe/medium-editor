@@ -16,11 +16,27 @@
         // Helpers for event handling
 
         attachDOMEvent: function (targets, event, listener, useCapture) {
+            var selectiveListener = function (event) {
+                var i, disabled, target;
+                disabled = this.options.disable;
+                target = event.target;
+
+                if (disabled) {
+                    disabled = Array.isArray(disabled) ? disabled : [disabled];
+                    for (i in disabled) {
+                        if (target.matches && target.matches(disabled[i])) {
+                            return;
+                        }
+                    }
+                }
+                listener.apply(this, arguments);
+            }.bind(this);
+
             targets = MediumEditor.util.isElement(targets) || [window, document].indexOf(targets) > -1 ? [targets] : targets;
 
             Array.prototype.forEach.call(targets, function (target) {
-                target.addEventListener(event, listener, useCapture);
-                this.events.push([target, event, listener, useCapture]);
+                target.addEventListener(event, selectiveListener, useCapture);
+                this.events.push([target, event, listener, useCapture, selectiveListener]);
             }.bind(this));
         },
 
@@ -32,7 +48,7 @@
                 index = this.indexOfListener(target, event, listener, useCapture);
                 if (index !== -1) {
                     e = this.events.splice(index, 1)[0];
-                    e[0].removeEventListener(e[1], e[2], e[3]);
+                    e[0].removeEventListener(e[1], e[4], e[3]);
                 }
             }.bind(this));
         },
@@ -51,7 +67,7 @@
         detachAllDOMEvents: function () {
             var e = this.events.pop();
             while (e) {
-                e[0].removeEventListener(e[1], e[2], e[3]);
+                e[0].removeEventListener(e[1], e[4], e[3]);
                 e = this.events.pop();
             }
         },

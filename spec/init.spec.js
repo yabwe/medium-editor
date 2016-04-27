@@ -98,6 +98,7 @@ describe('Initialization TestCase', function () {
         it('should have a default set of options', function () {
             var defaultOptions = {
                 delay: 0,
+                disable: [],
                 disableReturn: false,
                 disableDoubleReturn: false,
                 disableExtraSpaces: false,

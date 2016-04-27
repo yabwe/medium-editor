@@ -218,7 +218,7 @@
             selector = [selector];
         }
         // Convert NodeList (or other array like object) into an array
-        var elements = Array.prototype.slice.apply(selector);
+        var elements = MediumEditor.util.toArr(selector);
 
         // Loop through elements and convert textarea's into divs
         this.elements = [];
@@ -227,6 +227,21 @@
                 this.elements.push(createContentEditable.call(this, element, index));
             } else {
                 this.elements.push(element);
+            }
+        }, this);
+    }
+
+    function offDisabledElements(elements) {
+        // Should be checked that it exists outside the func.
+        elements.forEach(function (element) {
+            var i, disabled, disabledElements;
+            disabled = this.options.disable;
+            disabled = Array.isArray(disabled) ? disabled : [disabled];
+            for (i in disabled) {
+                disabledElements = MediumEditor.util.toArr(element.querySelectorAll(disabled[i]));
+                disabledElements.forEach(function (disabledElement) {
+                    disabledElement.setAttribute('contenteditable', 'false');
+                });
             }
         }, this);
     }
@@ -603,6 +618,10 @@
             }
 
             createElementsArray.call(this, this.origElements);
+
+            if (this.options.disable) {
+                offDisabledElements.call(this, this.elements);
+            }
 
             if (this.elements.length === 0) {
                 return;
