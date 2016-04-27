@@ -15,18 +15,26 @@
 
         // Helpers for event handling
 
-        attachDOMEvent: function (target, event, listener, useCapture) {
-            target.addEventListener(event, listener, useCapture);
-            this.events.push([target, event, listener, useCapture]);
+        attachDOMEvent: function (targets, event, listener, useCapture) {
+            targets = MediumEditor.util.isElement(targets) || [window, document].indexOf(targets) > -1 ? [targets] : targets;
+
+            Array.prototype.forEach.call(targets, function (target) {
+                target.addEventListener(event, listener, useCapture);
+                this.events.push([target, event, listener, useCapture]);
+            }.bind(this));
         },
 
-        detachDOMEvent: function (target, event, listener, useCapture) {
-            var index = this.indexOfListener(target, event, listener, useCapture),
-                e;
-            if (index !== -1) {
-                e = this.events.splice(index, 1)[0];
-                e[0].removeEventListener(e[1], e[2], e[3]);
-            }
+        detachDOMEvent: function (targets, event, listener, useCapture) {
+            var index, e;
+            targets = MediumEditor.util.isElement(targets) || [window, document].indexOf(targets) > -1 ? [targets] : targets;
+
+            Array.prototype.forEach.call(targets, function (target) {
+                index = this.indexOfListener(target, event, listener, useCapture);
+                if (index !== -1) {
+                    e = this.events.splice(index, 1)[0];
+                    e[0].removeEventListener(e[1], e[2], e[3]);
+                }
+            }.bind(this));
         },
 
         indexOfListener: function (target, event, listener, useCapture) {
