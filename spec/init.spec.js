@@ -92,32 +92,6 @@ describe('Initialization TestCase', function () {
             editor.setup();
             expect(editor.elements.length).toBe(1);
         });
-
-        it('should contain dynamically added elements after calling destory and setup again', function () {
-            var editor = this.newMediumEditor('.editor');
-            expect(editor.elements.length).toBe(1);
-            var otherElement = this.createElement('div', '', 'other');
-            editor.addElements(otherElement);
-            expect(editor.elements.length).toBe(2);
-            editor.destroy();
-            expect(editor.elements.length).toBe(0);
-            editor.setup();
-            expect(editor.elements.indexOf(document.querySelector('.editor'))).not.toBe(-1);
-            expect(editor.elements.indexOf(otherElement)).not.toBe(-1, 'The dynamically added element was not preserved after calling destory() -> setup()');
-        });
-
-        it('should not contain dynamically removed elements after calling destory and setup again', function () {
-            this.createElement('div', 'editor', 'other content');
-            var editor = this.newMediumEditor('.editor'),
-                firstElement = editor.elements[0];
-            expect(editor.elements.length).toBe(2);
-            editor.removeElements(firstElement);
-            expect(editor.elements.length).toBe(1);
-            editor.destroy();
-            expect(editor.elements.length).toBe(0);
-            editor.setup();
-            expect(editor.elements.indexOf(firstElement)).toBe(-1, 'The dynamically removed element was added back to elements after calling destroy() -> setup()');
-        });
     });
 
     describe('With a valid element', function () {
