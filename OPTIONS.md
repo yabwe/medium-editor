@@ -137,7 +137,7 @@ Time in milliseconds to show the toolbar or anchor tag preview.
 #### `disable`
 **Default:** `[]`
 
-Disable the Editor over elements that matches listed selectors.
+Disable the Editor over elements that match listed selectors.
 Can be an array `['selector', 'selector2']` or a string `'selector'`.
 
 ***
