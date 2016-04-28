@@ -1055,7 +1055,7 @@
         },
 
         toArr: function (arraylike) {
-            return Array.prototype.slice.call(arraylike);
+            return [].slice.call(arraylike);
         }
     };
 
