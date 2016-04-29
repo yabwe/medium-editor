@@ -569,7 +569,9 @@ editor.subscribe('editableInput', this._handleEditableInput.bind(this));
 
 // imagine an ajax fetch/any other dynamic functionality which will add new '.editable' elements to dom
 
-editor.addElements(document.querySelectorAll('.editable'));
+editor.addElements('.editable');
+// OR editor.addElements(document.getElementsByClassName('editable'));
+// OR editor.addElements(document.querySelectorAll('.editable'));
 ```
 
 Passing an elements or array of elements to `addElements(elements)` will:
@@ -587,6 +589,8 @@ Straight forward, just call `removeElements` with the elemnt or array of element
 
 ```javascript
 editor.removeElements(document.querySelector('#myElement'));
+// OR editor.removeElements(document.getElementById('myElement'));
+// OR editor.removeElements('#myElement');
 
 // in case you have jQuery and don't exactly know when an element was removed, for example after routing state change
 var removedElements = [];
