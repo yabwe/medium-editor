@@ -205,4 +205,56 @@ describe('Textarea TestCase', function () {
             expect(this.el.classList.contains('medium-editor-hidden')).toBe(false);
         });
     });
+
+    describe('Calling removeElements', function () {
+        beforeEach(function () {
+            setupTestHelpers.call(this);
+            this.div = this.createElement('div', 'editable-div', 'sample div');
+            this.el = this.createElement('textarea', 'editor');
+            this.el.value = 'test content';
+            this.el.id = 'editor-textarea';
+        });
+
+        afterEach(function () {
+            this.cleanupTest();
+        });
+
+        it('should remove the created div and show the textarea when passed a div created for a textarea', function () {
+            var editor = this.newMediumEditor('.editor'),
+                createdDiv = editor.elements[0],
+                divParent = createdDiv.parentNode;
+            expect(editor.elements.length).toBe(1);
+            expect(this.el.classList.contains('medium-editor-hidden')).toBe(true);
+
+            editor.addElements(this.div);
+            expect(editor.elements.length).toBe(2);
+
+            editor.removeElements(createdDiv);
+            expect(editor.elements.length).toBe(1);
+            expect(createdDiv.parentNode).not.toBe(divParent, 'The div created for the textarea should have been removed');
+            expect(this.el.hasAttribute('medium-editor-textarea-id')).toBe(false,
+                'The textarea should not have a medium-editor-textarea-id attribute when its editor div is removed');
+            expect(this.el.classList.contains('medium-editor-hidden')).toBe(false,
+                'The textarea should be hidden when its editor div is removed');
+        });
+
+        it('should remove the created div and show the textaarea when passed the actual textarea', function () {
+            var editor = this.newMediumEditor('.editor'),
+                createdDiv = editor.elements[0],
+                divParent = createdDiv.parentNode;
+            expect(editor.elements.length).toBe(1);
+            expect(this.el.classList.contains('medium-editor-hidden')).toBe(true);
+
+            editor.addElements(this.div);
+            expect(editor.elements.length).toBe(2);
+
+            editor.removeElements(this.el);
+            expect(editor.elements.length).toBe(1);
+            expect(createdDiv.parentNode).not.toBe(divParent, 'The div created for the textarea should have been removed');
+            expect(this.el.hasAttribute('medium-editor-textarea-id')).toBe(false,
+                'The textarea should not have a medium-editor-textarea-id attribute when its editor div is removed');
+            expect(this.el.classList.contains('medium-editor-hidden')).toBe(false,
+                'The textarea should be hidden when its editor div is removed');
+        });
+    });
 });
