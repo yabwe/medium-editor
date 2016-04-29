@@ -45,6 +45,46 @@ describe('MediumEditor.DynamicElements TestCase', function () {
             expect(blurredEditable).toBe(this.addOne);
         });
 
+        it('should attach all event handlers to an element when adding an element', function () {
+            var listenerWrapper = function () {
+                this.listenerInfo.push([arguments[0], arguments[1], arguments[2]]);
+                this._addEventListner.apply(this, arguments);
+            };
+
+            this.el._addEventListner = this.el.addEventListener;
+            this.el.listenerInfo = [];
+            this.el.addEventListener = listenerWrapper.bind(this.el);
+            this.addOne._addEventListner = this.addOne.addEventListener;
+            this.addOne.listenerInfo = [];
+            this.addOne.addEventListener = listenerWrapper.bind(this.addOne);
+
+            // Instatiating editor will trigger adding event handlers to each element
+            expect(this.el.listenerInfo.length).toBe(0);
+            var editor = this.newMediumEditor('.editor', { anchorPreview: false });
+            expect(this.el.listenerInfo.length).not.toBe(0);
+            var listenerCount = this.el.listenerInfo.length;
+            editor.subscribe('editableBlur', function blurHandler () { });
+            expect(this.el.listenerInfo.length).toBe(listenerCount + 1);
+
+            // When adding a new element, all handlers should also be added to that element
+            expect(this.addOne.listenerInfo.length).toBe(0);
+            editor.addElements(this.addOne);
+            expect(this.addOne.listenerInfo.length).toBe(this.el.listenerInfo.length);
+
+            // When attaching a new handler, the handler should be added to dynamically added elements too
+            editor.subscribe('editableMouseover', function mouseoverHandler () {});
+            expect(this.el.listenerInfo.length).toBe(listenerCount + 2);
+            expect(this.addOne.listenerInfo.length).toBe(listenerCount + 2);
+
+            // Check that the same handlers have been added to each element
+            this.el.listenerInfo.forEach(function (elListener) {
+                var found = this.addOne.listenerInfo.some(function (addOneListener) {
+                    return elListener[0] === addOneListener[0] && elListener[0].name === addOneListener[0].name;
+                });
+                expect(found).toBe(true);
+            }, this);
+        });
+
         it('should accept a selector to specify elements to add', function () {
             var editor = this.newMediumEditor('.editor');
             expect(editor.elements.length).toBe(1);
@@ -129,6 +169,17 @@ describe('MediumEditor.DynamicElements TestCase', function () {
     });
 
     describe('removeElements', function () {
+        it('should accept specific elements to remove', function () {
+            var editor = this.newMediumEditor('.editor, .add-one');
+            expect(editor.elements.indexOf(this.addOne)).not.toBe(-1);
+            expect(editor.elements.indexOf(this.el)).not.toBe(-1);
+            editor.removeElements(this.addOne);
+            expect(editor.elements.indexOf(this.addOne)).toBe(-1);
+            expect(editor.elements.indexOf(this.el)).not.toBe(-1);
+            editor.removeElements(this.el);
+            expect(editor.elements.indexOf(this.el)).toBe(-1);
+        });
+
         it('should accept a selector to specify elements to remove', function () {
             var editor = this.newMediumEditor('.editor, .add-one');
             expect(editor.elements.length).toBe(2);
@@ -145,6 +196,35 @@ describe('MediumEditor.DynamicElements TestCase', function () {
             expect(editor.elements.length).toBe(1);
             editor.removeElements(document.getElementsByClassName('add-one'));
             expect(editor.elements.length).toBe(0);
+        });
+
+        it('should detach all event handlers from an element', function () {
+            var attached = [],
+                origAdd = this.el.addEventListener,
+                origRemove = this.el.removeEventListener;
+
+            this.el.removeEventListener = function () {
+                var args = arguments;
+                attached = attached.filter(function (props) {
+                    if (props[0] === args[0] && props[1] === args[1] && props[2] === args[2]) {
+                        return false;
+                    }
+                    return true;
+                });
+                origRemove.apply(this, arguments);
+            }.bind(this.el);
+            this.el.addEventListener = function () {
+                attached.push([arguments[0], arguments[1], arguments[2]]);
+                origAdd.apply(this, arguments);
+            }.bind(this.el);
+
+            // Instatiating editor will trigger adding event handlers to each element
+            var editor = this.newMediumEditor('.editor, .add-one');
+            expect(attached.length).not.toBe(0);
+
+            // Removing should make calls to remove each individual event handler
+            editor.removeElements(this.el);
+            expect(attached.length).toBe(0);
         });
     });
 });
