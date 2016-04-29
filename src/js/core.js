@@ -249,6 +249,18 @@
         });
     }
 
+    function cleanupTextareaElement(element) {
+        var textarea = element.parentNode.querySelector('textarea[medium-editor-textarea-id="' + element.getAttribute('medium-editor-textarea-id') + '"]');
+        if (textarea) {
+            // Un-hide the textarea
+            textarea.classList.remove('medium-editor-hidden');
+            textarea.removeAttribute('medium-editor-textarea-id');
+        }
+        if (element.parentNode) {
+            element.parentNode.removeChild(element);
+        }
+    }
+
     function setExtensionDefaults(extension, defaults) {
         Object.keys(defaults).forEach(function (prop) {
             if (extension[prop] === undefined) {
@@ -377,7 +389,7 @@
             element.setAttribute('aria-multiline', true);
             element.setAttribute('medium-editor-index', MediumEditor.util.guid());
 
-            if (element.hasAttribute('medium-editor-textarea-id')) {
+            if (element.getAttribute('medium-editor-textarea-id')) {
                 isTextareaUsed = true;
             }
         }, this);
@@ -686,15 +698,8 @@
                 element.removeAttribute('medium-editor-index');
 
                 // Remove any elements created for textareas
-                if (element.hasAttribute('medium-editor-textarea-id')) {
-                    var textarea = element.parentNode.querySelector('textarea[medium-editor-textarea-id="' + element.getAttribute('medium-editor-textarea-id') + '"]');
-                    if (textarea) {
-                        // Un-hide the textarea
-                        textarea.classList.remove('medium-editor-hidden');
-                    }
-                    if (element.parentNode) {
-                        element.parentNode.removeChild(element);
-                    }
+                if (element.getAttribute('medium-editor-textarea-id')) {
+                    cleanupTextareaElement(element);
                 }
             }, this);
             this.elements = [];
@@ -1155,9 +1160,9 @@
             this.addElements([element]);
         },
 
-        addElements: function (toAdd) {
+        addElements: function (selector) {
             // Convert elements into an array
-            var elements = createElementsArray(toAdd, this.options.ownerDocument, true);
+            var elements = createElementsArray(selector, this.options.ownerDocument, true);
 
             // Do we have elements to add now?
             if (elements.length === 0) {
@@ -1178,14 +1183,25 @@
             }, this);
         },
 
-        removeElements: function (toRemove) {
+        removeElements: function (selector) {
             // Convert elements into an array
-            var elements = createElementsArray(toRemove, this.options.ownerDocument);
+            var elements = createElementsArray(selector, this.options.ownerDocument),
+                toRemove = elements.map(function (el) {
+                    // For textareas, make sure we're looking at the editor div and not the textarea itself
+                    if (el.getAttribute('medium-editor-textarea-id') && el.parentNode) {
+                        return el.parentNode.querySelector('div[medium-editor-textarea-id="' + el.getAttribute('medium-editor-textarea-id') + '"]');
+                    } else {
+                        return el;
+                    }
+                });
 
             this.elements = this.elements.filter(function (element) {
                 // If this is an element we want to remove
-                if (elements.indexOf(element) === -1) {
+                if (toRemove.indexOf(element) !== -1) {
                     this.events.cleanupElement(element);
+                    if (element.getAttribute('medium-editor-textarea-id')) {
+                        cleanupTextareaElement(element);
+                    }
                     return false;
                 }
                 return true;
