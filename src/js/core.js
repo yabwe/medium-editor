@@ -1098,8 +1098,13 @@
             if (this.elements[index]) {
                 var target = this.elements[index];
                 target.innerHTML = html;
-                this.events.updateInput(target, { target: target, currentTarget: target });
+                this.checkContentChanged(target);
             }
+        },
+
+        checkContentChanged: function (editable) {
+            editable = editable || MediumEditor.selection.getSelectionElement(this.window);
+            this.events.updateInput(editable, { target: editable, currentTarget: editable });
         }
     };
 }());

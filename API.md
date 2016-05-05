@@ -33,6 +33,7 @@
   - [`pasteHTML(html, options)`](#pastehtmlhtml-options)
   - [`queryCommandState(action)`](#querycommandstateaction)
 - [Helper Functions](#helper-functions)
+  - [`checkContentChanged(editable)`](#checkContentChangededitable)
   - [`delay(fn)`](#delayfn)
   - [`getExtensionByName(name)`](#getextensionbynamename)
   - [`serialize()`](#serialize)
@@ -287,6 +288,16 @@ _wrapper around the browser's built in `document.queryCommandState(action)` for 
 
 ***
 ## Helper Functions
+
+### `checkContentChanged(editable)`
+
+Trigger the editor to check for updates to the html, and trigger the `editableInput` event if needed.
+
+**Arguments**
+
+1. _**editable** (`HTMLElement`)_: _**OPTIONAL**_
+  * The `<div contenteditable=true></div>` element that contains the html that may have changed.
+  * If no element is provided, the editor will check the currently 'active' editor element (the element with focus).
 
 ### `delay(fn)`
 
