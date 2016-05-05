@@ -1103,7 +1103,7 @@
         },
 
         checkContentChanged: function (editable) {
-            editable = editable || MediumEditor.selection.getSelectionElement(this.window);
+            editable = editable || MediumEditor.selection.getSelectionElement(this.options.contentWindow);
             this.events.updateInput(editable, { target: editable, currentTarget: editable });
         }
     };
