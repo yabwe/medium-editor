@@ -172,6 +172,13 @@
         }
     }
 
+    function handleEditableInput(event, editable) {
+        var textarea = editable.parentNode.querySelector('textarea[medium-editor-textarea-id="' + editable.getAttribute('medium-editor-textarea-id') + '"]');
+        if (textarea) {
+            textarea.value = editable.innerHTML.trim();
+        }
+    }
+
     // Internal helper methods which shouldn't be exposed externally
 
     function addToEditors(win) {
@@ -372,14 +379,8 @@
         return div;
     }
 
-    function initElements() {
-        var isTextareaUsed = false;
-
-        this.elements.forEach(function (element) {
-            if (element.getAttribute('data-medium-editor-element')) {
-                return;
-            }
-
+    function initElement(element) {
+        if (!element.getAttribute('data-medium-editor-element')) {
             if (!this.options.disableEditing && !element.getAttribute('data-disable-editing')) {
                 element.setAttribute('contentEditable', true);
                 element.setAttribute('spellcheck', this.options.spellcheck);
@@ -389,19 +390,17 @@
             element.setAttribute('aria-multiline', true);
             element.setAttribute('medium-editor-index', MediumEditor.util.guid());
 
-            if (element.getAttribute('medium-editor-textarea-id')) {
-                isTextareaUsed = true;
+            if (!this.instanceHandleEditableInput && element.getAttribute('medium-editor-textarea-id')) {
+                this.instanceHandleEditableInput = handleEditableInput.bind(this);
+                this.subscribe('editableInput', this.instanceHandleEditableInput);
             }
-        }, this);
-
-        if (isTextareaUsed) {
-            this.subscribe('editableInput', function (event, editable) {
-                var textarea = editable.parentNode.querySelector('textarea[medium-editor-textarea-id="' + editable.getAttribute('medium-editor-textarea-id') + '"]');
-                if (textarea) {
-                    textarea.value = this.serialize()[editable.id].value;
-                }
-            }.bind(this));
         }
+
+        return element;
+    }
+
+    function initElements() {
+        this.elements = this.elements.map(initElement, this);
     }
 
     function attachHandlers() {
