@@ -106,6 +106,15 @@ describe('MediumEditor.DynamicElements TestCase', function () {
             expect(editor.elements.length).toBe(1);
         });
 
+        it('should attach editableKeydownEnter to the editor when adding an element with a data-disable-return attribute', function () {
+            var editor = this.newMediumEditor('.editor');
+            expect(editor.events.customEvents['editableKeydownEnter'].length).toBe(1);
+
+            this.addOne.setAttribute('data-disable-return', true);
+            editor.addElements(this.addOne);
+            expect(editor.events.customEvents['editableKeydownEnter'].length).toBe(2, 'editableKeydownEnter should be subscribed to when adding a data-disbale-return element');
+        });
+
         function runAddTest(inputSupported) {
             it('should re-attach element properly when removed from dom, cleaned up and injected to dom again', function () {
                 var originalInputSupport = MediumEditor.Events.prototype.InputEventOnContenteditableSupported;
