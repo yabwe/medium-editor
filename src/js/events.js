@@ -86,14 +86,6 @@
             this.customEvents[event].push(listener);
         },
 
-        reAttachCustomEventsOnElement: function (element) {
-            if (this.listeners['editableInput']) {
-                this.contentCache[element.getAttribute('medium-editor-index')] = element.innerHTML;
-            }
-
-            this.reAttachHandlersToElement(element);
-        },
-
         detachCustomEvent: function (event, listener) {
             var index = this.indexOfCustomListener(event, listener);
             if (index !== -1) {
@@ -120,6 +112,19 @@
                 this.customEvents[name].forEach(function (listener) {
                     listener(data, editable);
                 });
+            }
+        },
+
+        // Attach all existing handlers to a new element
+        attachAllEvents: function (element) {
+            if (this.listeners['editableInput']) {
+                this.contentCache[element.getAttribute('medium-editor-index')] = element.innerHTML;
+            }
+
+            if (this.eventsCache) {
+                this.eventsCache.forEach(function (e) {
+                    this.attachDOMEvent(element, e['name'], e['handler'].bind(this));
+                }, this);
             }
         },
 
@@ -354,12 +359,6 @@
             }, this);
 
             this.eventsCache.push({ 'name': name, 'handler': handler });
-        },
-
-        reAttachHandlersToElement: function (element) {
-            this.eventsCache.forEach(function (e) {
-                this.attachDOMEvent(element, e['name'], e['handler'].bind(this));
-            }, this);
         },
 
         cleanupElement: function (element) {

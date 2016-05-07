@@ -389,6 +389,8 @@
             element.setAttribute('role', 'textbox');
             element.setAttribute('aria-multiline', true);
             element.setAttribute('medium-editor-index', MediumEditor.util.guid());
+
+            this.events.attachAllEvents(element);
         }
 
         return element;
@@ -444,8 +446,6 @@
                 this.on(element, 'keyup', handleKeyup.bind(this));
             }
         }
-
-        this.events.reAttachCustomEventsOnElement(element);
     }
 
     function initExtensions() {
