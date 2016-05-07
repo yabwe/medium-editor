@@ -84,6 +84,9 @@ describe('Extensions TestCase', function () {
                     },
                     execCommand: function () {
                         return document.execCommand.apply(document, arguments);
+                    },
+                    getElementById: function () {
+                        return document.getElementById.apply(document, arguments);
                     }
                 },
                 fakeWindow = {

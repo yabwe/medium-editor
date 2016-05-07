@@ -1,5 +1,15 @@
 (function () {
     'use strict';
+
+    /* Helpers and internal variables that don't need to be members of actual paste handler */
+
+    var pasteBinDefaultContent = '%ME_PASTEBIN%',
+        lastRange = null,
+        keyboardPasteEditable = null,
+        stopProp = function (event) {
+            event.stopPropagation();
+        };
+
     /*jslint regexp: true*/
     /*
         jslint does not allow character negation, because the negation
@@ -9,6 +19,15 @@
     */
     function createReplacements() {
         return [
+            // Remove anything but the contents within the BODY element
+            [new RegExp(/^[\s\S]*<body[^>]*>\s*|\s*<\/body[^>]*>[\s\S]*$/g), ''],
+
+            // cleanup comments added by Chrome when pasting html
+            [new RegExp(/<!--StartFragment-->|<!--EndFragment-->/g), ''],
+
+            // Trailing BR elements
+            [new RegExp(/<br>$/i), ''],
+
             // replace two bogus tags that begin pastes from google docs
             [new RegExp(/<[^>]*docs-internal-guid[^>]*>/gi), ''],
             [new RegExp(/<\/b>(<br[^>]*>)?$/gi), ''],
@@ -38,14 +57,45 @@
             [new RegExp(/\n+<p/gi), '<p'],
 
             // Microsoft Word makes these odd tags, like <o:p></o:p>
-            [new RegExp(/<\/?o:[a-z]*>/gi), ''],
-
-            // cleanup comments added by Chrome when pasting html
-            ['<!--EndFragment-->', ''],
-            ['<!--StartFragment-->', '']
+            [new RegExp(/<\/?o:[a-z]*>/gi), '']
         ];
     }
     /*jslint regexp: false*/
+
+    /**
+     * Gets various content types out of the Clipboard API. It will also get the
+     * plain text using older IE and WebKit API.
+     *
+     * @param {event} event Event fired on paste.
+     * @param {win} reference to window
+     * @param {doc} reference to document
+     * @return {Object} Object with mime types and data for those mime types.
+     */
+    function getClipboardContent(event, win, doc) {
+        var dataTransfer = event.clipboardData || win.clipboardData || doc.dataTransfer,
+            data = {};
+
+        if (!dataTransfer) {
+            return data;
+        }
+
+        // Use old WebKit/IE API
+        if (dataTransfer.getData) {
+            var legacyText = dataTransfer.getData('Text');
+            if (legacyText && legacyText.length > 0) {
+                data['text/plain'] = legacyText;
+            }
+        }
+
+        if (dataTransfer.types) {
+            for (var i = 0; i < dataTransfer.types.length; i++) {
+                var contentType = dataTransfer.types[i];
+                data[contentType] = dataTransfer.getData(contentType);
+            }
+        }
+
+        return data;
+    }
 
     var PasteHandler = MediumEditor.Extension.extend({
         /* Paste Options */
@@ -91,58 +141,212 @@
 
             if (this.forcePlainText || this.cleanPastedHTML) {
                 this.subscribe('editablePaste', this.handlePaste.bind(this));
+                this.subscribe('editableKeydown', this.handleKeydown.bind(this));
             }
         },
 
-        handlePaste: function (event, element) {
-            var paragraphs,
-                html = '',
-                p,
-                dataFormatHTML = 'text/html',
-                dataFormatPlain = 'text/plain',
-                pastedHTML,
-                pastedPlain;
+        destroy: function () {
+            // Make sure pastebin is destroyed in case it's still around for some reason
+            if (this.forcePlainText || this.cleanPastedHTML) {
+                this.removePasteBin();
+            }
+        },
 
-            if (this.window.clipboardData && event.clipboardData === undefined) {
-                event.clipboardData = this.window.clipboardData;
+        handlePaste: function (event, editable) {
+            if (event.defaultPrevented) {
+                return;
+            }
+
+            var clipboardContent = getClipboardContent(event, this.window, this.document),
+                pastedHTML = clipboardContent['text/html'],
+                pastedPlain = clipboardContent['text/plain'];
+
+            if (this.window.clipboardData && event.clipboardData === undefined && !pastedHTML) {
                 // If window.clipboardData exists, but event.clipboardData doesn't exist,
                 // we're probably in IE. IE only has two possibilities for clipboard
                 // data format: 'Text' and 'URL'.
                 //
-                // Of the two, we want 'Text':
-                dataFormatHTML = 'Text';
-                dataFormatPlain = 'Text';
+                // For IE, we'll fallback to 'Text' for text/html
+                pastedHTML = pastedPlain;
             }
 
-            if (event.clipboardData &&
-                    event.clipboardData.getData &&
-                    !event.defaultPrevented) {
+            if (pastedHTML || pastedPlain) {
                 event.preventDefault();
 
-                pastedHTML = event.clipboardData.getData(dataFormatHTML);
-                pastedPlain = event.clipboardData.getData(dataFormatPlain);
+                this.doPaste(pastedHTML, pastedPlain, editable);
+            }
+        },
 
-                if (this.cleanPastedHTML && pastedHTML) {
-                    return this.cleanPaste(pastedHTML);
-                }
+        doPaste: function (pastedHTML, pastedPlain, editable) {
+            var paragraphs,
+                html = '',
+                p;
 
-                if (!(this.getEditorOption('disableReturn') || element.getAttribute('data-disable-return'))) {
-                    paragraphs = pastedPlain.split(/[\r\n]+/g);
-                    // If there are no \r\n in data, don't wrap in <p>
-                    if (paragraphs.length > 1) {
-                        for (p = 0; p < paragraphs.length; p += 1) {
-                            if (paragraphs[p] !== '') {
-                                html += '<p>' + MediumEditor.util.htmlEntities(paragraphs[p]) + '</p>';
-                            }
+            if (this.cleanPastedHTML && pastedHTML) {
+                return this.cleanPaste(pastedHTML);
+            }
+
+            if (!(this.getEditorOption('disableReturn') || (editable && editable.getAttribute('data-disable-return')))) {
+                paragraphs = pastedPlain.split(/[\r\n]+/g);
+                // If there are no \r\n in data, don't wrap in <p>
+                if (paragraphs.length > 1) {
+                    for (p = 0; p < paragraphs.length; p += 1) {
+                        if (paragraphs[p] !== '') {
+                            html += '<p>' + MediumEditor.util.htmlEntities(paragraphs[p]) + '</p>';
                         }
-                    } else {
-                        html = MediumEditor.util.htmlEntities(paragraphs[0]);
                     }
                 } else {
-                    html = MediumEditor.util.htmlEntities(pastedPlain);
+                    html = MediumEditor.util.htmlEntities(paragraphs[0]);
                 }
-                MediumEditor.util.insertHTMLCommand(this.document, html);
+            } else {
+                html = MediumEditor.util.htmlEntities(pastedPlain);
             }
+            MediumEditor.util.insertHTMLCommand(this.document, html);
+        },
+
+        handlePasteBinPaste: function (event) {
+            if (event.defaultPrevented) {
+                this.removePasteBin();
+                return;
+            }
+
+            var clipboardContent = getClipboardContent(event, this.window, this.document),
+                pastedHTML = clipboardContent['text/html'],
+                pastedPlain = clipboardContent['text/plain'],
+                editable = keyboardPasteEditable;
+
+            // If we have valid html already, or we're not in cleanPastedHTML mode
+            // we can ignore the paste bin and just paste now
+            if (!this.cleanPastedHTML || pastedHTML) {
+                event.preventDefault();
+                this.removePasteBin();
+                this.doPaste(pastedHTML, pastedPlain, editable);
+                return;
+            }
+
+            // We need to look at the paste bin, so do a setTimeout to let the paste
+            // fall through into the paste bin
+            setTimeout(function () {
+                // Only look for HTML if we're in cleanPastedHTML mode
+                if (this.cleanPastedHTML) {
+                    // If clipboard didn't have HTML, try the paste bin
+                    pastedHTML = this.getPasteBinHtml();
+                }
+
+                // If we needed the paste bin, we're done with it now, remove it
+                this.removePasteBin();
+
+                // Handle the paste with the html from the paste bin
+                this.doPaste(pastedHTML, pastedPlain, editable);
+            }.bind(this), 0);
+        },
+
+        handleKeydown: function (event, editable) {
+            // if it's not Ctrl+V, do nothing
+            if (!(MediumEditor.util.isKey(event, MediumEditor.util.keyCode.V) && MediumEditor.util.isMetaCtrlKey(event))) {
+                return;
+            }
+
+            event.stopImmediatePropagation();
+
+            this.removePasteBin();
+            this.createPasteBin(editable);
+        },
+
+        createPasteBin: function (editable) {
+            var rects,
+                range = MediumEditor.selection.getSelectionRange(this.document),
+                top = this.window.pageYOffset;
+
+            keyboardPasteEditable = editable;
+
+            if (range) {
+                rects = range.getClientRects();
+
+                // on empty line, rects is empty so we grab information from the first container of the range
+                if (rects.length) {
+                    top += rects[0].top;
+                } else {
+                    top += range.startContainer.getBoundingClientRect().top;
+                }
+            }
+
+            lastRange = range;
+
+            var pasteBinElm = this.document.createElement('div');
+            pasteBinElm.id = this.pasteBinId = 'medium-editor-pastebin-' + (+Date.now());
+            pasteBinElm.setAttribute('style', 'border: 1px red solid; position: absolute; top: ' + top + 'px; width: 10px; height: 10px; overflow: hidden; opacity: 0');
+            pasteBinElm.setAttribute('contentEditable', true);
+            pasteBinElm.innerHTML = pasteBinDefaultContent;
+
+            this.document.body.appendChild(pasteBinElm);
+
+            // avoid .focus() to stop other event (actually the paste event)
+            this.on(pasteBinElm, 'focus', stopProp);
+            this.on(pasteBinElm, 'focusin', stopProp);
+            this.on(pasteBinElm, 'focusout', stopProp);
+
+            pasteBinElm.focus();
+
+            MediumEditor.selection.selectNode(pasteBinElm, this.document);
+
+            if (!this.boundHandlePaste) {
+                this.boundHandlePaste = this.handlePasteBinPaste.bind(this);
+            }
+
+            this.on(pasteBinElm, 'paste', this.boundHandlePaste);
+        },
+
+        removePasteBin: function () {
+            if (null !== lastRange) {
+                MediumEditor.selection.selectRange(this.document, lastRange);
+                lastRange = null;
+            }
+
+            if (null !== keyboardPasteEditable) {
+                keyboardPasteEditable = null;
+            }
+
+            var pasteBinElm = this.getPasteBin();
+            if (!pasteBinElm) {
+                return;
+            }
+
+            if (pasteBinElm) {
+                this.off(pasteBinElm, 'focus', stopProp);
+                this.off(pasteBinElm, 'focusin', stopProp);
+                this.off(pasteBinElm, 'focusout', stopProp);
+                this.off(pasteBinElm, 'paste', this.boundHandlePaste);
+                pasteBinElm.parentElement.removeChild(pasteBinElm);
+            }
+        },
+
+        getPasteBin: function () {
+            return this.document.getElementById(this.pasteBinId);
+        },
+
+        getPasteBinHtml: function () {
+            var pasteBinElm = this.getPasteBin();
+
+            if (!pasteBinElm) {
+                return false;
+            }
+
+            // WebKit has a nice bug where it clones the paste bin if you paste from for example notepad
+            // so we need to force plain text mode in this case
+            if (pasteBinElm.firstChild && pasteBinElm.firstChild.id === 'mcepastebin') {
+                return false;
+            }
+
+            var pasteBinHtml = pasteBinElm.innerHTML;
+
+            // If paste bin is empty try using plain text mode
+            // since that is better than nothing right
+            if (!pasteBinHtml || pasteBinHtml === pasteBinDefaultContent) {
+                return false;
+            }
+
+            return pasteBinHtml;
         },
 
         cleanPaste: function (text) {
@@ -221,16 +425,19 @@
             MediumEditor.util.insertHTMLCommand(this.document, fragmentBody.innerHTML.replace(/&nbsp;/g, ' '));
         },
 
+        // TODO (6.0): Make this an internal helper instead of member of paste handler
         isCommonBlock: function (el) {
             return (el && (el.nodeName.toLowerCase() === 'p' || el.nodeName.toLowerCase() === 'div'));
         },
 
+        // TODO (6.0): Make this an internal helper instead of member of paste handler
         filterCommonBlocks: function (el) {
             if (/^\s*$/.test(el.textContent) && el.parentNode) {
                 el.parentNode.removeChild(el);
             }
         },
 
+        // TODO (6.0): Make this an internal helper instead of member of paste handler
         filterLineBreak: function (el) {
             if (this.isCommonBlock(el.previousElementSibling)) {
                 // remove stray br's following common block elements
@@ -244,6 +451,7 @@
             }
         },
 
+        // TODO (6.0): Make this an internal helper instead of member of paste handler
         // remove an element, including its parent, if it is the only element within its parent
         removeWithParent: function (el) {
             if (el && el.parentNode) {
@@ -255,6 +463,7 @@
             }
         },
 
+        // TODO (6.0): Make this an internal helper instead of member of paste handler
         cleanupSpans: function (containerEl) {
             var i,
                 el,

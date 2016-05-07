@@ -49,6 +49,7 @@
         isMac: (window.navigator.platform.toUpperCase().indexOf('MAC') >= 0),
 
         // https://github.com/jashkenas/underscore
+        // Lonely letter MUST USE the uppercase code
         keyCode: {
             BACKSPACE: 8,
             TAB: 9,
@@ -57,7 +58,8 @@
             SPACE: 32,
             DELETE: 46,
             K: 75, // K keycode, and not k
-            M: 77
+            M: 77,
+            V: 86
         },
 
         /**
@@ -492,8 +494,7 @@
                     range = range.cloneRange();
                     range.setStartAfter(lastNode);
                     range.collapse(true);
-                    selection.removeAllRanges();
-                    selection.addRange(range);
+                    MediumEditor.selection.selectRange(doc, range);
                 }
                 res = true;
             }
