@@ -385,6 +385,21 @@
                 element.setAttribute('contentEditable', true);
                 element.setAttribute('spellcheck', this.options.spellcheck);
             }
+
+            // Make sure we only attach to editableKeydownEnter once for disable-return options
+            if (!this.instanceHandleEditableKeydownEnter) {
+                if (element.getAttribute('data-disable-return') || element.getAttribute('data-disable-double-return')) {
+                    this.instanceHandleEditableKeydownEnter = handleDisabledEnterKeydown.bind(this);
+                    this.subscribe('editableKeydownEnter', this.instanceHandleEditableKeydownEnter);
+                }
+            }
+
+            // if we're not disabling return, add a handler to help handle cleanup
+            // for certain cases when enter is pressed
+            if (!this.options.disableReturn && !element.getAttribute('data-disable-return')) {
+                this.on(element, 'keyup', handleKeyup.bind(this));
+            }
+
             element.setAttribute('data-medium-editor-element', true);
             element.setAttribute('role', 'textbox');
             element.setAttribute('aria-multiline', true);
@@ -396,14 +411,7 @@
         return element;
     }
 
-    function initElements() {
-        this.elements = this.elements.map(initElement, this);
-    }
-
     function attachHandlers() {
-        var i,
-            len = this.elements.length;
-
         // attach to tabs
         this.subscribe('editableKeydownTab', handleTabKeydown.bind(this));
 
@@ -416,34 +424,12 @@
             this.subscribe('editableKeydownSpace', handleDisableExtraSpaces.bind(this));
         }
 
-        // disabling return or double return
-        if (this.options.disableReturn || this.options.disableDoubleReturn) {
-            this.subscribe('editableKeydownEnter', handleDisabledEnterKeydown.bind(this));
-        } else {
-            for (i = 0; i < len; i += 1) {
-                if (this.elements[i].getAttribute('data-disable-return') || this.elements[i].getAttribute('data-disable-double-return')) {
-                    this.subscribe('editableKeydownEnter', handleDisabledEnterKeydown.bind(this));
-                    break;
-                }
-            }
-        }
-
-        // if we're not disabling return, add a handler to help handle cleanup
-        // for certain cases when enter is pressed
-        if (!this.options.disableReturn) {
-            this.elements.forEach(function (element) {
-                if (!element.getAttribute('data-disable-return')) {
-                    this.on(element, 'keyup', handleKeyup.bind(this));
-                }
-            }, this);
-        }
-    }
-
-    function reAttachHandlers(element) {
-        // rerun the part of attachHandlers which is must be bound to this new element
-        if (!this.options.disableReturn) {
-            if (!element.getAttribute('data-disable-return')) {
-                this.on(element, 'keyup', handleKeyup.bind(this));
+        // Make sure we only attach to editableKeydownEnter once for disable-return options
+        if (!this.instanceHandleEditableKeydownEnter) {
+            // disabling return or double return
+            if (this.options.disableReturn || this.options.disableDoubleReturn) {
+                this.instanceHandleEditableKeydownEnter = handleDisabledEnterKeydown.bind(this);
+                this.subscribe('editableKeydownEnter', this.instanceHandleEditableKeydownEnter);
             }
         }
     }
@@ -642,7 +628,10 @@
                 return;
             }
 
-            this.elements = createElementsArray(this.origElements, this.options.ownerDocument, true);
+            this.events = new MediumEditor.Events(this);
+            this.elements = [];
+
+            this.addElements(this.origElements);
 
             if (this.elements.length === 0) {
                 return;
@@ -651,10 +640,7 @@
             this.isActive = true;
             addToEditors.call(this, this.options.contentWindow);
 
-            this.events = new MediumEditor.Events(this);
-
             // Call initialization helpers
-            initElements.call(this);
             initExtensions.call(this);
             attachHandlers.call(this);
         },
@@ -691,10 +677,11 @@
                 // Remove any elements created for textareas
                 if (element.getAttribute('medium-editor-textarea-id')) {
                     cleanupTextareaElement(element);
-                    this.instanceHandleEditableInput = null;
                 }
             }, this);
             this.elements = [];
+            this.instanceHandleEditableKeydownEnter = null;
+            this.instanceHandleEditableInput = null;
 
             removeFromEditors.call(this, this.options.contentWindow);
         },
@@ -1164,7 +1151,6 @@
             elements.forEach(function (element) {
                 // Initialize all new elements (we check that in those functions don't worry)
                 element = initElement.call(this, element);
-                reAttachHandlers.apply(this, [element]);
 
                 // Add new elements to our internal elements array
                 this.elements.push(element);
