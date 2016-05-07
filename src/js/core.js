@@ -1130,15 +1130,6 @@
             this.events.updateInput(editable, { target: editable, currentTarget: editable });
         },
 
-        addElement: function (element) {
-            if (element.length) {
-                // it is already an array..
-                return this.addElements(element);
-            }
-
-            this.addElements([element]);
-        },
-
         addElements: function (selector) {
             // Convert elements into an array
             var elements = createElementsArray(selector, this.options.ownerDocument, true);
