@@ -67,6 +67,19 @@
             }
         },
 
+        // Attach all existing handlers to a new element
+        attachAllEventsToElement: function (element) {
+            if (this.listeners['editableInput']) {
+                this.contentCache[element.getAttribute('medium-editor-index')] = element.innerHTML;
+            }
+
+            if (this.eventsCache) {
+                this.eventsCache.forEach(function (e) {
+                    this.attachDOMEvent(element, e['name'], e['handler'].bind(this));
+                }, this);
+            }
+        },
+
         enableCustomEvent: function (event) {
             if (this.disabledEvents[event] !== undefined) {
                 delete this.disabledEvents[event];
@@ -112,19 +125,6 @@
                 this.customEvents[name].forEach(function (listener) {
                     listener(data, editable);
                 });
-            }
-        },
-
-        // Attach all existing handlers to a new element
-        attachAllEvents: function (element) {
-            if (this.listeners['editableInput']) {
-                this.contentCache[element.getAttribute('medium-editor-index')] = element.innerHTML;
-            }
-
-            if (this.eventsCache) {
-                this.eventsCache.forEach(function (e) {
-                    this.attachDOMEvent(element, e['name'], e['handler'].bind(this));
-                }, this);
             }
         },
 

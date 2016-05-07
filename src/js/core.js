@@ -405,7 +405,7 @@
             element.setAttribute('aria-multiline', true);
             element.setAttribute('medium-editor-index', MediumEditor.util.guid());
 
-            this.events.attachAllEvents(element);
+            this.events.attachAllEventsToElement(element);
         }
 
         return element;
