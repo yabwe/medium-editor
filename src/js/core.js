@@ -246,16 +246,6 @@
         return elements;
     }
 
-    function convertTextareas(elements, doc) {
-        return elements.map(function (element, index) {
-            if (element.nodeName.toLowerCase() === 'textarea') {
-                return createContentEditable(element, index, doc);
-            } else {
-                return element;
-            }
-        });
-    }
-
     function cleanupTextareaElement(element) {
         var textarea = element.parentNode.querySelector('textarea[medium-editor-textarea-id="' + element.getAttribute('medium-editor-textarea-id') + '"]');
         if (textarea) {
@@ -379,8 +369,18 @@
         return div;
     }
 
-    function initElement(element) {
+    function initElement(element, id) {
         if (!element.getAttribute('data-medium-editor-element')) {
+            if (element.nodeName.toLowerCase() === 'textarea') {
+                element = createContentEditable(element, id, this.options.ownerDocument);
+
+                // Make sure we only attach to editableInput once for <textarea> elements
+                if (!this.instanceHandleEditableInput) {
+                    this.instanceHandleEditableInput = handleEditableInput.bind(this);
+                    this.subscribe('editableInput', this.instanceHandleEditableInput);
+                }
+            }
+
             if (!this.options.disableEditing && !element.getAttribute('data-disable-editing')) {
                 element.setAttribute('contentEditable', true);
                 element.setAttribute('spellcheck', this.options.spellcheck);
@@ -389,11 +389,6 @@
             element.setAttribute('role', 'textbox');
             element.setAttribute('aria-multiline', true);
             element.setAttribute('medium-editor-index', MediumEditor.util.guid());
-
-            if (!this.instanceHandleEditableInput && element.getAttribute('medium-editor-textarea-id')) {
-                this.instanceHandleEditableInput = handleEditableInput.bind(this);
-                this.subscribe('editableInput', this.instanceHandleEditableInput);
-            }
         }
 
         return element;
@@ -649,9 +644,6 @@
 
             this.elements = createElementsArray(this.origElements, this.options.ownerDocument, true);
 
-            // Loop through elements and convert textareas into divs
-            this.elements = convertTextareas(this.elements, this.options.ownerDocument);
-
             if (this.elements.length === 0) {
                 return;
             }
@@ -699,6 +691,7 @@
                 // Remove any elements created for textareas
                 if (element.getAttribute('medium-editor-textarea-id')) {
                     cleanupTextareaElement(element);
+                    this.instanceHandleEditableInput = null;
                 }
             }, this);
             this.elements = [];
@@ -1168,17 +1161,13 @@
                 return false;
             }
 
-            // Convert any textareas into divs
-            elements = convertTextareas(elements, this.options.ownerDocument);
-
-            // Add new elements to our internal elements array
-            this.elements = this.elements.concat(elements);
-
-            // Initialize all new elements (we check that in those functions don't worry)
-            initElements.call(this);
-
             elements.forEach(function (element) {
+                // Initialize all new elements (we check that in those functions don't worry)
+                element = initElement.call(this, element);
                 reAttachHandlers.apply(this, [element]);
+
+                // Add new elements to our internal elements array
+                this.elements.push(element);
             }, this);
         },
 
