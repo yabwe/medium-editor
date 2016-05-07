@@ -1,4 +1,5 @@
-/*global fireEvent, selectElementContents */
+/*global fireEvent, selectElementContents,
+  selectElementContentsAndFire */
 
 describe('Core-API', function () {
     'use strict';
@@ -99,6 +100,51 @@ describe('Core-API', function () {
             var exportedSelection = editor.exportSelection();
             expect(Object.keys(exportedSelection).sort()).toEqual(['editableElementIndex', 'end', 'start']);
             expect(exportedSelection.editableElementIndex).toEqual(1);
+        });
+    });
+
+    describe('checkContentChanged', function () {
+        it('should trigger editableInput when called after the html has changed', function () {
+            var editor = this.newMediumEditor('.editor', {
+                    toolbar: {
+                        buttons: ['italic', 'underline', 'strikethrough']
+                    }
+                }),
+                spy = jasmine.createSpy('handler');
+
+            editor.subscribe('editableInput', spy);
+            expect(spy).not.toHaveBeenCalled();
+
+            selectElementContentsAndFire(this.el.firstChild);
+            jasmine.clock().tick(1);
+
+            this.el.innerHTML = 'lorem ipsum';
+            expect(spy).not.toHaveBeenCalled();
+
+            var obj = { target: this.el, currentTarget: this.el };
+            editor.checkContentChanged();
+            expect(spy).toHaveBeenCalledWith(obj, this.el);
+        });
+
+        it('should not trigger editableInput when called after the html has not changed', function () {
+            var editor = this.newMediumEditor('.editor', {
+                    toolbar: {
+                        buttons: ['italic', 'underline', 'strikethrough']
+                    }
+                }),
+                spy = jasmine.createSpy('handler');
+
+            editor.subscribe('editableInput', spy);
+            expect(spy).not.toHaveBeenCalled();
+
+            selectElementContentsAndFire(this.el.firstChild);
+            jasmine.clock().tick(1);
+
+            this.el.innerHTML = 'lore ipsum';
+            expect(spy).not.toHaveBeenCalled();
+
+            editor.checkContentChanged();
+            expect(spy).not.toHaveBeenCalled();
         });
     });
 });

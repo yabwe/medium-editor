@@ -44,6 +44,10 @@
 
             handleClick: function (event) {
                 this.classApplier.toggleSelection();
+
+                // Ensure the editor knows about an html change so watchers are notified
+                // ie: <textarea> elements depend on the editableInput event to stay synchronized
+                this.base.checkContentChanged();
             }
         });
         var editor = new MediumEditor('.editable', {

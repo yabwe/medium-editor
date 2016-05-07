@@ -17,7 +17,7 @@
 
 You can find a demo of this example in the source code via [button-example.html](../../../demo/button-example.html).
 
-To interact with the demo, load the page from your fork in a browser via: 
+To interact with the demo, load the page from your fork in a browser via:
 
 `file://[Medium Editor Source Root]/demo/button-example.html`
 
@@ -46,7 +46,7 @@ var editor = new MediumEditor('.editable', {
 });
 ```
 
-**NOTE:** 
+**NOTE:**
 
 In order for the toolbar to look for a button to add to the toolbar, the name of the extension must be passed in the `toolbar.buttons` array.
 
@@ -141,7 +141,7 @@ var HighlighterButton = MediumEditor.Extension.extend({
         elementTagName: 'mark',
         normalize: true
     });
-    
+
     this.button = this.document.createElement('button');
     this.button.classList.add('medium-editor-action');
     this.button.innerHTML = '<i class="fa fa-paint-brush"></i>';
@@ -156,6 +156,10 @@ var HighlighterButton = MediumEditor.Extension.extend({
 
   handleClick: function (event) {
     this.classApplier.toggleSelection();
+
+    // Ensure the editor knows about an html change so watchers are notified
+    // ie: <textarea> elements depend on the editableInput event to stay synchronized
+    this.base.checkContentChanged();
   }
 });
 ```
@@ -175,9 +179,13 @@ After highlighting the text and clicking the button, the text now appears highli
 **HTML:**
 <p align="center"><img src="http://yabwe.github.io/medium-editor/img/button-example-04.png" /></p>
 
-**NOTE:** 
+**NOTE:**
 
 A great convienience of using the `toggleSelection()` method of the **CSS Class Applier** is that it will also unwrap the selection.  So, since we're always calling `toggleSelection()` when the button is clicked, if you highlight the same text and click the button again, the text will go back to normal and the `<mark>` element will be removed.
+
+**NOTE:**
+
+In `handleClick` the extra call to `this.base.checkContentChanged` is calling the core editor directly to notify it that the html may have changed.  This is needed here so that any external dependencies that are watching for changes the HTML are notified.  For example, you can pass a `<textarea>` as a editor element when initializing MediumEditor and the editor relies on knowing about changes to the html so it can keep the `<textarea>` synchronized with changes to the generated `<div>` that is displayed as the actual editor element.
 
 ***
 ### 5. Respond to Selection
@@ -196,7 +204,7 @@ var HighlighterButton = MediumEditor.Extension.extend({
         elementTagName: 'mark',
         normalize: true
     });
-    
+
     this.button = this.document.createElement('button');
     this.button.classList.add('medium-editor-action');
     this.button.innerHTML = '<i class="fa fa-paint-brush"></i>';
@@ -211,6 +219,7 @@ var HighlighterButton = MediumEditor.Extension.extend({
 
   handleClick: function (event) {
     this.classApplier.toggleSelection();
+    this.base.checkContentChanged();
   },
 
   isAlreadyApplied: function (node) {
@@ -242,7 +251,7 @@ As shown above, now our button responds to what the user has selected.  To make 
 1. **isAlreadyApplied(node)**
   * This will be called on each element which contains the user's selection, starting with the lowest element and climbing its ancestors.  If any of these elements are a `<mark>` element, we return `true` since that means the selection is higlighted.
 1. **isActive()**
-  * This should return whether the button is already active.  We check this by seeing if the `'medium-editor-button-active'` class already exists on the toolbar button. 
+  * This should return whether the button is already active.  We check this by seeing if the `'medium-editor-button-active'` class already exists on the toolbar button.
 1. **setActive()**
   * This is called when we should make our button active (add the '`medium-editor-button-active'` class)
 1. **setInactive()**
@@ -278,6 +287,7 @@ var HighlighterButton = MediumEditor.extensions.button.extend({
 
   handleClick: function (event) {
     this.classApplier.toggleSelection();
+    this.base.checkContentChanged();
   }
 });
 ```
