@@ -1053,6 +1053,10 @@
             } else {
                 el.parentNode.removeChild(el);
             }
+        },
+
+        toArr: function (arraylike) {
+            return [].slice.call(arraylike);
         }
     };
 
