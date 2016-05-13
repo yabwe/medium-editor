@@ -536,7 +536,7 @@
             return result;
         }
 
-        return this.options.ownerDocument.execCommand(action, false, null);
+        return this.options.ownerDocument.execCommand(action, false, opts);
     }
 
     /* If we've just justified text within a container block

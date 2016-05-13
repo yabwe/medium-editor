@@ -103,6 +103,16 @@ describe('Core-API', function () {
         });
     });
 
+    describe('execAction', function () {
+        it('should pass opt directly to document.execCommand', function () {
+            spyOn(document, 'execCommand').and.callThrough();
+            var editor = this.newMediumEditor('.editor');
+
+            editor.execAction('foreColor', 'red');
+            expect(document.execCommand).toHaveBeenCalledWith('foreColor', false, 'red');
+        });
+    });
+
     describe('checkContentChanged', function () {
         it('should trigger editableInput when called after the html has changed', function () {
             var editor = this.newMediumEditor('.editor', {
