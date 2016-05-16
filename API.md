@@ -8,6 +8,8 @@
   - [`MediumEditor(elements, options)`](#mediumeditorelements-options)
   - [`destroy()`](#destroy)
   - [`setup()`](#setup)
+  - [`addElements()`](#addelementselements)
+  - [`removeElements()`](#removeelementselements)
 - [Event Functions](#event-functions)
   - [`on(targets, event, listener, useCapture)`](#ontargets-event-listener-usecapture)
   - [`off(targets, event, listener, useCapture)`](#offtargets-event-listener-usecapture)
@@ -47,14 +49,17 @@
 
 Creating an instance of MediumEditor will:
 * Convert all passed in elements into `contenteditable` elements.
-* For any `<textarea>` elements, hide the `<textarea>`, create a new `<div contenteditable=true>` element, and ensure the 2 elements remain sync'd.
+* For any `<textarea>` elements:
+  * Hide the `<textarea>`
+  * Create a new `<div contenteditable=true>` element and add it to the elements array.
+  * Ensure the 2 elements remain sync'd.
 * Initialize any custom extensions or buttons passed in.
 * Create any additional elements needed.
 * Setup all event handling needed to monitor the editable elements.
 
 **Arguments**
 
-_**elements** (`String` | `HTMLElement` | `Array`)_:
+_**elements** (`String` | `HTMLElement` | `Array` | `NodeList` | `HTMLCollection`)_:
 
 1. `String`: If passed as a string, this is used as a selector in a call to `document.querySelectorAll()` to find elements on the page.  All results are stored in the internal list of **elements**.
 
@@ -80,6 +85,55 @@ Tear down the editor if already setup by doing the following:
 ### `setup()`
 
 Initialize this instance of the editor if it has been destroyed.  This will reuse the `elements` selector and `options` object passed in when the editor was instantiated.
+
+***
+### `addElements(elements)`
+
+Dynamically add one or more elements to an already initialized instance of MediumEditor.
+
+Passing an elements or array of elements to `addElements(elements)` will:
+* Add the given element or array of elements to the editor **elements**
+* Ensure the element(s) are initialized with the proper attributes and event handlers as if the element had been passed during instantiation of the editor
+* For any `<textarea>` elements:
+  * Hide the `<textarea>`
+  * Create a new `<div contenteditable=true>` element and add it to the editor **elements**
+  * Ensure the 2 elements remain sync'd.
+* Be intelligent enough to run the necessary code only once per element, no matter how often you will call it
+
+So, every element you pass to `addElements` will turn into a fully supported contenteditable too - even earlier calls to `editor.subscribe(..)`
+for custom events will work on the newly added element(s).
+
+**Arguments**
+
+_**elements** (`String` | `HTMLElement` | `Array` | `NodeList` | `HTMLCollection`)_:
+
+1. `String`: If passed as a string, this is used as a selector in a call to `document.querySelectorAll()` to find elements on the page.
+
+2. `HTMLElement`: If passed as a single element, this will be the only element added to the editor **elements**.
+
+3. `Array` | `NodeList` | `HTMLCollection`: If passed as an `Array`-like collection of `HTMLElement`s, all of these elements will be added to the editor **elements**.
+
+***
+### `removeElements(elements)`
+
+Remove one or more elements from an already initialized instance of MediumEditor.
+
+Passing an elements or array of elements to `removeElements(elements)` will:
+* Remove the given element or array of elements from the internal `this.elements` array.
+* Remove any added event handlers or attributes (with the exception of `contenteditable`).
+* Unhide any `<textarea>` elements and remove any created `<div>` elements created for `<textarea>` elements.
+
+Each element itself will remain a contenteditable - it will just remove all event handlers and all references to it so you can safely remove it from DOM.
+
+**Arguments**
+
+_**elements** (`String` | `HTMLElement` | `Array` | `NodeList` | `HTMLCollection`)_:
+
+1. `String`: If passed as a string, this is used as a selector in a call to `document.querySelectorAll()` to find elements on the page.
+
+2. `HTMLElement`: If passed as a single element, this will be the only element removed from the editor **elements**.
+
+3. `Array` | `NodeList` | `HTMLCollection`: If passed as an `Array`-like collection of `HTMLElement`s, all of these elements will be removed from the edtior **elements**.
 
 ***
 ## Event Functions

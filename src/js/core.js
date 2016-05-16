@@ -172,6 +172,13 @@
         }
     }
 
+    function handleEditableInput(event, editable) {
+        var textarea = editable.parentNode.querySelector('textarea[medium-editor-textarea-id="' + editable.getAttribute('medium-editor-textarea-id') + '"]');
+        if (textarea) {
+            textarea.value = editable.innerHTML.trim();
+        }
+    }
+
     // Internal helper methods which shouldn't be exposed externally
 
     function addToEditors(win) {
@@ -205,30 +212,50 @@
         win._mediumEditors[this.id] = null;
     }
 
-    function createElementsArray(selector) {
+    function createElementsArray(selector, doc, filterEditorElements) {
+        var elements = [];
+
         if (!selector) {
             selector = [];
         }
         // If string, use as query selector
         if (typeof selector === 'string') {
-            selector = this.options.ownerDocument.querySelectorAll(selector);
+            selector = doc.querySelectorAll(selector);
         }
         // If element, put into array
         if (MediumEditor.util.isElement(selector)) {
             selector = [selector];
         }
-        // Convert NodeList (or other array like object) into an array
-        var elements = Array.prototype.slice.apply(selector);
 
-        // Loop through elements and convert textarea's into divs
-        this.elements = [];
-        elements.forEach(function (element, index) {
-            if (element.nodeName.toLowerCase() === 'textarea') {
-                this.elements.push(createContentEditable.call(this, element, index));
-            } else {
-                this.elements.push(element);
+        if (filterEditorElements) {
+            // Remove elements that have already been initialized by the editor
+            // selecotr might not be an array (ie NodeList) so use for loop
+            for (var i = 0; i < selector.length; i++) {
+                var el = selector[i];
+                if (MediumEditor.util.isElement(el) &&
+                    !el.getAttribute('data-medium-editor-element') &&
+                    !el.getAttribute('medium-editor-textarea-id')) {
+                    elements.push(el);
+                }
             }
-        }, this);
+        } else {
+            // Convert NodeList (or other array like object) into an array
+            elements = Array.prototype.slice.apply(selector);
+        }
+
+        return elements;
+    }
+
+    function cleanupTextareaElement(element) {
+        var textarea = element.parentNode.querySelector('textarea[medium-editor-textarea-id="' + element.getAttribute('medium-editor-textarea-id') + '"]');
+        if (textarea) {
+            // Un-hide the textarea
+            textarea.classList.remove('medium-editor-hidden');
+            textarea.removeAttribute('medium-editor-textarea-id');
+        }
+        if (element.parentNode) {
+            element.parentNode.removeChild(element);
+        }
     }
 
     function setExtensionDefaults(extension, defaults) {
@@ -306,15 +333,15 @@
         return !this.options.extensions['imageDragging'];
     }
 
-    function createContentEditable(textarea, id) {
-        var div = this.options.ownerDocument.createElement('div'),
+    function createContentEditable(textarea, id, doc) {
+        var div = doc.createElement('div'),
             now = Date.now(),
             uniqueId = 'medium-editor-' + now + '-' + id,
             atts = textarea.attributes;
 
         // Some browsers can move pretty fast, since we're using a timestamp
         // to make a unique-id, ensure that the id is actually unique on the page
-        while (this.options.ownerDocument.getElementById(uniqueId)) {
+        while (doc.getElementById(uniqueId)) {
             now++;
             uniqueId = 'medium-editor-' + now + '-' + id;
         }
@@ -342,37 +369,49 @@
         return div;
     }
 
-    function initElements() {
-        var isTextareaUsed = false;
+    function initElement(element, id) {
+        if (!element.getAttribute('data-medium-editor-element')) {
+            if (element.nodeName.toLowerCase() === 'textarea') {
+                element = createContentEditable(element, id, this.options.ownerDocument);
 
-        this.elements.forEach(function (element, index) {
+                // Make sure we only attach to editableInput once for <textarea> elements
+                if (!this.instanceHandleEditableInput) {
+                    this.instanceHandleEditableInput = handleEditableInput.bind(this);
+                    this.subscribe('editableInput', this.instanceHandleEditableInput);
+                }
+            }
+
             if (!this.options.disableEditing && !element.getAttribute('data-disable-editing')) {
                 element.setAttribute('contentEditable', true);
                 element.setAttribute('spellcheck', this.options.spellcheck);
             }
+
+            // Make sure we only attach to editableKeydownEnter once for disable-return options
+            if (!this.instanceHandleEditableKeydownEnter) {
+                if (element.getAttribute('data-disable-return') || element.getAttribute('data-disable-double-return')) {
+                    this.instanceHandleEditableKeydownEnter = handleDisabledEnterKeydown.bind(this);
+                    this.subscribe('editableKeydownEnter', this.instanceHandleEditableKeydownEnter);
+                }
+            }
+
+            // if we're not disabling return, add a handler to help handle cleanup
+            // for certain cases when enter is pressed
+            if (!this.options.disableReturn && !element.getAttribute('data-disable-return')) {
+                this.on(element, 'keyup', handleKeyup.bind(this));
+            }
+
             element.setAttribute('data-medium-editor-element', true);
             element.setAttribute('role', 'textbox');
             element.setAttribute('aria-multiline', true);
-            element.setAttribute('medium-editor-index', index);
+            element.setAttribute('medium-editor-index', MediumEditor.util.guid());
 
-            if (element.hasAttribute('medium-editor-textarea-id')) {
-                isTextareaUsed = true;
-            }
-        }, this);
-
-        if (isTextareaUsed) {
-            this.subscribe('editableInput', function (event, editable) {
-                var textarea = editable.parentNode.querySelector('textarea[medium-editor-textarea-id="' + editable.getAttribute('medium-editor-textarea-id') + '"]');
-                if (textarea) {
-                    textarea.value = this.serialize()[editable.id].value;
-                }
-            }.bind(this));
+            this.events.attachAllEventsToElement(element);
         }
+
+        return element;
     }
 
     function attachHandlers() {
-        var i;
-
         // attach to tabs
         this.subscribe('editableKeydownTab', handleTabKeydown.bind(this));
 
@@ -385,26 +424,13 @@
             this.subscribe('editableKeydownSpace', handleDisableExtraSpaces.bind(this));
         }
 
-        // disabling return or double return
-        if (this.options.disableReturn || this.options.disableDoubleReturn) {
-            this.subscribe('editableKeydownEnter', handleDisabledEnterKeydown.bind(this));
-        } else {
-            for (i = 0; i < this.elements.length; i += 1) {
-                if (this.elements[i].getAttribute('data-disable-return') || this.elements[i].getAttribute('data-disable-double-return')) {
-                    this.subscribe('editableKeydownEnter', handleDisabledEnterKeydown.bind(this));
-                    break;
-                }
+        // Make sure we only attach to editableKeydownEnter once for disable-return options
+        if (!this.instanceHandleEditableKeydownEnter) {
+            // disabling return or double return
+            if (this.options.disableReturn || this.options.disableDoubleReturn) {
+                this.instanceHandleEditableKeydownEnter = handleDisabledEnterKeydown.bind(this);
+                this.subscribe('editableKeydownEnter', this.instanceHandleEditableKeydownEnter);
             }
-        }
-
-        // if we're not disabling return, add a handler to help handle cleanup
-        // for certain cases when enter is pressed
-        if (!this.options.disableReturn) {
-            this.elements.forEach(function (element) {
-                if (!element.getAttribute('data-disable-return')) {
-                    this.on(element, 'keyup', handleKeyup.bind(this));
-                }
-            }, this);
         }
     }
 
@@ -602,7 +628,10 @@
                 return;
             }
 
-            createElementsArray.call(this, this.origElements);
+            this.events = new MediumEditor.Events(this);
+            this.elements = [];
+
+            this.addElements(this.origElements);
 
             if (this.elements.length === 0) {
                 return;
@@ -611,10 +640,7 @@
             this.isActive = true;
             addToEditors.call(this, this.options.contentWindow);
 
-            this.events = new MediumEditor.Events(this);
-
             // Call initialization helpers
-            initElements.call(this);
             initExtensions.call(this);
             attachHandlers.call(this);
         },
@@ -649,18 +675,13 @@
                 element.removeAttribute('medium-editor-index');
 
                 // Remove any elements created for textareas
-                if (element.hasAttribute('medium-editor-textarea-id')) {
-                    var textarea = element.parentNode.querySelector('textarea[medium-editor-textarea-id="' + element.getAttribute('medium-editor-textarea-id') + '"]');
-                    if (textarea) {
-                        // Un-hide the textarea
-                        textarea.classList.remove('medium-editor-hidden');
-                    }
-                    if (element.parentNode) {
-                        element.parentNode.removeChild(element);
-                    }
+                if (element.getAttribute('medium-editor-textarea-id')) {
+                    cleanupTextareaElement(element);
                 }
             }, this);
             this.elements = [];
+            this.instanceHandleEditableKeydownEnter = null;
+            this.instanceHandleEditableInput = null;
 
             removeFromEditors.call(this, this.options.contentWindow);
         },
@@ -707,8 +728,10 @@
         serialize: function () {
             var i,
                 elementid,
-                content = {};
-            for (i = 0; i < this.elements.length; i += 1) {
+                content = {},
+                len = this.elements.length;
+
+            for (i = 0; i < len; i += 1) {
                 elementid = (this.elements[i].id !== '') ? this.elements[i].id : 'element-' + i;
                 content[elementid] = {
                     value: this.elements[i].innerHTML.trim()
@@ -1073,7 +1096,7 @@
                 if (this.options.targetBlank || opts.target === '_blank' || opts.buttonClass) {
                     customEvent = this.options.ownerDocument.createEvent('HTMLEvents');
                     customEvent.initEvent('input', true, true, this.options.contentWindow);
-                    for (var i = 0; i < this.elements.length; i += 1) {
+                    for (var i = 0, len = this.elements.length; i < len; i += 1) {
                         this.elements[i].dispatchEvent(customEvent);
                     }
                 }
@@ -1105,6 +1128,49 @@
         checkContentChanged: function (editable) {
             editable = editable || MediumEditor.selection.getSelectionElement(this.options.contentWindow);
             this.events.updateInput(editable, { target: editable, currentTarget: editable });
+        },
+
+        addElements: function (selector) {
+            // Convert elements into an array
+            var elements = createElementsArray(selector, this.options.ownerDocument, true);
+
+            // Do we have elements to add now?
+            if (elements.length === 0) {
+                return false;
+            }
+
+            elements.forEach(function (element) {
+                // Initialize all new elements (we check that in those functions don't worry)
+                element = initElement.call(this, element);
+
+                // Add new elements to our internal elements array
+                this.elements.push(element);
+            }, this);
+        },
+
+        removeElements: function (selector) {
+            // Convert elements into an array
+            var elements = createElementsArray(selector, this.options.ownerDocument),
+                toRemove = elements.map(function (el) {
+                    // For textareas, make sure we're looking at the editor div and not the textarea itself
+                    if (el.getAttribute('medium-editor-textarea-id') && el.parentNode) {
+                        return el.parentNode.querySelector('div[medium-editor-textarea-id="' + el.getAttribute('medium-editor-textarea-id') + '"]');
+                    } else {
+                        return el;
+                    }
+                });
+
+            this.elements = this.elements.filter(function (element) {
+                // If this is an element we want to remove
+                if (toRemove.indexOf(element) !== -1) {
+                    this.events.cleanupElement(element);
+                    if (element.getAttribute('medium-editor-textarea-id')) {
+                        cleanupTextareaElement(element);
+                    }
+                    return false;
+                }
+                return true;
+            }, this);
         }
     };
 }());
