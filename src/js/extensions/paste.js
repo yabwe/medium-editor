@@ -57,7 +57,10 @@
             [new RegExp(/\n+<p/gi), '<p'],
 
             // Microsoft Word makes these odd tags, like <o:p></o:p>
-            [new RegExp(/<\/?o:[a-z]*>/gi), '']
+            [new RegExp(/<\/?o:[a-z]*>/gi), ''],
+
+            // Microsoft Word adds some special elements around list items
+            [new RegExp(/<!\[if !supportLists\]>(((?!<!).)*)<!\[endif]\>/gi), '$1']
         ];
     }
     /*jslint regexp: false*/
