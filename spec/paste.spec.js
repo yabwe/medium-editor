@@ -1,7 +1,7 @@
 /*global selectElementContents,
          selectElementContentsAndFire,
          fireEvent, prepareEvent,
-         firePreparedEvent */
+         firePreparedEvent, WORD_PASTE_EXAMPLE */
 
 describe('Pasting content', function () {
     'use strict';
@@ -41,6 +41,11 @@ describe('Pasting content', function () {
                 source: 'Microsoft Word - Proprietary elements',
                 paste: '<p>One<o:p></o:p></p><p>Two<o:p></o:p></p>',
                 output: '<p>One</p><p>Two</p>'
+            },
+            {
+                source: 'Microsoft Word - full document paste',
+                paste: WORD_PASTE_EXAMPLE,
+                output: '<p>Mycomplicated <b>word document renders</b> <i>like this in the card</i> generator.</p><p>Testbig text</p><p>Testingsmaller text and <s>crossed out text.</s></p><p>·      Test list</p><p>·      Test</p><p>o  Testindented</p><p>·      Tes6t</p><p>1.     tes t test test</p><p>a.    tes t indented</p>'
             }
         ],
         inlineTests = [
