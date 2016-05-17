@@ -1,6 +1,17 @@
+5.17.0 / 2016-05-17
+==================
+* Improved paste handling
+  * Includes proper support for keyboard paste in firefox
+  * More cleanup when pasting from Word
+* Introduce support for adding and removing elements from an existing editor instances
+  * New addElements and removeElements methods
+* Add checkContentChanged method for manually triggering editableInput
+* Add selection.selectRange helper method
+
+
 5.16.1 / 2016-04-14
 ==================
-  * Fix incorrect word breaking
+* Fix incorrect word breaking
 
 
 5.16.0 / 2016-04-12
