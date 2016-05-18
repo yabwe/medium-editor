@@ -366,7 +366,7 @@
             if (index) {
                 this.detachAllEventsFromElement(element);
                 
-                if(this.contentCache) {
+                if (this.contentCache) {
                     delete this.contentCache[index];
                 }
             }
