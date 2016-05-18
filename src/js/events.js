@@ -365,7 +365,6 @@
             var index = element.getAttribute('medium-editor-index');
             if (index) {
                 this.detachAllEventsFromElement(element);
-                
                 if (this.contentCache) {
                     delete this.contentCache[index];
                 }
