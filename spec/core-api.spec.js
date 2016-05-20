@@ -108,8 +108,40 @@ describe('Core-API', function () {
             spyOn(document, 'execCommand').and.callThrough();
             var editor = this.newMediumEditor('.editor');
 
-            editor.execAction('foreColor', 'red');
+            editor.execAction('foreColor', { value: 'red' });
             expect(document.execCommand).toHaveBeenCalledWith('foreColor', false, 'red');
+        });
+
+        it('fontName support old style', function () {
+            spyOn(document, 'execCommand').and.callThrough();
+            var editor = this.newMediumEditor('.editor');
+
+            editor.execAction('fontName', { name: 'Tahoma' });
+            expect(document.execCommand).toHaveBeenCalledWith('fontName', false, 'Tahoma');
+        });
+
+        it('fontName support new stle', function () {
+            spyOn(document, 'execCommand').and.callThrough();
+            var editor = this.newMediumEditor('.editor');
+
+            editor.execAction('fontName', { value: 'Tahoma' });
+            expect(document.execCommand).toHaveBeenCalledWith('fontName', false, 'Tahoma');
+        });
+
+        it('fontSize support old style', function () {
+            spyOn(document, 'execCommand').and.callThrough();
+            var editor = this.newMediumEditor('.editor');
+
+            editor.execAction('fontSize', { size: 14 });
+            expect(document.execCommand).toHaveBeenCalledWith('fontSize', false, 14);
+        });
+
+        it('fontSize support new stle', function () {
+            spyOn(document, 'execCommand').and.callThrough();
+            var editor = this.newMediumEditor('.editor');
+
+            editor.execAction('fontSize', { value: 14 });
+            expect(document.execCommand).toHaveBeenCalledWith('fontSize', false, 14);
         });
     });
 

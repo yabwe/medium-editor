@@ -151,7 +151,7 @@
             if (size === '4') {
                 this.clearFontSize();
             } else {
-                this.execAction('fontSize', { size: size });
+                this.execAction('fontSize', { value: size });
             }
         },
 
