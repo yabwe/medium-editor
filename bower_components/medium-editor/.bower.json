@@ -39,12 +39,12 @@
     "CONTRIBUTING.md",
     "UPGRADE-5.md"
   ],
-  "version": "5.16.1",
-  "_release": "5.16.1",
+  "version": "5.17.0",
+  "_release": "5.17.0",
   "_resolution": {
     "type": "version",
-    "tag": "5.16.1",
-    "commit": "5687829254a68872c31913217f2eff14bb1a7e67"
+    "tag": "5.17.0",
+    "commit": "4017f64cc4f6b531e57b320c41b8982402f7964a"
   },
   "_source": "https://github.com/daviferreira/medium-editor.git",
   "_target": "^5.11.0",

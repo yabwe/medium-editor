@@ -465,7 +465,6 @@ var editor = new MediumEditor('.editable', {
 });
 ```
 
-
 ## Buttons
 
 By default, MediumEditor supports buttons for most of the commands for `document.execCommand()` that are well-supported across all its supported browsers.
@@ -524,6 +523,8 @@ View the [MediumEditor Object API documentation](API.md) on the Wiki for details
 * __MediumEditor(elements, options)__:  Creates an instance of MediumEditor
 * __.destroy()__: tears down the editor if already setup, removing all DOM elements and event handlers
 * __.setup()__: rebuilds the editor if it has already been destroyed, recreating DOM elements and attaching event handlers
+* __.addElements()__: add elements to an already initialized instance of MediumEditor
+* __.removeElements()__: remove elements from an already initialized instance of MediumEditor
 
 ### Event Methods
 * __.on(target, event, listener, useCapture)__: attach a listener to a DOM event which will be detached when MediumEditor is deactivated
@@ -557,6 +558,51 @@ View the [MediumEditor Object API documentation](API.md) on the Wiki for details
 * __.getExtensionByName(name)__: get a reference to an extension with the specified name
 * __.serialize()__: returns a JSON object with elements contents
 * __.setContent(html, index)__: sets the `innerHTML` to `html` of the element at `index`
+
+## Dynamically add/remove elements to your instance
+
+It is possible to dynamically add new elements to your existing MediumtEditor instance:
+
+```javascript
+var editor = new MediumEditor('.editable');
+editor.subscribe('editableInput', this._handleEditableInput.bind(this));
+
+// imagine an ajax fetch/any other dynamic functionality which will add new '.editable' elements to dom
+
+editor.addElements('.editable');
+// OR editor.addElements(document.getElementsByClassName('editable'));
+// OR editor.addElements(document.querySelectorAll('.editable'));
+```
+
+Passing an elements or array of elements to `addElements(elements)` will:
+* Add the given element or array of elements to the internal `this.elements` array.
+* Ensure the element(s) are initialized with the proper attributes and event handlers as if the element had been passed during instantiation of the editor.
+* For any `<textarea>` elements:
+  * Hide the `<textarea>`
+  * Create a new `<div contenteditable=true>` element and add it to the elements array.
+  * Ensure the 2 elements remain sync'd.
+* Be intelligent enough to run the necessary code only once per element, no matter how often you will call it.
+
+### Removing elements dynamically
+
+Straight forward, just call `removeElements` with the elemnt or array of elements you to want to tear down. Each element itself will remain a contenteditable - it will just remove all event handlers and all references to it so you can safely remove it from DOM.
+
+```javascript
+editor.removeElements(document.querySelector('#myElement'));
+// OR editor.removeElements(document.getElementById('myElement'));
+// OR editor.removeElements('#myElement');
+
+// in case you have jQuery and don't exactly know when an element was removed, for example after routing state change
+var removedElements = [];
+editor.elements.forEach(function (element) {
+    // check if the element is still available in current DOM
+    if (!$(element).parents('body').length) {
+        removedElements.push(element);
+    }
+});
+
+editor.removeElements(removedElements);
+```
 
 ## Capturing DOM changes
 
