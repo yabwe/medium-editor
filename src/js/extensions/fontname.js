@@ -158,7 +158,7 @@
             if (font === '') {
                 this.clearFontName();
             } else {
-                this.execAction('fontName', { name: font });
+                this.execAction('fontName', { value: font });
             }
         },
 

@@ -103,6 +103,48 @@ describe('Core-API', function () {
         });
     });
 
+    describe('execAction', function () {
+        it('should pass opt directly to document.execCommand', function () {
+            spyOn(document, 'execCommand').and.callThrough();
+            var editor = this.newMediumEditor('.editor');
+
+            editor.execAction('foreColor', { value: 'red' });
+            expect(document.execCommand).toHaveBeenCalledWith('foreColor', false, 'red');
+        });
+
+        it('fontName support old style', function () {
+            spyOn(document, 'execCommand').and.callThrough();
+            var editor = this.newMediumEditor('.editor');
+
+            editor.execAction('fontName', { name: 'Tahoma' });
+            expect(document.execCommand).toHaveBeenCalledWith('fontName', false, 'Tahoma');
+        });
+
+        it('fontName support new stle', function () {
+            spyOn(document, 'execCommand').and.callThrough();
+            var editor = this.newMediumEditor('.editor');
+
+            editor.execAction('fontName', { value: 'Tahoma' });
+            expect(document.execCommand).toHaveBeenCalledWith('fontName', false, 'Tahoma');
+        });
+
+        it('fontSize support old style', function () {
+            spyOn(document, 'execCommand').and.callThrough();
+            var editor = this.newMediumEditor('.editor');
+
+            editor.execAction('fontSize', { size: 14 });
+            expect(document.execCommand).toHaveBeenCalledWith('fontSize', false, 14);
+        });
+
+        it('fontSize support new stle', function () {
+            spyOn(document, 'execCommand').and.callThrough();
+            var editor = this.newMediumEditor('.editor');
+
+            editor.execAction('fontSize', { value: 14 });
+            expect(document.execCommand).toHaveBeenCalledWith('fontSize', false, 14);
+        });
+    });
+
     describe('checkContentChanged', function () {
         it('should trigger editableInput when called after the html has changed', function () {
             var editor = this.newMediumEditor('.editor', {

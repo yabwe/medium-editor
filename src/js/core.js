@@ -523,7 +523,8 @@
         /*jslint regexp: true*/
         var appendAction = /^append-(.+)$/gi,
             justifyAction = /justify([A-Za-z]*)$/g, /* Detecting if is justifyCenter|Right|Left */
-            match;
+            match,
+            cmdValueArgument;
         /*jslint regexp: false*/
 
         // Actions starting with 'append-' should attempt to format a block of text ('formatBlock') using a specific
@@ -534,11 +535,13 @@
         }
 
         if (action === 'fontSize') {
-            return this.options.ownerDocument.execCommand('fontSize', false, opts.size);
+            cmdValueArgument = opts.value || opts.size;
+            return this.options.ownerDocument.execCommand('fontSize', false, cmdValueArgument);
         }
 
         if (action === 'fontName') {
-            return this.options.ownerDocument.execCommand('fontName', false, opts.name);
+            cmdValueArgument = opts.value || opts.name;
+            return this.options.ownerDocument.execCommand('fontName', false, cmdValueArgument);
         }
 
         if (action === 'createLink') {
@@ -562,7 +565,8 @@
             return result;
         }
 
-        return this.options.ownerDocument.execCommand(action, false, null);
+        cmdValueArgument = opts && opts.value;
+        return this.options.ownerDocument.execCommand(action, false, cmdValueArgument);
     }
 
     /* If we've just justified text within a container block
@@ -965,7 +969,8 @@
 
         createLink: function (opts) {
             var currentEditor = MediumEditor.selection.getSelectionElement(this.options.contentWindow),
-                customEvent = {};
+                customEvent = {},
+                targetUrl;
 
             // Make sure the selection is within an element this editor is tracking
             if (this.elements.indexOf(currentEditor) === -1) {
@@ -974,7 +979,8 @@
 
             try {
                 this.events.disableCustomEvent('editableInput');
-                if (opts.url && opts.url.trim().length > 0) {
+                targetUrl = opts.url || opts.value;
+                if (targetUrl && targetUrl.trim().length > 0) {
                     var currentSelection = this.options.contentWindow.getSelection();
                     if (currentSelection) {
                         var currRange = currentSelection.getRangeAt(0),
@@ -1066,7 +1072,7 @@
                             }
 
                             // Creates the link in the document fragment
-                            MediumEditor.util.createLink(this.options.ownerDocument, textNodes, opts.url.trim());
+                            MediumEditor.util.createLink(this.options.ownerDocument, textNodes, targetUrl.trim());
 
                             // Chrome trims the leading whitespaces when inserting HTML, which messes up restoring the selection.
                             var leadingWhitespacesCount = (fragment.firstChild.innerHTML.match(/^\s+/) || [''])[0].length;
@@ -1078,13 +1084,13 @@
 
                             this.importSelection(exportedSelection);
                         } else {
-                            this.options.ownerDocument.execCommand('createLink', false, opts.url);
+                            this.options.ownerDocument.execCommand('createLink', false, targetUrl);
                         }
 
                         if (this.options.targetBlank || opts.target === '_blank') {
-                            MediumEditor.util.setTargetBlank(MediumEditor.selection.getSelectionStart(this.options.ownerDocument), opts.url);
+                            MediumEditor.util.setTargetBlank(MediumEditor.selection.getSelectionStart(this.options.ownerDocument), targetUrl);
                         } else {
-                            MediumEditor.util.removeTargetBlank(MediumEditor.selection.getSelectionStart(this.options.ownerDocument), opts.url);
+                            MediumEditor.util.removeTargetBlank(MediumEditor.selection.getSelectionStart(this.options.ownerDocument), targetUrl);
                         }
 
                         if (opts.buttonClass) {
