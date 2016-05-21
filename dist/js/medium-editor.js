@@ -2780,7 +2780,9 @@ MediumEditor.extensions = {};
             var index = element.getAttribute('medium-editor-index');
             if (index) {
                 this.detachAllEventsFromElement(element);
-                delete this.contentCache[index];
+                if (this.contentCache) {
+                    delete this.contentCache[index];
+                }
             }
         },
 
@@ -3741,12 +3743,12 @@ MediumEditor.extensions = {};
                 targetCheckbox = this.getAnchorTargetCheckbox(),
                 buttonCheckbox = this.getAnchorButtonCheckbox();
 
-            opts = opts || { url: '' };
+            opts = opts || { value: '' };
             // TODO: This is for backwards compatability
             // We don't need to support the 'string' argument in 6.0.0
             if (typeof opts === 'string') {
                 opts = {
-                    url: opts
+                    value: opts
                 };
             }
 
@@ -3755,7 +3757,7 @@ MediumEditor.extensions = {};
             MediumEditor.extensions.form.prototype.showForm.apply(this);
             this.setToolbarPosition();
 
-            input.value = opts.url;
+            input.value = opts.value;
             input.focus();
 
             // If we have a target checkbox, we want it to be checked/unchecked
@@ -3792,11 +3794,11 @@ MediumEditor.extensions = {};
             var targetCheckbox = this.getAnchorTargetCheckbox(),
                 buttonCheckbox = this.getAnchorButtonCheckbox(),
                 opts = {
-                    url: this.getInput().value.trim()
+                    value: this.getInput().value.trim()
                 };
 
             if (this.linkValidation) {
-                opts.url = this.checkLinkFormat(opts.url);
+                opts.value = this.checkLinkFormat(opts.value);
             }
 
             opts.target = '_self';
@@ -4784,7 +4786,7 @@ MediumEditor.extensions = {};
             if (font === '') {
                 this.clearFontName();
             } else {
-                this.execAction('fontName', { name: font });
+                this.execAction('fontName', { value: font });
             }
         },
 
@@ -4962,7 +4964,7 @@ MediumEditor.extensions = {};
             if (size === '4') {
                 this.clearFontSize();
             } else {
-                this.execAction('fontSize', { size: size });
+                this.execAction('fontSize', { value: size });
             }
         },
 
@@ -6830,7 +6832,8 @@ MediumEditor.extensions = {};
         /*jslint regexp: true*/
         var appendAction = /^append-(.+)$/gi,
             justifyAction = /justify([A-Za-z]*)$/g, /* Detecting if is justifyCenter|Right|Left */
-            match;
+            match,
+            cmdValueArgument;
         /*jslint regexp: false*/
 
         // Actions starting with 'append-' should attempt to format a block of text ('formatBlock') using a specific
@@ -6841,11 +6844,21 @@ MediumEditor.extensions = {};
         }
 
         if (action === 'fontSize') {
-            return this.options.ownerDocument.execCommand('fontSize', false, opts.size);
+            // TODO: Deprecate support for opts.size in 6.0.0
+            if (opts.size) {
+                MediumEditor.util.deprecated('.size option for fontSize command', '.value', '6.0.0');
+            }
+            cmdValueArgument = opts.value || opts.size;
+            return this.options.ownerDocument.execCommand('fontSize', false, cmdValueArgument);
         }
 
         if (action === 'fontName') {
-            return this.options.ownerDocument.execCommand('fontName', false, opts.name);
+            // TODO: Deprecate support for opts.name in 6.0.0
+            if (opts.name) {
+                MediumEditor.util.deprecated('.name option for fontName command', '.value', '6.0.0');
+            }
+            cmdValueArgument = opts.value || opts.name;
+            return this.options.ownerDocument.execCommand('fontName', false, cmdValueArgument);
         }
 
         if (action === 'createLink') {
@@ -6869,7 +6882,8 @@ MediumEditor.extensions = {};
             return result;
         }
 
-        return this.options.ownerDocument.execCommand(action, false, null);
+        cmdValueArgument = opts && opts.value;
+        return this.options.ownerDocument.execCommand(action, false, cmdValueArgument);
     }
 
     /* If we've just justified text within a container block
@@ -7272,7 +7286,8 @@ MediumEditor.extensions = {};
 
         createLink: function (opts) {
             var currentEditor = MediumEditor.selection.getSelectionElement(this.options.contentWindow),
-                customEvent = {};
+                customEvent = {},
+                targetUrl;
 
             // Make sure the selection is within an element this editor is tracking
             if (this.elements.indexOf(currentEditor) === -1) {
@@ -7281,7 +7296,12 @@ MediumEditor.extensions = {};
 
             try {
                 this.events.disableCustomEvent('editableInput');
-                if (opts.url && opts.url.trim().length > 0) {
+                // TODO: Deprecate support for opts.url in 6.0.0
+                if (opts.url) {
+                    MediumEditor.util.deprecated('.url option for createLink', '.value', '6.0.0');
+                }
+                targetUrl = opts.url || opts.value;
+                if (targetUrl && targetUrl.trim().length > 0) {
                     var currentSelection = this.options.contentWindow.getSelection();
                     if (currentSelection) {
                         var currRange = currentSelection.getRangeAt(0),
@@ -7373,7 +7393,7 @@ MediumEditor.extensions = {};
                             }
 
                             // Creates the link in the document fragment
-                            MediumEditor.util.createLink(this.options.ownerDocument, textNodes, opts.url.trim());
+                            MediumEditor.util.createLink(this.options.ownerDocument, textNodes, targetUrl.trim());
 
                             // Chrome trims the leading whitespaces when inserting HTML, which messes up restoring the selection.
                             var leadingWhitespacesCount = (fragment.firstChild.innerHTML.match(/^\s+/) || [''])[0].length;
@@ -7385,13 +7405,13 @@ MediumEditor.extensions = {};
 
                             this.importSelection(exportedSelection);
                         } else {
-                            this.options.ownerDocument.execCommand('createLink', false, opts.url);
+                            this.options.ownerDocument.execCommand('createLink', false, targetUrl);
                         }
 
                         if (this.options.targetBlank || opts.target === '_blank') {
-                            MediumEditor.util.setTargetBlank(MediumEditor.selection.getSelectionStart(this.options.ownerDocument), opts.url);
+                            MediumEditor.util.setTargetBlank(MediumEditor.selection.getSelectionStart(this.options.ownerDocument), targetUrl);
                         } else {
-                            MediumEditor.util.removeTargetBlank(MediumEditor.selection.getSelectionStart(this.options.ownerDocument), opts.url);
+                            MediumEditor.util.removeTargetBlank(MediumEditor.selection.getSelectionStart(this.options.ownerDocument), targetUrl);
                         }
 
                         if (opts.buttonClass) {
@@ -7520,7 +7540,7 @@ MediumEditor.parseVersionString = function (release) {
 
 MediumEditor.version = MediumEditor.parseVersionString.call(this, ({
     // grunt-bump looks for this:
-    'version': '5.17.0'
+    'version': '5.18.0'
 }).version);
 
     return MediumEditor;

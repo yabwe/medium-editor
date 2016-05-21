@@ -1,3 +1,10 @@
+5.18.0 / 2016-05-21
+==================
+* Add support calling document.execCommand with arbitrary argument from execAction
+  * Also deprecate custom execAction option names in favor of standard .value
+* Fix error from addElements when initializing editor with no elements
+
+
 5.17.0 / 2016-05-17
 ==================
 * Improved paste handling
