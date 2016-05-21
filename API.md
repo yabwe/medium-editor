@@ -133,7 +133,7 @@ _**elements** (`String` | `HTMLElement` | `Array` | `NodeList` | `HTMLCollection
 
 2. `HTMLElement`: If passed as a single element, this will be the only element removed from the editor **elements**.
 
-3. `Array` | `NodeList` | `HTMLCollection`: If passed as an `Array`-like collection of `HTMLElement`s, all of these elements will be removed from the edtior **elements**.
+3. `Array` | `NodeList` | `HTMLCollection`: If passed as an `Array`-like collection of `HTMLElement`s, all of these elements will be removed from the editor **elements**.
 
 ***
 ## Event Functions
@@ -282,6 +282,12 @@ Returns a reference to the editor **element** that currently has focus (if the e
 
 Returns a reference to the editor **element** that the user's selection is currently within.
 
+**Arguments**
+
+1. _**range** (`Range`)_: _**OPTIONAL**_
+  * The `Range` to find the selection parent element within
+  * If no element is provided, the editor will use the current range within the selection of the editor's `contentWindow`
+
 ***
 ### `restoreSelection()`
 
@@ -324,21 +330,87 @@ Enable the toolbar to start updating based on the user's selection, after a call
 ### `cleanPaste(text)`
 _convert text to plaintext and replace current selection with result_
 
+**Arguments**
+
+1. _**text** (`String`)_:
+
+  * Content to be pasted at the location of the current selection/cursor
+
 ***
 ### `createLink(opts)`
 _creates a link via the native `document.execCommand('createLink')` command_
+
+**Arguments**
+
+1. _**opts** (`Object`)_:
+
+  * Object containing additional properties needed for creating a link
+
+  **Properties of 'opts'**
+
+    1. _**value** (`String`)_ _**REQUIRED**_
+      * The url to set as the `href` of the created link.  A non-empty value must be provided for the link to be created.
+    2. _**target** (`String`)_
+      * Attribute to set as the `target` attribute of the created link.  Passing 'self' or not passing this option at all are equivalent in that they will just ensure that `target="_blank"` will NOT be present on the created link.
+      * **NOTE** If the `targetBlank` option on the editor is set to true, the `target` property of opts will be ignored and `target="_blank"` will be added to all created links.
+    3. _**buttonClass** (`String`)_
+      * Class (or classes) to append to the `class` attribute of the created link.
+
+##### Example
+
+```js
+editor.createLink({ value: 'https://github.com/yabwe/medium-editor', target: '_blank', buttonClass: 'medium-link' });
+```
 
 ***
 ### `execAction(action, opts)`
 _executes an built-in action via document.execCommand_
 
+**Arguments**
+
+1. _**action** (`String`)_:
+
+  * Action to be passed as the 'command' argument to `document.execCommand(command, showDefaultUI, value)`
+
+2. _**opts** (`Object`)_ _**OPTIONAL**_:
+
+  * Object containing additional properties for specific commands
+
+  **Properties of 'opts'**
+
+    1. _**value** (`String`)_
+      * The value to pass as the 'value' argument to `document.execCommand(command, showDefaultUI, value)`
+    2. For 'createLink', the `opts` are passed directly to [`.createLink(opts)`]((#createlinkopts)) so see that method for additional options for that command
+
 ***
 ### `pasteHTML(html, options)`
 _replace the current selection with html_
 
+**Arguments**
+
+1. _**html** (`String`)_:
+
+  * Content to be pasted at the location of the current selection/cursor
+
+2. _**options** (`Object`)_ _**OPTIONAL**_:
+
+  * Optional overrides for `cleanTags` and/or `cleanAttrs` for removing specific element types (`cleanTags`) or specific attributes (`cleanAttrs`) from the inserted HTML.  See [cleanTags](OPTIONS.md#cleantags) and [cleanAttrs](OPTIONS.md#cleanattrs) in OPTIONS.md for more information.
+
+##### Example
+
+```js
+editor.pasteHTML('<p class="classy"><strong>Some Custom HTML</strong></p>', { cleanAttrs: ['class'], cleanTags: ['strong']});
+```
+
 ***
 ### `queryCommandState(action)`
-_wrapper around the browser's built in `document.queryCommandState(action)` for checking whether a specific action has already been applied to the selection._
+_wrapper around the browser's built in `document.queryCommandState(command)` for checking whether a specific action has already been applied to the selection._
+
+**Arguments**
+
+1. _**action** (`String`)_:
+
+  * Action to be passed as the 'command' argument to `document.queryCommandState(command)`
 
 ***
 ## Helper Functions
