@@ -544,7 +544,7 @@
         }
 
         if (action === 'fontName') {
-            // TODO: Deprecate support for opts.size in 6.0.0
+            // TODO: Deprecate support for opts.name in 6.0.0
             if (opts.name) {
                 MediumEditor.util.deprecated('.name option for fontName command', '.value', '6.0.0');
             }
@@ -987,7 +987,7 @@
 
             try {
                 this.events.disableCustomEvent('editableInput');
-                // TODO: Deprecated support for opts.url in 6.0.0
+                // TODO: Deprecate support for opts.url in 6.0.0
                 if (opts.url) {
                     MediumEditor.util.deprecated('.url option for createLink', '.value', '6.0.0');
                 }

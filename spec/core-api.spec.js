@@ -173,6 +173,40 @@ describe('Core-API', function () {
             expect(document.execCommand).toHaveBeenCalledWith('fontSize', false, 14);
             MediumEditor.Events.prototype.InputEventOnContenteditableSupported = origSupported;
         });
+
+        it('createLink support old style', function () {
+            // In order to safely spy on document.execCommand we need to disable functionality
+            // which overrides document.execCommand in IE & Edge
+            var origSupported = MediumEditor.Events.prototype.InputEventOnContenteditableSupported;
+            MediumEditor.Events.prototype.InputEventOnContenteditableSupported = true;
+
+            spyOn(document, 'execCommand').and.callThrough();
+            var editor = this.newMediumEditor('.editor');
+
+            selectElementContentsAndFire(editor.elements[0].firstChild);
+            jasmine.clock().tick(1);
+
+            editor.execAction('createLink', { url: 'http://www.test.com' });
+            expect(document.execCommand).toHaveBeenCalledWith('createLink', false, 'http://www.test.com');
+            MediumEditor.Events.prototype.InputEventOnContenteditableSupported = origSupported;
+        });
+
+        it('createLink support new style', function () {
+            // In order to safely spy on document.execCommand we need to disable functionality
+            // which overrides document.execCommand in IE & Edge
+            var origSupported = MediumEditor.Events.prototype.InputEventOnContenteditableSupported;
+            MediumEditor.Events.prototype.InputEventOnContenteditableSupported = true;
+
+            spyOn(document, 'execCommand').and.callThrough();
+            var editor = this.newMediumEditor('.editor');
+
+            selectElementContentsAndFire(editor.elements[0].firstChild);
+            jasmine.clock().tick(1);
+
+            editor.execAction('createLink', { value: 'http://www.test.com' });
+            expect(document.execCommand).toHaveBeenCalledWith('createLink', false, 'http://www.test.com');
+            MediumEditor.Events.prototype.InputEventOnContenteditableSupported = origSupported;
+        });
     });
 
     describe('checkContentChanged', function () {
