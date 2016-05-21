@@ -105,43 +105,73 @@ describe('Core-API', function () {
 
     describe('execAction', function () {
         it('should pass opt directly to document.execCommand', function () {
+            // In order to safely spy on document.execCommand we need to disable functionality
+            // which overrides document.execCommand in IE & Edge
+            var origSupported = MediumEditor.Events.prototype.InputEventOnContenteditableSupported;
+            MediumEditor.Events.prototype.InputEventOnContenteditableSupported = true;
+
             spyOn(document, 'execCommand').and.callThrough();
             var editor = this.newMediumEditor('.editor');
 
             editor.execAction('foreColor', { value: 'red' });
             expect(document.execCommand).toHaveBeenCalledWith('foreColor', false, 'red');
+            MediumEditor.Events.prototype.InputEventOnContenteditableSupported = origSupported;
         });
 
         it('fontName support old style', function () {
+            // In order to safely spy on document.execCommand we need to disable functionality
+            // which overrides document.execCommand in IE & Edge
+            var origSupported = MediumEditor.Events.prototype.InputEventOnContenteditableSupported;
+            MediumEditor.Events.prototype.InputEventOnContenteditableSupported = true;
+
             spyOn(document, 'execCommand').and.callThrough();
             var editor = this.newMediumEditor('.editor');
 
             editor.execAction('fontName', { name: 'Tahoma' });
             expect(document.execCommand).toHaveBeenCalledWith('fontName', false, 'Tahoma');
+            MediumEditor.Events.prototype.InputEventOnContenteditableSupported = origSupported;
         });
 
         it('fontName support new stle', function () {
+            // In order to safely spy on document.execCommand we need to disable functionality
+            // which overrides document.execCommand in IE & Edge
+            var origSupported = MediumEditor.Events.prototype.InputEventOnContenteditableSupported;
+            MediumEditor.Events.prototype.InputEventOnContenteditableSupported = true;
+
             spyOn(document, 'execCommand').and.callThrough();
             var editor = this.newMediumEditor('.editor');
 
             editor.execAction('fontName', { value: 'Tahoma' });
             expect(document.execCommand).toHaveBeenCalledWith('fontName', false, 'Tahoma');
+            MediumEditor.Events.prototype.InputEventOnContenteditableSupported = origSupported;
         });
 
         it('fontSize support old style', function () {
+            // In order to safely spy on document.execCommand we need to disable functionality
+            // which overrides document.execCommand in IE & Edge
+            var origSupported = MediumEditor.Events.prototype.InputEventOnContenteditableSupported;
+            MediumEditor.Events.prototype.InputEventOnContenteditableSupported = true;
+
             spyOn(document, 'execCommand').and.callThrough();
             var editor = this.newMediumEditor('.editor');
 
             editor.execAction('fontSize', { size: 14 });
             expect(document.execCommand).toHaveBeenCalledWith('fontSize', false, 14);
+            MediumEditor.Events.prototype.InputEventOnContenteditableSupported = origSupported;
         });
 
         it('fontSize support new stle', function () {
+            // In order to safely spy on document.execCommand we need to disable functionality
+            // which overrides document.execCommand in IE & Edge
+            var origSupported = MediumEditor.Events.prototype.InputEventOnContenteditableSupported;
+            MediumEditor.Events.prototype.InputEventOnContenteditableSupported = true;
+
             spyOn(document, 'execCommand').and.callThrough();
             var editor = this.newMediumEditor('.editor');
 
             editor.execAction('fontSize', { value: 14 });
             expect(document.execCommand).toHaveBeenCalledWith('fontSize', false, 14);
+            MediumEditor.Events.prototype.InputEventOnContenteditableSupported = origSupported;
         });
     });
 
