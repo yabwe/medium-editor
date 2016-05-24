@@ -928,6 +928,10 @@ MediumEditor.extensions = {};
                         // FF handles blockquote differently on formatBlock
                         // allowing nesting, we need to use outdent
                         // https://developer.mozilla.org/en-US/docs/Rich-Text_Editing_in_Mozilla
+
+                        /* fix bug #1068 Quote is not working after orderedlist/unorderedlist list was removed*/
+                        doc.execCommand('formatBlock', false, "BLOCKQUOTE");
+
                         return doc.execCommand('outdent', false, null);
                     }
                 }
