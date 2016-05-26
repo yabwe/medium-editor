@@ -287,6 +287,48 @@ describe('Pasting content', function () {
             expect(pasteHandler.handlePasteBinPaste).toHaveBeenCalledWith(evt);
         });
 
+        it('should fire editablePaste event when pasting', function () {
+            var editor = this.newMediumEditor('.editor', {
+                    paste: {
+                        forcePlainText: false,
+                        cleanPastedHTML: true
+                    }
+                }),
+                spy = jasmine.createSpy('handler');
+
+            editor.subscribe('editablePaste', spy);
+
+            selectElementContentsAndFire(editor.elements[0].firstChild);
+            expect(spy).not.toHaveBeenCalled();
+
+            fireEvent(this.el, 'keydown', {
+                keyCode: MediumEditor.util.keyCode.V,
+                ctrlKey: true,
+                metaKey: true
+            });
+
+            var contentEditables = document.body.querySelectorAll('[contentEditable=true]');
+            expect(contentEditables.length).toBe(2);
+
+            var evt = {
+                    type: 'paste',
+                    defaultPrevented: true,
+                    preventDefault: function () {},
+                    clipboardData: {
+                        types: ['text/plain', 'text/html'],
+                        getData: function () {
+                            // do we need to return different results for the different types? text/plain, text/html
+                            return 'pasted content';
+                        }
+                    }
+                },
+                pasteExtension = editor.getExtensionByName('paste');
+
+            pasteExtension.handlePasteBinPaste(evt);
+            jasmine.clock().tick(1);
+            expect(spy).toHaveBeenCalledWith({ currentTarget: editor.elements[0], target: editor.elements[0] }, editor.elements[0]);
+        });
+
         it('should do nothing if default was prevented on paste event of the paste-bin', function () {
             var editor = this.newMediumEditor('.editor', {
                     paste: {
