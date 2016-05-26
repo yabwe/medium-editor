@@ -184,6 +184,30 @@ describe('Pasting content', function () {
 
         });
 
+        it('should trigger editablePaste', function () {
+            var editorEl = this.el,
+                editor = this.newMediumEditor('.editor', {
+                    paste: {
+                        forcePlainText: false,
+                        cleanPastedHTML: true
+                    }
+                }),
+                spy = jasmine.createSpy('handler');
+
+            editor.subscribe('editablePaste', spy);
+
+            // move caret to editor
+            editorEl.innerHTML = '<span id="editor-inner">&nbsp</span>';
+
+            selectElementContentsAndFire(editorEl);
+
+            expect(spy).not.toHaveBeenCalled();
+            var evt = prepareEvent(editorEl, 'paste');
+            firePreparedEvent(evt, editorEl, 'paste');
+            jasmine.clock().tick(1);
+            expect(spy).toHaveBeenCalledWith({ currentTarget: this.el, target: this.el }, this.el);
+        });
+
         it('should filter multi-line rich-text pastes when "insertHTML" command is not supported', function () {
             var editor = this.newMediumEditor('.editor', {
                 paste: {
@@ -312,7 +336,7 @@ describe('Pasting content', function () {
 
             var evt = {
                     type: 'paste',
-                    defaultPrevented: true,
+                    defaultPrevented: false,
                     preventDefault: function () {},
                     clipboardData: {
                         types: ['text/plain', 'text/html'],
