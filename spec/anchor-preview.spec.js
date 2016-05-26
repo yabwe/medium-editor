@@ -202,11 +202,29 @@ describe('Anchor Preview TestCase', function () {
             expect(anchor.getAnchorButtonCheckbox().checked).toBe(true);
         });
 
-        it('should NOT be displayed when the hovered link is empty', function () {
+        it('should be displayed by default when the hovered link is empty', function () {
             var editor = this.newMediumEditor('.editor', {
                     delay: 200
                 }),
                 anchorPreview = editor.getExtensionByName('anchor-preview');
+
+            // show preview
+            spyOn(MediumEditor.extensions.anchorPreview.prototype, 'showPreview').and.callThrough();
+            fireEvent(document.getElementById('test-empty-link'), 'mouseover');
+
+            // preview shows only after delay
+            jasmine.clock().tick(250);
+            expect(anchorPreview.showPreview).toHaveBeenCalled();
+        });
+
+        it('should NOT be displayed when the hovered link is empty and the option showOnEmptyLinks is set to false', function () {
+            var editor = this.newMediumEditor('.editor', {
+                delay: 200,
+                anchorPreview: {
+                    showOnEmptyLinks: false
+                }
+            }),
+            anchorPreview = editor.getExtensionByName('anchor-preview');
 
             // show preview
             spyOn(MediumEditor.extensions.anchorPreview.prototype, 'showPreview').and.callThrough();
