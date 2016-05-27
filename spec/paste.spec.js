@@ -184,6 +184,30 @@ describe('Pasting content', function () {
 
         });
 
+        it('should trigger editablePaste', function () {
+            var editorEl = this.el,
+                editor = this.newMediumEditor('.editor', {
+                    paste: {
+                        forcePlainText: false,
+                        cleanPastedHTML: true
+                    }
+                }),
+                spy = jasmine.createSpy('handler');
+
+            editor.subscribe('editablePaste', spy);
+
+            // move caret to editor
+            editorEl.innerHTML = '<span id="editor-inner">&nbsp</span>';
+
+            selectElementContentsAndFire(editorEl);
+
+            expect(spy).not.toHaveBeenCalled();
+            var evt = prepareEvent(editorEl, 'paste');
+            firePreparedEvent(evt, editorEl, 'paste');
+            jasmine.clock().tick(1);
+            expect(spy).toHaveBeenCalledWith({ currentTarget: this.el, target: this.el }, this.el);
+        });
+
         it('should filter multi-line rich-text pastes when "insertHTML" command is not supported', function () {
             var editor = this.newMediumEditor('.editor', {
                 paste: {
@@ -285,6 +309,48 @@ describe('Pasting content', function () {
 
             firePreparedEvent(evt, pasteBin, 'paste');
             expect(pasteHandler.handlePasteBinPaste).toHaveBeenCalledWith(evt);
+        });
+
+        it('should fire editablePaste event when pasting', function () {
+            var editor = this.newMediumEditor('.editor', {
+                    paste: {
+                        forcePlainText: false,
+                        cleanPastedHTML: true
+                    }
+                }),
+                spy = jasmine.createSpy('handler');
+
+            editor.subscribe('editablePaste', spy);
+
+            selectElementContentsAndFire(editor.elements[0].firstChild);
+            expect(spy).not.toHaveBeenCalled();
+
+            fireEvent(this.el, 'keydown', {
+                keyCode: MediumEditor.util.keyCode.V,
+                ctrlKey: true,
+                metaKey: true
+            });
+
+            var contentEditables = document.body.querySelectorAll('[contentEditable=true]');
+            expect(contentEditables.length).toBe(2);
+
+            var evt = {
+                    type: 'paste',
+                    defaultPrevented: false,
+                    preventDefault: function () {},
+                    clipboardData: {
+                        types: ['text/plain', 'text/html'],
+                        getData: function () {
+                            // do we need to return different results for the different types? text/plain, text/html
+                            return 'pasted content';
+                        }
+                    }
+                },
+                pasteExtension = editor.getExtensionByName('paste');
+
+            pasteExtension.handlePasteBinPaste(evt);
+            jasmine.clock().tick(1);
+            expect(spy).toHaveBeenCalledWith({ currentTarget: editor.elements[0], target: editor.elements[0] }, editor.elements[0]);
         });
 
         it('should do nothing if default was prevented on paste event of the paste-bin', function () {

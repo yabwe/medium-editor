@@ -542,7 +542,7 @@
         },
 
         handlePaste: function (event) {
-            this.triggerCustomEvent('editablePaste', event, event.currentTarget);
+            this.triggerCustomEvent('editablePaste', { currentTarget: event.currentTarget, target: event.target }, event.currentTarget);
         },
 
         handleKeydown: function (event) {
