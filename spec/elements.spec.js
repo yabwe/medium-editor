@@ -49,5 +49,11 @@ describe('Elements TestCase', function () {
             expect(editor.elements.length).toBe(1);
             expect(this.el.getAttribute('aria-multiline')).toEqual('true');
         });
+
+        it('should set the data-medium-editor-editor-index attribute to be the id of the editor instance', function () {
+            var editor = this.newMediumEditor('.editor');
+            expect(editor.elements[0]).toBe(this.el);
+            expect(parseInt(this.el.getAttribute('data-medium-editor-editor-index'))).toBe(editor.id);
+        });
     });
 });
