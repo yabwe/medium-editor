@@ -333,17 +333,17 @@
         return !this.options.extensions['imageDragging'];
     }
 
-    function createContentEditable(textarea, id, doc) {
+    function createContentEditable(textarea, doc) {
         var div = doc.createElement('div'),
             now = Date.now(),
-            uniqueId = 'medium-editor-' + now + '-' + id,
+            uniqueId = 'medium-editor-' + now,
             atts = textarea.attributes;
 
         // Some browsers can move pretty fast, since we're using a timestamp
         // to make a unique-id, ensure that the id is actually unique on the page
         while (doc.getElementById(uniqueId)) {
             now++;
-            uniqueId = 'medium-editor-' + now + '-' + id;
+            uniqueId = 'medium-editor-' + now;
         }
 
         div.className = textarea.className;
@@ -369,10 +369,10 @@
         return div;
     }
 
-    function initElement(element, id) {
+    function initElement(element) {
         if (!element.getAttribute('data-medium-editor-element')) {
             if (element.nodeName.toLowerCase() === 'textarea') {
-                element = createContentEditable(element, id, this.options.ownerDocument);
+                element = createContentEditable(element, this.options.ownerDocument);
 
                 // Make sure we only attach to editableInput once for <textarea> elements
                 if (!this.instanceHandleEditableInput) {
