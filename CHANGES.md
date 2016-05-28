@@ -1,3 +1,10 @@
+5.19.1 / 2016-05-28
+==================
+* Add feature for toggling anchor preview for empty or # links
+* Fix keyboard paste to properly fire editablePaste
+* Standardize editablePaste to always fire with mock event object
+
+
 5.18.0 / 2016-05-21
 ==================
 * Add support calling document.execCommand with arbitrary argument from execAction

@@ -2957,7 +2957,7 @@ MediumEditor.extensions = {};
         },
 
         handlePaste: function (event) {
-            this.triggerCustomEvent('editablePaste', event, event.currentTarget);
+            this.triggerCustomEvent('editablePaste', { currentTarget: event.currentTarget, target: event.target }, event.currentTarget);
         },
 
         handleKeydown: function (event) {
@@ -3948,6 +3948,11 @@ MediumEditor.extensions = {};
          */
         showWhenToolbarIsVisible: false,
 
+        /* showOnEmptyLinks: [boolean]
+        * determines whether the anchor tag preview shows up on links with href="" or href="#something"
+        */
+        showOnEmptyLinks: true,
+
         init: function () {
             this.anchorPreview = this.createPreview();
 
@@ -4106,7 +4111,8 @@ MediumEditor.extensions = {};
             // Detect empty href attributes
             // The browser will make href="" or href="#top"
             // into absolute urls when accessed as event.target.href, so check the html
-            if (!/href=["']\S+["']/.test(target.outerHTML) || /href=["']#\S+["']/.test(target.outerHTML)) {
+            if (!this.showOnEmptyLinks &&
+                (!/href=["']\S+["']/.test(target.outerHTML) || /href=["']#\S+["']/.test(target.outerHTML))) {
                 return true;
             }
 
@@ -5214,6 +5220,12 @@ MediumEditor.extensions = {};
                 event.preventDefault();
                 this.removePasteBin();
                 this.doPaste(pastedHTML, pastedPlain, editable);
+
+                // The event handling code listens for paste on the editable element
+                // in order to trigger the editablePaste event.  Since this paste event
+                // is happening on the pastebin, the event handling code never knows about it
+                // So, we have to trigger editablePaste manually
+                this.trigger('editablePaste', { currentTarget: editable, target: editable }, editable);
                 return;
             }
 
@@ -5231,6 +5243,12 @@ MediumEditor.extensions = {};
 
                 // Handle the paste with the html from the paste bin
                 this.doPaste(pastedHTML, pastedPlain, editable);
+
+                // The event handling code listens for paste on the editable element
+                // in order to trigger the editablePaste event.  Since this paste event
+                // is happening on the pastebin, the event handling code never knows about it
+                // So, we have to trigger editablePaste manually
+                this.trigger('editablePaste', { currentTarget: editable, target: editable }, editable);
             }.bind(this), 0);
         },
 
@@ -7540,7 +7558,7 @@ MediumEditor.parseVersionString = function (release) {
 
 MediumEditor.version = MediumEditor.parseVersionString.call(this, ({
     // grunt-bump looks for this:
-    'version': '5.18.0'
+    'version': '5.19.1'
 }).version);
 
     return MediumEditor;
