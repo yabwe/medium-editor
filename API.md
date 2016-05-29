@@ -40,6 +40,9 @@
   - [`getExtensionByName(name)`](#getextensionbynamename)
   - [`serialize()`](#serialize)
   - [`setContent(html, index)`](#setcontenthtml-index)
+- [Static Functions/Properties](#static-functionsproperties)
+  - [`getEditorFromElement(element)`](#geteditorfromelementelement)
+  - [`version`](#version)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -464,3 +467,32 @@ Trigger the `editableInput` event.
 
 2. _**index** (`integer`)_:
   * Index of the element to set the content on. Defaults to 0 when not provided.
+
+***
+## Static Functions/Properties
+
+### `getEditorFromElement(element)`
+
+Given an editor **element**, retrieves the instance of MediumEditor which created/is monitoring the **element**
+
+**Arguments**
+
+1. _**element** (`DOMElement`)_:
+  * An editor **element** which is part of a MediumEditor instance
+
+### `version`
+
+Object containing data about the version of the current MediumEditor library
+
+**Properties of 'version'**
+
+1. _**major** (`Number`)_
+  * The major version number (ie the `3` in `"3.2.1"`)
+2. _**minor** (`Number`)_
+  * The minor version number (ie the `2` in `"3.2.1"`)
+3. _**revision** (`Number`)_
+  * The revision (aka "patch") version number (ie the `1` in `"3.2.1"`)
+4. _**preRelease** (`String`)_
+  * The pre-release version tag (ie the `"rc.1"` in `"5.0.0-rc.1"`)
+5. _**toString** (`Function`)_
+  * Returns the full version number as a string (ie `"5.0.0-rc.1"`)
