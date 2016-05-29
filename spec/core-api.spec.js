@@ -253,4 +253,21 @@ describe('Core-API', function () {
             expect(spy).not.toHaveBeenCalled();
         });
     });
+
+    describe('getEditorFromElement', function () {
+        it('should return the editor instance the element belongs to', function () {
+            var elTwo = this.createElement('div', 'editor-two', 'lore ipsum'),
+                editorOne = this.newMediumEditor('.editor'),
+                editorTwo = this.newMediumEditor('.editor-two');
+            expect(editorOne.elements[0]).toBe(this.el);
+            expect(editorTwo.elements[0]).toBe(elTwo);
+
+            expect(MediumEditor.getEditorFromElement(this.el)).toBe(editorOne);
+            expect(MediumEditor.getEditorFromElement(elTwo)).toBe(editorTwo);
+        });
+
+        it('should return null if the element is not within an editor', function () {
+            expect(MediumEditor.getEditorFromElement(this.el)).toBeNull();
+        });
+    });
 });
