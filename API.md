@@ -37,6 +37,7 @@
 - [Helper Functions](#helper-functions)
   - [`checkContentChanged(editable)`](#checkContentChangededitable)
   - [`delay(fn)`](#delayfn)
+  - [`getContent(index)`](#getcontentindex)
   - [`getExtensionByName(name)`](#getextensionbynamename)
   - [`serialize()`](#serialize)
   - [`setContent(html, index)`](#setcontenthtml-index)
@@ -439,6 +440,16 @@ Delay any function from being executed by the amount of time passed as the **del
   * Function to delay execution for.
 
 ***
+### `getContent(index)`
+
+Returns the trimmed html content for the first editor **element**, or the **element** at `index`.
+
+**Arguments**
+
+1. _**index** (`integer`)_: _**OPTIONAL**_
+  * Index of the editor **element** to retrieve the content from. Defaults to 0 when not provided (returns content of the first editor **element**).
+
+***
 ### `getExtensionByName(name)`
 
 Get a reference to an extension with the specified name.
@@ -457,16 +468,15 @@ Returns a JSON object including the content of each of the **elements** inside t
 ***
 ### `setContent(html, index)`
 
-Sets the innerHTML content for the element at `index`.
-Trigger the `editableInput` event.
+Sets the html content for the first editor **element**, or the **element** at `index`. Ensures the the `editableInput` event is triggered.
 
 **Arguments**
 
 1. _**html** (`string`)_:
   * The content to set the element to
 
-2. _**index** (`integer`)_:
-  * Index of the element to set the content on. Defaults to 0 when not provided.
+2. _**index** (`integer`)_: _**OPTIONAL**_
+  * Index of the editor **element** to set the content of. Defaults to 0 when not provided (sets content of the first editor **element**).
 
 ***
 ## Static Functions/Properties
