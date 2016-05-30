@@ -55,6 +55,25 @@ describe('Core-API', function () {
         });
     });
 
+    describe('getContent', function () {
+        it('should retrieve the content of the first element', function () {
+            var editor = this.newMediumEditor('.editor');
+            expect(editor.getContent()).toEqual('lore ipsum');
+        });
+
+        it('should retrieve the content of the element at the specified index', function () {
+            var otherHTML = 'something different';
+            this.createElement('div', 'editor', otherHTML);
+            var editor = this.newMediumEditor('.editor');
+            expect(editor.getContent(1)).toEqual(otherHTML);
+        });
+
+        it('should return null if no element exists', function () {
+            var editor = this.newMediumEditor('.no-valid-selector');
+            expect(editor.getContent()).toBeNull();
+        });
+    });
+
     describe('saveSelection/restoreSelection', function () {
         it('should be applicable if html changes but text does not', function () {
             this.el.innerHTML = 'lorem <i>ipsum</i> dolor';
