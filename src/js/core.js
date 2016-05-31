@@ -1178,17 +1178,20 @@
         },
 
         resetContent: function (element) {
-            var elements = this.elements;
+            // For all elements that exist in the this.elements array, we can assume:
+            // - Its initial content has been set in the initialContent object
+            // - It has a medium-editor-index attribute which is the key value in the initialContent object
+
             if (element) {
-                elements = [];
-                if (this.elements.indexOf(element) !== -1) {
-                    elements.push(element);
+                var index = this.elements.indexOf(element);
+                if (index !== -1) {
+                    this.setContent(initialContent[element.getAttribute('medium-editor-index')], index);
                 }
+                return;
             }
-            elements.forEach(function (el, idx) {
-                if (el) {
-                    this.setContent(initialContent[el.getAttribute('medium-editor-index')], idx);
-                }
+
+            this.elements.forEach(function (el, idx) {
+                this.setContent(initialContent[el.getAttribute('medium-editor-index')], idx);
             }, this);
         },
 

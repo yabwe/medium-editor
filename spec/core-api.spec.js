@@ -103,10 +103,10 @@ describe('Core-API', function () {
             editor.setContent('<p>changed content</p>', 1);
             expect(elementTwo.innerHTML).not.toEqual(initialTwo);
 
-            editor.resetContent(this.el);
+            editor.resetContent(elementTwo);
 
-            expect(this.el.innerHTML).toEqual(initialOne);
-            expect(elementTwo.innerHTML).not.toEqual(initialTwo);
+            expect(this.el.innerHTML).not.toEqual(initialOne);
+            expect(elementTwo.innerHTML).toEqual(initialTwo);
         });
 
         it('should not reset anything if an invalid element is provided', function () {
