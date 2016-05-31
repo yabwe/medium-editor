@@ -100,6 +100,21 @@ describe('Textarea TestCase', function () {
             editor.destroy();
             expect(this.el.classList.contains('medium-editor-hidden')).toBe(false);
         });
+
+        it('should reset the value of created div when form containing textarea is reset', function () {
+            var form = this.createElement('form', null, null, true),
+                initialContent = this.el.value;
+            form.appendChild(this.el);
+            document.body.appendChild(form);
+            var editor = this.newMediumEditor('.editor');
+            expect(editor.elements[0].innerHTML).toEqual(initialContent);
+
+            editor.setContent('<p>custom content</p>');
+            expect(editor.elements[0].innerHTML).not.toEqual(initialContent);
+
+            form.reset();
+            expect(editor.elements[0].innerHTML).toEqual(initialContent);
+        });
     });
 
     describe('Dynamically adding textarea elements to the editor', function () {
@@ -213,6 +228,28 @@ describe('Textarea TestCase', function () {
             expect(this.el.classList.contains('medium-editor-hidden')).toBe(true);
             editor.destroy();
             expect(this.el.classList.contains('medium-editor-hidden')).toBe(false);
+        });
+
+        it('should reset the value of created div when form containing textarea is reset', function () {
+            var form = this.createElement('form', null, null, true),
+                initialContent = 'initial text',
+                otherTextarea = this.createElement('textarea', 'editor', initialContent, true),
+                editor = this.newMediumEditor('.editor');
+            otherTextarea.value = initialContent;
+            expect(editor.elements.length).toBe(1);
+
+            form.appendChild(otherTextarea);
+            document.body.appendChild(form);
+
+            editor.addElements(otherTextarea);
+            var createdDiv = editor.elements[1];
+            expect(createdDiv.innerHTML).toEqual(initialContent);
+
+            editor.setContent('<p>custom content</p>', 1);
+            expect(createdDiv.innerHTML).not.toEqual(initialContent);
+
+            form.reset();
+            expect(createdDiv.innerHTML).toEqual(initialContent);
         });
     });
 

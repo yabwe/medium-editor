@@ -333,15 +333,15 @@
         return !this.options.extensions['imageDragging'];
     }
 
-    function createContentEditable(textarea, doc) {
-        var div = doc.createElement('div'),
+    function createContentEditable(textarea) {
+        var div = this.options.ownerDocument.createElement('div'),
             now = Date.now(),
             uniqueId = 'medium-editor-' + now,
             atts = textarea.attributes;
 
         // Some browsers can move pretty fast, since we're using a timestamp
         // to make a unique-id, ensure that the id is actually unique on the page
-        while (doc.getElementById(uniqueId)) {
+        while (this.options.ownerDocument.getElementById(uniqueId)) {
             now++;
             uniqueId = 'medium-editor-' + now;
         }
@@ -360,6 +360,16 @@
             }
         }
 
+        // If textarea has a form, listen for reset on the form to clear
+        // the content of the created div
+        if (textarea.form) {
+            this.on(textarea.form, 'reset', function (event) {
+                if (!event.defaultPrevented) {
+                    this.resetContent(this.options.ownerDocument.getElementById(uniqueId));
+                }
+            }.bind(this));
+        }
+
         textarea.classList.add('medium-editor-hidden');
         textarea.parentNode.insertBefore(
             div,
@@ -372,7 +382,7 @@
     function initElement(element, editorId) {
         if (!element.getAttribute('data-medium-editor-element')) {
             if (element.nodeName.toLowerCase() === 'textarea') {
-                element = createContentEditable(element, this.options.ownerDocument);
+                element = createContentEditable.call(this, element);
 
                 // Make sure we only attach to editableInput once for <textarea> elements
                 if (!this.instanceHandleEditableInput) {
