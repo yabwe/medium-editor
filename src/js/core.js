@@ -400,11 +400,17 @@
                 this.on(element, 'keyup', handleKeyup.bind(this));
             }
 
+            var elementId = MediumEditor.util.guid();
+
             element.setAttribute('data-medium-editor-element', true);
             element.setAttribute('role', 'textbox');
             element.setAttribute('aria-multiline', true);
-            element.setAttribute('medium-editor-index', MediumEditor.util.guid());
             element.setAttribute('data-medium-editor-editor-index', editorId);
+            // TODO: Merge data-medium-editor-element and medium-editor-index attributes for 6.0.0
+            // medium-editor-index is not named correctly anymore and can be re-purposed to signify
+            // whether the element has been initialized or not
+            element.setAttribute('medium-editor-index', elementId);
+            initialContent[elementId] = element.innerHTML;
 
             this.events.attachAllEventsToElement(element);
         }
@@ -622,6 +628,8 @@
             this.restoreSelection();
         }
     }
+
+    var initialContent = {};
 
     MediumEditor.prototype = {
         // NOT DOCUMENTED - exposed for backwards compatability
@@ -1157,6 +1165,21 @@
         checkContentChanged: function (editable) {
             editable = editable || MediumEditor.selection.getSelectionElement(this.options.contentWindow);
             this.events.updateInput(editable, { target: editable, currentTarget: editable });
+        },
+
+        resetContent: function (element) {
+            var elements = this.elements;
+            if (element) {
+                elements = [];
+                if (this.elements.indexOf(element) !== -1) {
+                    elements.push(element);
+                }
+            }
+            elements.forEach(function (el, idx) {
+                if (el) {
+                    this.setContent(initialContent[el.getAttribute('medium-editor-index')], idx);
+                }
+            }, this);
         },
 
         addElements: function (selector) {

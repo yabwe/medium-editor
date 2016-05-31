@@ -74,6 +74,60 @@ describe('Core-API', function () {
         });
     });
 
+    describe('resetContent', function () {
+        it('should reset the content of all editor elements to their initial values', function () {
+            var initialOne = this.el.innerHTML,
+                initialTwo = 'Lorem ipsum dolor',
+                elementTwo = this.createElement('div', 'editor', initialTwo),
+                editor = this.newMediumEditor('.editor');
+
+            editor.setContent('<p>changed content</p>');
+            expect(this.el.innerHTML).not.toEqual(initialOne);
+            editor.setContent('<p>changed content</p>', 1);
+            expect(elementTwo.innerHTML).not.toEqual(initialTwo);
+
+            editor.resetContent();
+
+            expect(this.el.innerHTML).toEqual(initialOne);
+            expect(elementTwo.innerHTML).toEqual(initialTwo);
+        });
+
+        it('should reset the content of a specific element when provided', function () {
+            var initialOne = this.el.innerHTML,
+                initialTwo = 'Lorem ipsum dolor',
+                elementTwo = this.createElement('div', 'editor', initialTwo),
+                editor = this.newMediumEditor('.editor');
+
+            editor.setContent('<p>changed content</p>');
+            expect(this.el.innerHTML).not.toEqual(initialOne);
+            editor.setContent('<p>changed content</p>', 1);
+            expect(elementTwo.innerHTML).not.toEqual(initialTwo);
+
+            editor.resetContent(this.el);
+
+            expect(this.el.innerHTML).toEqual(initialOne);
+            expect(elementTwo.innerHTML).not.toEqual(initialTwo);
+        });
+
+        it('should not reset anything if an invalid element is provided', function () {
+            var initialOne = this.el.innerHTML,
+                initialTwo = 'Lorem ipsum dolor',
+                elementTwo = this.createElement('div', 'editor', initialTwo),
+                dummyElement = this.createElement('div', 'not-editor', '<p>dummy element</p>'),
+                editor = this.newMediumEditor('.editor');
+
+            editor.setContent('<p>changed content</p>');
+            expect(this.el.innerHTML).not.toEqual(initialOne);
+            editor.setContent('<p>changed content</p>', 1);
+            expect(elementTwo.innerHTML).not.toEqual(initialTwo);
+
+            editor.resetContent(dummyElement);
+
+            expect(this.el.innerHTML).not.toEqual(initialOne);
+            expect(elementTwo.innerHTML).not.toEqual(initialTwo);
+        });
+    });
+
     describe('saveSelection/restoreSelection', function () {
         it('should be applicable if html changes but text does not', function () {
             this.el.innerHTML = 'lorem <i>ipsum</i> dolor';
