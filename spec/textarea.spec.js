@@ -58,6 +58,10 @@ describe('Textarea TestCase', function () {
         });
 
         it('should create unique div ids for multiple textareas', function () {
+            var origDateNow = Date.now;
+            Date.now = function () {
+                return 1464448478887;
+            };
             for (var i = 0; i < 12; i++) {
                 var ta = this.createElement('textarea', 'editor');
                 ta.value = 'test content';
@@ -66,9 +70,14 @@ describe('Textarea TestCase', function () {
             editor.elements.forEach(function (el) {
                 expect(document.querySelectorAll('div#' + el.id).length).toEqual(1);
             });
+            Date.now = origDateNow;
         });
 
         it('should create unique medium-editor-textarea-ids across all editor instances', function () {
+            var origDateNow = Date.now;
+            Date.now = function () {
+                return 1464448478887;
+            };
             var tas = [];
             for (var i = 0; i < 12; i++) {
                 var ta = this.createElement('textarea', 'editor');
@@ -82,6 +91,7 @@ describe('Textarea TestCase', function () {
                 expect(document.querySelectorAll('textarea[medium-editor-textarea-id="' +
                     editor.elements[0].getAttribute('medium-editor-textarea-id') + '"]').length).toEqual(1);
             });
+            Date.now = origDateNow;
         });
 
         it('should cleanup after destroy', function () {

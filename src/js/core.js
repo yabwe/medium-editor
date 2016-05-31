@@ -333,17 +333,17 @@
         return !this.options.extensions['imageDragging'];
     }
 
-    function createContentEditable(textarea, id, doc) {
+    function createContentEditable(textarea, doc) {
         var div = doc.createElement('div'),
             now = Date.now(),
-            uniqueId = 'medium-editor-' + now + '-' + id,
+            uniqueId = 'medium-editor-' + now,
             atts = textarea.attributes;
 
         // Some browsers can move pretty fast, since we're using a timestamp
         // to make a unique-id, ensure that the id is actually unique on the page
         while (doc.getElementById(uniqueId)) {
             now++;
-            uniqueId = 'medium-editor-' + now + '-' + id;
+            uniqueId = 'medium-editor-' + now;
         }
 
         div.className = textarea.className;
@@ -369,10 +369,10 @@
         return div;
     }
 
-    function initElement(element, id) {
+    function initElement(element, editorId) {
         if (!element.getAttribute('data-medium-editor-element')) {
             if (element.nodeName.toLowerCase() === 'textarea') {
-                element = createContentEditable(element, id, this.options.ownerDocument);
+                element = createContentEditable(element, this.options.ownerDocument);
 
                 // Make sure we only attach to editableInput once for <textarea> elements
                 if (!this.instanceHandleEditableInput) {
@@ -404,6 +404,7 @@
             element.setAttribute('role', 'textbox');
             element.setAttribute('aria-multiline', true);
             element.setAttribute('medium-editor-index', MediumEditor.util.guid());
+            element.setAttribute('data-medium-editor-editor-index', editorId);
 
             this.events.attachAllEventsToElement(element);
         }
@@ -640,6 +641,7 @@
                 return;
             }
 
+            addToEditors.call(this, this.options.contentWindow);
             this.events = new MediumEditor.Events(this);
             this.elements = [];
 
@@ -650,7 +652,6 @@
             }
 
             this.isActive = true;
-            addToEditors.call(this, this.options.contentWindow);
 
             // Call initialization helpers
             initExtensions.call(this);
@@ -685,6 +686,7 @@
                 element.removeAttribute('role');
                 element.removeAttribute('aria-multiline');
                 element.removeAttribute('medium-editor-index');
+                element.removeAttribute('data-medium-editor-editor-index');
 
                 // Remove any elements created for textareas
                 if (element.getAttribute('medium-editor-textarea-id')) {
@@ -1159,7 +1161,7 @@
 
             elements.forEach(function (element) {
                 // Initialize all new elements (we check that in those functions don't worry)
-                element = initElement.call(this, element);
+                element = initElement.call(this, element, this.id);
 
                 // Add new elements to our internal elements array
                 this.elements.push(element);
@@ -1190,5 +1192,14 @@
                 return true;
             }, this);
         }
+    };
+
+    MediumEditor.getEditorFromElement = function (element) {
+        var index = element.getAttribute('data-medium-editor-editor-index'),
+            win = element && element.ownerDocument && (element.ownerDocument.defaultView || element.ownerDocument.parentWindow);
+        if (win && win._mediumEditors && win._mediumEditors[index]) {
+            return win._mediumEditors[index];
+        }
+        return null;
     };
 }());

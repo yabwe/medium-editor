@@ -10,7 +10,7 @@ MediumEditor has been written using vanilla JavaScript, no additional frameworks
 
 [![Sauce Test Status](https://saucelabs.com/browser-matrix/mediumeditor.svg)](https://saucelabs.com/u/mediumeditor)
 
-![Supportd Browsers](https://cloud.githubusercontent.com/assets/2444240/12874138/d3960a04-cd9b-11e5-8cc5-8136d82cf5f6.png)
+![Supported Browsers](https://cloud.githubusercontent.com/assets/2444240/12874138/d3960a04-cd9b-11e5-8cc5-8136d82cf5f6.png)
 
 [![NPM info](https://nodei.co/npm/medium-editor.png?downloads=true)](https://www.npmjs.com/package/medium-editor)
 
@@ -559,15 +559,19 @@ View the [MediumEditor Object API documentation](API.md) on the Wiki for details
 * __.serialize()__: returns a JSON object with elements contents
 * __.setContent(html, index)__: sets the `innerHTML` to `html` of the element at `index`
 
+### Static Methods/Properties
+* __.getEditorFromElement(element)__: retrieve the instance of MediumEditor that is monitoring the provided editor element
+* __.version__: the version information for the MediumEditor library
+
 ## Dynamically add/remove elements to your instance
 
-It is possible to dynamically add new elements to your existing MediumtEditor instance:
+It is possible to dynamically add new elements to your existing MediumEditor instance:
 
 ```javascript
 var editor = new MediumEditor('.editable');
 editor.subscribe('editableInput', this._handleEditableInput.bind(this));
 
-// imagine an ajax fetch/any other dynamic functionality which will add new '.editable' elements to dom
+// imagine an ajax fetch/any other dynamic functionality which will add new '.editable' elements to the DOM
 
 editor.addElements('.editable');
 // OR editor.addElements(document.getElementsByClassName('editable'));
@@ -585,7 +589,7 @@ Passing an elements or array of elements to `addElements(elements)` will:
 
 ### Removing elements dynamically
 
-Straight forward, just call `removeElements` with the elemnt or array of elements you to want to tear down. Each element itself will remain a contenteditable - it will just remove all event handlers and all references to it so you can safely remove it from DOM.
+Straight forward, just call `removeElements` with the element or array of elements you to want to tear down. Each element itself will remain a contenteditable - it will just remove all event handlers and all references to it so you can safely remove it from DOM.
 
 ```javascript
 editor.removeElements(document.querySelector('#myElement'));
@@ -625,7 +629,7 @@ This is handy when you need to capture any modifications to the contenteditable 
 
 Why is this interesting and why should you use this event instead of just attaching to the `input` event on the contenteditable element?
 
-So for most modern browsers (Chrome, Firefox, Safari, etc.), the `input` event works just fine. Infact, `editableInput` is just a proxy for the `input` event in those browsers. However, the `input` event [is not supported for contenteditable elements in IE 9-11](https://connect.microsoft.com/IE/feedback/details/794285/ie10-11-input-event-does-not-fire-on-div-with-contenteditable-set) and is _mostly_ supported in Microsoft Edge, but not fully.
+So for most modern browsers (Chrome, Firefox, Safari, etc.), the `input` event works just fine. In fact, `editableInput` is just a proxy for the `input` event in those browsers. However, the `input` event [is not supported for contenteditable elements in IE 9-11](https://connect.microsoft.com/IE/feedback/details/794285/ie10-11-input-event-does-not-fire-on-div-with-contenteditable-set) and is _mostly_ supported in Microsoft Edge, but not fully.
 
 So, to properly support the `editableInput` event in Internet Explorer and Microsoft Edge, MediumEditor uses a combination of the `selectionchange` and `keypress` events, as well as monitoring calls to `document.execCommand`.
 

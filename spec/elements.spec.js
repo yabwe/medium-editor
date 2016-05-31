@@ -1,16 +1,16 @@
 describe('Elements TestCase', function () {
     'use strict';
 
+    beforeEach(function () {
+        setupTestHelpers.call(this);
+        this.el = this.createElement('div', 'editor', 'lore ipsum');
+    });
+
+    afterEach(function () {
+        this.cleanupTest();
+    });
+
     describe('Initialization', function () {
-        beforeEach(function () {
-            setupTestHelpers.call(this);
-            this.el = this.createElement('div', 'editor', 'lore ipsum');
-        });
-
-        afterEach(function () {
-            this.cleanupTest();
-        });
-
         it('should set element contenteditable attribute to true', function () {
             var editor = this.newMediumEditor('.editor');
             expect(editor.elements.length).toBe(1);
@@ -48,6 +48,49 @@ describe('Elements TestCase', function () {
             var editor = this.newMediumEditor('.editor');
             expect(editor.elements.length).toBe(1);
             expect(this.el.getAttribute('aria-multiline')).toEqual('true');
+        });
+
+        it('should set the data-medium-editor-editor-index attribute to be the id of the editor instance', function () {
+            var editor = this.newMediumEditor('.editor');
+            expect(editor.elements[0]).toBe(this.el);
+            expect(parseInt(this.el.getAttribute('data-medium-editor-editor-index'))).toBe(editor.id);
+        });
+    });
+
+    describe('Destroy', function () {
+        it('should remove the contenteditable attribute', function () {
+            var editor = this.newMediumEditor('.editor');
+            expect(this.el.getAttribute('contenteditable')).toEqual('true');
+            editor.destroy();
+            expect(this.el.hasAttribute('contenteditable')).toBe(false);
+        });
+
+        it('should remove the medium-editor-element attribute', function () {
+            var editor = this.newMediumEditor('.editor');
+            expect(this.el.getAttribute('data-medium-editor-element')).toEqual('true');
+            editor.destroy();
+            expect(this.el.hasAttribute('data-medium-editor-element')).toBe(false);
+        });
+
+        it('should remove the role attribute', function () {
+            var editor = this.newMediumEditor('.editor');
+            expect(this.el.getAttribute('role')).toEqual('textbox');
+            editor.destroy();
+            expect(this.el.hasAttribute('role')).toBe(false);
+        });
+
+        it('should remove the aria-multiline attribute', function () {
+            var editor = this.newMediumEditor('.editor');
+            expect(this.el.getAttribute('aria-multiline')).toEqual('true');
+            editor.destroy();
+            expect(this.el.hasAttribute('aria-multiline')).toBe(false);
+        });
+
+        it('should remove the data-medium-editor-editor-index attribute', function () {
+            var editor = this.newMediumEditor('.editor');
+            expect(parseInt(this.el.getAttribute('data-medium-editor-editor-index'))).toBe(editor.id);
+            editor.destroy();
+            expect(this.el.hasAttribute('data-medium-editor-editor-index')).toBe(false);
         });
     });
 });
