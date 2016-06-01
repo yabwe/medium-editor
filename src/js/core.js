@@ -333,15 +333,15 @@
         return !this.options.extensions['imageDragging'];
     }
 
-    function createContentEditable(textarea, doc) {
-        var div = doc.createElement('div'),
+    function createContentEditable(textarea) {
+        var div = this.options.ownerDocument.createElement('div'),
             now = Date.now(),
             uniqueId = 'medium-editor-' + now,
             atts = textarea.attributes;
 
         // Some browsers can move pretty fast, since we're using a timestamp
         // to make a unique-id, ensure that the id is actually unique on the page
-        while (doc.getElementById(uniqueId)) {
+        while (this.options.ownerDocument.getElementById(uniqueId)) {
             now++;
             uniqueId = 'medium-editor-' + now;
         }
@@ -360,6 +360,16 @@
             }
         }
 
+        // If textarea has a form, listen for reset on the form to clear
+        // the content of the created div
+        if (textarea.form) {
+            this.on(textarea.form, 'reset', function (event) {
+                if (!event.defaultPrevented) {
+                    this.resetContent(this.options.ownerDocument.getElementById(uniqueId));
+                }
+            }.bind(this));
+        }
+
         textarea.classList.add('medium-editor-hidden');
         textarea.parentNode.insertBefore(
             div,
@@ -372,7 +382,7 @@
     function initElement(element, editorId) {
         if (!element.getAttribute('data-medium-editor-element')) {
             if (element.nodeName.toLowerCase() === 'textarea') {
-                element = createContentEditable(element, this.options.ownerDocument);
+                element = createContentEditable.call(this, element);
 
                 // Make sure we only attach to editableInput once for <textarea> elements
                 if (!this.instanceHandleEditableInput) {
@@ -400,11 +410,17 @@
                 this.on(element, 'keyup', handleKeyup.bind(this));
             }
 
+            var elementId = MediumEditor.util.guid();
+
             element.setAttribute('data-medium-editor-element', true);
             element.setAttribute('role', 'textbox');
             element.setAttribute('aria-multiline', true);
-            element.setAttribute('medium-editor-index', MediumEditor.util.guid());
             element.setAttribute('data-medium-editor-editor-index', editorId);
+            // TODO: Merge data-medium-editor-element and medium-editor-index attributes for 6.0.0
+            // medium-editor-index is not named correctly anymore and can be re-purposed to signify
+            // whether the element has been initialized or not
+            element.setAttribute('medium-editor-index', elementId);
+            initialContent[elementId] = element.innerHTML;
 
             this.events.attachAllEventsToElement(element);
         }
@@ -622,6 +638,8 @@
             this.restoreSelection();
         }
     }
+
+    var initialContent = {};
 
     MediumEditor.prototype = {
         // NOT DOCUMENTED - exposed for backwards compatability
@@ -1157,6 +1175,24 @@
         checkContentChanged: function (editable) {
             editable = editable || MediumEditor.selection.getSelectionElement(this.options.contentWindow);
             this.events.updateInput(editable, { target: editable, currentTarget: editable });
+        },
+
+        resetContent: function (element) {
+            // For all elements that exist in the this.elements array, we can assume:
+            // - Its initial content has been set in the initialContent object
+            // - It has a medium-editor-index attribute which is the key value in the initialContent object
+
+            if (element) {
+                var index = this.elements.indexOf(element);
+                if (index !== -1) {
+                    this.setContent(initialContent[element.getAttribute('medium-editor-index')], index);
+                }
+                return;
+            }
+
+            this.elements.forEach(function (el, idx) {
+                this.setContent(initialContent[el.getAttribute('medium-editor-index')], idx);
+            }, this);
         },
 
         addElements: function (selector) {
