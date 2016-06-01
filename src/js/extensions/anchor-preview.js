@@ -34,6 +34,11 @@
             this.attachToEditables();
         },
 
+        getInteractionElements: function () {
+            return this.getPreviewElement();
+        },
+
+        // TODO: Remove this function in 6.0.0
         getPreviewElement: function () {
             return this.anchorPreview;
         },

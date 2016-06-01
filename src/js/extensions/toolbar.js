@@ -189,6 +189,10 @@
 
         // Toolbar accessors
 
+        getInteractionElements: function () {
+            return this.getToolbarElement();
+        },
+
         getToolbarElement: function () {
             if (!this.toolbar) {
                 this.toolbar = this.createToolbar();

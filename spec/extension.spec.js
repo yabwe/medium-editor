@@ -1,4 +1,4 @@
-/*global selectElementContentsAndFire */
+/*global selectElementContentsAndFire, fireEvent */
 
 describe('Extensions TestCase', function () {
     'use strict';
@@ -283,6 +283,40 @@ describe('Extensions TestCase', function () {
 
             expect(tempExtension.getEditorOption('disableReturn')).toBe(true);
             expect(tempExtension.getEditorOption('spellcheck')).toBe(editor.options.spellcheck);
+        });
+
+        it('should be able to prevent blur on the editor when user iteracts with extension elements', function () {
+            var sampleElOne = this.createElement('button', null, 'Test Button'),
+                sampleElTwo = this.createElement('textarea', null, 'Test Div'),
+                externalEl = this.createElement('div', 'external-element', 'External Element'),
+                TempExtension = MediumEditor.Extension.extend({
+                    getInteractionElements: function () {
+                        return [sampleElOne, sampleElTwo];
+                    }
+                }),
+                editor = this.newMediumEditor('.editor', {
+                    extensions: {
+                        'temp-extension': new TempExtension()
+                    }
+                }),
+                spy = jasmine.createSpy('handler');
+
+            selectElementContentsAndFire(editor.elements[0]);
+            jasmine.clock().tick(1);
+            expect(editor.getExtensionByName('toolbar').isDisplayed()).toBe(true);
+
+            editor.subscribe('blur', spy);
+
+            fireEvent(sampleElTwo, 'mousedown');
+            fireEvent(sampleElTwo, 'mouseup');
+            fireEvent(sampleElTwo, 'click');
+            jasmine.clock().tick(51);
+            expect(spy).not.toHaveBeenCalled();
+
+            fireEvent(externalEl, 'mousedown');
+            fireEvent(document.body, 'mouseup');
+            fireEvent(document.body, 'click');
+            expect(spy).toHaveBeenCalled();
         });
     });
 

@@ -176,6 +176,16 @@
          */
         setInactive: undefined,
 
+        /* getInteractionElements: [function ()]
+         *
+         * If the extension renders any elements that the user can interact with
+         * this function should be implemented and return the root element or an array
+         * containg all of the root elements. MediumEditor will call this function to
+         * prevent the editor from triggering 'blur' when a user interacts with
+         * elements rendered by an extension.
+         */
+        getInteractionElements: undefined,
+
         /************************ Helpers ************************
          * The following are helpers that are either set by MediumEditor
          * during initialization, or are helper methods which either
