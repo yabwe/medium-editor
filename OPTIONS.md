@@ -42,6 +42,7 @@ var editor = new MediumEditor('.editor', {
 - [Anchor Preview options](#anchor-preview-options)
     - [`hideDelay`](#hidedelay)
     - [`previewValueSelector`](#previewvalueselector)
+    - [`showOnEmptyLinks`](#showonemptylinks)
   - [Disabling Anchor Preview](#disabling-anchor-preview)
 - [Placeholder Options](#placeholder-options)
     - [`text`](#text)
@@ -333,6 +334,12 @@ Time in milliseconds to show the anchor tag preview after the mouse has left the
 **Default:** `'a'`
 
 The default selector to locate where to put the activeAnchor value in the preview. You should only need to override this if you've modified the way in which the anchor-preview extension renders.
+
+***
+#### `showOnEmptyLinks`
+**Default:** `true`
+
+Determines whether the anchor tag preview shows up on link with href as "" or "#something". You should set this value to false if you do not want the preview to show up in such use cases.
 
 ***
 #### `showWhenToolbarIsVisible`
