@@ -178,11 +178,14 @@
 
         /* getInteractionElements: [function ()]
          *
-         * If the extension renders any elements that the user can interact with
-         * this function should be implemented and return the root element or an array
-         * containg all of the root elements. MediumEditor will call this function to
-         * prevent the editor from triggering 'blur' when a user interacts with
-         * elements rendered by an extension.
+         * If the extension renders any elements that the user can interact with,
+         * this method should be implemented and return the root element or an array
+         * containing all of the root elements. MediumEditor will call this function
+         * during interaction to see if the user clicked on something outside of the editor.
+         * The elements are used to check if the target element of a click or
+         * other user event is a descendant of any extension elements.
+         * This way, the editor can also count user interaction within editor elements as
+         * interactions with the editor, and thus not trigger 'blur'
          */
         getInteractionElements: undefined,
 
