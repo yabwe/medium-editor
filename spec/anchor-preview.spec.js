@@ -139,6 +139,9 @@ describe('Anchor Preview TestCase', function () {
             expect(toolbar.isDisplayed()).toBe(true);
             expect(anchor.isDisplayed()).toBe(true);
 
+            // textbox should contain the url
+            expect(anchor.getInput().value).toEqual('http://test.com');
+
             // the checkboxes should be unchecked
             expect(anchor.getAnchorTargetCheckbox().checked).toBe(false);
             expect(anchor.getAnchorButtonCheckbox().checked).toBe(false);
@@ -306,7 +309,7 @@ describe('Anchor Preview TestCase', function () {
         });
 
         // https://github.com/yabwe/medium-editor/issues/1047
-        it('should display the anchor form in the toolbar when clicked when showWhenToolbarIsVisible is set to true adn toolbar is visible', function () {
+        it('should display the anchor form in the toolbar when clicked when showWhenToolbarIsVisible is set to true and toolbar is visible', function () {
             var editor = this.newMediumEditor('.editor', {
                     anchorPreview: {
                         showWhenToolbarIsVisible: true
