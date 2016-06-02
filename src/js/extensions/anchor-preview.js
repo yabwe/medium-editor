@@ -155,7 +155,7 @@
                 this.base.delay(function () {
                     if (activeAnchor) {
                         var opts = {
-                            url: activeAnchor.attributes.href.value,
+                            value: activeAnchor.attributes.href.value,
                             target: activeAnchor.getAttribute('target'),
                             buttonClass: activeAnchor.getAttribute('class')
                         };
