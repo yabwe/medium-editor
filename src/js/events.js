@@ -1,6 +1,26 @@
 (function () {
     'use strict';
 
+    function isElementDescendantOfExtension(extensions, element) {
+        return extensions.some(function (extension) {
+            if (typeof extension.getInteractionElements !== 'function') {
+                return false;
+            }
+
+            var extensionElements = extension.getInteractionElements();
+            if (!extensionElements) {
+                return false;
+            }
+
+            if (!Array.isArray(extensionElements)) {
+                extensionElements = [extensionElements];
+            }
+            return extensionElements.some(function (el) {
+                return MediumEditor.util.isDescendant(el, element, true);
+            });
+        });
+    }
+
     var Events = function (instance) {
         this.base = instance;
         this.options = this.base.options;
@@ -377,21 +397,16 @@
         },
 
         updateFocus: function (target, eventObj) {
-            var toolbar = this.base.getExtensionByName('toolbar'),
-                toolbarEl = toolbar ? toolbar.getToolbarElement() : null,
-                anchorPreview = this.base.getExtensionByName('anchor-preview'),
-                previewEl = (anchorPreview && anchorPreview.getPreviewElement) ? anchorPreview.getPreviewElement() : null,
-                hadFocus = this.base.getFocusedElement(),
+            var hadFocus = this.base.getFocusedElement(),
                 toFocus;
 
-            // For clicks, we need to know if the mousedown that caused the click happened inside the existing focused element.
-            // If so, we don't want to focus another element
+            // For clicks, we need to know if the mousedown that caused the click happened inside the existing focused element
+            // or one of the extension elements.  If so, we don't want to focus another element
             if (hadFocus &&
                     eventObj.type === 'click' &&
                     this.lastMousedownTarget &&
                     (MediumEditor.util.isDescendant(hadFocus, this.lastMousedownTarget, true) ||
-                     MediumEditor.util.isDescendant(toolbarEl, this.lastMousedownTarget, true) ||
-                     MediumEditor.util.isDescendant(previewEl, this.lastMousedownTarget, true))) {
+                     isElementDescendantOfExtension(this.base.extensions, this.lastMousedownTarget))) {
                 toFocus = hadFocus;
             }
 
@@ -407,10 +422,9 @@
                 }, this);
             }
 
-            // Check if the target is external (not part of the editor, toolbar, or anchorpreview)
+            // Check if the target is external (not part of the editor, toolbar, or any other extension)
             var externalEvent = !MediumEditor.util.isDescendant(hadFocus, target, true) &&
-                                !MediumEditor.util.isDescendant(toolbarEl, target, true) &&
-                                !MediumEditor.util.isDescendant(previewEl, target, true);
+                                !isElementDescendantOfExtension(this.base.extensions, target);
 
             if (toFocus !== hadFocus) {
                 // If element has focus, and focus is going outside of editor

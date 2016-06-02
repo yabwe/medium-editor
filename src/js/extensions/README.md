@@ -21,6 +21,7 @@
     * [`checkState(node)`](#checkstatenode)
     * [`destroy()`](#destroy)
     * [`queryCommandState()`](#querycommandstate)
+    * [`getInteractionElements()`](#getinteractionelements)
     * [`isActive()`](#isactive)
     * [`isAlreadyApplied(node)`](#isalreadyappliednode)
     * [`setActive()`](#setactive)
@@ -234,9 +235,16 @@ If this method returns `true`, and the `setActive()` method is defined on the ex
 **Returns:** `boolean` OR `null`
 
 ***
+### `getInteractionElements()`
+
+If the extension renders any elements that the user can interact with, this method should be implemented and return the root element or an array containing all of the root elements.
+
+MediumEditor will call this function during interaction to see if the user clicked on something outside of the editor. The elements are used to check if the target element of a click or other user event is a descendant of any extension elements. This way, the editor can also count user interaction within editor elements as interactions with the editor, and thus not trigger 'blur'
+
+***
 ### `isActive()`
 
-If implemented, this method will be called from MediumEditor to determine whether the button has already been set as 'active'. 
+If implemented, this method will be called from MediumEditor to determine whether the button has already been set as 'active'.
 
 If it returns `true`, this extension/button will be skipped for checking its active state as MediumEditor responds to the change in selection.
 
@@ -252,7 +260,7 @@ If implemented, this method is similar to `checkState()` in that it will be call
 
 **NOTE:**
 
-* This method will NOT be called if `checkState()` has been implemented. 
+* This method will NOT be called if `checkState()` has been implemented.
 * This method will NOT be called if `queryCommandState()` is implemented and returns a non-null value when called.
 
 **Arguments**
@@ -273,7 +281,7 @@ Currently, this method is called when updating the editor & toolbar, and if `que
 ***
 ### `setInactive()`
 
-If implemented, this method is called when MediumEditor knows that this extension has not been applied to the current selection. Curently, this is called at the beginning of each state change for the editor & toolbar. 
+If implemented, this method is called when MediumEditor knows that this extension has not been applied to the current selection. Curently, this is called at the beginning of each state change for the editor & toolbar.
 
 After calling this, MediumEditor will attempt to update the extension, either via `checkState()` or the combination of `queryCommandState()`, `isAlreadyApplied(node)`, `isActive()`, and `setActive()`
 
@@ -540,7 +548,7 @@ var CustomButtonExtension = MediumEditor.extensions.button.extend({
   name: 'custom-button-extension',
 
   action: 'bold'
-  
+
   // ... other properties/methods ...
 })
 ```
@@ -559,24 +567,24 @@ var CustomButtonExtension = MediumEditor.extensions.button.extend({
   name: 'custom-button-extension',
 
   aria: 'bold text'
-  
+
   // ... other properties/methods ...
 })
 ```
 
 ***
 ### `tagNames` _(Array)_
-        
+
 Array of element tag names that would indicate that this button has already been applied. If this action has already been applied, the button will be displayed as 'active' in the toolbar.
 
-**NOTE:** 
+**NOTE:**
 
 `tagNames` is not used if `useQueryState` is set to `true`.
 
 **Example:**
 
 The following would create a custom button extension which would be 'active' in the toolbar if the selection is within a `<b>` or a `<strong>` tag:
-      
+
 ```js
 var CustomButtonExtension = MediumEditor.extensions.button.extend({
   name: 'custom-button-extension',
@@ -584,7 +592,7 @@ var CustomButtonExtension = MediumEditor.extensions.button.extend({
   useQueryState: false,
 
   tagNames: ['b', 'strong'],
-  
+
   // ... other properties/methods ...
 })
 ```
@@ -599,7 +607,7 @@ A pair of css property & value(s) that indicate that this button has already bee
 * **prop** *[String]*: name of the css property
 * **value** *[String]*: value(s) of the css property (multiple values can be separated by a '|')
 
-**NOTE:** 
+**NOTE:**
 
 `style` is not used if `useQueryState` is set to `true`.
 
@@ -617,7 +625,7 @@ var CustomButtonExtension = MediumEditor.extensions.button.extend({
     prop: 'font-weight',
     value: '700|bold'
   },
-  
+
   // ... other properties/methods ...
 })
 ```
