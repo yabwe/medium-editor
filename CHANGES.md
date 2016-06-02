@@ -1,3 +1,12 @@
+5.20.0 / 2016-06-02
+==================
+* Fix anchor-preview bug where click preview no longer prefills href into anchor form
+* Add getEditorFromElement for retrieving an editor instance from an editor element
+* Respect form.reset for textarea elements within forms passed into the editor
+* Add getContent + resetContent helpers for retrieving/reverting content of editors
+* Add support for extensions preventing blur on editor when user interacts with extension elements
+
+
 5.19.1 / 2016-05-28
 ==================
 * Add feature for toggling anchor preview for empty or # links

@@ -1653,6 +1653,19 @@ MediumEditor.extensions = {};
          */
         setInactive: undefined,
 
+        /* getInteractionElements: [function ()]
+         *
+         * If the extension renders any elements that the user can interact with,
+         * this method should be implemented and return the root element or an array
+         * containing all of the root elements. MediumEditor will call this function
+         * during interaction to see if the user clicked on something outside of the editor.
+         * The elements are used to check if the target element of a click or
+         * other user event is a descendant of any extension elements.
+         * This way, the editor can also count user interaction within editor elements as
+         * interactions with the editor, and thus not trigger 'blur'
+         */
+        getInteractionElements: undefined,
+
         /************************ Helpers ************************
          * The following are helpers that are either set by MediumEditor
          * during initialization, or are helper methods which either
@@ -2416,6 +2429,26 @@ MediumEditor.extensions = {};
 (function () {
     'use strict';
 
+    function isElementDescendantOfExtension(extensions, element) {
+        return extensions.some(function (extension) {
+            if (typeof extension.getInteractionElements !== 'function') {
+                return false;
+            }
+
+            var extensionElements = extension.getInteractionElements();
+            if (!extensionElements) {
+                return false;
+            }
+
+            if (!Array.isArray(extensionElements)) {
+                extensionElements = [extensionElements];
+            }
+            return extensionElements.some(function (el) {
+                return MediumEditor.util.isDescendant(el, element, true);
+            });
+        });
+    }
+
     var Events = function (instance) {
         this.base = instance;
         this.options = this.base.options;
@@ -2792,21 +2825,16 @@ MediumEditor.extensions = {};
         },
 
         updateFocus: function (target, eventObj) {
-            var toolbar = this.base.getExtensionByName('toolbar'),
-                toolbarEl = toolbar ? toolbar.getToolbarElement() : null,
-                anchorPreview = this.base.getExtensionByName('anchor-preview'),
-                previewEl = (anchorPreview && anchorPreview.getPreviewElement) ? anchorPreview.getPreviewElement() : null,
-                hadFocus = this.base.getFocusedElement(),
+            var hadFocus = this.base.getFocusedElement(),
                 toFocus;
 
-            // For clicks, we need to know if the mousedown that caused the click happened inside the existing focused element.
-            // If so, we don't want to focus another element
+            // For clicks, we need to know if the mousedown that caused the click happened inside the existing focused element
+            // or one of the extension elements.  If so, we don't want to focus another element
             if (hadFocus &&
                     eventObj.type === 'click' &&
                     this.lastMousedownTarget &&
                     (MediumEditor.util.isDescendant(hadFocus, this.lastMousedownTarget, true) ||
-                     MediumEditor.util.isDescendant(toolbarEl, this.lastMousedownTarget, true) ||
-                     MediumEditor.util.isDescendant(previewEl, this.lastMousedownTarget, true))) {
+                     isElementDescendantOfExtension(this.base.extensions, this.lastMousedownTarget))) {
                 toFocus = hadFocus;
             }
 
@@ -2822,10 +2850,9 @@ MediumEditor.extensions = {};
                 }, this);
             }
 
-            // Check if the target is external (not part of the editor, toolbar, or anchorpreview)
+            // Check if the target is external (not part of the editor, toolbar, or any other extension)
             var externalEvent = !MediumEditor.util.isDescendant(hadFocus, target, true) &&
-                                !MediumEditor.util.isDescendant(toolbarEl, target, true) &&
-                                !MediumEditor.util.isDescendant(previewEl, target, true);
+                                !isElementDescendantOfExtension(this.base.extensions, target);
 
             if (toFocus !== hadFocus) {
                 // If element has focus, and focus is going outside of editor
@@ -3961,6 +3988,11 @@ MediumEditor.extensions = {};
             this.attachToEditables();
         },
 
+        getInteractionElements: function () {
+            return this.getPreviewElement();
+        },
+
+        // TODO: Remove this function in 6.0.0
         getPreviewElement: function () {
             return this.anchorPreview;
         },
@@ -4082,7 +4114,7 @@ MediumEditor.extensions = {};
                 this.base.delay(function () {
                     if (activeAnchor) {
                         var opts = {
-                            url: activeAnchor.attributes.href.value,
+                            value: activeAnchor.attributes.href.value,
                             target: activeAnchor.getAttribute('target'),
                             buttonClass: activeAnchor.getAttribute('class')
                         };
@@ -5807,6 +5839,10 @@ MediumEditor.extensions = {};
 
         // Toolbar accessors
 
+        getInteractionElements: function () {
+            return this.getToolbarElement();
+        },
+
         getToolbarElement: function () {
             if (!this.toolbar) {
                 this.toolbar = this.createToolbar();
@@ -6660,17 +6696,17 @@ MediumEditor.extensions = {};
         return !this.options.extensions['imageDragging'];
     }
 
-    function createContentEditable(textarea, id, doc) {
-        var div = doc.createElement('div'),
+    function createContentEditable(textarea) {
+        var div = this.options.ownerDocument.createElement('div'),
             now = Date.now(),
-            uniqueId = 'medium-editor-' + now + '-' + id,
+            uniqueId = 'medium-editor-' + now,
             atts = textarea.attributes;
 
         // Some browsers can move pretty fast, since we're using a timestamp
         // to make a unique-id, ensure that the id is actually unique on the page
-        while (doc.getElementById(uniqueId)) {
+        while (this.options.ownerDocument.getElementById(uniqueId)) {
             now++;
-            uniqueId = 'medium-editor-' + now + '-' + id;
+            uniqueId = 'medium-editor-' + now;
         }
 
         div.className = textarea.className;
@@ -6687,6 +6723,16 @@ MediumEditor.extensions = {};
             }
         }
 
+        // If textarea has a form, listen for reset on the form to clear
+        // the content of the created div
+        if (textarea.form) {
+            this.on(textarea.form, 'reset', function (event) {
+                if (!event.defaultPrevented) {
+                    this.resetContent(this.options.ownerDocument.getElementById(uniqueId));
+                }
+            }.bind(this));
+        }
+
         textarea.classList.add('medium-editor-hidden');
         textarea.parentNode.insertBefore(
             div,
@@ -6696,10 +6742,10 @@ MediumEditor.extensions = {};
         return div;
     }
 
-    function initElement(element, id) {
+    function initElement(element, editorId) {
         if (!element.getAttribute('data-medium-editor-element')) {
             if (element.nodeName.toLowerCase() === 'textarea') {
-                element = createContentEditable(element, id, this.options.ownerDocument);
+                element = createContentEditable.call(this, element);
 
                 // Make sure we only attach to editableInput once for <textarea> elements
                 if (!this.instanceHandleEditableInput) {
@@ -6727,10 +6773,17 @@ MediumEditor.extensions = {};
                 this.on(element, 'keyup', handleKeyup.bind(this));
             }
 
+            var elementId = MediumEditor.util.guid();
+
             element.setAttribute('data-medium-editor-element', true);
             element.setAttribute('role', 'textbox');
             element.setAttribute('aria-multiline', true);
-            element.setAttribute('medium-editor-index', MediumEditor.util.guid());
+            element.setAttribute('data-medium-editor-editor-index', editorId);
+            // TODO: Merge data-medium-editor-element and medium-editor-index attributes for 6.0.0
+            // medium-editor-index is not named correctly anymore and can be re-purposed to signify
+            // whether the element has been initialized or not
+            element.setAttribute('medium-editor-index', elementId);
+            initialContent[elementId] = element.innerHTML;
 
             this.events.attachAllEventsToElement(element);
         }
@@ -6949,6 +7002,8 @@ MediumEditor.extensions = {};
         }
     }
 
+    var initialContent = {};
+
     MediumEditor.prototype = {
         // NOT DOCUMENTED - exposed for backwards compatability
         init: function (elements, options) {
@@ -6967,6 +7022,7 @@ MediumEditor.extensions = {};
                 return;
             }
 
+            addToEditors.call(this, this.options.contentWindow);
             this.events = new MediumEditor.Events(this);
             this.elements = [];
 
@@ -6977,7 +7033,6 @@ MediumEditor.extensions = {};
             }
 
             this.isActive = true;
-            addToEditors.call(this, this.options.contentWindow);
 
             // Call initialization helpers
             initExtensions.call(this);
@@ -7012,6 +7067,7 @@ MediumEditor.extensions = {};
                 element.removeAttribute('role');
                 element.removeAttribute('aria-multiline');
                 element.removeAttribute('medium-editor-index');
+                element.removeAttribute('data-medium-editor-editor-index');
 
                 // Remove any elements created for textareas
                 if (element.getAttribute('medium-editor-textarea-id')) {
@@ -7470,9 +7526,36 @@ MediumEditor.extensions = {};
             }
         },
 
+        getContent: function (index) {
+            index = index || 0;
+
+            if (this.elements[index]) {
+                return this.elements[index].innerHTML.trim();
+            }
+            return null;
+        },
+
         checkContentChanged: function (editable) {
             editable = editable || MediumEditor.selection.getSelectionElement(this.options.contentWindow);
             this.events.updateInput(editable, { target: editable, currentTarget: editable });
+        },
+
+        resetContent: function (element) {
+            // For all elements that exist in the this.elements array, we can assume:
+            // - Its initial content has been set in the initialContent object
+            // - It has a medium-editor-index attribute which is the key value in the initialContent object
+
+            if (element) {
+                var index = this.elements.indexOf(element);
+                if (index !== -1) {
+                    this.setContent(initialContent[element.getAttribute('medium-editor-index')], index);
+                }
+                return;
+            }
+
+            this.elements.forEach(function (el, idx) {
+                this.setContent(initialContent[el.getAttribute('medium-editor-index')], idx);
+            }, this);
         },
 
         addElements: function (selector) {
@@ -7486,7 +7569,7 @@ MediumEditor.extensions = {};
 
             elements.forEach(function (element) {
                 // Initialize all new elements (we check that in those functions don't worry)
-                element = initElement.call(this, element);
+                element = initElement.call(this, element, this.id);
 
                 // Add new elements to our internal elements array
                 this.elements.push(element);
@@ -7517,6 +7600,15 @@ MediumEditor.extensions = {};
                 return true;
             }, this);
         }
+    };
+
+    MediumEditor.getEditorFromElement = function (element) {
+        var index = element.getAttribute('data-medium-editor-editor-index'),
+            win = element && element.ownerDocument && (element.ownerDocument.defaultView || element.ownerDocument.parentWindow);
+        if (win && win._mediumEditors && win._mediumEditors[index]) {
+            return win._mediumEditors[index];
+        }
+        return null;
     };
 }());
 
@@ -7558,7 +7650,7 @@ MediumEditor.parseVersionString = function (release) {
 
 MediumEditor.version = MediumEditor.parseVersionString.call(this, ({
     // grunt-bump looks for this:
-    'version': '5.19.1'
+    'version': '5.20.0'
 }).version);
 
     return MediumEditor;
