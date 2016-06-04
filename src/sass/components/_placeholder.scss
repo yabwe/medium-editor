@@ -4,9 +4,22 @@
     &:after {
         content: attr(data-placeholder) !important;
         font-style: italic;
-        left: 0;
         position: absolute;
+        left: 0;
         top: 0;
+        white-space: pre;
+        padding: inherit;
+        margin: inherit;
+    }
+}
+
+.medium-editor-placeholder-relative {
+    position: relative;
+
+    &:after {
+        content: attr(data-placeholder) !important;
+        font-style: italic;
+        position: relative;
         white-space: pre;
         padding: inherit;
         margin: inherit;
