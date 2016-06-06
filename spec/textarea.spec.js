@@ -54,7 +54,7 @@ describe('Textarea TestCase', function () {
         it('should preserve textarea className', function () {
             this.el.className += ' test-class test-class-2';
             var editor = this.newMediumEditor('.editor');
-            expect(editor.elements[0].className).toBe('editor test-class test-class-2');
+            expect(editor.elements[0].className).toBe('editor test-class test-class-2 medium-editor-element');
         });
 
         it('should create unique div ids for multiple textareas', function () {
@@ -180,7 +180,7 @@ describe('Textarea TestCase', function () {
             this.el.className += ' test-class test-class-2';
             var editor = this.newMediumEditor('.editable-div');
             editor.addElements(this.el);
-            expect(editor.elements[1].className).toBe('editor test-class test-class-2');
+            expect(editor.elements[1].className).toBe('editor test-class test-class-2 medium-editor-element');
         });
 
         it('should create unique div ids for multiple textareas', function () {

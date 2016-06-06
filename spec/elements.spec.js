@@ -32,10 +32,11 @@ describe('Elements TestCase', function () {
             expect(this.el.getAttribute('contenteditable')).toBeFalsy();
         });
 
-        it('should set element data attr medium-editor-element to true', function () {
+        it('should set element data attr medium-editor-element to true and add medium-editor-element class', function () {
             var editor = this.newMediumEditor('.editor');
             expect(editor.elements.length).toBe(1);
             expect(this.el.getAttribute('data-medium-editor-element')).toEqual('true');
+            expect(this.el.className).toBe('editor medium-editor-element');
         });
 
         it('should set element role attribute to textbox', function () {
@@ -65,11 +66,15 @@ describe('Elements TestCase', function () {
             expect(this.el.hasAttribute('contenteditable')).toBe(false);
         });
 
-        it('should remove the medium-editor-element attribute', function () {
+        it('should remove the medium-editor-element attribute and class name', function () {
+            this.el.classList.add('temp-class');
+            expect(this.el.className).toBe('editor temp-class');
             var editor = this.newMediumEditor('.editor');
             expect(this.el.getAttribute('data-medium-editor-element')).toEqual('true');
+            expect(this.el.className).toBe('editor temp-class medium-editor-element');
             editor.destroy();
             expect(this.el.hasAttribute('data-medium-editor-element')).toBe(false);
+            expect(this.el.className).toBe('editor temp-class');
         });
 
         it('should remove the role attribute', function () {

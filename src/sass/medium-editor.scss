@@ -9,7 +9,7 @@
 @import "util/clearfix";
 
 // contenteditable rules
-[data-medium-editor-element] {
+.medium-editor-element {
     word-wrap: break-word;
     min-height: 30px;
 
