@@ -203,6 +203,7 @@ var editor = new MediumEditor('.editable', {
         diffTop: -10,
         firstButtonClass: 'medium-editor-button-first',
         lastButtonClass: 'medium-editor-button-last',
+        relativeContainer: null,
         standardizeSelectionStart: false,
         static: false,
 
@@ -249,6 +250,15 @@ CSS class added to the first button in the toolbar.
 **Default:** `'medium-editor-button-last'`
 
 CSS class added to the last button in the toolbar.
+
+***
+#### `relativeContainer`
+**Default:** `null`
+
+DOMElement to append the toolbar to instead of the body.  When an element is passed the toolbar will also be positioned `relative` instead of `absolute`, which means the editor will not attempt to manually position the toolbar automatically.
+
+**NOTE:**
+* Using this in combination with the `static` option for toolbar is not explicitly supported and the behavior in this case is not defined.
 
 ***
 #### `standardizeSelectionStart`
