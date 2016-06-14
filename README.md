@@ -137,9 +137,9 @@ var editor = new MediumEditor('.editable', {
         diffTop: -10,
         firstButtonClass: 'medium-editor-button-first',
         lastButtonClass: 'medium-editor-button-last',
+        relativeContainer: null,
         standardizeSelectionStart: false,
         static: false,
-        relativeContainer: null,
         /* options which only apply when static is true */
         align: 'center',
         sticky: false,
@@ -155,9 +155,9 @@ var editor = new MediumEditor('.editable', {
 * __diffTop__: value in pixels to be added to the Y axis positioning of the toolbar. Default: `-10`
 * __firstButtonClass__: CSS class added to the first button in the toolbar. Default: `'medium-editor-button-first'`
 * __lastButtonClass__: CSS class added to the last button in the toolbar. Default: `'medium-editor-button-last'`
+* __relativeContainer__: DOMElement to append the toolbar to instead of the body.  When passed, the toolbar will also be positioned `relative` instead of `absolute`. Default: `null`
 * __standardizeSelectionStart__: enables/disables standardizing how the beginning of a range is decided between browsers whenever the selected text is analyzed for updating toolbar buttons status. Default: `false`
 * __static__: enable/disable the toolbar always displaying in the same location relative to the medium-editor element. Default: `false`
-* __relativeContainer__: Toolbar is appended relative to a given DOM-Node instead of appending it to the body and position it absolute.
 
 ##### Options which only apply when the `static` option is being used:
 * __align__: `left`|`center`|`right` - When the __static__ option is `true`, this aligns the static toolbar relative to the medium-editor element. Default: `center`
