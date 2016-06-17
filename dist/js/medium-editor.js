@@ -5591,13 +5591,25 @@ MediumEditor.extensions = {};
 
         showPlaceholder: function (el) {
             if (el) {
-                el.classList.add('medium-editor-placeholder');
+                // https://github.com/yabwe/medium-editor/issues/234
+                // In firefox, styling the placeholder with an absolutely positioned
+                // pseudo element causes the cursor to appear in a bad location
+                // when the element is completely empty, so apply a different class to
+                // style it with a relatively positioned pseudo element
+                if (MediumEditor.util.isFF && el.childNodes.length === 0) {
+                    el.classList.add('medium-editor-placeholder-relative');
+                    el.classList.remove('medium-editor-placeholder');
+                } else {
+                    el.classList.add('medium-editor-placeholder');
+                    el.classList.remove('medium-editor-placeholder-relative');
+                }
             }
         },
 
         hidePlaceholder: function (el) {
             if (el) {
                 el.classList.remove('medium-editor-placeholder');
+                el.classList.remove('medium-editor-placeholder-relative');
             }
         },
 
@@ -6776,6 +6788,7 @@ MediumEditor.extensions = {};
             var elementId = MediumEditor.util.guid();
 
             element.setAttribute('data-medium-editor-element', true);
+            element.classList.add('medium-editor-element');
             element.setAttribute('role', 'textbox');
             element.setAttribute('aria-multiline', true);
             element.setAttribute('data-medium-editor-editor-index', editorId);
@@ -7064,6 +7077,7 @@ MediumEditor.extensions = {};
                 element.removeAttribute('contentEditable');
                 element.removeAttribute('spellcheck');
                 element.removeAttribute('data-medium-editor-element');
+                element.classList.remove('medium-editor-element');
                 element.removeAttribute('role');
                 element.removeAttribute('aria-multiline');
                 element.removeAttribute('medium-editor-index');
@@ -7650,7 +7664,7 @@ MediumEditor.parseVersionString = function (release) {
 
 MediumEditor.version = MediumEditor.parseVersionString.call(this, ({
     // grunt-bump looks for this:
-    'version': '5.20.0'
+    'version': '5.20.2'
 }).version);
 
     return MediumEditor;
