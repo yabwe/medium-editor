@@ -205,7 +205,7 @@ describe('Pasting content', function () {
             var evt = prepareEvent(editorEl, 'paste');
             firePreparedEvent(evt, editorEl, 'paste');
             jasmine.clock().tick(1);
-            expect(spy).toHaveBeenCalledWith({ currentTarget: this.el, target: this.el }, this.el);
+            expect(spy).toHaveBeenCalledWith(evt, this.el);
         });
 
         it('should filter multi-line rich-text pastes when "insertHTML" command is not supported', function () {
