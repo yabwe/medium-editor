@@ -247,6 +247,18 @@ describe('MediumEditor.DynamicElements TestCase', function () {
             editor.removeElements(this.el);
             expect(attached.length).toBe(0);
         });
+
+        it('should trigger removeElement custom event for each element', function () {
+            var editor = this.newMediumEditor('.editor, .add-one, .add-two'),
+                spy = jasmine.createSpy('handler');
+
+            editor.subscribe('removeElement', spy);
+            editor.removeElements('.add-one');
+            expect(spy).toHaveBeenCalledWith({ target: this.addOne, currentTarget: this.addOne }, this.addOne);
+
+            editor.removeElements(document.getElementsByClassName('add-two'));
+            expect(spy).toHaveBeenCalledWith({ target: this.addTwo, currentTarget: this.addTwo }, this.addTwo);
+        });
     });
 });
 

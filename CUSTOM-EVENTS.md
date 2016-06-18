@@ -21,6 +21,7 @@ If you need to override the editor's built-in behavior, try overriding the built
   - [`editableInput`](#editableinput)
   - [`externalInteraction`](#externalinteraction)
   - [`focus`](#focus)
+  - [`removeElement`](#removeelement)
 - [Toolbar Custom Events](#toolbar-custom-events)
   - [`hideToolbar`](#hidetoolbar)
   - [`positionToolbar`](#positiontoolbar)
@@ -112,7 +113,7 @@ These events are custom to MediumEditor so there may be one or more native event
 
 ### `addElement`
 
-`addElement` is triggered whenever an element is added to the editor after the editor has been instantiated.  This custom event will be triggered **after** the element has already been initialized by the editor and added to the internal array of **elements**.
+`addElement` is triggered whenever an element is added to the editor after the editor has been instantiated.  This custom event will be triggered **after** the element has already been initialized by the editor and added to the internal array of **elements**.  If the element being added was a `<textarea>`, the element passed to the listener will be the created `<div contenteditable=true>` element and not the root `<textarea>`.
 
 **Arguments to listener**
 
@@ -123,6 +124,7 @@ These events are custom to MediumEditor so there may be one or more native event
 2. _**editable** (`HTMLElement`)_
   * element which was added to the editor
 
+***
 ### `blur`
 
 `blur` is triggered whenever a `contenteditable` element within an editor has lost focus to an element other than an editor maintained element (ie Toolbar, Anchor Preview, etc).
@@ -155,6 +157,20 @@ Example:
 ### `focus`
 
 `focus` is triggered whenever a `contenteditable` element within an editor receives focus. If the user interacts with any editor maintained elements (ie toolbar), `blur` is NOT triggered because focus has not been lost.  Thus, `focus` will only be triggered when an `contenteditable` element (or the editor that contains it) is first interacted with.
+
+***
+### `removeElement`
+
+`removeElement` is triggered whenever an element is removed from the editor after the editor has been instantiated.  This custom event will be triggered **after** the element has already been removed from the editor and any events attached to it have already been removed.  If the element being removed was a `<div>` created to correspond to a `<textarea>`, the element will already have been removed from the DOM.
+
+**Arguments to listener**
+
+1. _**data** (`object`)_
+  * Properties of data object
+    * `target`: element which was removed from the editor
+    * `currentTarget`: element which was removed from the editor
+2. _**editable** (`HTMLElement`)_
+  * element which was removed from the editor
 
 ## Toolbar Custom Events
 
