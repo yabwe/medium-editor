@@ -172,6 +172,18 @@ describe('MediumEditor.extensions.placeholder TestCase', function () {
         expect(this.el.hasAttribute('data-placeholder')).toBe(false);
     });
 
+    it('should remove the added data-placeholder attribute when elements are removed dynamically from the editor', function () {
+        var editor = this.newMediumEditor('.editor'),
+            newEl = this.createElement('div', 'other-element');
+
+        expect(newEl.hasAttribute('other-element')).toBe(false);
+        editor.addElements(newEl);
+        expect(newEl.getAttribute('data-placeholder')).toBe(MediumEditor.extensions.placeholder.prototype.text);
+
+        editor.removeElements('.other-element');
+        expect(newEl.hasAttribute('data-placeholder')).toBe(false);
+    });
+
     it('should not remove custom data-placeholder attribute when destroyed', function () {
         var placeholderText = 'Custom placeholder';
         this.el.setAttribute('data-placeholder', placeholderText);
