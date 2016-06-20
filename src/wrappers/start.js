@@ -1,6 +1,7 @@
 (function (root, factory) {
     'use strict';
-    if (typeof module === 'object') {
+    var isElectron = typeof module == 'object' && process && process.versions && process.versions.electron;
+    if (!isElectron && typeof module === 'object') {
         module.exports = factory;
     } else if (typeof define === 'function' && define.amd) {
         define(function () {
