@@ -24,20 +24,32 @@
         },
 
         initPlaceholders: function () {
-            this.getEditorElements().forEach(function (el) {
-                if (!el.getAttribute('data-placeholder')) {
-                    el.setAttribute('data-placeholder', this.text);
-                }
-                this.updatePlaceholder(el);
-            }, this);
+            this.getEditorElements().forEach(this.initElement, this);
+        },
+
+        handleAddElement: function (event, editable) {
+            this.initElement(editable);
+        },
+
+        initElement: function (el) {
+            if (!el.getAttribute('data-placeholder')) {
+                el.setAttribute('data-placeholder', this.text);
+            }
+            this.updatePlaceholder(el);
         },
 
         destroy: function () {
-            this.getEditorElements().forEach(function (el) {
-                if (el.getAttribute('data-placeholder') === this.text) {
-                    el.removeAttribute('data-placeholder');
-                }
-            }, this);
+            this.getEditorElements().forEach(this.cleanupElement, this);
+        },
+
+        handleRemoveElement: function (event, editable) {
+            this.cleanupElement(editable);
+        },
+
+        cleanupElement: function (el) {
+            if (el.getAttribute('data-placeholder') === this.text) {
+                el.removeAttribute('data-placeholder');
+            }
         },
 
         showPlaceholder: function (el) {
@@ -86,6 +98,10 @@
 
             // When the editor loses focus, check if the placeholder should be visible
             this.subscribe('blur', this.handleBlur.bind(this));
+
+            // Need to know when elements are added/removed from the editor
+            this.subscribe('addElement', this.handleAddElement.bind(this));
+            this.subscribe('removeElement', this.handleRemoveElement.bind(this));
         },
 
         handleInput: function (event, element) {

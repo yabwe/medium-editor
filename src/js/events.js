@@ -360,6 +360,8 @@
                     // Detecting drop on the contenteditables
                     this.attachToEachElement('drop', this.handleDrop);
                     break;
+                // TODO: We need to have a custom 'paste' event separate from 'editablePaste'
+                // Need to think about the way to introduce this without breaking folks
                 case 'editablePaste':
                     // Detecting paste on the contenteditables
                     this.attachToEachElement('paste', this.handlePaste);
@@ -556,7 +558,7 @@
         },
 
         handlePaste: function (event) {
-            this.triggerCustomEvent('editablePaste', { currentTarget: event.currentTarget, target: event.target }, event.currentTarget);
+            this.triggerCustomEvent('editablePaste', event, event.currentTarget);
         },
 
         handleKeydown: function (event) {

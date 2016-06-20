@@ -153,6 +153,15 @@ describe('MediumEditor.extensions.placeholder TestCase', function () {
         validatePlaceholderContent(editor.elements[0], MediumEditor.extensions.placeholder.prototype.text);
     });
 
+    it('should add the default placeholder text when data-placeholder is not present on dynamically added elements', function () {
+        var editor = this.newMediumEditor('.editor');
+        expect(editor.elements.length).toBe(1);
+
+        var newEl = this.createElement('div', 'other-element');
+        editor.addElements(newEl);
+        validatePlaceholderContent(newEl, MediumEditor.extensions.placeholder.prototype.text);
+    });
+
     it('should remove the added data-placeholder attribute when destroyed', function () {
         expect(this.el.hasAttribute('data-placeholder')).toBe(false);
 
@@ -161,6 +170,18 @@ describe('MediumEditor.extensions.placeholder TestCase', function () {
 
         editor.destroy();
         expect(this.el.hasAttribute('data-placeholder')).toBe(false);
+    });
+
+    it('should remove the added data-placeholder attribute when elements are removed dynamically from the editor', function () {
+        var editor = this.newMediumEditor('.editor'),
+            newEl = this.createElement('div', 'other-element');
+
+        expect(newEl.hasAttribute('other-element')).toBe(false);
+        editor.addElements(newEl);
+        expect(newEl.getAttribute('data-placeholder')).toBe(MediumEditor.extensions.placeholder.prototype.text);
+
+        editor.removeElements('.other-element');
+        expect(newEl.hasAttribute('data-placeholder')).toBe(false);
     });
 
     it('should not remove custom data-placeholder attribute when destroyed', function () {

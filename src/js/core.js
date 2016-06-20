@@ -1212,6 +1212,9 @@
 
                 // Add new elements to our internal elements array
                 this.elements.push(element);
+
+                // Trigger event so extensions can know when an element has been added
+                this.trigger('addElement', { target: element, currentTarget: element }, element);
             }, this);
         },
 
@@ -1234,6 +1237,8 @@
                     if (element.getAttribute('medium-editor-textarea-id')) {
                         cleanupTextareaElement(element);
                     }
+                    // Trigger event so extensions can clean-up elements that are being removed
+                    this.trigger('removeElement', { target: element, currentTarget: element }, element);
                     return false;
                 }
                 return true;
