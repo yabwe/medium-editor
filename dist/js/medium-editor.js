@@ -385,7 +385,8 @@ if (!("classList" in document.createElement("_"))) {
 
 (function (root, factory) {
     'use strict';
-    if (typeof module === 'object') {
+    var isElectron = typeof module === 'object' && process && process.versions && process.versions.electron;
+    if (!isElectron && typeof module === 'object') {
         module.exports = factory;
     } else if (typeof define === 'function' && define.amd) {
         define(function () {
@@ -2788,6 +2789,8 @@ MediumEditor.extensions = {};
                     // Detecting drop on the contenteditables
                     this.attachToEachElement('drop', this.handleDrop);
                     break;
+                // TODO: We need to have a custom 'paste' event separate from 'editablePaste'
+                // Need to think about the way to introduce this without breaking folks
                 case 'editablePaste':
                     // Detecting paste on the contenteditables
                     this.attachToEachElement('paste', this.handlePaste);
@@ -2984,7 +2987,7 @@ MediumEditor.extensions = {};
         },
 
         handlePaste: function (event) {
-            this.triggerCustomEvent('editablePaste', { currentTarget: event.currentTarget, target: event.target }, event.currentTarget);
+            this.triggerCustomEvent('editablePaste', event, event.currentTarget);
         },
 
         handleKeydown: function (event) {
@@ -5171,9 +5174,18 @@ MediumEditor.extensions = {};
             MediumEditor.Extension.prototype.init.apply(this, arguments);
 
             if (this.forcePlainText || this.cleanPastedHTML) {
-                this.subscribe('editablePaste', this.handlePaste.bind(this));
                 this.subscribe('editableKeydown', this.handleKeydown.bind(this));
+                // We need access to the full event data in paste
+                // so we can't use the editablePaste event here
+                this.getEditorElements().forEach(function (element) {
+                    this.on(element, 'paste', this.handlePaste.bind(this));
+                }, this);
+                this.subscribe('addElement', this.handleAddElement.bind(this));
             }
+        },
+
+        handleAddElement: function (event, editable) {
+            this.on(editable, 'paste', this.handlePaste.bind(this));
         },
 
         destroy: function () {
@@ -5573,20 +5585,32 @@ MediumEditor.extensions = {};
         },
 
         initPlaceholders: function () {
-            this.getEditorElements().forEach(function (el) {
-                if (!el.getAttribute('data-placeholder')) {
-                    el.setAttribute('data-placeholder', this.text);
-                }
-                this.updatePlaceholder(el);
-            }, this);
+            this.getEditorElements().forEach(this.initElement, this);
+        },
+
+        handleAddElement: function (event, editable) {
+            this.initElement(editable);
+        },
+
+        initElement: function (el) {
+            if (!el.getAttribute('data-placeholder')) {
+                el.setAttribute('data-placeholder', this.text);
+            }
+            this.updatePlaceholder(el);
         },
 
         destroy: function () {
-            this.getEditorElements().forEach(function (el) {
-                if (el.getAttribute('data-placeholder') === this.text) {
-                    el.removeAttribute('data-placeholder');
-                }
-            }, this);
+            this.getEditorElements().forEach(this.cleanupElement, this);
+        },
+
+        handleRemoveElement: function (event, editable) {
+            this.cleanupElement(editable);
+        },
+
+        cleanupElement: function (el) {
+            if (el.getAttribute('data-placeholder') === this.text) {
+                el.removeAttribute('data-placeholder');
+            }
         },
 
         showPlaceholder: function (el) {
@@ -5615,7 +5639,7 @@ MediumEditor.extensions = {};
 
         updatePlaceholder: function (el, dontShow) {
             // If the element has content, hide the placeholder
-            if (el.querySelector('img, blockquote, ul, ol') || (el.textContent.replace(/^\s+|\s+$/g, '') !== '')) {
+            if (el.querySelector('img, blockquote, ul, ol, table') || (el.textContent.replace(/^\s+|\s+$/g, '') !== '')) {
                 return this.hidePlaceholder(el);
             }
 
@@ -5635,6 +5659,10 @@ MediumEditor.extensions = {};
 
             // When the editor loses focus, check if the placeholder should be visible
             this.subscribe('blur', this.handleBlur.bind(this));
+
+            // Need to know when elements are added/removed from the editor
+            this.subscribe('addElement', this.handleAddElement.bind(this));
+            this.subscribe('removeElement', this.handleRemoveElement.bind(this));
         },
 
         handleInput: function (event, element) {
@@ -7587,6 +7615,9 @@ MediumEditor.extensions = {};
 
                 // Add new elements to our internal elements array
                 this.elements.push(element);
+
+                // Trigger event so extensions can know when an element has been added
+                this.trigger('addElement', { target: element, currentTarget: element }, element);
             }, this);
         },
 
@@ -7609,6 +7640,8 @@ MediumEditor.extensions = {};
                     if (element.getAttribute('medium-editor-textarea-id')) {
                         cleanupTextareaElement(element);
                     }
+                    // Trigger event so extensions can clean-up elements that are being removed
+                    this.trigger('removeElement', { target: element, currentTarget: element }, element);
                     return false;
                 }
                 return true;
@@ -7664,7 +7697,7 @@ MediumEditor.parseVersionString = function (release) {
 
 MediumEditor.version = MediumEditor.parseVersionString.call(this, ({
     // grunt-bump looks for this:
-    'version': '5.20.2'
+    'version': '5.21.0'
 }).version);
 
     return MediumEditor;
