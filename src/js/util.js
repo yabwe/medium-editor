@@ -584,12 +584,20 @@
             var i, url = anchorUrl || false;
             if (el.nodeName.toLowerCase() === 'a') {
                 el.target = '_blank';
+                el.addEventListener('click', function() {
+                  window.open(el.href,'_blank');
+                  return false;
+                });
             } else {
                 el = el.getElementsByTagName('a');
 
                 for (i = 0; i < el.length; i += 1) {
                     if (false === url || url === el[i].attributes.href.value) {
                         el[i].target = '_blank';
+                        el[i].addEventListener('click', function() {
+                          window.open(el[i].href,'_blank');
+                          return false;
+                        });
                     }
                 }
             }
