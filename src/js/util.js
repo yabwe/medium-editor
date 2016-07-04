@@ -597,11 +597,11 @@
             }
         },
 
-        setEventListnerToAnchor: function(el, target) {
-          el.addEventListener('click', function() {
-            window.open(el.href, target);
-            return false;
-          });
+        setEventListnerToAnchor: function (el, target) {
+            el.addEventListener('click', function () {
+                window.open(el.href, target);
+                return false;
+            });
         },
 
         /*
