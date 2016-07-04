@@ -584,22 +584,24 @@
             var i, url = anchorUrl || false;
             if (el.nodeName.toLowerCase() === 'a') {
                 el.target = '_blank';
-                el.addEventListener('click', function() { Util.setEventListnerToAnchor(el, '_blank'); } );
+                Util.setEventListnerToAnchor(el, '_blank');
             } else {
                 el = el.getElementsByTagName('a');
 
                 for (i = 0; i < el.length; i += 1) {
                     if (false === url || url === el[i].attributes.href.value) {
                         el[i].target = '_blank';
-                        el[i].addEventListener('click', function() { Util.setEventListnerToAnchor(el[i], '_blank'); });
+                        Util.setEventListnerToAnchor(el[i], '_blank');
                     }
                 }
             }
         },
 
         setEventListnerToAnchor: function(el, target) {
-          window.open(el.href,target);
-          return false;
+          el.addEventListener('click', function() {
+            window.open(el.href, target);
+            return false;
+          });
         },
 
         /*
@@ -610,14 +612,14 @@
             var i;
             if (el.nodeName.toLowerCase() === 'a') {
                 el.removeAttribute('target');
-                el.addEventListener('click', function() { Util.setEventListnerToAnchor(el, '_self'); } );
+                Util.setEventListnerToAnchor(el, '_self');
             } else {
                 el = el.getElementsByTagName('a');
 
                 for (i = 0; i < el.length; i += 1) {
                     if (anchorUrl === el[i].attributes.href.value) {
                         el[i].removeAttribute('target');
-                        el[i].addEventListener('click', function() { Util.setEventListnerToAnchor(el[i], '_self'); } );
+                        Util.setEventListnerToAnchor(el[i], '_self');
                     }
                 }
             }
