@@ -329,6 +329,24 @@ describe('Anchor Button TestCase', function () {
             expect(link).not.toBeNull();
             expect(link.href).toBe(validUrl.toLowerCase());
         });
+        it('should not change fragment identifier when link begins with hash', function () {
+            var editor = this.newMediumEditor('.editor', {
+                    anchor: {
+                        linkValidation: true
+                    }
+                }),
+                validHashLink = '#!$&\'()*+,;=123abcDEF-._~:@/?',
+                link,
+                anchorExtension = editor.getExtensionByName('anchor');
+
+            selectElementContentsAndFire(editor.elements[0]);
+            anchorExtension.showForm(validHashLink);
+            fireEvent(anchorExtension.getForm().querySelector('a.medium-editor-toolbar-save'), 'click');
+
+            link = editor.elements[0].querySelector('a');
+            expect(link).not.toBeNull();
+            expect(link.getAttribute('href')).toBe(validHashLink);
+        });
         it('should change spaces to %20 for a valid url if linkValidation options is set to true', function () {
             var editor = this.newMediumEditor('.editor', {
                 anchor: {
