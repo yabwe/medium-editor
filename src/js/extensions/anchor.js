@@ -108,11 +108,10 @@
             if (this.targetCheckbox) {
                 // fixme: ideally, this targetCheckboxText would be a formLabel too,
                 // figure out how to deprecate? also consider `fa-` icon default implcations.
-                var checkbox_id = 'medium-editor-toolbar-anchor-target-'+Math.random()*1000000000;
                 template.push(
                     '<div class="medium-editor-toolbar-form-row">',
-                    '<input type="checkbox" class="medium-editor-toolbar-anchor-target" id="'+checkbox_id+'">',
-                    '<label for="'+checkbox_id+'">',
+                    '<input type="checkbox" class="medium-editor-toolbar-anchor-target" id="medium-editor-toolbar-form-anchor-target-input-', this.getEditorId(), '">',
+                    '<label for="medium-editor-toolbar-form-anchor-target-input-', this.getEditorId(), '">',
                     this.targetCheckboxText,
                     '</label>',
                     '</div>'
@@ -122,11 +121,10 @@
             if (this.customClassOption) {
                 // fixme: expose this `Button` text as a formLabel property, too
                 // and provide similar access to a `fa-` icon default.
-                var checkbox_button_id = 'medium-editor-toolbar-anchor-button-'+parseInt(Math.random()*1000000000);
                 template.push(
                     '<div class="medium-editor-toolbar-form-row">',
-                    '<input type="checkbox" class="medium-editor-toolbar-anchor-button" id="'+checkbox_button_id+'">',
-                    '<label for="'+checkbox_button_id+'">',
+                    '<input type="checkbox" class="medium-editor-toolbar-anchor-button" id="medium-editor-toolbar-form-anchor--custom-class-input-', this.getEditorId(), '">',
+                    '<label for="medium-editor-toolbar-form-anchor--custom-class-input-', this.getEditorId(), '">',
                     this.customClassOptionText,
                     '</label>',
                     '</div>'
