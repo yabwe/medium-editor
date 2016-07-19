@@ -203,6 +203,7 @@ describe('Anchor Button TestCase', function () {
             });
             expect(editor.elements[0].querySelector('a')).toBeNull();
         });
+
         it('should add http:// if need be and linkValidation option is set to true', function () {
             var editor = this.newMediumEditor('.editor', {
                 anchor: {
@@ -220,6 +221,7 @@ describe('Anchor Button TestCase', function () {
             expect(link).not.toBeNull();
             expect(link.href).toBe('http://test.com/');
         });
+
         it('should add tel: if need be and linkValidation option is set to true', function () {
             var editor = this.newMediumEditor('.editor', {
                 anchor: {
@@ -237,6 +239,7 @@ describe('Anchor Button TestCase', function () {
             expect(link).not.toBeNull();
             expect(link.href).toBe('tel:347-999-9999');
         });
+
         it('should not change protocol when a valid one is included', function () {
             var editor = this.newMediumEditor('.editor', {
                 anchor: {
@@ -255,6 +258,7 @@ describe('Anchor Button TestCase', function () {
             expect(link).not.toBeNull();
             expect(link.href).toBe(validUrl);
         });
+
         it('should not change protocol when a tel scheme is included', function () {
             var editor = this.newMediumEditor('.editor', {
                 anchor: {
@@ -274,6 +278,7 @@ describe('Anchor Button TestCase', function () {
             expect(link).not.toBeNull();
             expect(link.href).toBe(validUrl);
         });
+
         it('should not change protocol when a maps scheme is included', function () {
             var editor = this.newMediumEditor('.editor', {
                 anchor: {
@@ -293,6 +298,7 @@ describe('Anchor Button TestCase', function () {
             expect(link).not.toBeNull();
             expect(link.href).toBe(validUrl);
         });
+
         it('should not change protocol for protocol-relative URLs', function () {
             var editor = this.newMediumEditor('.editor', {
                 anchor: {
@@ -311,6 +317,7 @@ describe('Anchor Button TestCase', function () {
             expect(link).not.toBeNull();
             expect(link.href).toBe(window.location.protocol + validUrl);
         });
+
         it('should not change protocol for any alphabetic scheme', function () {
             var editor = this.newMediumEditor('.editor', {
                 anchor: {
@@ -329,6 +336,7 @@ describe('Anchor Button TestCase', function () {
             expect(link).not.toBeNull();
             expect(link.href).toBe(validUrl.toLowerCase());
         });
+
         it('should not change fragment identifier when link begins with hash', function () {
             var editor = this.newMediumEditor('.editor', {
                     anchor: {
@@ -347,6 +355,7 @@ describe('Anchor Button TestCase', function () {
             expect(link).not.toBeNull();
             expect(link.getAttribute('href')).toBe(validHashLink);
         });
+
         it('should change spaces to %20 for a valid url if linkValidation options is set to true', function () {
             var editor = this.newMediumEditor('.editor', {
                 anchor: {
@@ -372,6 +381,7 @@ describe('Anchor Button TestCase', function () {
             expect(link).not.toBeNull();
             expect(link.href).toBe(expectedOpts.value);
         });
+
         it('should not change spaces to %20 if linkValidation is set to false', function () {
             var editor = this.newMediumEditor('.editor', {
                 anchor: {
@@ -399,6 +409,7 @@ describe('Anchor Button TestCase', function () {
             link = editor.elements[0].querySelector('a');
             expect(link).not.toBeNull();
         });
+
         it('should add target="_blank" when "open in a new window" checkbox is checked', function () {
             var editor = this.newMediumEditor('.editor', {
                 anchor: {
@@ -422,6 +433,7 @@ describe('Anchor Button TestCase', function () {
             expect(link).not.toBeNull();
             expect(link.target).toBe('_blank');
         });
+
         it('should add target="_blank" when respective option is set to true', function () {
             var editor = this.newMediumEditor('.editor', {
                 targetBlank: true
@@ -437,6 +449,7 @@ describe('Anchor Button TestCase', function () {
             expect(link).not.toBeNull();
             expect(link.target).toBe('_blank');
         });
+
         it('should create a button when user selects this option and presses enter', function () {
             spyOn(MediumEditor.prototype, 'createLink').and.callThrough();
             var editor = this.newMediumEditor('.editor', {
