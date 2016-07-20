@@ -103,13 +103,15 @@
 
         positionPreview: function (activeAnchor) {
             activeAnchor = activeAnchor || this.activeAnchor;
-            var buttonHeight = this.anchorPreview.offsetHeight,
+            var containerWidth = this.window.innerWidth,
+                buttonHeight = this.anchorPreview.offsetHeight,
                 boundary = activeAnchor.getBoundingClientRect(),
-                middleBoundary = (boundary.left + boundary.right) / 2,
                 diffLeft = this.diffLeft,
                 diffTop = this.diffTop,
-                halfOffsetWidth,
-                defaultLeft;
+                elementsContainer = this.getEditorOption('elementsContainer'),
+                elementsContainerAbsolute = ['absolute', 'fixed'].indexOf(window.getComputedStyle(elementsContainer).getPropertyValue('position')) > -1,
+                relativeBoundary = {},
+                halfOffsetWidth, defaultLeft, middleBoundary, elementsContainerBoundary, top;
 
             halfOffsetWidth = this.anchorPreview.offsetWidth / 2;
             var toolbarExtension = this.base.getExtensionByName('toolbar');
@@ -119,12 +121,38 @@
             }
             defaultLeft = diffLeft - halfOffsetWidth;
 
-            this.anchorPreview.style.top = Math.round(buttonHeight + boundary.bottom - diffTop + this.window.pageYOffset - this.anchorPreview.offsetHeight) + 'px';
+            if (elementsContainerAbsolute) {
+                elementsContainerBoundary = elementsContainer.getBoundingClientRect();
+                ['top', 'left'].forEach(function (key) {
+                    relativeBoundary[key] = boundary[key] - elementsContainerBoundary[key];
+                });
+
+                ['bottom', 'right'].forEach(function (key) {
+                    relativeBoundary[key] = elementsContainerBoundary[key] - boundary[key];
+                });
+
+                relativeBoundary.width = boundary.width;
+                relativeBoundary.height = boundary.height;
+                boundary = relativeBoundary;
+
+                containerWidth = elementsContainerBoundary.width;
+            }
+
+            middleBoundary = boundary.left + boundary.width / 2;
+            top = buttonHeight + boundary.top + boundary.height - diffTop - this.anchorPreview.offsetHeight;
+
+            if (elementsContainerAbsolute) {
+                top += elementsContainer.scrollTop;
+            } else {
+                top += this.window.pageYOffset;
+            }
+
+            this.anchorPreview.style.top = Math.round(top) + 'px';
             this.anchorPreview.style.right = 'initial';
             if (middleBoundary < halfOffsetWidth) {
                 this.anchorPreview.style.left = defaultLeft + halfOffsetWidth + 'px';
                 this.anchorPreview.style.right = 'initial';
-            } else if ((this.window.innerWidth - middleBoundary) < halfOffsetWidth) {
+            } else if ((containerWidth - middleBoundary) < halfOffsetWidth) {
                 this.anchorPreview.style.left = 'auto';
                 this.anchorPreview.style.right = 0;
             } else {
