@@ -629,6 +629,7 @@
                 relativeBoundary = {},
                 middleBoundary, elementsContainerBoundary;
 
+            // If container element is absolute / fixed, recalculate boundaries to be relative to the container
             if (elementsContainerAbsolute) {
                 elementsContainerBoundary = elementsContainer.getBoundingClientRect();
                 ['top', 'left'].forEach(function (key) {
@@ -649,8 +650,10 @@
             middleBoundary = boundary.left + boundary.width / 2;
             positions.top = boundary.top - toolbarHeight;
 
+            // If container element is absolute / fixed, adjust top position according to container scroll position
             if (elementsContainerAbsolute) {
                 positions.top += elementsContainer.scrollTop;
+            // If container element isn't absolute / fixed, adjust top position according to window scroll position
             } else {
                 positions.top += this.window.pageYOffset;
             }

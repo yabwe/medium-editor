@@ -121,6 +121,7 @@
             }
             defaultLeft = diffLeft - halfOffsetWidth;
 
+            // If container element is absolute / fixed, recalculate boundaries to be relative to the container
             if (elementsContainerAbsolute) {
                 elementsContainerBoundary = elementsContainer.getBoundingClientRect();
                 ['top', 'left'].forEach(function (key) {
@@ -141,8 +142,10 @@
             middleBoundary = boundary.left + boundary.width / 2;
             top = buttonHeight + boundary.top + boundary.height - diffTop - this.anchorPreview.offsetHeight;
 
+            // If container element is absolute / fixed, adjust top position according to container scroll position
             if (elementsContainerAbsolute) {
                 top += elementsContainer.scrollTop;
+            // If container element isn't absolute / fixed, adjust top position according to window scroll position
             } else {
                 top += this.window.pageYOffset;
             }
