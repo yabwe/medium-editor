@@ -235,8 +235,8 @@
             // Matches any alphabetical characters followed by ://
             // Matches protocol relative "//"
             // Matches common external protocols "mailto:" "tel:" "maps:"
-            // Matches relative hash link, "#" followed by any character
-            var urlSchemeRegex = /^([a-z]+:)?\/\/|^(mailto|tel|maps):|^\#.+/i,
+            // Matches relative hash link, begins with "#"
+            var urlSchemeRegex = /^([a-z]+:)?\/\/|^(mailto|tel|maps):|^\#/i,
             // var te is a regex for checking if the string is a telephone number
             telRegex = /^\+?\s?\(?(?:\d\s?\-?\)?){3,20}$/;
             if (telRegex.test(value)) {
