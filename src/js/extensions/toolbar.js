@@ -636,27 +636,21 @@
                     relativeBoundary[key] = boundary[key] - elementsContainerBoundary[key];
                 });
 
-                ['bottom', 'right'].forEach(function (key) {
-                    relativeBoundary[key] = elementsContainerBoundary[key] - boundary[key];
-                });
-
                 relativeBoundary.width = boundary.width;
                 relativeBoundary.height = boundary.height;
                 boundary = relativeBoundary;
 
                 containerWidth = elementsContainerBoundary.width;
+
+                // Adjust top position according to container scroll position
+                positions.top = elementsContainer.scrollTop;
+            } else {
+                // Adjust top position according to window scroll position
+                positions.top = this.window.pageYOffset;
             }
 
             middleBoundary = boundary.left + boundary.width / 2;
-            positions.top = boundary.top - toolbarHeight;
-
-            // If container element is absolute / fixed, adjust top position according to container scroll position
-            if (elementsContainerAbsolute) {
-                positions.top += elementsContainer.scrollTop;
-            // If container element isn't absolute / fixed, adjust top position according to window scroll position
-            } else {
-                positions.top += this.window.pageYOffset;
-            }
+            positions.top += boundary.top - toolbarHeight;
 
             if (boundary.top < buttonHeight) {
                 toolbarElement.classList.add('medium-toolbar-arrow-over');

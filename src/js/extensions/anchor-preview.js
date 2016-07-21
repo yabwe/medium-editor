@@ -128,27 +128,21 @@
                     relativeBoundary[key] = boundary[key] - elementsContainerBoundary[key];
                 });
 
-                ['bottom', 'right'].forEach(function (key) {
-                    relativeBoundary[key] = elementsContainerBoundary[key] - boundary[key];
-                });
-
                 relativeBoundary.width = boundary.width;
                 relativeBoundary.height = boundary.height;
                 boundary = relativeBoundary;
 
                 containerWidth = elementsContainerBoundary.width;
+
+                // Adjust top position according to container scroll position
+                top = elementsContainer.scrollTop;
+            } else {
+                // Adjust top position according to window scroll position
+                top = this.window.pageYOffset;
             }
 
             middleBoundary = boundary.left + boundary.width / 2;
-            top = buttonHeight + boundary.top + boundary.height - diffTop - this.anchorPreview.offsetHeight;
-
-            // If container element is absolute / fixed, adjust top position according to container scroll position
-            if (elementsContainerAbsolute) {
-                top += elementsContainer.scrollTop;
-            // If container element isn't absolute / fixed, adjust top position according to window scroll position
-            } else {
-                top += this.window.pageYOffset;
-            }
+            top += buttonHeight + boundary.top + boundary.height - diffTop - this.anchorPreview.offsetHeight;
 
             this.anchorPreview.style.top = Math.round(top) + 'px';
             this.anchorPreview.style.right = 'initial';
