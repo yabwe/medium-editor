@@ -407,6 +407,40 @@ describe('Anchor Preview TestCase', function () {
 
             expect(document.querySelector('.medium-editor-anchor-preview')).toBeNull();
         });
+
+        it('should correctly set preview position even if elementsContainer is absolute', function () {
+            var container = document.createElement('div'),
+                editor, anchorPreview;
+
+            container.style.position = 'absolute';
+            container.style.left = '100px';
+            container.style.top = '100px';
+            document.body.appendChild(container);
+
+            editor = this.newMediumEditor('.editor', {
+                elementsContainer: container,
+                anchorPreview: {
+                    showWhenToolbarIsVisible: true
+                },
+                toolbar: {
+                    static: true
+                }
+            });
+            anchorPreview = editor.getExtensionByName('anchor-preview').getPreviewElement();
+
+            selectElementContentsAndFire(editor.elements[0].firstChild);
+
+            // show preview
+            fireEvent(document.getElementById('test-link'), 'mouseover');
+
+            // preview shows only after delay
+            jasmine.clock().tick(1);
+            expect(anchorPreview.classList.contains('medium-editor-anchor-preview-active')).toBe(true);
+            expect(parseInt(anchorPreview.style.left, 10)).toBeLessThan(100);
+            expect(parseInt(anchorPreview.style.top, 10)).toBeLessThan(100);
+
+            document.body.removeChild(container);
+        });
     });
 
 });
