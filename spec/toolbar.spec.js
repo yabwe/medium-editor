@@ -381,8 +381,8 @@ describe('MediumEditor.extensions.toolbar TestCase', function () {
 
             selectElementContentsAndFire(this.el);
             expect(toolbar.classList.contains('medium-editor-toolbar-active')).toBe(true);
-            expect(toolbar.style.left).toBe('0px');
-            expect(toolbar.style.top).toBe('60px');
+            expect(parseInt(toolbar.style.left, 10)).toBeLessThan(100);
+            expect(parseInt(toolbar.style.top, 10)).toBeLessThan(100);
 
             document.body.removeChild(container);
         });
