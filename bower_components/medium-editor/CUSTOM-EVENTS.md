@@ -1,12 +1,12 @@
 # MediumEditor Custom Events (v5.0.0)
 
-MediumEditor exposes a variety of custom events for convienience when using the editor with your web application.  You can attach and detach listeners to these custom events, as well as manually trigger any custom events including your own custom events.
+MediumEditor exposes a variety of custom events for convenience when using the editor with your web application.  You can attach and detach listeners to these custom events, as well as manually trigger any custom events including your own custom events.
 
 **NOTE:**
 
 Custom event listeners are triggered in the order that they were 'subscribed' to.  Most functionality within medium-editor uses these custom events to trigger updates, so in general, it can be assumed that most of the built-in functionality has already been completed before any of your custom event listeners will be called.
 
-If you need to override the editor's bult-in behavior, try overriding the built-in extensions with your own [custom extension](src/js/extensions).
+If you need to override the editor's built-in behavior, try overriding the built-in extensions with your own [custom extension](src/js/extensions).
 
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
@@ -16,10 +16,12 @@ If you need to override the editor's bult-in behavior, try overriding the built-
   - [`MediumEditor.unsubscribe(name, listener)`](#mediumeditorunsubscribename-listener)
   - [`MediumEditor.trigger(name, data, editable)`](#mediumeditortriggername-data-editable)
 - [Custom Events](#custom-events)
+  - [`addElement`](#addelement)
   - [`blur`](#blur)
   - [`editableInput`](#editableinput)
   - [`externalInteraction`](#externalinteraction)
   - [`focus`](#focus)
+  - [`removeElement`](#removeelement)
 - [Toolbar Custom Events](#toolbar-custom-events)
   - [`hideToolbar`](#hidetoolbar)
   - [`positionToolbar`](#positiontoolbar)
@@ -56,7 +58,7 @@ Attaches a listener for the specified custom event name.
 
   * Name of the event to listen to.  See the list of built-in [Custom Events](#custom-events) below.
 
-2. _**listener(data, editable)** (`function`)_: 
+2. _**listener(data, editable)** (`function`)_:
 
   * Listener method that will be called whenever the custom event is triggered.
 
@@ -80,7 +82,7 @@ Detaches a custom event listener for the specified custom event name.
 
   * Name of the event to detach the listener for.
 
-2. _**listener** (`function`)_: 
+2. _**listener** (`function`)_:
 
   * A reference to the listener to detach.  This must be a match by-reference and not a copy.
 
@@ -109,6 +111,20 @@ Manually triggers a custom event.
 
 These events are custom to MediumEditor so there may be one or more native events that can trigger them.
 
+### `addElement`
+
+`addElement` is triggered whenever an element is added to the editor after the editor has been instantiated.  This custom event will be triggered **after** the element has already been initialized by the editor and added to the internal array of **elements**.  If the element being added was a `<textarea>`, the element passed to the listener will be the created `<div contenteditable=true>` element and not the root `<textarea>`.
+
+**Arguments to listener**
+
+1. _**data** (`object`)_
+  * Properties of data object
+    * `target`: element which was added to the editor
+    * `currentTarget`: element which was added to the editor
+2. _**editable** (`HTMLElement`)_
+  * element which was added to the editor
+
+***
 ### `blur`
 
 `blur` is triggered whenever a `contenteditable` element within an editor has lost focus to an element other than an editor maintained element (ie Toolbar, Anchor Preview, etc).
@@ -140,7 +156,21 @@ Example:
 ***
 ### `focus`
 
-`focus` is triggered whenver a `contenteditable` element within an editor receives focus. If the user interacts with any editor maintained elements (ie toolbar), `blur` is NOT triggered because focus has not been lost.  Thus, `focus` will only be triggered when an `contenteditable` element (or the editor that contains it) is first interacted with.
+`focus` is triggered whenever a `contenteditable` element within an editor receives focus. If the user interacts with any editor maintained elements (ie toolbar), `blur` is NOT triggered because focus has not been lost.  Thus, `focus` will only be triggered when an `contenteditable` element (or the editor that contains it) is first interacted with.
+
+***
+### `removeElement`
+
+`removeElement` is triggered whenever an element is removed from the editor after the editor has been instantiated.  This custom event will be triggered **after** the element has already been removed from the editor and any events attached to it have already been removed.  If the element being removed was a `<div>` created to correspond to a `<textarea>`, the element will already have been removed from the DOM.
+
+**Arguments to listener**
+
+1. _**data** (`object`)_
+  * Properties of data object
+    * `target`: element which was removed from the editor
+    * `currentTarget`: element which was removed from the editor
+2. _**editable** (`HTMLElement`)_
+  * element which was removed from the editor
 
 ## Toolbar Custom Events
 
@@ -161,7 +191,7 @@ These events are triggered by the toolbar when the toolbar extension has not bee
 
 ## Proxied Custom Events
 
-These events are triggered whenever a native browser event is triggered for any of the `contenteditable` elements monitored by this instnace of MediumEditor.
+These events are triggered whenever a native browser event is triggered for any of the `contenteditable` elements monitored by this instance of MediumEditor.
 
 For example, the `editableClick` custom event will be triggered when a native `click` event is fired on any of the `contenteditable` elements. This provides a single event listener that can get fired for all elements, and also allows for the `contenteditable` element that triggered the event to be passed to the listener.
 

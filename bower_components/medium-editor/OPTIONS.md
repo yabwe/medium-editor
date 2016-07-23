@@ -42,6 +42,7 @@ var editor = new MediumEditor('.editor', {
 - [Anchor Preview options](#anchor-preview-options)
     - [`hideDelay`](#hidedelay)
     - [`previewValueSelector`](#previewvalueselector)
+    - [`showOnEmptyLinks`](#showonemptylinks)
   - [Disabling Anchor Preview](#disabling-anchor-preview)
 - [Placeholder Options](#placeholder-options)
     - [`text`](#text)
@@ -202,6 +203,7 @@ var editor = new MediumEditor('.editable', {
         diffTop: -10,
         firstButtonClass: 'medium-editor-button-first',
         lastButtonClass: 'medium-editor-button-last',
+        relativeContainer: null,
         standardizeSelectionStart: false,
         static: false,
 
@@ -248,6 +250,15 @@ CSS class added to the first button in the toolbar.
 **Default:** `'medium-editor-button-last'`
 
 CSS class added to the last button in the toolbar.
+
+***
+#### `relativeContainer`
+**Default:** `null`
+
+DOMElement to append the toolbar to instead of the body.  When an element is passed the toolbar will also be positioned `relative` instead of `absolute`, which means the editor will not attempt to manually position the toolbar automatically.
+
+**NOTE:**
+* Using this in combination with the `static` option for toolbar is not explicitly supported and the behavior in this case is not defined.
 
 ***
 #### `standardizeSelectionStart`
@@ -333,6 +344,12 @@ Time in milliseconds to show the anchor tag preview after the mouse has left the
 **Default:** `'a'`
 
 The default selector to locate where to put the activeAnchor value in the preview. You should only need to override this if you've modified the way in which the anchor-preview extension renders.
+
+***
+#### `showOnEmptyLinks`
+**Default:** `true`
+
+Determines whether the anchor tag preview shows up on link with href as "" or "#something". You should set this value to false if you do not want the preview to show up in such use cases.
 
 ***
 #### `showWhenToolbarIsVisible`
