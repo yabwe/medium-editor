@@ -142,8 +142,8 @@
                 (MediumEditor.util.getClosestTag(node, 'blockquote') !== false) &&
                 MediumEditor.selection.getCaretOffsets(node).right === 0) {
 
-            // when cursor is at the end of <blockquote>
-            // then pressing enter key should <p> tag, not <blockquote>
+            // when cursor is at the end of <blockquote>,
+            // then pressing enter key should create <p> tag, not <blockquote>
             p = this.options.ownerDocument.createElement('p');
             p.innerHTML = '<br>';
             node.parentElement.insertBefore(p, node.nextSibling);
