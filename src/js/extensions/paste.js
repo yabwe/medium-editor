@@ -60,7 +60,10 @@
             [new RegExp(/<\/?o:[a-z]*>/gi), ''],
 
             // Microsoft Word adds some special elements around list items
-            [new RegExp(/<!\[if !supportLists\]>(((?!<!).)*)<!\[endif]\>/gi), '$1']
+            [new RegExp(/<!\[if !supportLists\]>(((?!<!).)*)<!\[endif]\>/gi), '$1'],
+
+            // remove font tag
+            [new RegExp(/<font[^><]*>|<.font[^><]*>/gi), '']
         ];
     }
     /*jslint regexp: false*/
