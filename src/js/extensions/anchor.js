@@ -110,8 +110,8 @@
                 // figure out how to deprecate? also consider `fa-` icon default implcations.
                 template.push(
                     '<div class="medium-editor-toolbar-form-row">',
-                    '<input type="checkbox" class="medium-editor-toolbar-anchor-target">',
-                    '<label>',
+                    '<input type="checkbox" class="medium-editor-toolbar-anchor-target" id="medium-editor-toolbar-form-anchor-target-input-', this.getEditorId(), '">',
+                    '<label for="medium-editor-toolbar-form-anchor-target-input-', this.getEditorId(), '">',
                     this.targetCheckboxText,
                     '</label>',
                     '</div>'
@@ -123,8 +123,8 @@
                 // and provide similar access to a `fa-` icon default.
                 template.push(
                     '<div class="medium-editor-toolbar-form-row">',
-                    '<input type="checkbox" class="medium-editor-toolbar-anchor-button">',
-                    '<label>',
+                    '<input type="checkbox" class="medium-editor-toolbar-anchor-button" id="medium-editor-toolbar-form-anchor--custom-class-input-', this.getEditorId(), '">',
+                    '<label for="medium-editor-toolbar-form-anchor--custom-class-input-', this.getEditorId(), '">',
                     this.customClassOptionText,
                     '</label>',
                     '</div>'
