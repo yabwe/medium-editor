@@ -451,20 +451,6 @@ describe('Content TestCase', function () {
                 expect(this.el.innerHTML).toBe('<blockquote>lorem ipsum</blockquote>');
             });
         });
-        describe('within a div element', function () {
-            it('at the end of the div, p tag should be created next, not div', function () {
-                this.el.innerHTML = '<div>lorem ipsum</div>';
-                var editor = this.newMediumEditor('.editor'),
-                    target = editor.elements[0].querySelector('div').firstChild;
-
-                placeCursorInsideElement(target, target.textContent.length);
-                fireEvent(target, 'keydown', {
-                    keyCode: MediumEditor.util.keyCode.ENTER
-                });
-
-                expect(this.el.innerHTML).toBe('<div>lorem ipsum</div><p><br></p>');
-            });
-        });
     });
 
     describe('when the ctrl key and m key is pressed', function () {
