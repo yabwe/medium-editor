@@ -117,6 +117,8 @@
   * An extension that inserts custom HTML using a new button in the MediumEditor toolbar
 * [MediumButton](https://github.com/arcs-/MediumButton)
   * Extends your Medium Editor with the possibility add buttons.
+* [MediumEditor Phrase](https://github.com/nymag/medium-editor-phrase)
+  * Adds a configurable button to the MediumEditor toolbar which adds phrasing content tags (e.g. `span` tags) to selected text.
 * [MediumEditor Handsontable](https://github.com/asselinpaul/medium-editor-handsontable)
   * Supports adding [handsontable](https://handsontable.com/) spreadsheets to MediumEditor.
 * [MediumEditor Lists](https://github.com/mkawczynski07/medium-editor-list)
