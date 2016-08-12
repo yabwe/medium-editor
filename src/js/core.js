@@ -33,6 +33,10 @@
         var node = MediumEditor.selection.getSelectionStart(this.options.ownerDocument),
             tag = node && node.nodeName.toLowerCase();
 
+        if (node.getAttribute('data-disable-tab')) {
+            return
+        }
+
         if (tag === 'pre') {
             event.preventDefault();
             MediumEditor.util.insertHTMLCommand(this.options.ownerDocument, '    ');
@@ -445,7 +449,9 @@
 
     function attachHandlers() {
         // attach to tabs
-        this.subscribe('editableKeydownTab', handleTabKeydown.bind(this));
+        if (!this.options.disableTab) {
+            this.subscribe('editableKeydownTab', handleTabKeydown.bind(this));
+        }
 
         // Bind keys which can create or destroy a block element: backspace, delete, return
         this.subscribe('editableKeydownDelete', handleBlockDeleteKeydowns.bind(this));
