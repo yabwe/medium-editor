@@ -34,7 +34,7 @@
             tag = node && node.nodeName.toLowerCase();
 
         if (node.getAttribute('data-disable-tab')) {
-            return
+            return;
         }
 
         if (tag === 'pre') {
