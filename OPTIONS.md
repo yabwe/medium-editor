@@ -521,6 +521,12 @@ List of element attributes to remove during paste when __cleanPastedHTML__ is `t
 
 List of element tag names to remove during paste when __cleanPastedHTML__ is `true` or when calling `cleanPaste(text)` or `pasteHTML(html,options)` helper methods.
 
+***
+#### `unwrapTags`
+**Default:** `[]`
+
+List of element tag names to unwrap (remove the element tag but retain its child elements) during paste when __cleanPastedHTML__ is `true` or when calling `cleanPaste(text)` or `pasteHTML(html,options)` helper methods.
+
 ### Disabling Paste Handling
 
 To disable MediumEditor manipulating pasted content, set the both the `forcePlainText` and `cleanPastedHTML` options to `false`:

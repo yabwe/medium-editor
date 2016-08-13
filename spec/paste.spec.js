@@ -716,21 +716,34 @@ describe('Pasting content', function () {
             expect(editor.elements[0].innerHTML).toBe('<div><i>test</i></div>');
         });
 
+        it('should accept a list of tags to unwrap', function () {
+            var editor = this.newMediumEditor('.editor');
+            selectElementContents(this.el.firstChild);
+            editor.pasteHTML(
+                '<div><i>test</i><sub><b>test</b></sub><sup>test</sup></div>',
+                { unwrapTags: ['sub', 'sup'] }
+            );
+            expect(editor.elements[0].innerHTML).toBe('<div><i>test</i><b>test</b>test</div>');
+        });
+
         it('should respect custom clean up options passed during instantiation', function () {
             var editor = this.newMediumEditor('.editor', {
                 paste: {
                     cleanAttrs: ['style', 'dir'],
-                    cleanTags: ['meta', 'b']
+                    cleanTags: ['meta', 'b'],
+                    unwrapTags: ['sub', 'sup']
                 }
             });
             selectElementContents(this.el.firstChild);
             editor.pasteHTML(
                 '<table class="medium-editor-table" dir="ltr" style="border: 1px solid red;"><tbody><tr><td>test</td></tr></tbody></table>' +
-                '<div><i>test</i><meta name="description" content="test" /><b>test</b></div>'
+                '<div><i>test</i><meta name="description" content="test" /><b>test</b></div>' +
+                '<div><i>test</i><sub><b>test</b></sub><sup>test</sup></div>'
             );
             expect(editor.elements[0].innerHTML).toBe(
                 '<table class="medium-editor-table"><tbody><tr><td>test</td></tr></tbody></table>' +
-                '<div><i>test</i></div>'
+                '<div><i>test</i></div>' +
+                '<div><i>test</i>test</div>'
             );
         });
     });
