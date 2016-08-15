@@ -65,41 +65,6 @@
     }
     /*jslint regexp: false*/
 
-    /**
-     * Gets various content types out of the Clipboard API. It will also get the
-     * plain text using older IE and WebKit API.
-     *
-     * @param {event} event Event fired on paste.
-     * @param {win} reference to window
-     * @param {doc} reference to document
-     * @return {Object} Object with mime types and data for those mime types.
-     */
-    function getClipboardContent(event, win, doc) {
-        var dataTransfer = event.clipboardData || win.clipboardData || doc.dataTransfer,
-            data = {};
-
-        if (!dataTransfer) {
-            return data;
-        }
-
-        // Use old WebKit/IE API
-        if (dataTransfer.getData) {
-            var legacyText = dataTransfer.getData('Text');
-            if (legacyText && legacyText.length > 0) {
-                data['text/plain'] = legacyText;
-            }
-        }
-
-        if (dataTransfer.types) {
-            for (var i = 0; i < dataTransfer.types.length; i++) {
-                var contentType = dataTransfer.types[i];
-                data[contentType] = dataTransfer.getData(contentType);
-            }
-        }
-
-        return data;
-    }
-
     var PasteHandler = MediumEditor.Extension.extend({
         /* Paste Options */
 
@@ -164,12 +129,47 @@
             }
         },
 
+        /**
+         * Gets various content types out of the Clipboard API. It will also get the
+         * plain text using older IE and WebKit API.
+         *
+         * @param {event} event Event fired on paste.
+         * @param {win} reference to window
+         * @param {doc} reference to document
+         * @return {Object} Object with mime types and data for those mime types.
+         */
+        getClipboardContent(event, win, doc) {
+            var dataTransfer = event.clipboardData || win.clipboardData || doc.dataTransfer,
+                data = {};
+
+            if (!dataTransfer) {
+                return data;
+            }
+
+            // Use old WebKit/IE API
+            if (dataTransfer.getData) {
+                var legacyText = dataTransfer.getData('Text');
+                if (legacyText && legacyText.length > 0) {
+                    data['text/plain'] = legacyText;
+                }
+            }
+
+            if (dataTransfer.types) {
+                for (var i = 0; i < dataTransfer.types.length; i++) {
+                    var contentType = dataTransfer.types[i];
+                    data[contentType] = dataTransfer.getData(contentType);
+                }
+            }
+
+            return data;
+        },
+
         handlePaste: function (event, editable) {
             if (event.defaultPrevented) {
                 return;
             }
 
-            var clipboardContent = getClipboardContent(event, this.window, this.document),
+            var clipboardContent = this.getClipboardContent(event, this.window, this.document),
                 pastedHTML = clipboardContent['text/html'],
                 pastedPlain = clipboardContent['text/plain'];
 
@@ -222,7 +222,7 @@
                 return;
             }
 
-            var clipboardContent = getClipboardContent(event, this.window, this.document),
+            var clipboardContent = this.getClipboardContent(event, this.window, this.document),
                 pastedHTML = clipboardContent['text/html'],
                 pastedPlain = clipboardContent['text/plain'],
                 editable = keyboardPasteEditable;
