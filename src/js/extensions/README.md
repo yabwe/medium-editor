@@ -91,6 +91,8 @@
   * A Medium Editor extension for adding custom 'mention' support, circa Medium 2.0.
 * [MediumEditor AutoList](https://github.com/varun-raj/medium-editor-autolist)
   * A Medium Editor extension for converting `1.` and `*` into ordered lists and unordered lists.
+* [MediumEditor Embed Button](https://github.com/orhanveli/medium-editor-embed-button)
+  * oEmbed based embedding button extension to add rich embeds to your document.
 
 
 ## What is a Button?
