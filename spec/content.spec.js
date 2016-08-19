@@ -652,6 +652,22 @@ describe('Content TestCase', function () {
                 expect(this.el.innerHTML).toBe('<p>lorem ipsum</p><ul><li></li><li>lorem ipsum</li></ul>');
             });
         });
+
+        describe('within an empty paragraph which is the first element of the editor', function () {
+            it('should delete the paragraph and place the caret to the next paragraph', function () {
+                this.el.innerHTML = '<p class=""><br></p><p>test</p>';
+                var editor = this.newMediumEditor('.editor'),
+                    target = editor.elements[0].querySelector('p'),
+                    range;
+                placeCursorInsideElement(target, 0);
+                fireEvent(target, 'keydown', {
+                    keyCode: MediumEditor.util.keyCode.BACKSPACE
+                });
+                expect(this.el.innerHTML).toBe('<p>test</p>');
+                range = document.getSelection().getRangeAt(0);
+                expect(range.commonAncestorContainer.textContent).toBe('test');
+            });
+        });
     });
 
     describe('with header tags', function () {
