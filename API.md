@@ -399,12 +399,12 @@ _replace the current selection with html_
 
 2. _**options** (`Object`)_ _**OPTIONAL**_:
 
-  * Optional overrides for `cleanTags` and/or `cleanAttrs` for removing specific element types (`cleanTags`) or specific attributes (`cleanAttrs`) from the inserted HTML.  See [cleanTags](OPTIONS.md#cleantags) and [cleanAttrs](OPTIONS.md#cleanattrs) in OPTIONS.md for more information.
+  * Optional overrides for `cleanTags`, `unwrapTags`, and/or `cleanAttrs` for removing/unwrapping specific element types (`cleanTags`/`unwrapTags`),  or removing specific attributes (`cleanAttrs`) from the inserted HTML.  See [cleanTags](OPTIONS.md#cleantags), [unwrapTags](OPTIONS.md#unwraptags), and [cleanAttrs](OPTIONS.md#cleanattrs) in OPTIONS.md for more information.
 
 ##### Example
 
 ```js
-editor.pasteHTML('<p class="classy"><strong>Some Custom HTML</strong></p>', { cleanAttrs: ['class'], cleanTags: ['strong']});
+editor.pasteHTML('<p class="classy"><strong>Some Custom HTML</strong></p>', { cleanAttrs: ['class'], cleanTags: ['strong'], unwrapTags: ['em']});
 ```
 
 ***

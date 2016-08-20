@@ -337,7 +337,8 @@ var editor = new MediumEditor('.editable', {
         cleanPastedHTML: false,
         cleanReplacements: [],
         cleanAttrs: ['class', 'style', 'dir'],
-        cleanTags: ['meta']
+        cleanTags: ['meta'],
+        unwrapTags: []
     }
 });
 ```
@@ -456,7 +457,8 @@ var editor = new MediumEditor('.editable', {
     paste: {
         cleanPastedHTML: true,
         cleanAttrs: ['style', 'dir'],
-        cleanTags: ['label', 'meta']
+        cleanTags: ['label', 'meta'],
+        unwrapTags: ['sub', 'sup']
     },
     anchorPreview: {
         hideDelay: 300
