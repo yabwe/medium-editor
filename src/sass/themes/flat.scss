@@ -86,5 +86,5 @@ $medium-editor-placeholder-color: #fff;
 }
 
 .medium-editor-placeholder:after {
-    color: $medium-editor-border-color;
+    color: lighten($medium-editor-bgcolor, 20);
 }
