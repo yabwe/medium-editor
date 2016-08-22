@@ -36,7 +36,10 @@
         // Helpers for event handling
 
         attachDOMEvent: function (targets, event, listener, useCapture) {
-            targets = MediumEditor.util.isElement(targets) || [window, document].indexOf(targets) > -1 ? [targets] : targets;
+            var win = this.base.options.contentWindow,
+                doc = this.base.options.ownerDocument;
+
+            targets = MediumEditor.util.isElement(targets) || [win, doc].indexOf(targets) > -1 ? [targets] : targets;
 
             Array.prototype.forEach.call(targets, function (target) {
                 target.addEventListener(event, listener, useCapture);
@@ -45,8 +48,11 @@
         },
 
         detachDOMEvent: function (targets, event, listener, useCapture) {
-            var index, e;
-            targets = MediumEditor.util.isElement(targets) || [window, document].indexOf(targets) > -1 ? [targets] : targets;
+            var index, e,
+                win = this.base.options.contentWindow,
+                doc = this.base.options.ownerDocument;
+
+            targets = MediumEditor.util.isElement(targets) || [win, doc].indexOf(targets) > -1 ? [targets] : targets;
 
             Array.prototype.forEach.call(targets, function (target) {
                 index = this.indexOfListener(target, event, listener, useCapture);
@@ -214,23 +220,23 @@
 
             // Helper method to call all listeners to execCommand
             var callListeners = function (args, result) {
-                    if (doc.execCommand.listeners) {
-                        doc.execCommand.listeners.forEach(function (listener) {
-                            listener({
-                                command: args[0],
-                                value: args[2],
-                                args: args,
-                                result: result
-                            });
+                if (doc.execCommand.listeners) {
+                    doc.execCommand.listeners.forEach(function (listener) {
+                        listener({
+                            command: args[0],
+                            value: args[2],
+                            args: args,
+                            result: result
                         });
-                    }
-                },
+                    });
+                }
+            },
 
-            // Create a wrapper method for execCommand which will:
-            // 1) Call document.execCommand with the correct arguments
-            // 2) Loop through any listeners and notify them that execCommand was called
-            //    passing extra info on the call
-            // 3) Return the result
+                // Create a wrapper method for execCommand which will:
+                // 1) Call document.execCommand with the correct arguments
+                // 2) Loop through any listeners and notify them that execCommand was called
+                //    passing extra info on the call
+                // 3) Return the result
                 wrapper = function () {
                     var result = doc.execCommand.orig.apply(this, arguments);
 
@@ -405,10 +411,10 @@
             // For clicks, we need to know if the mousedown that caused the click happened inside the existing focused element
             // or one of the extension elements.  If so, we don't want to focus another element
             if (hadFocus &&
-                    eventObj.type === 'click' &&
-                    this.lastMousedownTarget &&
-                    (MediumEditor.util.isDescendant(hadFocus, this.lastMousedownTarget, true) ||
-                     isElementDescendantOfExtension(this.base.extensions, this.lastMousedownTarget))) {
+                eventObj.type === 'click' &&
+                this.lastMousedownTarget &&
+                (MediumEditor.util.isDescendant(hadFocus, this.lastMousedownTarget, true) ||
+                    isElementDescendantOfExtension(this.base.extensions, this.lastMousedownTarget))) {
                 toFocus = hadFocus;
             }
 
@@ -426,7 +432,7 @@
 
             // Check if the target is external (not part of the editor, toolbar, or any other extension)
             var externalEvent = !MediumEditor.util.isDescendant(hadFocus, target, true) &&
-                                !isElementDescendantOfExtension(this.base.extensions, target);
+                !isElementDescendantOfExtension(this.base.extensions, target);
 
             if (toFocus !== hadFocus) {
                 // If element has focus, and focus is going outside of editor
