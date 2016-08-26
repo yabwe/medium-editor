@@ -134,8 +134,6 @@
   * Adds a "Add Paragraph" button which allows for inserting customized paragraphs to MediumEditor
 * [MediumEditor Embed Button](https://github.com/orhanveli/medium-editor-embed-button)
   * oEmbed based embedding button extension to add rich embeds to your document.
-* [MediumEditor Phrase](https://github.com/nymag/medium-editor-phrase)
-  * Phrase button for Medium Editor.
 
 ## What is a Form Extension?
 **Form Extensions** are a specific type of Button Extension which collect input from the user via the toolbar.  Form Extensions extend from Button, and thus inherit all of the lifecycle methods of a Button.  In addition, Form Extensions have some additional methods exposed to interact with MediumEditor and provide some common functionality.
