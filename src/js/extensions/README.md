@@ -91,9 +91,16 @@
   * A Medium Editor extension for adding custom 'mention' support, circa Medium 2.0.
 * [MediumEditor AutoList](https://github.com/varun-raj/medium-editor-autolist)
   * A Medium Editor extension for converting `1.` and `*` into ordered lists and unordered lists.
-* [MediumEditor Embed Button](https://github.com/orhanveli/medium-editor-embed-button)
-  * oEmbed based embedding button extension to add rich embeds to your document.
-
+* [MediumEditor Toolbar States](https://github.com/davideanderson/medium-editor-toolbar-states)
+  * An Extension for the medium-editor which allows different toolbar configurations based on the selected element(s).
+* [MediumEditor AutoFocus](https://github.com/dazorni/medium-editor-autofocus)
+  * Autofocus plugin for medium-editor
+* [MediumEditor Thaana Keyboard](https://github.com/jawish/medium-editor-thaanakbd)
+  * Thaana Keyboard extension for medium-editor
+* [MediumEditor Merge Fields Plugin](https://github.com/epascarello/merge-fields-plugin-for-medium-editor)
+  * Add merge fields for medium-editor
+* [MediumEditor Google Docs Anchor Preview](https://github.com/patternhq/MediumTools/tree/master/GdocMediumAnchorPreview)
+  * Google Doc style link preview for medium-editor
 
 ## What is a Button?
 **Buttons** are a specific type of Extension which have a contract with the MediumEditor toolbar.  Buttons have specific lifecycle methods that MediumEditor and the toolbar use to interact with these specific types of Extensions.  These contract create easy hooks, allowing custom buttons to:
@@ -125,7 +132,8 @@
   * Supports adding [handsontable](https://handsontable.com/) spreadsheets to MediumEditor.
 * [MediumEditor Lists](https://github.com/mkawczynski07/medium-editor-list)
   * Adds a "Add Paragraph" button which allows for inserting customized paragraphs to MediumEditor
-
+* [MediumEditor Embed Button](https://github.com/orhanveli/medium-editor-embed-button)
+  * oEmbed based embedding button extension to add rich embeds to your document.
 
 ## What is a Form Extension?
 **Form Extensions** are a specific type of Button Extension which collect input from the user via the toolbar.  Form Extensions extend from Button, and thus inherit all of the lifecycle methods of a Button.  In addition, Form Extensions have some additional methods exposed to interact with MediumEditor and provide some common functionality.
