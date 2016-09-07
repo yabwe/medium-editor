@@ -210,6 +210,10 @@
             if (false === target) {
                 return;
             }
+            
+            if ( target.getAttribute('data-disable-preview') === 'true' ) {
+                return;
+            }
 
             // Detect empty href attributes
             // The browser will make href="" or href="#top"
