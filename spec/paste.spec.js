@@ -562,6 +562,42 @@ describe('Pasting content', function () {
             contentEditables = document.body.querySelectorAll('[contentEditable=true]');
             expect(contentEditables.length).toBe(1);
         });
+
+        it('should keep the keyboard input focus on the editable element', function () {
+            var editor = this.newMediumEditor('.editor'),
+                pasteExtension = editor.getExtensionByName('paste');
+
+            selectElementContentsAndFire(editor.elements[0].firstChild);
+
+            var contentEditables = document.body.querySelectorAll('[contentEditable=true]');
+            expect(contentEditables.length).toBe(1);
+
+            contentEditables[0].focus();
+
+            fireEvent(this.el, 'keydown', {
+                keyCode: MediumEditor.util.keyCode.V,
+                ctrlKey: true,
+                metaKey: true
+            });
+
+            var evt = {
+                    type: 'paste',
+                    preventDefault: function () {},
+                    clipboardData: {
+                        types: ['text/plain'],
+                        getData: function () {
+                            return 'Plain Text';
+                        }
+                    }
+                };
+
+            pasteExtension.handlePasteBinPaste(evt);
+            jasmine.clock().tick(1);
+
+            contentEditables = document.body.querySelectorAll('[contentEditable=true]');
+            expect(contentEditables.length).toBe(1);
+            expect(document.activeElement).toBe(contentEditables[0]);
+        });
     });
 
     describe('using cleanPaste', function () {
