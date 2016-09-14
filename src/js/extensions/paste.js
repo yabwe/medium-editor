@@ -312,13 +312,6 @@
 
             this.document.body.appendChild(pasteBinElm);
 
-            // avoid .focus() to stop other event (actually the paste event)
-            this.on(pasteBinElm, 'focus', stopProp);
-            this.on(pasteBinElm, 'focusin', stopProp);
-            this.on(pasteBinElm, 'focusout', stopProp);
-
-            pasteBinElm.focus();
-
             MediumEditor.selection.selectNode(pasteBinElm, this.document);
 
             if (!this.boundHandlePaste) {
