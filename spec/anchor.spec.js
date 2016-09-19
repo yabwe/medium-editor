@@ -16,8 +16,8 @@ describe('Anchor Button TestCase', function () {
     describe('Anchor Form', function () {
         it('should add class for visible state and remove it for invisivble', function () {
             var editor = this.newMediumEditor('.editor', {
-                buttonLabels: 'fontawesome'
-            }),
+                    buttonLabels: 'fontawesome'
+                }),
                 anchorExtension = editor.getExtensionByName('anchor'),
                 toolbar = editor.getExtensionByName('toolbar'),
                 activeClass = anchorExtension.activeClass;
@@ -33,8 +33,8 @@ describe('Anchor Button TestCase', function () {
 
         it('should not hide the toolbar when mouseup fires inside the anchor form', function () {
             var editor = this.newMediumEditor('.editor', {
-                buttonLabels: 'fontawesome'
-            }),
+                    buttonLabels: 'fontawesome'
+                }),
                 anchorExtension = editor.getExtensionByName('anchor'),
                 toolbar = editor.getExtensionByName('toolbar');
 
@@ -339,10 +339,10 @@ describe('Anchor Button TestCase', function () {
 
         it('should not change fragment identifier when link begins with hash', function () {
             var editor = this.newMediumEditor('.editor', {
-                anchor: {
-                    linkValidation: true
-                }
-            }),
+                    anchor: {
+                        linkValidation: true
+                    }
+                }),
                 validHashLink = '#!$&\'()*+,;=123abcDEF-._~:@/?',
                 link,
                 anchorExtension = editor.getExtensionByName('anchor');
@@ -453,10 +453,10 @@ describe('Anchor Button TestCase', function () {
         it('should create a button when user selects this option and presses enter', function () {
             spyOn(MediumEditor.prototype, 'createLink').and.callThrough();
             var editor = this.newMediumEditor('.editor', {
-                anchor: {
-                    customClassOption: 'btn btn-default'
-                }
-            }),
+                    anchor: {
+                        customClassOption: 'btn btn-default'
+                    }
+                }),
                 save,
                 input,
                 button,
@@ -492,123 +492,77 @@ describe('Anchor Button TestCase', function () {
             expect(link.classList.contains('btn-default')).toBe(true);
         });
 
-        it('should add the specified css class to the link when user selects this option, even if selected text is styled in a complex nested way', function () {
-            spyOn(MediumEditor.prototype, 'createLink').and.callThrough();
-            this.el.innerHTML = '<b>this is a</b><i><b> complicated</b> <strike><b>markup</b></strike></i>';
-
+        it('should remove the target _blank from the anchor tag when the open in a new window checkbox,' +
+                ' is unchecked and the form is saved', function () {
             var editor = this.newMediumEditor('.editor', {
                 anchor: {
-                    customClassOption: 'btn btn-default'
+                    targetCheckbox: true
                 }
             }),
-                b = this.el.firstChild,
-                endb = this.el.querySelector('strike b'),
-                save,
-                input,
-                button,
-                link,
-                opts,
                 anchorExtension = editor.getExtensionByName('anchor'),
-                toolbar = editor.getExtensionByName('toolbar');
+                targetCheckbox,
+                link;
 
-            MediumEditor.selection.select(document, b.firstChild, 'this'.length, endb.firstChild, 'mar'.length);
-            save = toolbar.getToolbarElement().querySelector('[data-action="createLink"]');
-            fireEvent(save, 'click');
+            selectElementContentsAndFire(editor.elements[0]);
+            anchorExtension.showForm('http://test.com');
+            expect(anchorExtension.isDisplayed()).toBe(true);
+            targetCheckbox = anchorExtension.getForm().querySelector('input.medium-editor-toolbar-anchor-target');
+            targetCheckbox.checked = true;
+            fireEvent(anchorExtension.getForm().querySelector('a.medium-editor-toolbar-save'), 'click');
+            link = editor.elements[0].querySelector('a');
+            expect(link.target).toBe('_blank');
 
-            input = anchorExtension.getInput();
-            input.value = 'http://test.com';
+            selectElementContentsAndFire(editor.elements[0]);
+            anchorExtension.showForm('http://test.com');
+            targetCheckbox = anchorExtension.getForm().querySelector('input.medium-editor-toolbar-anchor-target');
+            targetCheckbox.checked = false;
+            fireEvent(anchorExtension.getForm().querySelector('a.medium-editor-toolbar-save'), 'click');
+            link = editor.elements[0].querySelector('a');
+            expect(link.target).toBe('');
+        });
 
-            button = anchorExtension.getForm().querySelector('input.medium-editor-toolbar-anchor-button');
-            button.setAttribute('type', 'checkbox');
-            button.checked = true;
+        it('should fire editableInput only once when the user creates a link open to a new window,' +
+                ' and it should fire at the end of the DOM and selection modifications', function () {
+            spyOn(MediumEditor.prototype, 'createLink').and.callThrough();
+            this.el.innerHTML = '<p>Lorem ipsum et dolitur sunt.</p>';
+            var editor = this.newMediumEditor('.editor', {
+                    anchor: {
+                        targetCheckbox: true
+                    }
+                }),
+                p = this.el.lastChild,
+                anchorExtension = editor.getExtensionByName('anchor'),
+                toolbar = editor.getExtensionByName('toolbar'),
+                selectionWhenEventsFired = [],
+                listener = function () {
+                    selectionWhenEventsFired.push(window.getSelection().toString());
+                };
 
+            MediumEditor.selection.select(document, p.firstChild, 'Lorem '.length, p.firstChild, 'Lorem ipsum'.length);
+            fireEvent(editor.elements[0], 'focus');
+            jasmine.clock().tick(1);
+
+            // Click the 'anchor' button in the toolbar
+            fireEvent(toolbar.getToolbarElement().querySelector('[data-action="createLink"]'), 'click');
+
+            // Input a url and save
+            var input = anchorExtension.getInput(),
+                checkbox = anchorExtension.getAnchorTargetCheckbox();
+            input.value = 'http://www.example.com';
+            checkbox.checked = true;
+            editor.subscribe('editableInput', listener);
             fireEvent(input, 'keyup', {
                 keyCode: MediumEditor.util.keyCode.ENTER
             });
-            opts = {
-                value: 'http://test.com',
-                target: '_self',
-                buttonClass: 'btn btn-default'
-            };
-            expect(editor.createLink).toHaveBeenCalledWith(opts);
 
-            link = editor.elements[0].querySelector('a');
-            expect(link).not.toBeNull();
-            expect(link.classList.contains('btn')).toBe(true);
-            expect(link.classList.contains('btn-default')).toBe(true);
+            expect(editor.createLink).toHaveBeenCalledWith({
+                value: 'http://www.example.com',
+                target: '_blank'
+            });
+            expect(window.getSelection().toString()).toBe('ipsum', 'selected text should remain selected');
+            expect(selectionWhenEventsFired.length).toBe(1, 'only one editableInput event should have been registered');
+            expect(selectionWhenEventsFired[0]).toBe('ipsum', 'selected text should have been the same when event fired');
         });
-
-        it('should remove the target _blank from the anchor tag when the open in a new window checkbox,' +
-            ' is unchecked and the form is saved', function () {
-                var editor = this.newMediumEditor('.editor', {
-                    anchor: {
-                        targetCheckbox: true
-                    }
-                }),
-                    anchorExtension = editor.getExtensionByName('anchor'),
-                    targetCheckbox,
-                    link;
-
-                selectElementContentsAndFire(editor.elements[0]);
-                anchorExtension.showForm('http://test.com');
-                expect(anchorExtension.isDisplayed()).toBe(true);
-                targetCheckbox = anchorExtension.getForm().querySelector('input.medium-editor-toolbar-anchor-target');
-                targetCheckbox.checked = true;
-                fireEvent(anchorExtension.getForm().querySelector('a.medium-editor-toolbar-save'), 'click');
-                link = editor.elements[0].querySelector('a');
-                expect(link.target).toBe('_blank');
-
-                selectElementContentsAndFire(editor.elements[0]);
-                anchorExtension.showForm('http://test.com');
-                targetCheckbox = anchorExtension.getForm().querySelector('input.medium-editor-toolbar-anchor-target');
-                targetCheckbox.checked = false;
-                fireEvent(anchorExtension.getForm().querySelector('a.medium-editor-toolbar-save'), 'click');
-                link = editor.elements[0].querySelector('a');
-                expect(link.target).toBe('');
-            });
-
-        it('should fire editableInput only once when the user creates a link open to a new window,' +
-            ' and it should fire at the end of the DOM and selection modifications', function () {
-                spyOn(MediumEditor.prototype, 'createLink').and.callThrough();
-                this.el.innerHTML = '<p>Lorem ipsum et dolitur sunt.</p>';
-                var editor = this.newMediumEditor('.editor', {
-                    anchor: {
-                        targetCheckbox: true
-                    }
-                }),
-                    p = this.el.lastChild,
-                    anchorExtension = editor.getExtensionByName('anchor'),
-                    toolbar = editor.getExtensionByName('toolbar'),
-                    selectionWhenEventsFired = [],
-                    listener = function () {
-                        selectionWhenEventsFired.push(window.getSelection().toString());
-                    };
-
-                MediumEditor.selection.select(document, p.firstChild, 'Lorem '.length, p.firstChild, 'Lorem ipsum'.length);
-                fireEvent(editor.elements[0], 'focus');
-                jasmine.clock().tick(1);
-
-                // Click the 'anchor' button in the toolbar
-                fireEvent(toolbar.getToolbarElement().querySelector('[data-action="createLink"]'), 'click');
-
-                // Input a url and save
-                var input = anchorExtension.getInput(),
-                    checkbox = anchorExtension.getAnchorTargetCheckbox();
-                input.value = 'http://www.example.com';
-                checkbox.checked = true;
-                editor.subscribe('editableInput', listener);
-                fireEvent(input, 'keyup', {
-                    keyCode: MediumEditor.util.keyCode.ENTER
-                });
-
-                expect(editor.createLink).toHaveBeenCalledWith({
-                    value: 'http://www.example.com',
-                    target: '_blank'
-                });
-                expect(window.getSelection().toString()).toBe('ipsum', 'selected text should remain selected');
-                expect(selectionWhenEventsFired.length).toBe(1, 'only one editableInput event should have been registered');
-                expect(selectionWhenEventsFired[0]).toBe('ipsum', 'selected text should have been the same when event fired');
-            });
 
         // https://github.com/yabwe/medium-editor/issues/757
         it('should not select empty paragraphs when link is created at beginning of paragraph after empty paragraphs', function () {

@@ -614,11 +614,6 @@
             }
         },
 
-        /*
-         * this function adds one or several classes on an a element.
-         * if el parameter is not an a, it will look for a children of el.
-         * if no a children are found, it will look for the a parent.
-         */
         addClassToAnchors: function (el, buttonClass) {
             var classes = buttonClass.split(' '),
                 i,
@@ -628,15 +623,7 @@
                     el.classList.add(classes[j]);
                 }
             } else {
-                var aChildren = el.getElementsByTagName('a');
-                if (aChildren.length === 0) {
-                    while (el.nodeName.toLowerCase() !== 'a') {
-                        el = el.parentNode;
-                    }
-                    el = [el];
-                } else {
-                    el = aChildren;
-                }
+                el = el.getElementsByTagName('a');
                 for (i = 0; i < el.length; i += 1) {
                     for (j = 0; j < classes.length; j += 1) {
                         el[i].classList.add(classes[j]);
