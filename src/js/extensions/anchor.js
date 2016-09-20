@@ -257,7 +257,7 @@
             // Matches common external protocols "mailto:" "tel:" "maps:"
             // Matches relative hash link, begins with "#"
             var urlSchemeRegex = /^([a-z]+:)?\/\/|^(mailto|tel|maps):|^\#/i,
-                // var te is a regex for checking if the string is a telephone number
+                // telRegex is a regex for checking if the string is a telephone number
                 telRegex = /^\+?\s?\(?(?:\d\s?\-?\)?){3,20}$/,
                 split = value.split('?'),
                 path = split[0],

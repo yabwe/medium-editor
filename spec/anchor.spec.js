@@ -356,7 +356,7 @@ describe('Anchor Button TestCase', function () {
             expect(link.getAttribute('href')).toBe(validHashLink);
         });
 
-        it('should change spaces to %20 for a valid url if linkValidation options is set to true', function () {
+        it('should change spaces to %20 for a valid url if linkValidation option is set to true', function () {
             var editor = this.newMediumEditor('.editor', {
                     anchor: {
                         linkValidation: true
@@ -382,7 +382,7 @@ describe('Anchor Button TestCase', function () {
             expect(link.href).toBe(expectedOpts.value);
         });
 
-        it('should not encode an encoded URL if linkValidation options is set to true', function () {
+        it('should not encode an encoded URL if linkValidation option is set to true', function () {
             var editor = this.newMediumEditor('.editor', {
                     anchor: {
                         linkValidation: true
@@ -396,7 +396,6 @@ describe('Anchor Button TestCase', function () {
                 };
 
             spyOn(editor, 'execAction').and.callThrough();
-
             selectElementContentsAndFire(editor.elements[0]);
             anchorExtension.showForm('a%20b.com/');
             fireEvent(anchorExtension.getForm().querySelector('a.medium-editor-toolbar-save'), 'click');
@@ -408,7 +407,7 @@ describe('Anchor Button TestCase', function () {
             expect(link.href).toBe(expectedOpts.value);
         });
 
-        it('should encode query params if linkValidation options is set to true', function () {
+        it('should encode query params if linkValidation option is set to true', function () {
             var editor = this.newMediumEditor('.editor', {
                     anchor: {
                         linkValidation: true
@@ -434,7 +433,7 @@ describe('Anchor Button TestCase', function () {
             expect(link.href).toBe(expectedOpts.value);
         });
 
-        it('should not encode an encoded query param if linkValidation options is set to true', function () {
+        it('should not encode an encoded query param if linkValidation option is set to true', function () {
             var editor = this.newMediumEditor('.editor', {
                     anchor: {
                         linkValidation: true
