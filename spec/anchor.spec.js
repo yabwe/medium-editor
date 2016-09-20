@@ -358,10 +358,10 @@ describe('Anchor Button TestCase', function () {
 
         it('should change spaces to %20 for a valid url if linkValidation options is set to true', function () {
             var editor = this.newMediumEditor('.editor', {
-                anchor: {
-                    linkValidation: true
-                }
-            }),
+                    anchor: {
+                        linkValidation: true
+                    }
+                }),
                 link,
                 anchorExtension = editor.getExtensionByName('anchor'),
                 expectedOpts = {
@@ -373,6 +373,84 @@ describe('Anchor Button TestCase', function () {
 
             selectElementContentsAndFire(editor.elements[0]);
             anchorExtension.showForm('te s t.com/');
+            fireEvent(anchorExtension.getForm().querySelector('a.medium-editor-toolbar-save'), 'click');
+
+            expect(editor.execAction).toHaveBeenCalledWith('createLink', expectedOpts);
+
+            link = editor.elements[0].querySelector('a');
+            expect(link).not.toBeNull();
+            expect(link.href).toBe(expectedOpts.value);
+        });
+
+        it('should not encode an encoded URL if linkValidation options is set to true', function () {
+            var editor = this.newMediumEditor('.editor', {
+                    anchor: {
+                        linkValidation: true
+                    }
+                }),
+                link,
+                anchorExtension = editor.getExtensionByName('anchor'),
+                expectedOpts = {
+                    value: 'http://a%20b.com/',
+                    target: '_self'
+                };
+
+            spyOn(editor, 'execAction').and.callThrough();
+
+            selectElementContentsAndFire(editor.elements[0]);
+            anchorExtension.showForm('a%20b.com/');
+            fireEvent(anchorExtension.getForm().querySelector('a.medium-editor-toolbar-save'), 'click');
+
+            expect(editor.execAction).toHaveBeenCalledWith('createLink', expectedOpts);
+
+            link = editor.elements[0].querySelector('a');
+            expect(link).not.toBeNull();
+            expect(link.href).toBe(expectedOpts.value);
+        });
+
+        it('should encode query params if linkValidation options is set to true', function () {
+            var editor = this.newMediumEditor('.editor', {
+                    anchor: {
+                        linkValidation: true
+                    }
+                }),
+                link,
+                anchorExtension = editor.getExtensionByName('anchor'),
+                expectedOpts = {
+                    value: 'http://a.com/?q=http%3A%2F%2Fb.com&q2=http%3A%2F%2Fc.com',
+                    target: '_self'
+                };
+
+            spyOn(editor, 'execAction').and.callThrough();
+
+            selectElementContentsAndFire(editor.elements[0]);
+            anchorExtension.showForm('a.com/?q=http://b.com&q2=http://c.com');
+            fireEvent(anchorExtension.getForm().querySelector('a.medium-editor-toolbar-save'), 'click');
+
+            expect(editor.execAction).toHaveBeenCalledWith('createLink', expectedOpts);
+
+            link = editor.elements[0].querySelector('a');
+            expect(link).not.toBeNull();
+            expect(link.href).toBe(expectedOpts.value);
+        });
+
+        it('should not encode an encoded query param if linkValidation options is set to true', function () {
+            var editor = this.newMediumEditor('.editor', {
+                    anchor: {
+                        linkValidation: true
+                    }
+                }),
+                link,
+                anchorExtension = editor.getExtensionByName('anchor'),
+                expectedOpts = {
+                    value: 'http://a.com/?q=http%3A%2F%2Fb.com&q2=http%3A%2F%2Fc.com',
+                    target: '_self'
+                };
+
+            spyOn(editor, 'execAction').and.callThrough();
+
+            selectElementContentsAndFire(editor.elements[0]);
+            anchorExtension.showForm('a.com/?q=http%3A%2F%2Fb.com&q2=http://c.com');
             fireEvent(anchorExtension.getForm().querySelector('a.medium-editor-toolbar-save'), 'click');
 
             expect(editor.execAction).toHaveBeenCalledWith('createLink', expectedOpts);
