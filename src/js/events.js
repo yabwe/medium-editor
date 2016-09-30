@@ -148,6 +148,12 @@
             }
         },
 
+        getComputedStyle: function () {
+            var range = document.getSelection().getRangeAt(0),
+                element = range.commonAncestorContainer.parentNode;
+            return window.getComputedStyle(element, null);
+        },
+
         // Cleaning up
 
         destroy: function () {
@@ -516,6 +522,7 @@
         },
 
         handleClick: function (event) {
+            event.computedStyle = this.getComputedStyle();
             this.triggerCustomEvent('editableClick', event, event.currentTarget);
         },
 
@@ -540,6 +547,7 @@
         },
 
         handleKeyup: function (event) {
+            event.computedStyle = this.getComputedStyle();
             this.triggerCustomEvent('editableKeyup', event, event.currentTarget);
         },
 
