@@ -52,8 +52,13 @@
     }
 
     function handleBlockDeleteKeydowns(event) {
-        var p, node = MediumEditor.selection.getSelectionStart(this.options.ownerDocument),
-            tagName = node.nodeName.toLowerCase(),
+        var p, node = MediumEditor.selection.getSelectionStart(this.options.ownerDocument);
+
+        if (!node) {
+            return;
+        }
+
+        var tagName = node.nodeName.toLowerCase(),
             isEmpty = /^(\s+|<br\/?>)?$/i,
             isHeader = /h\d/i;
 
