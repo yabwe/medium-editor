@@ -2587,6 +2587,12 @@ MediumEditor.extensions = {};
             }
         },
 
+        getComputedStyle: function () {
+            var range = document.getSelection().getRangeAt(0),
+                element = range.commonAncestorContainer.parentNode;
+            return window.getComputedStyle(element, null);
+        },
+
         // Cleaning up
 
         destroy: function () {
@@ -2957,6 +2963,7 @@ MediumEditor.extensions = {};
         },
 
         handleClick: function (event) {
+            event.computedStyle = this.getComputedStyle();
             this.triggerCustomEvent('editableClick', event, event.currentTarget);
         },
 
@@ -2981,6 +2988,7 @@ MediumEditor.extensions = {};
         },
 
         handleKeyup: function (event) {
+            event.computedStyle = this.getComputedStyle();
             this.triggerCustomEvent('editableKeyup', event, event.currentTarget);
         },
 
@@ -7826,7 +7834,7 @@ MediumEditor.parseVersionString = function (release) {
 
 MediumEditor.version = MediumEditor.parseVersionString.call(this, ({
     // grunt-bump looks for this:
-    'version': '5.22.1'
+    'version': '5.23.0'
 }).version);
 
     return MediumEditor;
