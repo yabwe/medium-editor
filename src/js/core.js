@@ -138,6 +138,31 @@
             // then pressing backspace key should change the <blockquote> to a <p> tag
             event.preventDefault();
             MediumEditor.util.execFormatBlock(this.options.ownerDocument, 'p');
+        } else if (MediumEditor.util.isKey(event, MediumEditor.util.keyCode.ENTER) &&
+                (MediumEditor.util.getClosestTag(node, 'blockquote') !== false) &&
+                MediumEditor.selection.getCaretOffsets(node).right === 0) {
+
+            // when cursor is at the end of <blockquote>,
+            // then pressing enter key should create <p> tag, not <blockquote>
+            p = this.options.ownerDocument.createElement('p');
+            p.innerHTML = '<br>';
+            node.parentElement.insertBefore(p, node.nextSibling);
+
+            // move the cursor into the new paragraph
+            MediumEditor.selection.moveCursor(this.options.ownerDocument, p);
+
+            event.preventDefault();
+        } else if (MediumEditor.util.isKey(event, MediumEditor.util.keyCode.BACKSPACE) &&
+                MediumEditor.util.isMediumEditorElement(node.parentElement) &&
+                !node.previousElementSibling &&
+                node.nextElementSibling &&
+                isEmpty.test(node.innerHTML)) {
+
+            // when cursor is in the first element, it's empty and user presses backspace,
+            // do delete action instead to get rid of the first element and move caret to 2nd
+            event.preventDefault();
+            MediumEditor.selection.moveCursor(this.options.ownerDocument, node.nextSibling);
+            node.parentElement.removeChild(node);
         }
     }
 
@@ -1212,6 +1237,9 @@
 
                 // Add new elements to our internal elements array
                 this.elements.push(element);
+
+                // Trigger event so extensions can know when an element has been added
+                this.trigger('addElement', { target: element, currentTarget: element }, element);
             }, this);
         },
 
@@ -1234,6 +1262,8 @@
                     if (element.getAttribute('medium-editor-textarea-id')) {
                         cleanupTextareaElement(element);
                     }
+                    // Trigger event so extensions can clean-up elements that are being removed
+                    this.trigger('removeElement', { target: element, currentTarget: element }, element);
                     return false;
                 }
                 return true;

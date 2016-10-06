@@ -362,6 +362,30 @@ describe('MediumEditor.extensions.toolbar TestCase', function () {
             expect(toolbar.setToolbarButtonStates).toHaveBeenCalled();
             expect(toolbar.showAndUpdateToolbar).toHaveBeenCalled();
         });
+
+        it('should correctly update position even if elementsContainer is absolute', function () {
+            var container = document.createElement('div'),
+                editor, toolbar;
+
+            container.style.position = 'absolute';
+            container.style.left = '100px';
+            container.style.top = '100px';
+            document.body.appendChild(container);
+
+            this.el.innerHTML = 'lorem';
+
+            editor = this.newMediumEditor('.editor', {
+                elementsContainer: container
+            });
+            toolbar = editor.getExtensionByName('toolbar').getToolbarElement();
+
+            selectElementContentsAndFire(this.el);
+            expect(toolbar.classList.contains('medium-editor-toolbar-active')).toBe(true);
+            expect(parseInt(toolbar.style.left, 10)).toBeLessThan(100);
+            expect(parseInt(toolbar.style.top, 10)).toBeLessThan(100);
+
+            document.body.removeChild(container);
+        });
     });
 
     describe('Static Toolbars', function () {

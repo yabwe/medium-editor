@@ -24,37 +24,61 @@
         },
 
         initPlaceholders: function () {
-            this.getEditorElements().forEach(function (el) {
-                if (!el.getAttribute('data-placeholder')) {
-                    el.setAttribute('data-placeholder', this.text);
-                }
-                this.updatePlaceholder(el);
-            }, this);
+            this.getEditorElements().forEach(this.initElement, this);
+        },
+
+        handleAddElement: function (event, editable) {
+            this.initElement(editable);
+        },
+
+        initElement: function (el) {
+            if (!el.getAttribute('data-placeholder')) {
+                el.setAttribute('data-placeholder', this.text);
+            }
+            this.updatePlaceholder(el);
         },
 
         destroy: function () {
-            this.getEditorElements().forEach(function (el) {
-                if (el.getAttribute('data-placeholder') === this.text) {
-                    el.removeAttribute('data-placeholder');
-                }
-            }, this);
+            this.getEditorElements().forEach(this.cleanupElement, this);
+        },
+
+        handleRemoveElement: function (event, editable) {
+            this.cleanupElement(editable);
+        },
+
+        cleanupElement: function (el) {
+            if (el.getAttribute('data-placeholder') === this.text) {
+                el.removeAttribute('data-placeholder');
+            }
         },
 
         showPlaceholder: function (el) {
             if (el) {
-                el.classList.add('medium-editor-placeholder');
+                // https://github.com/yabwe/medium-editor/issues/234
+                // In firefox, styling the placeholder with an absolutely positioned
+                // pseudo element causes the cursor to appear in a bad location
+                // when the element is completely empty, so apply a different class to
+                // style it with a relatively positioned pseudo element
+                if (MediumEditor.util.isFF && el.childNodes.length === 0) {
+                    el.classList.add('medium-editor-placeholder-relative');
+                    el.classList.remove('medium-editor-placeholder');
+                } else {
+                    el.classList.add('medium-editor-placeholder');
+                    el.classList.remove('medium-editor-placeholder-relative');
+                }
             }
         },
 
         hidePlaceholder: function (el) {
             if (el) {
                 el.classList.remove('medium-editor-placeholder');
+                el.classList.remove('medium-editor-placeholder-relative');
             }
         },
 
         updatePlaceholder: function (el, dontShow) {
             // If the element has content, hide the placeholder
-            if (el.querySelector('img, blockquote, ul, ol') || (el.textContent.replace(/^\s+|\s+$/g, '') !== '')) {
+            if (el.querySelector('img, blockquote, ul, ol, table') || (el.textContent.replace(/^\s+|\s+$/g, '') !== '')) {
                 return this.hidePlaceholder(el);
             }
 
@@ -74,6 +98,10 @@
 
             // When the editor loses focus, check if the placeholder should be visible
             this.subscribe('blur', this.handleBlur.bind(this));
+
+            // Need to know when elements are added/removed from the editor
+            this.subscribe('addElement', this.handleAddElement.bind(this));
+            this.subscribe('removeElement', this.handleRemoveElement.bind(this));
         },
 
         handleInput: function (event, element) {

@@ -37,13 +37,13 @@
             [new RegExp(/<br class="Apple-interchange-newline">/g), '<br>'],
 
             // replace google docs italics+bold with a span to be replaced once the html is inserted
-            [new RegExp(/<span[^>]*(font-style:italic;font-weight:bold|font-weight:bold;font-style:italic)[^>]*>/gi), '<span class="replace-with italic bold">'],
+            [new RegExp(/<span[^>]*(font-style:italic;font-weight:(bold|700)|font-weight:(bold|700);font-style:italic)[^>]*>/gi), '<span class="replace-with italic bold">'],
 
             // replace google docs italics with a span to be replaced once the html is inserted
             [new RegExp(/<span[^>]*font-style:italic[^>]*>/gi), '<span class="replace-with italic">'],
 
             //[replace google docs bolds with a span to be replaced once the html is inserted
-            [new RegExp(/<span[^>]*font-weight:bold[^>]*>/gi), '<span class="replace-with bold">'],
+            [new RegExp(/<span[^>]*font-weight:(bold|700)[^>]*>/gi), '<span class="replace-with bold">'],
 
              // replace manually entered b/i/a tags with real ones
             [new RegExp(/&lt;(\/?)(i|b|a)&gt;/gi), '<$1$2>'],
@@ -139,13 +139,29 @@
          */
         cleanTags: ['meta'],
 
+        /* unwrapTags: [Array]
+         * list of element tag names to unwrap (remove the element tag but retain its child elements)
+         * during paste when __cleanPastedHTML__ is `true` or when
+         * calling `cleanPaste(text)` or `pasteHTML(html, options)` helper methods.
+         */
+        unwrapTags: [],
+
         init: function () {
             MediumEditor.Extension.prototype.init.apply(this, arguments);
 
             if (this.forcePlainText || this.cleanPastedHTML) {
-                this.subscribe('editablePaste', this.handlePaste.bind(this));
                 this.subscribe('editableKeydown', this.handleKeydown.bind(this));
+                // We need access to the full event data in paste
+                // so we can't use the editablePaste event here
+                this.getEditorElements().forEach(function (element) {
+                    this.on(element, 'paste', this.handlePaste.bind(this));
+                }, this);
+                this.subscribe('addElement', this.handleAddElement.bind(this));
             }
+        },
+
+        handleAddElement: function (event, editable) {
+            this.on(editable, 'paste', this.handlePaste.bind(this));
         },
 
         destroy: function () {
@@ -413,7 +429,8 @@
         pasteHTML: function (html, options) {
             options = MediumEditor.util.defaults({}, options, {
                 cleanAttrs: this.cleanAttrs,
-                cleanTags: this.cleanTags
+                cleanTags: this.cleanTags,
+                unwrapTags: this.unwrapTags
             });
 
             var elList, workEl, i, fragmentBody, pasteBlock = this.document.createDocumentFragment();
@@ -435,6 +452,7 @@
 
                 MediumEditor.util.cleanupAttrs(workEl, options.cleanAttrs);
                 MediumEditor.util.cleanupTags(workEl, options.cleanTags);
+                MediumEditor.util.unwrapTags(workEl, options.unwrapTags);
             }
 
             MediumEditor.util.insertHTMLCommand(this.document, fragmentBody.innerHTML.replace(/&nbsp;/g, ' '));

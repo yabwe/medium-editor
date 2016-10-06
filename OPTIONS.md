@@ -11,6 +11,7 @@ var editor = new MediumEditor('.editor', {
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 
+
 - [Core Options](#core-options)
     - [`activeButtonClass`](#activebuttonclass)
     - [`buttonLabels`](#buttonlabels)
@@ -32,17 +33,20 @@ var editor = new MediumEditor('.editor', {
     - [`diffTop`](#difftop)
     - [`firstButtonClass`](#firstbuttonclass)
     - [`lastButtonClass`](#lastbuttonclass)
+    - [`relativeContainer`](#relativecontainer)
     - [`standardizeSelectionStart`](#standardizeselectionstart)
     - [`static`](#static)
   - ['static' Toolbar Options](#static-toolbar-options)
     - [`align`](#align)
     - [`sticky`](#sticky)
+    - [`stickyTopOffset`](#stickytopoffset)
     - [`updateOnEmptySelection`](#updateonemptyselection)
   - [Disabling Toolbar](#disabling-toolbar)
 - [Anchor Preview options](#anchor-preview-options)
     - [`hideDelay`](#hidedelay)
     - [`previewValueSelector`](#previewvalueselector)
     - [`showOnEmptyLinks`](#showonemptylinks)
+    - [`showWhenToolbarIsVisible`](#showwhentoolbarisvisible)
   - [Disabling Anchor Preview](#disabling-anchor-preview)
 - [Placeholder Options](#placeholder-options)
     - [`text`](#text)
@@ -61,6 +65,7 @@ var editor = new MediumEditor('.editor', {
     - [`cleanReplacements`](#cleanreplacements)
     - [`cleanAttrs`](#cleanattrs)
     - [`cleanTags`](#cleantags)
+    - [`unwrapTags`](#unwraptags)
   - [Disabling Paste Handling](#disabling-paste-handling)
 - [KeyboardCommands Options](#keyboardcommands-options)
     - [`commands`](#commands)
@@ -203,6 +208,7 @@ var editor = new MediumEditor('.editable', {
         diffTop: -10,
         firstButtonClass: 'medium-editor-button-first',
         lastButtonClass: 'medium-editor-button-last',
+        relativeContainer: null,
         standardizeSelectionStart: false,
         static: false,
 
@@ -249,6 +255,15 @@ CSS class added to the first button in the toolbar.
 **Default:** `'medium-editor-button-last'`
 
 CSS class added to the last button in the toolbar.
+
+***
+#### `relativeContainer`
+**Default:** `null`
+
+DOMElement to append the toolbar to instead of the body.  When an element is passed the toolbar will also be positioned `relative` instead of `absolute`, which means the editor will not attempt to manually position the toolbar automatically.
+
+**NOTE:**
+* Using this in combination with the `static` option for toolbar is not explicitly supported and the behavior in this case is not defined.
 
 ***
 #### `standardizeSelectionStart`
@@ -511,6 +526,13 @@ List of element attributes to remove during paste when __cleanPastedHTML__ is `t
 
 List of element tag names to remove during paste when __cleanPastedHTML__ is `true` or when calling `cleanPaste(text)` or `pasteHTML(html,options)` helper methods.
 
+***
+#### `unwrapTags`
+**Default:** `[]`
+
+List of element tag names to unwrap (remove the element tag but retain its child elements) during paste when __cleanPastedHTML__ is `true` or when calling `cleanPaste(text)` or `pasteHTML(html,options)` helper methods.
+
+***
 ### Disabling Paste Handling
 
 To disable MediumEditor manipulating pasted content, set the both the `forcePlainText` and `cleanPastedHTML` options to `false`:

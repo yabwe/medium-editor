@@ -298,7 +298,9 @@ module.exports = function (grunt) {
                 sauceConfig: {
                     public: 'public',
                     build: process.env.TRAVIS_JOB_ID,
-                    name: 'medium-editor-tests'
+                    name: 'medium-editor-tests',
+                    maxDuration: 900,
+                    idleTimeout: 600
                 }
             }
         }

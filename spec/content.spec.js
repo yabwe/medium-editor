@@ -422,6 +422,35 @@ describe('Content TestCase', function () {
             });
             expect(document.execCommand).toHaveBeenCalledWith('unlink', false, null);
         });
+
+        describe('within a blockquote element', function () {
+
+            it('at the end of the blockquote, p tag should be created next, not blockquote', function () {
+                this.el.innerHTML = '<blockquote>lorem ipsum</blockquote>';
+                var editor = this.newMediumEditor('.editor'),
+                    target = editor.elements[0].querySelector('blockquote').firstChild;
+
+                placeCursorInsideElement(target, target.textContent.length);
+                fireEvent(target, 'keydown', {
+                    keyCode: MediumEditor.util.keyCode.ENTER
+                });
+
+                expect(this.el.innerHTML).toBe('<blockquote>lorem ipsum</blockquote><p><br></p>');
+            });
+
+            it('NOT at the start of the blockqoute, no formatting should be changed', function () {
+                this.el.innerHTML = '<blockquote>lorem ipsum</blockquote>';
+                var editor = this.newMediumEditor('.editor'),
+                    target = editor.elements[0].querySelector('blockquote').firstChild;
+
+                placeCursorInsideElement(target, 0);
+                fireEvent(target, 'keydown', {
+                    keyCode: MediumEditor.util.keyCode.ENTER
+                });
+
+                expect(this.el.innerHTML).toBe('<blockquote>lorem ipsum</blockquote>');
+            });
+        });
     });
 
     describe('when the ctrl key and m key is pressed', function () {
@@ -621,6 +650,22 @@ describe('Content TestCase', function () {
                     keyCode: MediumEditor.util.keyCode.BACKSPACE
                 });
                 expect(this.el.innerHTML).toBe('<p>lorem ipsum</p><ul><li></li><li>lorem ipsum</li></ul>');
+            });
+        });
+
+        describe('within an empty paragraph which is the first element of the editor', function () {
+            it('should delete the paragraph and place the caret to the next paragraph', function () {
+                this.el.innerHTML = '<p class=""><br></p><p>test</p>';
+                var editor = this.newMediumEditor('.editor'),
+                    target = editor.elements[0].querySelector('p'),
+                    range;
+                placeCursorInsideElement(target, 0);
+                fireEvent(target, 'keydown', {
+                    keyCode: MediumEditor.util.keyCode.BACKSPACE
+                });
+                expect(this.el.innerHTML).toBe('<p>test</p>');
+                range = document.getSelection().getRangeAt(0);
+                expect(range.commonAncestorContainer.textContent).toBe('test');
             });
         });
     });

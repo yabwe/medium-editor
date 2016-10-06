@@ -115,6 +115,18 @@ describe('MediumEditor.DynamicElements TestCase', function () {
             expect(editor.events.customEvents['editableKeydownEnter'].length).toBe(2, 'editableKeydownEnter should be subscribed to when adding a data-disbale-return element');
         });
 
+        it('should trigger addElement custom event for each element', function () {
+            var editor = this.newMediumEditor('.editor'),
+                spy = jasmine.createSpy('handler');
+
+            editor.subscribe('addElement', spy);
+            editor.addElements('.add-one');
+            expect(spy).toHaveBeenCalledWith({ target: this.addOne, currentTarget: this.addOne }, this.addOne);
+
+            editor.addElements(document.getElementsByClassName('add-two'));
+            expect(spy).toHaveBeenCalledWith({ target: this.addTwo, currentTarget: this.addTwo }, this.addTwo);
+        });
+
         function runAddTest(inputSupported) {
             it('should re-attach element properly when removed from dom, cleaned up and injected to dom again', function () {
                 var originalInputSupport = MediumEditor.Events.prototype.InputEventOnContenteditableSupported;
@@ -234,6 +246,18 @@ describe('MediumEditor.DynamicElements TestCase', function () {
             // Removing should make calls to remove each individual event handler
             editor.removeElements(this.el);
             expect(attached.length).toBe(0);
+        });
+
+        it('should trigger removeElement custom event for each element', function () {
+            var editor = this.newMediumEditor('.editor, .add-one, .add-two'),
+                spy = jasmine.createSpy('handler');
+
+            editor.subscribe('removeElement', spy);
+            editor.removeElements('.add-one');
+            expect(spy).toHaveBeenCalledWith({ target: this.addOne, currentTarget: this.addOne }, this.addOne);
+
+            editor.removeElements(document.getElementsByClassName('add-two'));
+            expect(spy).toHaveBeenCalledWith({ target: this.addTwo, currentTarget: this.addTwo }, this.addTwo);
         });
     });
 });

@@ -1,3 +1,12 @@
+5.20.2 / 2016-06-17
+==================
+(5.20.1 was skipped because of a bad release)
+* Fix test failure in Chrome 51 #1114
+* Fix slow CSS selector #1115
+* Improve documentation for toolbar.relativeContainer option #1122
+* Fix cursor rendering incorrectly in Firefox #1113
+
+
 5.20.0 / 2016-06-02
 ==================
 * Fix anchor-preview bug where click preview no longer prefills href into anchor form
