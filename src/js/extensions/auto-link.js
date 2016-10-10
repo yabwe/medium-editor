@@ -217,7 +217,7 @@
             while ((match = LINK_REGEXP.exec(textContent)) !== null) {
                 var matchOk = true,
                     matchEnd = match.index + match[0].length;
-                // If the regexp detec^ted something as a link that has text immediately preceding/following it, bail out.
+                // If the regexp detected something as a link that has text immediately preceding/following it, bail out.
                 matchOk = (match.index === 0 || WHITESPACE_CHARS.indexOf(textContent[match.index - 1]) !== -1) &&
                     (matchEnd === textContent.length || WHITESPACE_CHARS.indexOf(textContent[matchEnd]) !== -1);
                 // If the regexp detected a bare domain that doesn't use one of our expected TLDs, bail out.
