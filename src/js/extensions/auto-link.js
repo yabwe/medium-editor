@@ -201,7 +201,7 @@
             var shouldNotLink = false;
             for (var i = 0; i < textNodes.length && shouldNotLink === false; i++) {
                 // Do not link if the text node is either inside an anchor or inside span[data-auto-link]
-                shouldNotLink = !!MediumEditor.util.traverseUp(textNodes[i], function (node) {
+                shouldNotLink = MediumEditor.util.traverseUp(textNodes[i], function (node) {
                     return node.nodeName.toLowerCase() === 'a' ||
                         (node.getAttribute && node.getAttribute('data-auto-link') === 'true');
                 });
