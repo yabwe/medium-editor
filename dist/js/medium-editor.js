@@ -2589,8 +2589,24 @@ MediumEditor.extensions = {};
 
         getComputedStyle: function () {
             var range = document.getSelection().getRangeAt(0),
-                element = range.commonAncestorContainer.parentNode;
-            return window.getComputedStyle(element, null);
+                parentNode = range.commonAncestorContainer.parentNode,
+                parentNodeCSS = window.getComputedStyle(parentNode, null),
+                containerNode = range.startContainer,
+                containerNodeCSS;
+            try {
+                containerNodeCSS = window.getComputedStyle(containerNode, null);
+            } catch (e) {
+            }
+            var fontStyles = {
+                'fontFamily': containerNodeCSS && containerNodeCSS.getPropertyValue('font-family') || parentNodeCSS.getPropertyValue('font-family'),
+                'fontSize': containerNodeCSS && containerNodeCSS.getPropertyValue('font-size') || parentNodeCSS.getPropertyValue('font-size'),
+                'color': containerNodeCSS && containerNodeCSS.getPropertyValue('color') || parentNodeCSS.getPropertyValue('color')
+            };
+            parentNodeCSS.setProperty('font-family', fontStyles.fontFamily);
+            parentNodeCSS.setProperty('font-size', fontStyles.fontSize);
+            parentNodeCSS.setProperty('color', fontStyles.color);
+
+            return parentNodeCSS;
         },
 
         // Cleaning up
@@ -4313,7 +4329,8 @@ MediumEditor.extensions = {};
     var WHITESPACE_CHARS,
         KNOWN_TLDS_FRAGMENT,
         LINK_REGEXP_TEXT,
-        KNOWN_TLDS_REGEXP;
+        KNOWN_TLDS_REGEXP,
+        LINK_REGEXP;
 
     WHITESPACE_CHARS = [' ', '\t', '\n', '\r', '\u00A0', '\u2000', '\u2001', '\u2002', '\u2003',
                                     '\u2028', '\u2029'];
@@ -4334,6 +4351,8 @@ MediumEditor.extensions = {};
         ')|(([a-z0-9\\-]+\\.)?[a-z0-9\\-]+\\.(' + KNOWN_TLDS_FRAGMENT + '))';
 
     KNOWN_TLDS_REGEXP = new RegExp('^(' + KNOWN_TLDS_FRAGMENT + ')$', 'i');
+
+    LINK_REGEXP = new RegExp(LINK_REGEXP_TEXT, 'gi');
 
     function nodeIsNotInsideAnchorTag(node) {
         return !MediumEditor.util.getClosestTag(node, 'a');
@@ -4516,12 +4535,11 @@ MediumEditor.extensions = {};
         },
 
         findLinkableText: function (contenteditable) {
-            var linkRegExp = new RegExp(LINK_REGEXP_TEXT, 'gi'),
-                textContent = contenteditable.textContent,
+            var textContent = contenteditable.textContent,
                 match = null,
                 matches = [];
 
-            while ((match = linkRegExp.exec(textContent)) !== null) {
+            while ((match = LINK_REGEXP.exec(textContent)) !== null) {
                 var matchOk = true,
                     matchEnd = match.index + match[0].length;
                 // If the regexp detected something as a link that has text immediately preceding/following it, bail out.
