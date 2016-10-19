@@ -604,6 +604,11 @@
             return this.options.ownerDocument.execCommand('insertImage', false, src);
         }
 
+        if (action === 'eval') {
+            var html = this.options.contentWindow.getSelection().toString().trim();
+            return MediumEditor.util.insertHTMLCommand(this.options.ownerDocument, html);
+        }
+
         /* Issue: https://github.com/yabwe/medium-editor/issues/595
          * If the action is to justify the text */
         if (justifyAction.exec(action)) {

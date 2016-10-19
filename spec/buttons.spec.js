@@ -744,6 +744,26 @@ describe('Buttons TestCase', function () {
         });
     });
 
+    describe('Eval', function () {
+        it('should create an evaluated html tag', function () {
+            var editor = this.newMediumEditor('.editor', {
+                    toolbar: {
+                        buttons: ['eval']
+                    }
+                }),
+                toolbar = editor.getExtensionByName('toolbar'),
+                button = toolbar.getToolbarElement().querySelector('[data-action="eval"]');
+            spyOn(document, 'execCommand').and.callThrough();
+            this.el.innerHTML = '<span id="span-eval">&lt;iframe width="854" height="480" src="https://www.youtube.com/embed/QHH3iSeDBLo" frameborder="0" allowfullscreen&gt;&lt;/iframe&gt;  \n\n</span>';
+
+            selectElementContentsAndFire(document.getElementById('span-eval'));
+
+            fireEvent(button, 'click');
+
+            expect(this.el.innerHTML).toContain('<iframe width="854" height="480" src="https://www.youtube.com/embed/QHH3iSeDBLo" frameborder="0" allowfullscreen=""></iframe>');
+        });
+    });
+
     describe('OrderedList', function () {
         it('button should be active if the selection already has the element', function () {
             var editor = this.newMediumEditor('.editor', {
