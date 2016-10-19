@@ -3350,14 +3350,6 @@ MediumEditor.extensions = {};
             contentDefault: '<b>image</b>',
             contentFA: '<i class="fa fa-picture-o"></i>'
         },
-        'eval': {
-            name: 'eval',
-            action: 'eval',
-            aria: 'evaluate html',
-            tagNames: ['iframe', 'object'],
-            contentDefault: '<b>eval</b>',
-            contentFA: '<i class="fa fa-play-circle"></i>'
-        },
         'orderedlist': {
             name: 'orderedlist',
             action: 'insertorderedlist',
@@ -3519,7 +3511,6 @@ MediumEditor.extensions = {};
     };
 
 })();
-
 (function () {
     'use strict';
 
@@ -4314,8 +4305,7 @@ MediumEditor.extensions = {};
     var WHITESPACE_CHARS,
         KNOWN_TLDS_FRAGMENT,
         LINK_REGEXP_TEXT,
-        KNOWN_TLDS_REGEXP,
-        LINK_REGEXP;
+        KNOWN_TLDS_REGEXP;
 
     WHITESPACE_CHARS = [' ', '\t', '\n', '\r', '\u00A0', '\u2000', '\u2001', '\u2002', '\u2003',
                                     '\u2028', '\u2029'];
@@ -4336,8 +4326,6 @@ MediumEditor.extensions = {};
         ')|(([a-z0-9\\-]+\\.)?[a-z0-9\\-]+\\.(' + KNOWN_TLDS_FRAGMENT + '))';
 
     KNOWN_TLDS_REGEXP = new RegExp('^(' + KNOWN_TLDS_FRAGMENT + ')$', 'i');
-
-    LINK_REGEXP = new RegExp(LINK_REGEXP_TEXT, 'gi');
 
     function nodeIsNotInsideAnchorTag(node) {
         return !MediumEditor.util.getClosestTag(node, 'a');
@@ -4520,11 +4508,12 @@ MediumEditor.extensions = {};
         },
 
         findLinkableText: function (contenteditable) {
-            var textContent = contenteditable.textContent,
+            var linkRegExp = new RegExp(LINK_REGEXP_TEXT, 'gi'),
+                textContent = contenteditable.textContent,
                 match = null,
                 matches = [];
 
-            while ((match = LINK_REGEXP.exec(textContent)) !== null) {
+            while ((match = linkRegExp.exec(textContent)) !== null) {
                 var matchOk = true,
                     matchEnd = match.index + match[0].length;
                 // If the regexp detected something as a link that has text immediately preceding/following it, bail out.
@@ -7120,11 +7109,6 @@ MediumEditor.extensions = {};
         if (action === 'image') {
             var src = this.options.contentWindow.getSelection().toString().trim();
             return this.options.ownerDocument.execCommand('insertImage', false, src);
-        }
-
-        if (action === 'eval') {
-            var html = this.options.contentWindow.getSelection().toString().trim();
-            return MediumEditor.util.insertHTMLCommand(this.options.ownerDocument, html);
         }
 
         /* Issue: https://github.com/yabwe/medium-editor/issues/595
