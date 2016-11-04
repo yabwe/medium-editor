@@ -137,7 +137,7 @@ var HighlighterButton = MediumEditor.Extension.extend({
   name: 'highlighter',
 
   init: function () {
-    this.classApplier = rangy.createCssClassApplier('highlight', {
+    this.classApplier = rangy.createClassApplier('highlight', {
         elementTagName: 'mark',
         normalize: true
     });
@@ -200,7 +200,7 @@ var HighlighterButton = MediumEditor.Extension.extend({
   name: 'highlighter',
 
   init: function () {
-    this.classApplier = rangy.createCssClassApplier('highlight', {
+    this.classApplier = rangy.createClassApplier('highlight', {
         elementTagName: 'mark',
         normalize: true
     });
@@ -279,7 +279,7 @@ var HighlighterButton = MediumEditor.extensions.button.extend({
   init: function () {
     MediumEditor.extensions.button.prototype.init.call(this);
 
-    this.classApplier = rangy.createCssClassApplier('highlight', {
+    this.classApplier = rangy.createClassApplier('highlight', {
       elementTagName: 'mark',
       normalize: true
     });
