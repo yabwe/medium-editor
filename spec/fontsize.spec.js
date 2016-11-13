@@ -38,7 +38,9 @@ describe('Font Size Button TestCase', function () {
             selectElementContentsAndFire(editor.elements[0]);
             button = toolbar.getToolbarElement().querySelector('[data-action="fontSize"]');
             fireEvent(button, 'click');
-            expect(toolbar.getToolbarActionsElement().style.display).toBe('none');
+            toolbar.getToolbarActionsElements().forEach(function (el) {
+                expect(el.style.display).toBe('none');
+            });
             expect(fontSizeExtension.isDisplayed()).toBe(true);
             expect(fontSizeExtension.showForm).toHaveBeenCalled();
         });
