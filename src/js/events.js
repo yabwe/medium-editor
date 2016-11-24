@@ -52,15 +52,17 @@
                 win = this.base.options.contentWindow,
                 doc = this.base.options.ownerDocument;
 
-            targets = MediumEditor.util.isElement(targets) || [win, doc].indexOf(targets) > -1 ? [targets] : targets;
+            if (targets !== null) {
+                targets = MediumEditor.util.isElement(targets) || [win, doc].indexOf(targets) > -1 ? [targets] : targets;
 
-            Array.prototype.forEach.call(targets, function (target) {
-                index = this.indexOfListener(target, event, listener, useCapture);
-                if (index !== -1) {
-                    e = this.events.splice(index, 1)[0];
-                    e[0].removeEventListener(e[1], e[2], e[3]);
-                }
-            }.bind(this));
+                Array.prototype.forEach.call(targets, function (target) {
+                    index = this.indexOfListener(target, event, listener, useCapture);
+                    if (index !== -1) {
+                        e = this.events.splice(index, 1)[0];
+                        e[0].removeEventListener(e[1], e[2], e[3]);
+                    }
+                }.bind(this));
+            }
         },
 
         indexOfListener: function (target, event, listener, useCapture) {
