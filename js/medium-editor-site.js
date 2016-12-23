@@ -98,7 +98,9 @@
 
 		function gotoCurrentTheme() {
 			var item = items[currentIndex];
-			carousel.style.transform = 'translateX(-' + (item.offsetLeft - carousel.offsetLeft) + 'px)';
+			var width = item.offsetWidth || item.clientWidth;
+
+			carousel.style.transform = 'translateX(' + -(width * currentIndex) + 'px)';
 		}
 
 		calculateWidth();
