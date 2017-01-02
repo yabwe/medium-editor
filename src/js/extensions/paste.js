@@ -138,7 +138,7 @@
          * @param {doc} reference to document
          * @return {Object} Object with mime types and data for those mime types.
          */
-        getClipboardContent(event, win, doc) {
+        getClipboardContent: function (event, win, doc) {
             var dataTransfer = event.clipboardData || win.clipboardData || doc.dataTransfer,
                 data = {};
 
