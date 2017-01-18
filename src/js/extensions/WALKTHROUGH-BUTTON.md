@@ -273,7 +273,7 @@ var HighlighterButton = MediumEditor.extensions.button.extend({
   tagNames: ['mark'], // nodeName which indicates the button should be 'active' when isAlreadyApplied() is called
   contentDefault: '<b>H</b>', // default innerHTML of the button
   contentFA: '<i class="fa fa-paint-brush"></i>', // innerHTML of button when 'fontawesome' is being used
-  aria: 'Hightlight', // used as both aria-label and title attributes
+  aria: 'Highlight', // used as both aria-label and title attributes
   action: 'highlight', // used as the data-action attribute of the button
 
   init: function () {
