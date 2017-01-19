@@ -59,6 +59,8 @@ Run in your console: `npm install medium-editor`
 
 Download the [latest release](https://github.com/yabwe/medium-editor/releases) and attach medium editor's stylesheets to your page:
 
+Find the files to below mentioned linking in the dist folder. (./medium-editor/dist/...)
+
 ```html
 <link rel="stylesheet" href="css/medium-editor.css"> <!-- Core -->
 <link rel="stylesheet" href="css/themes/default.css"> <!-- or any other theme -->
