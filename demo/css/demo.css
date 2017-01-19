@@ -89,6 +89,12 @@ blockquote {
     margin: 30px auto;
 }
 
+#all-demos {
+    text-align: center;
+    border-bottom: 1px solid #dbdbdb;
+    padding-bottom: 40px;
+}
+
 .editable,
 .secondEditable
  {
