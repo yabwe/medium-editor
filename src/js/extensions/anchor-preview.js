@@ -71,7 +71,7 @@
         },
 
         hidePreview: function () {
-            if(this.anchorPreview){
+            if (this.anchorPreview) {
                 this.anchorPreview.classList.remove('medium-editor-anchor-preview-active');
             }
             this.activeAnchor = null;
