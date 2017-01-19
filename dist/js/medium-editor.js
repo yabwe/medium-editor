@@ -629,10 +629,11 @@ MediumEditor.extensions = {};
         splitEndNodeIfNeeded: function (currentNode, newNode, matchEndIndex, currentTextIndex) {
             var textIndexOfEndOfFarthestNode,
                 endSplitPoint;
-            textIndexOfEndOfFarthestNode = currentTextIndex + currentNode.nodeValue.length +
-                    (newNode ? newNode.nodeValue.length : 0) - 1;
-            endSplitPoint = matchEndIndex - currentTextIndex -
-                    (newNode ? currentNode.nodeValue.length : 0);
+            textIndexOfEndOfFarthestNode = currentTextIndex + (newNode || currentNode).nodeValue.length +
+                    (newNode ? currentNode.nodeValue.length : 0) -
+                    1;
+            endSplitPoint = (newNode || currentNode).nodeValue.length -
+                    (textIndexOfEndOfFarthestNode + 1 - matchEndIndex);
             if (textIndexOfEndOfFarthestNode >= matchEndIndex &&
                     currentTextIndex !== textIndexOfEndOfFarthestNode &&
                     endSplitPoint !== 0) {
@@ -2484,15 +2485,17 @@ MediumEditor.extensions = {};
                 win = this.base.options.contentWindow,
                 doc = this.base.options.ownerDocument;
 
-            targets = MediumEditor.util.isElement(targets) || [win, doc].indexOf(targets) > -1 ? [targets] : targets;
+            if (targets !== null) {
+                targets = MediumEditor.util.isElement(targets) || [win, doc].indexOf(targets) > -1 ? [targets] : targets;
 
-            Array.prototype.forEach.call(targets, function (target) {
-                index = this.indexOfListener(target, event, listener, useCapture);
-                if (index !== -1) {
-                    e = this.events.splice(index, 1)[0];
-                    e[0].removeEventListener(e[1], e[2], e[3]);
-                }
-            }.bind(this));
+                Array.prototype.forEach.call(targets, function (target) {
+                    index = this.indexOfListener(target, event, listener, useCapture);
+                    if (index !== -1) {
+                        e = this.events.splice(index, 1)[0];
+                        e[0].removeEventListener(e[1], e[2], e[3]);
+                    }
+                }.bind(this));
+            }
         },
 
         indexOfListener: function (target, event, listener, useCapture) {
@@ -4066,7 +4069,9 @@ MediumEditor.extensions = {};
         },
 
         hidePreview: function () {
-            this.anchorPreview.classList.remove('medium-editor-anchor-preview-active');
+            if (this.anchorPreview) {
+                this.anchorPreview.classList.remove('medium-editor-anchor-preview-active');
+            }
             this.activeAnchor = null;
         },
 
@@ -4304,7 +4309,8 @@ MediumEditor.extensions = {};
     var WHITESPACE_CHARS,
         KNOWN_TLDS_FRAGMENT,
         LINK_REGEXP_TEXT,
-        KNOWN_TLDS_REGEXP;
+        KNOWN_TLDS_REGEXP,
+        LINK_REGEXP;
 
     WHITESPACE_CHARS = [' ', '\t', '\n', '\r', '\u00A0', '\u2000', '\u2001', '\u2002', '\u2003',
                                     '\u2028', '\u2029'];
@@ -4325,6 +4331,8 @@ MediumEditor.extensions = {};
         ')|(([a-z0-9\\-]+\\.)?[a-z0-9\\-]+\\.(' + KNOWN_TLDS_FRAGMENT + '))';
 
     KNOWN_TLDS_REGEXP = new RegExp('^(' + KNOWN_TLDS_FRAGMENT + ')$', 'i');
+
+    LINK_REGEXP = new RegExp(LINK_REGEXP_TEXT, 'gi');
 
     function nodeIsNotInsideAnchorTag(node) {
         return !MediumEditor.util.getClosestTag(node, 'a');
@@ -4507,12 +4515,11 @@ MediumEditor.extensions = {};
         },
 
         findLinkableText: function (contenteditable) {
-            var linkRegExp = new RegExp(LINK_REGEXP_TEXT, 'gi'),
-                textContent = contenteditable.textContent,
+            var textContent = contenteditable.textContent,
                 match = null,
                 matches = [];
 
-            while ((match = linkRegExp.exec(textContent)) !== null) {
+            while ((match = LINK_REGEXP.exec(textContent)) !== null) {
                 var matchOk = true,
                     matchEnd = match.index + match[0].length;
                 // If the regexp detected something as a link that has text immediately preceding/following it, bail out.
@@ -7825,7 +7832,7 @@ MediumEditor.parseVersionString = function (release) {
 
 MediumEditor.version = MediumEditor.parseVersionString.call(this, ({
     // grunt-bump looks for this:
-    'version': '5.22.1'
+    'version': '5.22.2'
 }).version);
 
     return MediumEditor;
