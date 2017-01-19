@@ -156,6 +156,28 @@
             }
         },
 
+        getComputedStyle: function () {
+            var range = document.getSelection().getRangeAt(0),
+                parentNode = range.commonAncestorContainer.parentNode,
+                parentNodeCSS = window.getComputedStyle(parentNode, null),
+                containerNode = range.startContainer,
+                containerNodeCSS;
+            try {
+                containerNodeCSS = window.getComputedStyle(containerNode, null);
+            } catch (e) {
+            }
+            var fontStyles = {
+                'fontFamily': containerNodeCSS && containerNodeCSS.getPropertyValue('font-family') || parentNodeCSS.getPropertyValue('font-family'),
+                'fontSize': containerNodeCSS && containerNodeCSS.getPropertyValue('font-size') || parentNodeCSS.getPropertyValue('font-size'),
+                'color': containerNodeCSS && containerNodeCSS.getPropertyValue('color') || parentNodeCSS.getPropertyValue('color')
+            };
+            parentNodeCSS.setProperty('font-family', fontStyles.fontFamily);
+            parentNodeCSS.setProperty('font-size', fontStyles.fontSize);
+            parentNodeCSS.setProperty('color', fontStyles.color);
+
+            return parentNodeCSS;
+        },
+
         // Cleaning up
 
         destroy: function () {
@@ -526,6 +548,7 @@
         },
 
         handleClick: function (event) {
+            event.computedStyle = this.getComputedStyle();
             this.triggerCustomEvent('editableClick', event, event.currentTarget);
         },
 
@@ -550,6 +573,7 @@
         },
 
         handleKeyup: function (event) {
+            event.computedStyle = this.getComputedStyle();
             this.triggerCustomEvent('editableKeyup', event, event.currentTarget);
         },
 
