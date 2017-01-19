@@ -32,7 +32,7 @@
             testText = document.createTextNode(' ');
         testParent.appendChild(testText);
         nodeContainsWorksWithTextNodes = testParent.contains(testText);
-    } catch (exc) {}
+    } catch (exc) { }
 
     var Util = {
 
@@ -224,13 +224,13 @@
             var textIndexOfEndOfFarthestNode,
                 endSplitPoint;
             textIndexOfEndOfFarthestNode = currentTextIndex + (newNode || currentNode).nodeValue.length +
-                    (newNode ? currentNode.nodeValue.length : 0) -
-                    1;
+                (newNode ? currentNode.nodeValue.length : 0) -
+                1;
             endSplitPoint = (newNode || currentNode).nodeValue.length -
-                    (textIndexOfEndOfFarthestNode + 1 - matchEndIndex);
+                (textIndexOfEndOfFarthestNode + 1 - matchEndIndex);
             if (textIndexOfEndOfFarthestNode >= matchEndIndex &&
-                    currentTextIndex !== textIndexOfEndOfFarthestNode &&
-                    endSplitPoint !== 0) {
+                currentTextIndex !== textIndexOfEndOfFarthestNode &&
+                endSplitPoint !== 0) {
                 (newNode || currentNode).splitText(endSplitPoint);
             }
         },
@@ -453,7 +453,7 @@
             if (!MediumEditor.util.isEdge && doc.queryCommandSupported('insertHTML')) {
                 try {
                     return doc.execCommand.apply(doc, ecArgs);
-                } catch (ignore) {}
+                } catch (ignore) { }
             }
 
             selection = doc.getSelection();
@@ -467,13 +467,13 @@
                 if (Util.isMediumEditorElement(toReplace) && !toReplace.firstChild) {
                     range.selectNode(toReplace.appendChild(doc.createTextNode('')));
                 } else if ((toReplace.nodeType === 3 && range.startOffset === 0 && range.endOffset === toReplace.nodeValue.length) ||
-                        (toReplace.nodeType !== 3 && toReplace.innerHTML === range.toString())) {
+                    (toReplace.nodeType !== 3 && toReplace.innerHTML === range.toString())) {
                     // Ensure range covers maximum amount of nodes as possible
                     // By moving up the DOM and selecting ancestors whose only child is the range
                     while (!Util.isMediumEditorElement(toReplace) &&
-                            toReplace.parentNode &&
-                            toReplace.parentNode.childNodes.length === 1 &&
-                            !Util.isMediumEditorElement(toReplace.parentNode)) {
+                        toReplace.parentNode &&
+                        toReplace.parentNode.childNodes.length === 1 &&
+                        !Util.isMediumEditorElement(toReplace.parentNode)) {
                         toReplace = toReplace.parentNode;
                     }
                     range.selectNode(toReplace);
@@ -614,6 +614,11 @@
             }
         },
 
+        /*
+         * this function adds one or several classes on an a element.
+         * if el parameter is not an a, it will look for a children of el.
+         * if no a children are found, it will look for the a parent.
+         */
         addClassToAnchors: function (el, buttonClass) {
             var classes = buttonClass.split(' '),
                 i,
@@ -623,7 +628,15 @@
                     el.classList.add(classes[j]);
                 }
             } else {
-                el = el.getElementsByTagName('a');
+                var aChildren = el.getElementsByTagName('a');
+                if (aChildren.length === 0) {
+                    while (el.nodeName.toLowerCase() !== 'a') {
+                        el = el.parentNode;
+                    }
+                    el = [el];
+                } else {
+                    el = aChildren;
+                }
                 for (i = 0; i < el.length; i += 1) {
                     for (j = 0; j < classes.length; j += 1) {
                         el[i].classList.add(classes[j]);
