@@ -382,6 +382,32 @@ describe('Anchor Button TestCase', function () {
             expect(link.href).toBe(expectedOpts.value);
         });
 
+        it('should not change # to %23 for a valid url if linkValidation option is set to true', function () {
+            var editor = this.newMediumEditor('.editor', {
+                    anchor: {
+                        linkValidation: true
+                    }
+                }),
+                link,
+                anchorExtension = editor.getExtensionByName('anchor'),
+                expectedOpts = {
+                    value: 'http://example.com/?query=value#anchor',
+                    target: '_self'
+                };
+
+            spyOn(editor, 'execAction').and.callThrough();
+
+            selectElementContentsAndFire(editor.elements[0]);
+            anchorExtension.showForm(expectedOpts.value);
+            fireEvent(anchorExtension.getForm().querySelector('a.medium-editor-toolbar-save'), 'click');
+
+            expect(editor.execAction).toHaveBeenCalledWith('createLink', expectedOpts);
+
+            link = editor.elements[0].querySelector('a');
+            expect(link).not.toBeNull();
+            expect(link.href).toBe(expectedOpts.value);
+        });
+
         it('should not encode an encoded URL if linkValidation option is set to true', function () {
             var editor = this.newMediumEditor('.editor', {
                     anchor: {

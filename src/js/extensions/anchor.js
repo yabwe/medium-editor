@@ -259,9 +259,10 @@
             var urlSchemeRegex = /^([a-z]+:)?\/\/|^(mailto|tel|maps):|^\#/i,
                 // telRegex is a regex for checking if the string is a telephone number
                 telRegex = /^\+?\s?\(?(?:\d\s?\-?\)?){3,20}$/,
-                split = value.split('?'),
-                path = split[0],
-                query = split[1];
+                urlParts = value.match(/^(.*?)(?:\?(.*?))?(?:#(.*))?$/),
+                path = urlParts[1],
+                query = urlParts[2],
+                fragment = urlParts[3];
 
             if (telRegex.test(value)) {
                 return 'tel:' + value;
@@ -271,7 +272,10 @@
                     // Ensure path is encoded
                     this.ensureEncodedUri(path) +
                     // Ensure query is encoded
-                    (query === undefined ? '' : '?' + this.ensureEncodedQuery(query));
+                    (query === undefined ? '' : '?' + this.ensureEncodedQuery(query)) +
+                    // Include fragment unencoded as encodeUriComponent is too
+                    // heavy handed for the many characters allowed in a fragment
+                    (fragment === undefined ? '' : '#' + fragment);
             }
         },
 
