@@ -516,6 +516,7 @@ These are all the built-in buttons supported by MediumEditor.
 * __h5__
 * __h6__
 * __removeFormat__ (clears inline style formatting, preserves blocks)
+* __html__ (parses selected html and converts into actual html elements)
 
 ## Themes
 
