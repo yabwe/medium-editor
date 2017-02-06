@@ -744,19 +744,19 @@ describe('Buttons TestCase', function () {
         });
     });
 
-    describe('Eval', function () {
+    describe('Html', function () {
         it('should create an evaluated html tag', function () {
             var editor = this.newMediumEditor('.editor', {
                     toolbar: {
-                        buttons: ['eval']
+                        buttons: ['html']
                     }
                 }),
                 toolbar = editor.getExtensionByName('toolbar'),
-                button = toolbar.getToolbarElement().querySelector('[data-action="eval"]');
+                button = toolbar.getToolbarElement().querySelector('[data-action="html"]');
             spyOn(document, 'execCommand').and.callThrough();
-            this.el.innerHTML = '<span id="span-eval">&lt;iframe width="854" height="480" src="https://www.youtube.com/embed/QHH3iSeDBLo" frameborder="0" allowfullscreen&gt;&lt;/iframe&gt;  \n\n</span>';
+            this.el.innerHTML = '<span id="span-html">&lt;iframe width="854" height="480" src="https://www.youtube.com/embed/QHH3iSeDBLo" frameborder="0" allowfullscreen&gt;&lt;/iframe&gt;  \n\n</span>';
 
-            selectElementContentsAndFire(document.getElementById('span-eval'));
+            selectElementContentsAndFire(document.getElementById('span-html'));
 
             fireEvent(button, 'click');
 

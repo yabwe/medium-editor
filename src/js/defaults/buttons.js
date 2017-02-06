@@ -87,12 +87,12 @@
             contentDefault: '<b>image</b>',
             contentFA: '<i class="fa fa-picture-o"></i>'
         },
-        'eval': {
-            name: 'eval',
-            action: 'eval',
+        'html': {
+            name: 'html',
+            action: 'html',
             aria: 'evaluate html',
             tagNames: ['iframe', 'object'],
-            contentDefault: '<b>eval</b>',
+            contentDefault: '<b>html</b>',
             contentFA: '<i class="fa fa-play-circle"></i>'
         },
         'orderedlist': {

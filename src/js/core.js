@@ -604,7 +604,7 @@
             return this.options.ownerDocument.execCommand('insertImage', false, src);
         }
 
-        if (action === 'eval') {
+        if (action === 'html') {
             var html = this.options.contentWindow.getSelection().toString().trim();
             return MediumEditor.util.insertHTMLCommand(this.options.ownerDocument, html);
         }
