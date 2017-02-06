@@ -93,7 +93,7 @@
             aria: 'evaluate html',
             tagNames: ['iframe', 'object'],
             contentDefault: '<b>html</b>',
-            contentFA: '<i class="fa fa-play-circle"></i>'
+            contentFA: '<i class="fa fa-code"></i>'
         },
         'orderedlist': {
             name: 'orderedlist',
