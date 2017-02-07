@@ -760,7 +760,7 @@ describe('Buttons TestCase', function () {
 
             fireEvent(button, 'click');
 
-            expect(this.el.innerHTML).toContain('<iframe width="854" height="480" src="https://www.youtube.com/embed/QHH3iSeDBLo" frameborder="0" allowfullscreen=""></iframe>');
+            expect(this.el.innerHTML).toMatch(/<iframe(?: width="854"| height="480"| src="https:\/\/www.youtube.com\/embed\/QHH3iSeDBLo"| frameborder="0"| allowfullscreen=""){5}>(<br>)?<\/iframe>/gi);
         });
     });
 
