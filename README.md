@@ -652,6 +652,13 @@ A list of existing extensions and plugins, such as [Images and Media embeds](htt
 
 ## Development
 
+To run the demo locally:
+
+1. Clone this repo locally
+2. Run `npm install` from your console at the root
+3. Run `node index.js` from the root
+4. Navigate to `http://localhost:8088/demo/index.html` to view the demo
+
 MediumEditor development tasks are managed by Grunt. To install all the necessary packages, just invoke:
 
 ```bash
