@@ -118,6 +118,7 @@
 * justifyLeft, justifyCenter, justifyRight, justifyFull
 * h1, h2, h3, h4, h5, h6
 * removeFormat
+* html
 
 #### Examples of custom built external buttons:
 * [MediumEditor tables](https://github.com/yabwe/medium-editor-tables)
