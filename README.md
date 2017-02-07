@@ -1,14 +1,16 @@
 ﻿# MediumEditor
 
-[![Join the chat at https://gitter.im/yabwe/medium-editor](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/yabwe/medium-editor?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
-
 This is a clone of [medium.com](https://medium.com) inline editor toolbar.
 
 MediumEditor has been written using vanilla JavaScript, no additional frameworks required.
 
+![screenshot](https://raw.github.com/yabwe/medium-editor/master/demo/img/medium-editor.jpg)
+
+[![Join the chat at https://gitter.im/yabwe/medium-editor](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/yabwe/medium-editor?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 ## Browser Support
 
-[![Sauce Test Status](https://saucelabs.com/browser-matrix/mediumeditor.svg)](https://saucelabs.com/u/mediumeditor)
+[![Saucelabs Build Status](https://saucelabs.com/browser-matrix/mediumeditor.svg)](https://saucelabs.com/beta/dashboard/builds)
 
 ![Supported Browsers](https://cloud.githubusercontent.com/assets/2444240/12874138/d3960a04-cd9b-11e5-8cc5-8136d82cf5f6.png)
 
@@ -21,7 +23,7 @@ MediumEditor has been written using vanilla JavaScript, no additional frameworks
 
 # Basic usage
 
-![screenshot](https://raw.github.com/yabwe/medium-editor/master/demo/img/medium-editor.jpg)
+### Demo
 
 __demo__: [http://yabwe.github.io/medium-editor/](http://yabwe.github.io/medium-editor/)
 
