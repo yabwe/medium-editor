@@ -1,14 +1,16 @@
 ﻿# MediumEditor
 
-[![Join the chat at https://gitter.im/yabwe/medium-editor](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/yabwe/medium-editor?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
-
 This is a clone of [medium.com](https://medium.com) inline editor toolbar.
 
 MediumEditor has been written using vanilla JavaScript, no additional frameworks required.
 
+[![screenshot](https://raw.github.com/yabwe/medium-editor/master/demo/img/medium-editor.jpg)](http://yabwe.github.io/medium-editor/)
+
+[![Join the chat at https://gitter.im/yabwe/medium-editor](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/yabwe/medium-editor?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 ## Browser Support
 
-[![Sauce Test Status](https://saucelabs.com/browser-matrix/mediumeditor.svg)](https://saucelabs.com/u/mediumeditor)
+[![Saucelabs Build Status](https://saucelabs.com/browser-matrix/mediumeditor.svg)](https://saucelabs.com/beta/dashboard/builds)
 
 ![Supported Browsers](https://cloud.githubusercontent.com/assets/2444240/12874138/d3960a04-cd9b-11e5-8cc5-8136d82cf5f6.png)
 
@@ -21,7 +23,7 @@ MediumEditor has been written using vanilla JavaScript, no additional frameworks
 
 # Basic usage
 
-![screenshot](https://raw.github.com/yabwe/medium-editor/master/demo/img/medium-editor.jpg)
+### Demo
 
 __demo__: [http://yabwe.github.io/medium-editor/](http://yabwe.github.io/medium-editor/)
 
@@ -649,6 +651,13 @@ Check the [documentation](src/js/extensions) in order to learn how to develop ex
 A list of existing extensions and plugins, such as [Images and Media embeds](http://orthes.github.io/medium-editor-insert-plugin/), [Tables](https://github.com/yabwe/medium-editor-tables) and [Markdown](https://github.com/IonicaBizau/medium-editor-markdown) can be found [here](https://github.com/yabwe/medium-editor/wiki/Extensions-Plugins).
 
 ## Development
+
+To run the demo locally:
+
+1. Clone this repo locally
+2. Run `npm install` from your console at the root
+3. Run `node index.js` from the root
+4. Navigate to `http://localhost:8088/demo/index.html` to view the demo
 
 MediumEditor development tasks are managed by Grunt. To install all the necessary packages, just invoke:
 
