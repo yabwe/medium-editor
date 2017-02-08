@@ -595,13 +595,59 @@ describe('Anchor Button TestCase', function () {
             expect(link.classList.contains('btn-default')).toBe(true);
         });
 
+        it('should create a button when user selects this option, even if selected text carries tags ' +
+                'and the selection doesn\'t exactly match those tags', function () {
+            spyOn(MediumEditor.prototype, 'createLink').and.callThrough();
+            this.el.innerHTML = '<p>Hello <b>world</b>&nbsp;!</p>';
+
+            var editor = this.newMediumEditor('.editor', {
+                    anchor: {
+                        customClassOption: 'btn btn-default'
+                    }
+                }),
+                p = this.el.querySelector('p'),
+                b = p.childNodes[1],
+                emptySpacePart = p.childNodes[2],
+                save,
+                input,
+                button,
+                link,
+                opts,
+                anchorExtension = editor.getExtensionByName('anchor'),
+                toolbar = editor.getExtensionByName('toolbar');
+
+            MediumEditor.selection.select(document, b, 0, emptySpacePart, 1); //select world including space
+            save = toolbar.getToolbarElement().querySelector('[data-action="createLink"]');
+
+            input = anchorExtension.getInput();
+            input.value = 'http://test.com';
+
+            button = anchorExtension.getForm().querySelector('input.medium-editor-toolbar-anchor-button');
+            button.setAttribute('type', 'checkbox');
+            button.checked = true;
+
+            fireEvent(anchorExtension.getForm().querySelector('a.medium-editor-toolbar-save'), 'click');
+
+            opts = {
+                value: 'http://test.com',
+                target: '_self',
+                buttonClass: 'btn btn-default'
+            };
+            expect(editor.createLink).toHaveBeenCalledWith(opts);
+
+            link = editor.elements[0].querySelector('a');
+            expect(link).not.toBeNull('Link does not exist');
+            expect(link.classList.contains('btn')).toBe(true, 'Link does not contain class btn');
+            expect(link.classList.contains('btn-default')).toBe(true, 'Link does not contain class btn-default');
+        });
+
         it('should remove the target _blank from the anchor tag when the open in a new window checkbox,' +
                 ' is unchecked and the form is saved', function () {
             var editor = this.newMediumEditor('.editor', {
-                anchor: {
-                    targetCheckbox: true
-                }
-            }),
+                    anchor: {
+                        targetCheckbox: true
+                    }
+                }),
                 anchorExtension = editor.getExtensionByName('anchor'),
                 targetCheckbox,
                 link;
