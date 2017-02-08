@@ -32,7 +32,7 @@
             testText = document.createTextNode(' ');
         testParent.appendChild(testText);
         nodeContainsWorksWithTextNodes = testParent.contains(testText);
-    } catch (exc) { }
+    } catch (exc) {}
 
     var Util = {
 
@@ -228,8 +228,8 @@
             endSplitPoint = matchEndIndex - currentTextIndex -
                     (newNode ? currentNode.nodeValue.length : 0);
             if (textIndexOfEndOfFarthestNode >= matchEndIndex &&
-                currentTextIndex !== textIndexOfEndOfFarthestNode &&
-                endSplitPoint !== 0) {
+                    currentTextIndex !== textIndexOfEndOfFarthestNode &&
+                    endSplitPoint !== 0) {
                 (newNode || currentNode).splitText(endSplitPoint);
             }
         },
@@ -452,7 +452,7 @@
             if (!MediumEditor.util.isEdge && doc.queryCommandSupported('insertHTML')) {
                 try {
                     return doc.execCommand.apply(doc, ecArgs);
-                } catch (ignore) { }
+                } catch (ignore) {}
             }
 
             selection = doc.getSelection();
@@ -466,13 +466,13 @@
                 if (Util.isMediumEditorElement(toReplace) && !toReplace.firstChild) {
                     range.selectNode(toReplace.appendChild(doc.createTextNode('')));
                 } else if ((toReplace.nodeType === 3 && range.startOffset === 0 && range.endOffset === toReplace.nodeValue.length) ||
-                    (toReplace.nodeType !== 3 && toReplace.innerHTML === range.toString())) {
+                        (toReplace.nodeType !== 3 && toReplace.innerHTML === range.toString())) {
                     // Ensure range covers maximum amount of nodes as possible
                     // By moving up the DOM and selecting ancestors whose only child is the range
                     while (!Util.isMediumEditorElement(toReplace) &&
-                        toReplace.parentNode &&
-                        toReplace.parentNode.childNodes.length === 1 &&
-                        !Util.isMediumEditorElement(toReplace.parentNode)) {
+                            toReplace.parentNode &&
+                            toReplace.parentNode.childNodes.length === 1 &&
+                            !Util.isMediumEditorElement(toReplace.parentNode)) {
                         toReplace = toReplace.parentNode;
                     }
                     range.selectNode(toReplace);
