@@ -629,10 +629,8 @@
             } else {
                 var aChildren = el.getElementsByTagName('a');
                 if (aChildren.length === 0) {
-                    while (el.nodeName.toLowerCase() !== 'a') {
-                        el = el.parentNode;
-                    }
-                    el = [el];
+                    var parentAnchor = Util.getClosestTag(el, 'a');
+                    el = parentAnchor ? [parentAnchor] : [];
                 } else {
                     el = aChildren;
                 }

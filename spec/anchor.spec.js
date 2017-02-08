@@ -636,9 +636,9 @@ describe('Anchor Button TestCase', function () {
             expect(editor.createLink).toHaveBeenCalledWith(opts);
 
             link = editor.elements[0].querySelector('a');
-            expect(link).not.toBeNull();
-            expect(link.classList.contains('btn')).toBe(true);
-            expect(link.classList.contains('btn-default')).toBe(true);
+            expect(link).not.toBeNull('Link does not exist');
+            expect(link.classList.contains('btn')).toBe(true, 'Link does not contain class btn');
+            expect(link.classList.contains('btn-default')).toBe(true, 'Link does not contain class btn-default');
         });
 
         it('should remove the target _blank from the anchor tag when the open in a new window checkbox,' +
