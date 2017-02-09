@@ -356,6 +356,63 @@ describe('Anchor Button TestCase', function () {
             expect(link.getAttribute('href')).toBe(validHashLink);
         });
 
+        it('should not add a scheme to an absolute path', function () {
+            var editor = this.newMediumEditor('.editor', {
+                    anchor: {
+                        linkValidation: true
+                    }
+                }),
+                absolutePath = '/test',
+                link,
+                anchorExtension = editor.getExtensionByName('anchor');
+
+            selectElementContentsAndFire(editor.elements[0]);
+            anchorExtension.showForm(absolutePath);
+            fireEvent(anchorExtension.getForm().querySelector('a.medium-editor-toolbar-save'), 'click');
+
+            link = editor.elements[0].querySelector('a');
+            expect(link).not.toBeNull();
+            expect(link.getAttribute('href')).toBe(absolutePath);
+        });
+
+        it('should not add a scheme to an obviously relative path', function () {
+            var editor = this.newMediumEditor('.editor', {
+                    anchor: {
+                        linkValidation: true
+                    }
+                }),
+                relativePath = 'test/file.html',
+                link,
+                anchorExtension = editor.getExtensionByName('anchor');
+
+            selectElementContentsAndFire(editor.elements[0]);
+            anchorExtension.showForm(relativePath);
+            fireEvent(anchorExtension.getForm().querySelector('a.medium-editor-toolbar-save'), 'click');
+
+            link = editor.elements[0].querySelector('a');
+            expect(link).not.toBeNull();
+            expect(link.getAttribute('href')).toBe(relativePath);
+        });
+
+        it('should add a scheme to a localhost url', function () {
+            var editor = this.newMediumEditor('.editor', {
+                    anchor: {
+                        linkValidation: true
+                    }
+                }),
+                localhostUrl = 'http://localhost',
+                link,
+                anchorExtension = editor.getExtensionByName('anchor');
+
+            selectElementContentsAndFire(editor.elements[0]);
+            anchorExtension.showForm('localhost');
+            fireEvent(anchorExtension.getForm().querySelector('a.medium-editor-toolbar-save'), 'click');
+
+            link = editor.elements[0].querySelector('a');
+            expect(link).not.toBeNull();
+            expect(link.getAttribute('href')).toBe(localhostUrl);
+        });
+
         it('should change spaces to %20 for a valid url if linkValidation option is set to true', function () {
             var editor = this.newMediumEditor('.editor', {
                     anchor: {
