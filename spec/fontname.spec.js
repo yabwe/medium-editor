@@ -38,7 +38,9 @@ describe('Font Name Button TestCase', function () {
             selectElementContentsAndFire(editor.elements[0]);
             button = toolbar.getToolbarElement().querySelector('[data-action="fontName"]');
             fireEvent(button, 'click');
-            expect(toolbar.getToolbarActionsElement().style.display).toBe('none');
+            toolbar.getToolbarActionsElements().forEach(function (el) {
+                expect(el.style.display).toBe('none');
+            });
             expect(fontNameExtension.isDisplayed()).toBe(true);
             expect(fontNameExtension.showForm).toHaveBeenCalled();
         });
