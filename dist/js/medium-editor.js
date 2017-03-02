@@ -1019,6 +1019,11 @@ MediumEditor.extensions = {};
             }
         },
 
+        /*
+         * this function adds one or several classes on an a element.
+         * if el parameter is not an a, it will look for a children of el.
+         * if no a children are found, it will look for the a parent.
+         */
         addClassToAnchors: function (el, buttonClass) {
             var classes = buttonClass.split(' '),
                 i,
@@ -1028,7 +1033,13 @@ MediumEditor.extensions = {};
                     el.classList.add(classes[j]);
                 }
             } else {
-                el = el.getElementsByTagName('a');
+                var aChildren = el.getElementsByTagName('a');
+                if (aChildren.length === 0) {
+                    var parentAnchor = Util.getClosestTag(el, 'a');
+                    el = parentAnchor ? [parentAnchor] : [];
+                } else {
+                    el = aChildren;
+                }
                 for (i = 0; i < el.length; i += 1) {
                     for (j = 0; j < classes.length; j += 1) {
                         el[i].classList.add(classes[j]);
@@ -3351,6 +3362,14 @@ MediumEditor.extensions = {};
             contentDefault: '<b>image</b>',
             contentFA: '<i class="fa fa-picture-o"></i>'
         },
+        'html': {
+            name: 'html',
+            action: 'html',
+            aria: 'evaluate html',
+            tagNames: ['iframe', 'object'],
+            contentDefault: '<b>html</b>',
+            contentFA: '<i class="fa fa-code"></i>'
+        },
         'orderedlist': {
             name: 'orderedlist',
             action: 'insertorderedlist',
@@ -3512,6 +3531,7 @@ MediumEditor.extensions = {};
     };
 
 })();
+
 (function () {
     'use strict';
 
@@ -3891,22 +3911,35 @@ MediumEditor.extensions = {};
             // Matches common external protocols "mailto:" "tel:" "maps:"
             // Matches relative hash link, begins with "#"
             var urlSchemeRegex = /^([a-z]+:)?\/\/|^(mailto|tel|maps):|^\#/i,
+                hasScheme = urlSchemeRegex.test(value),
+                scheme = '',
                 // telRegex is a regex for checking if the string is a telephone number
                 telRegex = /^\+?\s?\(?(?:\d\s?\-?\)?){3,20}$/,
-                split = value.split('?'),
-                path = split[0],
-                query = split[1];
+                urlParts = value.match(/^(.*?)(?:\?(.*?))?(?:#(.*))?$/),
+                path = urlParts[1],
+                query = urlParts[2],
+                fragment = urlParts[3];
 
             if (telRegex.test(value)) {
                 return 'tel:' + value;
-            } else {
-                // Check for URL scheme and default to http:// if none found
-                return (urlSchemeRegex.test(value) ? '' : 'http://') +
-                    // Ensure path is encoded
-                    this.ensureEncodedUri(path) +
-                    // Ensure query is encoded
-                    (query === undefined ? '' : '?' + this.ensureEncodedQuery(query));
             }
+
+            if (!hasScheme) {
+                var host = path.split('/')[0];
+                // if the host part of the path looks like a hostname
+                if (host.match(/.+(\.|:).+/) || host === 'localhost') {
+                    scheme = 'http://';
+                }
+            }
+
+            return scheme +
+                // Ensure path is encoded
+                this.ensureEncodedUri(path) +
+                // Ensure query is encoded
+                (query === undefined ? '' : '?' + this.ensureEncodedQuery(query)) +
+                // Include fragment unencoded as encodeUriComponent is too
+                // heavy handed for the many characters allowed in a fragment
+                (fragment === undefined ? '' : '#' + fragment);
         },
 
         doFormCancel: function () {
@@ -7116,6 +7149,11 @@ MediumEditor.extensions = {};
             return this.options.ownerDocument.execCommand('insertImage', false, src);
         }
 
+        if (action === 'html') {
+            var html = this.options.contentWindow.getSelection().toString().trim();
+            return MediumEditor.util.insertHTMLCommand(this.options.ownerDocument, html);
+        }
+
         /* Issue: https://github.com/yabwe/medium-editor/issues/595
          * If the action is to justify the text */
         if (justifyAction.exec(action)) {
@@ -7831,7 +7869,7 @@ MediumEditor.parseVersionString = function (release) {
 
 MediumEditor.version = MediumEditor.parseVersionString.call(this, ({
     // grunt-bump looks for this:
-    'version': '5.22.2'
+    'version': '5.23.0'
 }).version);
 
     return MediumEditor;
