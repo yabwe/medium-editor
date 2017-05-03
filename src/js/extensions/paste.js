@@ -277,6 +277,10 @@
             if (!(MediumEditor.util.isKey(event, MediumEditor.util.keyCode.V) && MediumEditor.util.isMetaCtrlKey(event))) {
                 return;
             }
+            
+            if(event.target.tagName.toUpperCase() == 'INPUT' || event.target.tagName.toUpperCase() == 'TEXTAREA') {
+              return;
+            }
 
             event.stopImmediatePropagation();
 
