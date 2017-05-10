@@ -4582,6 +4582,19 @@ MediumEditor.extensions = {};
             while (anchor.childNodes.length > 1) {
                 span.appendChild(anchor.childNodes[1]);
             }
+
+            // Solves error when auto-detecting links on Safari
+            var sel, range;
+            if (window.getSelection) {
+                sel = window.getSelection();
+                if (sel.rangeCount) {
+                    range = sel.getRangeAt(0);
+                    range.setStartAfter(anchor.nextSibling);
+                    range.setEndAfter(anchor.nextSibling);
+                    sel.removeAllRanges();
+                    sel.addRange(range);
+                }
+            }
         }
 
     });
