@@ -1,7 +1,7 @@
 .medium-editor-placeholder {
     position: relative;
 
-    &:after {
+    &:empty:after {
         content: attr(data-placeholder) !important;
         font-style: italic;
         position: absolute;
