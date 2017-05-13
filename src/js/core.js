@@ -839,6 +839,9 @@
                 case 'autoLink':
                     extension = new MediumEditor.extensions.autoLink();
                     break;
+                case 'embed':
+                    extension = new MediumEditor.extensions.embed(this.options.embed);
+                    break;
                 case 'fileDragging':
                     extension = new MediumEditor.extensions.fileDragging(opts);
                     break;
