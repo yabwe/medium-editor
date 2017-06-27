@@ -3764,8 +3764,8 @@ MediumEditor.extensions = {};
                 // figure out how to deprecate? also consider `fa-` icon default implcations.
                 template.push(
                     '<div class="medium-editor-toolbar-form-row">',
-                    '<input type="checkbox" class="medium-editor-toolbar-anchor-target">',
-                    '<label>',
+                    '<input type="checkbox" class="medium-editor-toolbar-anchor-target" id="medium-editor-toolbar-anchor-target-field-' + this.getEditorId() + '">',
+                    '<label for="medium-editor-toolbar-anchor-target-field-' + this.getEditorId() + '">',
                     this.targetCheckboxText,
                     '</label>',
                     '</div>'
@@ -7869,7 +7869,7 @@ MediumEditor.parseVersionString = function (release) {
 
 MediumEditor.version = MediumEditor.parseVersionString.call(this, ({
     // grunt-bump looks for this:
-    'version': '5.23.0'
+    'version': '5.23.1'
 }).version);
 
     return MediumEditor;

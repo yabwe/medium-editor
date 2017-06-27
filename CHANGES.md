@@ -1,3 +1,9 @@
+5.23.1 / 2017-06-27
+==================
+* Remove src from bower ignored files #1330
+* Add label-checkbox relation in CreateLink form #1275 #1340
+
+
 5.23.0 / 2017-03-02
 ==================
 * Only add schemes to URLs with hostnames #1258
