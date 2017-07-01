@@ -668,6 +668,30 @@
 
         cleanListDOM: function (ownerDocument, element) {
             if (element.nodeName.toLowerCase() !== 'li') {
+                var selection = ownerDocument.getSelection(),
+                    node = selection.anchorNode;
+
+                if (node && node.nodeType === 3) {
+                    var nextElement = node.nextElementSibling,
+                        p = ownerDocument.createElement('p'),
+                        context = this;
+
+                    if (
+                        nextElement &&
+                        nextElement.tagName &&
+                        nextElement.tagName.toLowerCase() === 'br' &&
+                        nextElement.parentNode
+                    ) {
+                        nextElement.parentNode.removeChild(nextElement);
+                    }
+
+                    setTimeout(function () {
+                        context.moveTextRangeIntoElement(node, node, p);
+                        MediumEditor.selection.moveCursor(ownerDocument, node, node.textContent.length);
+                    }, 0);
+
+                }
+
                 return;
             }
 
