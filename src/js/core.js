@@ -178,6 +178,12 @@
         // Firefox thrown an error when calling `formatBlock` on an empty editable blockContainer that's not a <div>
         if (MediumEditor.util.isMediumEditorElement(node) && node.children.length === 0 && !MediumEditor.util.isBlockContainer(node)) {
             this.options.ownerDocument.execCommand('formatBlock', false, 'p');
+
+            // https://github.com/yabwe/medium-editor/issues/1350
+            // Pressing backspace/delete once more on an already empty field will clear it entirely
+            if (MediumEditor.util.isKey(event, [MediumEditor.util.keyCode.DELETE, MediumEditor.util.keyCode.BACKSPACE])) {
+                this.setContent(null);
+            }
         }
 
         // https://github.com/yabwe/medium-editor/issues/834
