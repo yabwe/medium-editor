@@ -570,10 +570,9 @@ describe('MediumEditor.util', function () {
         });
 
         it('should return the parent editable if element is a text node child of the editor', function () {
-            var el = this.createElement('div', 'editable', ' <p>text</p>'),
-                emptyTextNode = el.firstChild;
+            var el = this.createElement('div', 'editable', ' <p>text</p>');
             this.newMediumEditor('.editable');
-            var container = MediumEditor.util.getClosestBlockContainer(emptyTextNode);
+            var container = MediumEditor.util.getClosestBlockContainer(el.firstChild);
             expect(container).toBe(el);
         });
     });
@@ -587,10 +586,9 @@ describe('MediumEditor.util', function () {
         });
 
         it('should return the parent editable if element is a text node child of the editor', function () {
-            var el = this.createElement('div', 'editable', ' <p>text</p>'),
-                emptyTextNode = el.firstChild;
+            var el = this.createElement('div', 'editable', ' <p>text</p>');
             this.newMediumEditor('.editable');
-            var container = MediumEditor.util.getTopBlockContainer(emptyTextNode);
+            var container = MediumEditor.util.getTopBlockContainer(el.firstChild);
             expect(container).toBe(el);
         });
     });
@@ -613,10 +611,10 @@ describe('MediumEditor.util', function () {
         });
 
         it('should not find a previous sibling if the element is at the beginning of an editor element', function () {
-            var el = this.createElement('div', 'editable', '<p>first <b>second </b><i>third</i></p><ul><li>fourth</li></ul>'),
-                first = el.querySelector('p').firstChild;
+            var el = this.createElement('div', 'editable', '<p>first <b>second </b><i>third</i></p><ul><li>fourth</li></ul>');
             this.newMediumEditor('.editable');
-            var prevSibling = MediumEditor.util.findPreviousSibling(first);
+            var first = el.querySelector('p').firstChild,
+                prevSibling = MediumEditor.util.findPreviousSibling(first);
             expect(prevSibling).toBeFalsy();
         });
     });

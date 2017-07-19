@@ -1249,6 +1249,8 @@
                 // Add new elements to our internal elements array
                 this.elements.push(element);
 
+                this.setContent(element.innerHTML, this.elements.length - 1);
+
                 // Trigger event so extensions can know when an element has been added
                 this.trigger('addElement', { target: element, currentTarget: element }, element);
             }, this);
