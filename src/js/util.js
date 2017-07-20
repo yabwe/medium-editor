@@ -112,7 +112,7 @@
             // all other known block elements
             'address', 'article', 'aside', 'audio', 'canvas', 'dd', 'dl', 'dt', 'fieldset',
             'figcaption', 'figure', 'footer', 'form', 'header', 'hgroup', 'main', 'nav',
-            'noscript', 'output', 'section', 'video',
+            'noscript', 'output', 'section', 'video', 'div',
             'table', 'thead', 'tbody', 'tfoot', 'tr', 'th', 'td'
         ],
 
@@ -926,7 +926,7 @@
         },
 
         isBlockContainer: function (element) {
-            return element && element.nodeType !== 3 && Util.blockContainerElementNames.indexOf(element.nodeName.toLowerCase()) !== -1;
+            return element && element.nodeType !== 3 && !Util.isMediumEditorElement(element) && Util.blockContainerElementNames.indexOf(element.nodeName.toLowerCase()) !== -1;
         },
 
         /* Finds the closest ancestor which is a block container element

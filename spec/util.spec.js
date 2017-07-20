@@ -389,9 +389,10 @@ describe('MediumEditor.util', function () {
 
         it('should execute indent command when called with blockquote when isIE is true', function () {
             var origIsIE = MediumEditor.util.isIE,
-                el = this.createElement('div', '', '<p>Some <b>Text</b></p>');
+                el = this.createElement('div', 'editable', '<p>Some <b>Text</b></p>');
+            this.newMediumEditor('.editable');
             MediumEditor.util.isIE = true;
-            el.setAttribute('contenteditable', true);
+            //el.setAttribute('contenteditable', true);
             selectElementContents(el.querySelector('b'));
             spyOn(document, 'execCommand');
 
@@ -579,9 +580,9 @@ describe('MediumEditor.util', function () {
 
     describe('getTopBlockContainer', function () {
         it('should return the highest level block container', function () {
-            var el = this.createElement('div', '', '<blockquote><p>paragraph</p><ul><li><span>list item</span></li></ul></blockquote>'),
-                span = el.querySelector('span'),
-                container = MediumEditor.util.getTopBlockContainer(span);
+            var el = this.createElement('div', 'editable', '<blockquote><p>paragraph</p><ul><li><span>list item</span></li></ul></blockquote>');
+            this.newMediumEditor('.editable');
+            var container = MediumEditor.util.getTopBlockContainer(el.querySelector('span'));
             expect(container).toBe(el.querySelector('blockquote'));
         });
 
