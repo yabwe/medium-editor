@@ -180,6 +180,7 @@
             this.options.ownerDocument.execCommand('formatBlock', false, 'p');
 
             // https://github.com/yabwe/medium-editor/issues/1350
+            // https://github.com/yabwe/medium-editor/pull/1351
             // Pressing backspace/delete once more on an already empty field will clear it entirely
             if (MediumEditor.util.isKey(event, [MediumEditor.util.keyCode.DELETE, MediumEditor.util.keyCode.BACKSPACE])) {
                 this.setContent(null);
