@@ -285,6 +285,26 @@ describe('Extensions TestCase', function () {
             expect(tempExtension.getEditorOption('spellcheck')).toBe(editor.options.spellcheck);
         });
 
+        it('should be able to manipulate the html via setContent() and getContent()', function () {
+            var TempExtension = MediumEditor.Extension.extend({
+                    setContent: function (html) {
+                        return html.replace(/replace/g, '*******');
+                    },
+                    getContent: function (html) {
+                        return html.replace(/\*\*\*\*\*\*\*/g, 'replace');
+                    }
+                }),
+                editable = this.createElement('div', 'editable', '<p>replace</p>'),
+                editor = this.newMediumEditor('.editable', {
+                    extensions: {
+                        'temp-extension': new TempExtension()
+                    }
+                });
+
+            expect(editable.innerHTML).toBe('<p>*******</p>');
+            expect(editor.getContent()).toBe('<p>replace</p>');
+        });
+
         it('should be able to prevent blur on the editor when user iteracts with extension elements', function () {
             var sampleElOne = this.createElement('button', null, 'Test Button'),
                 sampleElTwo = this.createElement('textarea', null, 'Test Div'),
