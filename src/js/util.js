@@ -545,6 +545,21 @@
                 tagName = '<' + tagName + '>';
             }
 
+            if (blockContainer) {
+                var blockTagName = blockContainer.nodeName.toLowerCase();
+
+                if (tagName !== blockTagName) {
+                    // Changing list items to something else breaks, remove list item first
+                    if (blockTagName === 'ul') {
+                        doc.execCommand('insertunorderedlist', false);
+                    }
+
+                    if (blockTagName === 'ol') {
+                        doc.execCommand('insertorderedlist', false);
+                    }
+                }
+            }
+
             // When FF, IE and Edge, we have to handle blockquote node seperately as 'formatblock' does not work.
             // https://developer.mozilla.org/en-US/docs/Web/API/Document/execCommand#Commands
             if (blockContainer && blockContainer.nodeName.toLowerCase() === 'blockquote') {

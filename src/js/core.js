@@ -195,6 +195,10 @@
                 this.options.ownerDocument.execCommand('formatBlock', false, 'p');
             }
         }
+
+        if (MediumEditor.util.isKey(event, MediumEditor.util.keyCode.ENTER) && node.nodeName.toLowerCase() === 'div') {
+            this.options.ownerDocument.execCommand('formatBlock', false, 'p');
+        }
     }
 
     function handleEditableInput(event, editable) {
