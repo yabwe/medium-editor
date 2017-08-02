@@ -1,3 +1,9 @@
+5.23.2 / 2017-08-02
+==================
+* Add noopener & noreferrer into targetBlank #1355
+* Add undefined check and fallback in Paste extension #1346
+
+
 5.23.1 / 2017-06-27
 ==================
 * Remove src from bower ignored files #1330
