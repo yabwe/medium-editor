@@ -3,6 +3,7 @@
 
     &:after {
         content: attr(data-placeholder) !important;
+        cursor: text;
         font-style: italic;
         position: absolute;
         left: 0;
@@ -18,6 +19,7 @@
 
     &:after {
         content: attr(data-placeholder) !important;
+        cursor: text;
         font-style: italic;
         position: relative;
         white-space: pre;
