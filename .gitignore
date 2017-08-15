@@ -9,6 +9,7 @@ npm-debug.log
 _SpecRunner.html
 reports/
 coverage/
+dist/
 ._*
 
 # IDE
