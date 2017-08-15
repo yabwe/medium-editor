@@ -1,0 +1,78 @@
+.medium-toolbar-arrow-under:after {
+  border-color: #000 transparent transparent transparent;
+  top: 40px; }
+
+.medium-toolbar-arrow-over:before {
+  border-color: transparent transparent #000 transparent; }
+
+.medium-editor-toolbar {
+  background-color: #000;
+  border: none;
+  border-radius: 50px; }
+  .medium-editor-toolbar li button {
+    background-color: transparent;
+    border: none;
+    box-sizing: border-box;
+    color: #ccc;
+    height: 40px;
+    min-width: 40px;
+    padding: 5px 12px;
+    -webkit-transition: background-color .2s ease-in, color .2s ease-in;
+            transition: background-color .2s ease-in, color .2s ease-in; }
+    .medium-editor-toolbar li button:hover {
+      background-color: #000;
+      color: #a2d7c7; }
+  .medium-editor-toolbar li .medium-editor-button-first {
+    border-bottom-left-radius: 50px;
+    border-top-left-radius: 50px;
+    padding-left: 24px; }
+  .medium-editor-toolbar li .medium-editor-button-last {
+    border-bottom-right-radius: 50px;
+    border-right: none;
+    border-top-right-radius: 50px;
+    padding-right: 24px; }
+  .medium-editor-toolbar li .medium-editor-button-active {
+    background-color: #000;
+    color: #a2d7c7; }
+
+.medium-editor-toolbar-form {
+  background: #000;
+  border-radius: 50px;
+  color: #ccc;
+  overflow: hidden; }
+  .medium-editor-toolbar-form .medium-editor-toolbar-input {
+    background: #000;
+    box-sizing: border-box;
+    color: #ccc;
+    height: 40px;
+    padding-left: 16px;
+    width: 220px; }
+    .medium-editor-toolbar-form .medium-editor-toolbar-input::-webkit-input-placeholder {
+      color: #f8f5f3;
+      color: rgba(248, 245, 243, 0.8); }
+    .medium-editor-toolbar-form .medium-editor-toolbar-input:-moz-placeholder {
+      /* Firefox 18- */
+      color: #f8f5f3;
+      color: rgba(248, 245, 243, 0.8); }
+    .medium-editor-toolbar-form .medium-editor-toolbar-input::-moz-placeholder {
+      /* Firefox 19+ */
+      color: #f8f5f3;
+      color: rgba(248, 245, 243, 0.8); }
+    .medium-editor-toolbar-form .medium-editor-toolbar-input:-ms-input-placeholder {
+      color: #f8f5f3;
+      color: rgba(248, 245, 243, 0.8); }
+  .medium-editor-toolbar-form a {
+    color: #ccc;
+    -webkit-transform: translateY(2px);
+            transform: translateY(2px); }
+  .medium-editor-toolbar-form .medium-editor-toolbar-close {
+    margin-right: 16px; }
+
+.medium-editor-toolbar-anchor-preview {
+  background: #000;
+  border-radius: 50px;
+  padding: 5px 12px; }
+
+.medium-editor-anchor-preview a {
+  color: #ccc;
+  text-decoration: none; }
