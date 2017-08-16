@@ -115,6 +115,6 @@ $medium-editor-placeholder-color: #f8f5f3;
 
 .medium-editor-toolbar-actions {
   li, button {
-    border-radius: 50px;
+    border-radius: $medium-editor-border-radius;
   }
 }
