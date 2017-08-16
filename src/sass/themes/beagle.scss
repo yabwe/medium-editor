@@ -112,3 +112,9 @@ $medium-editor-placeholder-color: #f8f5f3;
     text-decoration: none;
   }
 }
+
+.medium-editor-toolbar-actions {
+  li, button {
+    border-radius: $medium-editor-border-radius;
+  }
+}
