@@ -572,6 +572,25 @@
             return doc.execCommand('formatBlock', false, tagName);
         },
 
+        /*
+         * this function is called to ensure href is set correctly as FF does "encodeURI" on href value when execCommand createLink.
+         * see also https://bugzilla.mozilla.org/show_bug.cgi?id=451142
+         */
+        ensureHref: function (el, anchorUrl) {
+            var i, url = anchorUrl;
+            if (el.nodeName.toLowerCase() === 'a') {
+                el.attributes.href.value = url;
+            } else {
+                el = el.getElementsByTagName('a');
+
+                for (i = 0; i < el.length; i += 1) {
+                    if (encodeURI(url) === el[i].attributes.href.value) {
+                        el[i].attributes.href.value = url;
+                    }
+                }
+            }
+        },
+
         /**
          * Set target to blank on the given el element
          *
