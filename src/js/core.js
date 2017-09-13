@@ -381,7 +381,7 @@
         for (var i = 0, n = atts.length; i < n; i++) {
             // do not re-create existing attributes
             if (!div.hasAttribute(atts[i].nodeName)) {
-                div.setAttribute(atts[i].nodeName, atts[i].nodeValue);
+                div.setAttribute(atts[i].nodeName, atts[i].value);
             }
         }
 
