@@ -47,7 +47,8 @@
             font-size: 14px;
             line-height: 1.33;
             margin: 0;
-            padding: 15px;
+            padding: 0 15px;
+            min-height: 30px;
             text-decoration: none;
 
             &:focus {
