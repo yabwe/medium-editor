@@ -214,10 +214,10 @@ describe('MediumEditor.extensions.toolbar TestCase', function () {
                 el,
                 i;
 
-            this.el.textContent = '0';
+            this.el.textContent = '0. Lorem ipsum dolor sit amet';
             for (i = 1; i < 3; i += 1) {
                 el = this.createElement('div', 'editor');
-                el.textContent = i;
+                el.textContent = i + '. Lorem ipsum dolor sit amet';
             }
 
             expect(document.querySelectorAll('.editor').length).toBe(3);

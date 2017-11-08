@@ -737,7 +737,7 @@ describe('Content TestCase', function () {
         };
 
         this.el.parentNode.removeChild(this.el);
-        this.el = this.createElement('h1', 'editor', 'M');
+        this.el = this.createElement('h1', 'editor', 'Lorem ipsum dolor sit amet');
 
         var editor = this.newMediumEditor('h1.editor');
         editor.elements[0].focus();
