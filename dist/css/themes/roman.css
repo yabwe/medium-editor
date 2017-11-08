@@ -15,11 +15,9 @@
     background-color: transparent;
     color: #889aac;
     box-shadow: inset 0 0 3px #f8f8e6;
-    background: -webkit-linear-gradient(top, #fff, rgba(0, 0, 0, 0.2));
     background: linear-gradient(to bottom, #fff, rgba(0, 0, 0, 0.2));
     text-shadow: 1px 4px 6px #def, 0 0 0 #000, 1px 4px 6px #def;
-    -webkit-transition: background-color .2s ease-in;
-            transition: background-color .2s ease-in; }
+    transition: background-color .2s ease-in; }
     .medium-editor-toolbar li button:hover {
       background-color: #fff;
       color: #fff;
@@ -34,7 +32,6 @@
     background-color: #ccc;
     color: #000;
     color: rgba(0, 0, 0, 0.8);
-    background: -webkit-linear-gradient(bottom, #fff, rgba(0, 0, 0, 0.1));
     background: linear-gradient(to top, #fff, rgba(0, 0, 0, 0.1)); }
 
 .medium-editor-toolbar-form {
