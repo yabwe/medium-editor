@@ -413,8 +413,8 @@ describe('Anchor Preview TestCase', function () {
                 editor, anchorPreview;
 
             container.style.position = 'absolute';
-            container.style.left = '100px';
-            container.style.top = '100px';
+            container.style.left = '200px';
+            container.style.top = '200px';
             document.body.appendChild(container);
 
             editor = this.newMediumEditor('.editor', {
@@ -434,10 +434,10 @@ describe('Anchor Preview TestCase', function () {
             fireEvent(document.getElementById('test-link'), 'mouseover');
 
             // preview shows only after delay
-            jasmine.clock().tick(1);
+            jasmine.clock().tick(501);
             expect(anchorPreview.classList.contains('medium-editor-anchor-preview-active')).toBe(true);
-            expect(parseInt(anchorPreview.style.left, 10)).toBeLessThan(100);
-            expect(parseInt(anchorPreview.style.top, 10)).toBeLessThan(100);
+            expect(parseInt(anchorPreview.style.left, 10)).toBeLessThan(200);
+            expect(parseInt(anchorPreview.style.top, 10)).toBeLessThan(200);
 
             document.body.removeChild(container);
         });
