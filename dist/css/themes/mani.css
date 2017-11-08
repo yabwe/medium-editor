@@ -6,7 +6,6 @@
   border: 1px solid #cdd6e0;
   background-color: #dee7f0;
   background-color: rgba(222, 231, 240, 0.95);
-  background: -webkit-linear-gradient(bottom, #dee7f0, white);
   background: linear-gradient(to top, #dee7f0, white);
   border-radius: 2px;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.45); }
@@ -17,8 +16,7 @@
     border-right: 1px solid #cdd6e0;
     background-color: transparent;
     color: #40648a;
-    -webkit-transition: background-color .2s ease-in, color .2s ease-in;
-            transition: background-color .2s ease-in, color .2s ease-in; }
+    transition: background-color .2s ease-in, color .2s ease-in; }
     .medium-editor-toolbar li button:hover {
       background-color: #5c90c7;
       background-color: rgba(92, 144, 199, 0.45);
@@ -33,7 +31,6 @@
     background-color: #5c90c7;
     background-color: rgba(92, 144, 199, 0.45);
     color: #000;
-    background: -webkit-linear-gradient(top, #dee7f0, rgba(0, 0, 0, 0.1));
     background: linear-gradient(to bottom, #dee7f0, rgba(0, 0, 0, 0.1)); }
 
 .medium-editor-toolbar-form {

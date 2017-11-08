@@ -41,7 +41,7 @@
         isIE: ((navigator.appName === 'Microsoft Internet Explorer') || ((navigator.appName === 'Netscape') && (new RegExp('Trident/.*rv:([0-9]{1,}[.0-9]{0,})').exec(navigator.userAgent) !== null))),
 
         isEdge: (/Edge\/\d+/).exec(navigator.userAgent) !== null,
-
+        isChrome: (/Chrome\/\d+/).exec(navigator.userAgent) !== null,
         // if firefox
         isFF: (navigator.userAgent.toLowerCase().indexOf('firefox') > -1),
 
@@ -227,18 +227,18 @@
             var textIndexOfEndOfFarthestNode,
                 endSplitPoint;
             textIndexOfEndOfFarthestNode = currentTextIndex + currentNode.nodeValue.length +
-                    (newNode ? newNode.nodeValue.length : 0) - 1;
+                (newNode ? newNode.nodeValue.length : 0) - 1;
             endSplitPoint = matchEndIndex - currentTextIndex -
-                    (newNode ? currentNode.nodeValue.length : 0);
+                (newNode ? currentNode.nodeValue.length : 0);
             if (textIndexOfEndOfFarthestNode >= matchEndIndex &&
-                    currentTextIndex !== textIndexOfEndOfFarthestNode &&
-                    endSplitPoint !== 0) {
+                currentTextIndex !== textIndexOfEndOfFarthestNode &&
+                endSplitPoint !== 0) {
                 (newNode || currentNode).splitText(endSplitPoint);
             }
         },
 
         /*
-        * Take an element, and break up all of its text content into unique pieces such that:
+         * Take an element, and break up all of its text content into unique pieces such that:
          * 1) All text content of the elements are in separate blocks. No piece of text content should span
          *    across multiple blocks. This means no element return by this function should have
          *    any blocks as children.
@@ -469,13 +469,13 @@
                 if (Util.isMediumEditorElement(toReplace) && !toReplace.firstChild) {
                     range.selectNode(toReplace.appendChild(doc.createTextNode('')));
                 } else if ((toReplace.nodeType === 3 && range.startOffset === 0 && range.endOffset === toReplace.nodeValue.length) ||
-                        (toReplace.nodeType !== 3 && toReplace.innerHTML === range.toString())) {
+                    (toReplace.nodeType !== 3 && toReplace.innerHTML === range.toString())) {
                     // Ensure range covers maximum amount of nodes as possible
                     // By moving up the DOM and selecting ancestors whose only child is the range
                     while (!Util.isMediumEditorElement(toReplace) &&
-                            toReplace.parentNode &&
-                            toReplace.parentNode.childNodes.length === 1 &&
-                            !Util.isMediumEditorElement(toReplace.parentNode)) {
+                        toReplace.parentNode &&
+                        toReplace.parentNode.childNodes.length === 1 &&
+                        !Util.isMediumEditorElement(toReplace.parentNode)) {
                         toReplace = toReplace.parentNode;
                     }
                     range.selectNode(toReplace);
@@ -520,8 +520,8 @@
                     childNodes = Array.prototype.slice.call(blockContainer.childNodes);
                     // Check if the blockquote has a block element as a child (nested blocks)
                     if (childNodes.some(function (childNode) {
-                        return Util.isBlockContainer(childNode);
-                    })) {
+                            return Util.isBlockContainer(childNode);
+                        })) {
                         // FF handles blockquote differently on formatBlock
                         // allowing nesting, we need to use outdent
                         // https://developer.mozilla.org/en-US/docs/Rich-Text_Editing_in_Mozilla
@@ -557,12 +557,12 @@
                 }
 
                 // For Firefox and Edge, make sure there's a nested block element before calling outdent
-                if ((Util.isFF || Util.isEdge) && tagName === 'p') {
+                if ((Util.isFF || Util.isEdge || Util.isChrome) && tagName === 'p') {
                     childNodes = Array.prototype.slice.call(blockContainer.childNodes);
                     // If there are some non-block elements we need to wrap everything in a <p> before we outdent
                     if (childNodes.some(function (childNode) {
-                        return !Util.isBlockContainer(childNode);
-                    })) {
+                            return !Util.isBlockContainer(childNode);
+                        })) {
                         doc.execCommand('formatBlock', false, tagName);
                     }
                     return doc.execCommand('outdent', false, tagName);
@@ -718,7 +718,7 @@
          *  the <div>' would be returned as an element not appended to the DOM, and the <div>
          *  would remain in place where it was
          *
-        */
+         */
         splitOffDOMTree: function (rootNode, leafNode, splitLeft) {
             var splitOnNode = leafNode,
                 createdNode = null,
