@@ -17,8 +17,7 @@
     height: 40px;
     min-width: 40px;
     padding: 5px 12px;
-    -webkit-transition: background-color .2s ease-in, color .2s ease-in;
-            transition: background-color .2s ease-in, color .2s ease-in; }
+    transition: background-color .2s ease-in, color .2s ease-in; }
     .medium-editor-toolbar li button:hover {
       background-color: #000;
       color: #a2d7c7; }
@@ -76,3 +75,6 @@
 .medium-editor-anchor-preview a {
   color: #ccc;
   text-decoration: none; }
+
+.medium-editor-toolbar-actions li, .medium-editor-toolbar-actions button {
+  border-radius: 50px; }
