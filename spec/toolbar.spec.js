@@ -332,7 +332,9 @@ describe('MediumEditor.extensions.toolbar TestCase', function () {
         it('should hide when selecting multiple paragraphs and the deprecated allowMultiParagraphSelection option is false', function () {
             this.el.innerHTML = '<p id="p-one">lorem ipsum</p><p id="p-two">lorem ipsum</p>';
             var editor = this.newMediumEditor('.editor', {
-                    allowMultiParagraphSelection: false
+                    toolbar: {
+                        allowMultiParagraphSelection: false
+                    }
                 }),
                 toolbar = editor.getExtensionByName('toolbar');
             selectElementContentsAndFire(document.getElementById('p-one'));
