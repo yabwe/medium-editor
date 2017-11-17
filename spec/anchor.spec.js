@@ -240,6 +240,24 @@ describe('Anchor Button TestCase', function () {
             expect(link.href).toBe('tel:347-999-9999');
         });
 
+        it('should add mailto: if need be and linkValidation option is set to true', function () {
+            var editor = this.newMediumEditor('.editor', {
+                anchor: {
+                    linkValidation: true
+                }
+            }),
+                link,
+                anchorExtension = editor.getExtensionByName('anchor');
+
+            selectElementContentsAndFire(editor.elements[0]);
+            anchorExtension.showForm('test@example.com');
+            fireEvent(anchorExtension.getForm().querySelector('a.medium-editor-toolbar-save'), 'click');
+
+            link = editor.elements[0].querySelector('a');
+            expect(link).not.toBeNull();
+            expect(link.href).toBe('mailto:test@example.com');
+        });
+
         it('should not change protocol when a valid one is included', function () {
             var editor = this.newMediumEditor('.editor', {
                 anchor: {
