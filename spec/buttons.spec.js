@@ -431,6 +431,9 @@ describe('Buttons TestCase', function () {
             expect(button.classList.contains('medium-editor-button-active')).toBe(true);
 
             fireEvent(button, 'click');
+
+            this.el.innerHTML = stripAttrIfEmpty(this.el, 'style');
+
             // style="font-weight: bold" prevents IE9+10 from doing anything when 'bold' is triggered
             // but it should work in other browsers
             expect(!isOldIE() && button.classList.contains('medium-editor-button-active')).toBe(false);
@@ -507,6 +510,9 @@ describe('Buttons TestCase', function () {
             expect(button.classList.contains('medium-editor-button-active')).toBe(true);
 
             fireEvent(button, 'click');
+
+            this.el.innerHTML = stripAttrIfEmpty(this.el, 'style');
+
             // style="font-style: italic" prevents IE9+10 from doing anything when 'italic' is triggered
             // but it should work in other browsers
             expect(!isOldIE() && button.classList.contains('medium-editor-button-active')).toBe(false);
@@ -566,6 +572,9 @@ describe('Buttons TestCase', function () {
             expect(button.classList.contains('medium-editor-button-active')).toBe(true);
 
             fireEvent(button, 'click');
+
+            this.el.innerHTML = stripAttrIfEmpty(this.el, 'style');
+
             // style="text-decoration: underline" prevents IE9+10 from doing anything when 'underline' is triggered
             // but it should work in other browsers
             expect(!isOldIE() && button.classList.contains('medium-editor-button-active')).toBe(false);
@@ -625,6 +634,9 @@ describe('Buttons TestCase', function () {
             expect(button.classList.contains('medium-editor-button-active')).toBe(true);
 
             fireEvent(button, 'click');
+
+            this.el.innerHTML = stripAttrIfEmpty(this.el, 'style');
+
             // style="text-decoration: line-through" prevents IE9+10 from doing anything when 'strikethrough' is triggered
             // but it should work in other browsers
             expect(!isOldIE() && button.classList.contains('medium-editor-button-active')).toBe(false);
@@ -1056,3 +1068,14 @@ describe('Buttons TestCase', function () {
         });
     });
 });
+
+function stripAttrIfEmpty(element, attribute) {
+    // we want to strip empty attributes (especially styles,
+    // because the tests create style tags, inject style content,
+    // and then remove that style content.
+    //
+    // some browsers will remove empty attributes automatically.
+    //
+    // others (Chrome, seemingly) will not:
+    return element.innerHTML.replace(attribute + '=""', '');
+}

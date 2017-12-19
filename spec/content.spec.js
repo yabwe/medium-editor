@@ -649,7 +649,7 @@ describe('Content TestCase', function () {
                 fireEvent(target, 'keydown', {
                     keyCode: MediumEditor.util.keyCode.BACKSPACE
                 });
-                expect(this.el.innerHTML).toBe('<p>lorem ipsum</p><ul><li></li><li>lorem ipsum</li></ul>');
+                expect(this.el.innerHTML).toMatch(/^<p>lorem ipsum<\/p><ul><li>(<br>)?<\/li><li>lorem ipsum<\/li><\/ul>$/);
             });
         });
 
