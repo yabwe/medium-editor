@@ -214,10 +214,10 @@ describe('MediumEditor.extensions.toolbar TestCase', function () {
                 el,
                 i;
 
-            this.el.textContent = '0';
+            this.el.textContent = '0. Lorem ipsum dolor sit amet';
             for (i = 1; i < 3; i += 1) {
                 el = this.createElement('div', 'editor');
-                el.textContent = i;
+                el.textContent = i + '. Lorem ipsum dolor sit amet';
             }
 
             expect(document.querySelectorAll('.editor').length).toBe(3);
@@ -332,7 +332,9 @@ describe('MediumEditor.extensions.toolbar TestCase', function () {
         it('should hide when selecting multiple paragraphs and the deprecated allowMultiParagraphSelection option is false', function () {
             this.el.innerHTML = '<p id="p-one">lorem ipsum</p><p id="p-two">lorem ipsum</p>';
             var editor = this.newMediumEditor('.editor', {
-                    allowMultiParagraphSelection: false
+                    toolbar: {
+                        allowMultiParagraphSelection: false
+                    }
                 }),
                 toolbar = editor.getExtensionByName('toolbar');
             selectElementContentsAndFire(document.getElementById('p-one'));
@@ -368,8 +370,8 @@ describe('MediumEditor.extensions.toolbar TestCase', function () {
                 editor, toolbar;
 
             container.style.position = 'absolute';
-            container.style.left = '100px';
-            container.style.top = '100px';
+            container.style.left = '200px';
+            container.style.top = '200px';
             document.body.appendChild(container);
 
             this.el.innerHTML = 'lorem';
@@ -381,8 +383,8 @@ describe('MediumEditor.extensions.toolbar TestCase', function () {
 
             selectElementContentsAndFire(this.el);
             expect(toolbar.classList.contains('medium-editor-toolbar-active')).toBe(true);
-            expect(parseInt(toolbar.style.left, 10)).toBeLessThan(100);
-            expect(parseInt(toolbar.style.top, 10)).toBeLessThan(100);
+            expect(parseInt(toolbar.style.left, 10)).toBeLessThan(200);
+            expect(parseInt(toolbar.style.top, 10)).toBeLessThan(200);
 
             document.body.removeChild(container);
         });

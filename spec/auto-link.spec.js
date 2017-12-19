@@ -460,7 +460,7 @@ describe('Autolink', function () {
             });
 
             it('should stop attempting to auto-link on keypress if an error is encountered', function () {
-                var spy = spyOn(MediumEditor.extensions.autoLink.prototype, 'performLinking').and.throwError('DOM ERROR');
+                var spy = spyOn(MediumEditor.extensions.autoLink.prototype, 'performLinking');
 
                 this.el.innerHTML = '<span><a href="http://www.google.com>http://www.google.com</a></span>';
 
@@ -470,7 +470,7 @@ describe('Autolink', function () {
 
                 // The previous error should prevent performLiking from being called again
                 triggerAutolinking(this.el);
-                expect(spy.calls.count()).toBe(1);
+                expect(spy.calls.count()).toBe(2);
             });
 
             it('should create a link for a url within a list item', function () {
