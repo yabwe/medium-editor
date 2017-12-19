@@ -205,6 +205,10 @@
                 return this.cleanPaste(pastedHTML);
             }
 
+            if (!pastedPlain) {
+                return;
+            }
+
             if (!(this.getEditorOption('disableReturn') || (editable && editable.getAttribute('data-disable-return')))) {
                 paragraphs = pastedPlain.split(/[\r\n]+/g);
                 // If there are no \r\n in data, don't wrap in <p>
