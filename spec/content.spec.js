@@ -649,8 +649,7 @@ describe('Content TestCase', function () {
                 fireEvent(target, 'keydown', {
                     keyCode: MediumEditor.util.keyCode.BACKSPACE
                 });
-                this.el.innerHTML = stripLinebreak(this.el);
-                expect(this.el.innerHTML).toBe('<p>lorem ipsum</p><ul><li></li><li>lorem ipsum</li></ul>');
+                expect(this.el.innerHTML).toMatch(/^<p>lorem ipsum<\/p><ul><li>(<br>)?<\/li><li>lorem ipsum<\/li><\/ul>$/);
             });
         });
 
@@ -812,7 +811,3 @@ describe('Content TestCase', function () {
         });
     });
 });
-
-function stripLinebreak(element) {
-    return element.innerHTML.replace('<br>', '');
-}
