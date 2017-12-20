@@ -76,3 +76,6 @@
 .medium-editor-anchor-preview a {
   color: #ccc;
   text-decoration: none; }
+
+.medium-editor-toolbar-actions li, .medium-editor-toolbar-actions button {
+  border-radius: 50px; }

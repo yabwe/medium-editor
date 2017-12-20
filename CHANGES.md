@@ -1,3 +1,15 @@
+5.23.3 / 2017-12-20
+==================
+* Fix medium-editor-insert plugin css fixes on beagle theme #1361
+* Update jsDelivr links #1366 & #1367
+* Fix Firefox console warning causing issues #1370
+* Do not check only for null targets or it will fail when it's undefined. #1373
+* Fix crash when 'extensions' in 'isElementDescendantOfExtension' is undefined #1362
+* Fix Jasmine Unit Test errors #1385
+* Fix null error on pastedPlain.split #1397
+* Fix broken browser tests #1396
+
+
 5.23.2 / 2017-08-02
 ==================
 * Add noopener & noreferrer into targetBlank #1355
