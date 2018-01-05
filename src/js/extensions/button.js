@@ -167,7 +167,17 @@
             var action = this.getAction();
 
             if (action) {
-                this.execAction(action);
+                if (this.getEditorOption('disableEditing')) {
+                    this.getEditorElements().forEach(function (element) {
+                        element.setAttribute('contentEditable', 'true');
+                    });
+                    this.execAction(action);
+                    this.getEditorElements().forEach(function (element) {
+                        element.setAttribute('contentEditable', 'inherit');
+                    });
+                } else {
+                    this.execAction(action);
+                }
             }
         },
 
