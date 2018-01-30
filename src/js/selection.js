@@ -214,8 +214,8 @@
             }
 
             if (range.commonAncestorContainer.contentEditable === 'false') {
-              range.setStart(range.commonAncestorContainer.nextSibling, 0);
-              range.collapse(true);
+                range.setStart(range.commonAncestorContainer.nextSibling, 0);
+                range.collapse(true);
             }
 
             this.selectRange(doc, range);
