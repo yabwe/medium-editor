@@ -213,7 +213,7 @@
                 range = this.importSelectionMoveCursorPastAnchor(selectionState, range);
             }
 
-            if (range.commonAncestorContainer.contentEditable == 'false') {
+            if (range.commonAncestorContainer.contentEditable === 'false') {
               range.setStart(range.commonAncestorContainer.nextSibling, 0);
               range.collapse(true);
             }
