@@ -123,8 +123,8 @@
                 // and provide similar access to a `fa-` icon default.
                 template.push(
                     '<div class="medium-editor-toolbar-form-row">',
-                    '<input type="checkbox" class="medium-editor-toolbar-anchor-button">',
-                    '<label>',
+                    '<input type="checkbox" class="medium-editor-toolbar-anchor-button" id="medium-editor-toolbar-anchor-button-field-' + this.getEditorId() + '">',
+                    '<label for="medium-editor-toolbar-anchor-button-field-' + this.getEditorId() + '">',
                     this.customClassOptionText,
                     '</label>',
                     '</div>'
