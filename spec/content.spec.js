@@ -810,4 +810,56 @@ describe('Content TestCase', function () {
             expect(para.querySelectorAll('div').length).toBe(0, 'Some <br> elements were replaced with <div> elements within the <p>');
         });
     });
+
+    describe('when list element is unlisted', function () {
+        it('should fix markup when one list element is unlisted', function () {
+            this.el.innerHTML = '<ul><li>lorem</li><li>ipsum</li><li>dolor</li></ul>';
+            var editor = this.newMediumEditor('.editor', {
+                    toolbar: {
+                        buttons: ['unorderedlist']
+                    }
+                }),
+                target = editor.elements[0].querySelector('li'),
+                toolbar = editor.getExtensionByName('toolbar');
+
+            selectElementContentsAndFire(target);
+            fireEvent(toolbar.getToolbarElement().querySelector('[data-action="insertunorderedlist"]'), 'click');
+            expect(this.el.innerHTML).toBe('<p>lorem</p><ul><li>ipsum</li><li>dolor</li></ul>');
+        });
+
+        it('should fix markup when miltiple list elements are unlisted', function () {
+            this.el.innerHTML = '<ol><li>lorem</li><li>ipsum</li><li>dolor</li></ol>';
+            var editor = this.newMediumEditor('.editor', {
+                    toolbar: {
+                        buttons: ['orderedlist']
+                    }
+                }),
+                toolbar = editor.getExtensionByName('toolbar'),
+                selection = document.getSelection(),
+                range = document.createRange();
+
+            range.setStart(this.el.querySelectorAll('li')[0].firstChild, 0);
+            range.setEnd(this.el.querySelectorAll('li')[1].firstChild, 5);
+            selection.removeAllRanges();
+            selection.addRange(range);
+
+            fireEvent(toolbar.getToolbarElement().querySelector('[data-action="insertorderedlist"]'), 'click');
+            expect(this.el.innerHTML).toBe('<p>lorem</p><p>ipsum</p><ol><li>dolor</li></ol>');
+        });
+
+        it('should fix markup when all list elements are unlisted', function () {
+            this.el.innerHTML = '<ul><li>lorem</li><li>ipsum</li><li>dolor</li></ul>';
+            var editor = this.newMediumEditor('.editor', {
+                    toolbar: {
+                        buttons: ['unorderedlist']
+                    }
+                }),
+                target = editor.elements[0].querySelector('ul'),
+                toolbar = editor.getExtensionByName('toolbar');
+
+            selectElementContentsAndFire(target);
+            fireEvent(toolbar.getToolbarElement().querySelector('[data-action="insertunorderedlist"]'), 'click');
+            expect(this.el.innerHTML).toBe('<p>lorem</p><p>ipsum</p><p>dolor</p>');
+        });
+    });
 });
