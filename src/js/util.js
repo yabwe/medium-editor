@@ -674,10 +674,6 @@
         },
 
         cleanListDOM: function (ownerDocument, element) {
-            if (element.nodeName.toLowerCase() !== 'li') {
-                return;
-            }
-
             var list = element.parentElement;
 
             if (list.parentElement.nodeName.toLowerCase() === 'p') { // yes we need to clean up
@@ -686,6 +682,30 @@
                 // move cursor at the end of the text inside the list
                 // for some unknown reason, the cursor is moved to end of the "visual" line
                 MediumEditor.selection.moveCursor(ownerDocument, element.firstChild, element.firstChild.textContent.length);
+            }
+        },
+
+        cleanAndWrapSelectedTextNodeToParagraph: function (ownerDocument) {
+            var selection = ownerDocument.getSelection(),
+                node = selection.anchorNode;
+
+            if (node && node.nodeType === 3) {
+                var nextElement = node.nextElementSibling,
+                    p = ownerDocument.createElement('p'),
+                    context = this;
+
+                if (
+                    nextElement &&
+                    nextElement.tagName &&
+                    nextElement.tagName.toLowerCase() === 'br' &&
+                    nextElement.parentNode
+                ) {
+                    nextElement.parentNode.removeChild(nextElement);
+                }
+
+                setTimeout(function () {
+                    context.moveTextRangeIntoElement(node, node, p);
+                }, 0);
             }
         },
 

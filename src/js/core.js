@@ -939,7 +939,15 @@
 
             // do some DOM clean-up for known browser issues after the action
             if (action === 'insertunorderedlist' || action === 'insertorderedlist') {
-                MediumEditor.util.cleanListDOM(this.options.ownerDocument, this.getSelectedParentElement());
+                var element = this.getSelectedParentElement();
+
+                if (element.nodeName.toLowerCase() === 'li') {
+                    MediumEditor.util.cleanListDOM(this.options.ownerDocument, element);
+                } else {
+                    this.saveSelection();
+                    MediumEditor.util.cleanAndWrapSelectedTextNodeToParagraph(this.options.ownerDocument);
+                    setTimeout(this.restoreSelection.bind(this), 0);
+                }
             }
 
             this.checkSelection();
