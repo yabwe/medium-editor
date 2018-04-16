@@ -675,17 +675,60 @@
 
         cleanListDOM: function (ownerDocument, element) {
             if (element.nodeName.toLowerCase() !== 'li') {
-                return;
-            }
+                if (this.isIE || this.isEdge) {
+                    return;
+                }
 
-            var list = element.parentElement;
+                var selection = ownerDocument.getSelection(),
+                    newRange = ownerDocument.createRange(),
+                    oldRange = selection.getRangeAt(0),
+                    startContainer = oldRange.startContainer,
+                    startOffset = oldRange.startOffset,
+                    endContainer = oldRange.endContainer,
+                    endOffset = oldRange.endOffset,
+                    node, newNode, nextNode;
 
-            if (list.parentElement.nodeName.toLowerCase() === 'p') { // yes we need to clean up
-                Util.unwrap(list.parentElement, ownerDocument);
+                if (element.nodeName.toLowerCase() === 'span') {
+                    // Chrome & Safari unwraps removed li elements into a span
+                    node = element;
+                } else {
+                    // FF leaves them as text nodes
+                    node = startContainer;
+                }
 
-                // move cursor at the end of the text inside the list
-                // for some unknown reason, the cursor is moved to end of the "visual" line
-                MediumEditor.selection.moveCursor(ownerDocument, element.firstChild, element.firstChild.textContent.length);
+                while (node) {
+                    if (node.nodeName.toLowerCase() !== 'span' && node.nodeName.toLowerCase() !== '#text') {
+                        break;
+                    }
+
+                    if (node.nextSibling && node.nextSibling.nodeName.toLowerCase() === 'br') {
+                        node.nextSibling.remove();
+                    }
+
+                    nextNode = node.nextSibling;
+
+                    newNode = ownerDocument.createElement('p');
+                    node.parentNode.replaceChild(newNode, node);
+                    newNode.appendChild(node);
+
+                    node = nextNode;
+                }
+
+                // Restore selection
+                newRange.setStart(startContainer, startOffset);
+                newRange.setEnd(endContainer, endOffset);
+                selection.removeAllRanges();
+                selection.addRange(newRange);
+            } else {
+                var list = element.parentElement;
+
+                if (list.parentElement.nodeName.toLowerCase() === 'p') { // yes we need to clean up
+                    Util.unwrap(list.parentElement, ownerDocument);
+
+                    // move cursor at the end of the text inside the list
+                    // for some unknown reason, the cursor is moved to end of the "visual" line
+                    MediumEditor.selection.moveCursor(ownerDocument, element.firstChild, element.firstChild.textContent.length);
+                }
             }
         },
 
