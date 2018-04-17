@@ -2,7 +2,7 @@
          prepareEvent, selectElementContents,
          selectElementContentsAndFire,
          placeCursorInsideElement,
-         isFirefox */
+         isIE, getEdgeVersion, isFirefox */
 
 describe('Content TestCase', function () {
     'use strict';
@@ -824,7 +824,14 @@ describe('Content TestCase', function () {
 
             selectElementContentsAndFire(target);
             fireEvent(toolbar.getToolbarElement().querySelector('[data-action="insertunorderedlist"]'), 'click');
-            expect(this.el.innerHTML).toBe('<p>lorem</p><ul><li>ipsum</li><li>dolor</li></ul>');
+
+            if (isIE() || getEdgeVersion() > 0) {
+                // IE and Edge wraps elements in div
+                expect(this.el.innerHTML).toBe('<div>lorem</div><ul><li>ipsum</li><li>dolor</li></ul>');
+            } else {
+                // Other browsers should wrap them in p
+                expect(this.el.innerHTML).toBe('<p>lorem</p><ul><li>ipsum</li><li>dolor</li></ul>');
+            }
         });
 
         it('should fix markup when miltiple list elements are unlisted', function () {
@@ -844,7 +851,13 @@ describe('Content TestCase', function () {
             selection.addRange(range);
 
             fireEvent(toolbar.getToolbarElement().querySelector('[data-action="insertorderedlist"]'), 'click');
-            expect(this.el.innerHTML).toBe('<p>lorem</p><p>ipsum</p><ol><li>dolor</li></ol>');
+            if (isIE() || getEdgeVersion() > 0) {
+                // IE and Edge wraps elements in div
+                expect(this.el.innerHTML).toBe('<div>lorem</div><div>ipsum</div><ol><li>dolor</li></ol>');
+            } else {
+                // Other browsers should wrap them in p
+                expect(this.el.innerHTML).toBe('<p>lorem</p><p>ipsum</p><ol><li>dolor</li></ol>');
+            }
         });
 
         it('should fix markup when all list elements are unlisted', function () {
@@ -859,7 +872,13 @@ describe('Content TestCase', function () {
 
             selectElementContentsAndFire(target);
             fireEvent(toolbar.getToolbarElement().querySelector('[data-action="insertunorderedlist"]'), 'click');
-            expect(this.el.innerHTML).toBe('<p>lorem</p><p>ipsum</p><p>dolor</p>');
+            if (isIE() || getEdgeVersion() > 0) {
+                // IE and Edge wraps elements in div
+                expect(this.el.innerHTML).toBe('<div>lorem</div><div>ipsum</div><div>dolor</div>');
+            } else {
+                // Other browsers should wrap them in p
+                expect(this.el.innerHTML).toBe('<p>lorem</p><p>ipsum</p><p>dolor</p>');
+            }
         });
     });
 });
