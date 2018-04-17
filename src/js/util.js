@@ -673,6 +673,28 @@
             return false;
         },
 
+        findFirstTextNodeInSelection: function (selection) {
+            if (selection.anchorNode.nodeType === 3) {
+                return selection.anchorNode;
+            }
+
+            var node = selection.anchorNode.firstChild;
+
+            while (node) {
+                if (selection.containsNode(node, true)) {
+                    if (node.nodeType === 3) {
+                        return node;
+                    } else {
+                        node = node.firstChild;
+                    }
+                } else {
+                    node = node.nextSibling;
+                }
+            }
+
+            return null;
+        },
+
         cleanListDOM: function (ownerDocument, element) {
             if (element.nodeName.toLowerCase() !== 'li') {
                 if (this.isIE || this.isEdge) {
@@ -686,23 +708,29 @@
                     startOffset = oldRange.startOffset,
                     endContainer = oldRange.endContainer,
                     endOffset = oldRange.endOffset,
-                    node, newNode, nextNode;
+                    node, newNode, nextNode, moveEndOffset;
 
                 if (element.nodeName.toLowerCase() === 'span') {
                     // Chrome & Safari unwraps removed li elements into a span
                     node = element;
+                    moveEndOffset = false;
                 } else {
                     // FF leaves them as text nodes
-                    node = startContainer;
+                    node = this.findFirstTextNodeInSelection(selection);
+                    moveEndOffset = startContainer.nodeType !== 3;
                 }
 
                 while (node) {
-                    if (node.nodeName.toLowerCase() !== 'span' && node.nodeName.toLowerCase() !== '#text') {
+                    if (node.nodeName.toLowerCase() !== 'span' && node.nodeType !== 3) {
                         break;
                     }
 
                     if (node.nextSibling && node.nextSibling.nodeName.toLowerCase() === 'br') {
                         node.nextSibling.remove();
+
+                        if (moveEndOffset) {
+                            endOffset--;
+                        }
                     }
 
                     nextNode = node.nextSibling;
