@@ -2,7 +2,7 @@
          prepareEvent, selectElementContents,
          selectElementContentsAndFire,
          placeCursorInsideElement,
-         isIE, getEdgeVersion, isFirefox */
+         getEdgeVersion, isFirefox */
 
 describe('Content TestCase', function () {
     'use strict';
@@ -825,8 +825,8 @@ describe('Content TestCase', function () {
             selectElementContentsAndFire(target);
             fireEvent(toolbar.getToolbarElement().querySelector('[data-action="insertunorderedlist"]'), 'click');
 
-            if (isIE() || getEdgeVersion() > 0) {
-                // IE and Edge wraps elements in div
+            if (getEdgeVersion() > 0) {
+                // Edge wraps elements in div
                 expect(this.el.innerHTML).toBe('<div>lorem</div><ul><li>ipsum</li><li>dolor</li></ul>');
             } else {
                 // Other browsers should wrap them in p
@@ -851,8 +851,8 @@ describe('Content TestCase', function () {
             selection.addRange(range);
 
             fireEvent(toolbar.getToolbarElement().querySelector('[data-action="insertorderedlist"]'), 'click');
-            if (isIE() || getEdgeVersion() > 0) {
-                // IE and Edge wraps elements in div
+            if (getEdgeVersion() > 0) {
+                // Edge wraps elements in div
                 expect(this.el.innerHTML).toBe('<div>lorem</div><div>ipsum</div><ol><li>dolor</li></ol>');
             } else {
                 // Other browsers should wrap them in p
@@ -872,8 +872,8 @@ describe('Content TestCase', function () {
 
             selectElementContentsAndFire(target);
             fireEvent(toolbar.getToolbarElement().querySelector('[data-action="insertunorderedlist"]'), 'click');
-            if (isIE() || getEdgeVersion() > 0) {
-                // IE and Edge wraps elements in div
+            if (getEdgeVersion() > 0) {
+                // Edge wraps elements in div
                 expect(this.el.innerHTML).toBe('<div>lorem</div><div>ipsum</div><div>dolor</div>');
             } else {
                 // Other browsers should wrap them in p
