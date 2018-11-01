@@ -234,6 +234,10 @@ var editor = new MediumEditor('.editable', {
     }
 });
 ```
+### List Allowed Options
+```
+bold,italic,underline,strikethrough,superscript,subscript,image,html,orderedlist,unorderedlist,indent,outdent,justifyCenter,justifyFull,justifyLeft,justifyRight,removeFormat,quote,pre,h1,h2,h3,h4,h5,h6
+```
 
 ### Anchor Preview options
 
