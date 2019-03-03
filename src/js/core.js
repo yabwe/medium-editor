@@ -167,6 +167,11 @@
     }
 
     function handleKeyup(event) {
+        // According to https://developer.mozilla.org/en-US/docs/Web/Events/keyup
+        // Ignore composing keyUp event, prevent from duplicated first char with CJK IME.
+        if (event.isComposing || event.keyCode === 229) {
+            return;
+        }
         var node = MediumEditor.selection.getSelectionStart(this.options.ownerDocument),
             tagName;
 
