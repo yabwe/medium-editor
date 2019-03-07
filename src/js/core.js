@@ -180,6 +180,12 @@
             this.options.ownerDocument.execCommand('formatBlock', false, 'p');
         }
 
+        // https://github.com/yabwe/medium-editor/issues/1455
+        // if somehow we have the BR as the selected element, typing does nothing, so move the cursor
+        if (node.nodeName === 'BR') {
+            MediumEditor.selection.moveCursor(this.options.ownerDocument, node.parentElement);
+        }
+
         // https://github.com/yabwe/medium-editor/issues/834
         // https://github.com/yabwe/medium-editor/pull/382
         // Don't call format block if this is a block element (ie h1, figCaption, etc.)
@@ -193,6 +199,14 @@
                 this.options.ownerDocument.execCommand('unlink', false, null);
             } else if (!event.shiftKey && !event.ctrlKey) {
                 this.options.ownerDocument.execCommand('formatBlock', false, 'p');
+                // https://github.com/yabwe/medium-editor/issues/1455
+                // firefox puts the focus on the br - so we need to move the cursor to the newly created p
+                if (MediumEditor.util.isFF) {
+                    var newParagraph = node.querySelector('p');
+                    if (newParagraph) {
+                        MediumEditor.selection.moveCursor(this.options.ownerDocument, newParagraph);
+                    }
+                }
             }
         }
     }
