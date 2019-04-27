@@ -303,7 +303,7 @@ module.exports = function (grunt) {
                     name: 'medium-editor-tests',
                     maxDuration: 900,
                     statusCheckAttempts: 900,
-                    idleTimeout: 600,
+                    idleTimeout: 600
                 }
             }
         }
