@@ -302,7 +302,8 @@ module.exports = function (grunt) {
                     build: process.env.TRAVIS_JOB_ID,
                     name: 'medium-editor-tests',
                     maxDuration: 900,
-                    idleTimeout: 600
+                    statusCheckAttempts: 900,
+                    idleTimeout: 600,
                 }
             }
         }
