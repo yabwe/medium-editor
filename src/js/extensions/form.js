@@ -48,7 +48,7 @@
             return false;
         },
 
-        /* hideForm: [function ()]
+        /* showForm: [function ()]
          *
          * This function should show the form element inside
          * the toolbar container
