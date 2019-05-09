@@ -38,41 +38,48 @@ module.exports = function (grunt) {
         ],
         browsers = [{
             browserName: 'internet explorer',
-            version: '9',
-            platform: 'WIN7'
+            platform: 'Windows 7',
+            version: '9.0'
         }, {
             browserName: 'internet explorer',
-            version: '10',
-            platform: 'WIN8'
+            platform: 'Windows 8',
+            version: '10.0'
         }, {
             browserName: 'internet explorer',
-            version: '11',
-            platform: 'WIN8.1'
+            platform: 'Windows 8.1',
+            version: '11.0'
         }, {
             browserName: 'internet explorer',
-            version: '11',
-            platform: 'Windows 10'
+            platform: 'Windows 10',
+            version: '11.285'
         }, {
             browserName: 'MicrosoftEdge',
-            platform: 'Windows 10'
+            platform: 'Windows 10',
+            version: '18.17763'
         }, {
             browserName: 'chrome',
-            platform: 'WIN8.1'
+            platform: 'Windows 8.1',
+            version: '74.0'
         }, {
             browserName: 'chrome',
-            platform: 'Windows 10'
+            platform: 'Windows 10',
+            version: '74.0'
         }, {
             browserName: 'googlechrome',
-            platform: 'OS X 10.11'
+            platform: 'OS X 10.11',
+            version: '74.0'
         }, {
             browserName: 'firefox',
-            platform: 'WIN8.1'
+            platform: 'Windows 8.1',
+            version: '66.0'
         }, {
             browserName: 'firefox',
-            platform: 'Windows 10'
+            platform: 'Windows 10',
+            version: '66.0'
         }, {
             browserName: 'firefox',
-            platform: 'OS X 10.11'
+            platform: 'OS X 10.11',
+            version: '66.0'
         }, {
             browserName: 'safari',
             platform: 'OS X 10.10',
@@ -302,7 +309,6 @@ module.exports = function (grunt) {
                     build: process.env.TRAVIS_JOB_ID,
                     name: 'medium-editor-tests',
                     maxDuration: 900,
-                    statusCheckAttempts: 900,
                     idleTimeout: 600
                 }
             }
