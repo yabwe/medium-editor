@@ -38,14 +38,6 @@ module.exports = function (grunt) {
         ],
         browsers = [{
             browserName: 'internet explorer',
-            platform: 'Windows 7',
-            version: '9.0'
-        }, {
-            browserName: 'internet explorer',
-            platform: 'Windows 8',
-            version: '10.0'
-        }, {
-            browserName: 'internet explorer',
             platform: 'Windows 8.1',
             version: '11.0'
         }, {
@@ -78,16 +70,16 @@ module.exports = function (grunt) {
             version: '66.0'
         }, {
             browserName: 'firefox',
-            platform: 'OS X 10.11',
+            platform: 'macOS 10.14',
             version: '66.0'
         }, {
             browserName: 'safari',
-            platform: 'OS X 10.10',
-            version: '8.0'
+            platform: 'macOS 10.14',
+            version: '12.0'
         }, {
             browserName: 'safari',
-            platform: 'OS X 10.11',
-            version: '10.0'
+            platform: 'macOS 10.13',
+            version: '12.0'
         }];
 
     gruntConfig.connect = {
