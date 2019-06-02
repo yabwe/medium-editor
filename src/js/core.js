@@ -942,6 +942,12 @@
                 MediumEditor.util.cleanListDOM(this.options.ownerDocument, this.getSelectedParentElement());
             }
 
+            // https://github.com/yabwe/medium-editor/issues/1496
+            // ensure the focus remains in the editor for Firefox
+            if (MediumEditor.util.isFF) {
+                MediumEditor.util.getContainerEditorElement(this.getSelectedParentElement()).focus();
+            }
+
             this.checkSelection();
             return result;
         },
