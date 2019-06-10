@@ -8,10 +8,8 @@ export = MediumEditor;
 
 declare class MediumEditor {
   constructor(element: string | HTMLElement | string[] | NodeList | HTMLCollection, options: MediumEditor.MediumOptions);
-}
 
-declare namespace MediumEditor {
-  /**
+    /**
    * Tear down the editor if already setup
    * - Calling the destroy() method on each extension within the editor.
    * This should allow all extension to be torn down and cleaned up, including the toolbar and its elements
@@ -20,15 +18,162 @@ declare namespace MediumEditor {
    * - Remove any custom attributes from the editor **elements**
    * - Unhide any `<textarea>` elements and remove any created `<div>` elements created for `<textarea>` elements
    */
-  export const destroy: () => void
+  destroy: () => void
+
   /**
    * Initialize this instance of the editor if it has been destroyed.
    * This will reuse the elements selector and options object passed in when the editor was instantiated
    */
-  export const setup: () => void
+  setup: () => void
+
+  /**
+   * Dynamically add one or more elements to an already initialized instance of MediumEditor  
+   * Passing an elements or array of elements to addElements(elements) will:
+   * - Add the given element or array of elements to the editor **elements**
+   * - Ensure the element(s) are initialized with the proper attributes and event handlers
+   *   as if the element had been passed during instantiation of the editor
+   * - For any `<textarea>` elements:
+   *  - Hide the `<textarea>`
+   *  - Create a new `<div contenteditable=true>` element and add it to the editor elements
+   *  - Ensure the 2 elements remain sync'd
+   * - Be intelligent enough to run the necessary code only once per element, no matter how often you will call it  
+   * 
+   * So, every element you pass to `addElements` will turn into a fully supported contenteditable too
+   * even earlier calls to `editor.subscribe(..)` for custom events will work on the newly added element(s)
+   */
+  addElements: (element: string | HTMLElement | string[] | NodeList | HTMLCollection) => void
   
   /**
-   * Options to customize medium-editor are passed as the second argument to the MediumEditor constructor.
+   * Remove one or more elements from an already initialized instance of MediumEditor  
+   * Passing an elements or array of elements to removeElements(elements) will:
+   * - Remove the given element or array of elements from the internal `this.elements` array
+   * - Remove any added event handlers or attributes (with the exception of `contenteditable`)
+   * - Unhide any `<textarea>` elements and remove any created `<div>` elements created for `<textarea>` elements  
+   * 
+   * Each element itself will remain a contenteditable - it will just remove all event handlers
+   * and all references to it so you can safely remove it from DOM
+   */
+  removeElements: (element: string | HTMLElement | string[] | NodeList | HTMLCollection) => void
+  
+  /**
+   * Attaches an event listener to a specific element or elements via the browser's built-in
+   * `addEventListener(type, listener, useCapture)` API.
+   * However, this helper method also ensures that when MediumEditor is destroyed,
+   * this event listener will be automatically be detached from the DOM
+   */
+  on: (
+    /**
+     * Element or elements to attach listener to via `addEventListener(type, listener, useCapture)`
+     */
+    targets: HTMLElement|NodeList,
+    /**
+     * type argument for `addEventListener(type, listener, useCapture)`
+     */
+    event: string,
+    /**
+     * listener argument for addEventListener(type, listener, useCapture)
+     */
+    listener: EventListenerOrEventListenerObject,
+    /**
+     * useCapture argument for addEventListener(type, listener, useCapture)
+     */
+    useCapture: boolean|AddEventListenerOptions,
+  ) => void
+  
+  /**
+   * Detach an event listener from a specific element or elements via the browser's built-in
+   * `removeEventListener(type, listener, useCapture)` API
+   */
+  off: (
+    /**
+     * Element or elements to attach listener to via `addEventListener(type, listener, useCapture)`
+     */
+    targets: HTMLElement|NodeList,
+    /**
+     * type argument for `addEventListener(type, listener, useCapture)`
+     */
+    event: string,
+    /**
+     * listener argument for addEventListener(type, listener, useCapture)
+     */
+    listener: EventListenerOrEventListenerObject,
+    /**
+     * useCapture argument for addEventListener(type, listener, useCapture)
+     */
+    useCapture: boolean|AddEventListenerOptions,
+  ) => void
+
+  /**
+   * Attaches a listener for the specified custom event name
+   */
+  subscribe: (
+    /**
+     * Name of the event to listen to. See the list of built-in
+     * TODO:Event: Add builtin events here after creating type
+     */
+    name: string,
+    /**
+     * Listener method that will be called whenever the custom event is triggered
+     */
+    listener: MediumEditor.CutstomEventListener
+  ) => void
+  
+  unsubscribe: (
+    /**
+     * Name of the event to listen to. See the list of built-in
+     * TODO:Event: Add builtin events here after creating type
+     */
+    name: string,
+    /**
+     * A reference to the listener to detach. This must be a match by-reference and not a copy.  
+     * **NOTE:** Calling `destroy()` on the MediumEditor object will automatically remove all custom event listeners
+     */
+    listener: MediumEditor.CutstomEventListener
+  ) => void
+  
+  /**
+   * Manually triggers a custom event
+   */
+  trigger: (
+    /**
+     * Name of the event to trigger
+     * TODO:Event: Add builtin events here after creating type
+     */
+    name: string,
+    /**
+     * Native Event object or custom data object to pass to all the listeners to this custom event
+     */
+    data: Event|object,
+    /**
+     * The `<div contenteditable=true></div>` element to pass to all of the listeners to this custom event
+     */
+    editable: HTMLElement
+  ) => void
+}
+
+declare namespace MediumEditor {
+  interface CutstomEventListener {
+    (
+      /**
+       * For most custom events, this will be the browser's native `Event` object
+       * for the event that triggered the custom event to fire.  
+       * For some custom events, this will be an object containing information
+       * describing the event (depending on which custom event it is)
+       */
+      data: Event|object,
+      /**
+       *  A reference to the contenteditable container element that this custom event corresponds to.
+       * This is especially useful for instances where one instance of MediumEditor contains multiple
+       * elements, or there are multiple instances of MediumEditor on the page.  
+       * For example, when `blur` fires, this argument will be the `<div contenteditable=true></div>`
+       * element that is about to receive focus
+       */
+      editable: HTMLElement
+    )
+  }
+  /**
+   * Options to customize medium-editor are passed as the second
+   * argument to the MediumEditor constructor.
    */
   export interface MediumOptions {
     /**
