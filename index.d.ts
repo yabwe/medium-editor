@@ -1,4 +1,4 @@
-import { Key } from "readline";
+import { on } from "cluster";
 
 // Type definitions for medium-editor 5.0.0
 // Project: https://yabwe.github.io/medium-editor
@@ -8,23 +8,28 @@ export as namespace MediumEditor;
 
 export = MediumEditor;
 
-declare class MediumEditor {
-  constructor(element: string | HTMLElement | string[] | NodeList | HTMLCollection, options: MediumEditor.MediumOptions);
-    
-    /**
-     * Given an editor element, retrieves the instance of `MediumEditor` which created/is monitoring the element
-     */
-    static getEditorFromElement: (element: HTMLElement) => MediumEditor
+declare class MediumEditor implements Partial<IMediumEditor> {
+  constructor(
+    element: string|HTMLElement|Element|string[]|NodeList|HTMLCollection,
+    options?: Partial<MediumEditor.MediumOptions>
+  );
+  
+  /**
+   * Given an editor element, retrieves the instance of `MediumEditor` which created/is monitoring the element
+   */
+  static getEditorFromElement: (element: HTMLElement|Element) => MediumEditor
 
-    /**
-     * Object containing data about the version of the current MediumEditor library
-     */
-    static version: MediumEditor.VersionObject
+  /**
+   * Object containing data about the version of the current MediumEditor library
+   */
+  static version: MediumEditor.VersionObject
 
-    static Extension: {
-      extend: (any) // TODO:Extension type
-    }
-    
+  static Extension: {
+    extend(extension: Partial<MediumEditor.Extension>)
+  }
+}
+
+interface IMediumEditor {
     /**
    * Tear down the editor if already setup
    * - Calling the destroy() method on each extension within the editor.
@@ -57,7 +62,7 @@ declare class MediumEditor {
    * So, every element you pass to `addElements` will turn into a fully supported contenteditable too
    * even earlier calls to `editor.subscribe(..)` for custom events will work on the newly added element(s)
    */
-  addElements: (element: string | HTMLElement | string[] | NodeList | HTMLCollection) => boolean
+  addElements: (element: string|HTMLElement|Element|string[]|NodeList|HTMLCollection) => boolean
   
   /**
    * Remove one or more elements from an already initialized instance of MediumEditor  
@@ -69,7 +74,7 @@ declare class MediumEditor {
    * Each element itself will remain a contenteditable - it will just remove all event handlers
    * and all references to it so you can safely remove it from DOM
    */
-  removeElements: (element: string | HTMLElement | string[] | NodeList | HTMLCollection) => void
+  removeElements: (element: string|HTMLElement|Element|string[]|NodeList|HTMLCollection) => void
   
   /**
    * Attaches an event listener to a specific element or elements via the browser's built-in
@@ -77,75 +82,93 @@ declare class MediumEditor {
    * However, this helper method also ensures that when MediumEditor is destroyed,
    * this event listener will be automatically be detached from the DOM
    */
-  on: (
-    /**
-     * Element or elements to attach listener to via `addEventListener(type, listener, useCapture)`
-     */
-    targets: HTMLElement|NodeList,
-    /**
-     * type argument for `addEventListener(type, listener, useCapture)`
-     */
-    event: string,
-    /**
-     * listener argument for addEventListener(type, listener, useCapture)
-     */
-    listener: EventListenerOrEventListenerObject,
-    /**
-     * useCapture argument for addEventListener(type, listener, useCapture)
-     */
-    useCapture: boolean|AddEventListenerOptions,
-  ) => MediumEditor
+  on<K extends keyof MediumEditor.EditorEventMap>(
+    targets: HTMLElement|NodeList|Element,
+    event: K,
+    listener: (data: MediumEditor.EditorEventMap[K], editable: HTMLElement|Element) => void,
+    useCapture?: boolean|AddEventListenerOptions,
+  ): MediumEditor
+  on<K extends keyof MediumEditor.ProxiedEventMap>(
+    targets: HTMLElement|NodeList|Element,
+    event: K,
+    listener: (data: MediumEditor.ProxiedEventMap[K], editable: HTMLElement|Element) => void,
+    useCapture?: boolean|AddEventListenerOptions,
+  ): MediumEditor
+  on<K extends keyof MediumEditor.ToolbarEventMap>(
+    targets: HTMLElement|NodeList|Element,
+    event: K,
+    listener: (data: MediumEditor.ToolbarEventMap[K], editable: HTMLElement|Element) => void,
+    useCapture?: boolean|AddEventListenerOptions,
+  ): MediumEditor
+  on<K extends keyof DocumentEventMap>(
+    targets: HTMLElement|NodeList|Element,
+    event: K,
+    listener: (type: DocumentEventMap[K], editable: HTMLElement|Element) => void,
+    useCapture?: boolean|AddEventListenerOptions,
+  ): MediumEditor
   
   /**
    * Detach an event listener from a specific element or elements via the browser's built-in
    * `removeEventListener(type, listener, useCapture)` API
    */
-  off: (
-    /**
-     * Element or elements to attach listener to via `addEventListener(type, listener, useCapture)`
-     */
-    targets: HTMLElement|NodeList,
-    /**
-     * type argument for `addEventListener(type, listener, useCapture)`
-     */
-    event: string,
-    /**
-     * listener argument for addEventListener(type, listener, useCapture)
-     */
-    listener: EventListenerOrEventListenerObject,
-    /**
-     * useCapture argument for addEventListener(type, listener, useCapture)
-     */
-    useCapture: boolean|AddEventListenerOptions,
-  ) => MediumEditor
+  off<K extends keyof MediumEditor.EditorEventMap>(
+    targets: HTMLElement|Element|NodeList|Element,
+    listener: (data: MediumEditor.EditorEventMap[K], editable: HTMLElement|Element) => void,
+    event: K,
+    useCapture?: boolean|AddEventListenerOptions,
+  ): MediumEditor
+  off<K extends keyof MediumEditor.ProxiedEventMap>(
+    targets: HTMLElement|NodeList|Element,
+    event: K,
+    listener: (data: MediumEditor.ProxiedEventMap[K], editable: HTMLElement|Element) => void,
+    useCapture?: boolean|AddEventListenerOptions,
+  ): MediumEditor
+  off<K extends keyof MediumEditor.ToolbarEventMap>(
+    targets: HTMLElement|NodeList|Element,
+    event: K,
+    listener: (data: MediumEditor.ToolbarEventMap[K], editable: HTMLElement|Element) => void,
+    useCapture?: boolean|AddEventListenerOptions,
+  ): MediumEditor
+  off<K extends keyof DocumentEventMap>(
+    targets: HTMLElement|NodeList|Element,
+    event: K,
+    listener: (type: DocumentEventMap[K], editable: HTMLElement|Element) => void,
+    useCapture?: boolean|AddEventListenerOptions,
+  ): MediumEditor
 
   /**
    * Attaches a listener for the specified custom event name
    */
-  subscribe: (
-    /**
-     * Name of the event to listen to. See the list of built-in
-     * TODO:Event: Add builtin events here after creating type
-     */
-    name: string,
-    /**
-     * Listener method that will be called whenever the custom event is triggered
-     */
-    listener: MediumEditor.CutstomEventListener
-  ) => MediumEditor
-  
-  unsubscribe: (
-    /**
-     * Name of the event to listen to. See the list of built-in
-     * TODO:Event: Add builtin events here after creating type
-     */
-    name: string,
-    /**
-     * A reference to the listener to detach. This must be a match by-reference and not a copy.  
-     * **NOTE:** Calling `destroy()` on the MediumEditor object will automatically remove all custom event listeners
-     */
-    listener: MediumEditor.CutstomEventListener
-  ) => MediumEditor
+  subscribe<K extends keyof MediumEditor.EditorEventMap>(
+    name: K, listener: (data: MediumEditor.EditorEventMap[K], editable: HTMLElement|Element) => void
+  ): MediumEditor
+  subscribe<K extends keyof MediumEditor.ProxiedEventMap>(
+    name: K, listener: (data: MediumEditor.ProxiedEventMap[K], editable: HTMLElement|Element) => void
+  ): MediumEditor
+  subscribe<K extends keyof MediumEditor.ToolbarEventMap>(
+    name: K, listener: (data: MediumEditor.ToolbarEventMap[K], editable: HTMLElement|Element) => void
+  ): MediumEditor
+  subscribe<K extends keyof DocumentEventMap>(
+    name: K, listener: (data: DocumentEventMap[K], editable: HTMLElement|Element) => void
+  ): MediumEditor
+
+  /**
+   * Detaches a custom event listener for the specified custom event name
+   * @param name Name of the event to detach the listener for
+   * @param listener A reference to the listener to detach. This must be a match by-reference and not a copy
+   */
+  unsubscribe<K extends keyof MediumEditor.EditorEventMap>(
+    name: K, listener: (data: MediumEditor.EditorEventMap[K]) => void
+  ): MediumEditor
+  unsubscribe<K extends keyof MediumEditor.ProxiedEventMap>(
+    name: K, listener: (data: MediumEditor.ProxiedEventMap[K]) => void, age: string,
+  ): MediumEditor
+  unsubscribe<K extends keyof MediumEditor.ToolbarEventMap>(
+    name: K, listener: (data: MediumEditor.ToolbarEventMap[K]) => void, age: string,
+  ): MediumEditor
+  unsubscribe<K extends keyof DocumentEventMap>(
+    name: K, listener: (data: DocumentEventMap[K]) => void, age: string,
+  ): MediumEditor
   
   /**
    * Manually triggers a custom event
@@ -153,17 +176,16 @@ declare class MediumEditor {
   trigger: (
     /**
      * Name of the event to trigger
-     * TODO:Event: Add builtin events here after creating type
      */
-    name: string,
+    name: keyof MediumEditor.EditorEventMap | keyof MediumEditor.ProxiedEventMap | keyof MediumEditor.ToolbarEventMap | keyof DocumentEventMap,
     /**
      * Native Event object or custom data object to pass to all the listeners to this custom event
      */
-    data: Event|object,
+    data?: Event|object,
     /**
      * The `<div contenteditable=true></div>` element to pass to all of the listeners to this custom event
      */
-    editable: HTMLElement
+    editable?: HTMLElement|Element
   ) => MediumEditor
   
   /**
@@ -183,18 +205,24 @@ declare class MediumEditor {
   /**
    * Restores the selection using a data representation of previously selected text 
    * (ie value returned by `exportSelection())
-   * @param selectionState Data representing the state of the selection to restore
-   * @param favorLaterSelectionAnchor If true, import the cursor immediately subsequent to an anchor tag
    * if it would otherwise be placed right at the trailing edge inside the anchor.
    * This cursor positioning, even though visually equivalent to the user, can affect behavior in Internet Explorer
    */
-  importSelection: (selectionState: object, favorLaterSelectionAnchor: boolean) => void
+  importSelection: (
+    /**
+     * Data representing the state of the selection to restore
+     */
+    selectionState: object,
+    /**
+     * If true, import the cursor immediately subsequent to an anchor tag
+     */
+    favorLaterSelectionAnchor?: boolean
+  ) => void
   
   /**
    * Returns a reference to the editor element that currently has focus (if the editor has focus)
-   * TODO: Verify return
    */
-  getFocusedElement: () => HTMLElement
+  getFocusedElement: () => HTMLElement|Element
   
   /**
    * Returns a reference to the editor *element* that the user's selection is currently within
@@ -205,7 +233,7 @@ declare class MediumEditor {
      * If no element is provided, the editor will use the current range within the selection of the editor's contentWindow
      */
     range?: Range
-  ) => HTMLElement
+  ) => HTMLElement|Element
   
   /**
    * Restores the selection to what was selected the last time `saveSelection()` was called
@@ -230,7 +258,7 @@ declare class MediumEditor {
     /**
      * DOM Element -- which is a descendant of one of the editor's elements -- to select
      */
-    element: HTMLElement
+    element: HTMLElement|Element
   ) => void
   
   /**
@@ -322,7 +350,7 @@ declare class MediumEditor {
      * The `<div contenteditable=true></div>` element that contains the html that may have changed  
      * If no element is provided, the editor will check the currently 'active' editor element (the element with focus)
      */
-    editable: HTMLElement
+    editable: HTMLElement|Element
   ) => void
   
   /**
@@ -343,15 +371,14 @@ declare class MediumEditor {
   
   /**
    * Get a reference to an extension with the specified name.
-   * TODO: Extension type
    */
-  getExtensionByName: (name: string) => any
+  getExtensionByName: (name: string) => MediumEditor.Extension
   
   /**
    * Reset the content of all editor elements to their value at the time they were added
    * to the editor. If a specific editor element is provided, only the content of that element will be reset
    */
-  resetContent: (element?: HTMLElement) => void
+  resetContent: (element?: HTMLElement|Element) => void
   
   /**
    * Returns a JSON object including the content of each of the elements inside the editor
@@ -401,7 +428,7 @@ declare namespace MediumEditor {
        * For example, when `blur` fires, this argument will be the `<div contenteditable=true></div>`
        * element that is about to receive focus
        */
-      editable: HTMLElement
+      editable: HTMLElement|Element
     )
   }
   /**
@@ -426,7 +453,7 @@ declare namespace MediumEditor {
      * MediumEditor will use this for attaching events, getting selection, etc.  
      * Default: `window`
      */
-    contentWindow: object
+    contentWindow: object|Window
     /**
      * Time in milliseconds to show the toolbar or anchor tag preview.  
      * Default: `0`
@@ -461,19 +488,18 @@ declare namespace MediumEditor {
      * Specifies a DOM node to contain MediumEditor's toolbar and anchor preview elements.
      * Default: ownerDocument.body
      */
-    elementsContainer: HTMLElement
+    elementsContainer: HTMLElement|Element
     /**
-     * TODO: Add extension type  
      * Custom extensions to use. See [Custom Buttons and Extensions](https://github.com/yabwe/medium-editor/blob/master/src/js/extensions) for more details on extensions.  
      * Default: `{}`
      */
-    extensions: any
+    extensions: Array<MediumEditor.Extension>
     /**
      * The ownerDocument object for the contenteditable element.
      * MediumEditor will use this for creating elements, getting selection, attaching events, etc.  
      * Default: window.document
      */
-    ownerDocument: HTMLElement
+    ownerDocument: object|Document
     /**
      * Enable/disable native contentEditable automatic spellcheck.  
      * Ddfault: `true`
@@ -490,25 +516,25 @@ declare namespace MediumEditor {
      * but can also hold any custom buttons passed in as extensions  
      * Setting the value to false diables the toolbar
      */
-    toolbar: false|MediumEditor.ToolbarOptions
+    toolbar: false|Partial<MediumEditor.ToolbarOptions>
     /**
      * The anchor preview is a built-in extension which automatically displays a 'tooltip' when the user
      * is hovering over a link in the editor. The tooltip will display the href of the link, and when
      * click, will open the anchor editing form in the toolbar.  
      * To disable the anchor preview, set the value of the `anchorPreview` option to `false`:
      */
-    anchorPreview: false|MediumEditor.AnchorPreviewOptions
+    anchorPreview: false|Partial<MediumEditor.AnchorPreviewOptions>
     /**
      * The placeholder handler is a built-in extension which displays placeholder text when the editor is empty.  
      * To disable the placeholder, set the value of the placeholder option to `false`
      */
-    placeholder: false|MediumEditor.PlaceholderOptions
+    placeholder: boolean|Partial<MediumEditor.PlaceholderOptions>
     /**
      * The anchor form is a built-in button extension which allows the user to add/edit/remove links from within the editor.
      * When 'anchor' is passed in as a button in the list of buttons, this extension will be enabled
      * and can be triggered by clicking the corresponding button in the toolbar  
      */
-    anchor: AnchorFormOptions
+    anchor: Partial<AnchorFormOptions>
     /**
      * The paste handler is a built-in extension which attempts to filter the content when the user pastes.
      * How the paste handler filters is configurable via specific options  
@@ -519,7 +545,7 @@ declare namespace MediumEditor {
      * The keyboard commands handler is a built-in extension for mapping key-combinations to actions to execute in the editor  
      * To disable the keyboard commands, set the value of the `keyboardCommands` option to `false`
      */
-    keyboardCommands: MediumEditor.KeyboardCommandOptions
+    keyboardCommands: Partial<MediumEditor.KeyboardCommandOptions>
     /**
      * The auto-link handler is a built-in extension which automatically turns URLs entered into the text field
      * into HTML anchor tags (similar to the functionality of Markdown).  
@@ -741,7 +767,7 @@ declare namespace MediumEditor {
      * CSS class added to the last button in the toolbar.  
      * Default: `'medium-editor-button-last'`
      */
-    lastButtonClass
+    lastButtonClass: string
     /**
      * DOMElement to append the toolbar to instead of the body.
      * When an element is passed the toolbar will also be positioned `relative`
@@ -750,7 +776,7 @@ declare namespace MediumEditor {
      * **NOTE:** Using this in combination with the static option for toolbar is not
      * explicitly supported and the behavior in this case is not defined
      */
-    relativeContainer: HTMLElement
+    relativeContainer: HTMLElement|Element
     /**
      * Enables/disables standardizing how the beginning of a range is decided between browsers
      * whenever the selected text is analyzed for updating toolbar buttons status  
@@ -780,5 +806,126 @@ declare namespace MediumEditor {
      */
     updateOnEmptySelection: boolean
   }
+  
+  interface EditorEventMap {
+    "addElement": any;
+    "blur": any;
+    "editableInput": any;
+    "externalInteraction": any;
+    "focus": any;
+    "removeElement": any;
+  }
+  
+  interface ToolbarEventMap {
+    "hideToolbar": any;
+    "positionToolbar": any;
+    "positionedToolbar" : any;
+    "showToolbar": any
+  }
+  
+  interface ProxiedEventMap {
+    "editableClick": MouseEvent;
+    "editableBlur": FocusEvent;
+    "editableKeypress": KeyboardEvent;
+    "editableKeyup": KeyboardEvent;
+    "editableKeydown": KeyboardEvent;
+    "editableKeydownEnter": KeyboardEvent;
+    "editableKeydownTab": KeyboardEvent;
+    "editableKeydownDelete": KeyboardEvent;
+    "editableKeydownSpace": KeyboardEvent;
+    "editableMouseover": MouseEvent;
+    "editableDrag": DragEvent;
+    "editableDrop": DragEvent;
+    "editablePaste": ClipboardEvent;
+  }
 
+  
+  export interface Extension {
+    /**
+     * The name to identify the extension by. This is used for calls to
+     * MediumEditor.getExtensionByName(name) to retrieve the extension
+     * 
+     */
+    name: string
+    /**
+     * Called by MediumEditor during initialization.
+     */
+    init(this: MediumEditor.ExtensionHelpers): void
+    /**
+     * If implemented, this method will be called one or more times after
+     * the state of the editor & toolbar are updated
+     * @param node Current node, within the ancestors of the selection, 
+     * hat is being checked whenever a selection change occurred
+     */
+    checkState(this: MediumEditor.ExtensionHelpers, node: HTMLElement|Element): void
+    /**
+     * This method will be called whenever the MediumEditor is being destroyed
+     * (via a call to `MediumEditor.destroy())`
+     */
+    destroy(this: MediumEditor.ExtensionHelpers): void
+    /**
+     * his method will be called once on each extension
+     * when the state of the editor/toolbar is being updated
+     */
+    queryCommandState(this: MediumEditor.ExtensionHelpers): boolean|void
+    /**
+     * If the extension renders any elements that the user can interact with,
+     * this method should be implemented and return the root element
+     * or an array containing all of the root elements
+     */
+    getInteractionElements(this: MediumEditor.ExtensionHelpers): void
+    /**
+     * This method will be called from MediumEditor to determine whether the button has already been set as 'active'
+     */
+    isActive(this: MediumEditor.ExtensionHelpers): boolean
+    /**
+     * This method is similar to `checkState()` in that it will be called repeatedly as MediumEditor
+     * moves up the DOM to update the editor & toolbar after a state change
+     */
+    isAlreadyApplied(this: MediumEditor.ExtensionHelpers, node: HTMLElement|Element): boolean
+    /**
+     * his method is called when MediumEditor knows that this extension is currently enabled
+     */
+    setActive(this: MediumEditor.ExtensionHelpers): void
+    /**
+     * This method is called when MediumEditor knows that this extension
+     * has not been applied to the current selection. Curently, this is called
+     * at the beginning of each state change for the editor & toolbar
+     */
+    setInactive(this: MediumEditor.ExtensionHelpers): void
+  }
+  
+  interface ExtensionHelpers {
+    /**
+     * A reference to the instance of MediumEditor that this extension is part of
+     */
+    base: MediumEditor
+    /**
+     * A reference to the content window to be used by this instance of MediumEditor. 
+     * This maps to the value of the `contentWindow` option that is passed into MediumEditor
+     */
+    window: Window
+    /**
+     * A reference to the owner document to be used by this instance of MediumEditor.
+     * This maps to the value of the `ownerDocument` option that is passed into MediumEditor
+     */
+    document: Document
+    /**
+     * Returns a reference to the array of elements monitored by this instance of MediumEditor
+     */
+    getEditorElements(): Array<Element|HTMLElement>
+    /**
+     * Returns the unique identifier for this instance of MediumEditor
+     */
+    getEditorId(): number
+    /**
+     * Returns the value of a specific option used to initialize the MediumEditor object
+     */
+    getEditorOption<O extends keyof MediumEditor.MediumOptions>(option: O): MediumOptions[O]|object
+    execAction: IMediumEditor["execAction"]
+    on: IMediumEditor["on"]
+    off: IMediumEditor["off"]
+    subscribe: IMediumEditor["subscribe"]
+    trigger: IMediumEditor["trigger"]
+  }
 }
