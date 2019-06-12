@@ -1,5 +1,7 @@
+import { Key } from "readline";
+
 // Type definitions for medium-editor 5.0.0
-// Project: medium-editor
+// Project: https://yabwe.github.io/medium-editor
 // Definitions by: Ashinze Ekene <https://github.com/ashinzekene>
 
 export as namespace MediumEditor;
@@ -8,7 +10,21 @@ export = MediumEditor;
 
 declare class MediumEditor {
   constructor(element: string | HTMLElement | string[] | NodeList | HTMLCollection, options: MediumEditor.MediumOptions);
+    
+    /**
+     * Given an editor element, retrieves the instance of `MediumEditor` which created/is monitoring the element
+     */
+    static getEditorFromElement: (element: HTMLElement) => MediumEditor
 
+    /**
+     * Object containing data about the version of the current MediumEditor library
+     */
+    static version: MediumEditor.VersionObject
+
+    static Extension: {
+      extend: (any) // TODO:Extension type
+    }
+    
     /**
    * Tear down the editor if already setup
    * - Calling the destroy() method on each extension within the editor.
@@ -41,7 +57,7 @@ declare class MediumEditor {
    * So, every element you pass to `addElements` will turn into a fully supported contenteditable too
    * even earlier calls to `editor.subscribe(..)` for custom events will work on the newly added element(s)
    */
-  addElements: (element: string | HTMLElement | string[] | NodeList | HTMLCollection) => void
+  addElements: (element: string | HTMLElement | string[] | NodeList | HTMLCollection) => boolean
   
   /**
    * Remove one or more elements from an already initialized instance of MediumEditor  
@@ -78,7 +94,7 @@ declare class MediumEditor {
      * useCapture argument for addEventListener(type, listener, useCapture)
      */
     useCapture: boolean|AddEventListenerOptions,
-  ) => void
+  ) => MediumEditor
   
   /**
    * Detach an event listener from a specific element or elements via the browser's built-in
@@ -101,7 +117,7 @@ declare class MediumEditor {
      * useCapture argument for addEventListener(type, listener, useCapture)
      */
     useCapture: boolean|AddEventListenerOptions,
-  ) => void
+  ) => MediumEditor
 
   /**
    * Attaches a listener for the specified custom event name
@@ -116,7 +132,7 @@ declare class MediumEditor {
      * Listener method that will be called whenever the custom event is triggered
      */
     listener: MediumEditor.CutstomEventListener
-  ) => void
+  ) => MediumEditor
   
   unsubscribe: (
     /**
@@ -129,7 +145,7 @@ declare class MediumEditor {
      * **NOTE:** Calling `destroy()` on the MediumEditor object will automatically remove all custom event listeners
      */
     listener: MediumEditor.CutstomEventListener
-  ) => void
+  ) => MediumEditor
   
   /**
    * Manually triggers a custom event
@@ -148,10 +164,227 @@ declare class MediumEditor {
      * The `<div contenteditable=true></div>` element to pass to all of the listeners to this custom event
      */
     editable: HTMLElement
+  ) => MediumEditor
+  
+  /**
+   * If the toolbar is enabled, manually forces the toolbar to update based on the user's
+   * current selection. This includes hiding/showing the toolbar, positioning the toolbar,
+   * and updating the enabled/disable state of the toolbar buttons
+   */
+  checkSelection: () => void
+  
+  /**
+   * Returns a data representation of the selected text, which can be applied via
+   * `importSelection(selectionState)`. This data will include the beginning and end of the
+   * selection, as well as which of the editor **elements** the selection was within
+   */
+  exportSelection: () => void
+  
+  /**
+   * Restores the selection using a data representation of previously selected text 
+   * (ie value returned by `exportSelection())
+   * @param selectionState Data representing the state of the selection to restore
+   * @param favorLaterSelectionAnchor If true, import the cursor immediately subsequent to an anchor tag
+   * if it would otherwise be placed right at the trailing edge inside the anchor.
+   * This cursor positioning, even though visually equivalent to the user, can affect behavior in Internet Explorer
+   */
+  importSelection: (selectionState: object, favorLaterSelectionAnchor: boolean) => void
+  
+  /**
+   * Returns a reference to the editor element that currently has focus (if the editor has focus)
+   * TODO: Verify return
+   */
+  getFocusedElement: () => HTMLElement
+  
+  /**
+   * Returns a reference to the editor *element* that the user's selection is currently within
+   */
+  getSelectedParentElement: (
+    /**
+     * The Range to find the selection parent element within.
+     * If no element is provided, the editor will use the current range within the selection of the editor's contentWindow
+     */
+    range?: Range
+  ) => HTMLElement
+  
+  /**
+   * Restores the selection to what was selected the last time `saveSelection()` was called
+   */
+  restoreSelection: () => void
+  
+  /**
+   * Internally stores the user's current selection. This can be restored by calling `restoreSelection()`
+   */
+  saveSelection: () => void
+
+  /**
+   * Expands the selection to contain all text within the focused editor *element*
+   */
+  selectAllContents: () => void
+  
+  /**
+   * Change the user's selection to select the contents of the
+   * provided element and update the toolbar to reflect this change
+   */
+  selectElement: (
+    /**
+     * DOM Element -- which is a descendant of one of the editor's elements -- to select
+     */
+    element: HTMLElement
   ) => void
+  
+  /**
+   * Stop the toolbar from updating to reflect changes in the user's selection
+   */
+  stopSelectionUpdates: () => void
+  
+  /**
+   * Enable the toolbar to start updating based on the user's selection,
+   * after a call to `stopSelectionUpdates()`
+   */
+  startSelectionUpdates: () => void
+  
+  /**
+   * Convert text to plaintext and replace current selection with result
+   */
+  cleanPaste: (
+    /**
+     * Content to be pasted at the location of the current selection/cursor
+     */
+    text: string
+  ) => void
+  
+  /**
+   * creates a link via the native `document.execCommand('createLink')` command
+   */
+  createLink: (
+    options: {
+      /**
+       * he url to set as the `href` of the created link.
+       * A non-empty value must be provided for the link to be created
+       */
+      value: string,
+      /**
+       * Attribute to set as the `target` attribute of the created link.  Passing 'self'
+       * or not passing this option at all are equivalent in that they will just ensure that
+       *`target="_blank"` will NOT be present on the created link  
+       * **NOTE** If the `targetBlank` option on the editor is set to true, the `target`
+       * property of opts will be ignored and `target="_blank"` will be added to all created links
+       */
+      target?: string,
+      /**
+       * Class (or classes) to append to the `class` attribute of the created link
+       */
+      buttonClass?: string,
+    }
+  ) => void
+  
+  /**
+   * Executes an built-in action via `document.execCommand`
+   */
+  execAction: (
+    /**
+     * Action to be passed as the 'command' argument
+     * to `document.execCommand(command, showDefaultUI, value)`
+     */
+    action: string,
+    /**
+     * Object containing additional properties for specific commands
+     * https://github.com/yabwe/medium-editor/blob/master/API.md#execactionaction-opts
+     */
+    options?: object
+  ) => boolean
+  
+  /**
+   * Replace the current selection with html
+   */
+  pasteHTML: (
+    html: string,
+    options?: MediumEditor.PasteOptions
+  ) => void
+  
+  /**
+   * Wrapper around the browser's built in `document.queryCommandState(command)`
+   * for checking whether a specific action has already been applied to the selection
+   */
+  queryCommandState: (
+    /**
+     * Action to be passed as the 'command' argument to `document.queryCommandState(command)`
+     */
+    action: string
+  ) => boolean
+  
+  /**
+   * Trigger the editor to check for updates to the html, and trigger the `editableInput` event if needed
+   */
+  checkContentEditable: (
+    /**
+     * The `<div contenteditable=true></div>` element that contains the html that may have changed  
+     * If no element is provided, the editor will check the currently 'active' editor element (the element with focus)
+     */
+    editable: HTMLElement
+  ) => void
+  
+  /**
+   * Delay any function from being executed by the amount of time passed as the delay option
+   */
+  delay: (fn: () => any) => void
+  
+  /**
+   * Returns the trimmed html content for the first editor element, or the element at `index`
+   */
+  getContext: (
+    /**
+     * Index of the editor *element* to retrieve the content from.
+     * Defaults to 0 when not provided (returns content of the first editor *element*)
+     */
+    index?: number
+  ) => void
+  
+  /**
+   * Get a reference to an extension with the specified name.
+   * TODO: Extension type
+   */
+  getExtensionByName: (name: string) => any
+  
+  /**
+   * Reset the content of all editor elements to their value at the time they were added
+   * to the editor. If a specific editor element is provided, only the content of that element will be reset
+   */
+  resetContent: (element?: HTMLElement) => void
+  
+  /**
+   * Returns a JSON object including the content of each of the elements inside the editor
+   */
+  serialize: () => string
+  
+  /**
+   * Sets the html content for the first editor **element**, or the **element** at `index`.
+   * Ensures the the `editableInput` event is triggered
+   */
+  setContent: (
+    /**
+     * The content to set the element to
+     */
+    html: string,
+    /**
+     * Index of the editor element to set the content of.  
+     * Defaults to `0` when not provided (sets content of the first editor element)
+     */
+    index?: number
+  ) => void 
+  
 }
 
 declare namespace MediumEditor {
+  interface VersionObject {
+    major: number,
+    minor: number,
+    revision: number,
+    preRelease: string,
+    toString: () => string
+  }
+
   interface CutstomEventListener {
     (
       /**
@@ -547,5 +780,5 @@ declare namespace MediumEditor {
      */
     updateOnEmptySelection: boolean
   }
-  
+
 }
