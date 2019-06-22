@@ -1,5 +1,3 @@
-import { on } from "cluster";
-
 // Type definitions for medium-editor 5.0.0
 // Project: https://yabwe.github.io/medium-editor
 // Definitions by: Ashinze Ekene <https://github.com/ashinzekene>
@@ -25,7 +23,7 @@ declare class MediumEditor implements Partial<IMediumEditor> {
   static version: MediumEditor.VersionObject
 
   static Extension: {
-    extend(extension: Partial<MediumEditor.Extension>)
+    extend(extension: Partial<MediumEditor.Extension>): void
   }
 }
 
@@ -745,7 +743,6 @@ declare namespace MediumEditor {
     /**
      * The set of buttons to display on the toolbar.  
      * Default: `['bold', 'italic', 'underline', 'anchor', 'h2', 'h3', 'quote']`  
-     * TODO: Check if there a button list type can be created
      */
     buttons: string[]
     /**
@@ -927,5 +924,61 @@ declare namespace MediumEditor {
     off: IMediumEditor["off"]
     subscribe: IMediumEditor["subscribe"]
     trigger: IMediumEditor["trigger"]
+  }
+  
+  export interface Button {
+    /**
+     * If the name of an extension appears in the toolbar.buttons option,
+     * the MediumEditortoolbar will attempt to call this getButton() method on
+     * the extension. The HTMLElement returned by this method will be appended to the toolbar
+     */
+    getButton(): HTMLElement|Element
+    /**
+     * By default, the action argument to pass to `MediumEditor.execAction()` when the button is clicked.
+     * The value of this will also be set as the value of the `data-action`
+     * attribute which will be set on the button
+     */
+    action: string
+    /**
+     * The value to add as both the `aria-label` and `title` attributes of the button
+     */
+    aria: string
+    /**
+     * Array of element tag names that would indicate that this button has already been applied.
+     * If this action has already been applied, the button will be displayed as 'active' in the toolbar
+     */
+    tagNames: string[]
+    /**
+     * A pair of css property & value(s) that indicate that this button has already been applied.
+     * If this action has already been applied, the button will be displayed as 'active' in the toolbar
+     */
+    style: {prop: string, value: string|number}
+    /**
+     * Enables/disables whether this button should use the built-in `document.queryCommandState()`
+     * method to determine whether the action has already been applied
+     */
+    useQueryState: boolean
+    /**
+     * Default innerHTML to put inside the button
+     */
+    contentDefault: string
+    /**
+     * The innerHTML to use for the content of the button if the `buttonLabels`
+     * option for MediumEditor is set to `'fontawesome'`
+     */
+    contentFA: string
+    /**
+     * An array of classNames (strings) to be added to the button
+     */
+    classList: string[]
+    /**
+     * A set of key-value pairs to add to the button as custom attributes.
+     */
+    attrs: Object
+    /**
+     * The event listener called when the button is clicked.
+     * The default built-in button will call `this.execAction(action)` when the button is clicked
+     */
+    handleClick(e: Event): void
   }
 }
