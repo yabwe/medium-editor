@@ -149,13 +149,13 @@ describe('Core-API', function () {
             button = toolbar.getToolbarElement().querySelector('[data-action="underline"]');
             fireEvent(button, 'click');
 
-            // Restore selection back to <i> tag and add a <strike> tag
+            // Restore selection back to <i> tag and add a <s> tag
             editor.restoreSelection();
             button = toolbar.getToolbarElement().querySelector('[data-action="strikethrough"]');
             fireEvent(button, 'click');
 
             // Edge breaks this into 3 separate <u> tags for some reason...
-            var regex = new RegExp('^<u>lorem (<i><strike>|<strike><i>|</u><i><u><strike>)ipsum(</i></strike>|</strike></i>|</strike></u></i><u>) dolor</u>$');
+            var regex = new RegExp('^<u>lorem (<i><s>|<s><i>|</u><i><u><s>)ipsum(</i></s>|</s></i>|</s></u></i><u>) dolor</u>$');
             expect(editor.elements[0].innerHTML).toMatch(regex);
         });
     });
