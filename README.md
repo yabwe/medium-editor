@@ -241,7 +241,7 @@ var editor = new MediumEditor('.editable', {
 
 ### Anchor Preview options
 
-The anchor preview is a built-in extension which automatically displays a 'tooltip' when the user is hovering over a link in the editor.  The tooltip will display the `href` of the link, and when click, will open the anchor editing form in the toolbar.
+The anchor preview is a built-in extension which automatically displays a 'tooltip' when the user is hovering over a link in the editor.  The tooltip will display the `href` of the link, and when clicked, will open the anchor editing form in the toolbar.
 
 Options for the anchor preview 'tooltip' are passed as an object that is a member of the outer options object. Example:
 ```javascript
@@ -488,7 +488,7 @@ MediumEditor, by default, will show only the buttons listed here to avoid a huge
 * __bold__
 * __italic__
 * __underline__
-* __anchor__ _(built-in support for collecting a url via the anchor extension)_
+* __anchor__ _(built-in support for collecting a URL via the anchor extension)_
 * __h2__
 * __h3__
 * __quote__
@@ -694,7 +694,7 @@ The source files are located inside the __src__ directory.  Be sure to make chan
 4. Update the documentation to reflect your changes if they add or changes current functionality.
 5. Commit your changes (`git commit -am 'Added some feature'`) **without files from the _dist_ directory**.
 6. Push to the branch (`git push origin my-new-feature`)
-7. Create new Pull Request
+7. Create a new Pull Request
 
 ### Code Consistency
 
