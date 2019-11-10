@@ -32,6 +32,7 @@ $medium-editor-placeholder-color: #f8f5f3;
             min-width: $medium-editor-button-size;
             padding: 5px 12px;
             transition: background-color .2s ease-in, color .2s ease-in;
+
             &:hover {
                 background-color: $medium-editor-hover-color;
                 color: $medium-editor-button-active-text-color;
@@ -73,20 +74,23 @@ $medium-editor-placeholder-color: #f8f5f3;
         width: 220px;
 
         &::-webkit-input-placeholder {
-           color: $medium-editor-placeholder-color;
-           color: rgba($medium-editor-placeholder-color, .8);
+            color: $medium-editor-placeholder-color;
+            color: rgba($medium-editor-placeholder-color, .8);
         }
+
         &:-moz-placeholder { /* Firefox 18- */
-           color: $medium-editor-placeholder-color;
-           color: rgba($medium-editor-placeholder-color, .8);
+            color: $medium-editor-placeholder-color;
+            color: rgba($medium-editor-placeholder-color, .8);
         }
-        &::-moz-placeholder {  /* Firefox 19+ */
-           color: $medium-editor-placeholder-color;
-           color: rgba($medium-editor-placeholder-color, .8);
+
+        &::-moz-placeholder { /* Firefox 19+ */
+            color: $medium-editor-placeholder-color;
+            color: rgba($medium-editor-placeholder-color, .8);
         }
+
         &:-ms-input-placeholder {
-           color: $medium-editor-placeholder-color;
-           color: rgba($medium-editor-placeholder-color, .8);
+            color: $medium-editor-placeholder-color;
+            color: rgba($medium-editor-placeholder-color, .8);
         }
     }
 
@@ -96,7 +100,7 @@ $medium-editor-placeholder-color: #f8f5f3;
     }
 
     .medium-editor-toolbar-close {
-      margin-right: 16px;
+        margin-right: 16px;
     }
 }
 
@@ -107,14 +111,14 @@ $medium-editor-placeholder-color: #f8f5f3;
 }
 
 .medium-editor-anchor-preview {
-  a {
-    color: $medium-editor-link-color;
-    text-decoration: none;
-  }
+    a {
+        color: $medium-editor-link-color;
+        text-decoration: none;
+    }
 }
 
 .medium-editor-toolbar-actions {
-  li, button {
-    border-radius: $medium-editor-border-radius;
-  }
+    li, button {
+        border-radius: $medium-editor-border-radius;
+    }
 }

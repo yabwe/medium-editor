@@ -4,12 +4,12 @@
     &:after {
         content: attr(data-placeholder) !important;
         font-style: italic;
-        position: absolute;
         left: 0;
+        margin: inherit;
+        padding: inherit;
+        position: absolute;
         top: 0;
         white-space: pre;
-        padding: inherit;
-        margin: inherit;
     }
 }
 
@@ -19,9 +19,9 @@
     &:after {
         content: attr(data-placeholder) !important;
         font-style: italic;
+        margin: inherit;
+        padding: inherit;
         position: relative;
         white-space: pre;
-        padding: inherit;
-        margin: inherit;
     }
 }

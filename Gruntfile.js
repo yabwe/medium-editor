@@ -126,7 +126,7 @@ module.exports = function (grunt) {
                 specs: ['spec/*.spec.js'],
                 helpers: 'spec/helpers/*.js',
                 vendor: [
-                    'node_modules/lodash/index.js',
+                    'node_modules/lodash/lodash.js',
                     'spec/vendor/jasmine-jsreporter.js',
                     'spec/vendor/jasmine-jsreporter-script.js'
                 ],
@@ -342,7 +342,7 @@ module.exports = function (grunt) {
     grunt.registerTask('sauce', ['connect', 'saucelabs-jasmine']);
     grunt.registerTask('js', ['jshint', 'jscs', 'concat', 'jasmine:suite', 'uglify']);
     grunt.registerTask('css', ['sass', 'autoprefixer', 'cssmin', 'csslint']);
-    grunt.registerTask('default', ['js', 'css']);
+    grunt.registerTask('default', ['css', 'js']);
 
     grunt.registerTask('spec', 'Runs a task on a specified file', function (taskName, fileName) {
         globalConfig.file = fileName;

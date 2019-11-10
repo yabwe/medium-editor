@@ -7,9 +7,9 @@
     position: absolute;
     text-align: center;
     top: 0;
+    visibility: hidden;
     word-break: break-all;
     word-wrap: break-word;
-    visibility: hidden;
     z-index: $z-toolbar;
 
     a {

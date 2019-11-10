@@ -15,21 +15,21 @@ $medium-editor-border-radius: 5px;
 }
 
 .medium-editor-toolbar {
-    background-color: $medium-editor-bgcolor;
     background: linear-gradient(to bottom, $medium-editor-bgcolor, rgba($medium-editor-bgcolor, 0.75));
+    background-color: $medium-editor-bgcolor;
     border: 1px solid #000;
     border-radius: $medium-editor-border-radius;
     box-shadow: 0 0 3px #000;
 
     li {
         button {
-            background-color: $medium-editor-bgcolor;
             background: linear-gradient(to bottom, $medium-editor-bgcolor, rgba($medium-editor-bgcolor, 0.89));
+            background-color: $medium-editor-bgcolor;
             border: 0;
-            border-right: 1px solid #000;
             border-left: 1px solid #333;
             border-left: 1px solid rgba(#fff, .1);
-            box-shadow: 0 2px 2px rgba(0,0,0,0.3);
+            border-right: 1px solid #000;
+            box-shadow: 0 2px 2px rgba(0, 0, 0, 0.3);
             color: #fff;
             height: $medium-editor-button-size;
             min-width: $medium-editor-button-size;
@@ -52,8 +52,8 @@ $medium-editor-border-radius: 5px;
         }
 
         .medium-editor-button-active {
-            background-color: #000;
             background: linear-gradient(to bottom, $medium-editor-bgcolor, rgba(#000, 0.89));
+            background-color: #000;
             color: #fff;
         }
     }

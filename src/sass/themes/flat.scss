@@ -8,13 +8,13 @@ $medium-editor-placeholder-color: #fff;
 
 // theme rules
 .medium-toolbar-arrow-under:after {
-    top: $medium-editor-button-size;
     border-color: $medium-editor-bgcolor transparent transparent transparent;
+    top: $medium-editor-button-size;
 }
 
 .medium-toolbar-arrow-over:before {
-    top: -8px;
     border-color: transparent transparent $medium-editor-bgcolor transparent;
+    top: -8px;
 }
 
 .medium-editor-toolbar {
@@ -24,13 +24,14 @@ $medium-editor-placeholder-color: #fff;
         padding: 0;
 
         button {
-            min-width: $medium-editor-button-size;
-            height: $medium-editor-button-size;
+            background-color: transparent;
             border: none;
             border-right: 1px solid lighten($medium-editor-bgcolor, 20);
-            background-color: transparent;
             color: $medium-editor-link-color;
+            height: $medium-editor-button-size;
+            min-width: $medium-editor-button-size;
             transition: background-color .2s ease-in, color .2s ease-in;
+
             &:hover {
                 background-color: darken($medium-editor-bgcolor, 20);
                 color: $medium-editor-button-active-text-color;
@@ -50,28 +51,28 @@ $medium-editor-placeholder-color: #fff;
 
 .medium-editor-toolbar-form {
     .medium-editor-toolbar-input {
-        height: $medium-editor-button-size;
         background: $medium-editor-bgcolor;
         color: $medium-editor-link-color;
+        height: $medium-editor-button-size;
 
         &::-webkit-input-placeholder {
-           color: $medium-editor-placeholder-color;
-           color: rgba($medium-editor-placeholder-color, .8);
+            color: $medium-editor-placeholder-color;
+            color: rgba($medium-editor-placeholder-color, .8);
         }
 
         &:-moz-placeholder { /* Firefox 18- */
-           color: $medium-editor-placeholder-color;
-           color: rgba($medium-editor-placeholder-color, .8);
+            color: $medium-editor-placeholder-color;
+            color: rgba($medium-editor-placeholder-color, .8);
         }
 
-        &::-moz-placeholder {  /* Firefox 19+ */
-           color: $medium-editor-placeholder-color;
-           color: rgba($medium-editor-placeholder-color, .8);
+        &::-moz-placeholder { /* Firefox 19+ */
+            color: $medium-editor-placeholder-color;
+            color: rgba($medium-editor-placeholder-color, .8);
         }
 
         &:-ms-input-placeholder {
-           color: $medium-editor-placeholder-color;
-           color: rgba($medium-editor-placeholder-color, .8);
+            color: $medium-editor-placeholder-color;
+            color: rgba($medium-editor-placeholder-color, .8);
         }
     }
 

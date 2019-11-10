@@ -1,52 +1,21 @@
-@-webkit-keyframes medium-editor-image-loading {
-  0% {
-    -webkit-transform: scale(0);
-            transform: scale(0); }
-  100% {
-    -webkit-transform: scale(1);
-            transform: scale(1); } }
-
 @keyframes medium-editor-image-loading {
   0% {
-    -webkit-transform: scale(0);
-            transform: scale(0); }
+    transform: scale(0); }
   100% {
-    -webkit-transform: scale(1);
-            transform: scale(1); } }
-
-@-webkit-keyframes medium-editor-pop-upwards {
-  0% {
-    opacity: 0;
-    -webkit-transform: matrix(0.97, 0, 0, 1, 0, 12);
-            transform: matrix(0.97, 0, 0, 1, 0, 12); }
-  20% {
-    opacity: .7;
-    -webkit-transform: matrix(0.99, 0, 0, 1, 0, 2);
-            transform: matrix(0.99, 0, 0, 1, 0, 2); }
-  40% {
-    opacity: 1;
-    -webkit-transform: matrix(1, 0, 0, 1, 0, -1);
-            transform: matrix(1, 0, 0, 1, 0, -1); }
-  100% {
-    -webkit-transform: matrix(1, 0, 0, 1, 0, 0);
-            transform: matrix(1, 0, 0, 1, 0, 0); } }
+    transform: scale(1); } }
 
 @keyframes medium-editor-pop-upwards {
   0% {
     opacity: 0;
-    -webkit-transform: matrix(0.97, 0, 0, 1, 0, 12);
-            transform: matrix(0.97, 0, 0, 1, 0, 12); }
+    transform: matrix(0.97, 0, 0, 1, 0, 12); }
   20% {
     opacity: .7;
-    -webkit-transform: matrix(0.99, 0, 0, 1, 0, 2);
-            transform: matrix(0.99, 0, 0, 1, 0, 2); }
+    transform: matrix(0.99, 0, 0, 1, 0, 2); }
   40% {
     opacity: 1;
-    -webkit-transform: matrix(1, 0, 0, 1, 0, -1);
-            transform: matrix(1, 0, 0, 1, 0, -1); }
+    transform: matrix(1, 0, 0, 1, 0, -1); }
   100% {
-    -webkit-transform: matrix(1, 0, 0, 1, 0, 0);
-            transform: matrix(1, 0, 0, 1, 0, 0); } }
+    transform: matrix(1, 0, 0, 1, 0, 0); } }
 
 .medium-editor-anchor-preview {
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
@@ -57,9 +26,9 @@
   position: absolute;
   text-align: center;
   top: 0;
+  visibility: hidden;
   word-break: break-all;
   word-wrap: break-word;
-  visibility: hidden;
   z-index: 2000; }
   .medium-editor-anchor-preview a {
     color: #fff;
@@ -73,8 +42,7 @@
   background: #ddd; }
 
 .medium-editor-image-loading {
-  -webkit-animation: medium-editor-image-loading 1s infinite ease-in-out;
-          animation: medium-editor-image-loading 1s infinite ease-in-out;
+  animation: medium-editor-image-loading 1s infinite ease-in-out;
   background-color: #333;
   border-radius: 100%;
   display: inline-block;
@@ -86,22 +54,22 @@
   .medium-editor-placeholder:after {
     content: attr(data-placeholder) !important;
     font-style: italic;
-    position: absolute;
     left: 0;
-    top: 0;
-    white-space: pre;
+    margin: inherit;
     padding: inherit;
-    margin: inherit; }
+    position: absolute;
+    top: 0;
+    white-space: pre; }
 
 .medium-editor-placeholder-relative {
   position: relative; }
   .medium-editor-placeholder-relative:after {
     content: attr(data-placeholder) !important;
     font-style: italic;
-    position: relative;
-    white-space: pre;
+    margin: inherit;
     padding: inherit;
-    margin: inherit; }
+    position: relative;
+    white-space: pre; }
 
 .medium-toolbar-arrow-under:after, .medium-toolbar-arrow-over:before {
   border-style: solid;
@@ -166,8 +134,7 @@
   position: relative; }
 
 .medium-editor-toolbar-active.medium-editor-stalker-toolbar {
-  -webkit-animation: medium-editor-pop-upwards 160ms forwards linear;
-          animation: medium-editor-pop-upwards 160ms forwards linear; }
+  animation: medium-editor-pop-upwards 160ms forwards linear; }
 
 .medium-editor-action-bold {
   font-weight: bolder; }
@@ -188,11 +155,11 @@
   .medium-editor-toolbar-form label {
     border: none;
     box-sizing: border-box;
+    display: inline-block;
     font-size: 14px;
     margin: 0;
     padding: 6px;
-    width: 316px;
-    display: inline-block; }
+    width: 316px; }
     .medium-editor-toolbar-form .medium-editor-toolbar-input:focus,
     .medium-editor-toolbar-form label:focus {
       -webkit-appearance: none;
@@ -217,8 +184,8 @@
   display: table; }
 
 .medium-editor-element {
-  word-wrap: break-word;
-  min-height: 30px; }
+  min-height: 30px;
+  word-wrap: break-word; }
   .medium-editor-element img {
     max-width: 100%; }
   .medium-editor-element sub {

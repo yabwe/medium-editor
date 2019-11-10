@@ -17,8 +17,7 @@
     height: 40px;
     min-width: 40px;
     padding: 5px 12px;
-    -webkit-transition: background-color .2s ease-in, color .2s ease-in;
-            transition: background-color .2s ease-in, color .2s ease-in; }
+    transition: background-color .2s ease-in, color .2s ease-in; }
     .medium-editor-toolbar li button:hover {
       background-color: #000;
       color: #a2d7c7; }
@@ -63,8 +62,7 @@
       color: rgba(248, 245, 243, 0.8); }
   .medium-editor-toolbar-form a {
     color: #ccc;
-    -webkit-transform: translateY(2px);
-            transform: translateY(2px); }
+    transform: translateY(2px); }
   .medium-editor-toolbar-form .medium-editor-toolbar-close {
     margin-right: 16px; }
 

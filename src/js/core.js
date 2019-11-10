@@ -418,6 +418,8 @@
         return div;
     }
 
+    var initialContent = {};
+
     function initElement(element, editorId) {
         if (!element.getAttribute('data-medium-editor-element')) {
             if (element.nodeName.toLowerCase() === 'textarea') {
@@ -683,8 +685,6 @@
             this.restoreSelection();
         }
     }
-
-    var initialContent = {};
 
     MediumEditor.prototype = {
         // NOT DOCUMENTED - exposed for backwards compatability

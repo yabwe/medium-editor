@@ -44,7 +44,8 @@ describe('Full Content Action TestCase', function () {
 
             // Ensure the selection is still maintained
             editor.execAction('strikethrough');
-            expect(this.el.innerHTML).toBe('<p><u>lorem <s>ipsum</s> dolor</u></p>');
+            var regex = new RegExp('^<p><u>lorem <s(trike)?>ipsum</s(trike)?> dolor</u></p>$');
+            expect(this.el.innerHTML).toMatch(regex);
         });
 
         it('should justify all contents including multiple block elements', function () {

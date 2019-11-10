@@ -16,11 +16,11 @@
     label {
         border: none;
         box-sizing: border-box;
+        display: inline-block;
         font-size: 14px;
         margin: 0;
         padding: 6px;
         width: 316px;
-        display: inline-block;
 
         &:focus {
             appearance: none;
