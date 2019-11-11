@@ -14,5 +14,6 @@
   "sub": true,
   "undef": true,
   "unused": true,
-  "validthis": true
+  "validthis": true,
+  "esversion": 6
 }

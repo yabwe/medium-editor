@@ -4,7 +4,7 @@
 describe('Font Size Button TestCase', function () {
     'use strict';
 
-    function testFontSizeContents(el, size) {
+    function testFontSizeContents (el, size) {
         expect(el.childNodes.length).toBe(1);
         var child = el.childNodes[0];
         expect(child.nodeName.toLowerCase()).toBe('font');
@@ -69,7 +69,7 @@ describe('Font Size Button TestCase', function () {
 
             expect(document.execCommand).toHaveBeenCalledWith('fontSize', false, '7');
 
-            fireEvent(fontSizeExtension.getForm().querySelector('a.medium-editor-toobar-save'), 'click');
+            fireEvent(fontSizeExtension.getForm().querySelector('a.medium-editor-toolbar-save'), 'click');
             testFontSizeContents(this.el, '7');
         });
 
@@ -109,7 +109,7 @@ describe('Font Size Button TestCase', function () {
             selectElementContents(editor.elements[0]);
             fireEvent(input, 'change');
 
-            fireEvent(fontSizeExtension.getForm().querySelector('a.medium-editor-toobar-save'), 'click');
+            fireEvent(fontSizeExtension.getForm().querySelector('a.medium-editor-toolbar-save'), 'click');
             testFontSizeContents(this.el, null); // TODO: remove the <font> element entirely instead of just the `size` attribute
             expect(fontSizeExtension.clearFontSize).toHaveBeenCalled();
         });
@@ -127,7 +127,7 @@ describe('Font Size Button TestCase', function () {
 
             selectElementContentsAndFire(editor.elements[0]);
             button = toolbar.getToolbarElement().querySelector('[data-action="fontSize"]');
-            cancel = fontSizeExtension.getForm().querySelector('a.medium-editor-toobar-close');
+            cancel = fontSizeExtension.getForm().querySelector('a.medium-editor-toolbar-close');
 
             fireEvent(button, 'click');
             expect(fontSizeExtension.isDisplayed()).toBe(true);

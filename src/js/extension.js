@@ -73,11 +73,12 @@
          * current instance of MediumEditor when this is called.
          * All helper methods will exist as well
          */
-        init: function () {},
+        init: function () {
+        },
 
         /* base: [MediumEditor instance]
          *
-         * If not overriden, this will be set to the current instance
+         * If not overridden, this will be set to the current instance
          * of MediumEditor, before the init method is called
          */
         base: undefined,
@@ -167,7 +168,7 @@
         /* setInactive: [function ()]
          *
          * If implemented, this function is called when MediumEditor knows
-         * that this extension is currently disabled.  Curently, this
+         * that this extension is currently disabled.  Currently, this
          * is called at the beginning of each state change for
          * the editor & toolbar. After calling this, MediumEditor
          * will attempt to update the extension, either via checkState()
@@ -198,7 +199,7 @@
 
         /* window: [Window]
          *
-         * If not overriden, this will be set to the window object
+         * If not overridden, this will be set to the window object
          * to be used by MediumEditor and its extensions.  This is
          * passed via the 'contentWindow' option to MediumEditor
          * and is the global 'window' object by default
@@ -207,7 +208,7 @@
 
         /* document: [Document]
          *
-         * If not overriden, this will be set to the document object
+         * If not overridden, this will be set to the document object
          * to be used by MediumEditor and its extensions. This is
          * passed via the 'ownerDocument' optin to MediumEditor
          * and is the global 'document' object by default

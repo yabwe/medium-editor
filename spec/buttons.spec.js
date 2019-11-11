@@ -869,10 +869,10 @@ describe('Buttons TestCase', function () {
 
         it('buttons should deactivate other justify buttons', function () {
             this.el.innerHTML = '<p id="justify-para-one">lorem ipsum</p>' +
-                                '<p id="justify-para-two" align="left">lorem ipsum</p>' +
-                                '<p id="justify-para-three" align="right">lorem ipsum</p>' +
-                                '<p id="justify-para-four" align="center">lorem ipsum</p>' +
-                                '<p id="justify-para-five" align="justify">lorem ipsum</p>';
+                '<p id="justify-para-two" align="left">lorem ipsum</p>' +
+                '<p id="justify-para-three" align="right">lorem ipsum</p>' +
+                '<p id="justify-para-four" align="center">lorem ipsum</p>' +
+                '<p id="justify-para-five" align="justify">lorem ipsum</p>';
             var editor = this.newMediumEditor('.editor', {
                     toolbar: {
                         buttons: ['justifyLeft', 'justifyCenter', 'justifyRight', 'justifyFull']
@@ -1069,7 +1069,7 @@ describe('Buttons TestCase', function () {
     });
 });
 
-function stripAttrIfEmpty(element, attribute) {
+function stripAttrIfEmpty (element, attribute) {
     // we want to strip empty attributes (especially styles,
     // because the tests create style tags, inject style content,
     // and then remove that style content.

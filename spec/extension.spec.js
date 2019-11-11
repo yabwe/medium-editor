@@ -52,8 +52,10 @@ describe('Extensions TestCase', function () {
         });
 
         it('should set the name of property of extensions', function () {
-            var ExtensionOne = function () {},
-                ExtensionTwo = function () {},
+            var ExtensionOne = function () {
+                },
+                ExtensionTwo = function () {
+                },
                 extOne = new ExtensionOne(),
                 extTwo = new ExtensionTwo(),
                 editor = this.newMediumEditor('.editor', {
@@ -111,15 +113,16 @@ describe('Extensions TestCase', function () {
 
         it('should call destroy on extensions when being destroyed', function () {
             var TempExtension = MediumEditor.Extension.extend({
-                    destroy: function () {}
+                    destroy: function () {
+                    }
                 }),
                 extInstance = new TempExtension();
             spyOn(extInstance, 'destroy');
             var editor = this.newMediumEditor('.editor', {
-                    extensions: {
-                        'temp-extension': extInstance
-                    }
-                });
+                extensions: {
+                    'temp-extension': extInstance
+                }
+            });
             editor.destroy();
             expect(extInstance.destroy).toHaveBeenCalled();
         });
@@ -225,7 +228,8 @@ describe('Extensions TestCase', function () {
 
     describe('All extensions', function () {
         it('should get helper methods to call into base instance methods', function () {
-            var noop = function () {},
+            var noop = function () {
+                },
                 helpers = {
                     'on': [document, 'click', noop, false],
                     'off': [document, 'click', noop, false],
@@ -328,7 +332,8 @@ describe('Extensions TestCase', function () {
                     button.innerText = 'XXX';
                     return button;
                 },
-                checkState: function () {}
+                checkState: function () {
+                }
             },
             ExtensionWithString = {
                 getButton: function () {
@@ -336,7 +341,8 @@ describe('Extensions TestCase', function () {
                 }
             },
             ExtensionWithNoButton = function () {
-                this.init = function () {};
+                this.init = function () {
+                };
             };
 
         it('should include extensions button into toolbar', function () {
@@ -354,13 +360,13 @@ describe('Extensions TestCase', function () {
 
         it('should call checkState on extensions when toolbar selection updates', function () {
             var editor = this.newMediumEditor('.editor', {
-                    toolbar: {
-                        buttons: ['dummy']
-                    },
-                    extensions: {
-                        'dummy': ExtensionWithElement
-                    }
-                });
+                toolbar: {
+                    buttons: ['dummy']
+                },
+                extensions: {
+                    'dummy': ExtensionWithElement
+                }
+            });
             selectElementContentsAndFire(editor.elements[0].firstChild, { eventToFire: 'focus' });
             spyOn(ExtensionWithElement, 'checkState').and.callThrough();
             editor.checkSelection();

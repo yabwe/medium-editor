@@ -17,14 +17,14 @@ describe('MediumEditor.DynamicElements TestCase', function () {
     describe('addElements', function () {
         it('should initialize dom element properly when adding dynamically', function () {
             var editor = this.newMediumEditor('.editor'),
-            focusedEditable,
-            blurredEditable,
-            focusListener = function (event, editable) {
-                focusedEditable = editable;
-            },
-            blurListener = function (event, editable) {
-                blurredEditable = editable;
-            };
+                focusedEditable,
+                blurredEditable,
+                focusListener = function (event, editable) {
+                    focusedEditable = editable;
+                },
+                blurListener = function (event, editable) {
+                    blurredEditable = editable;
+                };
             editor.subscribe('focus', focusListener);
             editor.subscribe('blur', blurListener);
 
@@ -63,7 +63,8 @@ describe('MediumEditor.DynamicElements TestCase', function () {
             var editor = this.newMediumEditor('.editor', { anchorPreview: false });
             expect(this.el.listenerInfo.length).not.toBe(0);
             var listenerCount = this.el.listenerInfo.length;
-            editor.subscribe('editableBlur', function blurHandler () { });
+            editor.subscribe('editableBlur', function blurHandler () {
+            });
             expect(this.el.listenerInfo.length).toBe(listenerCount + 1);
 
             // When adding a new element, all handlers should also be added to that element
@@ -72,7 +73,8 @@ describe('MediumEditor.DynamicElements TestCase', function () {
             expect(this.addOne.listenerInfo.length).toBe(this.el.listenerInfo.length);
 
             // When attaching a new handler, the handler should be added to dynamically added elements too
-            editor.subscribe('editableMouseover', function mouseoverHandler () {});
+            editor.subscribe('editableMouseover', function mouseoverHandler () {
+            });
             expect(this.el.listenerInfo.length).toBe(listenerCount + 2);
             expect(this.addOne.listenerInfo.length).toBe(listenerCount + 2);
 
@@ -127,22 +129,22 @@ describe('MediumEditor.DynamicElements TestCase', function () {
             expect(spy).toHaveBeenCalledWith({ target: this.addTwo, currentTarget: this.addTwo }, this.addTwo);
         });
 
-        function runAddTest(inputSupported) {
+        function runAddTest (inputSupported) {
             it('should re-attach element properly when removed from dom, cleaned up and injected to dom again', function () {
                 var originalInputSupport = MediumEditor.Events.prototype.InputEventOnContenteditableSupported;
                 MediumEditor.Events.prototype.InputEventOnContenteditableSupported = inputSupported;
 
                 var editor = this.newMediumEditor('.editor'),
-                focusedEditable,
-                firedTarget,
-                firedCounter,
-                handler = function (event, editable) {
-                    firedTarget = editable;
-                    firedCounter++;
-                },
-                focusListener = function (event, editable) {
-                    focusedEditable = editable;
-                };
+                    focusedEditable,
+                    firedTarget,
+                    firedCounter,
+                    handler = function (event, editable) {
+                        firedTarget = editable;
+                        firedCounter++;
+                    },
+                    focusListener = function (event, editable) {
+                        focusedEditable = editable;
+                    };
 
                 firedCounter = 0;
 
@@ -262,7 +264,7 @@ describe('MediumEditor.DynamicElements TestCase', function () {
     });
 });
 
-function detach(node, async, fn) {
+function detach (node, async, fn) {
     var parent = node.parentNode,
         next = node.nextSibling;
     // No parent node? Abort!
@@ -285,8 +287,9 @@ function detach(node, async, fn) {
         fn.call(node);
         reattach();
     }
+
     // Re-attach node to DOM.
-    function reattach() {
+    function reattach () {
         parent.insertBefore(node, next);
     }
 }

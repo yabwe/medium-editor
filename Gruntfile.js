@@ -93,7 +93,6 @@ module.exports = function (grunt) {
     // TODO: build check with debug and devel false
     gruntConfig.jshint = {
         options: {
-            ignores: ['src/js/polyfills.js'],
             jshintrc: true,
             reporter: require('jshint-stylish')
         },
@@ -106,16 +105,14 @@ module.exports = function (grunt) {
         }
     };
 
-    // TODO: "maximumLineLength": 120
-    gruntConfig.jscs = {
+    gruntConfig.eslint = {
         src: [
             'src/js/**/*.js',
             'spec/*.spec.js',
-            'Gruntfile.js',
-            '!src/js/polyfills.js'
+            'Gruntfile.js'
         ],
         options: {
-            config: '.jscsrc'
+            config: '.eslintrc'
         }
     };
 
@@ -172,20 +169,10 @@ module.exports = function (grunt) {
         }
     };
 
-    gruntConfig.csslint = {
-        strict: {
-            options: {
-                'box-sizing': false,
-                'compatible-vendor-prefixes': false,
-                'fallback-colors': false,
-                'gradients': false,
-                'important': false,
-                'import': 2,
-                'outline-none': false,
-                'adjoining-classes': false
-            },
-            src: 'dist/css/**/*.css'
-        }
+    gruntConfig.stylelint = {
+        all: [
+            'dist/css/**/*.css'
+        ]
     };
 
     gruntConfig.sass = {
@@ -333,15 +320,15 @@ module.exports = function (grunt) {
     });
 
     if (parseInt(process.env.TRAVIS_PULL_REQUEST, 10) > 0) {
-        grunt.registerTask('travis', ['jshint', 'jscs', 'jasmine:suite', 'csslint', 'coveralls']);
+        grunt.registerTask('travis', ['jshint', 'eslint', 'jasmine:suite', 'stylelint', 'coveralls']);
     } else {
-        grunt.registerTask('travis', ['connect', 'jshint', 'jscs', 'jasmine:suite', 'csslint', 'saucelabs-jasmine', 'coveralls']);
+        grunt.registerTask('travis', ['connect', 'jshint', 'eslint', 'jasmine:suite', 'stylelint', 'saucelabs-jasmine', 'coveralls']);
     }
 
-    grunt.registerTask('test', ['jshint', 'jscs', 'concat', 'jasmine:suite', 'csslint']);
+    grunt.registerTask('test', ['jshint', 'eslint', 'concat', 'jasmine:suite', 'stylelint']);
     grunt.registerTask('sauce', ['connect', 'saucelabs-jasmine']);
-    grunt.registerTask('js', ['jshint', 'jscs', 'concat', 'jasmine:suite', 'uglify']);
-    grunt.registerTask('css', ['sass', 'autoprefixer', 'cssmin', 'csslint']);
+    grunt.registerTask('js', ['jshint', 'eslint', 'concat', 'jasmine:suite', 'uglify']);
+    grunt.registerTask('css', ['sass', 'autoprefixer', 'cssmin', 'stylelint']);
     grunt.registerTask('default', ['css', 'js']);
 
     grunt.registerTask('spec', 'Runs a task on a specified file', function (taskName, fileName) {

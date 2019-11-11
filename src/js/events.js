@@ -1,7 +1,7 @@
 (function () {
     'use strict';
 
-    function isElementDescendantOfExtension(extensions, element) {
+    function isElementDescendantOfExtension (extensions, element) {
         if (!extensions) {
             return false;
         }
@@ -226,17 +226,17 @@
 
             // Helper method to call all listeners to execCommand
             var callListeners = function (args, result) {
-                if (doc.execCommand.listeners) {
-                    doc.execCommand.listeners.forEach(function (listener) {
-                        listener({
-                            command: args[0],
-                            value: args[2],
-                            args: args,
-                            result: result
+                    if (doc.execCommand.listeners) {
+                        doc.execCommand.listeners.forEach(function (listener) {
+                            listener({
+                                command: args[0],
+                                value: args[2],
+                                args: args,
+                                result: result
+                            });
                         });
-                    });
-                }
-            },
+                    }
+                },
 
                 // Create a wrapper method for execCommand which will:
                 // 1) Call document.execCommand with the correct arguments
@@ -466,7 +466,7 @@
             if (!this.contentCache) {
                 return;
             }
-            // An event triggered which signifies that the user may have changed someting
+            // An event triggered which signifies that the user may have changed something
             // Look in our cache of input for the contenteditables to see if something changed
             var index = target.getAttribute('medium-editor-index'),
                 html = target.innerHTML;

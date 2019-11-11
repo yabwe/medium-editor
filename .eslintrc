@@ -1,0 +1,114 @@
+{
+  "rules": {
+    "no-empty": [
+      2,
+      {
+        "allowEmptyCatch": true
+      }
+    ],
+    "brace-style": [
+      2,
+      "1tbs",
+      {
+        "allowSingleLine": true
+      }
+    ],
+    "no-mixed-spaces-and-tabs": 2,
+    "no-multiple-empty-lines": 2,
+    "no-multi-str": 2,
+    "no-multi-spaces": 2,
+    "space-unary-ops": [
+      2,
+      {
+        "words": false,
+        "nonwords": false
+      }
+    ],
+    "key-spacing": [
+      2,
+      {
+        "beforeColon": false,
+        "afterColon": true
+      }
+    ],
+    "no-spaced-func": 2,
+    "space-before-function-paren": [
+      2,
+      "always"
+    ],
+    "array-bracket-spacing": [
+      2,
+      "never",
+      {
+        "objectsInArrays": false
+      }
+    ],
+    "space-in-parens": [
+      2,
+      "never"
+    ],
+    "comma-dangle": [
+      2,
+      "never"
+    ],
+    "no-trailing-spaces": 2,
+    "camelcase": [
+      2,
+      {
+        "properties": "never"
+      }
+    ],
+    "comma-style": [
+      2,
+      "last"
+    ],
+    "curly": [
+      2,
+      "all"
+    ],
+    "one-var": [
+      2,
+      "consecutive"
+    ],
+    "operator-linebreak": [
+      2,
+      "after"
+    ],
+    "semi": [
+      2,
+      "always"
+    ],
+    "space-infix-ops": 2,
+    "keyword-spacing": [
+      2,
+      {
+        "overrides": {
+          "else": {
+            "before": true
+          },
+          "while": {
+            "before": true
+          },
+          "catch": {
+            "before": true
+          }
+        }
+      }
+    ],
+    "space-before-blocks": [
+      2,
+      "always"
+    ],
+    "indent": [
+      2,
+      4,
+      {
+        "SwitchCase": 1
+      }
+    ],
+    "quotes": [
+      2,
+      "single"
+    ]
+  }
+}

@@ -3,7 +3,7 @@
 (function (window) {
     'use strict';
 
-    function copyInto(overwrite, dest) {
+    function copyInto (overwrite, dest) {
         var prop,
             sources = Array.prototype.slice.call(arguments, 2);
         dest = dest || {};
@@ -32,13 +32,14 @@
             testText = document.createTextNode(' ');
         testParent.appendChild(testText);
         nodeContainsWorksWithTextNodes = testParent.contains(testText);
-    } catch (exc) {}
+    } catch (exc) {
+    }
 
     var Util = {
 
         // http://stackoverflow.com/questions/17907445/how-to-detect-ie11#comment30165888_17907562
         // by rg89
-        isIE: ((navigator.appName === 'Microsoft Internet Explorer') || ((navigator.appName === 'Netscape') && (new RegExp('Trident/.*rv:([0-9]{1,}[.0-9]{0,})').exec(navigator.userAgent) !== null))),
+        isIE: ((navigator.appName === 'Microsoft Internet Explorer') || ((navigator.appName === 'Netscape') && (new RegExp('Trident/.*rv:([0-9]+[.0-9]*)').exec(navigator.userAgent) !== null))),
 
         isEdge: (/Edge\/\d+/).exec(navigator.userAgent) !== null,
 
@@ -67,11 +68,7 @@
          * See #591
          */
         isMetaCtrlKey: function (event) {
-            if ((Util.isMac && event.metaKey) || (!Util.isMac && event.ctrlKey)) {
-                return true;
-            }
-
-            return false;
+            return !!((Util.isMac && event.metaKey) || (!Util.isMac && event.ctrlKey));
         },
 
         /**
@@ -88,11 +85,7 @@
                 return keyCode === keys;
             }
 
-            if (-1 === keys.indexOf(keyCode)) {
-                return false;
-            }
-
-            return true;
+            return -1 !== keys.indexOf(keyCode);
         },
 
         getKeyCode: function (event) {
@@ -118,12 +111,12 @@
 
         emptyElementNames: ['br', 'col', 'colgroup', 'hr', 'img', 'input', 'source', 'wbr'],
 
-        extend: function extend(/* dest, source1, source2, ...*/) {
+        extend: function extend (/* dest, source1, source2, ...*/) {
             var args = [true].concat(Array.prototype.slice.call(arguments));
             return copyInto.apply(this, args);
         },
 
-        defaults: function defaults(/*dest, source1, source2, ...*/) {
+        defaults: function defaults (/*dest, source1, source2, ...*/) {
             var args = [false].concat(Array.prototype.slice.call(arguments));
             return copyInto.apply(this, args);
         },
@@ -227,12 +220,12 @@
             var textIndexOfEndOfFarthestNode,
                 endSplitPoint;
             textIndexOfEndOfFarthestNode = currentTextIndex + currentNode.nodeValue.length +
-                    (newNode ? newNode.nodeValue.length : 0) - 1;
+                (newNode ? newNode.nodeValue.length : 0) - 1;
             endSplitPoint = matchEndIndex - currentTextIndex -
-                    (newNode ? currentNode.nodeValue.length : 0);
+                (newNode ? currentNode.nodeValue.length : 0);
             if (textIndexOfEndOfFarthestNode >= matchEndIndex &&
-                    currentTextIndex !== textIndexOfEndOfFarthestNode &&
-                    endSplitPoint !== 0) {
+                currentTextIndex !== textIndexOfEndOfFarthestNode &&
+                endSplitPoint !== 0) {
                 (newNode || currentNode).splitText(endSplitPoint);
             }
         },
@@ -242,7 +235,7 @@
          * 1) All text content of the elements are in separate blocks. No piece of text content should span
          *    across multiple blocks. This means no element return by this function should have
          *    any blocks as children.
-         * 2) The union of the textcontent of all of the elements returned here covers all
+         * 2) The union of the text content of all of the elements returned here covers all
          *    of the text within the element.
          *
          *
@@ -300,7 +293,7 @@
         //  - A descendant of a sibling element
         //  - A sibling text node of an ancestor
         //  - A descendant of a sibling element of an ancestor
-        findAdjacentTextNodeWithContent: function findAdjacentTextNodeWithContent(rootNode, targetNode, ownerDocument) {
+        findAdjacentTextNodeWithContent: function findAdjacentTextNodeWithContent (rootNode, targetNode, ownerDocument) {
             var pastTarget = false,
                 nextNode,
                 nodeIterator = ownerDocument.createNodeIterator(rootNode, NodeFilter.SHOW_TEXT, null, false);
@@ -338,7 +331,7 @@
             return previousSibling;
         },
 
-        isDescendant: function isDescendant(parent, child, checkEquality) {
+        isDescendant: function isDescendant (parent, child, checkEquality) {
             if (!parent || !child) {
                 return false;
             }
@@ -363,7 +356,7 @@
         },
 
         // https://github.com/jashkenas/underscore
-        isElement: function isElement(obj) {
+        isElement: function isElement (obj) {
             return !!(obj && obj.nodeType === 1);
         },
 
@@ -455,7 +448,8 @@
             if (!MediumEditor.util.isEdge && doc.queryCommandSupported('insertHTML')) {
                 try {
                     return doc.execCommand.apply(doc, ecArgs);
-                } catch (ignore) {}
+                } catch (ignore) {
+                }
             }
 
             selection = doc.getSelection();
@@ -469,13 +463,13 @@
                 if (Util.isMediumEditorElement(toReplace) && !toReplace.firstChild) {
                     range.selectNode(toReplace.appendChild(doc.createTextNode('')));
                 } else if ((toReplace.nodeType === 3 && range.startOffset === 0 && range.endOffset === toReplace.nodeValue.length) ||
-                        (toReplace.nodeType !== 3 && toReplace.innerHTML === range.toString())) {
+                    (toReplace.nodeType !== 3 && toReplace.innerHTML === range.toString())) {
                     // Ensure range covers maximum amount of nodes as possible
                     // By moving up the DOM and selecting ancestors whose only child is the range
                     while (!Util.isMediumEditorElement(toReplace) &&
-                            toReplace.parentNode &&
-                            toReplace.parentNode.childNodes.length === 1 &&
-                            !Util.isMediumEditorElement(toReplace.parentNode)) {
+                    toReplace.parentNode &&
+                    toReplace.parentNode.childNodes.length === 1 &&
+                    !Util.isMediumEditorElement(toReplace.parentNode)) {
                         toReplace = toReplace.parentNode;
                     }
                     range.selectNode(toReplace);
@@ -548,7 +542,7 @@
                 tagName = '<' + tagName + '>';
             }
 
-            // When FF, IE and Edge, we have to handle blockquote node seperately as 'formatblock' does not work.
+            // When FF, IE and Edge, we have to handle blockquote node separately as 'formatblock' does not work.
             // https://developer.mozilla.org/en-US/docs/Web/API/Document/execCommand#Commands
             if (blockContainer && blockContainer.nodeName.toLowerCase() === 'blockquote') {
                 // For IE, just use outdent
@@ -1148,7 +1142,7 @@
         },
 
         guid: function () {
-            function _s4() {
+            function _s4 () {
                 return Math
                     .floor((1 + Math.random()) * 0x10000)
                     .toString(16)

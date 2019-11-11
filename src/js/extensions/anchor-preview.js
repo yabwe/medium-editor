@@ -79,7 +79,7 @@
 
         showPreview: function (anchorEl) {
             if (this.anchorPreview.classList.contains('medium-editor-anchor-preview-active') ||
-                    anchorEl.getAttribute('data-disable-preview')) {
+                anchorEl.getAttribute('data-disable-preview')) {
                 return true;
             }
 

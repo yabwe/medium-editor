@@ -4,7 +4,7 @@
 describe('Font Name Button TestCase', function () {
     'use strict';
 
-    function testFontNameContents(el, name) {
+    function testFontNameContents (el, name) {
         expect(el.childNodes.length).toBe(1);
         var child = el.childNodes[0];
         expect(child.nodeName.toLowerCase()).toBe('font');
@@ -69,7 +69,7 @@ describe('Font Name Button TestCase', function () {
 
             expect(document.execCommand).toHaveBeenCalledWith('fontName', false, 'Arial');
 
-            fireEvent(fontNameExtension.getForm().querySelector('a.medium-editor-toobar-save'), 'click');
+            fireEvent(fontNameExtension.getForm().querySelector('a.medium-editor-toolbar-save'), 'click');
             testFontNameContents(this.el, 'Arial');
         });
 
@@ -109,7 +109,7 @@ describe('Font Name Button TestCase', function () {
             selectElementContents(editor.elements[0]);
             fireEvent(select, 'change');
 
-            fireEvent(fontNameExtension.getForm().querySelector('a.medium-editor-toobar-save'), 'click');
+            fireEvent(fontNameExtension.getForm().querySelector('a.medium-editor-toolbar-save'), 'click');
             testFontNameContents(this.el, null); // TODO: remove the <font> element entirely instead of just the `size` attribute
             expect(fontNameExtension.clearFontName).toHaveBeenCalled();
         });
@@ -127,7 +127,7 @@ describe('Font Name Button TestCase', function () {
 
             selectElementContentsAndFire(editor.elements[0]);
             button = toolbar.getToolbarElement().querySelector('[data-action="fontName"]');
-            cancel = fontNameExtension.getForm().querySelector('a.medium-editor-toobar-close');
+            cancel = fontNameExtension.getForm().querySelector('a.medium-editor-toolbar-close');
 
             fireEvent(button, 'click');
             expect(fontNameExtension.isDisplayed()).toBe(true);

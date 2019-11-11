@@ -252,7 +252,6 @@ var editor = new MediumEditor('.editable', {
         hideDelay: 500,
         previewValueSelector: 'a'
     }
-}
 });
 ```
 
@@ -320,7 +319,6 @@ var editor = new MediumEditor('.editable', {
         targetCheckbox: false,
         targetCheckboxText: 'Open in new window'
     }
-}
 });
 ```
 
@@ -677,8 +675,8 @@ grunt
 These are the other available grunt tasks:
 
 * __js__: runs jslint and jasmine tests and creates minified and concatenated versions of the script;
-* __css__: runs autoprefixer and csslint
-* __test__: runs jasmine tests, jslint and csslint
+* __css__: runs autoprefixer and stylelint
+* __test__: runs jasmine tests, jslint and stylelint
 * __watch__: watch for modifications on script/scss files
 * __spec__: runs a task against a specified file
 
@@ -704,9 +702,9 @@ To help create consistent looking code throughout the project, we use a few tool
 
 We use [JSHint](http://jshint.com/) on each build to find easy-to-catch errors and potential problems in our js.  You can find our JSHint settings in the `.jshintrc` file in the root of the project.
 
-#### jscs
+#### ESLint
 
-We use [jscs](http://jscs.info/) on each build to enforce some code style rules we have for our project.  You can find our jscs settings in the `.jscsrc` file in the root of the project.
+We use [ESLint](https://eslint.org/) on each build to enforce some code style rules we have for our project.  You can find our ESLint settings in the `.eslintrc` file in the root of the project.
 
 #### EditorConfig
 

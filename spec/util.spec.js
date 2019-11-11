@@ -49,7 +49,8 @@ describe('MediumEditor.util', function () {
     describe('Deprecated', function () {
         it('should warn when a method is deprecated', function () {
             var testObj = {
-                newMethod: function () {}
+                newMethod: function () {
+                }
             };
             spyOn(testObj, 'newMethod').and.callThrough();
             spyOn(MediumEditor.util, 'warn').and.callThrough();
@@ -193,8 +194,7 @@ describe('MediumEditor.util', function () {
          *  1   2   3        4     5   6
          */
         it('should split a complex tree correctly when splitting off right part of tree', function () {
-            var el = this.createElement('div', '',
-                '<span><b>1</b><i>2</i></span><span><b>3</b><u>4</u></span><span><b>5</b><i>6</i></span>'),
+            var el = this.createElement('div', '', '<span><b>1</b><i>2</i></span><span><b>3</b><u>4</u></span><span><b>5</b><i>6</i></span>'),
                 splitOn = el.querySelector('u').firstChild,
                 result = MediumEditor.util.splitOffDOMTree(el, splitOn);
 
@@ -219,8 +219,7 @@ describe('MediumEditor.util', function () {
          *  1  2   3  4     5  6
          */
         it('should split a complex tree correctly when splitting off left part of tree', function () {
-            var el = this.createElement('div', '',
-                '<span><b>1</b><i>2</i></span><span><b>3</b><u>4</u></span><span><b>5</b><i>6</i></span>'),
+            var el = this.createElement('div', '', '<span><b>1</b><i>2</i></span><span><b>3</b><u>4</u></span><span><b>5</b><i>6</i></span>'),
                 splitOn = el.querySelector('u').firstChild,
                 result = MediumEditor.util.splitOffDOMTree(el, splitOn, true);
 
@@ -251,7 +250,8 @@ describe('MediumEditor.util', function () {
                     '<span>:443/</span>' +
                     '<span>path/to</span>' +
                     '<span>somewhere#</span>' +
-                    '<span>index notLink</span>'),
+                    '<span>index notLink</span>'
+                ),
                 firstText = el.firstChild.firstChild.splitText('Link = '.length),
                 lastText = el.lastChild.firstChild,
                 para = this.createElement('p', '');
@@ -260,14 +260,14 @@ describe('MediumEditor.util', function () {
             expect(el.innerHTML).toBe(
                 '<span>Link = </span>' +
                 '<p>' +
-                    '<span>http</span>' +
-                    '<span>://</span>' +
-                    '<span>www.exam</span>' +
-                    '<span>ple.com</span>' +
-                    '<span>:443/</span>' +
-                    '<span>path/to</span>' +
-                    '<span>somewhere#</span>' +
-                    '<span>index</span>' +
+                '<span>http</span>' +
+                '<span>://</span>' +
+                '<span>www.exam</span>' +
+                '<span>ple.com</span>' +
+                '<span>:443/</span>' +
+                '<span>path/to</span>' +
+                '<span>somewhere#</span>' +
+                '<span>index</span>' +
                 '</p>' +
                 '<span> notLink</span>'
             );
@@ -503,10 +503,10 @@ describe('MediumEditor.util', function () {
             var el = this.createElement('div');
             el.innerHTML = '' +
                 '<blockquote><ol>' +
-                        '<li><div><table><thead><tr><th>Head</th></tr></thead></table></div></li>' +
-                        '<li>List Item</li>' +
-                    '</ol>' +
-                    '<p>paragraph</p>' +
+                '<li><div><table><thead><tr><th>Head</th></tr></thead></table></div></li>' +
+                '<li>List Item</li>' +
+                '</ol>' +
+                '<p>paragraph</p>' +
                 '</blockquote>';
 
             var parts = MediumEditor.util.splitByBlockElements(el);
@@ -527,9 +527,9 @@ describe('MediumEditor.util', function () {
             var el = this.createElement('div');
             el.innerHTML = '' +
                 '<blockquote>' +
-                    '<span>Text <b>bold <i>bold + italics</i></b> <u>underlined</u></span>' +
-                    '<ol><li>List Item</li></ol>' +
-                    'Text Node' +
+                '<span>Text <b>bold <i>bold + italics</i></b> <u>underlined</u></span>' +
+                '<ol><li>List Item</li></ol>' +
+                'Text Node' +
                 '</blockquote>';
             var parts = MediumEditor.util.splitByBlockElements(el);
             expect(parts.length).toBe(3);
@@ -554,8 +554,8 @@ describe('MediumEditor.util', function () {
         it('should ignore nested comments', function () {
             var el = this.createElement('div');
             el.innerHTML = '' +
-                  '<p>Text</p>' +
-                  '<!---->';
+                '<p>Text</p>' +
+                '<!---->';
             var parts = MediumEditor.util.splitByBlockElements(el);
             expect(parts.length).toBe(1);
         });
@@ -625,7 +625,10 @@ describe('MediumEditor.util', function () {
         it('should return text nodes within an element', function () {
             var el = this.createElement('div');
             el.innerHTML = '<p>Plain <b>bold</b> <a href="#">link</a> <i>italic</i> <u>underline</u> <span>span1 <span>span2</span></span></p>';
-            var textNodes = MediumEditor.util.findOrCreateMatchingTextNodes(document, el, { start: 0, end: el.textContent.length });
+            var textNodes = MediumEditor.util.findOrCreateMatchingTextNodes(document, el, {
+                start: 0,
+                end: el.textContent.length
+            });
             expect(textNodes.length).toBe(11);
             expect(textNodes[0].nodeValue).toBe('Plain ');
             expect(textNodes[9].nodeValue).toBe('span1 ');

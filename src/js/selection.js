@@ -1,7 +1,7 @@
 (function () {
     'use strict';
 
-    function filterOnlyParentElements(node) {
+    function filterOnlyParentElements (node) {
         if (MediumEditor.util.isBlockContainer(node)) {
             return NodeFilter.FILTER_ACCEPT;
         } else {
@@ -145,12 +145,11 @@
                         if (allowRangeToStartAtEndOfNode || selectionState.start < nextCharIndex) {
                             range.setStart(node, selectionState.start - charIndex);
                             foundStart = true;
-                        }
-                        // We're at the end of a text node where the selection could start but we shouldn't
-                        // make the selection start here because allowRangeToStartAtEndOfNode is false.
-                        // However, we should keep a reference to this node in case there aren't any more
-                        // text nodes after this, so that we have somewhere to import the selection to
-                        else {
+                        } else {
+                            // We're at the end of a text node where the selection could start but we shouldn't
+                            // make the selection start here because allowRangeToStartAtEndOfNode is false.
+                            // However, we should keep a reference to this node in case there aren't any more
+                            // text nodes after this, so that we have somewhere to import the selection to
                             lastTextNode = node;
                         }
                     }
@@ -222,9 +221,9 @@
                 return node.nodeName.toLowerCase() === 'a';
             };
             if (selectionState.start === selectionState.end &&
-                    range.startContainer.nodeType === 3 &&
-                    range.startOffset === range.startContainer.nodeValue.length &&
-                    MediumEditor.util.traverseUp(range.startContainer, nodeInsideAnchorTagFunction)) {
+                range.startContainer.nodeType === 3 &&
+                range.startOffset === range.startContainer.nodeValue.length &&
+                MediumEditor.util.traverseUp(range.startContainer, nodeInsideAnchorTagFunction)) {
                 var prevNode = range.startContainer,
                     currentNode = range.startContainer.parentNode;
                 while (currentNode !== null && currentNode.nodeName.toLowerCase() !== 'a') {
@@ -302,7 +301,7 @@
         },
 
         // Returns -1 unless the cursor is at the beginning of a paragraph/block
-        // If the paragraph/block is preceeded by empty paragraphs/block (with no text)
+        // If the paragraph/block is preceded by empty paragraphs/block (with no text)
         // it will return the number of empty paragraphs before the cursor.
         // Otherwise, it will return 0, which indicates the cursor is at the beginning
         // of a paragraph/block, and not at the end of the paragraph/block before it
@@ -327,9 +326,8 @@
                 // If there is no previous sibling, this is the first text element in the editor
                 if (!previousSibling) {
                     return -1;
-                }
-                // If the previous sibling has text, then there are no empty blocks before this
-                else if (previousSibling.nodeValue) {
+                } else if (previousSibling.nodeValue) {
+                    // If the previous sibling has text, then there are no empty blocks before this
                     return -1;
                 }
             }
@@ -379,7 +377,7 @@
                 if (next === img) {
                     break;
                 }
-                // If we haven't hit the iamge, but found text that contains content
+                // If we haven't hit the image, but found text that contains content
                 // then the range doesn't start with an image
                 if (next.nodeValue) {
                     return false;
@@ -464,7 +462,7 @@
         selectionContainsContent: function (doc) {
             var sel = doc.getSelection();
 
-            // collapsed selection or selection withour range doesn't contain content
+            // collapsed selection or selection without range doesn't contain content
             if (!sel || sel.isCollapsed || !sel.rangeCount) {
                 return false;
             }
@@ -505,7 +503,7 @@
 
         // http://stackoverflow.com/questions/4176923/html-of-selected-text
         // by Tim Down
-        getSelectionHtml: function getSelectionHtml(doc) {
+        getSelectionHtml: function getSelectionHtml (doc) {
             var i,
                 html = '',
                 sel = doc.getSelection(),
@@ -526,9 +524,9 @@
          *
          *  @param {DOMElement} An element containing the cursor to find offsets relative to.
          *  @param {Range} A Range representing cursor position. Will window.getSelection if none is passed.
-         *  @return {Object} 'left' and 'right' attributes contain offsets from begining and end of Element
+         *  @return {Object} 'left' and 'right' attributes contain offsets from beginning and end of Element
          */
-        getCaretOffsets: function getCaretOffsets(element, range) {
+        getCaretOffsets: function getCaretOffsets (element, range) {
             var preCaretRange, postCaretRange;
 
             if (!range) {

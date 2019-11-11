@@ -273,7 +273,8 @@ describe('MediumEditor.Events TestCase', function () {
             var origExecCommand = document.execCommand,
                 editor = this.newMediumEditor('.editor');
 
-            editor.subscribe('editableInput', function () { });
+            editor.subscribe('editableInput', function () {
+            });
             expect(document.execCommand).not.toBe(origExecCommand);
 
             editor.selectElement(editor.elements[0].firstChild);
@@ -331,7 +332,7 @@ describe('MediumEditor.Events TestCase', function () {
 
     describe('Custom EditableInput Listener', function () {
 
-        function runEditableInputTests(inputSupported) {
+        function runEditableInputTests (inputSupported) {
             var namePrefix = inputSupported ? 'when Input is supported' : 'when Input is NOT supported';
 
             it(namePrefix + ' should trigger with the corresponding editor element passed as an argument', function () {

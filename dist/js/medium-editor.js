@@ -182,7 +182,7 @@ if (!("classList" in document.createElement("_"))) {
  */
 
 /*global self, unescape */
-/*jslint bitwise: true, regexp: true, confusion: true, es5: true, vars: true, white: true,
+/*jslint bitwise: true, regexp: true, confusion: true, vars: true, white: true,
   plusplus: true */
 
 /*! @source http://purl.eligrey.com/github/Blob.js/blob/master/Blob.js */
@@ -399,7 +399,7 @@ if (!("classList" in document.createElement("_"))) {
 
     'use strict';
 
-function MediumEditor(elements, options) {
+function MediumEditor (elements, options) {
     'use strict';
     return this.init(elements, options);
 }
@@ -409,7 +409,7 @@ MediumEditor.extensions = {};
 (function (window) {
     'use strict';
 
-    function copyInto(overwrite, dest) {
+    function copyInto (overwrite, dest) {
         var prop,
             sources = Array.prototype.slice.call(arguments, 2);
         dest = dest || {};
@@ -438,13 +438,14 @@ MediumEditor.extensions = {};
             testText = document.createTextNode(' ');
         testParent.appendChild(testText);
         nodeContainsWorksWithTextNodes = testParent.contains(testText);
-    } catch (exc) {}
+    } catch (exc) {
+    }
 
     var Util = {
 
         // http://stackoverflow.com/questions/17907445/how-to-detect-ie11#comment30165888_17907562
         // by rg89
-        isIE: ((navigator.appName === 'Microsoft Internet Explorer') || ((navigator.appName === 'Netscape') && (new RegExp('Trident/.*rv:([0-9]{1,}[.0-9]{0,})').exec(navigator.userAgent) !== null))),
+        isIE: ((navigator.appName === 'Microsoft Internet Explorer') || ((navigator.appName === 'Netscape') && (new RegExp('Trident/.*rv:([0-9]+[.0-9]*)').exec(navigator.userAgent) !== null))),
 
         isEdge: (/Edge\/\d+/).exec(navigator.userAgent) !== null,
 
@@ -473,11 +474,7 @@ MediumEditor.extensions = {};
          * See #591
          */
         isMetaCtrlKey: function (event) {
-            if ((Util.isMac && event.metaKey) || (!Util.isMac && event.ctrlKey)) {
-                return true;
-            }
-
-            return false;
+            return !!((Util.isMac && event.metaKey) || (!Util.isMac && event.ctrlKey));
         },
 
         /**
@@ -494,11 +491,7 @@ MediumEditor.extensions = {};
                 return keyCode === keys;
             }
 
-            if (-1 === keys.indexOf(keyCode)) {
-                return false;
-            }
-
-            return true;
+            return -1 !== keys.indexOf(keyCode);
         },
 
         getKeyCode: function (event) {
@@ -524,12 +517,12 @@ MediumEditor.extensions = {};
 
         emptyElementNames: ['br', 'col', 'colgroup', 'hr', 'img', 'input', 'source', 'wbr'],
 
-        extend: function extend(/* dest, source1, source2, ...*/) {
+        extend: function extend (/* dest, source1, source2, ...*/) {
             var args = [true].concat(Array.prototype.slice.call(arguments));
             return copyInto.apply(this, args);
         },
 
-        defaults: function defaults(/*dest, source1, source2, ...*/) {
+        defaults: function defaults (/*dest, source1, source2, ...*/) {
             var args = [false].concat(Array.prototype.slice.call(arguments));
             return copyInto.apply(this, args);
         },
@@ -633,12 +626,12 @@ MediumEditor.extensions = {};
             var textIndexOfEndOfFarthestNode,
                 endSplitPoint;
             textIndexOfEndOfFarthestNode = currentTextIndex + currentNode.nodeValue.length +
-                    (newNode ? newNode.nodeValue.length : 0) - 1;
+                (newNode ? newNode.nodeValue.length : 0) - 1;
             endSplitPoint = matchEndIndex - currentTextIndex -
-                    (newNode ? currentNode.nodeValue.length : 0);
+                (newNode ? currentNode.nodeValue.length : 0);
             if (textIndexOfEndOfFarthestNode >= matchEndIndex &&
-                    currentTextIndex !== textIndexOfEndOfFarthestNode &&
-                    endSplitPoint !== 0) {
+                currentTextIndex !== textIndexOfEndOfFarthestNode &&
+                endSplitPoint !== 0) {
                 (newNode || currentNode).splitText(endSplitPoint);
             }
         },
@@ -648,7 +641,7 @@ MediumEditor.extensions = {};
          * 1) All text content of the elements are in separate blocks. No piece of text content should span
          *    across multiple blocks. This means no element return by this function should have
          *    any blocks as children.
-         * 2) The union of the textcontent of all of the elements returned here covers all
+         * 2) The union of the text content of all of the elements returned here covers all
          *    of the text within the element.
          *
          *
@@ -706,7 +699,7 @@ MediumEditor.extensions = {};
         //  - A descendant of a sibling element
         //  - A sibling text node of an ancestor
         //  - A descendant of a sibling element of an ancestor
-        findAdjacentTextNodeWithContent: function findAdjacentTextNodeWithContent(rootNode, targetNode, ownerDocument) {
+        findAdjacentTextNodeWithContent: function findAdjacentTextNodeWithContent (rootNode, targetNode, ownerDocument) {
             var pastTarget = false,
                 nextNode,
                 nodeIterator = ownerDocument.createNodeIterator(rootNode, NodeFilter.SHOW_TEXT, null, false);
@@ -744,7 +737,7 @@ MediumEditor.extensions = {};
             return previousSibling;
         },
 
-        isDescendant: function isDescendant(parent, child, checkEquality) {
+        isDescendant: function isDescendant (parent, child, checkEquality) {
             if (!parent || !child) {
                 return false;
             }
@@ -769,7 +762,7 @@ MediumEditor.extensions = {};
         },
 
         // https://github.com/jashkenas/underscore
-        isElement: function isElement(obj) {
+        isElement: function isElement (obj) {
             return !!(obj && obj.nodeType === 1);
         },
 
@@ -861,7 +854,8 @@ MediumEditor.extensions = {};
             if (!MediumEditor.util.isEdge && doc.queryCommandSupported('insertHTML')) {
                 try {
                     return doc.execCommand.apply(doc, ecArgs);
-                } catch (ignore) {}
+                } catch (ignore) {
+                }
             }
 
             selection = doc.getSelection();
@@ -875,13 +869,13 @@ MediumEditor.extensions = {};
                 if (Util.isMediumEditorElement(toReplace) && !toReplace.firstChild) {
                     range.selectNode(toReplace.appendChild(doc.createTextNode('')));
                 } else if ((toReplace.nodeType === 3 && range.startOffset === 0 && range.endOffset === toReplace.nodeValue.length) ||
-                        (toReplace.nodeType !== 3 && toReplace.innerHTML === range.toString())) {
+                    (toReplace.nodeType !== 3 && toReplace.innerHTML === range.toString())) {
                     // Ensure range covers maximum amount of nodes as possible
                     // By moving up the DOM and selecting ancestors whose only child is the range
                     while (!Util.isMediumEditorElement(toReplace) &&
-                            toReplace.parentNode &&
-                            toReplace.parentNode.childNodes.length === 1 &&
-                            !Util.isMediumEditorElement(toReplace.parentNode)) {
+                    toReplace.parentNode &&
+                    toReplace.parentNode.childNodes.length === 1 &&
+                    !Util.isMediumEditorElement(toReplace.parentNode)) {
                         toReplace = toReplace.parentNode;
                     }
                     range.selectNode(toReplace);
@@ -954,7 +948,7 @@ MediumEditor.extensions = {};
                 tagName = '<' + tagName + '>';
             }
 
-            // When FF, IE and Edge, we have to handle blockquote node seperately as 'formatblock' does not work.
+            // When FF, IE and Edge, we have to handle blockquote node separately as 'formatblock' does not work.
             // https://developer.mozilla.org/en-US/docs/Web/API/Document/execCommand#Commands
             if (blockContainer && blockContainer.nodeName.toLowerCase() === 'blockquote') {
                 // For IE, just use outdent
@@ -1554,7 +1548,7 @@ MediumEditor.extensions = {};
         },
 
         guid: function () {
-            function _s4() {
+            function _s4 () {
                 return Math
                     .floor((1 + Math.random()) * 0x10000)
                     .toString(16)
@@ -1643,11 +1637,12 @@ MediumEditor.extensions = {};
          * current instance of MediumEditor when this is called.
          * All helper methods will exist as well
          */
-        init: function () {},
+        init: function () {
+        },
 
         /* base: [MediumEditor instance]
          *
-         * If not overriden, this will be set to the current instance
+         * If not overridden, this will be set to the current instance
          * of MediumEditor, before the init method is called
          */
         base: undefined,
@@ -1737,7 +1732,7 @@ MediumEditor.extensions = {};
         /* setInactive: [function ()]
          *
          * If implemented, this function is called when MediumEditor knows
-         * that this extension is currently disabled.  Curently, this
+         * that this extension is currently disabled.  Currently, this
          * is called at the beginning of each state change for
          * the editor & toolbar. After calling this, MediumEditor
          * will attempt to update the extension, either via checkState()
@@ -1768,7 +1763,7 @@ MediumEditor.extensions = {};
 
         /* window: [Window]
          *
-         * If not overriden, this will be set to the window object
+         * If not overridden, this will be set to the window object
          * to be used by MediumEditor and its extensions.  This is
          * passed via the 'contentWindow' option to MediumEditor
          * and is the global 'window' object by default
@@ -1777,7 +1772,7 @@ MediumEditor.extensions = {};
 
         /* document: [Document]
          *
-         * If not overriden, this will be set to the document object
+         * If not overridden, this will be set to the document object
          * to be used by MediumEditor and its extensions. This is
          * passed via the 'ownerDocument' optin to MediumEditor
          * and is the global 'document' object by default
@@ -1844,7 +1839,7 @@ MediumEditor.extensions = {};
 (function () {
     'use strict';
 
-    function filterOnlyParentElements(node) {
+    function filterOnlyParentElements (node) {
         if (MediumEditor.util.isBlockContainer(node)) {
             return NodeFilter.FILTER_ACCEPT;
         } else {
@@ -1988,12 +1983,11 @@ MediumEditor.extensions = {};
                         if (allowRangeToStartAtEndOfNode || selectionState.start < nextCharIndex) {
                             range.setStart(node, selectionState.start - charIndex);
                             foundStart = true;
-                        }
-                        // We're at the end of a text node where the selection could start but we shouldn't
-                        // make the selection start here because allowRangeToStartAtEndOfNode is false.
-                        // However, we should keep a reference to this node in case there aren't any more
-                        // text nodes after this, so that we have somewhere to import the selection to
-                        else {
+                        } else {
+                            // We're at the end of a text node where the selection could start but we shouldn't
+                            // make the selection start here because allowRangeToStartAtEndOfNode is false.
+                            // However, we should keep a reference to this node in case there aren't any more
+                            // text nodes after this, so that we have somewhere to import the selection to
                             lastTextNode = node;
                         }
                     }
@@ -2065,9 +2059,9 @@ MediumEditor.extensions = {};
                 return node.nodeName.toLowerCase() === 'a';
             };
             if (selectionState.start === selectionState.end &&
-                    range.startContainer.nodeType === 3 &&
-                    range.startOffset === range.startContainer.nodeValue.length &&
-                    MediumEditor.util.traverseUp(range.startContainer, nodeInsideAnchorTagFunction)) {
+                range.startContainer.nodeType === 3 &&
+                range.startOffset === range.startContainer.nodeValue.length &&
+                MediumEditor.util.traverseUp(range.startContainer, nodeInsideAnchorTagFunction)) {
                 var prevNode = range.startContainer,
                     currentNode = range.startContainer.parentNode;
                 while (currentNode !== null && currentNode.nodeName.toLowerCase() !== 'a') {
@@ -2145,7 +2139,7 @@ MediumEditor.extensions = {};
         },
 
         // Returns -1 unless the cursor is at the beginning of a paragraph/block
-        // If the paragraph/block is preceeded by empty paragraphs/block (with no text)
+        // If the paragraph/block is preceded by empty paragraphs/block (with no text)
         // it will return the number of empty paragraphs before the cursor.
         // Otherwise, it will return 0, which indicates the cursor is at the beginning
         // of a paragraph/block, and not at the end of the paragraph/block before it
@@ -2170,9 +2164,8 @@ MediumEditor.extensions = {};
                 // If there is no previous sibling, this is the first text element in the editor
                 if (!previousSibling) {
                     return -1;
-                }
-                // If the previous sibling has text, then there are no empty blocks before this
-                else if (previousSibling.nodeValue) {
+                } else if (previousSibling.nodeValue) {
+                    // If the previous sibling has text, then there are no empty blocks before this
                     return -1;
                 }
             }
@@ -2222,7 +2215,7 @@ MediumEditor.extensions = {};
                 if (next === img) {
                     break;
                 }
-                // If we haven't hit the iamge, but found text that contains content
+                // If we haven't hit the image, but found text that contains content
                 // then the range doesn't start with an image
                 if (next.nodeValue) {
                     return false;
@@ -2307,7 +2300,7 @@ MediumEditor.extensions = {};
         selectionContainsContent: function (doc) {
             var sel = doc.getSelection();
 
-            // collapsed selection or selection withour range doesn't contain content
+            // collapsed selection or selection without range doesn't contain content
             if (!sel || sel.isCollapsed || !sel.rangeCount) {
                 return false;
             }
@@ -2348,7 +2341,7 @@ MediumEditor.extensions = {};
 
         // http://stackoverflow.com/questions/4176923/html-of-selected-text
         // by Tim Down
-        getSelectionHtml: function getSelectionHtml(doc) {
+        getSelectionHtml: function getSelectionHtml (doc) {
             var i,
                 html = '',
                 sel = doc.getSelection(),
@@ -2369,9 +2362,9 @@ MediumEditor.extensions = {};
          *
          *  @param {DOMElement} An element containing the cursor to find offsets relative to.
          *  @param {Range} A Range representing cursor position. Will window.getSelection if none is passed.
-         *  @return {Object} 'left' and 'right' attributes contain offsets from begining and end of Element
+         *  @return {Object} 'left' and 'right' attributes contain offsets from beginning and end of Element
          */
-        getCaretOffsets: function getCaretOffsets(element, range) {
+        getCaretOffsets: function getCaretOffsets (element, range) {
             var preCaretRange, postCaretRange;
 
             if (!range) {
@@ -2522,7 +2515,7 @@ MediumEditor.extensions = {};
 (function () {
     'use strict';
 
-    function isElementDescendantOfExtension(extensions, element) {
+    function isElementDescendantOfExtension (extensions, element) {
         if (!extensions) {
             return false;
         }
@@ -2747,17 +2740,17 @@ MediumEditor.extensions = {};
 
             // Helper method to call all listeners to execCommand
             var callListeners = function (args, result) {
-                if (doc.execCommand.listeners) {
-                    doc.execCommand.listeners.forEach(function (listener) {
-                        listener({
-                            command: args[0],
-                            value: args[2],
-                            args: args,
-                            result: result
+                    if (doc.execCommand.listeners) {
+                        doc.execCommand.listeners.forEach(function (listener) {
+                            listener({
+                                command: args[0],
+                                value: args[2],
+                                args: args,
+                                result: result
+                            });
                         });
-                    });
-                }
-            },
+                    }
+                },
 
                 // Create a wrapper method for execCommand which will:
                 // 1) Call document.execCommand with the correct arguments
@@ -2987,7 +2980,7 @@ MediumEditor.extensions = {};
             if (!this.contentCache) {
                 return;
             }
-            // An event triggered which signifies that the user may have changed someting
+            // An event triggered which signifies that the user may have changed something
             // Look in our cache of input for the contenteditables to see if something changed
             var index = target.getAttribute('medium-editor-index'),
                 html = target.innerHTML;
@@ -3843,7 +3836,7 @@ MediumEditor.extensions = {};
 
             if (this.targetCheckbox) {
                 // fixme: ideally, this targetCheckboxText would be a formLabel too,
-                // figure out how to deprecate? also consider `fa-` icon default implcations.
+                // figure out how to deprecate? also consider `fa-` icon default implications.
                 template.push(
                     '<div class="medium-editor-toolbar-form-row">',
                     '<input type="checkbox" class="medium-editor-toolbar-anchor-target" id="medium-editor-toolbar-anchor-target-field-' + this.getEditorId() + '">',
@@ -3887,7 +3880,7 @@ MediumEditor.extensions = {};
                 buttonCheckbox = this.getAnchorButtonCheckbox();
 
             opts = opts || { value: '' };
-            // TODO: This is for backwards compatability
+            // TODO: This is for backwards compatibility
             // We don't need to support the 'string' argument in 6.0.0
             if (typeof opts === 'string') {
                 opts = {
@@ -3992,11 +3985,11 @@ MediumEditor.extensions = {};
             // Matches protocol relative "//"
             // Matches common external protocols "mailto:" "tel:" "maps:"
             // Matches relative hash link, begins with "#"
-            var urlSchemeRegex = /^([a-z]+:)?\/\/|^(mailto|tel|maps):|^\#/i,
+            var urlSchemeRegex = /^([a-z]+:)?\/\/|^(mailto|tel|maps):|^#/i,
                 hasScheme = urlSchemeRegex.test(value),
                 scheme = '',
                 // telRegex is a regex for checking if the string is a telephone number
-                telRegex = /^\+?\s?\(?(?:\d\s?\-?\)?){3,20}$/,
+                telRegex = /^\+?\s?\(?(?:\d\s?-?\)?){3,20}$/,
                 urlParts = value.match(/^(.*?)(?:\?(.*?))?(?:#(.*))?$/),
                 path = urlParts[1],
                 query = urlParts[2],
@@ -4009,7 +4002,7 @@ MediumEditor.extensions = {};
             if (!hasScheme) {
                 var host = path.split('/')[0];
                 // if the host part of the path looks like a hostname
-                if (host.match(/.+(\.|:).+/) || host === 'localhost') {
+                if (host.match(/.+([.:]).+/) || host === 'localhost') {
                     scheme = 'http://';
                 }
             }
@@ -4191,7 +4184,7 @@ MediumEditor.extensions = {};
 
         showPreview: function (anchorEl) {
             if (this.anchorPreview.classList.contains('medium-editor-anchor-preview-active') ||
-                    anchorEl.getAttribute('data-disable-preview')) {
+                anchorEl.getAttribute('data-disable-preview')) {
                 return true;
             }
 
@@ -4427,7 +4420,7 @@ MediumEditor.extensions = {};
         LINK_REGEXP;
 
     WHITESPACE_CHARS = [' ', '\t', '\n', '\r', '\u00A0', '\u2000', '\u2001', '\u2002', '\u2003',
-                                    '\u2028', '\u2029'];
+        '\u2028', '\u2029'];
     KNOWN_TLDS_FRAGMENT = 'com|net|org|edu|gov|mil|aero|asia|biz|cat|coop|info|int|jobs|mobi|museum|name|post|pro|tel|travel|' +
         'xxx|ac|ad|ae|af|ag|ai|al|am|an|ao|aq|ar|as|at|au|aw|ax|az|ba|bb|bd|be|bf|bg|bh|bi|bj|bm|bn|bo|br|bs|bt|bv|bw|by|' +
         'bz|ca|cc|cd|cf|cg|ch|ci|ck|cl|cm|cn|co|cr|cs|cu|cv|cx|cy|cz|dd|de|dj|dk|dm|do|dz|ec|ee|eg|eh|er|es|et|eu|fi|fj|' +
@@ -4448,7 +4441,7 @@ MediumEditor.extensions = {};
 
     LINK_REGEXP = new RegExp(LINK_REGEXP_TEXT, 'gi');
 
-    function nodeIsNotInsideAnchorTag(node) {
+    function nodeIsNotInsideAnchorTag (node) {
         return !MediumEditor.util.getClosestTag(node, 'a');
     }
 
@@ -4607,7 +4600,7 @@ MediumEditor.extensions = {};
 
             for (var matchIndex = 0; matchIndex < matches.length; matchIndex++) {
                 var matchingTextNodes = MediumEditor.util.findOrCreateMatchingTextNodes(this.document, element,
-                        matches[matchIndex]);
+                    matches[matchIndex]);
                 if (this.shouldNotLink(matchingTextNodes)) {
                     continue;
                 }
@@ -4676,7 +4669,7 @@ MediumEditor.extensions = {};
 
     var CLASS_DRAG_OVER = 'medium-editor-dragover';
 
-    function clearClassNames(element) {
+    function clearClassNames (element) {
         var editable = MediumEditor.util.getContainerEditorElement(element),
             existing = Array.prototype.slice.call(editable.parentElement.querySelectorAll('.' + CLASS_DRAG_OVER));
 
@@ -4831,16 +4824,15 @@ MediumEditor.extensions = {};
                 if (data.meta === isMeta &&
                     data.shift === isShift &&
                     (data.alt === isAlt ||
-                     undefined === data.alt)) { // TODO deprecated: remove check for undefined === data.alt when jumping to 6.0.0
+                        undefined === data.alt)) { // TODO deprecated: remove check for undefined === data.alt when jumping to 6.0.0
                     event.preventDefault();
                     event.stopPropagation();
 
                     // command can be a function to execute
                     if (typeof data.command === 'function') {
                         data.command.apply(this);
-                    }
-                    // command can be false so the shortcut is just disabled
-                    else if (false !== data.command) {
+                    } else if (false !== data.command) {
+                        // command can be false so the shortcut is just disabled
                         this.execAction(data.command);
                     }
                 }
@@ -4956,7 +4948,7 @@ MediumEditor.extensions = {};
             this.on(form, 'click', this.handleFormClick.bind(this));
 
             // Add font names
-            for (var i = 0; i<this.fonts.length; i++) {
+            for (var i = 0; i < this.fonts.length; i++) {
                 option = doc.createElement('option');
                 option.innerHTML = this.fonts[i];
                 option.value = this.fonts[i];
@@ -4969,12 +4961,12 @@ MediumEditor.extensions = {};
             // Handle typing in the textbox
             this.on(select, 'change', this.handleFontChange.bind(this));
 
-            // Add save buton
+            // Add save button
             save.setAttribute('href', '#');
-            save.className = 'medium-editor-toobar-save';
+            save.className = 'medium-editor-toolbar-save';
             save.innerHTML = this.getEditorOption('buttonLabels') === 'fontawesome' ?
-                             '<i class="fa fa-check"></i>' :
-                             '&#10003;';
+                '<i class="fa fa-check"></i>' :
+                '&#10003;';
             form.appendChild(save);
 
             // Handle save button clicks (capture)
@@ -4982,10 +4974,10 @@ MediumEditor.extensions = {};
 
             // Add close button
             close.setAttribute('href', '#');
-            close.className = 'medium-editor-toobar-close';
+            close.className = 'medium-editor-toolbar-close';
             close.innerHTML = this.getEditorOption('buttonLabels') === 'fontawesome' ?
-                              '<i class="fa fa-times"></i>' :
-                              '&times;';
+                '<i class="fa fa-times"></i>' :
+                '&times;';
             form.appendChild(close);
 
             // Handle close button clicks
@@ -5147,12 +5139,12 @@ MediumEditor.extensions = {};
             // Handle typing in the textbox
             this.on(input, 'change', this.handleSliderChange.bind(this));
 
-            // Add save buton
+            // Add save button
             save.setAttribute('href', '#');
-            save.className = 'medium-editor-toobar-save';
+            save.className = 'medium-editor-toolbar-save';
             save.innerHTML = this.getEditorOption('buttonLabels') === 'fontawesome' ?
-                             '<i class="fa fa-check"></i>' :
-                             '&#10003;';
+                '<i class="fa fa-check"></i>' :
+                '&#10003;';
             form.appendChild(save);
 
             // Handle save button clicks (capture)
@@ -5160,10 +5152,10 @@ MediumEditor.extensions = {};
 
             // Add close button
             close.setAttribute('href', '#');
-            close.className = 'medium-editor-toobar-close';
+            close.className = 'medium-editor-toolbar-close';
             close.innerHTML = this.getEditorOption('buttonLabels') === 'fontawesome' ?
-                              '<i class="fa fa-times"></i>' :
-                              '&times;';
+                '<i class="fa fa-times"></i>' :
+                '&times;';
             form.appendChild(close);
 
             // Handle close button clicks
@@ -5231,7 +5223,7 @@ MediumEditor.extensions = {};
     //    will not match any unicode characters. In the regexes in this
     //    block, negation is used specifically to match the end of an html
     //    tag, and in fact unicode characters *should* be allowed.
-    function createReplacements() {
+    function createReplacements () {
         return [
             // Remove anything but the contents within the BODY element
             [new RegExp(/^[\s\S]*<body[^>]*>\s*|\s*<\/body[^>]*>[\s\S]*$/g), ''],
@@ -5260,7 +5252,7 @@ MediumEditor.extensions = {};
             [new RegExp(/<span[^>]*font-weight:(bold|700)[^>]*>/gi), '<span class="replace-with bold">'],
 
             // replace manually entered b/i/a tags with real ones
-            [new RegExp(/&lt;(\/?)(i|b|a)&gt;/gi), '<$1$2>'],
+            [new RegExp(/&lt;(\/?)([iba])&gt;/gi), '<$1$2>'],
 
             // replace manually a tags with real ones, converting smart-quotes from google docs
             [new RegExp(/&lt;a(?:(?!href).)+href=(?:&quot;|&rdquo;|&ldquo;|"|“|”)(((?!&quot;|&rdquo;|&ldquo;|"|“|”).)*)(?:&quot;|&rdquo;|&ldquo;|"|“|”)(?:(?!&gt;).)*&gt;/gi), '<a href="$1">'],
@@ -5274,7 +5266,7 @@ MediumEditor.extensions = {};
             [new RegExp(/<\/?o:[a-z]*>/gi), ''],
 
             // Microsoft Word adds some special elements around list items
-            [new RegExp(/<!\[if !supportLists\]>(((?!<!).)*)<!\[endif]\>/gi), '$1']
+            [new RegExp(/<!\[if !supportLists]>(((?!<!).)*)<!\[endif]>/gi), '$1']
         ];
     }
 
@@ -5289,7 +5281,7 @@ MediumEditor.extensions = {};
      * @param {doc} reference to document
      * @return {Object} Object with mime types and data for those mime types.
      */
-    function getClipboardContent(event, win, doc) {
+    function getClipboardContent (event, win, doc) {
         var dataTransfer = event.clipboardData || win.clipboardData || doc.dataTransfer,
             data = {};
 
@@ -6043,7 +6035,7 @@ MediumEditor.extensions = {};
                 }
 
                 // If the button already exists as an extension, it'll be returned
-                // othwerise it'll create the default built-in button
+                // otherwise it'll create the default built-in button
                 extension = this.base.addBuiltInExtension(buttonName, buttonOpts);
 
                 if (extension && typeof extension.getButton === 'function') {
@@ -6140,8 +6132,8 @@ MediumEditor.extensions = {};
         handleDocumentMouseup: function (event) {
             // Do not trigger checkState when mouseup fires over the toolbar
             if (event &&
-                    event.target &&
-                    MediumEditor.util.isDescendant(this.getToolbarElement(), event.target)) {
+                event.target &&
+                MediumEditor.util.isDescendant(this.getToolbarElement(), event.target)) {
                 return false;
             }
             this.checkState();
@@ -6233,7 +6225,7 @@ MediumEditor.extensions = {};
 
         // Responding to changes in user selection
 
-        // Checks for existance of multiple block elements in the current selection
+        // Checks for existence of multiple block elements in the current selection
         multipleBlockElementsSelected: function () {
             var regexEmptyHTMLTags = /<[^\/>][^>]*><\/[^>]+>/gim, // http://stackoverflow.com/questions/3129738/remove-empty-tags-using-regex
                 regexBlockElements = new RegExp('<(' + MediumEditor.util.blockContainerElementNames.join('|') + ')[^>]*>', 'g'),
@@ -6264,8 +6256,8 @@ MediumEditor.extensions = {};
             * adjacent text node that actually has content in it, and move the selectionRange start there.
             */
             if (this.standardizeSelectionStart &&
-                    selectionRange.startContainer.nodeValue &&
-                    (selectionRange.startOffset === selectionRange.startContainer.nodeValue.length)) {
+                selectionRange.startContainer.nodeValue &&
+                (selectionRange.startOffset === selectionRange.startContainer.nodeValue.length)) {
                 var adjacentNode = MediumEditor.util.findAdjacentTextNodeWithContent(MediumEditor.selection.getSelectionElement(this.window), selectionRange.startContainer, this.document);
                 if (adjacentNode) {
                     var offset = 0;
@@ -6286,7 +6278,7 @@ MediumEditor.extensions = {};
             // If no editable has focus OR selection is inside contenteditable = false
             // hide toolbar
             if (!this.base.getFocusedElement() ||
-                    MediumEditor.selection.selectionInContentEditableFalse(this.window)) {
+                MediumEditor.selection.selectionInContentEditableFalse(this.window)) {
                 return this.hideToolbar();
             }
 
@@ -6295,8 +6287,8 @@ MediumEditor.extensions = {};
             // hide toolbar
             var selectionElement = MediumEditor.selection.getSelectionElement(this.window);
             if (!selectionElement ||
-                    this.getEditorElements().indexOf(selectionElement) === -1 ||
-                    selectionElement.getAttribute('data-disable-toolbar')) {
+                this.getEditorElements().indexOf(selectionElement) === -1 ||
+                selectionElement.getAttribute('data-disable-toolbar')) {
                 return this.hideToolbar();
             }
 
@@ -6346,8 +6338,8 @@ MediumEditor.extensions = {};
                     if (typeof extension.checkState === 'function') {
                         extension.checkState(parentNode);
                     } else if (typeof extension.isActive === 'function' &&
-                               typeof extension.isAlreadyApplied === 'function' &&
-                               typeof extension.setActive === 'function') {
+                        typeof extension.isAlreadyApplied === 'function' &&
+                        typeof extension.setActive === 'function') {
                         if (!extension.isActive() && extension.isAlreadyApplied(parentNode)) {
                             extension.setActive();
                         }
@@ -6380,8 +6372,8 @@ MediumEditor.extensions = {};
 
             // Make sure the selection parent isn't outside of the contenteditable
             if (!this.getEditorElements().some(function (element) {
-                    return MediumEditor.util.isDescendant(element, parentNode, true);
-                })) {
+                return MediumEditor.util.isDescendant(element, parentNode, true);
+            })) {
                 return;
             }
 
@@ -6451,11 +6443,11 @@ MediumEditor.extensions = {};
                 if (scrollTop > (containerTop + container.offsetHeight - toolbarHeight - this.stickyTopOffset)) {
                     toolbarElement.style.top = (containerTop + container.offsetHeight - toolbarHeight) + 'px';
                     toolbarElement.classList.remove('medium-editor-sticky-toolbar');
-                // Stick the toolbar to the top of the window
+                    // Stick the toolbar to the top of the window
                 } else if (scrollTop > (containerTop - toolbarHeight - this.stickyTopOffset)) {
                     toolbarElement.classList.add('medium-editor-sticky-toolbar');
                     toolbarElement.style.top = this.stickyTopOffset + 'px';
-                // Normal static toolbar position
+                    // Normal static toolbar position
                 } else {
                     toolbarElement.classList.remove('medium-editor-sticky-toolbar');
                     toolbarElement.style.top = containerTop - toolbarHeight + 'px';
@@ -6636,7 +6628,7 @@ MediumEditor.extensions = {};
 
     // Event handlers that shouldn't be exposed externally
 
-    function handleDisableExtraSpaces(event) {
+    function handleDisableExtraSpaces (event) {
         var node = MediumEditor.selection.getSelectionStart(this.options.ownerDocument),
             textContent = node.textContent,
             caretPositions = MediumEditor.selection.getCaretOffsets(node);
@@ -6646,7 +6638,7 @@ MediumEditor.extensions = {};
         }
     }
 
-    function handleDisabledEnterKeydown(event, element) {
+    function handleDisabledEnterKeydown (event, element) {
         if (this.options.disableReturn || element.getAttribute('data-disable-return')) {
             event.preventDefault();
         } else if (this.options.disableDoubleReturn || element.getAttribute('data-disable-double-return')) {
@@ -6655,13 +6647,13 @@ MediumEditor.extensions = {};
             // if current text selection is empty OR previous sibling text is empty OR it is not a list
             if ((node && node.textContent.trim() === '' && node.nodeName.toLowerCase() !== 'li') ||
                 (node.previousElementSibling && node.previousElementSibling.nodeName.toLowerCase() !== 'br' &&
-                 node.previousElementSibling.textContent.trim() === '')) {
+                    node.previousElementSibling.textContent.trim() === '')) {
                 event.preventDefault();
             }
         }
     }
 
-    function handleTabKeydown(event) {
+    function handleTabKeydown (event) {
         // Override tab only for pre nodes
         var node = MediumEditor.selection.getSelectionStart(this.options.ownerDocument),
             tag = node && node.nodeName.toLowerCase();
@@ -6684,27 +6676,27 @@ MediumEditor.extensions = {};
         }
     }
 
-    function handleBlockDeleteKeydowns(event) {
+    function handleBlockDeleteKeydowns (event) {
         var p, node = MediumEditor.selection.getSelectionStart(this.options.ownerDocument),
             tagName = node.nodeName.toLowerCase(),
             isEmpty = /^(\s+|<br\/?>)?$/i,
             isHeader = /h\d/i;
 
         if (MediumEditor.util.isKey(event, [MediumEditor.util.keyCode.BACKSPACE, MediumEditor.util.keyCode.ENTER]) &&
-                // has a preceeding sibling
-                node.previousElementSibling &&
-                // in a header
-                isHeader.test(tagName) &&
-                // at the very end of the block
-                MediumEditor.selection.getCaretOffsets(node).left === 0) {
+            // has a preceding sibling
+            node.previousElementSibling &&
+            // in a header
+            isHeader.test(tagName) &&
+            // at the very end of the block
+            MediumEditor.selection.getCaretOffsets(node).left === 0) {
             if (MediumEditor.util.isKey(event, MediumEditor.util.keyCode.BACKSPACE) && isEmpty.test(node.previousElementSibling.innerHTML)) {
-                // backspacing the begining of a header into an empty previous element will
+                // backspacing the beginning of a header into an empty previous element will
                 // change the tagName of the current node to prevent one
                 // instead delete previous node and cancel the event.
                 node.previousElementSibling.parentNode.removeChild(node.previousElementSibling);
                 event.preventDefault();
             } else if (!this.options.disableDoubleReturn && MediumEditor.util.isKey(event, MediumEditor.util.keyCode.ENTER)) {
-                // hitting return in the begining of a header will create empty header elements before the current one
+                // hitting return in the beginning of a header will create empty header elements before the current one
                 // instead, make "<p><br></p>" element, which are what happens if you hit return in an empty paragraph
                 p = this.options.ownerDocument.createElement('p');
                 p.innerHTML = '<br>';
@@ -6712,19 +6704,19 @@ MediumEditor.extensions = {};
                 event.preventDefault();
             }
         } else if (MediumEditor.util.isKey(event, MediumEditor.util.keyCode.DELETE) &&
-                    // between two sibling elements
-                    node.nextElementSibling &&
-                    node.previousElementSibling &&
-                    // not in a header
-                    !isHeader.test(tagName) &&
-                    // in an empty tag
-                    isEmpty.test(node.innerHTML) &&
-                    // when the next tag *is* a header
-                    isHeader.test(node.nextElementSibling.nodeName.toLowerCase())) {
+            // between two sibling elements
+            node.nextElementSibling &&
+            node.previousElementSibling &&
+            // not in a header
+            !isHeader.test(tagName) &&
+            // in an empty tag
+            isEmpty.test(node.innerHTML) &&
+            // when the next tag *is* a header
+            isHeader.test(node.nextElementSibling.nodeName.toLowerCase())) {
             // hitting delete in an empty element preceding a header, ex:
             //  <p>[CURSOR]</p><h1>Header</h1>
             // Will cause the h1 to become a paragraph.
-            // Instead, delete the paragraph node and move the cursor to the begining of the h1
+            // Instead, delete the paragraph node and move the cursor to the beginning of the h1
 
             // remove node and move cursor to start of header
             MediumEditor.selection.moveCursor(this.options.ownerDocument, node.nextElementSibling);
@@ -6733,16 +6725,16 @@ MediumEditor.extensions = {};
 
             event.preventDefault();
         } else if (MediumEditor.util.isKey(event, MediumEditor.util.keyCode.BACKSPACE) &&
-                tagName === 'li' &&
-                // hitting backspace inside an empty li
-                isEmpty.test(node.innerHTML) &&
-                // is first element (no preceeding siblings)
-                !node.previousElementSibling &&
-                // parent also does not have a sibling
-                !node.parentElement.previousElementSibling &&
-                // is not the only li in a list
-                node.nextElementSibling &&
-                node.nextElementSibling.nodeName.toLowerCase() === 'li') {
+            tagName === 'li' &&
+            // hitting backspace inside an empty li
+            isEmpty.test(node.innerHTML) &&
+            // is first element (no preceding siblings)
+            !node.previousElementSibling &&
+            // parent also does not have a sibling
+            !node.parentElement.previousElementSibling &&
+            // is not the only li in a list
+            node.nextElementSibling &&
+            node.nextElementSibling.nodeName.toLowerCase() === 'li') {
             // backspacing in an empty first list element in the first list (with more elements) ex:
             //  <ul><li>[CURSOR]</li><li>List Item 2</li></ul>
             // will remove the first <li> but add some extra element before (varies based on browser)
@@ -6764,16 +6756,16 @@ MediumEditor.extensions = {};
 
             event.preventDefault();
         } else if (MediumEditor.util.isKey(event, MediumEditor.util.keyCode.BACKSPACE) &&
-                (MediumEditor.util.getClosestTag(node, 'blockquote') !== false) &&
-                MediumEditor.selection.getCaretOffsets(node).left === 0) {
+            (MediumEditor.util.getClosestTag(node, 'blockquote') !== false) &&
+            MediumEditor.selection.getCaretOffsets(node).left === 0) {
 
-            // when cursor is at the begining of the element and the element is <blockquote>
+            // when cursor is at the beginning of the element and the element is <blockquote>
             // then pressing backspace key should change the <blockquote> to a <p> tag
             event.preventDefault();
             MediumEditor.util.execFormatBlock(this.options.ownerDocument, 'p');
         } else if (MediumEditor.util.isKey(event, MediumEditor.util.keyCode.ENTER) &&
-                (MediumEditor.util.getClosestTag(node, 'blockquote') !== false) &&
-                MediumEditor.selection.getCaretOffsets(node).right === 0) {
+            (MediumEditor.util.getClosestTag(node, 'blockquote') !== false) &&
+            MediumEditor.selection.getCaretOffsets(node).right === 0) {
 
             // when cursor is at the end of <blockquote>,
             // then pressing enter key should create <p> tag, not <blockquote>
@@ -6786,10 +6778,10 @@ MediumEditor.extensions = {};
 
             event.preventDefault();
         } else if (MediumEditor.util.isKey(event, MediumEditor.util.keyCode.BACKSPACE) &&
-                MediumEditor.util.isMediumEditorElement(node.parentElement) &&
-                !node.previousElementSibling &&
-                node.nextElementSibling &&
-                isEmpty.test(node.innerHTML)) {
+            MediumEditor.util.isMediumEditorElement(node.parentElement) &&
+            !node.previousElementSibling &&
+            node.nextElementSibling &&
+            isEmpty.test(node.innerHTML)) {
 
             // when cursor is in the first element, it's empty and user presses backspace,
             // do delete action instead to get rid of the first element and move caret to 2nd
@@ -6799,7 +6791,7 @@ MediumEditor.extensions = {};
         }
     }
 
-    function handleKeyup(event) {
+    function handleKeyup (event) {
         var node = MediumEditor.selection.getSelectionStart(this.options.ownerDocument),
             tagName;
 
@@ -6844,7 +6836,7 @@ MediumEditor.extensions = {};
         }
     }
 
-    function handleEditableInput(event, editable) {
+    function handleEditableInput (event, editable) {
         var textarea = editable.parentNode.querySelector('textarea[medium-editor-textarea-id="' + editable.getAttribute('medium-editor-textarea-id') + '"]');
         if (textarea) {
             textarea.value = editable.innerHTML.trim();
@@ -6853,7 +6845,7 @@ MediumEditor.extensions = {};
 
     // Internal helper methods which shouldn't be exposed externally
 
-    function addToEditors(win) {
+    function addToEditors (win) {
         if (!win._mediumEditors) {
             // To avoid breaking users who are assuming that the unique id on
             // medium-editor elements will start at 1, inserting a 'null' in the
@@ -6869,7 +6861,7 @@ MediumEditor.extensions = {};
         win._mediumEditors[this.id] = this;
     }
 
-    function removeFromEditors(win) {
+    function removeFromEditors (win) {
         if (!win._mediumEditors || !win._mediumEditors[this.id]) {
             return;
         }
@@ -6884,7 +6876,7 @@ MediumEditor.extensions = {};
         win._mediumEditors[this.id] = null;
     }
 
-    function createElementsArray(selector, doc, filterEditorElements) {
+    function createElementsArray (selector, doc, filterEditorElements) {
         var elements = [];
 
         if (!selector) {
@@ -6918,7 +6910,7 @@ MediumEditor.extensions = {};
         return elements;
     }
 
-    function cleanupTextareaElement(element) {
+    function cleanupTextareaElement (element) {
         var textarea = element.parentNode.querySelector('textarea[medium-editor-textarea-id="' + element.getAttribute('medium-editor-textarea-id') + '"]');
         if (textarea) {
             // Un-hide the textarea
@@ -6930,7 +6922,7 @@ MediumEditor.extensions = {};
         }
     }
 
-    function setExtensionDefaults(extension, defaults) {
+    function setExtensionDefaults (extension, defaults) {
         Object.keys(defaults).forEach(function (prop) {
             if (extension[prop] === undefined) {
                 extension[prop] = defaults[prop];
@@ -6939,7 +6931,7 @@ MediumEditor.extensions = {};
         return extension;
     }
 
-    function initExtension(extension, name, instance) {
+    function initExtension (extension, name, instance) {
         var extensionDefaults = {
             'window': instance.options.contentWindow,
             'document': instance.options.ownerDocument,
@@ -6961,19 +6953,19 @@ MediumEditor.extensions = {};
         return extension;
     }
 
-    function isToolbarEnabled() {
+    function isToolbarEnabled () {
         // If any of the elements don't have the toolbar disabled
         // We need a toolbar
         if (this.elements.every(function (element) {
-                return !!element.getAttribute('data-disable-toolbar');
-            })) {
+            return !!element.getAttribute('data-disable-toolbar');
+        })) {
             return false;
         }
 
         return this.options.toolbar !== false;
     }
 
-    function isAnchorPreviewEnabled() {
+    function isAnchorPreviewEnabled () {
         // If toolbar is disabled, don't add
         if (!isToolbarEnabled.call(this)) {
             return false;
@@ -6982,34 +6974,34 @@ MediumEditor.extensions = {};
         return this.options.anchorPreview !== false;
     }
 
-    function isPlaceholderEnabled() {
+    function isPlaceholderEnabled () {
         return this.options.placeholder !== false;
     }
 
-    function isAutoLinkEnabled() {
+    function isAutoLinkEnabled () {
         return this.options.autoLink !== false;
     }
 
-    function isImageDraggingEnabled() {
+    function isImageDraggingEnabled () {
         return this.options.imageDragging !== false;
     }
 
-    function isKeyboardCommandsEnabled() {
+    function isKeyboardCommandsEnabled () {
         return this.options.keyboardCommands !== false;
     }
 
-    function shouldUseFileDraggingExtension() {
+    function shouldUseFileDraggingExtension () {
         // Since the file-dragging extension replaces the image-dragging extension,
-        // we need to check if the user passed an overrided image-dragging extension.
+        // we need to check if the user passed an overridden image-dragging extension.
         // If they have, to avoid breaking users, we won't use file-dragging extension.
         return !this.options.extensions['imageDragging'];
     }
 
-    function createContentEditable(textarea) {
+    function createContentEditable (textarea) {
         var div = this.options.ownerDocument.createElement('div'),
             now = Date.now(),
             uniqueId = 'medium-editor-' + now,
-            atts = textarea.attributes;
+            attributes = textarea.attributes;
 
         // Some browsers can move pretty fast, since we're using a timestamp
         // to make a unique-id, ensure that the id is actually unique on the page
@@ -7024,11 +7016,11 @@ MediumEditor.extensions = {};
 
         textarea.setAttribute('medium-editor-textarea-id', uniqueId);
 
-        // re-create all attributes from the textearea to the new created div
-        for (var i = 0, n = atts.length; i < n; i++) {
+        // re-create all attributes from the textarea to the new created div
+        for (var i = 0, n = attributes.length; i < n; i++) {
             // do not re-create existing attributes
-            if (!div.hasAttribute(atts[i].nodeName)) {
-                div.setAttribute(atts[i].nodeName, atts[i].value);
+            if (!div.hasAttribute(attributes[i].nodeName)) {
+                div.setAttribute(attributes[i].nodeName, attributes[i].value);
             }
         }
 
@@ -7053,7 +7045,7 @@ MediumEditor.extensions = {};
 
     var initialContent = {};
 
-    function initElement(element, editorId) {
+    function initElement (element, editorId) {
         if (!element.getAttribute('data-medium-editor-element')) {
             if (element.nodeName.toLowerCase() === 'textarea') {
                 element = createContentEditable.call(this, element);
@@ -7103,7 +7095,7 @@ MediumEditor.extensions = {};
         return element;
     }
 
-    function attachHandlers() {
+    function attachHandlers () {
         // attach to tabs
         this.subscribe('editableKeydownTab', handleTabKeydown.bind(this));
 
@@ -7126,7 +7118,7 @@ MediumEditor.extensions = {};
         }
     }
 
-    function initExtensions() {
+    function initExtensions () {
 
         this.extensions = [];
 
@@ -7138,7 +7130,7 @@ MediumEditor.extensions = {};
             }
         }, this);
 
-        // 4 Cases for imageDragging + fileDragging extensons:
+        // 4 Cases for imageDragging + fileDragging extensions:
         //
         // 1. ImageDragging ON + No Custom Image Dragging Extension:
         //    * Use fileDragging extension (default options)
@@ -7181,7 +7173,7 @@ MediumEditor.extensions = {};
         // just create the default toolbar
         var toolbarExtension = this.options.extensions['toolbar'];
         if (!toolbarExtension && isToolbarEnabled.call(this)) {
-            // Backwards compatability
+            // Backwards compatibility
             var toolbarOptions = MediumEditor.util.extend({}, this.options.toolbar, {
                 allowMultiParagraphSelection: this.options.allowMultiParagraphSelection // deprecated
             });
@@ -7195,7 +7187,7 @@ MediumEditor.extensions = {};
         }
     }
 
-    function mergeOptions(defaults, options) {
+    function mergeOptions (defaults, options) {
         var deprecatedProperties = [
             ['allowMultiParagraphSelection', 'toolbar.allowMultiParagraphSelection']
         ];
@@ -7211,7 +7203,7 @@ MediumEditor.extensions = {};
         return MediumEditor.util.defaults({}, options, defaults);
     }
 
-    function execActionInternal(action, opts) {
+    function execActionInternal (action, opts) {
         /*jslint regexp: true*/
         var appendAction = /^append-(.+)$/gi,
             justifyAction = /justify([A-Za-z]*)$/g, /* Detecting if is justifyCenter|Right|Left */
@@ -7278,7 +7270,7 @@ MediumEditor.extensions = {};
      * Chrome may have removed <br> elements and instead wrapped lines in <div> elements
      * with a text-align property.  If so, we want to fix this
      */
-    function cleanupJustifyDivFragments(blockContainer) {
+    function cleanupJustifyDivFragments (blockContainer) {
         if (!blockContainer) {
             return;
         }
@@ -7320,7 +7312,7 @@ MediumEditor.extensions = {};
     }
 
     MediumEditor.prototype = {
-        // NOT DOCUMENTED - exposed for backwards compatability
+        // NOT DOCUMENTED - exposed for backwards compatibility
         init: function (elements, options) {
             this.options = mergeOptions.call(this, this.defaults, options);
             this.origElements = elements;
@@ -7733,7 +7725,7 @@ MediumEditor.extensions = {};
 
                             // since we are going to create a link from an extracted text,
                             // be sure that if we are updating a link, we won't let an empty link behind (see #754)
-                            // (Workaroung for Chrome)
+                            // (Workaround for Chrome)
                             this.execAction('unlink');
 
                             exportedSelection = this.exportSelection();
@@ -7744,7 +7736,7 @@ MediumEditor.extensions = {};
                                 // as our reference inside this.elements gets detached from the page when insertHTML runs.
                                 // If we just use [parentElement, 0] and [parentElement, parentElement.childNodes.length]
                                 // as the range boundaries, this happens whenever parentElement === currentEditor.
-                                // The tradeoff to this workaround is that a orphaned tag can sometimes be left behind at
+                                // The trade-off to this workaround is that a orphaned tag can sometimes be left behind at
                                 // the end of the editor's content.
                                 // In Gecko:
                                 // as an empty <strong></strong> if parentElement.lastChild is a <strong> tag.
@@ -7756,7 +7748,7 @@ MediumEditor.extensions = {};
                                     0,
                                     parentElement.lastChild,
                                     parentElement.lastChild.nodeType === 3 ?
-                                    parentElement.lastChild.nodeValue.length : parentElement.lastChild.childNodes.length
+                                        parentElement.lastChild.nodeValue.length : parentElement.lastChild.childNodes.length
                                 );
                             } else {
                                 MediumEditor.selection.select(

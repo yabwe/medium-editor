@@ -191,7 +191,7 @@ if (!("classList" in document.createElement("_"))) {
  */
 
 /*global self, unescape */
-/*jslint bitwise: true, regexp: true, confusion: true, es5: true, vars: true, white: true,
+/*jslint bitwise: true, regexp: true, confusion: true, vars: true, white: true,
   plusplus: true */
 
 /*! @source http://purl.eligrey.com/github/Blob.js/blob/master/Blob.js */

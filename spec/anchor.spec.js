@@ -206,10 +206,10 @@ describe('Anchor Button TestCase', function () {
 
         it('should add http:// if need be and linkValidation option is set to true', function () {
             var editor = this.newMediumEditor('.editor', {
-                anchor: {
-                    linkValidation: true
-                }
-            }),
+                    anchor: {
+                        linkValidation: true
+                    }
+                }),
                 link,
                 anchorExtension = editor.getExtensionByName('anchor');
 
@@ -224,10 +224,10 @@ describe('Anchor Button TestCase', function () {
 
         it('should add tel: if need be and linkValidation option is set to true', function () {
             var editor = this.newMediumEditor('.editor', {
-                anchor: {
-                    linkValidation: true
-                }
-            }),
+                    anchor: {
+                        linkValidation: true
+                    }
+                }),
                 link,
                 anchorExtension = editor.getExtensionByName('anchor');
 
@@ -242,10 +242,10 @@ describe('Anchor Button TestCase', function () {
 
         it('should not change protocol when a valid one is included', function () {
             var editor = this.newMediumEditor('.editor', {
-                anchor: {
-                    linkValidation: true
-                }
-            }),
+                    anchor: {
+                        linkValidation: true
+                    }
+                }),
                 validUrl = 'mailto:test.com',
                 link,
                 anchorExtension = editor.getExtensionByName('anchor');
@@ -261,10 +261,10 @@ describe('Anchor Button TestCase', function () {
 
         it('should not change protocol when a tel scheme is included', function () {
             var editor = this.newMediumEditor('.editor', {
-                anchor: {
-                    linkValidation: true
-                }
-            }),
+                    anchor: {
+                        linkValidation: true
+                    }
+                }),
                 // Specifically using a bad phone number to illustrate that what follows tel is not checked
                 validUrl = 'tel:abc123!@#',
                 link,
@@ -281,10 +281,10 @@ describe('Anchor Button TestCase', function () {
 
         it('should not change protocol when a maps scheme is included', function () {
             var editor = this.newMediumEditor('.editor', {
-                anchor: {
-                    linkValidation: true
-                }
-            }),
+                    anchor: {
+                        linkValidation: true
+                    }
+                }),
                 // Specifically using a non-sensical maps string to illustrate that what follows maps is not checked
                 validUrl = 'maps:abc123!@#',
                 link,
@@ -301,10 +301,10 @@ describe('Anchor Button TestCase', function () {
 
         it('should not change protocol for protocol-relative URLs', function () {
             var editor = this.newMediumEditor('.editor', {
-                anchor: {
-                    linkValidation: true
-                }
-            }),
+                    anchor: {
+                        linkValidation: true
+                    }
+                }),
                 validUrl = '//test.com/',
                 link,
                 anchorExtension = editor.getExtensionByName('anchor');
@@ -320,10 +320,10 @@ describe('Anchor Button TestCase', function () {
 
         it('should not change protocol for any alphabetic scheme', function () {
             var editor = this.newMediumEditor('.editor', {
-                anchor: {
-                    linkValidation: true
-                }
-            }),
+                    anchor: {
+                        linkValidation: true
+                    }
+                }),
                 link,
                 validUrl = 'abcDEFgHi://test.com/',
                 anchorExtension = editor.getExtensionByName('anchor');
@@ -544,10 +544,10 @@ describe('Anchor Button TestCase', function () {
 
         it('should not change spaces to %20 if linkValidation is set to false', function () {
             var editor = this.newMediumEditor('.editor', {
-                anchor: {
-                    linkValidation: false
-                }
-            }),
+                    anchor: {
+                        linkValidation: false
+                    }
+                }),
                 link,
                 anchorExtension = editor.getExtensionByName('anchor'),
                 expectedOpts = {
@@ -572,10 +572,10 @@ describe('Anchor Button TestCase', function () {
 
         it('should add target="_blank" when "open in a new window" checkbox is checked', function () {
             var editor = this.newMediumEditor('.editor', {
-                anchor: {
-                    targetCheckbox: true
-                }
-            }),
+                    anchor: {
+                        targetCheckbox: true
+                    }
+                }),
                 anchorExtension = editor.getExtensionByName('anchor'),
                 targetCheckbox,
                 link;
@@ -597,8 +597,8 @@ describe('Anchor Button TestCase', function () {
 
         it('should add target="_blank" when respective option is set to true', function () {
             var editor = this.newMediumEditor('.editor', {
-                targetBlank: true
-            }),
+                    targetBlank: true
+                }),
                 link,
                 anchorExtension = editor.getExtensionByName('anchor');
 
@@ -655,7 +655,7 @@ describe('Anchor Button TestCase', function () {
         });
 
         it('should create a button when user selects this option, even if selected text carries tags ' +
-                'and the selection doesn\'t exactly match those tags', function () {
+            'and the selection doesn\'t exactly match those tags', function () {
             spyOn(MediumEditor.prototype, 'createLink').and.callThrough();
             this.el.innerHTML = '<p>Hello <b>world</b>&nbsp;!</p>';
 
@@ -701,7 +701,7 @@ describe('Anchor Button TestCase', function () {
         });
 
         it('should remove the target _blank from the anchor tag when the open in a new window checkbox,' +
-                ' is unchecked and the form is saved', function () {
+            ' is unchecked and the form is saved', function () {
             var editor = this.newMediumEditor('.editor', {
                     anchor: {
                         targetCheckbox: true
@@ -731,7 +731,7 @@ describe('Anchor Button TestCase', function () {
         });
 
         it('should fire editableInput only once when the user creates a link open to a new window,' +
-                ' and it should fire at the end of the DOM and selection modifications', function () {
+            ' and it should fire at the end of the DOM and selection modifications', function () {
             spyOn(MediumEditor.prototype, 'createLink').and.callThrough();
             this.el.innerHTML = '<p>Lorem ipsum et dolitur sunt.</p>';
             var editor = this.newMediumEditor('.editor', {

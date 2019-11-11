@@ -103,7 +103,7 @@
             this.on(form, 'click', this.handleFormClick.bind(this));
 
             // Add font names
-            for (var i = 0; i<this.fonts.length; i++) {
+            for (var i = 0; i < this.fonts.length; i++) {
                 option = doc.createElement('option');
                 option.innerHTML = this.fonts[i];
                 option.value = this.fonts[i];
@@ -116,12 +116,12 @@
             // Handle typing in the textbox
             this.on(select, 'change', this.handleFontChange.bind(this));
 
-            // Add save buton
+            // Add save button
             save.setAttribute('href', '#');
-            save.className = 'medium-editor-toobar-save';
+            save.className = 'medium-editor-toolbar-save';
             save.innerHTML = this.getEditorOption('buttonLabels') === 'fontawesome' ?
-                             '<i class="fa fa-check"></i>' :
-                             '&#10003;';
+                '<i class="fa fa-check"></i>' :
+                '&#10003;';
             form.appendChild(save);
 
             // Handle save button clicks (capture)
@@ -129,10 +129,10 @@
 
             // Add close button
             close.setAttribute('href', '#');
-            close.className = 'medium-editor-toobar-close';
+            close.className = 'medium-editor-toolbar-close';
             close.innerHTML = this.getEditorOption('buttonLabels') === 'fontawesome' ?
-                              '<i class="fa fa-times"></i>' :
-                              '&times;';
+                '<i class="fa fa-times"></i>' :
+                '&times;';
             form.appendChild(close);
 
             // Handle close button clicks

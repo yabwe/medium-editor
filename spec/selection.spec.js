@@ -43,17 +43,17 @@ describe('MediumEditor.selection TestCase', function () {
         });
 
         it('should not export a position indicating the cursor is after an empty paragraph (in a complicated markup case)',
-                function () {
-            this.el.innerHTML = '<p><span>www.google.com</span></p><p><br /></p>' +
-                '<p>What<span class="target">ever</span></p>';
-            // Before the 'e' in whatever
-            placeCursorInsideElement(this.el.querySelector('span.target').firstChild, 0);
-            var exportedSelection = MediumEditor.selection.exportSelection(this.el, document);
-            expect(exportedSelection.emptyBlocksIndex).toEqual(undefined);
-        });
+            function () {
+                this.el.innerHTML = '<p><span>www.google.com</span></p><p><br /></p>' +
+                    '<p>What<span class="target">ever</span></p>';
+                // Before the 'e' in whatever
+                placeCursorInsideElement(this.el.querySelector('span.target').firstChild, 0);
+                var exportedSelection = MediumEditor.selection.exportSelection(this.el, document);
+                expect(exportedSelection.emptyBlocksIndex).toEqual(undefined);
+            });
 
         it('should not export a position indicating the cursor is after an empty paragraph ' +
-                '(in a complicated markup with selection on the element)', function () {
+            '(in a complicated markup with selection on the element)', function () {
             this.el.innerHTML = '<p><span>www.google.com</span></p><p><br /></p>' +
                 '<p>What<span class="target">ever</span></p>';
             // Before the 'e' in whatever
@@ -324,10 +324,10 @@ describe('MediumEditor.selection TestCase', function () {
         // https://github.com/yabwe/medium-editor/issues/732
         it('should support a selection correctly when space + newlines are separating block elements', function () {
             this.el.innerHTML = '<ul>\n' +
-                                '    <li><a href="#">a link</a></li>\n' +
-                                '    <li>a list item</li>\n' +
-                                '    <li>target</li>\n' +
-                                '</ul>';
+                '    <li><a href="#">a link</a></li>\n' +
+                '    <li>a list item</li>\n' +
+                '    <li>target</li>\n' +
+                '</ul>';
             var lastLi = this.el.querySelectorAll('ul > li')[2];
 
             // Select the <li> with 'target'
@@ -346,7 +346,12 @@ describe('MediumEditor.selection TestCase', function () {
 
         it('should support a selection that specifies an image is the selection', function () {
             this.el.innerHTML = '<p>lorem ipsum <a href="#"><img src="../demo/img/medium-editor.jpg" /></a> dolor</p>';
-            MediumEditor.selection.importSelection({ start: 12, end: 12, startsWithImage: true, trailingImageCount: 1 }, this.el, document);
+            MediumEditor.selection.importSelection({
+                start: 12,
+                end: 12,
+                startsWithImage: true,
+                trailingImageCount: 1
+            }, this.el, document);
             var range = window.getSelection().getRangeAt(0);
             expect(range.toString()).toBe('');
             expect(MediumEditor.util.isDescendant(range.endContainer, this.el.querySelector('img'), true)).toBe(true, 'the image is not within the selection');

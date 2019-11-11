@@ -333,7 +333,6 @@ var editor = new MediumEditor('.editable', {
         hideDelay: 500,
         previewValueSelector: 'a'
     }
-}
 });
 ```
 
@@ -435,7 +434,6 @@ var editor = new MediumEditor('.editable', {
         targetCheckbox: false,
         targetCheckboxText: 'Open in new window'
     }
-}
 });
 ```
 

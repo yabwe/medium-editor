@@ -3,7 +3,7 @@
 
     var CLASS_DRAG_OVER = 'medium-editor-dragover';
 
-    function clearClassNames(element) {
+    function clearClassNames (element) {
         var editable = MediumEditor.util.getContainerEditorElement(element),
             existing = Array.prototype.slice.call(editable.parentElement.querySelectorAll('.' + CLASS_DRAG_OVER));
 

@@ -107,7 +107,7 @@
 
             if (this.targetCheckbox) {
                 // fixme: ideally, this targetCheckboxText would be a formLabel too,
-                // figure out how to deprecate? also consider `fa-` icon default implcations.
+                // figure out how to deprecate? also consider `fa-` icon default implications.
                 template.push(
                     '<div class="medium-editor-toolbar-form-row">',
                     '<input type="checkbox" class="medium-editor-toolbar-anchor-target" id="medium-editor-toolbar-anchor-target-field-' + this.getEditorId() + '">',
@@ -151,7 +151,7 @@
                 buttonCheckbox = this.getAnchorButtonCheckbox();
 
             opts = opts || { value: '' };
-            // TODO: This is for backwards compatability
+            // TODO: This is for backwards compatibility
             // We don't need to support the 'string' argument in 6.0.0
             if (typeof opts === 'string') {
                 opts = {
@@ -256,11 +256,11 @@
             // Matches protocol relative "//"
             // Matches common external protocols "mailto:" "tel:" "maps:"
             // Matches relative hash link, begins with "#"
-            var urlSchemeRegex = /^([a-z]+:)?\/\/|^(mailto|tel|maps):|^\#/i,
+            var urlSchemeRegex = /^([a-z]+:)?\/\/|^(mailto|tel|maps):|^#/i,
                 hasScheme = urlSchemeRegex.test(value),
                 scheme = '',
                 // telRegex is a regex for checking if the string is a telephone number
-                telRegex = /^\+?\s?\(?(?:\d\s?\-?\)?){3,20}$/,
+                telRegex = /^\+?\s?\(?(?:\d\s?-?\)?){3,20}$/,
                 urlParts = value.match(/^(.*?)(?:\?(.*?))?(?:#(.*))?$/),
                 path = urlParts[1],
                 query = urlParts[2],
@@ -273,7 +273,7 @@
             if (!hasScheme) {
                 var host = path.split('/')[0];
                 // if the host part of the path looks like a hostname
-                if (host.match(/.+(\.|:).+/) || host === 'localhost') {
+                if (host.match(/.+([.:]).+/) || host === 'localhost') {
                     scheme = 'http://';
                 }
             }

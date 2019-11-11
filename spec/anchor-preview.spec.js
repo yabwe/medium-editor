@@ -222,12 +222,12 @@ describe('Anchor Preview TestCase', function () {
 
         it('should NOT be displayed when the hovered link is empty and the option showOnEmptyLinks is set to false', function () {
             var editor = this.newMediumEditor('.editor', {
-                delay: 200,
-                anchorPreview: {
-                    showOnEmptyLinks: false
-                }
-            }),
-            anchorPreview = editor.getExtensionByName('anchor-preview');
+                    delay: 200,
+                    anchorPreview: {
+                        showOnEmptyLinks: false
+                    }
+                }),
+                anchorPreview = editor.getExtensionByName('anchor-preview');
 
             // show preview
             spyOn(MediumEditor.extensions.anchorPreview.prototype, 'showPreview').and.callThrough();

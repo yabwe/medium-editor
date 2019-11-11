@@ -255,17 +255,17 @@ describe('KeyboardCommands TestCase', function () {
             spyOn(MediumEditor.prototype, 'execAction');
             var result,
                 editor = this.newMediumEditor('.editor', {
-                keyboardCommands: {
-                    commands: [
-                        {
-                            command: false,
-                            key: 'J',
-                            meta: true,
-                            shift: false
-                        }
-                    ]
-                }
-            });
+                    keyboardCommands: {
+                        commands: [
+                            {
+                                command: false,
+                                key: 'J',
+                                meta: true,
+                                shift: false
+                            }
+                        ]
+                    }
+                });
 
             selectElementContentsAndFire(editor.elements[0]);
             fireEvent(editor.elements[0], 'keydown', {

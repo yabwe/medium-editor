@@ -261,11 +261,11 @@ describe('Pasting content', function () {
     describe('using keyboard', function () {
         it('should insert a custom paste-bin on keydown of CTRL + V', function () {
             var editor = this.newMediumEditor('.editor', {
-                    paste: {
-                        forcePlainText: false,
-                        cleanPastedHTML: true
-                    }
-                });
+                paste: {
+                    forcePlainText: false,
+                    cleanPastedHTML: true
+                }
+            });
 
             selectElementContentsAndFire(editor.elements[0].firstChild);
 
@@ -347,7 +347,8 @@ describe('Pasting content', function () {
             var evt = {
                     type: 'paste',
                     defaultPrevented: false,
-                    preventDefault: function () {},
+                    preventDefault: function () {
+                    },
                     clipboardData: {
                         types: ['text/plain', 'text/html'],
                         getData: function () {
@@ -360,7 +361,10 @@ describe('Pasting content', function () {
 
             pasteExtension.handlePasteBinPaste(evt);
             jasmine.clock().tick(1);
-            expect(spy).toHaveBeenCalledWith({ currentTarget: editor.elements[0], target: editor.elements[0] }, editor.elements[0]);
+            expect(spy).toHaveBeenCalledWith({
+                currentTarget: editor.elements[0],
+                target: editor.elements[0]
+            }, editor.elements[0]);
         });
 
         it('should do nothing if default was prevented on paste event of the paste-bin', function () {
@@ -387,17 +391,18 @@ describe('Pasting content', function () {
             expect(contentEditables.length).toBe(2);
 
             var evt = {
-                    type: 'paste',
-                    defaultPrevented: true,
-                    preventDefault: function () {},
-                    clipboardData: {
-                        types: ['text/plain', 'text/html'],
-                        getData: function () {
-                            // do we need to return different results for the different types? text/plain, text/html
-                            return 'pasted content';
-                        }
+                type: 'paste',
+                defaultPrevented: true,
+                preventDefault: function () {
+                },
+                clipboardData: {
+                    types: ['text/plain', 'text/html'],
+                    getData: function () {
+                        // do we need to return different results for the different types? text/plain, text/html
+                        return 'pasted content';
                     }
-                };
+                }
+            };
 
             spyOn(evt, 'preventDefault');
 
@@ -435,16 +440,17 @@ describe('Pasting content', function () {
             expect(contentEditables.length).toBe(2);
 
             var evt = {
-                    type: 'paste',
-                    preventDefault: function () {},
-                    clipboardData: {
-                        types: ['text/plain', 'text/html'],
-                        getData: function () {
-                            // do we need to return different results for the different types? text/plain, text/html
-                            return 'pasted content';
-                        }
+                type: 'paste',
+                preventDefault: function () {
+                },
+                clipboardData: {
+                    types: ['text/plain', 'text/html'],
+                    getData: function () {
+                        // do we need to return different results for the different types? text/plain, text/html
+                        return 'pasted content';
                     }
-                };
+                }
+            };
 
             spyOn(evt, 'preventDefault');
 
@@ -483,7 +489,8 @@ describe('Pasting content', function () {
 
             var evt = {
                     type: 'paste',
-                    preventDefault: function () {},
+                    preventDefault: function () {
+                    },
                     clipboardData: {
                         types: ['text/plain'],
                         getData: function () {
@@ -536,7 +543,8 @@ describe('Pasting content', function () {
 
             var evt = {
                     type: 'paste',
-                    preventDefault: function () {},
+                    preventDefault: function () {
+                    },
                     clipboardData: {
                         types: ['text/plain'],
                         getData: function () {
@@ -595,11 +603,11 @@ describe('Pasting content', function () {
 
         it('should filter inline rich-text when "insertHTML" command is not supported', function () {
             var editor = this.newMediumEditor('.editor', {
-                    paste: {
-                        forcePlainText: false,
-                        cleanPastedHTML: true
-                    }
-                });
+                paste: {
+                    forcePlainText: false,
+                    cleanPastedHTML: true
+                }
+            });
 
             spyOn(document, 'queryCommandSupported').and.returnValue(false);
 

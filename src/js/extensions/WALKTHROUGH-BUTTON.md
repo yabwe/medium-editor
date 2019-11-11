@@ -118,7 +118,7 @@ var editor = new MediumEditor('.editable', {
 **PREVIEW:**
 <p align="center"><img src="http://yabwe.github.io/medium-editor/img/button-example-02.png" /></p>
 
-To change the apperances, we have:
+To change the appearances, we have:
 
 1. Changed the `innerHTML` of our button to be `<i class="fa fa-paint-brush"></i>` in the `init()` method
 1. Added 'Highlight' as a title attribute to enable the tooltip
@@ -181,7 +181,7 @@ After highlighting the text and clicking the button, the text now appears highli
 
 **NOTE:**
 
-A great convienience of using the `toggleSelection()` method of the **CSS Class Applier** is that it will also unwrap the selection.  So, since we're always calling `toggleSelection()` when the button is clicked, if you highlight the same text and click the button again, the text will go back to normal and the `<mark>` element will be removed.
+A great convenience of using the `toggleSelection()` method of the **CSS Class Applier** is that it will also unwrap the selection.  So, since we're always calling `toggleSelection()` when the button is clicked, if you highlight the same text and click the button again, the text will go back to normal and the `<mark>` element will be removed.
 
 **NOTE:**
 
@@ -249,7 +249,7 @@ var HighlighterButton = MediumEditor.Extension.extend({
 As shown above, now our button responds to what the user has selected.  To make this final piece work, we've implemented 4 extension methods:
 
 1. **isAlreadyApplied(node)**
-  * This will be called on each element which contains the user's selection, starting with the lowest element and climbing its ancestors.  If any of these elements are a `<mark>` element, we return `true` since that means the selection is higlighted.
+  * This will be called on each element which contains the user's selection, starting with the lowest element and climbing its ancestors.  If any of these elements are a `<mark>` element, we return `true` since that means the selection is highlighted.
 1. **isActive()**
   * This should return whether the button is already active.  We check this by seeing if the `'medium-editor-button-active'` class already exists on the toolbar button.
 1. **setActive()**

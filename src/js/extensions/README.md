@@ -294,7 +294,7 @@ Currently, this method is called when updating the editor & toolbar, and if `que
 ***
 ### `setInactive()`
 
-If implemented, this method is called when MediumEditor knows that this extension has not been applied to the current selection. Curently, this is called at the beginning of each state change for the editor & toolbar.
+If implemented, this method is called when MediumEditor knows that this extension has not been applied to the current selection. Currently, this is called at the beginning of each state change for the editor & toolbar.
 
 After calling this, MediumEditor will attempt to update the extension, either via `checkState()` or the combination of `queryCommandState()`, `isAlreadyApplied(node)`, `isActive()`, and `setActive()`
 
@@ -544,7 +544,7 @@ The `getButton()` method on each button will be called and appended to the toolb
 ***
 ## Button Helpers
 
-The following are properties and methods of the built-in button extension implementation (`MediumEditor.extensions.button`) that can be reused and/or overriden to make custom button extensions easier to create.
+The following are properties and methods of the built-in button extension implementation (`MediumEditor.extensions.button`) that can be reused and/or overridden to make custom button extensions easier to create.
 
 ### `action` _(string)_
 

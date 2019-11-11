@@ -97,21 +97,21 @@ describe('Initialization TestCase', function () {
     describe('With a valid element', function () {
         it('should have a default set of options', function () {
             var defaultOptions = {
-                delay: 0,
-                disableReturn: false,
-                disableDoubleReturn: false,
-                disableExtraSpaces: false,
-                disableEditing: false,
-                autoLink: false,
-                elementsContainer: document.body,
-                contentWindow: window,
-                ownerDocument: document,
-                buttonLabels: false,
-                targetBlank: false,
-                extensions: {},
-                activeButtonClass: 'medium-editor-button-active',
-                spellcheck: true
-            },
+                    delay: 0,
+                    disableReturn: false,
+                    disableDoubleReturn: false,
+                    disableExtraSpaces: false,
+                    disableEditing: false,
+                    autoLink: false,
+                    elementsContainer: document.body,
+                    contentWindow: window,
+                    ownerDocument: document,
+                    buttonLabels: false,
+                    targetBlank: false,
+                    extensions: {},
+                    activeButtonClass: 'medium-editor-button-active',
+                    spellcheck: true
+                },
                 editor = this.newMediumEditor('.editor');
             expect(Object.keys(editor.options).length).toBe(Object.keys(defaultOptions).length);
             expect(_.isEqual(editor.options, defaultOptions)).toBe(true);
@@ -119,20 +119,20 @@ describe('Initialization TestCase', function () {
 
         it('should accept custom options values', function () {
             var options = {
-                delay: 300,
-                toolbar: {
-                    diffLeft: 10,
-                    diffTop: 5
+                    delay: 300,
+                    toolbar: {
+                        diffLeft: 10,
+                        diffTop: 5
+                    },
+                    anchor: {
+                        placeholderText: 'test',
+                        targetCheckboxText: 'new window?'
+                    },
+                    paste: {
+                        forcePlainText: false,
+                        cleanPastedHTML: true
+                    }
                 },
-                anchor: {
-                    placeholderText: 'test',
-                    targetCheckboxText: 'new window?'
-                },
-                paste: {
-                    forcePlainText: false,
-                    cleanPastedHTML: true
-                }
-            },
                 editor = this.newMediumEditor('.editor', options);
             Object.keys(options).forEach(function (customOption) {
                 expect(editor.options[customOption]).toBe(options[customOption]);

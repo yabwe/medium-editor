@@ -1,0 +1,5 @@
+demo/
+dist/
+spec/vendor/*.js
+src/js/polyfills.js
+index.js

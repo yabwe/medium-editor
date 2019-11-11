@@ -75,7 +75,7 @@ describe('MediumEditor.extensions.placeholder TestCase', function () {
     });
 
     it('should remove the placeholder on input, and NOT on click', function () {
-        var editor = this.newMediumEditor('.editor', { placeholder: { hideOnClick: false }});
+        var editor = this.newMediumEditor('.editor', { placeholder: { hideOnClick: false } });
         expect(editor.elements[0].className).toContain('medium-editor-placeholder');
         fireEvent(editor.elements[0], 'click');
         expect(editor.elements[0].className).toContain('medium-editor-placeholder');
@@ -137,21 +137,21 @@ describe('MediumEditor.extensions.placeholder TestCase', function () {
     });
 
     /*jslint regexp: true*/
-    function validatePlaceholderContent(element, expectedValue) {
+    function validatePlaceholderContent (element, expectedValue) {
         var placeholder = window.getComputedStyle(element, ':after').getPropertyValue('content'),
             regex = /^attr\(([^\)]+)\)$/g,
             match = regex.exec(placeholder);
         if (match) {
             // In firefox, getComputedStyle().getPropertyValue('content') can return attr() instead of what attr() evaluates to
             expect(match[1]).toBe('data-placeholder');
-        }
-        // When these tests run in firefox in saucelabs, for some reason the content property of the
-        // placeholder is 'none'.  Not sure why this happens, or why this is specific to saucelabs
-        // but for now, just skipping the assertion in this case
-        else if (placeholder !== 'none') {
+        } else if (placeholder !== 'none') {
+            // When these tests run in firefox in saucelabs, for some reason the content property of the
+            // placeholder is 'none'.  Not sure why this happens, or why this is specific to saucelabs
+            // but for now, just skipping the assertion in this case
             expect(placeholder).toMatch(new RegExp('^[\'"]' + expectedValue + '[\'"]$'));
         }
     }
+
     /*jslint regexp: false*/
 
     it('should add the default placeholder text when data-placeholder is not present', function () {
@@ -212,10 +212,10 @@ describe('MediumEditor.extensions.placeholder TestCase', function () {
     it('should use custom placeholder text when passed as the placeholder.text option', function () {
         var placeholderText = 'Custom placeholder',
             editor = this.newMediumEditor('.editor', {
-            placeholder: {
-                text: placeholderText
-            }
-        });
+                placeholder: {
+                    text: placeholderText
+                }
+            });
         validatePlaceholderContent(editor.elements[0], placeholderText);
     });
 

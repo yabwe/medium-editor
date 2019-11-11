@@ -16,7 +16,7 @@
     //    will not match any unicode characters. In the regexes in this
     //    block, negation is used specifically to match the end of an html
     //    tag, and in fact unicode characters *should* be allowed.
-    function createReplacements() {
+    function createReplacements () {
         return [
             // Remove anything but the contents within the BODY element
             [new RegExp(/^[\s\S]*<body[^>]*>\s*|\s*<\/body[^>]*>[\s\S]*$/g), ''],
@@ -45,7 +45,7 @@
             [new RegExp(/<span[^>]*font-weight:(bold|700)[^>]*>/gi), '<span class="replace-with bold">'],
 
             // replace manually entered b/i/a tags with real ones
-            [new RegExp(/&lt;(\/?)(i|b|a)&gt;/gi), '<$1$2>'],
+            [new RegExp(/&lt;(\/?)([iba])&gt;/gi), '<$1$2>'],
 
             // replace manually a tags with real ones, converting smart-quotes from google docs
             [new RegExp(/&lt;a(?:(?!href).)+href=(?:&quot;|&rdquo;|&ldquo;|"|“|”)(((?!&quot;|&rdquo;|&ldquo;|"|“|”).)*)(?:&quot;|&rdquo;|&ldquo;|"|“|”)(?:(?!&gt;).)*&gt;/gi), '<a href="$1">'],
@@ -59,7 +59,7 @@
             [new RegExp(/<\/?o:[a-z]*>/gi), ''],
 
             // Microsoft Word adds some special elements around list items
-            [new RegExp(/<!\[if !supportLists\]>(((?!<!).)*)<!\[endif]\>/gi), '$1']
+            [new RegExp(/<!\[if !supportLists]>(((?!<!).)*)<!\[endif]>/gi), '$1']
         ];
     }
 
@@ -74,7 +74,7 @@
      * @param {doc} reference to document
      * @return {Object} Object with mime types and data for those mime types.
      */
-    function getClipboardContent(event, win, doc) {
+    function getClipboardContent (event, win, doc) {
         var dataTransfer = event.clipboardData || win.clipboardData || doc.dataTransfer,
             data = {};
 

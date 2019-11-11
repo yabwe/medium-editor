@@ -109,33 +109,33 @@ describe('Autolink', function () {
             });
 
             var links = [
-                'http://www.royal.gov.uk',
-                'http://www.bbc.co.uk',
-                'http://mountaindew.com',
-                'http://coca-cola.com',
-                'http://example.com',
-                'http://wwww.example.com', // with more "w"s it's still a valid subdomain
-                'http://www.example.com',
-                'http://www.example.com/foo/bar',
-                'http://www.example.com?foo=bar',
-                'http://www.example.com/baz?foo=bar',
-                'http://www.example.com/baz?foo=bar#buzz',
-                'http://www.example.com/#buzz',
-                'http://about.museum',
-                'http://getty.art.museum/visit/center/art.html',
-                'http://en.wikipedia.org/wiki/List_of_diplomatic_missions_of_China'
-            ],
+                    'http://www.royal.gov.uk',
+                    'http://www.bbc.co.uk',
+                    'http://mountaindew.com',
+                    'http://coca-cola.com',
+                    'http://example.com',
+                    'http://wwww.example.com', // with more "w"s it's still a valid subdomain
+                    'http://www.example.com',
+                    'http://www.example.com/foo/bar',
+                    'http://www.example.com?foo=bar',
+                    'http://www.example.com/baz?foo=bar',
+                    'http://www.example.com/baz?foo=bar#buzz',
+                    'http://www.example.com/#buzz',
+                    'http://about.museum',
+                    'http://getty.art.museum/visit/center/art.html',
+                    'http://en.wikipedia.org/wiki/List_of_diplomatic_missions_of_China'
+                ],
                 notLinks = [
-                'http:google.com',
-                'http:/example.com',
-                'app.can',
-                'sadasda.sdfasf.sdfas',
-                'www.example.combasic',
-                // Our algorithm assumes that '.' is punctuation, not part of the URL.
-                'en.wikipedia.org/wiki/Embassy_of_China_in_Washington,_D.C.'
-            ];
+                    'http:google.com',
+                    'http:/example.com',
+                    'app.can',
+                    'sadasda.sdfasf.sdfas',
+                    'www.example.combasic',
+                    // Our algorithm assumes that '.' is punctuation, not part of the URL.
+                    'en.wikipedia.org/wiki/Embassy_of_China_in_Washington,_D.C.'
+                ];
 
-            function triggerAutolinking(element, key) {
+            function triggerAutolinking (element, key) {
                 var keyPressed = key || MediumEditor.util.keyCode.SPACE;
                 fireEvent(element, 'keypress', {
                     keyCode: keyPressed
@@ -143,7 +143,7 @@ describe('Autolink', function () {
                 jasmine.clock().tick(1);
             }
 
-            function generateLinkTest(link, href) {
+            function generateLinkTest (link, href) {
                 return function () {
                     var selection = window.getSelection(),
                         newRange = document.createRange();
@@ -175,7 +175,7 @@ describe('Autolink', function () {
                     generateLinkTest(noProtocolLink, link));
             });
 
-            function generateNotLinkTest(link) {
+            function generateNotLinkTest (link) {
                 return function () {
                     var selection = window.getSelection(),
                         newRange = document.createRange();
@@ -334,18 +334,18 @@ describe('Autolink', function () {
 
             it('should auto-link text in a really hideous example', function () {
                 this.el.innerHTML = '' +
-                '<span>' +
+                    '<span>' +
                     '<b>Link: http</b>' +
                     '<i>://</i>' +
-                '</span>' +
-                '<span>' +
+                    '</span>' +
+                    '<span>' +
                     '<b>www</b>' +
                     '<u>.google.com</u>' +
-                '</span>' +
-                '<span>' +
+                    '</span>' +
+                    '<span>' +
                     '<b>/wow </b>' +
                     '<i>impressive</i>' +
-                '</span>';
+                    '</span>';
 
                 selectElementContentsAndFire(this.el.firstChild);
 
@@ -358,28 +358,28 @@ describe('Autolink', function () {
                 links[0].firstChild.removeAttribute('data-href'); // to make the next innerHTML check work consistently
 
                 var expectedOutput = '' +
-                '<span>' +
+                    '<span>' +
                     '<b>Link: </b>' +
-                '</span>' +
-                '<a href="http://www.google.com/wow">' +
-                    '<span data-auto-link="true">' +
-                        '<span>' +
-                            '<b>http</b>' +
-                            '<i>://</i>' +
-                        '</span>' +
-                        '<span>' +
-                            '<b>www</b>' +
-                            '<u>.google.com</u>' +
-                        '</span>' +
-                        '<span>' +
-                            '<b>/wow</b>' +
-                        '</span>' +
                     '</span>' +
-                '</a>' +
-                '<span>' +
+                    '<a href="http://www.google.com/wow">' +
+                    '<span data-auto-link="true">' +
+                    '<span>' +
+                    '<b>http</b>' +
+                    '<i>://</i>' +
+                    '</span>' +
+                    '<span>' +
+                    '<b>www</b>' +
+                    '<u>.google.com</u>' +
+                    '</span>' +
+                    '<span>' +
+                    '<b>/wow</b>' +
+                    '</span>' +
+                    '</span>' +
+                    '</a>' +
+                    '<span>' +
                     '<b> </b>' +
                     '<i>impressive</i>' +
-                '</span>';
+                    '</span>';
 
                 expect(this.el.innerHTML).toBe(expectedOutput);
             });
@@ -433,7 +433,7 @@ describe('Autolink', function () {
             });
 
             it('should create a link with data-auto-link=true when the text no longer matches the original link' +
-                    ' and it has been unlinked', function () {
+                ' and it has been unlinked', function () {
                 this.el.innerHTML = 'Click this <span data-auto-link="true" data-href="http://www.example.com">' +
                     'www.example.co.uk</span> link';
 

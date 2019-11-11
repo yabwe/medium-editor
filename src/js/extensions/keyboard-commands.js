@@ -67,16 +67,15 @@
                 if (data.meta === isMeta &&
                     data.shift === isShift &&
                     (data.alt === isAlt ||
-                     undefined === data.alt)) { // TODO deprecated: remove check for undefined === data.alt when jumping to 6.0.0
+                        undefined === data.alt)) { // TODO deprecated: remove check for undefined === data.alt when jumping to 6.0.0
                     event.preventDefault();
                     event.stopPropagation();
 
                     // command can be a function to execute
                     if (typeof data.command === 'function') {
                         data.command.apply(this);
-                    }
-                    // command can be false so the shortcut is just disabled
-                    else if (false !== data.command) {
+                    } else if (false !== data.command) {
+                        // command can be false so the shortcut is just disabled
                         this.execAction(data.command);
                     }
                 }
