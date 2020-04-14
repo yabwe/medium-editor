@@ -2298,7 +2298,7 @@ MediumEditor.extensions = {};
          *
          *  @param {DOMElement} An element containing the cursor to find offsets relative to.
          *  @param {Range} A Range representing cursor position. Will window.getSelection if none is passed.
-         *  @return {Object} 'left' and 'right' attributes contain offsets from begining and end of Element
+         *  @return {Object} 'left' and 'right' attributes contain offsets from beginning and end of Element
          */
         getCaretOffsets: function getCaretOffsets(element, range) {
             var preCaretRange, postCaretRange;
@@ -6627,13 +6627,13 @@ MediumEditor.extensions = {};
                 // at the very end of the block
                 MediumEditor.selection.getCaretOffsets(node).left === 0) {
             if (MediumEditor.util.isKey(event, MediumEditor.util.keyCode.BACKSPACE) && isEmpty.test(node.previousElementSibling.innerHTML)) {
-                // backspacing the begining of a header into an empty previous element will
+                // backspacing the beginning of a header into an empty previous element will
                 // change the tagName of the current node to prevent one
                 // instead delete previous node and cancel the event.
                 node.previousElementSibling.parentNode.removeChild(node.previousElementSibling);
                 event.preventDefault();
             } else if (!this.options.disableDoubleReturn && MediumEditor.util.isKey(event, MediumEditor.util.keyCode.ENTER)) {
-                // hitting return in the begining of a header will create empty header elements before the current one
+                // hitting return in the beginning of a header will create empty header elements before the current one
                 // instead, make "<p><br></p>" element, which are what happens if you hit return in an empty paragraph
                 p = this.options.ownerDocument.createElement('p');
                 p.innerHTML = '<br>';
@@ -6653,7 +6653,7 @@ MediumEditor.extensions = {};
             // hitting delete in an empty element preceding a header, ex:
             //  <p>[CURSOR]</p><h1>Header</h1>
             // Will cause the h1 to become a paragraph.
-            // Instead, delete the paragraph node and move the cursor to the begining of the h1
+            // Instead, delete the paragraph node and move the cursor to the beginning of the h1
 
             // remove node and move cursor to start of header
             MediumEditor.selection.moveCursor(this.options.ownerDocument, node.nextElementSibling);
@@ -6696,7 +6696,7 @@ MediumEditor.extensions = {};
                 (MediumEditor.util.getClosestTag(node, 'blockquote') !== false) &&
                 MediumEditor.selection.getCaretOffsets(node).left === 0) {
 
-            // when cursor is at the begining of the element and the element is <blockquote>
+            // when cursor is at the beginning of the element and the element is <blockquote>
             // then pressing backspace key should change the <blockquote> to a <p> tag
             event.preventDefault();
             MediumEditor.util.execFormatBlock(this.options.ownerDocument, 'p');

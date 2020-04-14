@@ -15,7 +15,7 @@ describe('Protect Header Tags TestCase', function () {
 
     describe('ProtectHeaderTags', function () {
         it('header intact after leading return', function () {
-            // place cursor at begining of header
+            // place cursor at beginning of header
             var editor = this.newMediumEditor('.editor'),
                 el = document.getElementById('header'),
                 range = document.createRange(),
@@ -37,7 +37,7 @@ describe('Protect Header Tags TestCase', function () {
         });
 
         it('header leading return inserts paragraph, not additional header', function () {
-            // place cursor at begining of header
+            // place cursor at beginning of header
             var editor = this.newMediumEditor('.editor'),
                 el = document.getElementById('header'),
                 range = document.createRange(),
@@ -58,7 +58,7 @@ describe('Protect Header Tags TestCase', function () {
         });
 
         it('header leading backspace into empty p preserves header', function () {
-            // place cursor at begining of header
+            // place cursor at beginning of header
             var editor = this.newMediumEditor('.editor'),
                 originalHTML = document.getElementById('editor').innerHTML,
                 el = document.getElementById('header'),
