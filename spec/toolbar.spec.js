@@ -735,11 +735,11 @@ describe('MediumEditor.extensions.toolbar TestCase', function () {
             window.document.body.appendChild(relativeContainer);
 
             var editor = this.newMediumEditor('.editor', {
-                  toolbar: {
-                      relativeContainer: document.getElementById('someRelativeDiv')
-                  }
-              }),
-              toolbarHTML = editor.getExtensionByName('toolbar').getToolbarElement().outerHTML;
+                toolbar: {
+                    relativeContainer: document.getElementById('someRelativeDiv')
+                }
+            }),
+            toolbarHTML = editor.getExtensionByName('toolbar').getToolbarElement().outerHTML;
 
             expect(document.getElementById('someRelativeDiv').innerHTML).toBe(toolbarHTML);
         });
