@@ -138,7 +138,18 @@ describe('Core-API', function () {
                     }
                 }),
                 toolbar = editor.getExtensionByName('toolbar'),
-                button;
+                button,
+                // Beacuse not all browsers use <strike> or <s>, check for both
+                sTagO = '<(s|strike)>',
+                sTagC = '</(s|strike)>',
+                // Edge breaks this into 3 separate <u> tags for some reason...
+                regex = new RegExp([
+                    '^<u>lorem ',
+                    '(<i>' + sTagO + '|' + sTagO + '<i>|</u><i><u>' + sTagO + ')',
+                    'ipsum',
+                    '(</i>' + sTagC + '|' + sTagC + '</i>|' + sTagC + '</u></i><u>)',
+                    ' dolor</u>$'
+                ].join(''));
 
             // Save selection around <i> tag
             selectElementContents(editor.elements[0].querySelector('i'));
@@ -153,9 +164,6 @@ describe('Core-API', function () {
             editor.restoreSelection();
             button = toolbar.getToolbarElement().querySelector('[data-action="strikethrough"]');
             fireEvent(button, 'click');
-
-            // Edge breaks this into 3 separate <u> tags for some reason...
-            var regex = new RegExp('^<u>lorem (<i><s>|<s><i>|</u><i><u><s>)ipsum(</i></s>|</s></i>|</s></u></i><u>) dolor</u>$');
             expect(editor.elements[0].innerHTML).toMatch(regex);
         });
     });

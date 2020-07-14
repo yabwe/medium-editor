@@ -1,6 +1,8 @@
 (function () {
     'use strict';
 
+    var initialContent = {};
+
     // Event handlers that shouldn't be exposed externally
 
     function handleDisableExtraSpaces(event) {
@@ -683,8 +685,6 @@
             this.restoreSelection();
         }
     }
-
-    var initialContent = {};
 
     MediumEditor.prototype = {
         // NOT DOCUMENTED - exposed for backwards compatability

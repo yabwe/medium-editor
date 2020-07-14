@@ -11,7 +11,7 @@
         };
 
     /*jslint regexp: true*/
-    /*
+    /**
         jslint does not allow character negation, because the negation
         will not match any unicode characters. In the regexes in this
         block, negation is used specifically to match the end of an html
