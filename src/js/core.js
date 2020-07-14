@@ -211,12 +211,19 @@
                 }
             }
         }
+
+        if (MediumEditor.util.isKey(event, MediumEditor.util.keyCode.ENTER) && node.nodeName.toLowerCase() === 'div') {
+            this.options.ownerDocument.execCommand('formatBlock', false, 'p');
+        }
     }
 
     function handleEditableInput(event, editable) {
         var textarea = editable.parentNode.querySelector('textarea[medium-editor-textarea-id="' + editable.getAttribute('medium-editor-textarea-id') + '"]');
         if (textarea) {
-            textarea.value = editable.innerHTML.trim();
+            var index = this.elements.indexOf(editable);
+            if (index !== -1) {
+                textarea.value = this.getContent(index);
+            }
         }
     }
 
@@ -331,14 +338,6 @@
     }
 
     function isToolbarEnabled() {
-        // If any of the elements don't have the toolbar disabled
-        // We need a toolbar
-        if (this.elements.every(function (element) {
-                return !!element.getAttribute('data-disable-toolbar');
-            })) {
-            return false;
-        }
-
         return this.options.toolbar !== false;
     }
 
@@ -708,17 +707,13 @@
             this.events = new MediumEditor.Events(this);
             this.elements = [];
 
-            this.addElements(this.origElements);
-
-            if (this.elements.length === 0) {
-                return;
-            }
-
-            this.isActive = true;
-
             // Call initialization helpers
             initExtensions.call(this);
             attachHandlers.call(this);
+
+            this.addElements(this.origElements);
+
+            this.isActive = true;
         },
 
         destroy: function () {
@@ -736,11 +731,9 @@
 
             this.events.destroy();
 
-            this.elements.forEach(function (element) {
-                // Reset elements content, fix for issue where after editor destroyed the red underlines on spelling errors are left
-                if (this.options.spellcheck) {
-                    element.innerHTML = element.innerHTML;
-                }
+            this.elements.forEach(function (element, i) {
+                // Call the getContent to set innerHTML, extensions can do some cleanup
+                element.innerHTML = this.getContent(i);
 
                 // cleanup extra added attributes
                 element.removeAttribute('contentEditable');
@@ -812,7 +805,7 @@
             for (i = 0; i < len; i += 1) {
                 elementid = (this.elements[i].id !== '') ? this.elements[i].id : 'element-' + i;
                 content[elementid] = {
-                    value: this.elements[i].innerHTML.trim()
+                    value: this.getContent(i)
                 };
             }
             return content;
@@ -1210,7 +1203,15 @@
 
             if (this.elements[index]) {
                 var target = this.elements[index];
+
+                this.extensions.forEach(function (extension) {
+                    if (typeof extension.setContent === 'function') {
+                        html = extension.setContent(html);
+                    }
+                }, this);
+
                 target.innerHTML = html;
+
                 this.checkContentChanged(target);
             }
         },
@@ -1219,8 +1220,17 @@
             index = index || 0;
 
             if (this.elements[index]) {
-                return this.elements[index].innerHTML.trim();
+                var html = this.elements[index].innerHTML.trim();
+
+                this.extensions.forEach(function (extension) {
+                    if (typeof extension.getContent === 'function') {
+                        html = extension.getContent(html);
+                    }
+                }, this);
+
+                return html;
             }
+
             return null;
         },
 
@@ -1262,6 +1272,8 @@
 
                 // Add new elements to our internal elements array
                 this.elements.push(element);
+
+                this.setContent(element.innerHTML, this.elements.length - 1);
 
                 // Trigger event so extensions can know when an element has been added
                 this.trigger('addElement', { target: element, currentTarget: element }, element);

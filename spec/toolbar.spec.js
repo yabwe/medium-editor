@@ -530,12 +530,15 @@ describe('MediumEditor.extensions.toolbar TestCase', function () {
             expect(document.getElementsByClassName('medium-editor-toolbar-actions').length).toBe(0);
         });
 
+        /*
+        // Only disable using options, it is possible to add elements later who don't have the disable-toolbar attr and will not work
         it('should not create the toolbar if all elements has data attr of disable-toolbar', function () {
             this.el.setAttribute('data-disable-toolbar', 'true');
             var editor = this.newMediumEditor('.editor');
             expect(document.getElementsByClassName('medium-editor-toolbar-actions').length).toBe(0);
             expect(editor.getExtensionByName('toolbar')).toBeUndefined();
         });
+        */
 
         it('should not show the toolbar when one element has a data attr of disable-toolbar set and text is selected', function () {
             var element = this.createElement('div', 'editor', 'lorem ipsum'),
