@@ -33,7 +33,13 @@ describe('Full Content Action TestCase', function () {
     describe('Selection', function () {
         it('should preserve selection after multiple full-content commands', function () {
             this.el.innerHTML = '<p>lorem <u>ipsum</u> dolor</p>';
-            var editor = this.newMediumEditor('.editor');
+
+            var editor = this.newMediumEditor('.editor'),
+                // Beacuse not all browsers use <strike> or <s>, check for both
+                sTagO = '<(s|strike)>',
+                sTagC = '</(s|strike)>',
+                regex = new RegExp('^<p><u>lorem ' + sTagO + 'ipsum' + sTagC + ' dolor</u></p>$');
+
             selectElementContentsAndFire(editor.elements[0].querySelector('u'));
 
             editor.execAction('full-underline');
@@ -44,7 +50,7 @@ describe('Full Content Action TestCase', function () {
 
             // Ensure the selection is still maintained
             editor.execAction('strikethrough');
-            expect(this.el.innerHTML).toBe('<p><u>lorem <s>ipsum</s> dolor</u></p>');
+            expect(this.el.innerHTML).toMatch(regex);
         });
 
         it('should justify all contents including multiple block elements', function () {
