@@ -2,6 +2,7 @@
 *.swp
 .DS_Store
 *.swo
+.env
 node_modules/
 .sass-cache/
 npm-debug.log

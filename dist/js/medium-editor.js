@@ -1079,19 +1079,90 @@ MediumEditor.extensions = {};
             return false;
         },
 
-        cleanListDOM: function (ownerDocument, element) {
-            if (element.nodeName.toLowerCase() !== 'li') {
-                return;
+        findFirstTextNodeInSelection: function (selection) {
+            if (selection.anchorNode.nodeType === 3) {
+                return selection.anchorNode;
             }
 
-            var list = element.parentElement;
+            var node = selection.anchorNode.firstChild;
 
-            if (list.parentElement.nodeName.toLowerCase() === 'p') { // yes we need to clean up
-                Util.unwrap(list.parentElement, ownerDocument);
+            while (node) {
+                if (selection.containsNode(node, true)) {
+                    if (node.nodeType === 3) {
+                        return node;
+                    } else {
+                        node = node.firstChild;
+                    }
+                } else {
+                    node = node.nextSibling;
+                }
+            }
 
-                // move cursor at the end of the text inside the list
-                // for some unknown reason, the cursor is moved to end of the "visual" line
-                MediumEditor.selection.moveCursor(ownerDocument, element.firstChild, element.firstChild.textContent.length);
+            return null;
+        },
+
+        cleanListDOM: function (ownerDocument, element) {
+            if (element.nodeName.toLowerCase() !== 'li') {
+                if (this.isIE || this.isEdge) {
+                    return;
+                }
+
+                var selection = ownerDocument.getSelection(),
+                    newRange = ownerDocument.createRange(),
+                    oldRange = selection.getRangeAt(0),
+                    startContainer = oldRange.startContainer,
+                    startOffset = oldRange.startOffset,
+                    endContainer = oldRange.endContainer,
+                    endOffset = oldRange.endOffset,
+                    node, newNode, nextNode, moveEndOffset;
+
+                if (element.nodeName.toLowerCase() === 'span') {
+                    // Chrome & Safari unwraps removed li elements into a span
+                    node = element;
+                    moveEndOffset = false;
+                } else {
+                    // FF leaves them as text nodes
+                    node = this.findFirstTextNodeInSelection(selection);
+                    moveEndOffset = startContainer.nodeType !== 3;
+                }
+
+                while (node) {
+                    if (node.nodeName.toLowerCase() !== 'span' && node.nodeType !== 3) {
+                        break;
+                    }
+
+                    if (node.nextSibling && node.nextSibling.nodeName.toLowerCase() === 'br') {
+                        node.nextSibling.remove();
+
+                        if (moveEndOffset) {
+                            endOffset--;
+                        }
+                    }
+
+                    nextNode = node.nextSibling;
+
+                    newNode = ownerDocument.createElement('p');
+                    node.parentNode.replaceChild(newNode, node);
+                    newNode.appendChild(node);
+
+                    node = nextNode;
+                }
+
+                // Restore selection
+                newRange.setStart(startContainer, startOffset);
+                newRange.setEnd(endContainer, endOffset);
+                selection.removeAllRanges();
+                selection.addRange(newRange);
+            } else {
+                var list = element.parentElement;
+
+                if (list.parentElement.nodeName.toLowerCase() === 'p') { // yes we need to clean up
+                    Util.unwrap(list.parentElement, ownerDocument);
+
+                    // move cursor at the end of the text inside the list
+                    // for some unknown reason, the cursor is moved to end of the "visual" line
+                    MediumEditor.selection.moveCursor(ownerDocument, element.firstChild, element.firstChild.textContent.length);
+                }
             }
         },
 
@@ -3593,7 +3664,7 @@ MediumEditor.extensions = {};
             return false;
         },
 
-        /* hideForm: [function ()]
+        /* showForm: [function ()]
          *
          * This function should show the form element inside
          * the toolbar container
@@ -3788,8 +3859,8 @@ MediumEditor.extensions = {};
                 // and provide similar access to a `fa-` icon default.
                 template.push(
                     '<div class="medium-editor-toolbar-form-row">',
-                    '<input type="checkbox" class="medium-editor-toolbar-anchor-button">',
-                    '<label>',
+                    '<input type="checkbox" class="medium-editor-toolbar-anchor-button" id="medium-editor-toolbar-anchor-button-field-' + this.getEditorId() + '">',
+                    '<label for="medium-editor-toolbar-anchor-button-field-' + this.getEditorId() + '">',
                     this.customClassOptionText,
                     '</label>',
                     '</div>'
@@ -5155,7 +5226,7 @@ MediumEditor.extensions = {};
         };
 
     /*jslint regexp: true*/
-    /*
+    /**
         jslint does not allow character negation, because the negation
         will not match any unicode characters. In the regexes in this
         block, negation is used specifically to match the end of an html
@@ -6563,6 +6634,8 @@ MediumEditor.extensions = {};
 (function () {
     'use strict';
 
+    var initialContent = {};
+
     // Event handlers that shouldn't be exposed externally
 
     function handleDisableExtraSpaces(event) {
@@ -6742,6 +6815,12 @@ MediumEditor.extensions = {};
             this.options.ownerDocument.execCommand('formatBlock', false, 'p');
         }
 
+        // https://github.com/yabwe/medium-editor/issues/1455
+        // if somehow we have the BR as the selected element, typing does nothing, so move the cursor
+        if (node.nodeName === 'BR') {
+            MediumEditor.selection.moveCursor(this.options.ownerDocument, node.parentElement);
+        }
+
         // https://github.com/yabwe/medium-editor/issues/834
         // https://github.com/yabwe/medium-editor/pull/382
         // Don't call format block if this is a block element (ie h1, figCaption, etc.)
@@ -6755,6 +6834,14 @@ MediumEditor.extensions = {};
                 this.options.ownerDocument.execCommand('unlink', false, null);
             } else if (!event.shiftKey && !event.ctrlKey) {
                 this.options.ownerDocument.execCommand('formatBlock', false, 'p');
+                // https://github.com/yabwe/medium-editor/issues/1455
+                // firefox puts the focus on the br - so we need to move the cursor to the newly created p
+                if (MediumEditor.util.isFF) {
+                    var newParagraph = node.querySelector('p');
+                    if (newParagraph) {
+                        MediumEditor.selection.moveCursor(this.options.ownerDocument, newParagraph);
+                    }
+                }
             }
         }
     }
@@ -7232,8 +7319,6 @@ MediumEditor.extensions = {};
         }
     }
 
-    var initialContent = {};
-
     MediumEditor.prototype = {
         // NOT DOCUMENTED - exposed for backwards compatability
         init: function (elements, options) {
@@ -7502,6 +7587,12 @@ MediumEditor.extensions = {};
             // do some DOM clean-up for known browser issues after the action
             if (action === 'insertunorderedlist' || action === 'insertorderedlist') {
                 MediumEditor.util.cleanListDOM(this.options.ownerDocument, this.getSelectedParentElement());
+            }
+
+            // https://github.com/yabwe/medium-editor/issues/1496
+            // ensure the focus remains in the editor for Firefox
+            if (MediumEditor.util.isFF) {
+                MediumEditor.util.getContainerEditorElement(this.getSelectedParentElement()).focus();
             }
 
             this.checkSelection();
