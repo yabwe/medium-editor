@@ -3,6 +3,7 @@
 .DS_Store
 *.swo
 node_modules/
+.env
 .sass-cache/
 npm-debug.log
 .grunt/
