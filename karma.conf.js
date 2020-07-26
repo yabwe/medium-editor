@@ -138,8 +138,8 @@ module.exports = function (config) {
 
         autoWatch: false,
 
-        // browsers: ['WIN81Chrome', 'WIN81Edge', 'WIN81Firefox', 'WIN10Chrome', 'WIN10Edge', 'WIN10Firefox', 'OSXYosemiteSafari', 'OSXElCapitanChrome', 'OSXElCapitanFirefox', 'OSXElCapitanSafari'],
-        browsers: ['WIN10Chrome', 'WIN81Chrome', 'OSXElCapitanChrome'],
+        // TODO: 'OSXYosemiteSafari', 'OSXElCapitanSafari'
+        browsers: ['WIN10Edge', 'WIN10Chrome', 'WIN10Firefox', 'WIN81Edge', 'WIN81Chrome', 'WIN81Firefox', 'OSXElCapitanChrome', 'OSXElCapitanFirefox'],
 
         client: {
             clearContext: false
