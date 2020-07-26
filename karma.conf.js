@@ -4,7 +4,8 @@ module.exports = function (config) {
     config.set({
 
         browserStack: {
-            apiClientEndpoint: 'https://api.browserstack.com'
+            apiClientEndpoint: 'https://api.browserstack.com',
+            timeout: 600
         },
 
         customLaunchers: {
