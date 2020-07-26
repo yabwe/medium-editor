@@ -120,7 +120,12 @@ module.exports = function (config) {
             'karma-chrome-launcher'
         ],
 
-        reporters: ['progress', 'BrowserStack', 'dots', 'spec', 'kjhtml'],
+        reporters: ['coverage', 'coveralls', 'progress', 'BrowserStack', 'dots', 'spec', 'kjhtml'],
+
+        coverageReporter: {
+            type: 'lcov',
+            dir: 'coverage/'
+        },
 
         port: 9876,
 

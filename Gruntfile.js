@@ -318,11 +318,11 @@ module.exports = function (grunt) {
     //     }
     // };
 
-    gruntConfig.coveralls = {
-        dist: {
-            src: 'reports/jasmine/lcov/lcov.info'
-        }
-    };
+    // gruntConfig.coveralls = {
+    //     dist: {
+    //         src: 'reports/jasmine/lcov/lcov.info'
+    //     }
+    // };
 
     gruntConfig.bump = {
         options: {
@@ -345,10 +345,10 @@ module.exports = function (grunt) {
     });
 
     if (parseInt(process.env.TRAVIS_PULL_REQUEST, 10) > 0) {
-        grunt.registerTask('travis', ['jshint', 'jscs', 'karma:dev', 'csslint', 'coveralls']);
+        grunt.registerTask('travis', ['jshint', 'jscs', 'karma:dev', 'csslint']);
     } else {
         // grunt.registerTask('travis', ['connect', 'jshint', 'jscs', 'jasmine:suite', 'csslint', 'saucelabs-jasmine', 'coveralls']);
-        grunt.registerTask('travis', ['connect', 'jshint', 'jscs', 'csslint', 'karma:unit', 'coveralls']);
+        grunt.registerTask('travis', ['connect', 'jshint', 'jscs', 'csslint', 'karma:unit']);
     }
 
     grunt.registerTask('test', ['jshint', 'jscs', 'concat', 'csslint', 'karma:dev']);
