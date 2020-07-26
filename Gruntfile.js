@@ -345,10 +345,10 @@ module.exports = function (grunt) {
     });
 
     if (parseInt(process.env.TRAVIS_PULL_REQUEST, 10) > 0) {
-        grunt.registerTask('travis', ['jshint', 'jscs', 'karma:dev', 'csslint']);
+        grunt.registerTask('travis', ['jshint', 'jscs', 'karma:unit', 'csslint']);
     } else {
         // grunt.registerTask('travis', ['connect', 'jshint', 'jscs', 'jasmine:suite', 'csslint', 'saucelabs-jasmine', 'coveralls']);
-        grunt.registerTask('travis', ['connect', 'jshint', 'jscs', 'csslint', 'karma:unit']);
+        grunt.registerTask('travis', ['jshint', 'jscs', 'csslint', 'karma:unit']);
     }
 
     grunt.registerTask('test', ['jshint', 'jscs', 'concat', 'csslint', 'karma:dev']);
