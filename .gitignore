@@ -11,7 +11,11 @@ _SpecRunner.html
 reports/
 coverage/
 ._*
+local.log
+browserstack.err
 
 # IDE
 .idea/
 package-lock.json
+
+

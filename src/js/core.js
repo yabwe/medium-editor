@@ -957,8 +957,8 @@
             }
 
             // https://github.com/yabwe/medium-editor/issues/1496
-            // ensure the focus remains in the editor for Firefox
-            if (MediumEditor.util.isFF) {
+            // But only if something is selected i.e, getSelectedParentElement !== {}
+            if (this.getSelectedParentElement().length > 0 && MediumEditor.util.isFF) {
                 MediumEditor.util.getContainerEditorElement(this.getSelectedParentElement()).focus();
             }
 
