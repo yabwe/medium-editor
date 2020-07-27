@@ -123,7 +123,7 @@ module.exports = function (config) {
             'karma-coveralls'
         ],
 
-        reporters: ['coverage', 'coveralls', 'progress', 'BrowserStack', 'dots', 'spec', 'kjhtml'],
+        reporters: ['coverage', 'coveralls', 'BrowserStack', 'dots', 'spec', 'kjhtml'],
 
         coverageReporter: {
             type: 'lcov',
@@ -137,7 +137,7 @@ module.exports = function (config) {
 
         autoWatch: false,
 
-        browsers: ['WIN10Edge', 'WIN10Chrome', 'WIN10Firefox', 'WIN81Edge', 'WIN81Chrome', 'WIN81Firefox', 'OSXElCapitanChrome', 'OSXElCapitanFirefox', 'OSXElCapitanSafari', 'OSXYosemiteSafari'],
+        browsers: ['WIN10Edge', 'WIN10Chrome', 'WIN10Firefox', 'OSXElCapitanChrome', 'OSXElCapitanFirefox', 'OSXYosemiteSafari'],
 
         client: {
             clearContext: false
