@@ -132,7 +132,7 @@ module.exports = function (config) {
 
         port: 9876,
 
-        logLevel: config.LOG_INFO,
+        logLevel: config.LOG_ERROR,
         colors: true,
 
         autoWatch: false,

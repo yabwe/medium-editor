@@ -79,19 +79,7 @@ module.exports = function (grunt) {
             configFile: 'karma.conf.js'
         },
         dev: {
-            configFile: 'karma.conf.js',
-            browsers: [
-                'Chrome'
-            ],
-            plugins: [
-                'karma-jasmine',
-                'karma-spec-reporter',
-                'karma-jasmine-html-reporter',
-                'karma-browserstack-launcher',
-                'karma-phantomjs-launcher',
-                'karma-chrome-launcher'
-            ],
-            reporters: ['progress', 'BrowserStack', 'dots', 'spec', 'kjhtml']
+            configFile: 'karma.dev.conf.js'
         }
     };
 
