@@ -1,4 +1,4 @@
-/* global module, process */
+/* global module */
 
 module.exports = function (config) {
     config.set({
@@ -75,9 +75,8 @@ module.exports = function (config) {
         frameworks: ['jasmine'],
 
         files: [
+            'dist/css/*.css',
             'node_modules/lodash/index.js',
-            'spec/vendor/jasmine-jsreporter.js',
-            'spec/vendor/jasmine-jsreporter-script.js',
             'src/js/polyfills.js',
             'src/js/globals.js',
             'src/js/util.js',
@@ -133,13 +132,12 @@ module.exports = function (config) {
 
         port: 9876,
 
-        logLevel: config.LOG_DEBUG,
+        logLevel: config.LOG_INFO,
         colors: true,
 
         autoWatch: false,
 
-        // TODO: 'OSXYosemiteSafari', 'OSXElCapitanSafari'
-        browsers: ['WIN10Edge', 'WIN10Chrome', 'WIN10Firefox', 'WIN81Edge', 'WIN81Chrome', 'WIN81Firefox', 'OSXElCapitanChrome', 'OSXElCapitanFirefox'],
+        browsers: ['WIN10Edge', 'WIN10Chrome', 'WIN10Firefox', 'WIN81Edge', 'WIN81Chrome', 'WIN81Firefox', 'OSXElCapitanChrome', 'OSXElCapitanFirefox', 'OSXElCapitanSafari', 'OSXYosemiteSafari'],
 
         client: {
             clearContext: false

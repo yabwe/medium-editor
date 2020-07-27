@@ -36,51 +36,6 @@ module.exports = function (grunt) {
             'src/js/defaults/options.js',
             'src/js/version.js'
         ];
-    // browsers = [{
-    //     browserName: 'internet explorer',
-    //     version: '9',
-    //     platform: 'WIN7'
-    // }, {
-    //     browserName: 'internet explorer',
-    //     version: '10',
-    //     platform: 'WIN8'
-    // }, {
-    //     browserName: 'internet explorer',
-    //     version: '11',
-    //     platform: 'WIN8.1'
-    // }, {
-    //     browserName: 'internet explorer',
-    //     version: '11',
-    //     platform: 'Windows 10'
-    // }, {
-    //     browserName: 'MicrosoftEdge',
-    //     platform: 'Windows 10'
-    // }, {
-    //     browserName: 'chrome',
-    //     platform: 'WIN8.1'
-    // }, {
-    //     browserName: 'chrome',
-    //     platform: 'Windows 10'
-    // }, {
-    //     browserName: 'googlechrome',
-    //     platform: 'OS X 10.11'
-    // }, {
-    //     browserName: 'firefox',
-    //     platform: 'WIN8.1'
-    // }, {
-    //     browserName: 'firefox',
-    //     platform: 'Windows 10'
-    // }, {
-    //     browserName: 'firefox',
-    //     platform: 'OS X 10.11'
-    // }, {
-    //     browserName: 'safari',
-    //     platform: 'OS X 10.10'
-    // }, {
-    //     browserName: 'safari',
-    //     platform: 'OS X 10.11'
-    // }];
-
     gruntConfig.connect = {
         server: {
             options: {
@@ -118,49 +73,6 @@ module.exports = function (grunt) {
             config: '.jscsrc'
         }
     };
-
-    // gruntConfig.jasmine = {
-    //     suite: {
-    //         src: [srcFiles],
-    //         options: {
-    //             specs: ['spec/*.spec.js'],
-    //             helpers: 'spec/helpers/*.js',
-    //             vendor: [
-    //                 'node_modules/lodash/index.js',
-    //                 'spec/vendor/jasmine-jsreporter.js',
-    //                 'spec/vendor/jasmine-jsreporter-script.js'
-    //             ],
-    //             polyfills: [
-    //                 'src/js/polyfills.js'
-    //             ],
-    //             styles: 'dist/css/*.css',
-    //             junit: {
-    //                 path: 'reports/jasmine/',
-    //                 consolidate: true
-    //             },
-    //             keepRunner: true,
-    //             template: require('grunt-template-jasmine-istanbul'),
-    //             templateOptions: {
-    //                 coverage: 'reports/jasmine/coverage.json',
-    //                 report: [{
-    //                     type: 'lcov',
-    //                     options: {
-    //                         dir: 'reports/jasmine/lcov'
-    //                     }
-    //                 }],
-    //                 files: srcFiles.concat('!src/js/extensions/deprecated/*')
-    //             },
-    //             summary: true
-    //         }
-    //     },
-    //     spec: {
-    //         src: 'src/js/**/*.js',
-    //         options: {
-    //             specs: ['spec/<%= globalConfig.file %>.spec.js'],
-    //             helpers: 'spec/helpers/*.js'
-    //         }
-    //     }
-    // };
 
     gruntConfig.karma = {
         unit: {
@@ -308,31 +220,6 @@ module.exports = function (grunt) {
         }
     };
 
-    // gruntConfig['saucelabs-jasmine'] = {
-    //     all: {
-    //         options: {
-    //             urls: ['http://localhost:9999/_SpecRunner.html'],
-    //             tunnelTimeout: 5,
-    //             build: process.env.TRAVIS_JOB_ID,
-    //             concurrency: 3,
-    //             browsers: browsers,
-    //             sauceConfig: {
-    //                 public: 'public',
-    //                 build: process.env.TRAVIS_JOB_ID,
-    //                 name: 'medium-editor-tests',
-    //                 maxDuration: 900,
-    //                 idleTimeout: 600
-    //             }
-    //         }
-    //     }
-    // };
-
-    // gruntConfig.coveralls = {
-    //     dist: {
-    //         src: 'reports/jasmine/lcov/lcov.info'
-    //     }
-    // };
-
     gruntConfig.bump = {
         options: {
             files: ['package.json', 'src/js/version.js'],
@@ -356,12 +243,10 @@ module.exports = function (grunt) {
     if (parseInt(process.env.TRAVIS_PULL_REQUEST, 10) > 0) {
         grunt.registerTask('travis', ['jshint', 'jscs', 'karma:unit', 'csslint']);
     } else {
-        // grunt.registerTask('travis', ['connect', 'jshint', 'jscs', 'jasmine:suite', 'csslint', 'saucelabs-jasmine', 'coveralls']);
         grunt.registerTask('travis', ['jshint', 'jscs', 'csslint', 'karma:unit']);
     }
 
     grunt.registerTask('test', ['jshint', 'jscs', 'concat', 'csslint', 'karma:dev']);
-    // grunt.registerTask('sauce', ['connect', 'saucelabs-jasmine']);
     grunt.registerTask('js', ['jshint', 'jscs', 'concat', 'karma:dev', 'uglify']);
     grunt.registerTask('css', ['sass', 'autoprefixer', 'cssmin', 'csslint']);
     grunt.registerTask('default', ['js', 'css']);
@@ -371,7 +256,6 @@ module.exports = function (grunt) {
         grunt.task.run(taskName + ':spec');
     });
 
-    // release tasks
     grunt.registerTask('patch', ['bump', 'css', 'js']);
     grunt.registerTask('minor', ['bump:minor', 'css', 'js']);
     grunt.registerTask('major', ['bump:major', 'css', 'js']);
