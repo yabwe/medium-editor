@@ -76,7 +76,7 @@ module.exports = function (config) {
 
         files: [
             'dist/css/*.css',
-            'node_modules/lodash/index.js',
+            'node_modules/lodash/lodash.js',
             'src/js/polyfills.js',
             'src/js/globals.js',
             'src/js/util.js',
