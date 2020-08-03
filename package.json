@@ -18,6 +18,7 @@
   ],
   "description": "Medium.com WYSIWYG editor clone.",
   "main": "dist/js/medium-editor.js",
+  "types": "./index.d.ts",
   "repository": {
     "type": "git",
     "url": "https://github.com/yabwe/medium-editor"
