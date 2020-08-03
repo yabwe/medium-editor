@@ -232,6 +232,13 @@ enables/disables whether the toolbar should be displayed when selecting multiple
 
 The set of buttons to display on the toolbar.
 
+Can also be nested for multiline toolbar:
+`[['bold', 'italic', 'underline', 'pre'], ['anchor', 'h2', 'h3', 'quote']]`
+
+**NOTE:**
+Depending on the theme you are using, you may need to make some visual adjustments for proper rendering
+(ie. when buttons don't have fixed width).
+
 ***
 #### `diffLeft`
 **Default:** `0`

@@ -117,7 +117,9 @@
                 toolbar.className += ' medium-editor-stalker-toolbar';
             }
 
-            toolbar.appendChild(this.createToolbarButtons());
+            this.createToolbarButtons().forEach(function (row) {
+                toolbar.appendChild(row);
+            });
 
             // Add any forms that extensions may have
             this.forEachExtension(function (extension) {
@@ -132,19 +134,37 @@
         },
 
         createToolbarButtons: function () {
+            var rows = [];
+
+            if (Array.isArray(this.buttons[0])) {
+                this.buttons.forEach(function (row, index) {
+                    rows.push(this.createToolbarButtonsRow(row, index));
+                }, this);
+            } else {
+                rows.push(this.createToolbarButtonsRow(this.buttons, 0));
+            }
+
+            return rows;
+        },
+
+        createToolbarButtonsRow: function (buttons, index) {
             var ul = this.document.createElement('ul'),
                 li,
                 btn,
-                buttons,
+                buttonEls,
                 extension,
                 buttonName,
                 buttonOpts;
 
             ul.id = 'medium-editor-toolbar-actions' + this.getEditorId();
+            if (index > 0) {
+                // Preserve backward compatibility and add index only for extra rows
+                ul.id += '-' + index;
+            }
             ul.className = 'medium-editor-toolbar-actions';
             ul.style.display = 'block';
 
-            this.buttons.forEach(function (button) {
+            buttons.forEach(function (button) {
                 if (typeof button === 'string') {
                     buttonName = button;
                     buttonOpts = null;
@@ -169,10 +189,10 @@
                 }
             }, this);
 
-            buttons = ul.querySelectorAll('button');
+            buttonEls = ul.querySelectorAll('button');
             if (buttons.length > 0) {
-                buttons[0].classList.add(this.firstButtonClass);
-                buttons[buttons.length - 1].classList.add(this.lastButtonClass);
+                buttonEls[0].classList.add(this.firstButtonClass);
+                buttonEls[buttonEls.length - 1].classList.add(this.lastButtonClass);
             }
 
             return ul;
@@ -202,7 +222,13 @@
         },
 
         getToolbarActionsElement: function () {
-            return this.getToolbarElement().querySelector('.medium-editor-toolbar-actions');
+            // For backward compatibility
+            return this.getToolbarActionsElements()[0];
+        },
+
+        getToolbarActionsElements: function () {
+            var els = this.getToolbarElement().querySelectorAll('.medium-editor-toolbar-actions');
+            return Array.prototype.slice.call(els);
         },
 
         // Toolbar event handlers
@@ -315,7 +341,9 @@
 
         hideToolbarDefaultActions: function () {
             if (this.isToolbarDefaultActionsDisplayed()) {
-                this.getToolbarActionsElement().style.display = 'none';
+                this.getToolbarActionsElements().forEach(function (el) {
+                    el.style.display = 'none';
+                });
             }
         },
 
@@ -323,7 +351,9 @@
             this.hideExtensionForms();
 
             if (!this.isToolbarDefaultActionsDisplayed()) {
-                this.getToolbarActionsElement().style.display = 'block';
+                this.getToolbarActionsElements().forEach(function (el) {
+                    el.style.display = 'block';
+                });
             }
 
             // Using setTimeout + options.delay because:

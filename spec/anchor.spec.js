@@ -970,7 +970,9 @@ describe('Anchor Button TestCase', function () {
             selectElementContentsAndFire(editor.elements[0]);
             button = toolbar.getToolbarElement().querySelector('[data-action="createLink"]');
             fireEvent(button, 'click');
-            expect(toolbar.getToolbarActionsElement().style.display).toBe('none');
+            toolbar.getToolbarActionsElements().forEach(function (el) {
+                expect(el.style.display).toBe('none');
+            });
             expect(anchorExtension.isDisplayed()).toBe(true);
             expect(anchorExtension.showForm).toHaveBeenCalled();
         });
@@ -1006,7 +1008,9 @@ describe('Anchor Button TestCase', function () {
             // Click the 'anchor' button in the toolbar
             fireEvent(toolbar.getToolbarElement().querySelector('[data-action="createLink"]'), 'click');
 
-            expect(toolbar.getToolbarActionsElement().style.display).toBe('none');
+            toolbar.getToolbarActionsElements().forEach(function (el) {
+                expect(el.style.display).toBe('none');
+            });
             expect(anchorExtension.isDisplayed()).toBe(true);
             expect(anchorExtension.showForm).toHaveBeenCalled();
             expect(anchorExtension.getInput().value).toBe('');
