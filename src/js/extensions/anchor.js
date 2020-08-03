@@ -261,6 +261,9 @@
                 scheme = '',
                 // telRegex is a regex for checking if the string is a telephone number
                 telRegex = /^\+?\s?\(?(?:\d\s?\-?\)?){3,20}$/,
+                // emailRegex for checking if the string is an email address
+                // https://stackoverflow.com/questions/46155/how-to-validate-email-address-in-javascript
+                emailRegex = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
                 urlParts = value.match(/^(.*?)(?:\?(.*?))?(?:#(.*))?$/),
                 path = urlParts[1],
                 query = urlParts[2],
@@ -268,6 +271,8 @@
 
             if (telRegex.test(value)) {
                 return 'tel:' + value;
+            } else if (emailRegex.test(value)) {
+                return 'mailto:' + value;
             }
 
             if (!hasScheme) {
