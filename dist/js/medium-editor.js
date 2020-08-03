@@ -3788,8 +3788,8 @@ MediumEditor.extensions = {};
                 // and provide similar access to a `fa-` icon default.
                 template.push(
                     '<div class="medium-editor-toolbar-form-row">',
-                    '<input type="checkbox" class="medium-editor-toolbar-anchor-button">',
-                    '<label>',
+                    '<input type="checkbox" class="medium-editor-toolbar-anchor-button" id="medium-editor-toolbar-anchor-button-field-' + this.getEditorId() + '">',
+                    '<label for="medium-editor-toolbar-anchor-button-field-' + this.getEditorId() + '">',
                     this.customClassOptionText,
                     '</label>',
                     '</div>'
@@ -7162,7 +7162,7 @@ MediumEditor.extensions = {};
         }
 
         if (action === 'image') {
-            var src = this.options.contentWindow.getSelection().toString().trim();
+            var src = this.options.contentWindow.getSelection().toString().trim() || opts.url;
             return this.options.ownerDocument.execCommand('insertImage', false, src);
         }
 

@@ -616,7 +616,7 @@
         }
 
         if (action === 'image') {
-            var src = this.options.contentWindow.getSelection().toString().trim();
+            var src = this.options.contentWindow.getSelection().toString().trim() || opts.url;
             return this.options.ownerDocument.execCommand('insertImage', false, src);
         }
 
