@@ -464,6 +464,10 @@
             MediumEditor.util.insertHTMLCommand(this.document, fragmentBody.innerHTML.replace(/&nbsp;/g, ' '));
         },
 
+        getInteractionElements: function () {
+            return this.getPasteBin();
+        },
+
         // TODO (6.0): Make this an internal helper instead of member of paste handler
         isCommonBlock: function (el) {
             return (el && (el.nodeName.toLowerCase() === 'p' || el.nodeName.toLowerCase() === 'div'));
