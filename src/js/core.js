@@ -170,7 +170,9 @@
 
     function handleKeyup(event) {
         var node = MediumEditor.selection.getSelectionStart(this.options.ownerDocument),
-            tagName;
+            closestBlockTag,
+            tagName,
+            isHeader;
 
         if (!node) {
             return;
@@ -191,9 +193,12 @@
         // https://github.com/yabwe/medium-editor/issues/834
         // https://github.com/yabwe/medium-editor/pull/382
         // Don't call format block if this is a block element (ie h1, figCaption, etc.)
+        closestBlockTag = MediumEditor.util.getClosestBlockContainer(node).nodeName.toLowerCase();
+        isHeader = /h\d/i;
         if (MediumEditor.util.isKey(event, MediumEditor.util.keyCode.ENTER) &&
             !MediumEditor.util.isListItem(node) &&
-            !MediumEditor.util.isBlockContainer(node)) {
+            !MediumEditor.util.isBlockContainer(node) &&
+            !isHeader.test(closestBlockTag)) {
 
             tagName = node.nodeName.toLowerCase();
             // For anchor tags, unlink
