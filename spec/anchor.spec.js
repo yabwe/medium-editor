@@ -88,6 +88,26 @@ describe('Anchor Button TestCase', function () {
             expect(this.el.innerHTML.indexOf('<a href="http://test.com">lorem ipsum</a>')).toBe(0);
         });
 
+        // https://github.com/yabwe/medium-editor/pull/1364
+        it('should create a link containing utf-8 characters correctly when user presses enter', function () {
+            spyOn(MediumEditor.prototype, 'createLink').and.callThrough();
+            var editor = this.newMediumEditor('.editor'),
+                toolbar = editor.getExtensionByName('toolbar'),
+                button, input;
+
+            selectElementContents(editor.elements[0]);
+            button = toolbar.getToolbarElement().querySelector('[data-action="createLink"]');
+            fireEvent(button, 'click');
+            input = editor.getExtensionByName('anchor').getInput();
+            input.value = 'http://www.st\u00E4dtlifest.ch/';
+            fireEvent(input, 'keyup', {
+                keyCode: MediumEditor.util.keyCode.ENTER
+            });
+            expect(editor.createLink).toHaveBeenCalled();
+            // A trailing <br> may be added when insertHTML is used to add the link internally.
+            expect(this.el.innerHTML.indexOf('<a href="http://www.st\u00E4dtlifest.ch/">lorem ipsum</a>')).toBe(0);
+        });
+
         it('should remove the extra white spaces in the link when user presses enter', function () {
             spyOn(MediumEditor.prototype, 'createLink').and.callThrough();
             var editor = this.newMediumEditor('.editor'),

@@ -1173,6 +1173,7 @@
                             this.importSelection(exportedSelection);
                         } else {
                             this.options.ownerDocument.execCommand('createLink', false, targetUrl);
+                            MediumEditor.util.ensureHref(MediumEditor.selection.getSelectionStart(this.options.ownerDocument), targetUrl);
                         }
 
                         if (this.options.targetBlank || opts.target === '_blank') {
