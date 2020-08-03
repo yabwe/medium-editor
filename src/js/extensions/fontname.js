@@ -6,7 +6,7 @@
         name: 'fontname',
         action: 'fontName',
         aria: 'change font name',
-        contentDefault: '&#xB1;', // ±
+        contentDefault: '<b>A</b>', // ±
         contentFA: '<i class="fa fa-font"></i>',
 
         fonts: ['', 'Arial', 'Verdana', 'Times New Roman'],
@@ -82,7 +82,6 @@
 
         doFormCancel: function () {
             this.base.restoreSelection();
-            this.clearFontName();
             this.base.checkSelection();
         },
 
@@ -145,21 +144,10 @@
             return this.getForm().querySelector('select.medium-editor-toolbar-select');
         },
 
-        clearFontName: function () {
-            MediumEditor.selection.getSelectedElements(this.document).forEach(function (el) {
-                if (el.nodeName.toLowerCase() === 'font' && el.hasAttribute('face')) {
-                    el.removeAttribute('face');
-                }
-            });
-        },
-
         handleFontChange: function () {
             var font = this.getSelect().value;
-            if (font === '') {
-                this.clearFontName();
-            } else {
-                this.execAction('fontName', { value: font });
-            }
+            this.base.options.ownerDocument.execCommand('styleWithCSS', false, true);
+            this.execAction('fontName', { value: font });
         },
 
         handleFormClick: function (event) {
