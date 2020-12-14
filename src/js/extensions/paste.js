@@ -4,7 +4,7 @@
     /* Helpers and internal variables that don't need to be members of actual paste handler */
 
     var pasteBinDefaultContent = '%ME_PASTEBIN%',
-        lastRange = null,
+        lastSelection = null,
         keyboardPasteEditable = null,
         stopProp = function (event) {
             event.stopPropagation();
@@ -308,7 +308,10 @@
                 }
             }
 
-            lastRange = range;
+            lastSelection = {
+                exported: this.base.exportSelection(),
+                range: range
+            };
 
             var pasteBinElm = this.document.createElement('div');
             pasteBinElm.id = this.pasteBinId = 'medium-editor-pastebin-' + (+Date.now());
@@ -335,9 +338,10 @@
         },
 
         removePasteBin: function () {
-            if (null !== lastRange) {
-                MediumEditor.selection.selectRange(this.document, lastRange);
-                lastRange = null;
+            if (null !== lastSelection) {
+                MediumEditor.selection.selectRange(this.document, lastSelection.range);
+                this.base.importSelection(lastSelection.exported);
+                lastSelection = null;
             }
 
             if (null !== keyboardPasteEditable) {
